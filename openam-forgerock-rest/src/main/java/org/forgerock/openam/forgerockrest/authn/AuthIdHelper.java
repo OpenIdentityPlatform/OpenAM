@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
-import com.google.inject.Singleton;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
@@ -35,7 +34,7 @@ import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
+import javax.inject.Singleton;
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.SecureRandom;

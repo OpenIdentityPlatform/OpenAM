@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
@@ -21,8 +21,7 @@ import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.authz.AuthZFilter;
 import org.forgerock.authz.AuthorizationConfigurator;
 import org.forgerock.authz.AuthorizationFilter;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
+import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
@@ -35,23 +34,19 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 public class RestAuthorizationDispatcherFilterTest {
 
     private RestAuthorizationDispatcherFilter restAuthorizationDispatcherFilter;
-    private RestDispatcher restDispatcher;
+    private RestEndpointManager endpointManager;
 
     private AuthZFilter authZFilter;
 
@@ -59,9 +54,9 @@ public class RestAuthorizationDispatcherFilterTest {
     public void setUp() {
 
         authZFilter = mock(AuthZFilter.class);
-        restDispatcher = mock(RestDispatcher.class);
+        endpointManager = mock(RestEndpointManager.class);
 
-        restAuthorizationDispatcherFilter = new RestAuthorizationDispatcherFilter(restDispatcher, authZFilter);
+        restAuthorizationDispatcherFilter = new RestAuthorizationDispatcherFilter(endpointManager, authZFilter);
     }
 
     @Test (expectedExceptions = ServletException.class)
@@ -165,7 +160,7 @@ public class RestAuthorizationDispatcherFilterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldSkipAuthorizationIfEndpointNotFound() throws ServletException, IOException, NotFoundException {
+    public void shouldSkipAuthorizationIfEndpointNotFound() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -183,9 +178,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/realms");
-        given(restDispatcher.getRequestDetails(anyString())).willThrow(NotFoundException.class);
+        given(endpointManager.findEndpoint(anyString())).willReturn(null);
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
@@ -197,7 +190,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForRealms() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForRealms() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -215,9 +208,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/realms");
-        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+        given(endpointManager.findEndpoint(anyString())).willReturn("/realms");
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
@@ -230,7 +221,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForUsers() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForUsers() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -248,9 +239,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/users");
-        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+        given(endpointManager.findEndpoint(anyString())).willReturn("/users");
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
@@ -264,7 +253,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForGroups() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForGroups() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -282,9 +271,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/groups");
-        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+        given(endpointManager.findEndpoint(anyString())).willReturn("/groups");
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
@@ -298,7 +285,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForAgents() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForAgents() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -316,9 +303,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/agents");
-        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+        given(endpointManager.findEndpoint(anyString())).willReturn("/agents");
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
@@ -332,7 +317,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForOtherEndpoints() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForOtherEndpoints() throws ServletException, IOException {
 
         //Given
         FilterConfig filterConfig = mock(FilterConfig.class);
@@ -350,9 +335,7 @@ public class RestAuthorizationDispatcherFilterTest {
         ServletResponse response = mock(ServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        Map<String, String> details = new HashMap<String, String>();
-        details.put("resourceName", "/other");
-        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+        given(endpointManager.findEndpoint(anyString())).willReturn("/other");
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);

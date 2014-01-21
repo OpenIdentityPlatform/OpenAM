@@ -11,40 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2013 ForgeRock AS
+ * Copyright 2012-2014 ForgeRock AS
  */
-package org.forgerock.openam.forgerockrest;
 
-import java.lang.Exception;
-import java.lang.String;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.logging.Level;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.realm.RealmUtils;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
@@ -58,35 +46,32 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import com.sun.identity.idsvcs.*;
+import org.forgerock.openam.rest.resource.RealmContext;
+
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 
 /**
  * A simple {@code Map} based collection resource provider.
  */
 public final class RealmResource implements CollectionResourceProvider {
+
+    private static final Debug debug = Debug.getInstance("frRest");
+
     // TODO: filters, sorting, paged results.
 
     private Set subRealms = null;
-    private String realmPath = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
     final private static String TOP_LEVEL_REALM = "topLevelRealm";
     final private static String FORWARD_SLASH = "/";
-    /**
-     * Creates a new empty backend.
-     */
-    public RealmResource() {
-        // No implementation required.
-        this.realmPath = null;
-    }
-
-    public RealmResource(String realmPath) {
-        this.subRealms = subRealms;
-        this.realmPath = realmPath;
-    }
 
     /**
      * {@inheritDoc}
@@ -115,7 +100,10 @@ public final class RealmResource implements CollectionResourceProvider {
      */
     @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
-                               final ResultHandler<Resource> handler) {
+            final ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realmPath = realmContext.getRealm();
 
         Resource resource = null;
         String parentRealm = null;
@@ -157,49 +145,49 @@ public final class RealmResource implements CollectionResourceProvider {
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot find "
+                debug.error("RealmResource.createInstance()" + "Cannot find "
                         + realm + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
                 // User does not have authorization
-                RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(fe);
             } catch (PermanentException pe) {
-                RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 // Cannot recover from this exception
                 handler.handleError(pe);
             } catch (ConflictException ce) {
-                RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(ce);
             } catch (BadRequestException be) {
-                RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                         + realm + ":" + smse);
                 handler.handleError(be);
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         } catch (SSOException sso){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
                     + realm + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
                     + realm + ":" + fe);
             handler.handleError(fe);
         } catch (BadRequestException be){
-            RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + be);
             handler.handleError(be);
         } catch (PermanentException pe) {
-            RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + pe);
             // Cannot recover from this exception
             handler.handleError(pe);
         } catch (Exception e) {
-            RestDispatcher.debug.error("RealmResource.createInstance()" + realm + ":" + e);
+            debug.error("RealmResource.createInstance()" + realm + ":" + e);
             handler.handleError(new BadRequestException(e.getMessage(), e));
         }
 
@@ -238,7 +226,7 @@ public final class RealmResource implements CollectionResourceProvider {
                 realmServices.add(tmp, holdAttrForService);
             }
         } catch (SMSException e) {
-            RestDispatcher.debug.error("RealmResource.serviceNamesToJSON :: " + e);
+            debug.error("RealmResource.serviceNamesToJSON :: " + e);
             throw e;
         }
         return realmServices;
@@ -248,8 +236,11 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final ServerContext context, final String resourceId,
-                               final DeleteRequest request, final ResultHandler<Resource> handler) {
+    public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
+            final ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realmPath = realmContext.getRealm();
 
         boolean recursive = false;
         Resource resource = null;
@@ -273,36 +264,36 @@ public final class RealmResource implements CollectionResourceProvider {
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot find "
+                debug.error("RealmResource.deleteInstance()" + "Cannot find "
                         + resourceId + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
                 // User does not have authorization
-                RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
+                debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
                         + resourceId + ":" + smse);
                 handler.handleError(fe);
             } catch (PermanentException pe) {
-                RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
+                debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
                         + resourceId + ":" + smse);
                 // Cannot recover from this exception
                 handler.handleError(pe);
             } catch (ConflictException ce) {
-                RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
+                debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
                         + resourceId + ":" + smse);
                 handler.handleError(ce);
             } catch (BadRequestException be) {
-                RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
+                debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
                         + resourceId + ":" + smse);
                 handler.handleError(be);
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         } catch (SSOException sso){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
+            debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
                     + resourceId + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
+            debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
                     + resourceId + ":" + fe);
             handler.handleError(fe);
         } catch (Exception e) {
@@ -337,11 +328,11 @@ public final class RealmResource implements CollectionResourceProvider {
             }
             handler.handleResult(new QueryResult());
         } catch (SSOException sso){
-            RestDispatcher.debug.error("RealmResource.queryCollection()" + "Cannot QUERY "
+            debug.error("RealmResource.queryCollection()" + "Cannot QUERY "
                     + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot QUERY "
+            debug.error("RealmResource.updateInstance()" + "Cannot QUERY "
                     + ":" + fe);
             handler.handleError(fe);
         } catch (Exception e) {
@@ -353,8 +344,11 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final ServerContext context, final String resourceId,
-                             final ReadRequest request, final ResultHandler<Resource> handler) {
+    public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
+            final ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realmPath = realmContext.getRealm();
 
         Resource resource = null;
         JsonValue jval = null;
@@ -376,36 +370,36 @@ public final class RealmResource implements CollectionResourceProvider {
             handler.handleResult(resource);
 
         } catch (SSOException sso){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot READ "
+            debug.error("RealmResource.updateInstance()" + "Cannot READ "
                     + resourceId + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+            debug.error("RealmResource.readInstance()" + "Cannot READ "
                     + resourceId + ":" + fe);
             handler.handleError(fe);
         }  catch (SMSException smse) {
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
                 // User does not have authorization
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(fe);
             } catch (PermanentException pe) {
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 // Cannot recover from this exception
                 handler.handleError(pe);
             } catch (ConflictException ce) {
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(ce);
             } catch (BadRequestException be) {
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(be);
             } catch (Exception e) {
@@ -462,8 +456,9 @@ public final class RealmResource implements CollectionResourceProvider {
      * @throws SMSException
      * @throws Exception
      */
-    private void createOrganization(OrganizationConfigManager ocm,
-                                    JsonValue jVal, String realm) throws Exception {
+    private void createOrganization(OrganizationConfigManager ocm, JsonValue jVal, String realm, String realmPath)
+            throws Exception {
+
         Map defaultValues = null;
         OrganizationConfigManager realmCreatedOcm;
         if (realmPath != null && !realmPath.endsWith("/")) {
@@ -486,7 +481,7 @@ public final class RealmResource implements CollectionResourceProvider {
             // send back
             throw smse;
         } catch (Exception e) {
-            RestDispatcher.debug.error("RealmResource.createOrganization()" + e);
+            debug.error("RealmResource.createOrganization()" + e);
             throw e;
         }
     }
@@ -581,7 +576,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * @return SSOToken adminSSOtoken
      */
     private SSOToken getSSOToken() {
-        return (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
     /**
@@ -601,8 +596,11 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final ServerContext context, final String resourceId,
-                               final UpdateRequest request, final ResultHandler<Resource> handler) {
+    public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
+            final ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realmPath = realmContext.getRealm();
 
         final JsonValue realmDetails = request.getNewContent();
         Resource resource = null;
@@ -628,7 +626,7 @@ public final class RealmResource implements CollectionResourceProvider {
             updateConfiguredServices(ocm, createServicesMap(realmDetails));
             newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
             if (newServiceNames == null || newServiceNames.isEmpty()) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "No Services defined.");
+                debug.error("RealmResource.updateInstance()" + "No Services defined.");
             } else {
                 assignServices(ocm, newServiceNames); //assign services to realm
             }
@@ -642,7 +640,7 @@ public final class RealmResource implements CollectionResourceProvider {
             try {
                 configureErrorMessage(e);
             } catch (NotFoundException nfe) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot find "
+                debug.error("RealmResource.updateInstance()" + "Cannot find "
                         + resourceId + ":" + e + "\n" + "CREATING " + resourceId);
                 // Realm was NOT found, therefore create the realm
                 try {
@@ -650,7 +648,7 @@ public final class RealmResource implements CollectionResourceProvider {
                     String childRealm = RealmUtils.getChildRealm(realm);
                     ocm = new OrganizationConfigManager(getSSOToken(), parentRealm);
                     // create the realm
-                    createOrganization(ocm, realmDetails, childRealm);
+                    createOrganization(ocm, realmDetails, childRealm, realmPath);
 
                     // handle response
                     // read the realm to make sure that it has been created...
@@ -662,72 +660,72 @@ public final class RealmResource implements CollectionResourceProvider {
                     try {
                         configureErrorMessage(smse);
                     } catch (NotFoundException nf) {
-                        RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot find "
+                        debug.error("RealmResource.updateInstance()" + "Cannot find "
                                 + resourceId + ":" + smse);
                         handler.handleError(nf);
                     } catch (ForbiddenException fe) {
                         // User does not have authorization
-                        RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                        debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                                 + resourceId + ":" + smse);
                         handler.handleError(fe);
                     } catch (PermanentException pe) {
-                        RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                        debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                                 + resourceId + ":" + smse);
                         // Cannot recover from this exception
                         handler.handleError(pe);
                     } catch (ConflictException ce) {
-                        RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                        debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                                 + resourceId + ":" + smse);
                         handler.handleError(ce);
                     } catch (BadRequestException be) {
-                        RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                        debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                                 + resourceId + ":" + smse);
                         handler.handleError(be);
                     }
                 } catch (Exception ex) {
-                    RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                    debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                             + resourceId + ":" + ex);
                     handler.handleError(new NotFoundException("Cannot update realm.", ex));
                 }
 
             } catch (ForbiddenException fe) {
                 // User does not have authorization
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                         + resourceId + ":" + e);
                 handler.handleError(fe);
             } catch (PermanentException pe) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                         + resourceId + ":" + e);
                 // Cannot recover from this exception
                 handler.handleError(pe);
             } catch (ConflictException ce) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                         + resourceId + ":" + e);
                 handler.handleError(ce);
             } catch (BadRequestException be) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                         + resourceId + ":" + e);
                 handler.handleError(be);
             } catch (Exception ex) {
-                RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                         + resourceId + ":" + ex);
                 handler.handleError(new NotFoundException("Cannot update realm.", ex));
             }
         } catch (SSOException sso){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+            debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                     + resourceId + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+            debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                     + resourceId + ":" + fe);
             handler.handleError(fe);
         } catch (PermanentException pe) {
-            RestDispatcher.debug.error("RealmResource.Instance()" + "Cannot UPDATE "
+            debug.error("RealmResource.Instance()" + "Cannot UPDATE "
                     + resourceId + ":" + pe);
             // Cannot recover from this exception
             handler.handleError(pe);
         } catch (Exception ex) {
-            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+            debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                     + resourceId + ":" + ex);
             handler.handleError(new NotFoundException("Cannot update realm.", ex));
         }

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,19 +21,36 @@
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
  */
+
 package org.forgerock.openam.forgerockrest.server;
 
-import com.sun.identity.authentication.client.AuthClientUtils;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
-import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.services.RestSecurity;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.services.RestSecurity;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
+
 /**
  * Represents Server Information that can be queried via a REST interface.
  *
@@ -41,13 +58,9 @@ import java.util.Set;
  *
  * @author alin.brici@forgerock.com
  */
-public class ServerInfoResource implements CollectionResourceProvider{
-    
-    private String realm;
-    
-    public ServerInfoResource(String realm) {
-        this.realm = realm;
-    }
+public class ServerInfoResource implements CollectionResourceProvider {
+
+    private static Debug debug = Debug.getInstance("frRest");
     
     /**
      * Retrieves the cookie domains set on the server
@@ -56,7 +69,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * @param handler Result handler which handles error or success
      */
     private void getCookieDomains(ServerContext context, String resourceId,  ReadRequest request,
-                                  ResultHandler<Resource> handler) {
+            ResultHandler<Resource> handler) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Resource resource;
@@ -68,7 +81,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
             resource = new Resource(resourceId, Integer.toString(rev), result);
             handler.handleResult(resource);
         } catch (Exception e) {
-            RestDispatcher.debug.error("ServerInforResource.getCookieDomains:: Cannot retrieve cookie domains." + e);
+            debug.error("ServerInforResource.getCookieDomains:: Cannot retrieve cookie domains." + e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
@@ -79,7 +92,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * @param handler Result handler which handles error or success
      */
     private void getAllServerInfo(ServerContext context, String resourceId,  ReadRequest request,
-                                  ResultHandler<Resource> handler) {
+            ResultHandler<Resource> handler, final String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Resource resource;
@@ -93,15 +106,14 @@ public class ServerInfoResource implements CollectionResourceProvider{
             resource = new Resource(resourceId, Integer.toString(result.asMap().hashCode()), result);
             handler.handleResult(resource);
         } catch (Exception e) {
-            RestDispatcher.debug.error("ServerInforResource.getAllServerInfo:: Cannot retrieve all server info. " + e);
+            debug.error("ServerInforResource.getAllServerInfo:: Cannot retrieve all server info. " + e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
     /**
      * {@inheritDoc}
      */
-    public void actionCollection(ServerContext context, ActionRequest request,
-                                 ResultHandler<JsonValue> handler) {
+    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -109,7 +121,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * {@inheritDoc}
      */
     public void actionInstance(ServerContext context, String s, ActionRequest request,
-                               ResultHandler<JsonValue> handler) {
+            ResultHandler<JsonValue> handler) {
         //To change body of implemented methods use File | Settings | File Templates.
         RestUtils.generateUnsupportedOperation(handler);
     }
@@ -117,8 +129,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
     /**
      * {@inheritDoc}
      */
-    public void createInstance(ServerContext context, CreateRequest request,
-                               ResultHandler<Resource> handler) {
+    public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -126,37 +137,37 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * {@inheritDoc}
      */
     public void deleteInstance(ServerContext context, String s, DeleteRequest request,
-                               ResultHandler<Resource> handler) {
+            ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);    }
 
     /**
      * {@inheritDoc}
      */
-    public void patchInstance(ServerContext context, String s, PatchRequest request,
-                              ResultHandler<Resource> handler) {
+    public void patchInstance(ServerContext context, String s, PatchRequest request, ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void queryCollection(ServerContext context, QueryRequest request,
-                                QueryResultHandler handler) {
+    public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void readInstance(ServerContext context, String s, ReadRequest request,
-                             ResultHandler<Resource> handler) {
-        if(s.equalsIgnoreCase("cookieDomains")){
+    public void readInstance(ServerContext context, String s, ReadRequest request, ResultHandler<Resource> handler) {
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        String realm = realmContext.getRealm();
+
+        if(s.equalsIgnoreCase("cookieDomains")) {
             getCookieDomains(context, s, request, handler);
         } else if (s.equalsIgnoreCase("*")) { 
-            getAllServerInfo(context, s, request, handler);
+            getAllServerInfo(context, s, request, handler, realm);
         } else { // for now this is the only case coming in, so fail if otherwise
-            final ResourceException e =
-                    new NotSupportedException("ResourceId not supported: " + s);
+            final ResourceException e = new NotSupportedException("ResourceId not supported: " + s);
             handler.handleError(e);
         }
     }
@@ -165,7 +176,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * {@inheritDoc}
      */
     public void updateInstance(ServerContext context, String s, UpdateRequest request,
-                               ResultHandler<Resource> handler) {
+            ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 }

@@ -24,6 +24,7 @@ import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.rest.service.ServiceProvider;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.restlet.data.MediaType;
@@ -39,9 +40,14 @@ import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -50,7 +56,7 @@ import java.util.regex.Pattern;
  *
  * @since 12.0.0
  */
-public class AuthenticationService extends ServerResource {
+public class AuthenticationService extends ServerResource implements ServiceProvider {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -126,14 +132,14 @@ public class AuthenticationService extends ServerResource {
             JsonValue jsonResponse;
             if (jsonContent != null && jsonContent.size() > 0) {
                 // submit requirements
-                jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
-                        sessionUpgradeSSOTokenId);
+                jsonResponse = restAuthenticationHandler.continueAuthentication(wrapRequest(request), response,
+                        jsonContent, sessionUpgradeSSOTokenId);
             } else {
                 // initiate
                 final String authIndexType = queryString.get("authIndexType");
                 final String authIndexValue = queryString.get("authIndexValue");
-                jsonResponse = restAuthenticationHandler.initiateAuthentication(request, response, authIndexType,
-                        authIndexValue, sessionUpgradeSSOTokenId);
+                jsonResponse = restAuthenticationHandler.initiateAuthentication(wrapRequest(request), response,
+                        authIndexType, authIndexValue, sessionUpgradeSSOTokenId);
             }
 
             return createResponse(jsonResponse);
@@ -148,6 +154,51 @@ public class AuthenticationService extends ServerResource {
             DEBUG.error("Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
         }
+    }
+
+    /**
+     * Wraps the HttpServletRequest with the realm information used in the URI.
+     *
+     * @param request The HttpServletRequest.
+     * @return The wrapped HttpServletRequest.
+     */
+    private HttpServletRequest wrapRequest(final HttpServletRequest request) {
+
+        return new HttpServletRequestWrapper(request) {
+            @Override
+            public String getParameter(String name) {
+                if ("realm".equals(name)) {
+                    return (String) request.getAttribute(name);
+                }
+                return super.getParameter(name);
+            }
+
+            @Override
+            public Map getParameterMap() {
+                Map params = super.getParameterMap();
+                params.put("realm", request.getAttribute("realm"));
+                return params;
+            }
+
+            @Override
+            public Enumeration getParameterNames() {
+                Set<String> names = new HashSet<String>();
+                Enumeration<String> paramNames = super.getParameterNames();
+                while (paramNames.hasMoreElements()) {
+                    names.add(paramNames.nextElement());
+                }
+                names.add("realm");
+                return Collections.enumeration(names);
+            }
+
+            @Override
+            public String[] getParameterValues(String name) {
+                if ("realm".equals(name)) {
+                    return new String[]{(String) request.getAttribute(name)};
+                }
+                return super.getParameterValues(name);
+            }
+        };
     }
 
     /**

@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.forgerockrest.authn.restlet;
+package org.forgerock.openam.rest.service;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
@@ -25,7 +25,6 @@ import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.resource.Resource;
 import org.restlet.service.StatusService;
 
 import java.io.IOException;
@@ -35,11 +34,11 @@ import java.util.Map;
 /**
  * Service to handle error statuses. If an exception is thrown then the status is pulled from the response and the
  * matching Json Resource exception is created and sent back to the client. This keeps the authenticate REST endpoint
- * in line with the CREST resources.
+ * in line with the CREST resource exceptions.
  *
  * @since 12.0.0
  */
-public class RestAuthenticationStatusService extends StatusService {
+public class RestStatusService extends StatusService {
 
     /**
      * {@inheritDoc}
@@ -47,7 +46,12 @@ public class RestAuthenticationStatusService extends StatusService {
     @Override
     public Representation getRepresentation(Status status, Request request, Response response) {
 
-        JsonValue jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
+        final JsonValue jsonResponse;
+        if (status.getDescription() != null) {
+            jsonResponse = ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();
+        } else {
+            jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
+        }
 
         final ObjectMapper mapper = new ObjectMapper();
         try {

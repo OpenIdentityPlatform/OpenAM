@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,20 +21,23 @@
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
  */
+
 package org.forgerock.openam.services;
 
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
 
 public class RestSecurity {
+
+    private static Debug debug = Debug.getInstance("frRest");
 
     private static ServiceConfigManager mgr;
     private RestSecurityConfiguration restSecurityConfiguration;
@@ -54,13 +57,13 @@ public class RestSecurity {
     private class RestSecurityChangeListener implements ServiceListener {
         @Override
         public void schemaChanged(String serviceName, String version) {
-            RestDispatcher.debug.warning("The schemaChanged ServiceListener method was invoked for service "
+            debug.warning("The schemaChanged ServiceListener method was invoked for service "
                     + serviceName + ". This is unexpected.");
         }
 
         @Override
         public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent, int type) {
-            RestDispatcher.debug.warning("The globalConfigChanged ServiceListener method was invoked for service "
+            debug.warning("The globalConfigChanged ServiceListener method was invoked for service "
                     + serviceName);
             //if the global config changes, all organizationalConfig change listeners are invoked as well.
         }
@@ -69,15 +72,15 @@ public class RestSecurity {
         public void organizationConfigChanged(String serviceName, String version, String orgName, String groupName,
                                               String serviceComponent, int type) {
             if (currentRealmTargetedByOrganizationUpdate(serviceName, version, orgName, type)) {
-                if (RestDispatcher.debug.messageEnabled()) {
-                    RestDispatcher.debug.message("Updating RestSecurity service configuration state for realm " + realm);
+                if (debug.messageEnabled()) {
+                    debug.message("Updating RestSecurity service configuration state for realm " + realm);
                 }
                 initializeSettings(mgr);
             } if (currentRealmTargetedByOrganizaionRemoved(serviceName, version, orgName, type)){
                 mgr = null;
             } else {
-                if (RestDispatcher.debug.messageEnabled()) {
-                    RestDispatcher.debug.message("Got service update message, but update did not target Rest Security settings in " +
+                if (debug.messageEnabled()) {
+                    debug.message("Got service update message, but update did not target Rest Security settings in " +
                             realm + " realm. ServiceName: " + serviceName + " version: " + version + " orgName: " +
                             orgName + " groupName: " + groupName + " serviceComponent: " + serviceComponent +
                             " type (modified=4, delete=2, add=1): " + type + " realm as DN: " + DNMapper.orgNameToDN(realm));
@@ -137,13 +140,13 @@ public class RestSecurity {
                     forgotPassword);
 
             setProviderConfig(newRestSecuritySettings);
-            if (RestDispatcher.debug.messageEnabled()) {
-                RestDispatcher.debug.message("Successfully updated rest security service settings for realm " + realm + " with settings " +
+            if (debug.messageEnabled()) {
+                debug.message("Successfully updated rest security service settings for realm " + realm + " with settings " +
                         newRestSecuritySettings);
             }
         } catch (Exception e) {
             String message = "Not able to initialize Rest Security service settings for realm " + realm + " Exception: " + e;
-            RestDispatcher.debug.error(message, e);
+            debug.error(message, e);
         }
     }
 
@@ -160,11 +163,11 @@ public class RestSecurity {
             mgr = new ServiceConfigManager(AccessController.doPrivileged(AdminTokenAction.getInstance()),
                     SERVICE_NAME, SERVICE_VERSION);
         } catch (Exception e) {
-            RestDispatcher.debug.error("Cannot get ServiceConfigManager", e);
+            debug.error("Cannot get ServiceConfigManager", e);
         }
         initializeSettings(mgr);
         if (mgr.addListener(new RestSecurityChangeListener()) == null) {
-            RestDispatcher.debug.error("Could not add listener to ServiceConfigManager instance. Rest Security service " +
+            debug.error("Could not add listener to ServiceConfigManager instance. Rest Security service " +
                     "changes will not be dynamically updated for realm " + realm);
         }
     }
@@ -174,7 +177,7 @@ public class RestSecurity {
             return restSecurityConfiguration.selfRegistration;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : "+ SELF_REGISTRATION;
-            RestDispatcher.debug.error(message);
+            debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
@@ -188,7 +191,7 @@ public class RestSecurity {
             return restSecurityConfiguration.forgotPassword;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD;
-            RestDispatcher.debug.error(message);
+            debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
@@ -206,7 +209,7 @@ public class RestSecurity {
             return restSecurityConfiguration.selfRegTokenLifeTime;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : "+ SELF_REG_TOKEN_LIFE_TIME;
-            RestDispatcher.debug.error(message);
+            debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }
@@ -221,7 +224,7 @@ public class RestSecurity {
             return restSecurityConfiguration.forgotPasswordTokenLifeTime;
         } else {
             String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD_TOKEN_LIFE_TIME;
-            RestDispatcher.debug.error(message);
+            debug.error(message);
             throw new ServiceNotFoundException(message);
         }
     }

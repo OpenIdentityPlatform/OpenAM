@@ -11,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.AuthZFilter;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.rest.router.RestEndpointManager;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -29,7 +29,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Dispatcher for Rest Resource authorization.
@@ -53,7 +52,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR = "groupsAuthzConfigurator";
     private static final String INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR = "agentsAuthzConfigurator";
 
-    private final RestDispatcher restDispatcher;
+    private final RestEndpointManager endpointManager;
     private final AuthZFilter authZFilter;
     private FilterConfig filterConfig;
 
@@ -66,8 +65,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
      */
     public RestAuthorizationDispatcherFilter() {
-        this.restDispatcher = RestDispatcher.getInstance();
-        authZFilter = new AuthZFilter();
+        this(InjectorHolder.getInstance(RestEndpointManager.class), new AuthZFilter());
     }
 
     /**
@@ -75,10 +73,11 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      * <p>
      * Used for test purposes.
      *
+     * @param endpointManager An instance of the RestEndpointManager.
      * @param authZFilter An instance of the AuthZFilter.
      */
-    RestAuthorizationDispatcherFilter(RestDispatcher restDispatcher, AuthZFilter authZFilter) {
-        this.restDispatcher = restDispatcher;
+    RestAuthorizationDispatcherFilter(final RestEndpointManager endpointManager, final AuthZFilter authZFilter) {
+        this.endpointManager = endpointManager;
         this.authZFilter = authZFilter;
     }
 
@@ -123,26 +122,25 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         }
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        try {
-            final String resourcePath = request.getPathInfo();
-            Map<String, String> details = restDispatcher.getRequestDetails(resourcePath == null ? "/" : resourcePath);
+        final String resourcePath = request.getPathInfo();
+        String endpoint = endpointManager.findEndpoint(resourcePath == null ? "/" : resourcePath);
 
-            String endpoint = details.get("resourceName");
-
-            if (RestDispatcher.REALMS.equalsIgnoreCase(endpoint)) {
-                authorize(realmsAuthzConfiguratorClassName, request, servletResponse, chain);
-            } else if (RestDispatcher.USERS.equalsIgnoreCase(endpoint)) {
-                authorize(usersAuthzConfiguratorClassName, request, servletResponse, chain);
-            } else if (RestDispatcher.GROUPS.equalsIgnoreCase(endpoint)) {
-                authorize(groupsAuthzConfiguratorClassName, request, servletResponse, chain);
-            } else if (RestDispatcher.AGENTS.equalsIgnoreCase(endpoint)) {
-                authorize(agentsAuthzConfiguratorClassName, request, servletResponse, chain);
-            } else {
-                chain.doFilter(servletRequest, servletResponse);
-            }
-        } catch (NotFoundException e) {
+        if (endpoint == null) {
             // Endpoint not found so cannot perform any authorization
             DEBUG.message("Resource " + request.getPathInfo() + " not found. Not performing authorization on request.");
+            chain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
+        if (RestEndpointManager.REALMS.equalsIgnoreCase(endpoint)) {
+            authorize(realmsAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.USERS.equalsIgnoreCase(endpoint)) {
+            authorize(usersAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.GROUPS.equalsIgnoreCase(endpoint)) {
+            authorize(groupsAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.AGENTS.equalsIgnoreCase(endpoint)) {
+            authorize(agentsAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else {
             chain.doFilter(servletRequest, servletResponse);
         }
     }

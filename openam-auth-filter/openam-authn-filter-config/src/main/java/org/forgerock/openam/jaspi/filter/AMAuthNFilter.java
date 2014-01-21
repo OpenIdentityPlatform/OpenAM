@@ -19,7 +19,8 @@ package org.forgerock.openam.jaspi.filter;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.jaspi.JaspiRuntimeFilter;
 import org.forgerock.jaspi.utils.FilterConfiguration;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.rest.router.RestEndpointManager;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -45,7 +46,7 @@ public class AMAuthNFilter extends JaspiRuntimeFilter {
      * Constructs an instance of the AMAuthNFilter.
      */
     public AMAuthNFilter() {
-        endpointMatcher = new EndpointMatcher("/json", RestDispatcher.getInstance());
+        endpointMatcher = new EndpointMatcher("/json", InjectorHolder.getInstance(RestEndpointManager.class));
         init();
     }
 
@@ -54,12 +55,12 @@ public class AMAuthNFilter extends JaspiRuntimeFilter {
      * <p>
      * Used by tests.
      *
-     * @param restDispatcher An instance of the RestDispatcher.
+     * @param endpointManager An instance of the RestEndpointManager.
      * @param filterConfiguration An instance of the FilterConfiguration.
      */
-    AMAuthNFilter(final RestDispatcher restDispatcher, final FilterConfiguration filterConfiguration) {
+    public AMAuthNFilter(final RestEndpointManager endpointManager, final FilterConfiguration filterConfiguration) {
         super(filterConfiguration);
-        endpointMatcher = new EndpointMatcher("/json", restDispatcher);
+        endpointMatcher = new EndpointMatcher("/json", endpointManager);
         init();
     }
 
@@ -74,11 +75,11 @@ public class AMAuthNFilter extends JaspiRuntimeFilter {
          * <p>
          * Only need to specific the actual endpoint for the root path that this filter is registered against.
          */
-        endpointMatcher.endpoint("/authenticate", HttpMethod.GET);
-        endpointMatcher.endpoint("/authenticate", HttpMethod.POST);
-        endpointMatcher.endpoint("/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
-                "forgotPasswordReset", "anonymousCreate");
-        endpointMatcher.endpoint("/serverinfo", HttpMethod.GET);
+        endpointMatcher.endpoint(RestEndpointManager.AUTHENTICATE, HttpMethod.GET);
+        endpointMatcher.endpoint(RestEndpointManager.AUTHENTICATE, HttpMethod.POST);
+        endpointMatcher.endpoint(RestEndpointManager.USERS, HttpMethod.POST, "_action", "register", "confirm",
+                "forgotPassword", "forgotPasswordReset", "anonymousCreate");
+        endpointMatcher.endpoint(RestEndpointManager.SERVER_INFO, HttpMethod.GET);
     }
 
     /**

@@ -722,19 +722,6 @@
         <url-pattern>/ws/*</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>rest-auth</servlet-name>
-        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
-        <init-param>
-            <param-name>org.restlet.application</param-name>
-            <param-value>org.forgerock.openam.forgerockrest.authn.restlet.RestAuthenticationApplication</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>rest-auth</servlet-name>
-        <url-pattern>/json/authenticate/*</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>oauth</servlet-name>
         <url-pattern>/resources/*</url-pattern>
@@ -1140,13 +1127,7 @@
 
     <servlet>
         <servlet-name>ForgeRockRest</servlet-name>
-        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
-
-        <!-- Your application class name (Optional - For mode 3) -->
-        <init-param>
-            <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.forgerockrest.RestDispatcher</param-value>
-        </init-param>
+        <servlet-class>org.forgerock.openam.rest.RestEndpointServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ForgeRockRest</servlet-name>

@@ -11,19 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.filter;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.openam.forgerockrest.RestDispatcher;
+import org.forgerock.openam.rest.router.RestEndpointManager;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,7 +37,7 @@ public class EndpointMatcher {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
-    private final RestDispatcher restDispatcher;
+    private final RestEndpointManager endpointManager;
     private final String rootPath;
 
     private final List<Endpoint> endpoints = new ArrayList<Endpoint>();
@@ -48,10 +46,10 @@ public class EndpointMatcher {
      * Constructs a new EndpointMatcher.
      *
      * @param rootPath The path at which the filter is registered at.
-     * @param restDispatcher An instance of the RestDispatcher.
+     * @param endpointManager An instance of the RestEndpointManager.
      */
-    public EndpointMatcher(String rootPath, RestDispatcher restDispatcher) {
-        this.restDispatcher = restDispatcher;
+    public EndpointMatcher(String rootPath, RestEndpointManager endpointManager) {
+        this.endpointManager = endpointManager;
         this.rootPath = rootPath;
     }
 
@@ -65,26 +63,20 @@ public class EndpointMatcher {
 
         String path = getRequestPath(request);
 
-        try {
-            Map<String, String> details = restDispatcher.getRequestDetails(path);
-            if (details.get("resourceId") != null) {
-                path = details.get("resourceName") + "/" + details.get("resourceId");
-            } else {
-                path = details.get("resourceName");
-            }
-        } catch (NotFoundException e) {
+        final String endpoint = endpointManager.findEndpoint(path);
+        if (endpoint == null) {
             // Endpoint not found so return false
             DEBUG.message("Resource " + request.getPathInfo() + " not found.");
             return false;
         }
 
-        Endpoint requestEndpoint = new Endpoint(path, request.getMethod());
+        Endpoint requestEndpoint = new Endpoint(endpoint, request.getMethod());
         if (endpoints.contains(requestEndpoint)) {
 
             int index = endpoints.indexOf(requestEndpoint);
-            Endpoint endpoint = endpoints.get(index);
+            Endpoint matchedEndpoint = endpoints.get(index);
 
-            return matchQueryParameters(request, endpoint);
+            return matchQueryParameters(request, matchedEndpoint);
         }
 
         return false;

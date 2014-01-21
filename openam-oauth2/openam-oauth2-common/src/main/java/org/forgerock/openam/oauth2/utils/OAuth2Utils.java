@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -57,9 +57,9 @@ import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.common.util.KeystoreManager;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;

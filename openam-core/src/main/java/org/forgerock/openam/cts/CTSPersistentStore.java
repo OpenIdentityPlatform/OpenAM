@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,33 +18,18 @@
  * "Portions copyright [year] [name of copyright owner]".
  *
  */
+
 package org.forgerock.openam.cts;
 
-import com.google.inject.name.Named;
-import com.sun.identity.shared.debug.Debug;
-import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
-import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.impl.CoreTokenAdapter;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.openam.cts.reaper.CTSReaperWatchDog;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
-import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
-import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Core Token Service Persistent Store is responsible for the storage and retrieval of
@@ -67,31 +52,7 @@ import org.forgerock.opendj.ldap.Filter;
  * @author jason.lemay@forgerock.com
  * @author robert.wapshott@forgerock.com
  */
-public class CTSPersistentStore {
-
-    private Debug debug;
-
-    // Injected
-    private final LDAPDataConversion dataConversion;
-    private final TokenBlobStrategy strategy;
-    private final CoreTokenAdapter adapter;
-
-    /**
-     * Private restricted to preserve Singleton Instantiation.
-     */
-    @Inject
-    public CTSPersistentStore(LDAPDataConversion dataConversion, TokenBlobStrategy strategy,
-                              CoreTokenAdapter adapter, CTSReaperWatchDog watchDog,
-                              @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-
-        this.dataConversion = dataConversion;
-        this.strategy = strategy;
-        this.adapter = adapter;
-        this.debug = debug;
-
-        // Start the CTS Reaper watch dog which will monitor the CTS Reaper
-        watchDog.startReaper();
-    }
+public interface CTSPersistentStore {
 
     /**
      * Create a Token in the persistent store. If the Token already exists in the store then this
@@ -103,15 +64,7 @@ public class CTSPersistentStore {
      * @throws CoreTokenException If there was a non-recoverable error during the operation or if
      * the Token already exists in the store.
      */
-    public void create(Token token) throws CoreTokenException {
-        try {
-            strategy.perfom(token);
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
-        }
-
-        adapter.create(token);
-    }
+    void create(Token token) throws CoreTokenException;
 
     /**
      * Read a Token from the persistent store.
@@ -120,16 +73,7 @@ public class CTSPersistentStore {
      * @return Null if there was no matching Token. Otherwise a fully populated Token will be returned.
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
-    public Token read(String tokenId) throws CoreTokenException {
-        Token token = adapter.read(tokenId);
-        try {
-            strategy.reverse(token);
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
-        }
-
-        return token;
-    }
+    Token read(String tokenId) throws CoreTokenException;
 
     /**
      * Update an existing Token in the store. If the Token does not exist in the store then a
@@ -142,22 +86,7 @@ public class CTSPersistentStore {
      * @param token Non null Token to update.
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
-    public void update(Token token) throws CoreTokenException {
-        try {
-            strategy.perfom(token);
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
-        }
-
-        adapter.updateOrCreate(token);
-
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Update: {0} updated",
-                    token.getTokenId()));
-        }
-    }
+    void update(Token token) throws CoreTokenException;
 
     /**
      * Delete the Token from the store.
@@ -165,9 +94,7 @@ public class CTSPersistentStore {
      * @param token Non null Token to be deleted from the store.
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
-    public void delete(Token token) throws CoreTokenException {
-        delete(token.getTokenId());
-    }
+    void delete(Token token) throws CoreTokenException;
 
     /**
      * Delete the Token from the store based on its id.
@@ -178,15 +105,7 @@ public class CTSPersistentStore {
      * @param tokenId The non null Token Id of the token to remove.
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
-    public void delete(String tokenId) throws DeleteFailedException {
-        adapter.delete(tokenId);
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Delete: {0} deleted",
-                    tokenId));
-        }
-    }
+    void delete(String tokenId) throws DeleteFailedException;
 
     /**
      * Delete a collection of Tokens from the Token Store using a filter to narrow down the
@@ -201,38 +120,7 @@ public class CTSPersistentStore {
      *
      * @throws DeleteFailedException If the delete failed for any reason.
      */
-    public int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
-        QueryFilter.QueryFilterBuilder queryFilter = adapter.buildFilter().and();
-        for (Map.Entry<CoreTokenField, Object> entry : query.entrySet()) {
-            CoreTokenField key = entry.getKey();
-            Object value = entry.getValue();
-            queryFilter = queryFilter.attribute(key, value);
-        }
-
-        QueryBuilder builder = adapter
-                .query()
-                .withFilter(queryFilter.build())
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID);
-
-        Collection<Entry> entries;
-        try {
-            entries = builder.executeRawResults();
-            for (Entry entry : entries) {
-                Attribute attribute = entry.getAttribute(CoreTokenField.TOKEN_ID.toString());
-                String tokenId = attribute.firstValueAsString();
-                adapter.delete(tokenId);
-            }
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                        "Delete: {0} deleted",
-                        entries.size()));
-            }
-        } catch (CoreTokenException e) {
-            throw new DeleteFailedException(builder, e);
-        }
-        return entries.size();
-    }
+    int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException;
 
     /**
      * Perform a query based on a collection of queryable parameters.
@@ -244,31 +132,7 @@ public class CTSPersistentStore {
      * @return A non null, but possibly empty collection of Tokens.
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
-    public Collection<Token> list(Map<CoreTokenField, Object> query) throws CoreTokenException {
-        // Verify all types are safe to cast.
-        CoreTokenFieldTypes.validateTypes(query);
-
-        QueryBuilder builder = adapter.query();
-        QueryFilter.QueryFilterBuilder filterBuilder = adapter.buildFilter().and();
-
-        for (Map.Entry<CoreTokenField, Object> entry : query.entrySet()) {
-            CoreTokenField key = entry.getKey();
-            Object value = entry.getValue();
-            filterBuilder = filterBuilder.attribute(key, value);
-        }
-
-        Collection<Token> tokens = builder.withFilter(filterBuilder.build()).execute();
-        decryptTokens(tokens);
-
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "List: {0} Tokens listed",
-                    tokens.size()));
-        }
-
-        return tokens;
-    }
+    Collection<Token> list(Map<CoreTokenField, Object> query) throws CoreTokenException;
 
     /**
      * Performs a list operation against the Core Token Service with a predefined filter. This
@@ -281,27 +145,7 @@ public class CTSPersistentStore {
      * @return A non null, but possible empty collection of Tokens.
      * @throws CoreTokenException If there was an unrecoverable error.
      */
-    public Collection<Token> list(Filter filter) throws CoreTokenException {
-        Collection<Token> tokens = adapter.query().withFilter(filter).execute();
-        decryptTokens(tokens);
-        return tokens;
-    }
-
-    /**
-     * Handles the decrypting of tokens when needed.
-     *
-     * @param tokens A non null collection of Tokens.
-     * @return A new collection of Tokens with their byte contents decrypted if necessary.
-     */
-    private void decryptTokens(Collection<Token> tokens) throws CoreTokenException {
-        for (Token token : tokens) {
-            try {
-                strategy.reverse(token);
-            } catch (TokenStrategyFailedException e) {
-                throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
-            }
-        }
-    }
+    Collection<Token> list(Filter filter) throws CoreTokenException;
 
     /**
      * Returns the expiration information of all sessions belonging to a user.
@@ -312,36 +156,5 @@ public class CTSPersistentStore {
      * @throws Exception if there is any problem with accessing the session
      *                   repository.
      */
-    public Map<String, Long> getTokensByUUID(String uuid) throws CoreTokenException {
-        Collection<Entry> entries;
-        Filter filter = adapter.buildFilter().and().userId(uuid).build();
-        entries = adapter.query()
-                .withFilter(filter)
-                .returnTheseAttributes(
-                        SessionTokenField.SESSION_ID.getField(),
-                        CoreTokenField.EXPIRY_DATE)
-                .executeRawResults();
-
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Querying Sessions by User Id. Found {0} Sessions.\n" +
-                    "UUID: {1}",
-                    entries.size(),
-                    uuid));
-        }
-
-        Map<String, Long> sessions = new HashMap<String, Long>();
-        for (Entry entry : entries) {
-            String sessionId = entry.getAttribute(SessionTokenField.SESSION_ID.getField().toString()).firstValueAsString();
-            String dateString = entry.getAttribute(CoreTokenField.EXPIRY_DATE.toString()).firstValueAsString();
-
-            Calendar timestamp = dataConversion.fromLDAPDate(dateString);
-            long epochedSeconds = dataConversion.toEpochedSeconds(timestamp);
-
-            sessions.put(sessionId, epochedSeconds);
-        }
-
-        return sessions;
-    }
+    Map<String, Long> getTokensByUUID(String uuid) throws CoreTokenException;
 }

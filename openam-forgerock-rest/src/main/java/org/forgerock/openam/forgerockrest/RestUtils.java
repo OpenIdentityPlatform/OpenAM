@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2012-2014 ForgeRock Inc.
  */
-package org.forgerock.openam.forgerockrest;
 
+package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
@@ -26,6 +26,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
@@ -41,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * A collection of ForgeRock-REST based utility functions.
  *
@@ -49,6 +49,8 @@ import java.util.Set;
  * @author robert.wapshott@forgerock.com
  */
 final public class  RestUtils {
+
+    private static Debug debug = Debug.getInstance("frRest");
 
     private static final SSOToken token;
     private static final String adminUser;
@@ -63,7 +65,7 @@ final public class  RestUtils {
                     adminUser, IdType.USER, "/", null);
         } else {
             adminUserId = null;
-            RestDispatcher.debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
+            debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
         }
     }
 
@@ -94,14 +96,14 @@ final public class  RestUtils {
             amIdentity = new AMIdentity(ssotok);
 
             if (!(amIdentity.equals(adminUserId))){
-                RestDispatcher.debug.error("Unauthorized user.");
+                debug.error("Unauthorized user.");
                 return false;
             }
             return true;
         } catch (SSOException e) {
-            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
         } catch (IdRepoException ex) {
-            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
         }
         return false;
     }
@@ -119,7 +121,7 @@ final public class  RestUtils {
         amIdentity = new AMIdentity(ssotok);
 
         if (!(amIdentity.equals(adminUserId))){
-            RestDispatcher.debug.error("Unauthorized user.");
+            debug.error("Unauthorized user.");
             throw new ForbiddenException("Access Denied");
         }
     }
@@ -174,7 +176,7 @@ final public class  RestUtils {
             try {
                 return Long.decode(attribute.iterator().next());
             } catch (NumberFormatException e) {
-                RestDispatcher.debug.error("RestUtils.getLongAttribute() :: " +
+                debug.error("RestUtils.getLongAttribute() :: " +
                         "Number format exception decoding Long attribute  " + e);
                 return null;
             }

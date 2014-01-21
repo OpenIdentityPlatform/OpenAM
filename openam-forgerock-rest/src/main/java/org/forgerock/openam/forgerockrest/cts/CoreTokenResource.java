@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2014 ForgeRock, Inc.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,12 +13,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.forgerockrest.cts;
 
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -33,6 +30,10 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.util.HashMap;

@@ -36,6 +36,7 @@ import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
@@ -114,12 +115,12 @@ public class CoreGuiceModule extends AbstractModule {
          * Core Token Service bindings are divided into a number of logical groups.
          */
         // CTS General
+        bind(CTSPersistentStore.class).to(CTSPersistentStoreImpl.class);
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
         bind(CoreTokenConstants.class).in(Singleton.class);
-        bind(CTSPersistentStore.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
 
         // Add hooks for monitoring operation success/failure rates

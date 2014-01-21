@@ -1,0 +1,161 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
+ */
+
+package org.forgerock.openam.rest;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.rest.resource.CrestHttpServlet;
+import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
+import org.forgerock.openam.rest.router.RestEndpointManager;
+import org.forgerock.openam.rest.service.RestletServiceServlet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Root Servlet for all REST endpoint requests, which are then passed onto the correct underlying servlet, either
+ * CREST for Resource endpoints or Restlet for Service endpoints.
+ *
+ * @since 12.0.0
+ */
+public class RestEndpointServlet extends HttpServlet {
+
+    private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
+    private final RestletServiceServlet restServiceServlet;
+    private final RestEndpointManager endpointManager;
+
+    /**
+     * Constructs a new RestEndpointServlet.
+     */
+    public RestEndpointServlet() {
+        this.crestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
+                Names.named(RealmRouterConnectionFactory.CONNECTION_FACTORY_NAME))));
+        this.restServiceServlet = new RestletServiceServlet(this);
+        this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
+    }
+
+    /**
+     * Constructor for test use.
+     *
+     * @param crestServlet An instance of a CrestHttpServlet.
+     * @param restServiceServlet An instance of a RestletServiceServlet.
+     * @param endpointManager An instance of the RestEndpointManager.
+     */
+    RestEndpointServlet(final CrestHttpServlet crestServlet, final RestletServiceServlet restServiceServlet,
+            final RestEndpointManager endpointManager) {
+        this.crestServlet = crestServlet;
+        this.restServiceServlet = restServiceServlet;
+        this.endpointManager = endpointManager;
+    }
+
+    /**
+     * Initialises the CREST and Restlet Servlets.
+     *
+     * @throws ServletException If the CREST Servlet init() call fails.
+     */
+    @Override
+    public void init() throws ServletException {
+        crestServlet.init();
+        // Don't need to call restServiceServlet.init() as starts Restlet which is not needed as is not created by
+        // Servlet Container.
+    }
+
+    /**
+     * Delegates the request to either the CREST or Restlet servlet based on whether the request is for a resource
+     * or service REST endpoint.
+     *
+     * @param request The HttpServletRequest.
+     * @param response The HttpServletResponse.
+     * @throws ServletException If the CREST or Restlet Servlet service() calls fail.
+     * @throws IOException If the CREST or Restlet Servlet service() calls fail.
+     */
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+            IOException {
+
+        final String restRequest = getResourceName(request);
+
+        final String endpoint = endpointManager.findEndpoint(restRequest);
+
+        final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
+
+        if (endpointType == null) {
+            throw new ServletException("Endpoint Type could not be determined");
+        }
+
+        switch (endpointType) {
+        case RESOURCE: {
+            crestServlet.service(request, response);
+            break;
+        }
+        case SERVICE: {
+            restServiceServlet.service(new HttpServletRequestWrapper(request), response);
+            break;
+        }
+        }
+    }
+
+    /**
+     * Gets the resource name (resource path) from the HttpServletRequest.
+     *
+     * @param req The HttpServletRequest.
+     * @return The resource name (resource path).
+     */
+    private String getResourceName(final HttpServletRequest req) {
+        // Treat null path info as root resource.
+        String resourceName = req.getPathInfo();
+        if (resourceName == null) {
+            return "";
+        }
+        if (resourceName.endsWith("/")) {
+            resourceName = resourceName.substring(0, resourceName.length() - 1);
+        }
+        return resourceName;
+    }
+
+    /**
+     * Destroys the CREST and Restlet servlets.
+     */
+    @Override
+    public void destroy() {
+        crestServlet.destroy();
+        restServiceServlet.destroy();
+    }
+
+    /**
+     * Normalises the resource name to ensure that the it does not begin or end with forward slashes.
+     *
+     * @param name The resource name.
+     * @return The normalised resource name.
+     */
+    public static String normalizeResourceName(final String name) {
+        String tmp = name;
+        if (tmp.startsWith("/")) {
+            tmp = tmp.substring(1);
+        }
+        if (tmp.endsWith("/")) {
+            tmp = tmp.substring(0, tmp.length() - 1);
+        }
+        return tmp;
+    }
+}

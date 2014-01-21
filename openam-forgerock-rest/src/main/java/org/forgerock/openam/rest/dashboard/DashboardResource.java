@@ -1,4 +1,3 @@
-package org.forgerock.openam.dashboard;
 /*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -12,16 +11,35 @@ package org.forgerock.openam.dashboard;
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2012-2014 ForgeRock Inc.
  */
 
-import com.iplanet.am.util.SystemProperties;
+package org.forgerock.openam.rest.dashboard;
+
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.dashboard.Dashboard;
+import org.forgerock.openam.dashboard.ServerContextHelper;
 
 import java.util.HashMap;
 
@@ -30,81 +48,67 @@ import java.util.HashMap;
  */
 public final class DashboardResource implements CollectionResourceProvider {
 
-    public DashboardResource() {
-        // No implementation required.
-    }
-
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void actionCollection(final ServerContext context, final ActionRequest request,
-                                 final ResultHandler<JsonValue> handler) {
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+            final ResultHandler<JsonValue> handler) {
+        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
-                               final ResultHandler<JsonValue> handler) {
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+            final ResultHandler<JsonValue> handler) {
+        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
-                               final ResultHandler<Resource> handler) {
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+            final ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
-                               final ResultHandler<Resource> handler) {
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+            final ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void patchInstance(final ServerContext context, final String resourceId, final PatchRequest request,
-                              final ResultHandler<Resource> handler) {
-        final ResourceException e = new NotSupportedException("Patch operations are not supported");
-        handler.handleError(e);
+            final ResultHandler<Resource> handler) {
+        handler.handleError(new NotSupportedException("Patch operations are not supported"));
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void queryCollection(final ServerContext context, final QueryRequest request,
-                                final QueryResultHandler handler) {
-        final ResourceException e = new NotSupportedException("Query operations are not supported");
-        handler.handleError(e);
+            final QueryResultHandler handler) {
+        handler.handleError(new NotSupportedException("Query operations are not supported"));
 
     }
 
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
-                             final ResultHandler<Resource> handler) {
+            final ResultHandler<Resource> handler) {
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             SSOToken token = mgr.createSSOToken(ServerContextHelper.getCookieFromServerContext(context));
@@ -130,9 +134,9 @@ public final class DashboardResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-
+    @Override
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
-                               final ResultHandler<Resource> handler) {
+            final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Update operations are not supported");
         handler.handleError(e);
     }
