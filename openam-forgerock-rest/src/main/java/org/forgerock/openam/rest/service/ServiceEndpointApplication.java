@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.rest.service;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.restlet.Application;
@@ -29,9 +27,11 @@ import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Router;
-import org.restlet.util.RouteList;
 
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.Map;
+
+import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.ServiceProviderClass;
 
 /**
  * Restlet Application for REST Service Endpoints.
@@ -40,10 +40,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public final class ServiceEndpointApplication extends Application {
 
-    public static final String ROUTER_NAME = "ServiceEndpointRouter";
-
     private final RestRealmValidator realmValidator;
-    private final Router endpointRouter;
+    private final ServiceResourceEndpointMap serviceResourceEndpoints;
 
     /**
      * Constructs a new ServiceEndpointApplication.
@@ -52,7 +50,7 @@ public final class ServiceEndpointApplication extends Application {
      */
     public ServiceEndpointApplication() {
         this.realmValidator = InjectorHolder.getInstance(RestRealmValidator.class);
-        this.endpointRouter = InjectorHolder.getInstance(Key.get(Router.class, Names.named(ROUTER_NAME)));
+        this.serviceResourceEndpoints = InjectorHolder.getInstance(ServiceResourceEndpointMap.class);
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
         setStatusService(new RestStatusService());
     }
@@ -73,11 +71,45 @@ public final class ServiceEndpointApplication extends Application {
      * @param realm The realm.
      * @return A Router.
      */
+    @SuppressWarnings("unchecked")
     private Router realm(final String realm) {
         Router router = new Router(getContext());
-        router.setRoutes(new RouteList(endpointRouter.getRoutes()));
+
+        for (final Map.Entry<String, ServiceProviderClass> entry :
+                serviceResourceEndpoints.getServiceEndpoints().entrySet()) {
+            router.attach(entry.getKey(),
+                    endpoint(createFinder(entry.getValue().getClazz()), realm));
+        }
         router.attach("/{realm}", subrealm(realm));
         return router;
+    }
+
+    /**
+     * Wraps the given Restlet so that the realm can be created added to the request as an attribute.
+     *
+     *
+     * @param endpoint The endpoint that will handle the request.
+     * @param realm The realm from the request.
+     * @return A Restlet instance.
+     */
+    private Restlet endpoint(final Restlet endpoint, final String realm) {
+        return new Restlet() {
+            @Override
+            public void handle(Request request, Response response) {
+
+                String r = realm;
+
+                if (realm == null || realm.isEmpty()) {
+                    r = "/";
+                }
+
+                HttpServletRequestWrapper httpRequest = (HttpServletRequestWrapper) ServletUtils.getRequest(request);
+                request.getAttributes().put("realm", r);
+                httpRequest.setAttribute("realm", r);
+
+                endpoint.handle(request, response);
+            }
+        };
     }
 
     /**

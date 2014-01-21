@@ -36,6 +36,7 @@ import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.ServiceProvider;
+import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 
 import javax.inject.Inject;
@@ -120,7 +121,7 @@ public final class RestEndpointGuiceProvider {
      *
      * @since 12.0.0
      */
-    public static class ServiceProviderClass<T extends ServiceProvider> {
+    public static class ServiceProviderClass<T extends ServerResource> {
 
         private final Class<T> clazz;
 

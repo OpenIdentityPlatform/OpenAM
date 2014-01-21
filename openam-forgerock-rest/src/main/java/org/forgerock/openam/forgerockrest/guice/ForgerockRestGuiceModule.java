@@ -25,10 +25,8 @@ import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
-import org.forgerock.openam.rest.service.ServiceEndpointApplication;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.util.SignatureUtil;
-import org.restlet.routing.Router;
 
 import javax.inject.Singleton;
 
@@ -36,7 +34,6 @@ import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestCollectionResourceEndpointsBinder;
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestServiceEndpointsBinder;
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestSingletonResourceEndpointsBinder;
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.ServiceEndpointRouterProvider;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -66,12 +63,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(ConnectionFactory.class)
                 .annotatedWith(Names.named(RealmRouterConnectionFactory.CONNECTION_FACTORY_NAME))
                 .toProvider(CrestRealmConnectionFactoryProvider.class)
-                .in(Singleton.class);
-
-        // Restlet Router
-        bind(Router.class)
-                .annotatedWith(Names.named(ServiceEndpointApplication.ROUTER_NAME))
-                .toProvider(ServiceEndpointRouterProvider.class)
                 .in(Singleton.class);
 
         // Actual endpoint bindings
