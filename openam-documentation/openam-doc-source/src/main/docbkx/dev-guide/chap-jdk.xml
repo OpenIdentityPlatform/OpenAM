@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jdk'
@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Using the OpenAM Java SDK</title>
 
  <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
@@ -63,6 +62,14 @@
     <para>Deploy the .war in your Java web application container such as
     Apache Tomcat or JBoss.</para>
     <screen>$ cp <?eval ${clientSDKExamplesWarFile}?> /path/to/tomcat/webapps/client.war</screen>
+   </step>
+
+   <step>
+    <para>
+     If you have run this procedure before, make sure to deploy a fresh
+     copy of the .war file to a different location, such as
+     <filename>/path/to/tomcat/webapps/client1.war</filename>
+    </para>
    </step>
 
    <step>
