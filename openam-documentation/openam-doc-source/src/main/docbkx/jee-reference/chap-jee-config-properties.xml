@@ -667,25 +667,49 @@
      Default.</para>
     </listitem>
    </varlistentry>
-   <varlistentry>
-    <term><literal>com.sun.identity.agents.config.fqdn.mapping</literal></term>
-    <listitem>
-     <para>Enables virtual hosts, partial hostname and IP address to access
-     protected resources. Maps invalid or virtual name keys to valid FQDN
-     values so the agent can properly redirect users and the agents receive
-     cookies belonging to the domain.</para>
-     <para>To map <literal>myserver</literal> to
-     <literal>myserver.mydomain.example</literal>, enter
-     <literal>myserver</literal> in the Map Key field, and enter
-     <literal>myserver.mydomain.example</literal> in the Corresponding Map Value
-     field. This corresponds to
-     <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.example</literal>.</para>
-     <para>For centralized configurations this property is configured under
-     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
-     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt; FQDN
-     Virtual Host Map.</para>
-    </listitem>
-   </varlistentry>
+      <varlistentry>
+          <term><literal>com.sun.identity.agents.config.fqdn.mapping</literal></term>
+          <listitem>
+              <para>Maps virtual, invalid, or partial hostnames, and IP addresses to the FQDN to access
+                      protected resources. The property allows agents to redirect users to the FQDN and receive
+                      cookies belonging to the domain. It also ensures that invalid FQDN values that can cause the application server
+                      to become unusable or render resources inaccessible get properly mapped to the FQDN.
+              </para>
+              <para>The property accepts an <replaceable>invalid_hostname</replaceable> and a <replaceable>validN</replaceable> Map Key value.
+                  The <replaceable>invalid_hostname</replaceable> maps an invalid or a partial hostname, or an IP address to a FQDN.
+                  The <replaceable>validN</replaceable> (where N = 1, 2, 3 ...) Map Key maps virtual hostnames to a FQDN.</para>
+
+              <para><literal>com.sun.identity.agents.config.fqdn.mapping[<replaceable>invalid_hostname</replaceable>] = <replaceable>valid_hostname</replaceable></literal>
+                  <literal>com.sun.identity.agents.config.fqdn.mapping[<replaceable>validN</replaceable>] = <replaceable>valid_hostname</replaceable></literal></para>
+
+              <para>For example, to map the partial hostname <literal>myserver</literal> to
+                  <literal>myserver.mydomain.example</literal>, enter
+                  <literal>myserver</literal> in the Map Key field, enter
+                  <literal>myserver.mydomain.example</literal> in the Corresponding Map Value field and then click Add. This corresponds to:
+              </para>
+              <literallayout class="monospaced">com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.example</literallayout>
+
+              <para>To address a server as <literal>xyz.hostname.com</literal>,
+                  when the actual name of the server is <literal>abc.hostname.com</literal>,
+                  enter <literal>valid1</literal> in the Map Key field, enter
+                  <literal>xyz.hostname.example</literal> in the Corresponding Map Value field and then click Add. This corresponds to:
+              </para>
+              <literallayout class="monospaced">com.sun.identity.agents.config.fqdn.mapping[valid1]= xyz.hostname.com</literallayout>
+
+              <para>If you have multiple virtual servers <literal>rst.hostname.com</literal>, <literal>uvw.hostname.com</literal>, and <literal>xyz.hostname.com</literal>
+                  pointing to the same actual server <literal>abc.hostname.com</literal> and each virtual server has its own policies defined, the properties
+                  can be defined as:
+              </para>
+              <literallayout class="monospaced">com.sun.identity.agents.config.fqdn.mapping[valid1]= rst.hostname.com
+                  com.sun.identity.agents.config.fqdn.mapping[valid2]= uvw.hostname.com
+                  com.sun.identity.agents.config.fqdn.mapping[valid3]= xyz.hostname.com</literallayout>
+
+              <para>For centralized configurations, this property is configured under
+                  Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+                  J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt; FQDN
+                  Virtual Host Map.</para>
+          </listitem>
+      </varlistentry>
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.httpsession.binding</literal></term>
     <listitem>

@@ -1107,8 +1107,8 @@ token=value;Domain=subdomain.domain.com</literal></para>
      The <replaceable>invalid_hostname</replaceable> maps an invalid or a partial hostname, or an IP address to a FQDN.
      The <replaceable>validN</replaceable> (where N = 1, 2, 3 ...) Map Key maps virtual hostnames to a FQDN.</para>
 
-     <para><literal>com.sun.identity.config.fqdn.mapping[<replaceable>invalid_hostname</replaceable>] = <replaceable>valid_hostname</replaceable></literal>
-     <literal>com.sun.identity.config.fqdn.mapping[<replaceable>validN</replaceable>] = <replaceable>valid_hostname</replaceable></literal></para>
+     <para><literal>com.sun.identity.agents.config.fqdn.mapping[<replaceable>invalid_hostname</replaceable>] = <replaceable>valid_hostname</replaceable></literal>
+     <literal>com.sun.identity.agents.config.fqdn.mapping[<replaceable>validN</replaceable>] = <replaceable>valid_hostname</replaceable></literal></para>
 
      <para>For example, to map the partial hostname <literal>myserver</literal> to
      <literal>myserver.mydomain.example</literal>, enter
