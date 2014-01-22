@@ -168,6 +168,118 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
  --attributevalues iplanet-am-monitoring-snmp-enabled=true</screen>
   </section>
  </section>
+
+ <section xml:id="cts-monitoring">
+  <title>Monitoring CTS Tokens</title>
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>CTS</secondary>
+   </indexterm>
+
+  <!-- Current OIDs include the .999 label; will be changed per AME-2750 -->
+
+  <para>
+   The <link xlink:href="install-guide#chap-cts"
+   xlink:role="http://docbook.org/xlink/role/olink">OpenAM Core
+   Token Service</link> (CTS) provides persistent and highly available
+   token storage for a several components within OpenAM, including
+   user sessions, OAuth 2.0 and SAML 2.0 tokens.
+  </para>
+
+  <para>
+   Depending on system load and usage, the CTS can produce a
+   large quantity of tokens, which can be short lived. This style of
+   usage is significantly different form typical LDAP usage. As such,
+   systems administrators may be interested in monitoring this usage
+   as part of LDAP directory maintenance.
+  </para>
+
+  <para>
+   The CTS functions only with one external LDAP service, OpenDJ.
+  </para>
+
+  <para>
+   To that end, the current state of CTS tokens on a system
+   can be monitored over SNMP. The current state of different types
+   of CTS tokens are associated with different Object Identifiers (OIDs)
+   in a Management Information Base (MIB).
+  </para>
+
+  <para>
+   To enable SNMP, see <link xlink:href="admin-guide#monitoring-snmp"
+   xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>SNMP Monitoring</citetitle>.</link>
+  </para>
+
+  <section xml:id="cts-monitor-commands">
+   <title>CTS SNMP Monitoring</title>
+
+   <para>
+    Once activated, SNMP monitoring works over UDP by default. You may
+    want to install one of many available network monitoring tools. For
+    the purpose of this section, basic SNMP service and monitoring tools
+    have been installed on a GNU/Linux system. The same commands should
+    work on a Mac OS X system.
+   </para>
+
+   <para>SNMP depends on labels known as Object Identifiers (OIDs). These
+    are uniquely defined labels, organized in tree format. For OpenAM, they
+    are configured in a Management Information Base file named
+    <link xlink:show="new"
+    xlink:href="https://svn.forgerock.org/openam/trunk/openam/openam-schema/openam-mib-schema/src/main/resources/mib/FORGEROCK-OPENAM-CTS.mib">
+    <filename>FORGEROCK-OPENAM-CTS.mib</filename></link>.
+   </para>
+
+   <!-- Discussion in progress about including the mib file in the binary -->
+
+   <para>
+    For detailed information on configured OIDs, see the OpenAM Reference
+    chapter on the <link xlink:show="new" xlink:href="reference#chap-cts-oids"
+    xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Core Token Service (CTS) Object Identifiers (OIDs)</citetitle>.
+    </link>
+   </para>
+
+   <para>
+    With the OIDs in hand, you can set up an SNMP server to collect
+    the data. You would also need SNMP utility commands with associated
+    OIDs to measure the current state of a component. First, to verify
+    the operation of SNMP on a GNU/Linux system, over port 8085,
+    using SNMP version 2c, run the following command:</para>
+
+   <screen># snmpstatus -c public -v 2c localhost</screen>
+
+   <para>The output should normally specify communications over UDP. If you
+   get a <literal>timeout</literal> message, the SNMP service may not be
+   running.</para>
+
+   <para>You can get the value for a specific OID. For example, the
+    following command would retrieve the cumulative count for CTS
+    create operations, over port 8085:</para>
+
+   <!-- Replace 999 with the actual OID label for CTS when AME-2750 is complete -->
+
+   <screen># snmpget -c public -v 2c :8085 enterprises.36733.1.2.999.3.1.1.1</screen>
+
+   <para>
+    For one view of the tree of OIDs, you can use the
+    <command>snmpwalk</command> command. For example, the following command
+    lists all OIDs related to CTS:
+   </para>
+
+   <screen># snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.999</screen>
+
+   <para>
+    A number of CTS OIDs are listed with a <literal>Counter64</literal> value.
+    As defined in <link xlink:show="new"
+    xlink:href="http://tools.ietf.org/search/rfc2578#section-7.1.10">
+    <citetitle>RFC 2578</citetitle>,</link> an OID so configured has a maximum
+    value of <literal>2^64 - 1</literal>.
+   </para>
+
+  </section>
+
+ </section>
  
  <section xml:id="is-openam-alive">
   <title>Is OpenAM Running?</title>
