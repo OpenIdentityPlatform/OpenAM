@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -35,8 +35,8 @@ package com.iplanet.dpro.session;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.dpro.session.share.SessionInfo;
@@ -47,31 +47,31 @@ import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
 import com.iplanet.services.naming.WebtopNaming;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SearchResults;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 
+import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Vector;
 import java.security.AccessController;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Vector;
 
 /**
  * The <code>Session</code> class represents a session. It contains session
@@ -1300,11 +1300,17 @@ public class Session extends GeneralTaskRunnable {
      */
     public static URL getSessionServiceURL(SessionID sid)
             throws SessionException {
-        String primary_id = null;
-
-        validateSessionID(sid);
+        String primary_id;
 
         if (isServerMode()) {
+
+            /**
+             * Validate that the SessionID contains valid Server and Site references.
+             * This check is not appropriate for client side code as only the Site
+             * reference is exposed to client code.
+             */
+            validateSessionID(sid);
+
             SessionService ss = SessionService.getSessionService();
             if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
                 if (ss.isSessionFailoverEnabled()) {
