@@ -150,11 +150,14 @@ public class CoreTokenResourceTest {
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UpdateRequest updateRequest = mock(UpdateRequest.class);
         CoreTokenResource resource = new CoreTokenResource(serialisation, store);
+        JsonValue value = mock(JsonValue.class);
 
         //Ensure the Token is included in the UpdateRequest
         Token token = new Token("badger", TokenType.OAUTH);
         String tokenJson = serialisation.serialise(token);
-        given(updateRequest.getNewContent()).willReturn(new JsonValue(tokenJson));
+
+        given(value.toString()).willReturn(tokenJson);
+        given(updateRequest.getNewContent()).willReturn(value);
 
         // When
         resource.updateInstance(null, "badger", updateRequest, handler);

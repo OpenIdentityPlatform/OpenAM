@@ -152,9 +152,8 @@ public class CoreTokenResource implements CollectionResourceProvider {
      * @param handler To handle errors.
      */
     public void updateInstance(ServerContext serverContext, String tokenId, UpdateRequest updateRequest, ResultHandler<Resource> handler) {
-        JsonValue value = updateRequest.getNewContent();
-        String jsonText = value.getObject().toString();
-        Token newToken = serialisation.deserialise(jsonText, Token.class);
+        String value = updateRequest.getNewContent().toString();
+        Token newToken = serialisation.deserialise(value, Token.class);
 
         try {
             store.update(newToken);
