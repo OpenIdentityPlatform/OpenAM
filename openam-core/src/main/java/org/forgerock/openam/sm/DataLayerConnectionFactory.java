@@ -143,6 +143,6 @@ public class DataLayerConnectionFactory implements ConnectionFactory, ShutdownLi
      * @return the FutureResult from the underlying factory.
      */
     public FutureResult<Connection> getConnectionAsync(ResultHandler<? super Connection> resultHandler) {
-        return getConnectionAsync(resultHandler);
+        return factory.getConnectionAsync(resultHandler);
     }
 }
