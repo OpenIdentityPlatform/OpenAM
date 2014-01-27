@@ -26,8 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
 package com.sun.identity.cli.schema;
 
+
+import java.text.MessageFormat;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -40,9 +48,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.text.MessageFormat;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 
 /**
@@ -81,7 +86,7 @@ public class SchemaCommand extends AuthenticatedCommand {
         }
         return mgr;
     }
-    
+
     protected ServiceSchema getServiceSchema()
         throws CLIException {
         String serviceName = getStringOptionValue(IArgument.SERVICE_NAME);
@@ -133,14 +138,14 @@ public class SchemaCommand extends AuthenticatedCommand {
         if (ss == null) {
             String[] args = {subSchemaName};
             throw new CLIException(MessageFormat.format(
-                getResourceString("schema-sub-schema-does-not-exists"), 
+                getResourceString("schema-sub-schema-does-not-exists"),
                     (Object[])args),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
         return ss;
     }
 
-    private SchemaType getSchemaType(String schemaTypeName){
+    private SchemaType getSchemaType(String schemaTypeName) throws CLIException{
         SchemaType schemaType = null;
         if (schemaTypeName.equalsIgnoreCase(SCHEMA_TYPE_GLOBAL)) {
             schemaType = SchemaType.GLOBAL;
@@ -152,6 +157,11 @@ public class SchemaCommand extends AuthenticatedCommand {
             schemaType = SchemaType.USER;
         } else if (schemaTypeName.equalsIgnoreCase(SCHEMA_TYPE_POLICY)) {
             schemaType = SchemaType.POLICY;
+        } else {
+        	Object[] args = { schemaTypeName };
+            throw new CLIException(MessageFormat.format(
+                    getResourceString("supported-schema-type"), args),
+                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
         return schemaType;
     }
