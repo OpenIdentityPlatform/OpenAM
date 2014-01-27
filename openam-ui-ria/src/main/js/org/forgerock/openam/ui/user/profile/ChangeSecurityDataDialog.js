@@ -39,10 +39,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     var ChangeSecurityDataDialog = Dialog.extend({    
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
         
-        data: {         
-            width: 800,
-            height: 400
-        },
+        data: { },
         
         events: {
             "click input[type=submit]": "formSubmit",
@@ -88,11 +85,8 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
         render: function() {
             this.actions = {};
             this.addAction($.t("common.form.update"), "submit");
-            
             this.delegate = userDelegate;
-            
-                this.data.height = 260;
-                
+
             $("#dialogs").hide();
             this.show(_.bind(function() {
                 validatorsManager.bindValidators(this.$el);

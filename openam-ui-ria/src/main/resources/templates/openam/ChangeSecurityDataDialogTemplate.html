@@ -1,40 +1,40 @@
 <h1>{{t "templates.user.ChangeSecurityDataDialogTemplate.securityDataChange"}}</h1>
-<form id="passwordChange" action="" class="form large center no-margin" method="post" onsubmit="return false">
+<form id="passwordChange" action="" class="form" method="post" onsubmit="return false">
     <fieldset>
-            <div class="field">
-                <label for="csdd-oldPassword">{{t "common.user.oldPassword"}}</label> 
-                <input  id="csdd-oldPassword"  type="password" name="oldPassword" value=""  data-validator="required" required autofocus />
-                <span class="error">x</span>
-            </div>
-            <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p>
-            <div class="group-field" style="height: 100px;">
-                <div class="group-field">
-                    <div class="group-field-inputs">
-                        <div class="field">
-                            <label for="csdd-password">{{t "common.user.newPassword"}}</label> 
-                            <input  id="csdd-password" type="password" name="password" value=""  data-validator="minLength" minLength="8" required data-validator-event="keyup change"/>
-                            <span class="error">x</span>
-                        </div>
 
-                        <div class="field">
-                            <label for="csdd-passwordConfirm">{{t "common.user.confirmPassword"}}</label> 
-                            <input  id="csdd-passwordConfirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" required data-validator-event="keyup change" />
-                            <span class="error">x</span>
-                        </div>                        
-                    </div>
-                    <div class="group-field-errors validationRules" data-for-validator="password passwordConfirm">
-                        <div class="field-rule">
-                            <span class="error">x</span> 
-                            <span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
-                        </div> 
-                        <div class="field-rule">
-                            <span class="error">x</span> 
-                            <span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
-                        </div> 
-                    </div>
-                </div>
-                <div class="clear"></div>
-            </div>
+        <div class="group-field-row">
+            <label for="oldPassword">{{t "common.user.oldPassword"}}</label> 
+            <input  id="oldPassword"  type="password" name="oldPassword" value="" data-validator="required" autofocus />
+            <span class="error">x</span>
+        </div>
+
+        <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p>
+
+        <div class="group-field-row float-left">
+            <label for="password">{{t "common.user.newPassword"}}</label>
+            <input type="password" id="password" name="password" value="" data-validator="minLength" minLength="8" data-validator-event="keyup change" data-validation-status="error" />
+            <span class="error">x</span> 
+        </div> 
+
+        <div class="group-field-errors float-left validationRules" data-for-validator="password passwordConfirm">
+            <div class="field-rule">
+                <span class="error">x</span> 
+                <span data-for-validator="minLength">{{t "common.form.validation.atLeast8Characters"}}</span>
+            </div> 
+            <div class="field-rule">
+                <span class="error">x</span> 
+                <span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
+            </div> 
+        </div>
+
+        <div class="group-field-row float-left">
+            <label for="confirm">{{t "common.user.confirmPassword"}}</label> 
+            <input  id="confirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" />
+            <span class="error">x</span>
+        </div>                        
+   
+        
+
     </fieldset>
 </form>      
 

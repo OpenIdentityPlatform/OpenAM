@@ -22,16 +22,18 @@
                         "footer-background-color": "#eee",
                         "background-font-color": "#5a646d",
                         "column-padding": "160px",
-                        
-                        "login-container-width": "480px",
+                  
                         "login-container-label-align": "right",
+
+                        "login-container-width": "472px",
+                        "medium-container-width": "592px",
+                        "site-width": "960px",
             
-                        "message-background-color": "#F9F9F9",
+                        "message-background-color": "#fff",
                         "content-background": "#f9f9f9",
                         "font-color": "#5a646d",
                         "font-size": "14px",
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "site-width": "960px",
                         "line-height": "18px",
             
                         "color-active": "#80b7ab",
@@ -50,7 +52,10 @@
                         "color-success": "#71bd71",
                         "color-info": "blue",
                         "color-inactive": "gray",
-            
+
+
+                        "input-background-color": "#fff",
+                        "input-background-invalid-color": "#ffe5e9",
                         "input-border-basic": "#DBDBDB",
                         "header-border-color": "#5D5D5D",
             

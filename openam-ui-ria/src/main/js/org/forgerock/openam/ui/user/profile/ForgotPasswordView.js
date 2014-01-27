@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
-        baseTemplate: "templates/common/LoginBaseTemplate.html",
+        baseTemplate: "templates/common/MediumBaseTemplate.html",
         
         data: {},
         events: {

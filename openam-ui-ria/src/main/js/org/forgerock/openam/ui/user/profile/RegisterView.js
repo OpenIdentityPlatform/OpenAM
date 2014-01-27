@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
     
     var RegisterView = AbstractView.extend({
         template: "templates/openam/RegisterTemplate.html",
-        baseTemplate: "templates/common/LoginBaseTemplate.html",
+        baseTemplate: "templates/common/MediumBaseTemplate.html",
         
         data: {},
         events: {
