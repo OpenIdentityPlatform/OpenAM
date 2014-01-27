@@ -248,7 +248,7 @@ public class AuthenticationService extends ServerResource implements ServiceProv
         addResponseHeader(EXPIRES_HEADER_NAME, ALWAYS_EXPIRE_HEADER);
         addResponseHeader(CONTENT_TYPE_HEADER_NAME, MediaType.APPLICATION_JSON.getName());
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
         return new JacksonRepresentation<Map>(mapper.readValue(jsonResponse.toString(), Map.class));
     }
 
@@ -280,7 +280,7 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             addResponseHeader(key, e.getResponseHeaders().get(key));
         }
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
         try {
             return new JacksonRepresentation<Map>(mapper.readValue(e.getJsonResponse().toString(), Map.class));
         } catch (IOException ioe) {

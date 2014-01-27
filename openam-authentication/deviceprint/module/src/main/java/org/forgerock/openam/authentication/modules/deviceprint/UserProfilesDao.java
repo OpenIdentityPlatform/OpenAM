@@ -25,10 +25,16 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
+
+import com.sun.identity.shared.debug.Debug;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.forgerock.openam.authentication.modules.deviceprint.exceptions.NotUniqueUserProfileException;
+import org.forgerock.openam.authentication.modules.deviceprint.model.UserProfile;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -39,12 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.sun.identity.shared.debug.Debug;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.forgerock.openam.authentication.modules.deviceprint.exceptions.NotUniqueUserProfileException;
-import org.forgerock.openam.authentication.modules.deviceprint.model.UserProfile;
 
 /**
  * DAO class for CRUDL operations on UserProfiles in LDAP.
@@ -57,7 +57,7 @@ public class UserProfilesDao {
 
 	private final AMIdentityWrapper amIdentity;
 	private final List<UserProfile> profiles = new ArrayList<UserProfile>();
-	private final ObjectMapper mapper = new ObjectMapper();
+	private static final ObjectMapper mapper = new ObjectMapper().configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     /**
      * Constructs an instance of the UserProfilesDao.
@@ -73,7 +73,6 @@ public class UserProfilesDao {
      * Initialises the DAO's internal user profiles cache from LDAP.
      */
 	public void init() {
-        mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 		profiles.clear();
 		
 		try {

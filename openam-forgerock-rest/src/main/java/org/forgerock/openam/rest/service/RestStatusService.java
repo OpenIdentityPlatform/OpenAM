@@ -19,6 +19,7 @@ package org.forgerock.openam.rest.service;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
@@ -53,7 +54,7 @@ public class RestStatusService extends StatusService {
             jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
         }
 
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
         try {
             return new JacksonRepresentation<Map>(mapper.readValue(jsonResponse.toString(), Map.class));
         } catch (IOException e) {
