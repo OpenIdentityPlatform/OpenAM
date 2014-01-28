@@ -330,7 +330,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 options = _.find(cb.output, function (o) { return o.name === "options"; });
                 if (options && options.value !== undefined) {
                     _.each(options.value, function (option, index) {
-                        result += '<input name="callback_' + cb.input.index + '" type="submit" class="button active" index="'+ index +'" value="'+ option +'">';
+                        result += '<input name="callback_' + cb.input.index + '" type="submit" class="button" index="'+ index +'" value="'+ option +'">';
                     });
                 }
             break;

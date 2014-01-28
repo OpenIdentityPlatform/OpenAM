@@ -71,13 +71,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
-                    _this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                    _this.$el.find("input[type=submit]").prop('disabled', false);
                     if(response.message.indexOf("Email not sent") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "emailNotSent");
                     }
                 };
             
-            this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+            this.$el.find("input[type=submit]").prop('disabled', true);
             userDelegate.doAction("register",postData,success,error);
         },
         register: function(e) {
@@ -94,13 +94,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             },
             error = function(e) {
                 var response = JSON.parse(e.responseText);
-                _this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                _this.$el.find("input[type=submit]").prop('disabled', false);
                 if(response.message.indexOf("ldap exception") > -1) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
                 }
             };
             
-            this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+            this.$el.find("input[type=submit]").prop('disabled', true);
             
             userDelegate.doAction("confirm",this.data.urlParams,function(d){
                 _.extend(postData,d);
@@ -115,10 +115,10 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#registration")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
-                this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                this.$el.find("input[type=submit]").prop('disabled', false);
             }
             else {
-                this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+                this.$el.find("input[type=submit]").prop('disabled', true);
             }
         }
     }); 

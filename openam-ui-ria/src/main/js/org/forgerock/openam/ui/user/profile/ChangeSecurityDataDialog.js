@@ -74,12 +74,11 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
         customValidate: function () {
 
             if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#securityDataChange"))) {
-                this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                this.$el.find("input[type=submit]").prop('disabled', false);
             }
             else {
-                this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
-            }
-                
+                this.$el.find("input[type=submit]").prop('disabled', true);
+            } 
             
         },
         render: function() {
@@ -94,6 +93,8 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 this.reloadData();
                 
             }, this));
+
+            this.$el.find("input[type=submit]").prop('disabled', true);
         },
         
         reloadData: function() {

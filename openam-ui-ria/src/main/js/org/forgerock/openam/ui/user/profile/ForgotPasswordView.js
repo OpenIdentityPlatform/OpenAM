@@ -54,7 +54,6 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 this.data.isStageOne = false;
             }
             this.parentRender(function() {
-               this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
                validatorsManager.bindValidators(this.$el);
             });
         },
@@ -72,7 +71,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
-                    _this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                    _this.$el.find("input[type=submit]").prop('disabled', false);
                     if(response.message.indexOf("No email provided in profile.") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "noEmailProvided");
                     }
@@ -81,7 +80,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                     } 
                 };
             
-            this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+            this.$el.find("input[type=submit]").prop('disabled', true);
             userDelegate.doAction("forgotPassword",postData,success,error);
         },
         changePassword: function(e) {
@@ -94,7 +93,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 $("#passwordChangeSuccess").show();
             };
             _.extend(postData,this.data.urlParams);
-            this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+            this.$el.find("input[type=submit]").prop('disabled', true);
             userDelegate.doAction("forgotPasswordReset",postData,success);
         },
         cancel: function(e) {
@@ -105,10 +104,11 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
-                this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                this.$el.find("input[type=submit]").prop('disabled', false);
             }
             else {
-                this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
+                this.$el.find("input[type=submit]").prop('disabled', true);
+               
             }
         }
     }); 
