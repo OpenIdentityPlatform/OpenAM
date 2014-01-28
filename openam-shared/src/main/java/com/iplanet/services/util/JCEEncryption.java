@@ -27,23 +27,21 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.iplanet.services.util;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.Provider;
-import java.security.Security;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CipherProvider;
+import org.forgerock.openam.utils.JCECipherProvider;
+import org.forgerock.openam.utils.ThreadLocalCipherProvider;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * <p>
@@ -123,6 +121,18 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
                 KEYGEN_ALGORITHM_PROVIDER_DEFAULT_VALUE);
     }
 
+    private static final String CRYPTO_CACHE_SIZE_PROPERTY_NAME = "amCryptoCacheSize";
+    private static final int DEFAULT_CACHE_SIZE = 500;
+    private static final int CACHE_SIZE = Integer.getInteger(CRYPTO_CACHE_SIZE_PROPERTY_NAME, DEFAULT_CACHE_SIZE);
+
+    /**
+     * Stores a thread-local copy of the underlying cipher, fetched from the standard {@link Cipher} implementation,
+     * preferring the Sun JCE provider if available.
+     */
+    private static final CipherProvider cipherProvider = new ThreadLocalCipherProvider(
+            new JCECipherProvider(CRYPTO_DESCRIPTOR, CRYPTO_DESCRIPTOR_PROVIDER), CACHE_SIZE);
+
+
     /**
      * Method declaration
      * 
@@ -146,7 +156,7 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
      * 
      * @param clearText
      */
-    private byte[] pbeEncrypt(byte[] clearText) {
+    private byte[] pbeEncrypt(final byte[] clearText) {
         byte[] result = null;
         if (clearText == null || clearText.length == 0) {
             return null;
@@ -157,30 +167,10 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
                 byte type[] = new byte[2];
                 type[1] = (byte) DEFAULT_ENC_ALG_INDEX;
                 type[0] = (byte) DEFAULT_KEYGEN_ALG_INDEX;
-
-                Cipher pbeCipher = null;
-                try {
-                    pbeCipher = Cipher.getInstance(CRYPTO_DESCRIPTOR,
-                            CRYPTO_DESCRIPTOR_PROVIDER);
-                } catch (Exception ex) {
-                    if (ex instanceof NoSuchAlgorithmException
-                            || ex instanceof NoSuchPaddingException) {
-                        // Best effort try dynamically registring the SunJCE
-                        // provider
-                        Debug debug = Debug.getInstance("amSDK");
-                        if (debug != null) {
-                            debug.error("JCEEncryption:pbeEncrypt", ex);
-                        }
-                        pbeCipher = Cipher.getInstance(CRYPTO_DESCRIPTOR);
-                    } else {
-                        throw ex;
-                    }
-                }
-
+                
+                final Cipher pbeCipher = cipherProvider.getCipher();
                 if (pbeCipher != null) {
-                    pbeCipher.init(Cipher.ENCRYPT_MODE, pbeKey,
-                            pbeParameterSpec);
-
+                    pbeCipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
                     result = pbeCipher.doFinal(clearText);
                     byte[] iv = pbeCipher.getIV();
 
@@ -255,25 +245,7 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
 
                 byte raw[] = getRaw(share);
 
-                Cipher pbeCipher = null;
-                try {
-                    pbeCipher = Cipher.getInstance(CRYPTO_DESCRIPTOR,
-                            CRYPTO_DESCRIPTOR_PROVIDER);
-                } catch (Exception ex) {
-                    if (ex instanceof NoSuchAlgorithmException
-                            || ex instanceof NoSuchPaddingException) {
-                        // Best effort try dynamically registring the SunJCE
-                        // provider
-                        Debug debug = Debug.getInstance("amSDK");
-                        if (debug != null) {
-                            debug.error("JCEEncryption:pbeDecrypt", ex);
-                        }
-                        pbeCipher = Cipher.getInstance(CRYPTO_DESCRIPTOR);
-                    } else {
-                        throw ex;
-                    }
-                }
-
+                final Cipher pbeCipher = cipherProvider.getCipher();
                 if (pbeCipher != null) {
                     pbeCipher.init(Cipher.DECRYPT_MODE, pbeKey,
                             pbeParameterSpec);
@@ -320,19 +292,18 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
      * Sets password-based key to use
      */
     public void setPassword(String password) throws Exception {
-        pbeKey = SecretKeyFactory.getInstance(KEYGEN_ALGORITHM,
-                KEYGEN_ALGORITHM_PROVIDER).generateSecret(
-                new PBEKeySpec(password.toCharArray()));
+        pbeKey = SecretKeyFactory.getInstance(KEYGEN_ALGORITHM, KEYGEN_ALGORITHM_PROVIDER)
+                                 .generateSecret(new PBEKeySpec(password.toCharArray()));
         _initialized = true;
     }
 
     private static final byte[] ___y = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
             0x01, 0x01 };
 
-    private SecretKey pbeKey;
+    private volatile SecretKey pbeKey;
 
-    private boolean _initialized = false;
+    private volatile boolean _initialized = false;
 
-    private static PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(
+    private static final PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(
             ___y, ITERATION_COUNT);
 }
