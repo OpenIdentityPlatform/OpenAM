@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm;
 
@@ -41,6 +41,7 @@ import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
@@ -154,16 +155,18 @@ public final class AMIdentity {
      */
     public AMIdentity(SSOToken ssotoken, String universalId)
         throws IdRepoException {
+        this(new DN(universalId), ssotoken);
+    }
+
+    public AMIdentity(DN universalId, SSOToken ssotoken) throws IdRepoException {
         this.token = ssotoken;
         // Validate Universal ID
-        DN dnObject = new DN(universalId);
         String[] array = null;
-        if ((universalId != null) &&
-            universalId.toLowerCase().startsWith("id=") &&
-            dnObject.isDN()) {
-            array = dnObject.explodeDN(true);
+        if (universalId != null && universalId.isDN()
+                && ("id".equals(((RDN) universalId.getRDNs().get(0)).getType().toLowerCase()))) {
+            array = universalId.explodeDN(true);
         }
-        if ((array == null) || (array.length <3)) {
+        if (array == null || array.length < 3) {
             // Not a valid UUID since it should have the
             // name, type and realm components
             Object args[] = { universalId };
@@ -171,56 +174,19 @@ public final class AMIdentity {
         }
 
         // Valid UUID, construct rest of the parameters
-        univIdWithoutDN = dnObject.toRFCString();
+        univIdWithoutDN = universalId.toRFCString();
 
         // Check for AMSDK DN
         int index;
-        if ((index = univIdWithoutDN.toLowerCase().indexOf(
-            ",amsdkdn=")) != -1) {
+        if ((index = univIdWithoutDN.toLowerCase().indexOf(",amsdkdn=")) != -1) {
             // obtain DN and univIdWithoutDN
             univDN = univIdWithoutDN.substring(index + 9);
             univIdWithoutDN = univIdWithoutDN.substring(0, index);
-            dnObject = new DN(univIdWithoutDN);
-
+            universalId = new DN(univIdWithoutDN);
         }
-        name = LDAPDN.unEscapeValue( array[0] );
+        name = LDAPDN.unEscapeValue(array[0]);
         type = new IdType(array[1]);
-        orgName = dnObject.getParent().getParent().toRFCString();
-    }
-
-    public AMIdentity(DN universalId, SSOToken ssotoken)
-        throws IdRepoException {
-        this.token = ssotoken;
-        // Validate Universal ID
-        DN dnObject = universalId;
-        String[] array = null;
-        if ((dnObject != null) &&
-            ((RDN) dnObject.getRDNs().get(0)).getType().toLowerCase()
-                .equals("id") &&
-            dnObject.isDN()) {
-            array = dnObject.explodeDN(true);
-        }
-        if ((array == null) || (array.length <3)) {
-            // Not a valid UUID since it should have the
-            // name, type and realm components
-            Object args[] = { dnObject };
-            throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "215", args);
-        }
-
-        // Valid UUID, construct rest of the parameters
-        univIdWithoutDN = dnObject.toRFCString();
-        // Check for AMSDK DN
-        int index;
-        if ((index = univIdWithoutDN.toLowerCase().indexOf(
-            ",amsdkdn=")) != -1) {
-            // obtain DN and univIdWithoutDN
-            univDN = univIdWithoutDN.substring(index + 9);
-            univIdWithoutDN = univIdWithoutDN.substring(0, index);
-            dnObject = new DN(univIdWithoutDN);
-        }
-        name = array[0];
-        type = new IdType(array[1]);
-        orgName = dnObject.getParent().getParent().toRFCString();
+        orgName = universalId.getParent().getParent().toRFCString();
     }
 
     /**
@@ -239,47 +205,27 @@ public final class AMIdentity {
      * @param amsdkdn
      *            the amsdk name assoicated with this identity if any.
      */
-    public AMIdentity(SSOToken token, String name, IdType type, String orgName,
-            String amsdkdn) {
-        this.name = name;
-        this.type = type;
-        this.orgName = com.sun.identity.sm.DNMapper.orgNameToDN(orgName);
-        this.token = token;
-        if ((amsdkdn != null) && (amsdkdn.length() > 0)) {
-            this.univDN = (new DN(amsdkdn)).toRFCString();
-        }
-        StringBuilder sb = new StringBuilder(100);
-        if ((name != null) && (name.indexOf(',') != -1)) {
-            DN nameDN = new DN(name);
-            if (nameDN.isDN()) {
-                name = LDAPDN.explodeDN(nameDN, true)[0];
-            }
-        }
-        sb.append("id=").append(name).append(",ou=").append(type.getName())
-            .append(",").append(this.orgName);
-
-        univIdWithoutDN = sb.toString();
+    public AMIdentity(SSOToken token, String name, IdType type, String orgName, String amsdkdn) {
+        this(new DN(amsdkdn), token, name, type, orgName);
     }
 
-    public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type,
-            String orgName) {
+    public AMIdentity(DN amsdkdn, SSOToken token, String name, IdType type, String orgName) {
         this.name = name;
         this.type = type;
-        this.orgName = com.sun.identity.sm.DNMapper.orgNameToDN(orgName);
+        this.orgName = DNMapper.orgNameToDN(orgName);
         this.token = token;
-        if (amsdkdn != null) {
+        if (amsdkdn != null && amsdkdn.isDN()) {
             this.univDN = amsdkdn.toRFCString();
         }
         StringBuilder sb = new StringBuilder(100);
-        if ((name != null) && (name.indexOf(',') != -1)) {
+        if (name != null) {
             DN nameDN = new DN(name);
             if (nameDN.isDN()) {
-                name = LDAPDN.explodeDN(nameDN, true)[0];
+                name = LDAPDN.unEscapeValue(LDAPDN.explodeDN(nameDN, true)[0]);
             }
         }
-        sb.append("id=").append(LDAPDN.escapeValue( name ) )
-            .append(",ou=").append(type.getName())
-            .append(",").append(this.orgName);
+        sb.append("id=").append(LDAPDN.escapeValue(name)).append(",ou=").append(type.getName()).append(",")
+                .append(this.orgName);
 
         univIdWithoutDN = sb.toString();
     }
