@@ -46,6 +46,7 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.ImageField;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -107,7 +108,6 @@ public class LoginViewBean extends AuthViewBeanBase {
         super.registerChildren();
         registerChild(PAGE_STATE, StaticTextField.class);
         registerChild(LOGIN_URL, StaticTextField.class);
-        registerChild(AM_ORIG_URL, StaticTextField.class);
         registerChild(DEFAULT_LOGIN_URL, StaticTextField.class);
         registerChild(REDIRECT_URL, StaticTextField.class);
         registerChild(TILED_CALLBACKS, CallBackTiledView.class);
@@ -159,9 +159,6 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
             loginURL = AuthUtils.encodeURL(loginURL, ac, response);
             return new StaticTextField(this, name, loginURL);
-        } else if (name.equals(AM_ORIG_URL)) { //only used by new_org.jsp
-            origLoginURL = AuthUtils.constructOrigURL(request);
-            return new StaticTextField(this, name, origLoginURL);
         } else if (name.equals(PAGE_STATE)) {
             return new StaticTextField(this, name, pageState);
         } else if (name.equals("Image")) {
@@ -334,19 +331,10 @@ public class LoginViewBean extends AuthViewBeanBase {
                 } else {
                     loginDebug.message("Old Session is Active.");
                     newOrgExist = checkNewOrg(ssoToken);
-                    if (logIntoDiffOrg) {
-                        String origURL = request.getParameter(AM_ORIG_URL);
-                        if (origURL != null) {
-                            String tmp = new String(Base64.decode(origURL));
-                            response.sendRedirect(tmp);
-                        } else {
-                            errorCode = "102";
-                            setErrorMessage(null);
-                            super.forwardTo(requestContext);
-                        }
-                        return;
+                    if (newOrg) {
+                        sessionID = new SessionID();
                     }
-                    if (!newOrgExist && !dontLogIntoDiffOrg) {
+                    if (!newOrgExist) {
                         if (isPost) {
                             isBackPost = canGetOrigCredentials(ssoToken);
                         }
@@ -363,7 +351,15 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                 }
             }
-            
+
+            if ("true".equals(request.getParameter("new_org"))) {
+                ssoToken = AuthUtils.getExistingValidSSOToken(new SessionID(request));
+                handleNewOrgResponse(ssoToken);
+                if (logIntoDiffOrg) {
+                    //session is already deleted, so we should just continue our login process
+                    newOrgExist = true;
+                }
+            }
             if ((ssoToken != null) && !sessionUpgrade && !newOrgExist) {
                 try {
                     loginDebug.message("Session is Valid / already "
@@ -414,8 +410,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                 }
             }
 
-            ac = AuthUtils.getAuthContext(
-                    request, response, sessionID, sessionUpgrade, isBackPost);
+            ac = AuthUtils.getAuthContext(request, response, sessionID, sessionUpgrade, isBackPost);
             if (sessionID != null) {
                 intSession = AuthD.getSession(sessionID);
             }
@@ -491,9 +486,7 @@ public class LoginViewBean extends AuthViewBeanBase {
 		    if (AuthUtils.persistAMCookie(reqDataHash)) {
 			enableCookieTimeToLive();
 		    }
-                    if (!newOrgExist) {
-                        setCookie();
-                    }
+                    setCookie();
                     setlbCookie();
                 }
             } else {
@@ -525,7 +518,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             return;
         }
         
-        if ((errorTemplate==null)||(errorTemplate.length() == 0)) {
+        if (errorTemplate==null || errorTemplate.isEmpty()) {
             processLogin();
             if (requestContext==null) { // solve the recursive case
                 clearGlobals();
@@ -854,7 +847,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     
     private void processLogin() {
         loginDebug.message("In processLogin()");
-        if (isPost) {
+        if (isPost && !newOrgExist) {
             try {
                 processLoginDisplay();
             }
@@ -1591,15 +1584,13 @@ public class LoginViewBean extends AuthViewBeanBase {
     }
     
     // Method to check if this is Session Upgrade
-    private boolean checkNewOrg(SSOToken ssot) {
+    private boolean checkNewOrg(SSOToken ssoToken) {
         loginDebug.message("Check New Organization!");
         boolean checkNewOrg = false;
-        dontLogIntoDiffOrg = false;
-        logIntoDiffOrg = false;
 
         try {
             // always make sure the orgName is the same
-            String orgName = ssot.getProperty("Organization");
+            String orgName = ssoToken.getProperty("Organization");
             String newOrgName = AuthUtils.getDomainNameByRequest(request, reqDataHash);
             if (loginDebug.messageEnabled()) {
                 loginDebug.message("original org is : " + orgName);
@@ -1607,43 +1598,14 @@ public class LoginViewBean extends AuthViewBeanBase {
             }
             
             //if new Org is not valid / does not exist
-            if ((newOrgName == null) || (newOrgName.length() == 0)) {
+            if (newOrgName == null || newOrgName.isEmpty()) {
                 return checkNewOrg;
             }
             
             // if new Org is different from the old Org
-            if (!(DNUtils.normalizeDN(newOrgName))
-                .equals(DNUtils.normalizeDN(orgName))) {
-                String strButton = (String)reqDataHash.get(BUTTON);
-                if (strButton == null) {
-                    strButton = (String)reqDataHash.get(BUTTON_OLD);
-                }
-                if (loginDebug.messageEnabled()) {
-                    loginDebug.message("Submit with button : " + strButton);
-                }
-                
-                if ((strButton != null) && (strButton.length() != 0)) {
-                    ISLocaleContext localeContext = new ISLocaleContext();
-                    localeContext.setLocale(request);
-                    fallbackLocale = localeContext.getLocale();
-                    rb =  rbCache.getResBundle(bundleName, fallbackLocale);
-                    
-                    if (strButton.trim().equals(rb.getString("Yes").trim())) {
-                        logIntoDiffOrg = true;
-                        loginDebug.message("Submit with YES. Destroy session.");
-                        clearCookie(AuthUtils.getCookieName());
-                        AuthUtils.clearHostUrlCookie(response);
-                        AuthUtils.clearlbCookie(request, response);
-                        SSOTokenManager.getInstance().destroyToken(ssot);
-                    } else if (strButton.trim().equals(rb.getString("No").trim())) {
-                        loginDebug.message("Aborting different realm auth");
-                        dontLogIntoDiffOrg = true;
-                        return checkNewOrg;
-                    }
-                } else {
-                    newOrg = true;
-                    errorTemplate = "new_org.jsp";
-                }
+            if (!DNUtils.normalizeDN(newOrgName).equals(DNUtils.normalizeDN(orgName))) {
+                newOrg = true;
+                errorTemplate = "new_org.jsp";
                 checkNewOrg = true;
             }
         } catch (Exception e) {
@@ -1654,6 +1616,42 @@ public class LoginViewBean extends AuthViewBeanBase {
             loginDebug.message("checkNewOrg : " + checkNewOrg);
         }
         return checkNewOrg;
+    }
+
+    private void handleNewOrgResponse(SSOToken ssoToken) {
+        String strButton = (String) reqDataHash.get(BUTTON);
+        if (strButton == null) {
+            strButton = (String) reqDataHash.get(BUTTON_OLD);
+        }
+        if (loginDebug.messageEnabled()) {
+            loginDebug.message("Submit with button : " + strButton);
+        }
+
+        if (strButton != null && !strButton.isEmpty()) {
+            ISLocaleContext localeContext = new ISLocaleContext();
+            localeContext.setLocale(request);
+            fallbackLocale = localeContext.getLocale();
+            rb = rbCache.getResBundle(bundleName, fallbackLocale);
+
+            if (strButton.trim().equals(rb.getString("Yes").trim())) {
+                logIntoDiffOrg = true;
+                loginDebug.message("Submit with YES. Destroy session.");
+                clearCookie(AuthUtils.getCookieName());
+                AuthUtils.clearHostUrlCookie(response);
+                AuthUtils.clearlbCookie(request, response);
+                try {
+                    SSOTokenManager tokenMgr = SSOTokenManager.getInstance();
+                    tokenMgr.destroyToken(ssoToken);
+                } catch (SSOException ssoe) {
+                    loginDebug.message("Unable to destroy old session for new_org case", ssoe);
+                }
+            } else if (strButton.trim().equals(rb.getString("No").trim())) {
+                loginDebug.message("Aborting different realm auth");
+                logIntoDiffOrg = false;
+            }
+        } else {
+            setErrorMessage(null);
+        }
     }
     
     // Method to set DSAME cookie
@@ -2317,7 +2315,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     private boolean newOrg = false;
     private boolean bHttpBasic = false;
     private boolean newOrgExist = false;
-    private boolean dontLogIntoDiffOrg = false;
     private boolean logIntoDiffOrg = false;
     HttpServletRequest request;
     HttpServletResponse response;
@@ -2351,8 +2348,6 @@ public class LoginViewBean extends AuthViewBeanBase {
     public static final String PAGE_STATE = "PageState";
     /** Default parameter name for login url */
     public static final String LOGIN_URL = "LoginURL";
-    /** Original login URL used on first access */
-    public static final String AM_ORIG_URL = "AMOrigURL";
     /** Default parameter name for default login url */
     public static final String DEFAULT_LOGIN_URL = "DefaultLoginURL";
     /** Default parameter name for redirect url */

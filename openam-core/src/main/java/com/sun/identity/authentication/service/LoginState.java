@@ -1756,18 +1756,6 @@ public class LoginState {
         Hashtable requestHash) {
         String userOrg = null;
         
-        try {
-            SSOTokenManager manager = SSOTokenManager.getInstance();
-            SSOToken ssoToken = manager.createSSOToken(request);
-            if (!sessionUpgrade && !requestHash.isEmpty()
-            && (manager.isValidToken(ssoToken))) {
-                userOrg = ssoToken.getProperty("Organization");
-                debug.message("User org from existing valid session");
-            }
-        } catch (Exception e) {
-            debug.message("ERROR in getUserDomain - " + e.toString());
-        }
-        
         //org profile is not loaded yet so we can't check with getPersistentCookieMode()
         //but we will check if persistentCookie is there and use it because we will
         //verify if the pcookie is valid later anyways.

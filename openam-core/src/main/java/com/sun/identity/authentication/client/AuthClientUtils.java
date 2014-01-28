@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.client;
 
@@ -773,11 +773,11 @@ public class AuthClientUtils {
         if (sidValue == null) {
             sidValue = CookieUtils.getCookieValueFromReq(request, getAuthCookieName());
         }
-        if (sidValue != null) {
+        if (sidValue != null && !sidValue.isEmpty()) {
             sessionID = new SessionID(sidValue);
             utilDebug.message("sidValue from Auth Cookie");
         }
-        return (sessionID);
+        return sessionID;
     }
 
     /**
