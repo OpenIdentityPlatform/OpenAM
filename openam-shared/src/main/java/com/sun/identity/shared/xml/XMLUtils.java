@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.shared.xml;
 
@@ -35,39 +35,9 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
-import com.sun.org.apache.xerces.internal.parsers.DOMParser;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.forgerock.util.xml.XMLHandler;
+import org.forgerock.openam.utils.DocumentBuilderProvider;
+import org.forgerock.openam.utils.Providers;
+import org.forgerock.openam.utils.SAXParserProvider;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,6 +49,31 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
@@ -119,6 +114,26 @@ public class XMLUtils {
             // ignore since there is not debug class here
         }
     }
+
+    /**
+     * Size of document builder cache.
+     */
+    private static final int DOCBUILDER_CACHE_SIZE = SystemPropertiesManager.getAsInt(Constants.XML_DOCUMENT_BUILDER_CACHE_SIZE, 500);
+
+    /**
+     * Size of the SAXParser cache. Defaults to same size as document builder cache.
+     */
+    private static final int SAXPARSER_CACHE_SIZE = SystemPropertiesManager.getAsInt(Constants.XML_SAXPARSER_CACHE_SIZE, DOCBUILDER_CACHE_SIZE);
+
+    /**
+     * Provider for DocumentBuilder instances. Caches in an LRU cache per thread.
+     */
+    private static final DocumentBuilderProvider DOCUMENT_BUILDER_PROVIDER = Providers.documentBuilderProvider(DOCBUILDER_CACHE_SIZE);
+
+    /**
+     * Provider for SAXParse instances. Caches in a per-thread LRU cache.
+     */
+    private static final SAXParserProvider SAX_PARSER_PROVIDER = Providers.saxParserProvider(SAXPARSER_CACHE_SIZE);
 
     public String getATTR_VALUE_PAIR_NODE() {
         return ATTR_VALUE_PAIR_NODE;
@@ -898,7 +913,7 @@ public class XMLUtils {
      * of the required features.
      */
     public static DocumentBuilder getSafeDocumentBuilder(boolean validating) throws ParserConfigurationException {
-        return org.forgerock.util.xml.XMLUtils.getSafeDocumentBuilder(validating);
+        return DOCUMENT_BUILDER_PROVIDER.getDocumentBuilder(validating);
     }
 
     /**
@@ -913,7 +928,7 @@ public class XMLUtils {
      * features.
      */
     public static SAXParser getSafeSAXParser(boolean validating) throws ParserConfigurationException, SAXException {
-        return org.forgerock.util.xml.XMLUtils.getSafeSAXParser(validating);
+        return SAX_PARSER_PROVIDER.getSAXParser(validating);
     }
 
     /**

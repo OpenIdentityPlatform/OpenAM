@@ -34,8 +34,7 @@ package com.iplanet.services.util;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.CipherProvider;
-import org.forgerock.openam.utils.JCECipherProvider;
-import org.forgerock.openam.utils.ThreadLocalCipherProvider;
+import org.forgerock.openam.utils.Providers;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -126,11 +125,10 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
     private static final int CACHE_SIZE = Integer.getInteger(CRYPTO_CACHE_SIZE_PROPERTY_NAME, DEFAULT_CACHE_SIZE);
 
     /**
-     * Stores a thread-local copy of the underlying cipher, fetched from the standard {@link Cipher} implementation,
+     * Stores a per-thread copy of the underlying cipher, fetched from the standard {@link Cipher} implementation,
      * preferring the Sun JCE provider if available.
      */
-    private static final CipherProvider cipherProvider = new ThreadLocalCipherProvider(
-            new JCECipherProvider(CRYPTO_DESCRIPTOR, CRYPTO_DESCRIPTOR_PROVIDER), CACHE_SIZE);
+    private static final CipherProvider cipherProvider = Providers.cipherProvider(CRYPTO_DESCRIPTOR, CRYPTO_DESCRIPTOR_PROVIDER, CACHE_SIZE);
 
 
     /**

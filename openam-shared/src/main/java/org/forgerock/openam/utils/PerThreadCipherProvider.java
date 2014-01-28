@@ -26,7 +26,7 @@ import javax.crypto.Cipher;
  *
  * @since 12.0.0
  */
-public class ThreadLocalCipherProvider implements CipherProvider {
+public class PerThreadCipherProvider implements CipherProvider {
     private static final int DEFAULT_MAX_SIZE = 500;
 
     /**
@@ -34,23 +34,24 @@ public class ThreadLocalCipherProvider implements CipherProvider {
      * instance. Uses a LinkedHashMap initialised as a LRU cache to limit the amount of memory used for cached
      * ciphers. Access to this map should synchronize on it for thread safety.
      */
-    private final ThreadLocalCache<Cipher, RuntimeException> cipherCache;
+    private final PerThreadCache<Cipher, RuntimeException> cipherCache;
 
     /**
      * Initialises the thread-local cipher cache, delegating to the supplied cipher provider for actual ciphers.
      *
      * @param delegate the non-null provider to get ciphers from.
      * @param maxSize the maximum size of the thread-local cache.
-     * @throws IllegalArgumentException if the delegate is null or if maxSize is not a positive integer (&gt; 0).
+     * @throws NullPointerException if the delegate is null
+     * @throws IllegalArgumentException if maxSize is not a positive integer (&gt; 0).
      */
-    public ThreadLocalCipherProvider(final CipherProvider delegate, final int maxSize) {
+    public PerThreadCipherProvider(final CipherProvider delegate, final int maxSize) {
         if (delegate == null) {
-            throw new IllegalArgumentException("Must specify a valid delegate CipherProvider");
+            throw new NullPointerException("Must specify a valid delegate CipherProvider");
         }
         if (maxSize <= 0) {
             throw new IllegalArgumentException("maxSize must be positive");
         }
-        this.cipherCache = new ThreadLocalCache<Cipher, RuntimeException>(maxSize) {
+        this.cipherCache = new PerThreadCache<Cipher, RuntimeException>(maxSize) {
             @Override
             protected Cipher initialValue() {
                 return delegate.getCipher();
@@ -58,7 +59,7 @@ public class ThreadLocalCipherProvider implements CipherProvider {
         };
     }
 
-    public ThreadLocalCipherProvider(CipherProvider delegate) {
+    public PerThreadCipherProvider(CipherProvider delegate) {
         this(delegate, DEFAULT_MAX_SIZE);
     }
 

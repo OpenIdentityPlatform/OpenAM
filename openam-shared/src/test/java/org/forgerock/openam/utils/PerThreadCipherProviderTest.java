@@ -28,15 +28,15 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
- * Unit tests for the {@link ThreadLocalCipherProvider}.
+ * Unit tests for the {@link PerThreadCipherProvider}.
  */
-public class ThreadLocalCipherProviderTest {
+public class PerThreadCipherProviderTest {
 
-    private ThreadLocalCipherProvider testProvider;
+    private PerThreadCipherProvider testProvider;
 
     @BeforeMethod
     public void setup() {
-        testProvider = new ThreadLocalCipherProvider(new MockCipherProvider());
+        testProvider = new PerThreadCipherProvider(new MockCipherProvider());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ThreadLocalCipherProviderTest {
         // Given
         int maxSize = 1;
         ExecutorService otherThread = Executors.newSingleThreadExecutor();
-        testProvider = new ThreadLocalCipherProvider(new MockCipherProvider(), maxSize);
+        testProvider = new PerThreadCipherProvider(new MockCipherProvider(), maxSize);
 
         // When
         Cipher cipher1 = testProvider.getCipher();

@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @since 12.0.0
  */
-public abstract class ThreadLocalCache<T, E extends Exception> {
+public abstract class PerThreadCache<T, E extends Exception> {
     private static final int INITIAL_CACHE_SIZE = 16;
     private static final float CACHE_LOAD_FACTOR = 0.75f;
 
@@ -51,7 +51,7 @@ public abstract class ThreadLocalCache<T, E extends Exception> {
      *
      * @param maxSize the maximum number of instances to cache.
      */
-    public ThreadLocalCache(final int maxSize) {
+    public PerThreadCache(final int maxSize) {
         this.maxSize = maxSize;
     }
 

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock, SA.
  */
 
 package com.sun.identity.shared;
@@ -1306,4 +1306,14 @@ public interface Constants {
      * Heartbeat in seconds of the LDAP Store
      */
     public static final String LDAP_HEARTBEAT = "org.forgerock.services.cts.store.heartbeat";
+
+    /**
+     * Size of XML shared DocumentBuilder cache.
+     */
+    final String XML_DOCUMENT_BUILDER_CACHE_SIZE = "org.forgerock.openam.utils.xml.documentbuilder.cache.size";
+
+    /**
+     * Size of XML shared SAXParser cache.
+     */
+    final String XML_SAXPARSER_CACHE_SIZE = "org.forgerock.openam.utils.xml.saxparser.cache.size";
 }
