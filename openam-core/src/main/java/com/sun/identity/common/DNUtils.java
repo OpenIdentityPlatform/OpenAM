@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.common;
@@ -88,7 +88,7 @@ public class DNUtils {
         // String dn is guaranteed type of DN
         String id = dn;
         try {
-            id = LDAPDN.explodeDN(dn, noTypes)[0];
+            id = LDAPDN.unEscapeValue(LDAPDN.explodeDN(dn, noTypes)[0]);
         } catch (Exception e) {
         }
         return id;

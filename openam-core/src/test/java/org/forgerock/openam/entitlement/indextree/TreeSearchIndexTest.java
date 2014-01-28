@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -28,12 +28,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for TreeSearchIndex.
- *
- * @author andrew.forrest@forgerock.com
  */
 public class TreeSearchIndexTest {
 
@@ -82,7 +79,7 @@ public class TreeSearchIndexTest {
     }
 
     /**
-     * Tests that the search index parses retrieved indexes, encoding special LDAP characters.
+     * Tests that the search index parses retrieved indexes without encoding special characters.
      */
     @Test
     public void parseRetrievedIndexes() throws Exception {
@@ -97,8 +94,8 @@ public class TreeSearchIndexTest {
 
         // Verify the test results
         Set<String> parsedIndexes = new HashSet<String>();
-        parsedIndexes.add("a-b-\\2A-d-e");
-        parsedIndexes.add("a-\\2A-c-\\2A-e");
+        parsedIndexes.add("a-b-*-d-e");
+        parsedIndexes.add("a-*-c-*-e");
 
         assertEquals(Arrays.asList("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
         assertEquals(parsedIndexes, result.getPathIndexes());

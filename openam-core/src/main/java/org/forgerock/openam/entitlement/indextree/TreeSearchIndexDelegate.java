@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -22,15 +22,12 @@ import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.inject.Inject;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Implementation provides search index by means of an in memory rule index cache.
  * <p/>
  * Expects the passed resource to have already been normalised.
- *
- * @author apforrest
  */
 public class TreeSearchIndexDelegate implements ISearchIndex {
 
@@ -65,30 +62,9 @@ public class TreeSearchIndexDelegate implements ISearchIndex {
         // Indexes are handled in lower case.
         resource = resource.toLowerCase();
         // Search the index tree for matching path indexes.
-        Set<String> pathIndexes = escapePathIndexes(indexTreeService.searchTree(resource, realm));
+        Set<String> pathIndexes = indexTreeService.searchTree(resource, realm);
 
         return new ResourceSearchIndexes(
                 legacyIndexes.getHostIndexes(), pathIndexes, legacyIndexes.getParentPathIndexes());
     }
-
-    /**
-     * Prepare path indexes for LDAP search.
-     * <p/>
-     * TODO: This should use Filter#escapeAssertionValue() as provided by the OpenDJ SDK once it becomes available.
-     *
-     * @param pathIndexes
-     *         Path Indexes to be escaped.
-     * @return Escaped path indexes.
-     */
-    protected Set<String> escapePathIndexes(Set<String> pathIndexes) {
-        Set<String> escapedPathIndexes = new HashSet<String>();
-
-        for (String pathIndex : pathIndexes) {
-            pathIndex = pathIndex.replace("*", "\\2A");
-            escapedPathIndexes.add(pathIndex);
-        }
-
-        return escapedPathIndexes;
-    }
-
 }
