@@ -25,7 +25,7 @@
  * $Id: DataStore.java,v 1.13 2010/01/20 17:01:35 veiming Exp $
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -989,9 +989,7 @@ public class DataStore {
         StringBuilder subjectBuffer = new StringBuilder();
         if ((subjectIndexes != null) && !subjectIndexes.isEmpty()) {
             for (String i : subjectIndexes) {
-                Object[] o = {i};
-                subjectBuffer.append(
-                    MessageFormat.format(SUBJECT_FILTER_TEMPLATE, o));
+                subjectBuffer.append(MessageFormat.format(SUBJECT_FILTER_TEMPLATE, escapeCharactersInFilter(i)));
             }
         }
         if (subjectBuffer.length() > 0) {
@@ -1002,9 +1000,7 @@ public class DataStore {
         StringBuilder hostBuffer = new StringBuilder();
         if ((hostIndexes != null) && !hostIndexes.isEmpty()) {
             for (String h : indexes.getHostIndexes()) {
-                Object[] o = {h};
-                hostBuffer.append(MessageFormat.format(
-                    HOST_FILTER_TEMPLATE, o));
+                hostBuffer.append(MessageFormat.format(HOST_FILTER_TEMPLATE, escapeCharactersInFilter(h)));
             }
         }
         if (hostBuffer.length() > 0) {
@@ -1016,9 +1012,7 @@ public class DataStore {
 
         if ((pathIndexes != null) && !pathIndexes.isEmpty()) {
             for (String p : pathIndexes) {
-                Object[] o = {p};
-                pathBuffer.append(MessageFormat.format(
-                    PATH_FILTER_TEMPLATE, o));
+                pathBuffer.append(MessageFormat.format(PATH_FILTER_TEMPLATE, escapeCharactersInFilter(p)));
             }
         }
 
@@ -1026,9 +1020,7 @@ public class DataStore {
             Set<String> parentPathIndexes = indexes.getParentPathIndexes();
             if ((parentPathIndexes != null) && !parentPathIndexes.isEmpty()) {
                 for (String p : parentPathIndexes) {
-                    Object[] o = {p};
-                    pathBuffer.append(MessageFormat.format(
-                        PATH_PARENT_FILTER_TEMPLATE, o));
+                    pathBuffer.append(MessageFormat.format(PATH_PARENT_FILTER_TEMPLATE, escapeCharactersInFilter(p)));
                 }
             }
         }
@@ -1103,5 +1095,36 @@ public class DataStore {
         } catch (SMSException ex) {
             throw new EntitlementException(215, ex);
         }
+    }
+
+    private static String escapeCharactersInFilter(String assertionValue) {
+        StringBuilder result = new StringBuilder(assertionValue.length());
+        for (int cursor = 0; cursor < assertionValue.length(); cursor++) {
+            char nextChar = assertionValue.charAt(cursor);
+            switch (nextChar) {
+                case '*':
+                    result.append("\\2a");
+                    break;
+                case '(':
+                    result.append("\\28");
+                    break;
+                case ')':
+                    result.append("\\29");
+                    break;
+                case '/':
+                    result.append("\\2f");
+                    break;
+                case '\\':
+                    result.append("\\5c");
+                    break;
+                case '\0':
+                    result.append("\\00");
+                    break;
+                default:
+                    result.append(nextChar);
+                    break;
+            }
+        }
+        return result.toString();
     }
 }

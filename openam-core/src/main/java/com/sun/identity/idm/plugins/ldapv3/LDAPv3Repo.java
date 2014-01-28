@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS 
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -3011,13 +3011,9 @@ public class LDAPv3Repo extends IdRepo {
                     //assuming backslash wasn't escaped before this method
                     result.append("\\5c");
                     break;
-                case 'N' :
-                	String NULSTR = dn.substring(cursor, cursor+3);
-                    if (NULSTR.equals("NUL")) {
-                        result.append("\\00");
-                        cursor = cursor+2;
-                        break;
-                    }
+                case '\0' :
+                    result.append("\\00");
+                    break;
                 default  :
                     result.append(nextChar);
                     break;
