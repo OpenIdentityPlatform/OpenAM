@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.service;
 
@@ -551,16 +551,6 @@ public class AuthUtils extends AuthClientUtils {
                 utilDebug.message("this is an existing request");
             }
             return false;
-        }
-    }
-
-    public static String constructOrigURL(HttpServletRequest request) {
-        String requestURI = (String) request.getAttribute("javax.servlet.forward.request_uri");
-        if (requestURI != null) {
-            String queryString = (String) request.getAttribute("javax.servlet.forward.query_string");
-            return Base64.encode((requestURI + '?' + queryString).getBytes());
-        } else {
-            return Base64.encode((request.getRequestURI() + '?' + request.getQueryString()).getBytes());
         }
     }
 
