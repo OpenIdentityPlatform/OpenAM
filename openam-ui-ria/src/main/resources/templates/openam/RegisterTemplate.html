@@ -28,6 +28,14 @@
          
             <fieldset id="step2">
 
+                {{#if urlParams.email}}
+                <div class="group-field-row">
+                    <label for="email">{{t "common.user.emailAddress"}}</label>
+                    <input type="email" id="email" name="email" value="{{urlParams.email}}" readonly />
+                    <span class="ok">✔</span>
+                </div>
+                {{/if}}
+
                 <div class="group-field-row">
                     <label for="username">{{t "common.user.username"}}</label>
                     <input type="text" id="username" name="username" value="" autofocus data-validator="required"  data-validator-event="keyup change"/>

@@ -33,7 +33,7 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
     
     var ConfirmLoginView = AbstractView.extend({
         template: "templates/openam/RESTConfirmLoginTemplate.html",
-        baseTemplate: "templates/common/MediumBaseTemplate.html",
+        baseTemplate: "templates/common/LoginBaseTemplate.html",
         
         data: {},
         events: {
