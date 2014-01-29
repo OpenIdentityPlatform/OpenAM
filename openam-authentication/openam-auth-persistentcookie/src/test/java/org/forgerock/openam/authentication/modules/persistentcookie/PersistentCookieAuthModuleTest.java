@@ -24,6 +24,7 @@ import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.sm.SMSException;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
+import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.authentication.modules.common.AMLoginModuleBinder;
@@ -39,8 +40,10 @@ import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +52,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class PersistentCookieAuthModuleTest {
 
@@ -102,7 +106,6 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -129,7 +132,6 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -158,7 +160,6 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
 
         //Then
-        assertEquals(config.size(), 7);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -336,7 +337,6 @@ public class PersistentCookieAuthModuleTest {
                 ssoToken);
 
         //Then
-        assertEquals(config.size(), 7);
         assertEquals(config.get(JwtSessionModule.KEY_ALIAS_KEY), "KEY_ALIAS");
         assertEquals(config.get(JwtSessionModule.PRIVATE_KEY_PASSWORD_KEY), "PRIVATE_KEY_PASS");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
@@ -363,12 +363,6 @@ public class PersistentCookieAuthModuleTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        Map<String, Object> internalMap = new HashMap<String, Object>();
-        internalMap.put("openam.usr", "PRINCIPAL_NAME");
-        internalMap.put("openam.aty", "AUTH_TYPE");
-        internalMap.put("openam.sid", "SSO_TOKEN_ID");
-        internalMap.put("openam.rlm", "ORGANISATION");
-
         Map<String, Object> map = new HashMap<String, Object>();
         given(messageInfo.getMap()).willReturn(map);
 
@@ -388,7 +382,12 @@ public class PersistentCookieAuthModuleTest {
 
         //Then
         assertEquals(map.size(), 1);
-        assertEquals(map.get("org.forgerock.authentication.context"), internalMap);
+        Map<String, Object> contextMap = (Map<String, Object>) map.get("org.forgerock.authentication.context");
+        assertEquals(contextMap.get("openam.usr"), "PRINCIPAL_NAME");
+        assertEquals(contextMap.get("openam.aty"), "AUTH_TYPE");
+        assertEquals(contextMap.get("openam.sid"), "SSO_TOKEN_ID");
+        assertEquals(contextMap.get("openam.rlm"), "ORGANISATION");
+        assertEquals(contextMap.get("openam.clientip"), null);
     }
 
     @Test
@@ -411,12 +410,6 @@ public class PersistentCookieAuthModuleTest {
         Map<String, Object> map = new HashMap<String, Object>();
         given(messageInfo.getMap()).willReturn(map);
 
-        Map<String, Object> internalMapResult = new HashMap<String, Object>();
-        internalMapResult.put("openam.usr", "PRINCIPAL_NAME");
-        internalMapResult.put("openam.aty", "AUTH_TYPE");
-        internalMapResult.put("openam.sid", "SSO_TOKEN_ID");
-        internalMapResult.put("openam.rlm", "ORGANISATION");
-
         Principal principal = mock(Principal.class);
         given(principal.getName()).willReturn("PRINCIPAL_NAME");
 
@@ -435,7 +428,196 @@ public class PersistentCookieAuthModuleTest {
         //Then
         assertEquals(map.size(), 2);
         assertEquals(map.get("jwtValidated"), true);
-        assertEquals(map.get("org.forgerock.authentication.context"), internalMapResult);
+        Map<String, Object> contextMap = (Map<String, Object>) map.get("org.forgerock.authentication.context");
+        assertEquals(contextMap.get("openam.usr"), "PRINCIPAL_NAME");
+        assertEquals(contextMap.get("openam.aty"), "AUTH_TYPE");
+        assertEquals(contextMap.get("openam.sid"), "SSO_TOKEN_ID");
+        assertEquals(contextMap.get("openam.rlm"), "ORGANISATION");
+        assertEquals(contextMap.get("openam.clientip"), null);
+    }
 
+    @Test
+    public void shouldInitialiseAuthModuleWithClientIPEnforced() {
+
+        //Given
+        Subject subject = new Subject();
+        Map sharedState = new HashMap();
+        Map options = new HashMap();
+
+        options.put("openam-auth-persistent-cookie-enforce-ip", Collections.singleton("true"));
+
+        //When
+        Map<String, Object> config = persistentCookieAuthModule.initialize(subject, sharedState, options);
+
+        //Then
+        assertEquals(config.get("openam-auth-persistent-cookie-enforce-ip"), true);
+    }
+
+    @Test
+    public void shouldEnforceClientIPOnLoginWhenClientIPIsSame() throws LoginException {
+
+        //Given
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        Subject clientSubject = new Subject();
+        Callback[] callbacks = new Callback[0];
+        Jwt jwt = mock(Jwt.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        Map<String, Object> claimsSetContext = new HashMap<String, Object>();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        Map options = new HashMap();
+        options.put("openam-auth-persistent-cookie-enforce-ip", Collections.singleton("true"));
+        persistentCookieAuthModule.initialize(null, null, options);
+
+        given(jwtSessionModule.validateJwtSessionCookie(messageInfo)).willReturn(jwt);
+        given(jwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class)).willReturn(claimsSetContext);
+        claimsSetContext.put("openam.rlm", "REALM");
+        given(amLoginModuleBinder.getRequestOrg()).willReturn("REALM");
+        claimsSetContext.put("openam.clientip", "CLIENT_IP");
+        given(amLoginModuleBinder.getHttpServletRequest()).willReturn(request);
+        given(request.getRemoteAddr()).willReturn("CLIENT_IP");
+
+        //When
+        boolean result = persistentCookieAuthModule.process(messageInfo, clientSubject, callbacks);
+
+        //Then
+        assertTrue(result);
+    }
+
+    @Test (expectedExceptions = AuthLoginException.class)
+    public void shouldEnforceClientIPOnLoginWhenClientIPIsDifferent() throws LoginException {
+
+        //Given
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        Subject clientSubject = new Subject();
+        Callback[] callbacks = new Callback[0];
+        Jwt jwt = mock(Jwt.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        Map<String, Object> claimsSetContext = new HashMap<String, Object>();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        Map options = new HashMap();
+        options.put("openam-auth-persistent-cookie-enforce-ip", Collections.singleton("true"));
+        persistentCookieAuthModule.initialize(null, null, options);
+
+        given(jwtSessionModule.validateJwtSessionCookie(messageInfo)).willReturn(jwt);
+        given(jwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class)).willReturn(claimsSetContext);
+        claimsSetContext.put("openam.rlm", "REALM");
+        given(amLoginModuleBinder.getRequestOrg()).willReturn("REALM");
+        claimsSetContext.put("openam-auth-persistent-cookie-enforce-ip", "CLIENT_IP");
+        given(amLoginModuleBinder.getHttpServletRequest()).willReturn(request);
+        given(request.getRemoteAddr()).willReturn("CLIENT_IP_2");
+
+        //When
+        persistentCookieAuthModule.process(messageInfo, clientSubject, callbacks);
+
+        //Then
+        fail();
+    }
+
+    @Test (expectedExceptions = AuthLoginException.class)
+    public void shouldEnforceClientIPOnLoginWhenClientIPIsNotStoredInPCookie() throws LoginException {
+
+        //Given
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        Subject clientSubject = new Subject();
+        Callback[] callbacks = new Callback[0];
+        Jwt jwt = mock(Jwt.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        Map<String, Object> claimsSetContext = new HashMap<String, Object>();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        Map options = new HashMap();
+        options.put("openam-auth-persistent-cookie-enforce-ip", Collections.singleton("true"));
+        persistentCookieAuthModule.initialize(null, null, options);
+
+        given(jwtSessionModule.validateJwtSessionCookie(messageInfo)).willReturn(jwt);
+        given(jwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class)).willReturn(claimsSetContext);
+        claimsSetContext.put("openam.rlm", "REALM");
+        given(amLoginModuleBinder.getRequestOrg()).willReturn("REALM");
+        given(amLoginModuleBinder.getHttpServletRequest()).willReturn(request);
+        given(request.getRemoteAddr()).willReturn("CLIENT_IP");
+
+        //When
+        persistentCookieAuthModule.process(messageInfo, clientSubject, callbacks);
+
+        //Then
+        fail();
+    }
+
+    @Test (expectedExceptions = AuthLoginException.class)
+    public void shouldEnforceClientIPOnLoginWhenClientIPIsNotOnRequest() throws LoginException {
+
+        //Given
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        Subject clientSubject = new Subject();
+        Callback[] callbacks = new Callback[0];
+        Jwt jwt = mock(Jwt.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        Map<String, Object> claimsSetContext = new HashMap<String, Object>();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        Map options = new HashMap();
+        options.put("openam-auth-persistent-cookie-enforce-ip", Collections.singleton("true"));
+        persistentCookieAuthModule.initialize(null, null, options);
+
+        given(jwtSessionModule.validateJwtSessionCookie(messageInfo)).willReturn(jwt);
+        given(jwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class)).willReturn(claimsSetContext);
+        claimsSetContext.put("openam.rlm", "REALM");
+        given(amLoginModuleBinder.getRequestOrg()).willReturn("REALM");
+        claimsSetContext.put("openam-auth-persistent-cookie-enforce-ip", "CLIENT_IP");
+        given(amLoginModuleBinder.getHttpServletRequest()).willReturn(request);
+
+        //When
+        persistentCookieAuthModule.process(messageInfo, clientSubject, callbacks);
+
+        //Then
+        fail();
+    }
+
+    @Test
+    public void shouldInitialiseAuthModuleWithClientIPEnforcedForPAP() throws SSOException, AuthenticationException {
+
+        //Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        SSOToken ssoToken = mock(SSOToken.class);
+
+        given(ssoToken.getProperty("openam-auth-persistent-cookie-enforce-ip")).willReturn("true");
+
+        //When
+        Map<String, Object> config = persistentCookieAuthModule.initialize(Collections.emptyMap(), request, response,
+                ssoToken);
+
+        //Then
+        assertEquals(config.get("openam-auth-persistent-cookie-enforce-ip"), true);
+    }
+
+    @Test
+    public void shouldStoreClientIPOnLoginSuccess() throws AuthenticationException, SSOException {
+
+        //Given
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        SSOToken ssoToken = mock(SSOToken.class);
+        Map<String, Object> contextMap = new HashMap<String, Object>();
+        Principal principal = mock(Principal.class);
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
+
+        given(jwtSessionModule.getContextMap(messageInfo)).willReturn(contextMap);
+        given(ssoToken.getPrincipal()).willReturn(principal);
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+        given(request.getRemoteAddr()).willReturn("CLIENT_IP");
+
+        //When
+        persistentCookieAuthModule.onLoginSuccess(messageInfo, Collections.emptyMap(), request, response, ssoToken);
+
+        //Then
+        assertEquals(contextMap.get("openam.clientip"), "CLIENT_IP");
     }
 }

@@ -42,6 +42,18 @@
                         <Value>5</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-enforce-ip"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a003">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
@@ -57,6 +69,18 @@
                             i18nKey="a002">
                         <DefaultValues>
                             <Value>5</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-enforce-ip"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a003">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

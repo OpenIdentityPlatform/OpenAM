@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -33,6 +33,7 @@ import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthModuleWrapper;
 import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openam.utils.ClientUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -57,20 +58,22 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     private static final String AUTH_KEY_ALIAS = "iplanet-am-auth-key-alias";
     private static final String SSO_TOKEN_ORGANIZATION_PROPERTY_KEY = "Organization";
     private static final int MINUTES_IN_HOUR = 60;
-    private static final int SECONDS_IN_MINUTE = 60;
 
     private static final String COOKIE_IDLE_TIMEOUT_SETTING_KEY = "openam-auth-persistent-cookie-idle-time";
     private static final String COOKIE_MAX_LIFE_SETTING_KEY = "openam-auth-persistent-cookie-max-life";
+    private static final String ENFORCE_CLIENT_IP_SETTING_KEY = "openam-auth-persistent-cookie-enforce-ip";
 
     private static final String OPENAM_USER_CLAIM_KEY = "openam.usr";
     private static final String OPENAM_AUTH_TYPE_CLAIM_KEY = "openam.aty";
     private static final String OPENAM_SESSION_ID_CLAIM_KEY = "openam.sid";
     private static final String OPENAM_REALM_CLAIM_KEY = "openam.rlm";
+    private static final String OPENAM_CLIENT_IP_CLAIM_KEY = "openam.clientip";
 
     private final AMKeyProvider amKeyProvider;
 
     private Integer tokenIdleTime;
     private Integer maxTokenLife;
+    private boolean enforceClientIP;
 
     private Principal principal;
 
@@ -109,6 +112,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
 
         String idleTimeString = CollectionHelper.getMapAttr(options, COOKIE_IDLE_TIMEOUT_SETTING_KEY);
         String maxLifeString = CollectionHelper.getMapAttr(options, COOKIE_MAX_LIFE_SETTING_KEY);
+        final String enforceClientIPString = CollectionHelper.getMapAttr(options, ENFORCE_CLIENT_IP_SETTING_KEY);
         if (StringUtils.isEmpty(idleTimeString)) {
             DEBUG.warning("Cookie Idle Timeout not set. Defaulting to 0");
             idleTimeString = "0";
@@ -119,9 +123,10 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         }
         tokenIdleTime = Integer.parseInt(idleTimeString) * MINUTES_IN_HOUR;
         maxTokenLife = Integer.parseInt(maxLifeString) * MINUTES_IN_HOUR;
+        enforceClientIP = Boolean.parseBoolean(enforceClientIPString);
 
         try {
-            return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), getRequestOrg());
+            return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP, getRequestOrg());
         } catch (SMSException e) {
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
@@ -140,8 +145,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
      * @throws SMSException If there is a problem getting the key alias.
      * @throws SSOException If there is a problem getting the key alias.
      */
-    private Map<String, Object> initialize(String tokenIdleTime, String maxTokenLife, String realm) throws SMSException,
-            SSOException {
+    private Map<String, Object> initialize(final String tokenIdleTime, final String maxTokenLife,
+            final boolean enforceClientIP,  final String realm) throws SMSException, SSOException {
 
         Map<String, Object> config = new HashMap<String, Object>();
         config.put(JwtSessionModule.KEY_ALIAS_KEY, getKeyAlias(realm));
@@ -151,6 +156,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         config.put(JwtSessionModule.KEYSTORE_PASSWORD_KEY, new String(amKeyProvider.getKeystorePass()));
         config.put(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime);
         config.put(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife);
+        config.put(ENFORCE_CLIENT_IP_SETTING_KEY, enforceClientIP);
 
         return config;
     }
@@ -170,6 +176,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         case ISAuthConstants.LOGIN_START: {
             setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime.toString());
             setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife.toString());
+            setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
             final Subject clientSubject = new Subject();
             MessageInfo messageInfo = prepareMessageInfo(getHttpServletRequest(), getHttpServletResponse());
             if (process(messageInfo, clientSubject, callbacks)) {
@@ -197,8 +204,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     protected boolean process(MessageInfo messageInfo, Subject clientSubject, Callback[] callbacks)
             throws LoginException {
 
-        Jwt jwt = getServerAuthModule().validateJwtSessionCookie(
-                prepareMessageInfo(getHttpServletRequest(), getHttpServletResponse()));
+        final Jwt jwt = getServerAuthModule().validateJwtSessionCookie(messageInfo);
 
         if (jwt == null) {
             //BAD
@@ -206,15 +212,21 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         } else {
             //GOOD
 
-            Map<String, Object> claimsSetContext = jwt.getClaimsSet().getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class);
-            if(claimsSetContext == null) {
+            final Map<String, Object> claimsSetContext =
+                    jwt.getClaimsSet().getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class);
+            if (claimsSetContext == null) {
                 throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "jaspiContextNotFound", null);
             }
 
             // Need to check realm
-            String jwtRealm = (String) claimsSetContext.get(OPENAM_REALM_CLAIM_KEY);
+            final String jwtRealm = (String) claimsSetContext.get(OPENAM_REALM_CLAIM_KEY);
             if (!getRequestOrg().equals(jwtRealm)) {
                 throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedDiffRealm", null);
+            }
+
+            final String storedClientIP = (String) claimsSetContext.get(OPENAM_CLIENT_IP_CLAIM_KEY);
+            if (enforceClientIP) {
+                enforceClientIP(storedClientIP);
             }
 
             // Need to get user from jwt to use in Principal
@@ -229,6 +241,28 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
 
             return true;
         }
+    }
+
+    /**
+     * Enforces that the client IP that the request originated from matches the stored client IP that the
+     * persistent cookie was issued to.
+     *
+     * @param storedClientIP The stored client IP.
+     * @throws AuthLoginException If the client IP on the request does not match the stored client IP.
+     */
+    private void enforceClientIP(final String storedClientIP) throws AuthLoginException {
+        final String clientIP = ClientUtils.getClientIPAddress(getHttpServletRequest());
+        if (storedClientIP == null || storedClientIP.isEmpty()) {
+            DEBUG.message("Client IP not stored when persistent cookie was issued.");
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedClientIPDifferent", null);
+        } else if (clientIP == null || clientIP.isEmpty()) {
+            DEBUG.message("Client IP could not be retrieved from request.");
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedClientIPDifferent", null);
+        } else if (!storedClientIP.equals(clientIP)) {
+            DEBUG.message("Client IP not the same, original: " + storedClientIP + ", request: " + clientIP);
+            throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedClientIPDifferent", null);
+        }
+        // client IP is valid
     }
 
     /**
@@ -254,11 +288,12 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             HttpServletResponse response, SSOToken ssoToken) throws AuthenticationException {
 
         try {
-            String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY);
-            String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY);
-            String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY);
+            final String tokenIdleTime = ssoToken.getProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY);
+            final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY);
+            final boolean enforceClientIP = Boolean.parseBoolean(ssoToken.getProperty(ENFORCE_CLIENT_IP_SETTING_KEY));
+            final String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY);
 
-            return initialize(tokenIdleTime, maxTokenLife, realm);
+            return initialize(tokenIdleTime, maxTokenLife, enforceClientIP, realm);
 
         } catch (SSOException e) {
             DEBUG.error("Could not initialise the Auth Module", e);
@@ -290,6 +325,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             contextMap.put(OPENAM_AUTH_TYPE_CLAIM_KEY, ssoToken.getAuthType());
             contextMap.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
             contextMap.put(OPENAM_REALM_CLAIM_KEY, ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY));
+            contextMap.put(OPENAM_CLIENT_IP_CLAIM_KEY, ClientUtils.getClientIPAddress(request));
 
             String jwtString = ssoToken.getProperty(JwtSessionModule.JWT_VALIDATED_KEY);
             if (jwtString != null) {
