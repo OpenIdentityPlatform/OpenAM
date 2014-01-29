@@ -28,14 +28,15 @@
 
 /**
  * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli.definition;
 
 
 import com.sun.identity.cli.annotation.DefinitionClassInfo;
 import com.sun.identity.cli.annotation.Macro;
-import com.sun.identity.cli.annotation.SubCommandInfo;
 import com.sun.identity.cli.annotation.ResourceStrings;
+import com.sun.identity.cli.annotation.SubCommandInfo;
 
 public class AccessManager {
     @DefinitionClassInfo(
@@ -1006,7 +1007,7 @@ public class AccessManager {
         optionalOptions={
             "attributevalues|a|m|Attribute values e.g. homeaddress=here.",
             "datafile|D|s|Name of file that contains attribute values data.",
-            "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided)."},
+            "realm|e|s|Name of realm (Sub Configuration shall be set to global configuration if this option is not provided)."},
         resourceStrings={
             "modify-sub-configuration-succeed=Sub Configuration, {0} was modified.",
             "modify-sub-configuration-to-realm-succeed=Sub Configuration, {1} was modify in realm, {0}",
