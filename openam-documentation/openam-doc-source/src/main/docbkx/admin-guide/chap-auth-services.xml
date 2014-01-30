@@ -3728,6 +3728,21 @@
                   <literal>openam-auth-persistent-cookie-max-life</literal></para>
               </listitem>
           </varlistentry>
+          <varlistentry>
+              <term>Enforce Client IP</term>
+              <listitem>
+                  <para>
+                   When enabled, enforces that the persistent cookie
+                   can only be used from the same client IP
+                   to which the cookie was issued.
+                  </para>
+
+                  <para>
+                   <command>ssoadm</command> attribute:
+                   <literal>openam-auth-persistent-cookie-enforce-ip</literal>
+                  </para>
+              </listitem>
+          </varlistentry>
       </variablelist>
 
       <para>The Persistent Cookie module belongs with a second module in an authentication chain. To see how
