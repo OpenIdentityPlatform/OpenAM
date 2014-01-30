@@ -48,8 +48,12 @@ public class RestStatusService extends StatusService {
     public Representation getRepresentation(Status status, Request request, Response response) {
 
         final JsonValue jsonResponse;
-        if (status.getDescription() != null) {
-            jsonResponse = ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();
+        if (status.getThrowable() != null && status.getThrowable().getMessage() != null) {
+            jsonResponse =
+                    ResourceException.getException(status.getCode(), status.getThrowable().getMessage()).toJsonValue();
+        } else if (status.getDescription() != null) {
+            jsonResponse =
+                    ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();
         } else {
             jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
         }

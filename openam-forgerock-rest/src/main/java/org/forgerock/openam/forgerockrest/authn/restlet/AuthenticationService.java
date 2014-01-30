@@ -120,7 +120,7 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
         }
 
-        final HttpServletRequest request = ServletUtils.getRequest(getRequest());
+        final HttpServletRequest request = getHttpServletRequest();
         final HttpServletResponse response = ServletUtils.getResponse(getResponse());
 
         final Map<String, String> queryString = getReference().getQueryAsForm().getValuesMap();
@@ -132,14 +132,14 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             JsonValue jsonResponse;
             if (jsonContent != null && jsonContent.size() > 0) {
                 // submit requirements
-                jsonResponse = restAuthenticationHandler.continueAuthentication(wrapRequest(request), response,
-                        jsonContent, sessionUpgradeSSOTokenId);
+                jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
+                        sessionUpgradeSSOTokenId);
             } else {
                 // initiate
                 final String authIndexType = queryString.get("authIndexType");
                 final String authIndexValue = queryString.get("authIndexValue");
-                jsonResponse = restAuthenticationHandler.initiateAuthentication(wrapRequest(request), response,
-                        authIndexType, authIndexValue, sessionUpgradeSSOTokenId);
+                jsonResponse = restAuthenticationHandler.initiateAuthentication(request, response, authIndexType,
+                        authIndexValue, sessionUpgradeSSOTokenId);
             }
 
             return createResponse(jsonResponse);
@@ -154,6 +154,24 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             DEBUG.error("Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
         }
+    }
+
+    /**
+     * Gets the HttpServletRequest from Restlet and wraps the HttpServletRequest with the URI realm as long as
+     * the request does not contain the realm as a query parameter.
+     *
+     * @return The HttpServletRequest
+     */
+    private HttpServletRequest getHttpServletRequest() {
+        final HttpServletRequest request = ServletUtils.getRequest(getRequest());
+
+        // The request contains the realm query param then use that over any realm parsed from the URI
+        final String queryParamRealm = request.getParameter("realm");
+        if (queryParamRealm != null && !queryParamRealm.isEmpty()) {
+            return request;
+        }
+
+        return wrapRequest(request);
     }
 
     /**
