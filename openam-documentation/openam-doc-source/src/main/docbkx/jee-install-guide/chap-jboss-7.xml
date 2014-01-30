@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the JBoss 7 Application Server Policy Agent</title>
  <indexterm><primary>JBoss Application Server</primary></indexterm>
  <para>This chapter covers installation of the policy agent for JBoss
@@ -202,6 +201,12 @@ $ which java
   
   <procedure xml:id="install-agent-into-jboss7">
    <title>To Install the Policy Agent into JBoss</title>
+
+    <para>
+     If you want to include an application-specific module, make sure to
+     type in <literal>false</literal> when prompted with the following question:
+    </para>
+    <screen>Install agent as global module? [true]:</screen>
    
    <step>
     <para>Shut down the JBoss server where you plan to install the
@@ -303,9 +308,7 @@ Install log file location:
    <step>
     <para>To protect a web application, you must add the following filter
     to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag. The file for the sample 
-    application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/jboss_v7_agent/sampleapp/etc/web.xml</filename>.</para>
+    following the opening &lt;web-app&gt; tag.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
@@ -320,10 +323,39 @@ Install log file location:
   &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  &lt;/filter-mapping&gt;</programlisting>
+
+    <para>
+     You also need to add the following security constraint specification to the
+     <filename>WEB-INF/web.xml</filename> file of the application.
+    </para>
+    <programlisting language="xml">&lt;security-constraint&gt;
+  &lt;web-resource-collection&gt;
+   &lt;web-resource-name&gt;All resources&lt;/web-resource-name&gt;
+    &lt;description&gt;Protects all resources&lt;/description&gt;
+    &lt;url-pattern&gt;*.do&lt;/url-pattern&gt;
+   &lt;/web-resource-collection&gt;
+  &lt;/security-constraint&gt;</programlisting>
+
     <para>You must also add the following security domain specification to the
-    application's <filename>jboss.xml</filename> and
-    <filename>jboss-web.xml</filename> configuration files.</para>
+    <filename>jboss-web.xml</filename> configuration file of the application.</para>
     <programlisting language="xml">&lt;security-domain&gt;java:/jaas/AMRealm&lt;/security-domain&gt;</programlisting>
+    <para>
+     You can find that file packed in the <filename>agentsample.ear</filename>
+     archive in the
+     <filename>/path/to/j2ee_agents/jboss_v7_agent/sampleapp/dist</filename>
+     directory. Once unpacked, you can find the file in the
+     <filename>WEB-INF</filename> subdirectory.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If you typed in <literal>false</literal> to the <literal>Install
+     agent as global module</literal> question during the installation process,
+     you will need to add the following line to the
+     <filename>META-INF/MANIFEST.MF</filename> file of the application.
+    </para>
+    <programlisting language="xml">Dependencies: org.forgerock.openam.agent</programlisting>
    </step>
   </procedure>
   
