@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-openid-connect'
@@ -255,7 +255,8 @@
   easier to read).</para>
 
   <informalexample><?dbfo pgwide="1"?>
-  <screen>{
+  <screen>$ curl https://openam.example.com:8443/openam/.well-known/openid-configuration
+{
     "response_types_supported": [
         "id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType",
         "token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType",
