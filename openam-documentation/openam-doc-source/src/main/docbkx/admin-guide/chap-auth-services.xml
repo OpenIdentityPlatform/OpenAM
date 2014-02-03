@@ -3751,7 +3751,7 @@
       Persistent Cookie module is sufficient; if that cookie does not yet exist, authentication in this case
       relies on a data store module such as LDAP.</para>
 
-      <mediaobject xml:id="figure-persistent-cookie">
+      <mediaobject xml:id="figure-persistent-cookie-mod">
           <alt>Including the Persistent Cookie module in an authentication chain</alt>
           <imageobject>
               <imagedata fileref="images/persistent-cookie-mod.png" format="PNG" />
@@ -3761,8 +3761,11 @@
           </para></textobject>
       </mediaobject>
 
-      <para>Scroll down in the properties page for the chain. You should set the
-      <literal>PersistentCookieAuthModule</literal> as shown in the following figure:</para>
+      <para>
+       Scroll down in the properties page for the chain.
+       Set the Post Authentication Processing Class to
+       <literal>org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookieAuthModule</literal>
+       as shown in the following figure:</para>
 
       <mediaobject xml:id="figure-persistent-cookie-class">
           <alt>Including the Persistent Cookie attribute in the post processing class</alt>
