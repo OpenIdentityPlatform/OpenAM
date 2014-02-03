@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -790,6 +790,10 @@ public abstract class AbstractFlow extends ServerResource {
             responseTypes.put(parts[0], parts[1]);
         }
         return responseTypes;
+    }
+    
+    protected String getGrantType() {
+    	return OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.GRANT_TYPE, String.class);
     }
 
 }

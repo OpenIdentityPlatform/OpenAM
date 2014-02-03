@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -126,7 +126,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
     protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                 checkedScope, OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
-                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID());
+                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID(), getGrantType());
     }
 
 }

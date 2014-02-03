@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -103,7 +103,7 @@ public interface OAuth2TokenStore {
      * @return
      */
     public CoreToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid,
-                                String clientID, String redirectURI, String parent, String refreshToken) throws OAuthProblemException;
+                                String clientID, String redirectURI, String parent, String refreshToken, String grantType) throws OAuthProblemException;
 
     /**
      * Retrieves an access token from store.

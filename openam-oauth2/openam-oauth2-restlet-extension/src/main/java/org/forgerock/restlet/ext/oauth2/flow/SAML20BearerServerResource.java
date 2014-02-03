@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -142,7 +142,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
                 client.getClient().getClientId());
         CoreToken token = getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
                 OAuth2Utils.getRealm(getRequest()), assertionObject.getSubject().getNameID().getValue(),
-                client.getClient().getClientId(), null, null, null);
+                client.getClient().getClientId(), null, null, null, getGrantType());
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Token created: " + token.toString());
 
         Map<String, Object> response = token.convertToMap();

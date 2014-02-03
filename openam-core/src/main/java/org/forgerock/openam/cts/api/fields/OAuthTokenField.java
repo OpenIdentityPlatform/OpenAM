@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -42,7 +42,8 @@ public enum OAuthTokenField {
     ID(OAuth2Constants.CoreTokenParams.ID, CoreTokenField.TOKEN_ID),
     CLIENT_ID(OAuth2Constants.CoreTokenParams.CLIENT_ID, CoreTokenField.STRING_NINE),
     TOKEN_NAME(OAuth2Constants.CoreTokenParams.TOKEN_NAME, CoreTokenField.STRING_TEN),
-    NONCE(OAuth2Constants.Custom.NONCE, CoreTokenField.STRING_ELEVEN);
+    NONCE(OAuth2Constants.Custom.NONCE, CoreTokenField.STRING_ELEVEN),
+    GRANT_TYPE(OAuth2Constants.Params.GRANT_TYPE, CoreTokenField.STRING_TWELVE);
 
     private final String oAuthField;
     private final CoreTokenField coreTokenField;
