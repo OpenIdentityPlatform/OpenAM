@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,7 +50,8 @@ public class TokenResponseType implements ResponseType {
                 (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
                 (String)data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI),
                 null,
-                null);
+                null,
+                (String)data.get(OAuth2Constants.Params.GRANT_TYPE));
     }
 
     public String getReturnLocation(){

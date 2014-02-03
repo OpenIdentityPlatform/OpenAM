@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -194,7 +194,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      * {@inheritDoc}
      */
     public CoreToken createAccessToken(String accessTokenType, Set<String> scopes, String realm, String uuid,
-                                String clientID, String redirectURI, String parent, String refreshToken)
+                                String clientID, String redirectURI, String parent, String refreshToken, String grantType)
             throws OAuthProblemException{
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating access token");
@@ -208,11 +208,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (refreshToken == null || refreshToken.isEmpty()){
             accessToken =
                     new BearerToken(id, parent, uuid, new SessionClientImpl(clientID, redirectURI),
-                            realm, scopes, expireTime, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN);
+                            realm, scopes, expireTime, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType);
         } else {
             accessToken =
                     new BearerToken(id, parent, uuid, new SessionClientImpl(clientID, redirectURI),
-                            realm, scopes, expireTime, refreshToken, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN);
+                            realm, scopes, expireTime, refreshToken, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, grantType);
         }
 
         // Create in CTS

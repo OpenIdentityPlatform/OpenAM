@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -43,7 +43,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     public CoreToken(String id, String userName, String realm, long expireTime, String tokenType, String tokenName,
-                     String nonce){
+                     String nonce, String grantType){
         super(new HashMap<String, Object>());
         setTokenID(id);
         setUserName(userName);
@@ -52,6 +52,7 @@ public class CoreToken extends JsonValue implements Token {
         setTokenType(tokenType);
         setTokenName(tokenName);
         setNonce(nonce);
+        setGrantType(grantType);
     }
 
     /**
@@ -107,6 +108,10 @@ public class CoreToken extends JsonValue implements Token {
 
     protected void setTokenName(String tokenName) {
         this.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, OAuth2Utils.stringToSet(tokenName));
+    }
+
+    protected void setGrantType(String grantType) {
+        this.put(OAuth2Constants.Params.GRANT_TYPE, OAuth2Utils.stringToSet(grantType));
     }
 
     /**
@@ -289,4 +294,14 @@ public class CoreToken extends JsonValue implements Token {
         this.put(OAuth2Constants.CoreTokenParams.ISSUED, OAuth2Utils.stringToSet("true"));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getGrantType() {
+        Set<String> value = this.getParameter(OAuth2Constants.Params.GRANT_TYPE);
+        if (value != null && !value.isEmpty()){
+            return value.iterator().next();
+        }
+        return null;
+    }
 }

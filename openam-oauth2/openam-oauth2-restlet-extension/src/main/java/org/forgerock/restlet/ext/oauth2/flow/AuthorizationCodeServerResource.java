@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -203,11 +203,11 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                     code.getScope(), OAuth2Utils.getRealm(getRequest()), token.getUserID(),
-                    token.getClientID(), token.getRedirectURI(), code.getTokenID(), token.getTokenID());
+                    token.getClientID(), token.getRedirectURI(), code.getTokenID(), token.getTokenID(), getGrantType());
         } else {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                     code.getScope(), OAuth2Utils.getRealm(getRequest()), code.getUserID(),
-                    code.getClientID(), code.getRedirectURI(), code.getTokenID(), null);
+                    code.getClientID(), code.getRedirectURI(), code.getTokenID(), null, getGrantType());
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -243,7 +243,8 @@ public class AbstractFlowTest {
         // Mock createAccessToken - Refresh Token
         when(
                 realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        any(String.class), any(String.class), any(String.class), any(String.class), any(String.class), any(String.class))).then(new Answer<CoreToken>() {
+                        any(String.class), any(String.class), any(String.class), any(String.class), 
+                        any(String.class), any(String.class), any(String.class))).then(new Answer<CoreToken>() {
             @Override
             public CoreToken answer(InvocationOnMock invocation) throws Throwable {
                 CoreToken refreshToken = (CoreToken) invocation.getArguments()[2];

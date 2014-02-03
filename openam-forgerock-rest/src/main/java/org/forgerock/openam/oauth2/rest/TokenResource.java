@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -110,36 +110,44 @@ public class TokenResource implements CollectionResourceProvider {
         //only admin can delete
         AMIdentity uid = null;
         try {
+        	//first check if SSOToken is valid
+        	uid = getUid(context);
 
-            JsonValue response = null;
+        	JsonValue response = null;
             try {
-                response = oAuthTokenStore.read(resourceId);
+            	response = oAuthTokenStore.read(resourceId);
                 if (response == null){
                     throw new NotFoundException("Token Not Found", null);
                 }
                 Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
                 String username= null;
-
-                Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
-                String realm = null;
-                if (realms != null && !realms.isEmpty()){
-                    realm = realms.iterator().next();
-                }
-                uid = getUid(context, realm);
-
                 if (usernameSet != null && !usernameSet.isEmpty()){
                     username = usernameSet.iterator().next();
                 }
                 if(username == null || username.isEmpty()){
-                    PermanentException ex = new PermanentException(404, "Not Found", null);
-                    handler.handleError(ex);
+                    throw new PermanentException(404, "Not Found", null);
                 }
-                AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
-                if (uid.equals(uid2) || uid.equals(adminUserId)) {
+                
+                Set<String> grantTypes = (Set<String>) response.get(OAuth2Constants.Params.GRANT_TYPE).getObject();
+                String grantType = null;
+                if (grantTypes != null && !grantTypes.isEmpty()){
+                    grantType = grantTypes.iterator().next();
+                }
+                
+                if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS)) {
                     oAuthTokenStore.delete(resourceId);
                 } else {
-                    PermanentException ex = new PermanentException(401, "Unauthorized", null);
-                    handler.handleError(ex);
+                    Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
+                    String realm = null;
+                    if (realms != null && !realms.isEmpty()){
+                        realm = realms.iterator().next();
+                    }
+                    AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+                    if (uid.equals(uid2) || uid.equals(adminUserId)) {
+                        oAuthTokenStore.delete(resourceId);
+                    } else {
+                        throw new PermanentException(401, "Unauthorized", null);
+                    }
                 }
             } catch (CoreTokenException e) {
                 throw new ServiceUnavailableException(e.getMessage(),e);
@@ -178,7 +186,7 @@ public class TokenResource implements CollectionResourceProvider {
                 //get uid of submitter
                 AMIdentity uid;
                 try {
-                    uid = getUid(context, null);
+                    uid = getUid(context);
                     if (!uid.equals(adminUserId)){
                         query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
                     } else {
@@ -227,7 +235,10 @@ public class TokenResource implements CollectionResourceProvider {
         AMIdentity uid = null;
         String username = null;
         try {
-            JsonValue response;
+        	//first check if SSOToken is valid
+        	uid = getUid(context);
+        	
+        	JsonValue response;
             Resource resource;
             try {
                 response = oAuthTokenStore.read(resourceId);
@@ -237,26 +248,37 @@ public class TokenResource implements CollectionResourceProvider {
             if (response == null){
                 throw new NotFoundException("Token Not Found", null);
             }
-            Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
-            String realm = null;
-            if (realms != null && !realms.isEmpty()){
-                realm = realms.iterator().next();
+
+            Set<String> grantTypes = (Set<String>) response.get(OAuth2Constants.Params.GRANT_TYPE).getObject();
+            String grantType = null;
+            if (grantTypes != null && !grantTypes.isEmpty()){
+                grantType = grantTypes.iterator().next();
             }
-            uid = getUid(context, realm);
-            Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
-            if (usernameSet != null && !usernameSet.isEmpty()){
-                username = usernameSet.iterator().next();
-            }
-            if(username == null || username.isEmpty()){
-                PermanentException ex = new PermanentException(404, "Not Found", null);
-                handler.handleError(ex);
-            }
-            AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
-            if (uid.equals(adminUserId) || uid.equals(uid2)){
-                resource = new Resource(OAuth2Constants.Params.ID, "1", response);
-                handler.handleResult(resource);
+            
+            if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS)) {
+            	resource = new Resource(OAuth2Constants.Params.ID, "1", response);
+            	handler.handleResult(resource);
             } else {
-                throw new PermanentException(401, "Unauthorized" ,null);
+                Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
+                String realm = null;
+                if (realms != null && !realms.isEmpty()){
+                    realm = realms.iterator().next();
+                }
+            
+                Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
+                if (usernameSet != null && !usernameSet.isEmpty()){
+                username = usernameSet.iterator().next();
+                }
+                if(username == null || username.isEmpty()){
+                    throw new PermanentException(404, "Not Found", null);
+                }
+                AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+                if (uid.equals(adminUserId) || uid.equals(uid2)){
+                    resource = new Resource(OAuth2Constants.Params.ID, "1", response);
+                    handler.handleResult(resource);
+                } else {
+                    throw new PermanentException(401, "Unauthorized" ,null);
+                }
             }
         } catch (ResourceException e){
             handler.handleError(e);
@@ -285,11 +307,11 @@ public class TokenResource implements CollectionResourceProvider {
         return RestUtils.getCookieFromServerContext(context);
     }
 
-    private AMIdentity getUid(ServerContext context, String realm) throws SSOException, IdRepoException{
+    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
-        return OAuth2Utils.getIdentity(token.getProperty("UserToken"), realm);
+        return OAuth2Utils.getIdentity(token.getProperty("UserToken"), token.getProperty("Organization"));
     }
 
 }

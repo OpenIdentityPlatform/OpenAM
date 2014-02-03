@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -123,11 +123,11 @@ public class PasswordServerResource extends AbstractFlow {
         if (token == null) {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                     checkedScope, OAuth2Utils.getRealm(getRequest()),
-                    resourceOwner.getIdentifier(), client.getClient().getClientId(), null, null, null);
+                    resourceOwner.getIdentifier(), client.getClient().getClientId(), null, null, null, getGrantType());
         } else {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                     checkedScope, OAuth2Utils.getRealm(getRequest()),
-                    resourceOwner.getIdentifier(), client.getClient().getClientId(), null, null, token.getTokenID());
+                    resourceOwner.getIdentifier(), client.getClient().getClientId(), null, null, token.getTokenID(), getGrantType());
         }
     }
 
