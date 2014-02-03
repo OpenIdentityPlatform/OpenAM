@@ -14,7 +14,7 @@
 
             <div class="group-field-row float-left">
                 <label for="password">{{t "common.user.newPassword"}}</label>
-                <input type="password" id="password" name="password" value="" data-validator="minLength passwordConfirm" minLength="8" data-validator-event="keyup change" data-validation-status="error" />
+                <input type="password" id="password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator="minLength" minLength="8" data-validator-event="keyup change" data-validation-status="error" />
             </div> 
             
              <div class="group-field-row float-left">

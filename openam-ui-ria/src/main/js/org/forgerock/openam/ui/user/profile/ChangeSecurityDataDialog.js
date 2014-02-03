@@ -92,13 +92,12 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 $("#dialogs").show();
                 this.reloadData();
                 
-            }, this));
-
-            this.$el.find("input[type=submit]").prop('disabled', true);
+            }, this));      
         },
         
         reloadData: function() {
             this.$el.find("input[name=_id]").val(conf.loggedUser.name);
+            this.$el.find("input[type=submit]").prop('disabled', true);
         }
     }); 
     
