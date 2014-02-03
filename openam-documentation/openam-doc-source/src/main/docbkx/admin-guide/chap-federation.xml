@@ -3357,4 +3357,85 @@ Bulk Federation for this host was completed.</screen>
    &amp;metaAlias=/sp
    &amp;binding=HTTP-Artifact</literallayout>
  </section>
+
+ <section xml:id="using-saml2-with-policy-agents">
+  <title>SAML 2.0 &amp; Policy Agents</title>
+
+  <para>
+   You can use policy agents in a SAML 2.0 Federation deployment.
+  </para>
+
+  <procedure xml:id="policy-agent-with-saml2">
+   <title>To Use a Policy Agent with a SAML 2.0 Service Provider</title>
+
+   <para>
+    The following procedure applies
+    when OpenAM is configured as an IDP in one domain,
+    and the desired policy agent protects resources
+    on behalf of a second OpenAM server configured as an SP on a second domain.
+   </para>
+
+   <step>
+    <para>
+     Install the policy agent.
+    </para>
+
+    <para>
+     The basic process for installing policy agents is available in the
+     <link xlink:href="web-install-guide" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Web Policy Agent Installation Guide</citetitle></link>
+     and the <link xlink:href="jee-install-guide" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Java EE Policy Agent Installation Guide</citetitle></link>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Replace the given OpenAM Login URL and OpenAM Logout URLs
+     with SAML 2.0 URLs described in <xref linkend="using-saml2-sso-slo" />.
+    </para>
+
+    <para>
+     The following steps explain how to do this for web policy agents.
+    </para>
+
+    <stepalternatives>
+     <step>
+      <para>
+       If you have configured the Web policy agents to store their properties
+       centralized on an OpenAM server, navigate to the URL for the OpenAM console.
+       Select Access Control &gt; <replaceable>Realm Name</replaceable> &gt;
+       Agents &gt; Web &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM Services.
+      </para>
+
+      <para>
+       For the Web Agent, under the OpenAM Services tab,
+       in the Agent Logout URL section, set up a list of application logout URLs.
+       In the Logout Redirect URL text box,
+       enter an appropriate URL to redirect the user after logout.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Alternatively, if the Web policy agents are set up to store properties
+       on local systems,
+       find the <filename>${agentsConfigurationFile}</filename> file
+       in the <filename>/path/to/agent/config/</filename> directory.
+      </para>
+
+      <para>
+       You can specify OpenAM Login and Logout URLs
+       with the <literal>com.sun.identity.agents.config.login.url</literal>
+       and <literal>com.sun.identity.agents.config.logout.url</literal>
+       attributes, respectively.
+      </para>
+     </step>
+    </stepalternatives>
+   </step>
+  </procedure>
+
+ </section>
 </chapter>
