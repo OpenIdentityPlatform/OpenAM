@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-config-ref'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuration Reference</title>
 
@@ -1662,7 +1663,7 @@
 
      <para>Defaults:
      <literal>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</literal>,
-     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</literal>,
+     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</literal>,
      <literal>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</literal></para>
 
      <para><command>ssoadm</command> attribute:
@@ -1708,19 +1709,23 @@
     </listitem>
    </varlistentry>
 
-   <!--
    <varlistentry>
     <term>Subject Types supported</term>
     <listitem>
-     <para>List of OpenID Connect subject types supported. Values are
-     <literal>pairwise</literal> and <literal>public</literal>, and both are
-     supported by default. Pairwise is the same as confidential.</para>
+     <para>
+      List of OpenID Connect subject types supported.
+      Values are <literal>pairwise</literal> and <literal>public</literal>.
+      Pairwise is the same as confidential.
+     </para>
+
+     <para>
+      Default: <literal>public</literal>
+     </para>
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-subject-types-supported</literal></para>
     </listitem>
    </varlistentry>
-   -->
 
    <varlistentry>
     <term>ID Token Signing Algorithms supported</term>
@@ -1741,6 +1746,50 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-supported-claims</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>OpenID Connect JWT Token Lifetime (seconds)</term>
+    <listitem>
+     <para>
+      Time in seconds that a JWT is valid.
+     </para>
+
+     <para>
+      Default: 600 (10 minutes)
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-jwt-token-lifetime</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Alias of ID Token Signing Key</term>
+    <listitem>
+     <para>
+      Alias of key in OpenAM's key store that is used to sign ID Tokens.
+     </para>
+
+     <para>
+      Default: <literal>test</literal> (OpenAM test key pair,
+      not for use in production)
+     </para>
+
+     <para>
+      See <link xlink:show="new" xlink:href="admin-guide#change-signing-key"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+      >To Change the Signing Key for Federation</citetitle></link> for
+      instructions on changing the key pair.
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-keypair-name</literal>
+     </para>
     </listitem>
    </varlistentry>
   </variablelist>
