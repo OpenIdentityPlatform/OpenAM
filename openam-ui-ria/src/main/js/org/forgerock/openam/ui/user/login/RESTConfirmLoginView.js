@@ -54,7 +54,8 @@ define("org/forgerock/openam/ui/user/login/RESTConfirmLoginView", [
         },
         logout: function(){
             authNDelegate.logout().then(function(){
-                location.href = "#login" + conf.globalData.auth.passedInRealm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
+                var realm = (conf.globalData.auth.passedInRealm) ? conf.globalData.auth.passedInRealm : conf.globalData.auth.realm;
+                location.href = "#login" + realm + restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             });
             return false;
         }

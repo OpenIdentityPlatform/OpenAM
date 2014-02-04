@@ -140,7 +140,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         conf.globalData.auth.passedInRealm = conf.globalData.auth.realm;
                         // if we have a token, let's see who we are logged in as....
                         sessionManager.getLoggedUser(function(user) {
-                            if(conf.globalData.auth.passedInRealm === conf.globalData.auth.realm){
+                            if(String(conf.globalData.auth.passedInRealm).toLowerCase() === conf.globalData.auth.realm.toLowerCase()){
                                 conf.setProperty('loggedUser', user);
                                 delete conf.globalData.auth.passedInRealm;
                                 restLoginHelper.setSuccessURL();
