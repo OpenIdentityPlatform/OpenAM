@@ -25,7 +25,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -899,7 +899,7 @@ public class IDPSSOFederate {
                 // Get the cached Authentication Request and Relay State before
                 // invoking the IDP Adapter
 
-                CacheObject cacheObj = null;
+                CacheObject cacheObj;
                 synchronized (IDPCache.authnRequestCache) {
                     cacheObj = (CacheObject) IDPCache.authnRequestCache.get(reqID);
                 }
@@ -915,7 +915,7 @@ public class IDPSSOFederate {
                 // There should be a session on the second pass. If this is not the case then provide an error message
                 // If there is a session then it must belong to the proper realm
                 if (!isValidSessionInRealm) {
-                    if (authnReq.isPassive()) {
+                    if (authnReq != null && Boolean.TRUE.equals(authnReq.isPassive())) {
                         // Send an appropriate response to the passive request
                         String spEntityID = authnReq.getIssuer().getValue();
                         try {
@@ -931,7 +931,7 @@ public class IDPSSOFederate {
                         String ipAddress = request.getRemoteAddr();
                         String authnReqString = "";
                         try {
-                            authnReqString = authnReq.toXMLString();
+                            authnReqString = authnReq == null ? "" : authnReq.toXMLString();
                         } catch (SAML2Exception ex) {
                             SAML2Utils.debug.error(classMethod + "Could not obtain the AuthnReq to be logged");
                         }
