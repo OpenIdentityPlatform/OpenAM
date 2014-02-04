@@ -24,7 +24,7 @@
 
    $Id: spSingleLogoutRedirect.jsp,v 1.14 2009/06/17 03:10:28 exu Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS
 --%>
 
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
@@ -42,6 +42,7 @@
 <%@ page import="com.sun.identity.saml2.protocol.LogoutRequest" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPProxyUtil" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
@@ -137,9 +138,25 @@
             return;
         }
 
-        if (relayState != null && !relayState.isEmpty() &&
-            SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE) &&
-            ESAPI.validator().isValidInput("HTTP URL: " + relayState, relayState, "URL", 2000, true)) {
+        boolean isRelayStateURLValid = false;
+        if (!SPCache.isFedlet) {
+            isRelayStateURLValid = relayState != null && !relayState.isEmpty()
+                    && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true);
+        } else {
+            SAML2MetaManager manager = new SAML2MetaManager();
+            String metaAlias = null;
+            List<String> spMetaAliases = manager.getAllHostedServiceProviderMetaAliases("/");
+            if (spMetaAliases != null && !spMetaAliases.isEmpty()) {
+                // get first one
+                metaAlias = spMetaAliases.get(0);
+            }
+
+            isRelayStateURLValid = relayState != null && !relayState.isEmpty()
+                    && SAML2Utils.isRelayStateURLValid(metaAlias, relayState, SAML2Constants.SP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true);
+        }
+        if (isRelayStateURLValid) {
             try {
                  response.sendRedirect(relayState);
             } catch (java.io.IOException ioe) {

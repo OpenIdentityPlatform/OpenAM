@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.saml2.common;
 
@@ -4523,16 +4523,32 @@ public class SAML2Utils extends SAML2SDKUtils {
 
     /**
      * Convenience method to validate a SAML2 relay state (goto) URL, often called from a JSP.
-     * @param request Used to help establish the realm and hostEntityID
-     * @param relayState The URL to validate
-     * @param role The role of the caller
-     * @return true if the relayState is valid
+     *
+     * @param request Used to help establish the realm and hostEntityID.
+     * @param relayState The URL to validate.
+     * @param role The role of the caller.
+     * @return <code>true</code> if the relayState is valid.
      */
     public static boolean isRelayStateURLValid(HttpServletRequest request, String relayState, String role) {
+        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
+        if (metaAlias == null) {
+            //try to acquire the metaAlias from request parameter
+            metaAlias = request.getParameter(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
+        }
+        return isRelayStateURLValid(metaAlias, relayState, role);
+    }
 
+    /**
+     * Convenience method to validate a SAML2 relay state (goto) URL, often called from a JSP.
+     *
+     * @param metaAlias The metaAlias of the hosted entity.
+     * @param relayState The URL to validate.
+     * @param role The role of the caller.
+     * @return <code>true</code> if the relayState is valid.
+     */
+    public static boolean isRelayStateURLValid(String metaAlias, String relayState, String role) {
         boolean result = false;
 
-        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
         if (metaAlias != null) {
             String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
             try {
