@@ -13,6 +13,7 @@
                 "usernameNotFound" : "Username not found",
                 "noEmailProvided" : "No email provided in profile",
                 "emailNotSent" : "Email not sent",
+                "unableToRegister" : "Unable to register at this time. Please contact your Administrator",
                 "serviceUnavailable" : "Service unavailable",
                 "changedPassword" : "Password has been changed",
                 "unknown" : "Unknown error. Please contact with administrator",
