@@ -28,7 +28,7 @@
 
 
 <%--
-   Portions Copyrighted 2010-2013 ForgeRock AS
+   Portions Copyrighted 2010-2014 ForgeRock AS
 --%>
 
 
@@ -96,7 +96,7 @@
                response.sendRedirect(intermmediatePage);
             } else {
                 if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
-                    ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
+                    ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
                    response.sendRedirect(relayState);
                } else {
                    %>
@@ -120,7 +120,8 @@
         }
         if (metaAlias == null) {
             SessionManager.getProvider().invalidateSession(ssoToken, request, response);
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
                 response.sendRedirect(relayState);
             } else {
                 %>
@@ -184,7 +185,8 @@
         IDPSingleLogout.initiateLogoutRequest(request,response,
             binding,paramsMap);
         if (!response.isCommitted()) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(metaAlias, relayState, SAML2Constants.IDP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

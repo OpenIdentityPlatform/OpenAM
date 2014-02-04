@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012-2013 ForgeRock AS
+   Portions Copyrighted 2012-2014 ForgeRock AS
 --%>
 
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
@@ -82,14 +82,10 @@
 
     try {
         String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP Query String: " + RelayState,
-            RelayState, "HTTPQueryString", 2000, true)){
-                RelayState = null;
-        }
         if (RelayState == null || RelayState.isEmpty()) {
             RelayState = request.getParameter(SAML2Constants.GOTO);
         }
-        if (!ESAPI.validator().isValidInput("HTTP Query String: " + RelayState, RelayState, "HTTPQueryString", 1024, true)) {
+        if (!ESAPI.validator().isValidInput("RelayState", RelayState, "HTTPQueryString", 2000, true)) {
             RelayState = null;
         }
 
@@ -111,9 +107,9 @@
             if (ssoToken == null) {
                 //There is no local session, so we can't perform the logout on the IdP,
                 //let's just return with HTTP 200
-                if (RelayState != null && !RelayState.isEmpty() &&
-                    SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
-                    ESAPI.validator().isValidInput("HTTP URL Parameter: " + RelayState, RelayState, "URL", 2000, true)) {
+                if (RelayState != null && !RelayState.isEmpty()
+                        && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)
+                        && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
                     response.sendRedirect(RelayState);
                 } else {
                     %>
@@ -153,8 +149,8 @@
                     SAML2Utils.debug.message("No session.");
                 }
             }
-            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
-                ESAPI.validator().isValidInput("HTTP URL Parameter: " + RelayState, RelayState, "URL", 2000, true)) {
+            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>
@@ -258,9 +254,9 @@
             binding,paramsMap);
         
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null && !RelayState.isEmpty() &&
-                SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
-                ESAPI.validator().isValidInput("HTTP URL: " + RelayState, RelayState, "URL", 2000, true)) {
+            if (RelayState != null && !RelayState.isEmpty()
+                    && SAML2Utils.isRelayStateURLValid(metaAlias, RelayState, SAML2Constants.SP_ROLE)
+                    && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>
