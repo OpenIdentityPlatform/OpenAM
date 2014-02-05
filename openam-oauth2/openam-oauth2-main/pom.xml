@@ -60,14 +60,6 @@
         <!-- Commons -->
         <dependency>
             <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-patch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
             <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
