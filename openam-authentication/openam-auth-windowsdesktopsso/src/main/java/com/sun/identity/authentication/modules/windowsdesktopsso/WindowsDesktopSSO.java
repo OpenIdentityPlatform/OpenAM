@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock, Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -381,15 +381,17 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
     private byte[] getSPNEGOTokenFromHTTPRequest(HttpServletRequest req) {
         byte[] spnegoToken = null;
-        String header = req.getHeader("Authorization");
-        if ((header != null) && header.startsWith("Negotiate")) {
-            header = header.substring("Negotiate".length()).trim();
-            try { 
-                spnegoToken = Base64.decode(header);
-            } catch (Exception e) {
-                debug.error("Decoding token error.");
-                if (debug.messageEnabled()) {
-                    debug.message("Stack trace: ", e);
+        if (req != null) {
+            String header = req.getHeader("Authorization");
+            if ((header != null) && header.startsWith("Negotiate")) {
+                header = header.substring("Negotiate".length()).trim();
+                try {
+                    spnegoToken = Base64.decode(header);
+                } catch (Exception e) {
+                    debug.error("Decoding token error.");
+                    if (debug.messageEnabled()) {
+                        debug.message("Stack trace: ", e);
+                    }
                 }
             }
         }
@@ -659,9 +661,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
      /**
      * Searches for an account with user Id userID in the organization organization
-     * @param searchAttribute The attribute to be used to search for an identity
-     *  in the organization
-     * @param attributeValue The attributeValue to compare when searchinf for an 
+     * @param attributeValue The attributeValue to compare when searching for an
      *  identity in the organization
      * @param organization organization or the organization name where the identity will be
      *  looked up
