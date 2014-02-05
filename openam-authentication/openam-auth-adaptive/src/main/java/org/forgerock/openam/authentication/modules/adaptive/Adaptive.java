@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -495,7 +495,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 if (debug.messageEnabled()) {
                     debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
                     debug.message("IP version is: " + IP_V4);
-                    debug.message("Client IP is: " + IPv6Address.fromString(clientIP));
+                    debug.message("Client IP is: " + clientIP);
                 }
                 IPRange theRange = new IPRange(nextIP);
                 if (theRange.inRange(clientIP)) {
