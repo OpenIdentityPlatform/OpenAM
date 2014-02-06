@@ -56,6 +56,7 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
+
         <!-- Commons -->
         <dependency>
             <groupId>org.forgerock.commons</groupId>
@@ -91,6 +92,8 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
+
+        <!-- External -->
         <dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet</artifactId>

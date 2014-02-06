@@ -35,7 +35,9 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.util.Map;
 import java.util.Set;
@@ -167,8 +169,8 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
     private ProviderConfiguration providerConfiguration;
 
-    private final String deploymentUrl;
-    private final String realm;
+    private String deploymentUrl;
+    private String realm;
 
     /*
     This boolean is used to determine exception propagation behavior in initializeSettings - don't propagate exceptions
@@ -178,6 +180,16 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     private static final boolean PROPAGATE_EXCEPTIONS = false;
 
     public OAuth2ProviderSettingsImpl(Request request) {
+        HttpServletRequest req = ServletUtils.getRequest(request);
+        initializeClass(req);
+    }
+
+    public OAuth2ProviderSettingsImpl(HttpServletRequest request) {
+        initializeClass(request);
+    }
+
+    private void initializeClass(HttpServletRequest request){
+
         deploymentUrl = OAuth2Utils.getDeploymentURL(request);
         realm = OAuth2Utils.getRealm(request);
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
@@ -194,6 +206,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             OAuth2Utils.DEBUG.error("Could not add listener to ServiceConfigManager instance. OAuth2 provider service " +
                     "changes will not be dynamically updated for realm " + realm);
         }
+
     }
 
     private void initializeSettings(boolean propagateException) {
