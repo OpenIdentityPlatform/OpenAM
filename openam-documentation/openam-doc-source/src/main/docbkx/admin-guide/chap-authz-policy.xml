@@ -257,16 +257,22 @@
 
      <listitem>
       <para>
-       Duplicate and trailing slashes (<literal>/</literal>)
+       Duplicate slashes (<literal>/</literal>)
        are not considered part of the resource name to match.
+       A trailing slash is considered by OpenAM as part of the resource name.
       </para>
 
       <para>
-       For example, <literal>http://www.example.com/path</literal>,
-       <literal>http://www.example.com/path/</literal>,
-       <literal>http://www.example.com//path/</literal>, and
-       <literal>http://www.example.com/path//</literal>
-       are all treated in the same way.
+       For example,
+       <literal>http://www.example.com//path/</literal>,
+       and <literal>http://www.example.com/path//</literal>
+       are treated in the same way.
+      </para>
+
+      <para>
+       <literal>http://www.example.com/path</literal>,
+       and <literal>http://www.example.com/path/</literal>
+       are considered distinct resources.
       </para>
      </listitem>
 

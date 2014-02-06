@@ -162,6 +162,15 @@
     <para>
      When you upgrade OpenAM, the upgrade tool converts existing referral rules.
     </para>
+
+    <para>
+     The fix for <link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509"
+     >OPENAM-3509</link> ensures that OpenAM considers a trailing slash
+     as part of the resource name to match.
+     This improves compatibility between self and subtree modes,
+     and compatibility with older policy agents.
+    </para>
    </listitem>
 
    <listitem>
