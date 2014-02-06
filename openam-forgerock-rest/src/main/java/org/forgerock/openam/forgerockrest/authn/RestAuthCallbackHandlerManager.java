@@ -126,31 +126,31 @@ public class RestAuthCallbackHandlerManager {
      * @param jsonCallbacks The JSON representation of the Callbacks.
      * @return The same Callbacks as in the parameters with the required values set.
      */
-    public Callback[] handleJsonCallbacks(Callback[] originalCallbacks, JsonValue jsonCallbacks) throws RestAuthException {
+    public Callback[] handleJsonCallbacks(final Callback[] originalCallbacks, final JsonValue jsonCallbacks)
+            throws RestAuthException {
 
-        for (int j = 0; j < originalCallbacks.length; j++) {
+        if (originalCallbacks.length != jsonCallbacks.size()) {
+            logger.error("Incorrect number of callbacks found in JSON response");
+            throw new RestAuthException(ResourceException.BAD_REQUEST,
+                    "Incorrect number of callbacks found in JSON response");
+        }
 
-            RestAuthCallbackHandler restAuthCallbackHandler =
-                    restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(originalCallbacks[j].getClass());
+        for (int i = 0; i < originalCallbacks.length; i++) {
 
-            boolean foundParser = false;
+            final Callback originalCallback = originalCallbacks[i];
 
-            for (int i = 0; i < jsonCallbacks.size(); i++) {
+            final RestAuthCallbackHandler restAuthCallbackHandler =
+                    restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(originalCallback.getClass());
 
-                JsonValue jsonCallback = jsonCallbacks.get(i);
+            final JsonValue jsonCallback = jsonCallbacks.get(i);
 
-                if (restAuthCallbackHandler.getCallbackClassName().equals(jsonCallback.get("type").asString())) {
-                    foundParser = true;
-                    restAuthCallbackHandler.convertFromJson(originalCallbacks[j], jsonCallback);
-                    break;
-                }
-            }
-
-            if (!foundParser) {
+            if (!restAuthCallbackHandler.getCallbackClassName().equals(jsonCallback.get("type").asString())) {
                 logger.error("Required callback not found in JSON response");
                 throw new RestAuthException(ResourceException.BAD_REQUEST,
                         "Required callback not found in JSON response");
             }
+
+            restAuthCallbackHandler.convertFromJson(originalCallback, jsonCallback);
         }
 
         return originalCallbacks;
