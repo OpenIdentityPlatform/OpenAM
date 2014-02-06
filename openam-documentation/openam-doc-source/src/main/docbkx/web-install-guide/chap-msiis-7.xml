@@ -459,11 +459,25 @@ Internet services successfully restarted</screen>
      <step>
       <para>Generate the key using
       <literal>com.sun.identity.common.DESGenKey</literal> using the .jars
-      where you deployed OpenAM, as in the following example.</para>
+      where you deployed OpenAM, as in the following example. The Java command below is
+      broken out into multiple lines for display purposes only.</para>
       <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib
-$ java -cp openam-core-<?eval ${serverDocTargetVersion}?>.jar:openam-shared-<?eval ${serverDocTargetVersion}?>.jar
- com.sun.identity.common.DESGenKey
+$ java -cp forgerock-util-1.1.0.jar:\
+     openam-core-<?eval ${serverDocTargetVersion}?>.jar:\
+     openam-shared-<?eval ${serverDocTargetVersion}?>.jar \
+     com.sun.identity.common.DESGenKey
 Key ==> sxVoaDRAN0o=</screen>
+
+         <note>
+             <para>Windows users should use semi-colons (";"), instead of colons (":") in the commands.
+             The Java command below is broken out into multiple lines for display purposes only.</para>
+             <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib
+$ java -cp forgerock-util-1.1.0.jar;^
+     openam-core-<?eval ${serverDocTargetVersion}?>.jar;^
+     openam-shared-<?eval ${serverDocTargetVersion}?>.jar ^
+     com.sun.identity.common.DESGenKey
+Key ==> sxVoaDRAN0o=</screen>
+         </note>
      </step>
 
      <step>
