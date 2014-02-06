@@ -60,8 +60,6 @@ public class AuthenticationService extends ServerResource implements ServiceProv
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
-    private static final Pattern CONTENT_TYPE_REGEX =
-            Pattern.compile("^application/json([ ]*;[ ]*charset=utf-8)?$", Pattern.CASE_INSENSITIVE);
     private static final String RESTLET_HEADERS_KEY = "org.restlet.http.headers";
     private static final String CACHE_CONTROL_HEADER_NAME = "Cache-Control";
     private static final String NO_CACHE_CACHE_CONTROL_HEADER = "no-cache, no-store, must-revalidate";
@@ -116,7 +114,7 @@ public class AuthenticationService extends ServerResource implements ServiceProv
     @Post
     public Representation authenticate(JsonRepresentation entity) throws ResourceException {
 
-        if (!isJsonContentType()) {
+        if (entity != null && !MediaType.APPLICATION_JSON.equals(entity.getMediaType())) {
             throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
         }
 
@@ -217,17 +215,6 @@ public class AuthenticationService extends ServerResource implements ServiceProv
                 return super.getParameterValues(name);
             }
         };
-    }
-
-    /**
-     * Check if the Http Headers contains the 'application/json' content type.
-     *
-     * @return <code>true</code> if the Content-Type header contains 'application/json'
-     */
-    private boolean isJsonContentType() {
-        Series headers = (Series) getRequestAttributes().get("org.restlet.http.headers");
-        String contentType = headers.getFirstValue("Content-Type", true);
-        return contentType != null && CONTENT_TYPE_REGEX.matcher(contentType).matches();
     }
 
     /**
