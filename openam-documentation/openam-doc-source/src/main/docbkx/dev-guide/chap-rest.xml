@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -2789,12 +2789,13 @@ $ curl --request PUT --header "If-None-Match: *"
    <screen>$ curl --request DELETE --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/groups/myGroup
 {"success":"true"}</screen>
-  </section>
+
   <note>
     <para>Deleting a user does not automatically remove any of the user's sessions.
     After deleting a user, check for any sessions for the user and remove them under the Console's Sessions tab.
     </para>
   </note>
+  </section>
 
   <section xml:id="rest-api-query-identity">
    <title>Listing Identities</title>
