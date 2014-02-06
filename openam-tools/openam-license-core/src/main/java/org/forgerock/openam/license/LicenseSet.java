@@ -76,7 +76,6 @@ public class LicenseSet implements Iterable<License> {
      *
      * @return an iterator over the required licenses, in order.
      */
-    @Override
     public Iterator<License> iterator() {
         return licenses.iterator();
     }

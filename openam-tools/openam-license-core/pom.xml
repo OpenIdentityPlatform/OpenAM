@@ -39,8 +39,4 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <java.source.version>1.6</java.source.version>
-        <java.target.version>1.6</java.target.version>
-    </properties>
 </project>

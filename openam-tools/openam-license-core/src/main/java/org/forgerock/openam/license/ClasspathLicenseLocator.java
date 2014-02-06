@@ -81,7 +81,6 @@ public class ClasspathLicenseLocator implements LicenseLocator {
      * @throws MissingLicenseException if any of the required licenses cannot be found on the classpath or cannot be
      * loaded for any reason.
      */
-    @Override
     public LicenseSet getRequiredLicenses() {
         List<License> licenses = new ArrayList<License>(licenseFiles.size());
         for (String licenseFile : licenseFiles) {
