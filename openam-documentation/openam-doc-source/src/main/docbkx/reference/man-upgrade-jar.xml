@@ -64,7 +64,7 @@
                             specified configuration file. Upgrade configuration
                             files are described in the sections below.
                             Also, you can specify the system properties on the command line,
-                            instead of using the configuration file,
+                            instead of using the configuration file. 
                             See Example 2 below.</para>
                 </listitem>
             </varlistentry>
