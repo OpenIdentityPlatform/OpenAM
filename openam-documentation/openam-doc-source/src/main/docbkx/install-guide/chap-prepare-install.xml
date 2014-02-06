@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-prepare-install'
@@ -1279,12 +1279,10 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
      <literal>&lt;security-configuration</literal> element.
     </para>
 
-     <programlisting language="xml">
-&lt;security-configuration>
+     <programlisting language="xml">&lt;security-configuration>
    &lt;enforce-valid-basic-auth-credentials>false
    &lt;/enforce-valid-basic-auth-credentials>
-&lt;/security-configuration>
-     </programlisting>
+&lt;/security-configuration></programlisting>
    </listitem>
    </orderedlist>
 
@@ -1297,8 +1295,7 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
        </para>
    <listitem>
        <para>Create a WebLogic descriptor file, <literal>/WEB-INF/weblogic.xml</literal>.</para>
-       <programlisting language="xml">
-  &lt;?xml version="1.0" encoding="UTF-8"?>
+       <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?>
   &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
@@ -1307,8 +1304,7 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
         &lt;container-descriptor>
            &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
         &lt;/container-descriptor>
-  &lt;/weblogic-web-app>
-       </programlisting>
+  &lt;/weblogic-web-app></programlisting>
    </listitem>
 
    <listitem>
@@ -1338,13 +1334,11 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
 
     Change the following line:
 
-    <programlisting language="shell"
-    >${DOMAIN_HOME}/bin/startWebLogic.sh $*</programlisting>
+    <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh $*</programlisting>
 
     To set the <literal>javax.xml.soap.MessageFactory</literal> property:
 
-    <programlisting language="shell"
-    >${DOMAIN_HOME}/bin/startWebLogic.sh \
+    <programlisting language="shell">${DOMAIN_HOME}/bin/startWebLogic.sh \
 -Djavax.xml.soap.MessageFactory=\
 com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
    </para>
