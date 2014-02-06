@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-realms'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Realms</title>
  
@@ -213,15 +214,30 @@
    <secondary>Delegating</secondary>
   </indexterm>
   
-  <para>When you delegate access management for a realm, you might want to
-  delegate policy management. You can delegate policy management by creating a
-  referral.</para>
-  
+  <para>
+   When you delegate access management for a realm,
+   you might want to delegate policy management as well.
+   You delegate policy management by creating a referral.
+  </para>
+
+  <para>
+   Ultimately, policy management is delegated
+   from / (Top Level Realm) down through sub-realms.
+   Each intervening realm also delegates policy management with referrals.
+  </para>
+
   <step>
-   <para>In the OpenAM console, browse to Access Control &gt;
-   <replaceable>Realm Name</replaceable> &gt; Policies, where
-   <replaceable>Realm Name</replaceable> is the realm <emphasis>from
-   which</emphasis> you intend to delegate policy.</para>
+   <para>
+    In the OpenAM console, browse to Access Control &gt;
+    <replaceable>Realm Name</replaceable> &gt; Policies,
+    where <replaceable>Realm Name</replaceable> is the realm
+    <emphasis>from which</emphasis> you intend to delegate policy management.
+   </para>
+
+   <para>
+    Start by making sure a referral is created in the Top Level Realm,
+    continuing down to the realm from which you delegate policy management.
+   </para>
   </step>
   <step>
    <para>Click the New Referral... button in the Policies table.</para>
