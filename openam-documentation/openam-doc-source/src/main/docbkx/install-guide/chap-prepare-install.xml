@@ -1256,20 +1256,17 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
 
   <orderedlist>
    <para>
-    In addition, edit the WebLogic domain configuration
+    Next, edit the WebLogic domain configuration
     to allow basic authentication credentials to be passed back to OpenAM.
-   </para>
-
-   <para>
-    By default WebLogic attempts to resolve authentication credentials itself.
+    By default, WebLogic attempts to resolve authentication credentials itself.
     When you change the WebLogic domain configuration, you make sure that
-    OpenAM OAuth 2.0 providers receive basic authentication credentials
+    the OpenAM OAuth 2.0 providers receive basic authentication credentials
     for OAuth 2.0 grants that rely on basic authentication.
    </para>
 
    <listitem>
     <para>
-     Stop WebLogic server.
+     Stop the WebLogic server.
     </para>
    </listitem>
 
@@ -1282,14 +1279,36 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
      <literal>&lt;security-configuration</literal> element.
     </para>
 
-    <informalexample>
-     <?dbfo pgwide="1"?>
      <programlisting language="xml">
-  &lt;security-configuration>
-    &lt;enforce-valid-basic-auth-credentials>false&lt;/enforce-valid-basic-auth-credentials>
-  &lt;/security-configuration>
+&lt;security-configuration>
+   &lt;enforce-valid-basic-auth-credentials>false
+   &lt;/enforce-valid-basic-auth-credentials>
+&lt;/security-configuration>
      </programlisting>
-    </informalexample>
+   </listitem>
+   </orderedlist>
+
+   <orderedlist>
+       <para>By default, WebLogic uses its own classes if a class exists in both the parent and child classloaders.
+           To use OpenAM with its own classes,
+           create a WebLogic deployment descriptor file <literal>weblogic.xml</literal>
+           and place it in the <literal>/WEB-INF</literal> directory.
+           The descriptor file maps resources defined for OpenAM.
+       </para>
+   <listitem>
+       <para>Create a WebLogic descriptor file, <literal>/WEB-INF/weblogic.xml</literal>.</para>
+       <programlisting language="xml">
+  &lt;?xml version="1.0" encoding="UTF-8"?>
+  &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
+     http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
+        &lt;context-root>/openam&lt;/context-root>
+        &lt;container-descriptor>
+           &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
+        &lt;/container-descriptor>
+  &lt;/weblogic-web-app>
+       </programlisting>
    </listitem>
 
    <listitem>
