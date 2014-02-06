@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS All rights reserved.
+ * Copyright (c) 2013-2014 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -68,7 +68,7 @@ public class CheckSessionImpl implements CheckSession {
      */
     public String getClientSessionURI(HttpServletRequest request){
         SignedJwt jwt = getIDToken(request);
-        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPublic())){
+        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPrivate())) {
             return "";
         }
         List<String> clients = jwt.getClaimsSet().getAudience();
@@ -88,7 +88,7 @@ public class CheckSessionImpl implements CheckSession {
      */
     public boolean getValidSession(HttpServletRequest request){
         SignedJwt jwt = getIDToken(request);
-        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPublic())){
+        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPrivate())) {
             return false;
         }
         try {
