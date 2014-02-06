@@ -48,6 +48,7 @@
         <module>openam-installtools-launcher</module>
         <module>openam-diagnostics</module>
         <module>openam-upgrade-tool</module>
+        <module>openam-license-core</module>
     </modules>
 </project>
 
