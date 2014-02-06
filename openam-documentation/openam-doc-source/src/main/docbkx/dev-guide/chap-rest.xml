@@ -285,8 +285,20 @@
 { "errorMessage": "Invalid Password!!",
   "failureUrl": "http://www.example.com/401.html" }</screen>
 
-   <para>You can set the realm by using the realm query string parameter as
-   in <literal>?realm=myRealm</literal>.</para>
+   <para>To specify a realm in your request, first make sure that the name of your realm does not match
+       an endpoint name to avoid any potential routing errors.
+       Then, specify the realm in one of two ways. For example, if you have a realm
+       titled "<literal>myRealm</literal>," you can use it in your request as follows:</para>
+    <itemizedlist>
+        <listitem>
+            <para>Using the realm in the URI to the endpoint (preferred method):</para>
+            <literallayout class="monospaced">https://openam.example.com:8443/openam/json/<literal>myRealm</literal>/authenticate</literallayout>
+        </listitem>
+        <listitem>
+            <para>Using the realm query string parameter:</para>
+            <literallayout class="monospaced">https://openam.example.com:8443/openam/json/authenticate?realm=<literal>myRealm</literal></literallayout>
+        </listitem>
+    </itemizedlist>
 
    <variablelist>
     <para>You can use the <literal>authIndexType</literal> and
