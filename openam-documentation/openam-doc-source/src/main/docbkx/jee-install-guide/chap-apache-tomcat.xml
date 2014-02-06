@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-apache-tomcat'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the Apache Tomcat Policy Agent</title>
  <indexterm><primary>Apache Tomcat Server</primary></indexterm>
@@ -142,14 +143,19 @@ $ which java
    </varlistentry>
   </variablelist>
 
-  <para>The <filename>web.xml</filename> file is the basic Java configuration file for web
-  applications. As such, you may find significantly different versions of this file in
-  various directories. For the purpose of installing the Tomcat policy agent, you should be
-  concerned with the Tomcat <filename>web.xml</filename> file, which you can find in the
-  <filename>/path/to/tomcat/conf</filename> directory, along with the <filename>web.xml</filename>
-  file associated with the actual web application. This section refers to a sample Web application
-  <filename>web.xml</filename> file in the <filename>/path/to/j2ee_agents/tomcat_v6_agent/sampleapp/etc</filename>
-  directory.</para>
+  <para>
+   The web application deployment descriptor file, <filename>web.xml</filename>,
+   is the basic configuration file for web applications.
+   As such, the specific content of the <filename>web.xml</filename> file
+   depends on the application.
+   Apache Tomcat also provides a global
+   <filename>/path/to/tomcat/conf/web.xml</filename> deployment descriptor,
+   which sets defaults for all deployed applications.
+   When you install the Apache Tomcat policy agent,
+   you should be concerned with <filename>/path/to/tomcat/conf/web.xml</filename>,
+   and also with the <filename>WEB-INF/web.xml</filename> files
+   in each protected application.
+  </para>
 
  </section>
  
@@ -354,9 +360,9 @@ Install log file location:
 
    <para>The steps required for policy agent installation into Tomcat 7 are subtly different from those
    required for Tomcat 6. For Tomcat 7, you should not install the global <filename>web.xml</filename>
-   file, but configure the application-specific <filename>web.xml</filename> file
+   file, but configure the application-specific <filename>WEB-INF/web.xml</filename> file
    after basic installation is complete. You will also need to include the
-   agent application war archive, <filename>agentappp.war</filename>.</para>
+   agent application war archive, <filename>agentapp.war</filename>.</para>
 
    <step>
     <para>Shut down the Tomcat server where you plan to install the
@@ -459,10 +465,8 @@ Install log file location:
    <step>
     <para>Since you did not install a global filter in the Tomcat 7
     <filename>web.xml</filename>, then you must add the filter
-    manually for each protected application's <filename>web.xml</filename>
-    configuration, following the opening &lt;web-app&gt; tag. The file for  
-    the sample application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/tomcat_v6_agent/sampleapp/etc/web.xml</filename>.</para>
+    manually for each protected application's <filename>WEB-INF/web.xml</filename>
+    deployment descriptor file, following the opening &lt;web-app&gt; tag.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;

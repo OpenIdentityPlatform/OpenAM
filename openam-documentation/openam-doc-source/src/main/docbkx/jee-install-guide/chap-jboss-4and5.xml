@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jboss-4and5'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the JBoss 4 and 5 Application Server Policy Agent</title>
  <indexterm><primary>JBoss Application Server</primary></indexterm>
@@ -320,10 +321,8 @@ Install log file location:
    </step>
    <step>
     <para>To protect a web application, you must add the following filter
-    to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag. The file for the sample 
-    application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/jboss_v42_agent/sampleapp/etc/web.xml</filename>.</para>
+    to the application's <filename>WEB-INF/web.xml</filename> deployment descriptor,
+    following the opening &lt;web-app&gt; tag.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;

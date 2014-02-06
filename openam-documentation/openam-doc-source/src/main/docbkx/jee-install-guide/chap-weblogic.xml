@@ -363,10 +363,8 @@ Install log file location:
    </step>
    <step>
     <para>For each web application to protect, add the following filter
-    to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag. The file for the sample 
-    application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/weblogic_v10_agent/sampleapp/etc/web.xml</filename>.</para>
+    to the application's <filename>WEB-INF/web.xml</filename> deployment descriptor,
+    following the opening &lt;web-app&gt; tag.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;

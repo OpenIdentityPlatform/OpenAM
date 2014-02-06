@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jetty'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the Jetty Server Policy Agent</title>
@@ -73,10 +74,13 @@ $ which java
   posted on the download page.</para>
   
   <note>
-   <para>Command line examples in this chapter show Jetty accessed remotely. If 
-   you are following the examples and have issues accessing Jetty remotely,
-    you might have to change the test filter settings in
-   <filename>/path/to/jetty/webapps/test/WEB-INF/web.xml</filename>.</para>
+   <para>
+    Command line examples in this chapter show Jetty accessed remotely. If
+    you are following the examples and have issues accessing Jetty remotely,
+    you might have to change filter settings in the deployment descriptor file,
+    such as <filename>/path/to/jetty/webapps/test/WEB-INF/web.xml</filename>,
+    as shown in the following example.
+   </para>
    <programlisting language="xml">&lt;filter&gt;
  &lt;filter-name&gt;TestFilter&lt;/filter-name&gt;
  &lt;filter-class&gt;com.acme.TestFilter&lt;/filter-class&gt;
@@ -330,10 +334,8 @@ Install log file location:
    </step>
    <step>
     <para>To protect a web application, you must add the following filter
-    to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag. The file for the sample 
-    application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/jetty_v61_agent/sampleapp/etc/web.xml</filename>.</para>
+    to the application's <filename>WEB-INF/web.xml</filename> deployment descriptor,
+    following the opening &lt;web-app&gt; tag.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;

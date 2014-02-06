@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-about-jee-agents'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>About OpenAM Java EE Policy Agents</title>
@@ -142,11 +143,18 @@
   centrally from the OpenAM console.<footnote><para>You can opt to store the
   agent configuration locally if necessary.</para></footnote></para>
   
-  <para>For each web application that you protect, you also configure at least
-  the deployment descriptor to filter requests through the policy agent.
-  ForgeRock delivers the J2EE policy agents with a sample application under
-  <filename>j2ee_agents/<replaceable>container</replaceable>_agent/sampleapp/</filename>
-  demonstrating the configuration to use to protect your web application.</para>
+  <para>
+   For each web application that you protect,
+   you also configure at least the deployment descriptor
+   to filter requests through the policy agent.
+   ForgeRock delivers the J2EE policy agents with a sample application .war file
+   under <filename>j2ee_agents/<replaceable>container</replaceable>_agent/sampleapp/</filename>
+   demonstrating the configuration to use to protect your web application.
+   In the <filename>WEB-INF/web.xml</filename> deployment descriptor file
+   for the sample application,
+   you find an example of the filter configuration
+   that you must add to the deployment descriptors of your applications.
+  </para>
   
   <para>You configure J2EE policy agents per OpenAM realm. Thus to access
   centralized configuration, you select Access Control &gt; <replaceable>Realm
