@@ -21,6 +21,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -87,14 +88,25 @@ public class AuthIdHelper {
 
         Map<String, Object> jwtValues = new HashMap<String, Object>();
         if (loginConfiguration.getIndexType().getIndexType() != null && loginConfiguration.getIndexValue() != null) {
-            jwtValues.put("authIndexType", loginConfiguration.getIndexType().getIndexType().toString());
-            jwtValues.put("authIndexValue", loginConfiguration.getIndexValue());
+            jwtValues.put("authIndexType",
+                    escapeJsonString(loginConfiguration.getIndexType().getIndexType().toString()));
+            jwtValues.put("authIndexValue", escapeJsonString(loginConfiguration.getIndexValue()));
         }
         jwtValues.put("realm", authContext.getOrgDN());
         jwtValues.put("sessionId", authContext.getSessionID().toString());
 
         String authId = generateAuthId(keyAlias, jwtValues);
         return authId;
+    }
+
+    /**
+     * Escapes " and \ characters from a String which will be put in a JSON string, as per spec.
+     *
+     * @param s The String to escape
+     * @return The escaped String.
+     */
+    private String escapeJsonString(final String s) {
+        return StringEscapeUtils.escapeJava(s);
     }
 
     /**

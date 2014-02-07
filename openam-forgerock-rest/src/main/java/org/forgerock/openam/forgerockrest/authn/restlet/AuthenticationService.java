@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -192,8 +193,9 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             @Override
             public Map getParameterMap() {
                 Map params = super.getParameterMap();
-                params.put("realm", request.getAttribute("realm"));
-                return params;
+                Map p = new HashMap(params);
+                p.put("realm", request.getAttribute("realm"));
+                return p;
             }
 
             @Override
