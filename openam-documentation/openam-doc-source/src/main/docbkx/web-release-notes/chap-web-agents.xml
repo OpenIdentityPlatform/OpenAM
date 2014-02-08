@@ -59,6 +59,7 @@
     >OPENAM-2397</link>).</para>
    </listitem>
 
+<!--
    <listitem>
     <para>This release adds a new web policy agent for Varnish Cache (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1362"
@@ -69,6 +70,7 @@
     installation or Varnish Cache updates. The user running Varnish Cache must
     have access to update the <filename>vmods</filename> directory.</para>
    </listitem>
+-->
 
    <listitem>
     <variablelist>
@@ -226,7 +228,7 @@
    <para> ForgeRock recommends the most recent update of the supported version of
    Java to ensure you have the latest security fixes.</para>
 
-   <para>All web policy agents except those associated with Varnish Cache and
+   <para>All web policy agents except those associated with <!--Varnish Cache and-->
    Microsoft IIS require a Java 6 or 7 runtime environment for installation.
    ForgeRock recommends the most recent update of Java 6 or 7 to ensure you
    have the latest security fixes.</para>
@@ -267,9 +269,11 @@
       <para><?eval ${agentSunWebServerSupport}?></para>
      </listitem>
 
+<!--
      <listitem>
       <para><?eval ${agentVarnishCacheSupport}?></para>
      </listitem>
+-->
     </itemizedlist>
    </section>
 
@@ -288,8 +292,10 @@
     <para>The Microsoft IIS 8 web policy agent has been tested on Windows Server
     2012.</para>
 
+<!--
     <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
     later, and on Oracle Solaris 10 or later.</para>
+-->
 
     <para>
      Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
