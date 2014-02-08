@@ -1606,6 +1606,19 @@ $ curl
 
     <para>Alternatively, you can configure them for an individual realm under
     Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+
+    <para>
+     At this point users can self-register.
+     The starting screen for self-registration is
+     at <literal>/XUI/#register/</literal>
+     under the base URL where OpenAM is installed.
+     The default confirmation URI is <literal>/XUI/confirm.html</literal>.
+    </para>
+
+    <para>
+     The steps that follow show how to use the REST API directly.
+    </para>
+
    </listitem>
 
    <listitem>
@@ -1642,11 +1655,14 @@ $ curl
    <listitem>
     <para>
      The user receives an email message that includes a URL
-     similar to the following example.
+     similar to the following example, but all on one line.
     </para>
 
     <literallayout class="monospaced"
-    >https://openam.example.com:8443/openam/json/confirmation/register?confirmationId=P23PK5kyAgNdqeNJpAvq1ebcpcg=&amp;email=newuser@example.com&amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=</literallayout>
+    >https://openam.example.com:8443/openam/json/confirmation/register?
+     confirmationId=P23PK5kyAgNdqeNJpAvq1ebcpcg=
+     &amp;email=newuser@example.com
+     &amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=</literallayout>
    </listitem>
 
    <listitem>
@@ -1677,15 +1693,17 @@ $ curl
     HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
     create the user as shown in the following example.</para>
 
-    <screen>$ curl --request POST --header "iPlanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+    <screen>$ curl
+ --request POST
  --header "Content-Type: application/json"
  --data '{"email":"newuser@example.com",
      "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
      "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=",
-     "name":"newuser","userpassword":"password"}'
+     "username":"newuser",
+     "userpassword":"password"}'
  https://openam.example.com:8443/openam/json/users?_action=anonymousCreate
 {
-    "username": "mark",
+    "username": "newuser",
     "realm": "/",
     "uid": [
         "newuser"
@@ -1780,6 +1798,19 @@ $ curl
 
     <para>Alternatively, you can configure it for an individual realm under
     Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+
+    <para>
+     At this point users with mail addresses can reset their forgotten passwords.
+     The starting screen for forgotten password reset is
+     at <literal>/XUI/#forgotPassword/</literal>
+     under the base URL where OpenAM is installed.
+     The default confirmation URI is <literal>/XUI/confirm.html</literal>.
+    </para>
+
+    <para>
+     The steps that follow show how to use the REST API directly.
+    </para>
+
    </listitem>
 
    <listitem>
@@ -1790,7 +1821,7 @@ $ curl
 
     <para>
      To use a subject and message other than those configured in the Email Service,
-     you can optionall set the mail subject and message content
+     you can optionally set the mail subject and message content
      by including "subject" and "message" strings in the JSON data.
 
      For example, the following POST results in a mail with
@@ -1817,10 +1848,14 @@ $ curl
 
    <listitem>
     <para>OpenAM looks up the email address in the user profile, and sends an
-    email message that includes a URL as in the following example.</para>
+    email message that includes a URL as in the following example,
+    but all on one line.</para>
 
     <literallayout class="monospaced"
-    >https://openam.example.com:8443/openam/json/confirmation/forgotPassword?confirmationId=jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=&amp;tokenId=M8cVqWqbKtCtpd/UqEAr0x25fxA=&amp;username=demo</literallayout>
+    >https://openam.example.com:8443/openam/json/confirmation/forgotPassword
+     ?confirmationId=jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=
+     &amp;tokenId=M8cVqWqbKtCtpd/UqEAr0x25fxA=
+     &amp;username=demo</literallayout>
    </listitem>
 
    <listitem>
@@ -1918,7 +1953,7 @@ $ curl
 #Version: 1.0
 #Fields: time   Data    LoginID ContextID   IPAddr  LogLevel    Domain 
  LoggedBy    MessageID   ModuleName  NameID  HostName    
-"2011-09-14 16:38:17"   /home/mark/openam/openam/log/
+"2011-09-14 16:38:17"   /home/user/openam/openam/log/
    "cn=dsameuser,ou=DSAME Users,o=openam"  aa307b2dcb721d4201
    "Not Available" INFO    o=openam    "cn=dsameuser,ou=DSAME Users,o=openam"
    LOG-1   rest.access "Not Available"192.168.56.2 
