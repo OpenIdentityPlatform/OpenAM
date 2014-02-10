@@ -24,7 +24,8 @@
 
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS.
+   Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyrighted 2014 Nomura Research Institute, Ltd.
 -->
 <accesscontrols>
     <!-- REALM -->
@@ -398,6 +399,7 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentGroupMembersViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentTabManager" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentGroupAddViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.AgentDumpViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceSTSEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceEditViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.agentconfig.WebServiceProviderEditViewBean" />
