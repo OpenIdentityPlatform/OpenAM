@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-14 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -120,5 +120,12 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
      */
     private String getCookieHeaderName() {
         return authUtilsWrapper.getCookieName();
+    }
+
+    /**
+     * Does nothing in this impl.
+     */
+    public void destroy() {
+
     }
 }

@@ -110,4 +110,10 @@ public class PassThroughAuthorizationFilter implements AuthorizationFilter {
 
         return true;
     }
+
+    /**
+     * Does nothing in this impl.
+     */
+    public void destroy() {
+    }
 }
