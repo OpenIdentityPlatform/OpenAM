@@ -9,34 +9,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 <title>OpenAM</title>
-<script type="text/javascript">
-(function () {
-    var fakeConsole = {
-            log : function() {
-            },
-            info : function() {
-            },
-            debug : function() {
-            }
-    };
-
-    if (typeof console == "undefined") {
-        window.console = fakeConsole;
-    }
-    else
-    {
-        if (window.console.log) fakeConsole.log = window.console.log;
-        for (var key in fakeConsole)
-        {
-            if (!window.console[key]) window.console[key] = fakeConsole.log;    
-        }
-    }
-
-})();
-</script>
-
 <script src="libs/jquery-1.8.1-min.js"></script>
-<script data-main="main" src="libs/requirejs-2.0.6-min.js"></script>
+<script src="libs/underscore-1.4.4-min.js"></script>
+<script src="libs/backbone-0.9.2-min.js"></script>
+<script data-main="main" src="libs/requirejs-2.1.10-min.js"></script>
 
 
 <!--[if IE]>
