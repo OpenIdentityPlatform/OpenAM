@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS
 --%>
 
 <%@ page language="java" 
@@ -50,6 +50,7 @@ com.sun.identity.sae.api.Utils,
 org.forgerock.openam.utils.ClientUtils,
 org.owasp.esapi.ESAPI"
 %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%
     //  Setup http GET/POST to sp app URL
@@ -273,7 +274,7 @@ org.owasp.esapi.ESAPI"
     // The href at the bottom will take effect
     try {
         if (spApp != null && SAML2Utils.isRelayStateURLValid(request, spApp, SAML2Constants.SP_ROLE)) {
-            Utils.redirect(response, spApp, sParams, action);
+            Utils.redirect(response, new PrintWriter(out, true), spApp, sParams, action);
         } else {
             throw new Exception("Redirect URL was not valid " + spApp);
         }

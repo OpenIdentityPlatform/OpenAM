@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.federation.services.fednsso;
 
 import com.sun.identity.federation.message.FSAuthnRequest;
@@ -85,6 +89,7 @@ public class FSLECPConsumerHandler extends FSAssertionArtifactHandler {
                     + "Resource URL is null");
                 response.sendError (response.SC_INTERNAL_SERVER_ERROR,
                     FSUtils.bundle.getString ("nullInputParameter"));
+                return;
             }
             if (FSUtils.debug.messageEnabled()) {
                 FSUtils.debug.message(

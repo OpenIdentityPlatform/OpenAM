@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -160,6 +160,7 @@ public class IDPSSOUtil {
      *
      * @param request      the <code>HttpServletRequest</code> object
      * @param response     the <code>HttpServletResponse</code> object
+     * @param out          the print writer for writing out presentation
      * @param authnReq     the <code>AuthnRequest</code> object
      * @param spEntityID   the entity id of the service provider
      * @param idpMetaAlias the meta alias of the identity provider
@@ -169,13 +170,14 @@ public class IDPSSOUtil {
      */
     public static void doSSOFederate(HttpServletRequest request,
                                      HttpServletResponse response,
+                                     PrintWriter out,
                                      AuthnRequest authnReq,
                                      String spEntityID,
                                      String idpMetaAlias,
                                      String nameIDFormat,
                                      String relayState)
             throws SAML2Exception {
-        doSSOFederate(request, response, authnReq,
+        doSSOFederate(request, response, out, authnReq,
                 spEntityID, idpMetaAlias, nameIDFormat,
                 relayState, null);
     }
@@ -185,6 +187,7 @@ public class IDPSSOUtil {
      *
      * @param request      the <code>HttpServletRequest</code> object
      * @param response     the <code>HttpServletResponse</code> object
+     * @param out          the print writer for writing out presentation
      * @param authnReq     the <code>AuthnRequest</code> object
      * @param spEntityID   the entity id of the service provider
      * @param idpMetaAlias the meta alias of the identity provider
@@ -195,6 +198,7 @@ public class IDPSSOUtil {
      */
     public static void doSSOFederate(HttpServletRequest request,
                                      HttpServletResponse response,
+                                     PrintWriter out,
                                      AuthnRequest authnReq,
                                      String spEntityID,
                                      String idpMetaAlias,
@@ -315,7 +319,7 @@ public class IDPSSOUtil {
         }
         // End of invocation
 
-        sendResponseToACS(request, response, session, authnReq, spEntityID,
+        sendResponseToACS(request, response, out, session, authnReq, spEntityID,
                 idpEntityID, idpMetaAlias, realm, nameIDFormat, relayState, null);
     }
 
@@ -325,6 +329,7 @@ public class IDPSSOUtil {
      *
      * @param request              the <code>HttpServletRequest</code> object
      * @param response             the <code>HttpServletResponse</code> object
+     * @param out                  the print writer for writing out presentation
      * @param session              user session
      * @param authnReq             the <code>AuthnRequest</code> object
      * @param spEntityID           the entity id of the service provider
@@ -336,8 +341,8 @@ public class IDPSSOUtil {
      * @param matchingAuthnContext the <code>AuthnContext</code> used to find
      *                             authentication type and scheme.
      */
-    public static void sendResponseToACS(HttpServletRequest request,
-                                         HttpServletResponse response, Object session, AuthnRequest authnReq,
+    public static void sendResponseToACS(HttpServletRequest request, HttpServletResponse response, PrintWriter out,
+                                         Object session, AuthnRequest authnReq,
                                          String spEntityID, String idpEntityID, String idpMetaAlias,
                                          String realm, String nameIDFormat, String relayState,
                                          AuthnContext matchingAuthnContext)
@@ -404,8 +409,7 @@ public class IDPSSOUtil {
                     if (outputData != null && !outputData.isEmpty()) {
                         SAML2Utils.debug.message("Printing the forwarded response");
                         response.setContentType("text/html; charset=UTF-8");
-                        PrintWriter pw = response.getWriter();
-                        pw.println(outputData);
+                        out.println(outputData);
                         return;
                     }
                 }
@@ -664,16 +668,12 @@ public class IDPSSOUtil {
             LogUtil.access(Level.INFO,
                     LogUtil.POST_RESPONSE, logdata1, session, props);
             try {
-                SAML2Utils.postToTarget(response, "SAMLResponse",
+                SAML2Utils.postToTarget(request, response, "SAMLResponse",
                         encodedResMsg, "RelayState", relayState, acsURL);
-            } catch (Exception e) {
-                SAML2Utils.debug.error(classMethod +
-                        "postToTarget failed.", e);
+            } catch (SAML2Exception saml2E) {
                 String[] data = {acsURL};
-                LogUtil.error(Level.INFO,
-                        LogUtil.POST_TO_TARGET_FAILED, data, session, props);
-                throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("postToTargetFailed"));
+                LogUtil.error(Level.INFO, LogUtil.POST_TO_TARGET_FAILED, data, session, props);
+                throw saml2E;
             }
         } else if (acsBinding.equals(SAML2Constants.HTTP_ARTIFACT)) {
             IDPSSOUtil.sendResponseArtifact(request, response, idpEntityID,
@@ -2191,7 +2191,7 @@ public class IDPSSOUtil {
                 LogUtil.access(Level.INFO, LogUtil.SEND_ARTIFACT, logdata,
                         session, props);
 
-                SAML2Utils.postToTarget(response, SAML2Constants.SAML_ART,
+                SAML2Utils.postToTarget(request, response, SAML2Constants.SAML_ART,
                         artStr, "RelayState", relayState, acsURL);
             } else {
                 String redirectURL = acsURL +
@@ -2277,6 +2277,7 @@ public class IDPSSOUtil {
             SAMLUtils.sendError(request, response,
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "failedToSendECPResponse", ex.getMessage());
+            return;
         }
     }
 

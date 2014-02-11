@@ -27,9 +27,11 @@
    $Id: home.jsp,v 1.6 2008/11/25 23:50:41 exu Exp $
 
 --%>
+
 <%--
-   Portions Copyrighted 2011 ForgeRock AS
+   Portions Copyrighted 2011-2014 ForgeRock AS
 --%>
+
 <%@ page import="com.iplanet.sso.SSOTokenManager,
             com.iplanet.sso.SSOException,
             com.iplanet.sso.SSOToken"
@@ -223,6 +225,7 @@
             response.sendError(response.SC_BAD_REQUEST, 
                 "No Hosted Service or Identity Provider configured for this instance."
                 + "<br/>Please configure the sample first.");
+            return;
         }
     
         if (iAmIDP) {

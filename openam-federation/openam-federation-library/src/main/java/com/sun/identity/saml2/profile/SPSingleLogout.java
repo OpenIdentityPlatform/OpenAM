@@ -27,8 +27,9 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
+
 package com.sun.identity.saml2.profile;
 
 import javax.xml.soap.SOAPMessage;
@@ -65,6 +66,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -751,6 +753,7 @@ public class SPSingleLogout {
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out the print writer for writing out presentation
      * @param samlRequest <code>LogoutRequest</code> in the
      *          XML string format.
      * @param relayState the target URL on successful
@@ -763,6 +766,7 @@ public class SPSingleLogout {
     public static void processLogoutRequest(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String samlRequest,
         String relayState) throws SAML2Exception, SessionException {
         String method = "processLogoutRequest : ";
@@ -923,7 +927,7 @@ public class SPSingleLogout {
                 request, response, false, false, binding, true);
             logoutRespon.setDestination(XMLUtils.escapeSpecialCharacters(
                 location));
-            IDPProxyUtil.sendIDPInitProxyLogoutRequest(request, response,
+            IDPProxyUtil.sendIDPInitProxyLogoutRequest(request, response, out,
                  logoutRespon, location, spEntityID, idpEntityID, binding);
         } else {
             LogoutResponse logoutRes = processLogoutRequest(
@@ -932,7 +936,7 @@ public class SPSingleLogout {
             logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(
                 location));
 
-            LogoutUtil.sendSLOResponse(response, logoutRes, location,
+            LogoutUtil.sendSLOResponse(response, request, logoutRes, location,
                 relayState, realm, spEntityID, SAML2Constants.SP_ROLE,
                 idpEntityID, binding);
         }

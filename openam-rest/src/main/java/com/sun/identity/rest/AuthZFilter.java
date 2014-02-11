@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.rest;
 
 import com.sun.identity.rest.spi.IAuthorization;
@@ -61,6 +65,7 @@ public final class AuthZFilter implements Filter {
         if (auth == null) {
             ((HttpServletResponse) response).sendError(
                 HttpServletResponse.SC_BAD_REQUEST);
+            return;
         } else {
             auth.doFilter(request, response, chain);
         }

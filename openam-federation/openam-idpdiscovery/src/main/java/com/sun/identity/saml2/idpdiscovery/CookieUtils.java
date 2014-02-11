@@ -27,8 +27,9 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
+
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
@@ -339,6 +340,7 @@ public class CookieUtils {
             // no error processing URL set, use sendError
             try {
                 response.sendError(httpStatusCode, errorMsg);
+                return;
             } catch (IOException ioe) {
                 debug.error("CookieUtils.sendError", ioe);
             }

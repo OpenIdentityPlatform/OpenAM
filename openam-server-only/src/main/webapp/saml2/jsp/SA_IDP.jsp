@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock AS.
+   Portions Copyrighted 2013-2014 ForgeRock AS
 --%>
 
 <%@ page language="java" 
@@ -51,6 +51,7 @@ com.sun.identity.saml2.meta.SAML2MetaException,
 org.forgerock.openam.utils.ClientUtils,
 org.owasp.esapi.ESAPI"
 %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%-- functions --%>
 <%!
@@ -402,7 +403,7 @@ org.owasp.esapi.ESAPI"
         SAML2Utils.logAccess(Level.INFO, LogUtil.SAE_IDP_AUTH, 
                    data, token, ipaddr, userid, realm, "SAE", null);
         try {
-            Utils.redirect(response, redirectUrl, postParams, action);
+            Utils.redirect(response, new PrintWriter(out, true), redirectUrl, postParams, action);
         } catch (Exception ex) {
             String errStr = 
               errorUrl+"SA_IDP:errcode=5,redirect to Login failed:"+ex;

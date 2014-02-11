@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2014 ForgeRock AS
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement" %>
@@ -208,7 +212,7 @@ height="55" width="31" /></td></tr></tbody></table>
         if(newpackage.getrelaystate() != null){
             relayState = newpackage.getrelaystate();
         }
-        SAML2Utils.postToTarget(response, "SAMLResponse",
+        SAML2Utils.postToTarget(request, response, "SAMLResponse",
                    encodedResMsg, "RelayState", relayState, acsURL);
     %>
     <BR>

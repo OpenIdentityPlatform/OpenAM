@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
@@ -184,6 +188,7 @@ public class CookieReaderServlet extends HttpServlet {
             CookieUtils.sendError(request, response,
                     response.SC_INTERNAL_SERVER_ERROR, "readerServiceFailed",
                     e.getMessage());
+            return;
         }
     }    
     

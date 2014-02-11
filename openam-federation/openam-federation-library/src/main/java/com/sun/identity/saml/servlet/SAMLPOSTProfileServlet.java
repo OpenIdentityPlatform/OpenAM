@@ -27,8 +27,9 @@
  */
 
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
+
 package com.sun.identity.saml.servlet;
 
 import com.sun.identity.shared.encode.Base64;
@@ -464,7 +465,7 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
             if (SAMLUtils.debug.messageEnabled()) {
                 SAMLUtils.debug.message("POST to target:"+target);
             }
-            SAMLUtils.postToTarget(response, assertions, target,attrMap);
+            SAMLUtils.postToTarget(response, response.getWriter(), assertions, target,attrMap);
         } else {
             response.setHeader("Location", target);
             response.sendRedirect(target);

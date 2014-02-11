@@ -27,9 +27,8 @@
 --%>
 
 <%--
-    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012-2014 ForgeRock AS
 --%>
-
 
 <%@page
 import="com.sun.identity.shared.encode.URLEncDec,
@@ -52,6 +51,7 @@ com.sun.identity.plugin.session.SessionException,
 java.util.logging.Level
 "
 %>
+<%@ page import="java.io.PrintWriter" %>
 
 <html>
 <head>
@@ -199,7 +199,7 @@ java.util.logging.Level
     Object newSession = null;
     try {
         newSession = SPACSUtils.processResponse(
-            request, response, metaAlias, token, respInfo,
+            request, response, new PrintWriter(out, true), metaAlias, token, respInfo,
             orgName, hostEntityId, metaManager);
     } catch (SAML2Exception se) {
         SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
@@ -256,7 +256,7 @@ java.util.logging.Level
     boolean isProxyOn = IDPProxyUtil.isIDPProxyEnabled(requestID);
     if (isProxyOn) { 
     try { 
-        IDPProxyUtil.generateProxyResponse(request, response, metaAlias,
+        IDPProxyUtil.generateProxyResponse(request, response, new PrintWriter(out, true), metaAlias,
              respInfo,newSession);
     } catch (SAML2Exception se) {
         SAML2Utils.debug.message("Failed sending proxy response"); 

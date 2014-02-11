@@ -25,6 +25,10 @@
  * $Id: SSOTokenAuthZ.java,v 1.4 2009/12/11 09:24:42 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.rest.spi;
 
 import com.iplanet.am.util.SystemProperties;
@@ -130,6 +134,7 @@ public class SSOTokenAuthZ implements IAuthorization {
         if (statusCode != HttpServletResponse.SC_OK) {
             ((HttpServletResponse)response).sendError(statusCode, 
                 statusMessage);
+            return;
         }
     }
 

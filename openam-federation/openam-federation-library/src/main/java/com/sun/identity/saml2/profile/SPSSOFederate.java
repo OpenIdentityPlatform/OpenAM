@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -319,7 +319,7 @@ public class SPSSOFederate {
                         "SAML Response content :\n" + authXMLString);
                 }
                 String encodedReqMsg = SAML2Utils.encodeForPOST(authXMLString);
-                SAML2Utils.postToTarget(response, "SAMLRequest",
+                SAML2Utils.postToTarget(request, response, "SAMLRequest",
                     encodedReqMsg, "RelayState", relayStateID, ssoURL);
 	    } else {
                 // encode the xml string

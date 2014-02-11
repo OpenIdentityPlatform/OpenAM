@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 
 package com.sun.identity.saml.servlet;
 
@@ -363,7 +366,7 @@ public class SAMLAwareServlet extends HttpServlet {
             if (SAMLUtils.debug.messageEnabled()) {
                 SAMLUtils.debug.message("POST to target:"+targeturl);
             }
-            SAMLUtils.postToTarget(response,assts, targeturl, attrMap);
+            SAMLUtils.postToTarget(response, response.getWriter(), assts, targeturl, attrMap);
         } else {
             response.sendRedirect(targeturl);
         }

@@ -50,6 +50,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     spSingleLogoutPOST.jsp
@@ -112,8 +113,8 @@
               IDPCache.proxySPLogoutReqCache.get(inRes); 
           if (origLogoutRequest != null && !origLogoutRequest.equals("")) {
               IDPCache.proxySPLogoutReqCache.remove(inRes);
-              IDPProxyUtil.sendProxyLogoutResponse(response,
-                  origLogoutRequest.getID(), infoMap,
+              IDPProxyUtil.sendProxyLogoutResponse(response, request,
+                      origLogoutRequest.getID(), infoMap,
                   origLogoutRequest.getIssuer().getValue(),
                   SAML2Constants.HTTP_POST); 
               return;        
@@ -192,7 +193,7 @@
              * @throws SAML2Exception if error processing
              *          <code>LogoutRequest</code>.
              */
-            SPSingleLogout.processLogoutRequest(request,response,
+            SPSingleLogout.processLogoutRequest(request,response, new PrintWriter(out, true),
                 samlRequest,relayState);
             } catch (SAML2Exception sse) {
                 SAML2Utils.debug.error("Error processing LogoutRequest :", sse);

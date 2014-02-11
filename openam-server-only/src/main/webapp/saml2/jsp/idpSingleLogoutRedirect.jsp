@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS
 --%>
 
 
@@ -37,6 +37,8 @@
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     idpSingleLogoutRedirect.jsp
@@ -148,7 +150,7 @@
              * @throws SAML2Exception if error processing
              *          <code>LogoutRequest</code>.
              */
-            IDPSingleLogout.processLogoutRequest(request,response,
+            IDPSingleLogout.processLogoutRequest(request,response, new PrintWriter(out, true),
                 samlRequest,relayState);
             } catch (SAML2Exception sse) {
                 SAML2Utils.debug.error("Error processing LogoutRequest :", sse);

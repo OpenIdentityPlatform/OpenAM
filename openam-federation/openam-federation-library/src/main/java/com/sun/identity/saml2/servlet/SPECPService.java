@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.saml2.servlet;
 
 import com.sun.identity.saml.common.SAMLUtils;
@@ -70,6 +74,7 @@ public class SPECPService extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                  HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                  "failedToInitECPRequest", ex.getMessage());
+            return;
         }
     }
 }

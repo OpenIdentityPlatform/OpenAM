@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.saml2.servlet;
 
 import java.io.InputStream;
@@ -163,6 +167,7 @@ public class AttributeServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "soapError", soap.getMessage());
+            return;
         }
     }
 }

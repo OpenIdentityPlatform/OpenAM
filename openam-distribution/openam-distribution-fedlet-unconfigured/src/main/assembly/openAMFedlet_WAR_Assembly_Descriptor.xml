@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -131,6 +131,7 @@
                 <include>spSingleLogoutInit.jsp</include>
                 <include>spSingleLogoutPOST.jsp</include>
                 <include>spSingleLogoutRedirect.jsp</include>
+                <include>autosubmitaccessrights.jsp</include>
             </includes>
         </fileSet>
         <fileSet>

@@ -25,6 +25,10 @@
  * $Id: SPManageNameIDServiceSOAP.java,v 1.3 2009/06/12 22:21:41 mallas Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.saml2.servlet;
 
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -63,11 +67,13 @@ public class SPManageNameIDServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(request, response, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "requestProcessingMNIError", ex.getMessage());
+            return;
         } catch (SOAPException se) {
             SAML2Utils.debug.error("SPManageNameIDServiceSOAP.doPost:", se);
             SAMLUtils.sendError(request, response, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "requestProcessingMNIError", se.getMessage());
+            return;
         }
     }
 }

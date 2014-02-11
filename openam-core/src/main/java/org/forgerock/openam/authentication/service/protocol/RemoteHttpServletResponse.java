@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -170,9 +170,9 @@ implements HttpServletResponse, Serializable {
      * @throws IOException If the error code cannot be set.
      */
     public void sendError(int sc, String msg) throws IOException {
-	if (this._getHttpServletResponse() != null)
+	    if (this._getHttpServletResponse() != null)
             this._getHttpServletResponse().sendError(sc, msg);
-    }
+        }
 
     /**
      * The default behavior of this method is to call sendError(int sc)

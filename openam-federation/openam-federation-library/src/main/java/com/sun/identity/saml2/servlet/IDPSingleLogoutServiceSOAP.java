@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.servlet;
 
@@ -143,11 +146,13 @@ public class IDPSingleLogoutServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "singleLogoutFailed", ex.getMessage());
+            return;
         } catch (SOAPException soap) {
             SAML2Utils.debug.error("IDPSingleLogoutServiceSOAP", soap);
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "singleLogoutFailed", soap.getMessage());
+            return;
         }
     }
 

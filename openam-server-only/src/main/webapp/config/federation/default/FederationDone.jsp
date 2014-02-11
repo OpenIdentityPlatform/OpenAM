@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+    Portions Copyrighted 2014 ForgeRock AS
+ --%>
+
 <%@ page language="java"
 import="com.sun.liberty.LibertyManager"
 %>
@@ -51,6 +55,7 @@ import="com.sun.liberty.LibertyManager"
     } else {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,
             "Not able to get Provider ID");
+        return;
     }
     if (LibertyManager.isFederationCancelled(request)) {
 %>

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml.servlet;
@@ -90,6 +90,7 @@ public class AssertionManagerServlet extends JAXRPCServlet {
                     "untrustedSite",
                     SAMLUtils.bundle.getString("untrustedSite")
                     + clientIP);
+            return;
         }
     }
 }

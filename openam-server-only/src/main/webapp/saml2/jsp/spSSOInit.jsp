@@ -24,10 +24,11 @@
 
    $Id: spSSOInit.jsp,v 1.11 2009/06/24 23:05:30 mrudulahg Exp $
 
-   Portions Copyright 2013 ForgeRock AS
 --%>
 
-
+<%--
+   Portions Copyrighted 2013-2014 ForgeRock AS
+--%>
 
 
 <%@ page import="com.sun.identity.shared.debug.Debug" %>
@@ -220,16 +221,18 @@
 				          idpEntityID,
                                           paramsMap);
     } catch (SAML2Exception sse) {
-	SAML2Utils.debug.error("Error sending AuthnRequest " , sse);
-	SAMLUtils.sendError(request, response, 
+	    SAML2Utils.debug.error("Error sending AuthnRequest " , sse);
+	    SAMLUtils.sendError(request, response,
             response.SC_BAD_REQUEST, "requestProcessingError",
-	    SAML2Utils.bundle.getString("requestProcessingError") + " " +
+	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             sse.getMessage());
+        return;
     } catch (Exception e) {
         SAML2Utils.debug.error("Error processing Request ",e);
-	SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
             "requestProcessingError",
-	    SAML2Utils.bundle.getString("requestProcessingError") + " " +
+	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             e.getMessage());
+        return;
     }
 %>

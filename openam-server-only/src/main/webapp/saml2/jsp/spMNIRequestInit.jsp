@@ -27,7 +27,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS
 --%>
 
 <%@ page import="com.sun.identity.federation.common.FSUtils" %>
@@ -166,5 +166,6 @@
             "requestProcessingMNIError",
             SAML2Utils.bundle.getString("requestProcessingMNIError") + " " +
             e.getMessage());
+        return;
     }
 %>

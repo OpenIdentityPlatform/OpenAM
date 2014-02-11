@@ -1108,6 +1108,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             response.setHeader(hc.getNegotiationHeaderName(),
             hc.getNegotiationHeaderValue());
             response.sendError(hc.getNegotiationCode());
+            return;
         }
     }
 

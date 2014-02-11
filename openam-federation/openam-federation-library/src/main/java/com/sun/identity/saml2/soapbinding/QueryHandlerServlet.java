@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
+
 package com.sun.identity.saml2.soapbinding;
 
 import com.sun.identity.saml2.key.KeyUtil;
@@ -170,11 +171,13 @@ public class QueryHandlerServlet extends HttpServlet {
             SAMLUtils.sendError(request, response,
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "failedToProcessRequest", ex.getMessage());
+            return;
         } catch (SOAPException soap) {
             debug.error(classMethod, soap);
             SAMLUtils.sendError(request, response, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "failedToProcessRequest", soap.getMessage());
+            return;
         }
     }
     

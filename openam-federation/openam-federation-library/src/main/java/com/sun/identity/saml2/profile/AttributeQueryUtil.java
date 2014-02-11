@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions copyright 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -86,7 +86,6 @@ import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.saml2.xmlenc.EncManager;
-import java.io.IOException;
 
 
 /**
@@ -228,12 +227,7 @@ public class AttributeQueryUtil {
         if (binding.equalsIgnoreCase(SAML2Constants.HTTP_POST)) {
             signAttributeQuery(attrQuery, realm, false);
             String encodedReqMsg = SAML2Utils.encodeForPOST(attrQuery.toXMLString(true, true));
-            try {
-                SAML2Utils.postToTarget(response, "SAMLRequest",
-                                encodedReqMsg, null, null, location);
-            } catch (IOException ptte) {
-                SAML2Utils.bundle.getBundle("errorSendingAttributeQuery");
-            }
+            SAML2Utils.postToTarget(request, response, "SAMLRequest", encodedReqMsg, null, null, location);
         } else {
             throw new SAML2Exception(
                 SAML2Utils.bundle.getString("unsupportedBinding"));

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.servlet;
 
@@ -52,7 +55,7 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, true, SAML2Constants.SOAP);
+        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -60,6 +63,6 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, true, SAML2Constants.SOAP);
+        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
     }
 }

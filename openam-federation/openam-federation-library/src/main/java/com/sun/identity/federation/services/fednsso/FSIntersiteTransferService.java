@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.federation.services.fednsso;
 
 import com.sun.identity.cot.CircleOfTrustManager;
@@ -491,6 +495,7 @@ public class FSIntersiteTransferService extends HttpServlet {
             try {
                 response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                     FSUtils.bundle.getString("Exception"));
+                return;
             } catch(IOException ioe){
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message("FSIntersiteTransferService.doGet: "

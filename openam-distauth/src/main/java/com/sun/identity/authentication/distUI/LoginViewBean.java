@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.distUI;
@@ -1543,6 +1543,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             response.setHeader(hc.getNegotiationHeaderName(),
                     hc.getNegotiationHeaderValue());
             response.sendError(hc.getNegotiationCode());
+            return;
         }
     }
 
