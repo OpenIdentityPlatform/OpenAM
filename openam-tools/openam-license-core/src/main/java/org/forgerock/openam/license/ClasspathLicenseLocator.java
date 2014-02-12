@@ -26,8 +26,6 @@ import java.nio.charset.Charset;
  * @since 12.0.0
  */
 public class ClasspathLicenseLocator extends ResourceLoaderLicenseLocator {
-    private static final String[] DEFAULT_LICENSE_FILES = {"license.txt"};
-
     private final ClassLoader classLoader;
 
     /**
@@ -44,17 +42,6 @@ public class ClasspathLicenseLocator extends ResourceLoaderLicenseLocator {
         }
 
         this.classLoader = classLoader;
-    }
-
-    /**
-     * Constructs a classpath license locator with the system default classloader, platform default character set,
-     * and the default license file name ("license.txt").
-     *
-     * @see ClassLoader#getSystemClassLoader()
-     * @see java.nio.charset.Charset#defaultCharset()
-     */
-    public ClasspathLicenseLocator() {
-        this(ClassLoader.getSystemClassLoader(), Charset.defaultCharset(), DEFAULT_LICENSE_FILES);
     }
 
     /**

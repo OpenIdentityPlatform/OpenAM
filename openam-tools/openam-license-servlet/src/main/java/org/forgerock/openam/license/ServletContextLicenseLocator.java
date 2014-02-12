@@ -28,7 +28,6 @@ import java.nio.charset.Charset;
  * @since 12.0.0
  */
 public class ServletContextLicenseLocator extends ResourceLoaderLicenseLocator {
-    private static final String[] DEFAULT_LICENSE_FILES = { "WEB-INF/legal-notices/license.txt" };
     private final ServletContext servletContext;
 
     /**
@@ -46,18 +45,6 @@ public class ServletContextLicenseLocator extends ResourceLoaderLicenseLocator {
             throw new NullPointerException("ServletContext is null");
         }
         this.servletContext = servletContext;
-    }
-
-    /**
-     * Constructs the license locator with the given servlet context, the platform default character set, and the
-     * default license file name (WEB-INF/legal-notices/license.txt).
-     *
-     * @param servletContext the servlet context to use for locating license files.
-     * @see ServletContext#getResourceAsStream(String)
-     * @see Charset#defaultCharset()
-     */
-    public ServletContextLicenseLocator(ServletContext servletContext) {
-        this(servletContext, Charset.defaultCharset(), DEFAULT_LICENSE_FILES);
     }
 
     /**
