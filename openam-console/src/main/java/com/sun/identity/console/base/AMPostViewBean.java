@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.NavigationException;
@@ -95,9 +99,11 @@ public class AMPostViewBean
      * @param url URL of target view bean.
      */
     public void setTargetViewBeanURL(String url) {
-        isValid = ESAPI.validator().isValidInput("AMPost_viewbeanUrl", url, "HTTPURI", 1024, false);
+        // The HTTPParameterValue validator provides better coverage of input values such as : but still allows / and ?
+        isValid = ESAPI.validator().isValidInput("AMPost_viewbeanUrl", url, "HTTPParameterValue", 1024, false);
         if (!isValid && debug.warningEnabled()) {
-            debug.warning("Possibly malicious content detected in AMPostViewBean: " + url);
+            debug.warning("AMPostViewBean.setTargetViewBeanURL: Possibly malicious content detected in AMPostViewBean: "
+                    + url);
         }
         urlViewBean = url;
     }
