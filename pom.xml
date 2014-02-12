@@ -176,6 +176,31 @@
             </properties>
         </profile>
 
+        <!-- When building an Enterprise binary download, include the correct binary license terms. -->
+        <profile>
+            <id>binary-licensing</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>Grab binary license</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <connectionUrl>scm:svn:https://svn.forgerock.org/internal/trunk/QA/OpenDJ/builds/b2.6/license/</connectionUrl>
+                                    <checkoutDirectory>${project.build.directory}/legal-notices</checkoutDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <!-- OpenAM Child Modules -->
@@ -620,6 +645,16 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-installtools-launcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-servlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1753,6 +1788,27 @@
                     <individualFiles>true</individualFiles>
                     <quiet>true</quiet>
                 </configuration>
+            </plugin>
+
+            <!-- Copy CDDL license into place, if binary license not already present. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>copy-cddl-license</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target name="copy-cddl-license">
+                                <copy file="${project.basedir}/legal/CDDLv1.0.txt" tofile="${project.build.directory}/legal-notices/license.txt" overwrite="false"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

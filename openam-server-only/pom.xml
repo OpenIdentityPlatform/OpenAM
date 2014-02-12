@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -209,6 +209,14 @@
                             </includes>
                             <targetPath>WEB-INF</targetPath>
                             <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <!-- Copy all licenses into the legal-notices directory. -->
+                            <directory>${project.parent.build.directory}/legal-notices</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>WEB-INF/legal-notices</targetPath>
                         </webResource>
                         <webResource>
                             <directory>

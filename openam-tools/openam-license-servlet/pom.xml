@@ -26,13 +26,22 @@
         <version>12.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- Component Definition -->
-    <name>OpenAM License Core</name>
-    <description>OpenAM License Core</description>
-    <artifactId>openam-license-core</artifactId>
+    <name>OpenAM ServletContext License Locator</name>
+    <description>OpenAM ServletContext License Locator</description>
+    <artifactId>openam-license-servlet</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-license-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
