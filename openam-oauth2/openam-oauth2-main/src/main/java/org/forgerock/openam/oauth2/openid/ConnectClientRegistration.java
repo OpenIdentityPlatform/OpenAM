@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,6 +20,10 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ */
+
+/*
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.oauth2.openid;
@@ -209,7 +213,7 @@ public class ConnectClientRegistration extends ServerResource {
                 Set<String> set = new HashSet<String>();
                 for (int i = 0; i < temp.length(); i++){
                     try {
-                        set.add((String) temp.get(i));
+                        set.add("[" + i + "]=" + temp.get(i));
                     } catch (JSONException e) {
                         OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
                         throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
