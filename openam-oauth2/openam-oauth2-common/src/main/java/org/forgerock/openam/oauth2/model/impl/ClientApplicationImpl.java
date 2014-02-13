@@ -246,7 +246,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CONTACTS +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -263,7 +266,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -280,7 +286,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.LOGO_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -297,7 +306,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -314,7 +326,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.POLICY_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -331,7 +346,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.TOS_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -348,7 +366,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.JKWS_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -365,7 +386,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -374,19 +398,19 @@ public class ClientApplicationImpl implements ClientApplication{
      */
     public SubjectType getSubjectType(){
         SubjectType subjectType = null;
-        try {
-            Set<String> clientTypeSet = id.getAttribute(OAuth2Constants.OAuth2Client.SUBJECT_TYPE);
-            if (clientTypeSet.iterator().next().equalsIgnoreCase("PAIRWISE")){
-                subjectType = SubjectType.PAIRWISE;
-            } else {
-                subjectType = SubjectType.PUBLIC;
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository");
-        }
-        return subjectType;
+        //try {
+            //Set<String> clientTypeSet = id.getAttribute(OAuth2Constants.OAuth2Client.SUBJECT_TYPE);
+            //if (clientTypeSet.iterator().next().equalsIgnoreCase("PAIRWISE")){
+            //    subjectType = SubjectType.PAIRWISE;
+            //} else {
+            //    subjectType = SubjectType.PUBLIC;
+            //}
+        //} catch (Exception e){
+        //    OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository", e);
+        //    throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+        //            "Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository");
+       // }
+        return subjectType.PUBLIC;
     }
 
     /**
@@ -402,7 +426,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -419,7 +446,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -436,7 +466,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -453,7 +486,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -470,7 +506,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -487,7 +526,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -504,7 +546,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -521,7 +566,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -538,7 +586,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -555,7 +606,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -572,7 +626,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.INIT_LOGIN_URL +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -589,7 +646,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.POST_LOGOUT_URI +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -606,7 +666,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_URLs +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
@@ -623,7 +686,10 @@ public class ClientApplicationImpl implements ClientApplication{
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
                     "Unable to get "+ OAuth2Constants.OAuth2Client.ACCESS_TOKEN +" from repository");
         }
-        return set.iterator().next();
+        if (set.iterator().hasNext()){
+            return set.iterator().next();
+        }
+        return null;
 
     }
 
