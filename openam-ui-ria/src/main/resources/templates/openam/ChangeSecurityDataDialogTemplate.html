@@ -4,7 +4,7 @@
 
         <div class="group-field-row">
             <label for="oldPassword">{{t "common.user.oldPassword"}}</label> 
-            <input  id="oldPassword"  type="password" name="oldPassword" value="" data-validator="required" autofocus />
+            <input  id="oldPassword"  type="password" name="oldPassword" value="" data-validator="required" pattern=".{8,}" required autofocus />
             <span class="error">x</span>
         </div>
 
@@ -14,12 +14,12 @@
 
             <div class="group-field-row float-left">
                 <label for="password">{{t "common.user.newPassword"}}</label>
-                <input type="password" id="password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator="minLength" minLength="8" data-validator-event="keyup change" data-validation-status="error" />
+                <input type="password" id="password" name="password" value="" data-validation-dependents="passwordConfirm" data-validator="minLength" minLength="8" pattern=".{8,}" data-validator-event="keyup change" data-validation-status="error" required />
             </div> 
             
              <div class="group-field-row float-left">
                 <label for="confirm">{{t "common.user.confirmPassword"}}</label> 
-                <input  id="confirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" />
+                <input  id="confirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" required/>
             </div>   
 
         </div>  

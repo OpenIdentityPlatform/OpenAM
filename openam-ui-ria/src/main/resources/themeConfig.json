@@ -55,7 +55,8 @@
 
 
                         "input-background-color": "#fff",
-                        "input-background-invalid-color": "#ffe5e9",
+                        "input-background-invalid-color": "#fee",
+                        "input-border-invalid-color": "#f8b9b3",
                         "input-border-basic": "#DBDBDB",
                         "header-border-color": "#5D5D5D",
             

@@ -313,11 +313,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         
         switch (cb.type) {
             case "PasswordCallback" :
-                result += '<input type="password" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" data-validator-event="keyup" />';
+                result += '<input type="password" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';
             break;
             
             case "TextInputCallback" :
-                result += '<textarea name="callback_' + cb.input.index + '" data-validator="required" data-validator-event="keyup">' + cb.input.value + '</textarea>';
+                result += '<textarea name="callback_' + cb.input.index + '" data-validator="required" required data-validator-event="keyup">' + cb.input.value + '</textarea>';
             break;
             case "TextOutputCallback" :
                 result += '<div id="callback_' + cb.input.index + '" class="textOutputCallback ' + 
@@ -346,7 +346,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             break;
             default: 
-                result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" data-validator-event="keyup" />';
+                result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';
             break;
         }
         
