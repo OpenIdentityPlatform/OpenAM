@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -338,7 +338,7 @@ public class AuthorizeServerResource extends AbstractFlow {
             int loc = consent.indexOf(" ");
             String consentClientId = consent.substring(0, loc);
             String[] scopesArray = null;
-            if (loc + 1 <= consent.length()) {
+            if (loc + 1 < consent.length()) {
                 scopesArray = consent.substring(loc + 1, consent.length()).split(" ");
             }
             Set<String> consentScopes = null;
