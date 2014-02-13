@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -55,7 +55,7 @@ public class OpenIDConnectConfiguration extends ServerResource {
         response.put("claims_supported", settings.getSupportedClaims());
         response.put("response_types_supported", settings.getResponseTypes());
         response.put("subject_types_supported", settings.getSubjectTypesSupported());
-        response.put("id_token_siging_alg_values_supported", settings.getTheIDTokenSigningAlgorithmsSupported());
+        response.put("id_token_signing_alg_values_supported", settings.getTheIDTokenSigningAlgorithmsSupported());
         return new JsonRepresentation(response);
     }
 }
