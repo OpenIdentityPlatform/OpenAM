@@ -200,7 +200,15 @@ public abstract class AbstractFlow extends ServerResource {
     protected void doCatch(Throwable throwable) {
         if (throwable instanceof OAuthProblemException) {
             OAuthProblemException exception = (OAuthProblemException) throwable;
-            doError(exception.getStatus());
+
+            if (exception.getStatus().equals(Status.REDIRECTION_TEMPORARY)){
+                Redirector redirector =
+                        new Redirector(new Context(), exception.getRedirectUri().toString(), Redirector.MODE_CLIENT_PERMANENT);
+                redirector.handle(getRequest(), getResponse());
+                return;
+            } else {
+                doError(exception.getStatus());
+            }
 
             switch (endpointType) {
             case TOKEN_ENDPOINT: {
