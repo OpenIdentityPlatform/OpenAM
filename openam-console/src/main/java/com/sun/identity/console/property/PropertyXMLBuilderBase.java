@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.console.property;
@@ -47,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -1005,7 +1007,10 @@ public abstract class PropertyXMLBuilderBase
         }        
 
         List sorted = new ArrayList(attributeSchemas);
-        Collections.sort(sorted, new AttributeSchemaComparator(null));
+        if (!(attributeSchemas instanceof LinkedHashSet)) {
+            // Sort attribute schemas by property key if they are not sorted by section properties.
+            Collections.sort(sorted, new AttributeSchemaComparator(null));
+        }
 
         for (Iterator iter = sorted.iterator(); iter.hasNext(); ) {
             AttributeSchema as = (AttributeSchema)iter.next();
@@ -1048,11 +1053,14 @@ public abstract class PropertyXMLBuilderBase
     } 
     
     protected Set<AttributeSchema> getAttributeSchemaForSection(Set<AttributeSchema> attributeSchemas, List<String> sectionList) {
-        Set<AttributeSchema> result = new HashSet<AttributeSchema>();
-        
-        for (AttributeSchema attribute : attributeSchemas) {
-            if (sectionList.contains(attribute.getName())) {
-                result.add(attribute);
+        // Create an attribute schema set sorted by section properties.
+        Set<AttributeSchema> result = new LinkedHashSet<AttributeSchema>();
+        for (String section : sectionList) {
+            for (AttributeSchema attribute : attributeSchemas) {
+                if (section.equals(attribute.getName())) {
+                    result.add(attribute);
+                    break;
+                }
             }
         }
         
