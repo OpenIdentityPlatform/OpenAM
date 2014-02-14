@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing OpenID Connect 1.0 Authorization</title>
  <indexterm>
@@ -268,7 +269,6 @@
     "version": "3.0",
     "userinfo_endpoint": "https://openam.example.com:8443/openam/oauth2/userinfo",
     "subject_types_supported": [
-        "pairwise",
         "public"
     ],
     "issuer": "https://openam.example.com:8443/openam",
@@ -376,20 +376,21 @@
     the examples <link xlink:show="new"
     xlink:href="https://github.com/markcraig/openid/">available online</link>.
     Successful registration shows a response that includes the client ID and
-    client secret.</para>
+    client secret. Lines are folded in the following example.</para>
 
     <programlisting language="javascript">{
-  "issued_at": 1376916775,
+  "issued_at": 1392364349,
   "expires_at": 0,
-  "client_secret": "5a1f50db-ed93-4a9b-bf37-c1cb3c74ca16",
-  "com.forgerock.openam.oauth2provider.redirectionURIs": [
+  "client_secret": "7f446ca9-3f1f-48fb-bf8c-150b9e643f29",
+  "redirect_uris": [
     "https://openam.example.com:8443/openid/cb-basic.html",
     "https://openam.example.com:8443/openid/cb-implicit.html"
   ],
-  "client_id": "c1e5c60a-9fd4-4780-a283-ec89580b6cc1",
+  "registration_access_token": "515d6551-4512-4279-98b6-c0ef3f03a722",
+  "client_id": "6e4abd50-3f03-41dc-b807-c6705c3e45d7",
   "registration_client_uri":
-    "https://openam.example.com:8443/openam/oauth2/connect/register
-     ?client_id=c1e5c60a-9fd4-4780-a283-ec89580b6cc1"
+     "https://openam.example.com:8443/openam/oauth2/connect/register
+     ?client_id=6e4abd50-3f03-41dc-b807-c6705c3e45d7"
 }</programlisting>
    </step>
   </procedure>
