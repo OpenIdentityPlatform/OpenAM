@@ -74,6 +74,8 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     _this.$el.find("input[type=submit]").prop('disabled', false);
                     if(response.message.indexOf("Email not sent") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
+                    }else{
+                        console.error('unableToRegister', e)
                     }
                 };
             
@@ -82,12 +84,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
         },
         register: function(e) {
             e.preventDefault();
+            
             var confirmParams,
             _this = this,
             postData = _.extend(
                     form2js(this.$el.find("#registration")[0]),
                     {userpassword:this.$el.find("#password").val()}
-                    ),
+            ),
             success = function() {
                 _this.$el.find("#step2").hide();
                 _this.$el.find("#registerSuccess").show();
@@ -99,13 +102,18 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
                 }
             };
-            
-            this.$el.find("input[type=submit]").prop('disabled', true);
-            
-            userDelegate.doAction("confirm",this.data.urlParams,function(d){
-                _.extend(postData,d);
-                userDelegate.doAction("anonymousCreate",postData,success,error);
-            });
+         
+            userDelegate.doAction("confirm", this.data.urlParams,
+                function(d){
+                    _.extend(postData,d);
+                    userDelegate.doAction("anonymousCreate",postData,success,error);
+                },
+                function(e){
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
+                });
+
+           this.$el.find("input[type=submit]").prop('disabled', true);
+
         },
         cancel: function(e) {
             e.preventDefault();
