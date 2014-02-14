@@ -75,7 +75,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     if(response.message.indexOf("Email not sent") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                     }else{
-                        console.error('unableToRegister', e)
+                        console.error('unableToRegister', e);
                     }
                 };
             
