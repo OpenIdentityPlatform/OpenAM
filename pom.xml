@@ -135,6 +135,11 @@
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+
+        <!-- Default license (CDDL) to package into the artifacts -->
+        <forgerock.license.groupId>org.forgerock</forgerock.license.groupId>
+        <forgerock.license.artifactId>cddl-license</forgerock.license.artifactId>
+        <forgerock.license.version>1.0.0</forgerock.license.version>
     </properties>
 
     <!-- Profiles -->
@@ -178,28 +183,20 @@
 
         <!-- When building an Enterprise binary download, include the correct binary license terms. -->
         <profile>
+            <!-- Overrides the default CDDL license with the Forgerock binary license. Only available from Forgerock internal repository. -->
             <id>binary-licensing</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-scm-plugin</artifactId>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <id>Grab binary license</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>checkout</goal>
-                                </goals>
-                                <configuration>
-                                    <connectionUrl>scm:svn:https://svn.forgerock.org/internal/trunk/QA/OpenDJ/builds/b2.6/license/</connectionUrl>
-                                    <checkoutDirectory>${project.build.directory}/legal-notices</checkoutDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+            <properties>
+                <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
+                <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
+                <forgerock.license.version>1.0.0</forgerock.license.version>
+            </properties>
         </profile>
     </profiles>
 
@@ -1788,27 +1785,6 @@
                     <individualFiles>true</individualFiles>
                     <quiet>true</quiet>
                 </configuration>
-            </plugin>
-
-            <!-- Copy CDDL license into place, if binary license not already present. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>copy-cddl-license</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target name="copy-cddl-license">
-                                <copy file="${project.basedir}/legal/CDDLv1.0.txt" tofile="${project.build.directory}/legal-notices/license.txt" overwrite="false"/>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 
