@@ -301,6 +301,15 @@
                             <targetPath />
                             <filtering>false</filtering>
                         </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-sts/openam-rest-sts/src/main/resources
+                            </directory>
+                            <includes>
+                                <include>stsstore.jks</include>
+                            </includes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
                     </webResources>
                 </configuration>
 
@@ -600,7 +609,20 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rest-sts</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-common-sts</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-slf4j</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>

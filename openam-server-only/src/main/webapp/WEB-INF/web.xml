@@ -604,6 +604,15 @@
     </servlet>
 
     <servlet>
+        <servlet-name>rest-sts</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>org.forgerock.openam.sts.rest.application.RestSTSApplication</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
         <description>JAX-WS endpoint - sts</description>
         <display-name>sts</display-name>
         <servlet-name>sts</servlet-name>
@@ -1011,6 +1020,10 @@
     <servlet-mapping>
         <servlet-name>sts</servlet-name>
         <url-pattern>/sts/mexsoap11</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rest-sts</servlet-name>
+        <url-pattern>/rest_sts/*</url-pattern>
     </servlet-mapping>
 
     <!-- end of servlet mapping -->
