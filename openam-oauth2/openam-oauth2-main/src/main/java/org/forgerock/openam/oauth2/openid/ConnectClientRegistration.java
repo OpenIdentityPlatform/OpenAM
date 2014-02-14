@@ -90,6 +90,7 @@ public class ConnectClientRegistration extends ServerResource {
     private static final String REQUEST_URIS = "request_uris";
     private static final String POST_LOGOUT_REDIRECT_URIS = "post_logout_redirect_uris";
     private static final String REGISTRATION_ACCESS_TOKEN = "registration_access_token";
+    private static final String CLIENT_SESSION_URI = "client_session_uri";
 
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
@@ -101,8 +102,8 @@ public class ConnectClientRegistration extends ServerResource {
     private static final String NOT_USED = null;
 
     private static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
-    private static final String ISSUED_AT = "issued_at";
-    private static final String EXPIRES_AT = "expires_at";
+    private static final String ISSUED_AT = "client_id_issued_at";
+    private static final String EXPIRES_AT = "client_secret_expires_at";
 
     private static final String OAUTH2_CLIENT = "OAuth2Client";
     private static final String AGENT_TYPE = "AgentType";
@@ -121,8 +122,8 @@ public class ConnectClientRegistration extends ServerResource {
 
     private void createTranslationMaps(){
         translationMap.put(REDIRECT_URIS, OAuth2Constants.OAuth2Client.REDIRECT_URI);
-        translationMap.put(RESPONSE_TYPES, OAuth2Constants.OAuth2Client.RESPONSE_TYPES);
-        translationMap.put(GRANT_TYPES, OAuth2Constants.OAuth2Client.GRANT_TYPES);
+        translationMap.put(RESPONSE_TYPES, NOT_USED);
+        translationMap.put(GRANT_TYPES, NOT_USED);
         translationMap.put(APPLICATION_TYPE, NOT_USED);
         translationMap.put(CONTACTS, NOT_USED);
         translationMap.put(CLIENT_NAME, OAuth2Constants.OAuth2Client.NAME);
@@ -130,7 +131,7 @@ public class ConnectClientRegistration extends ServerResource {
         translationMap.put(CLIENT_URI, NOT_USED);
         translationMap.put(POLICY_URI, NOT_USED);
         translationMap.put(TOS_URI, NOT_USED);
-        translationMap.put(JWKS_URI, OAuth2Constants.OAuth2Client.JKWS_URI);
+        translationMap.put(JWKS_URI, NOT_USED);
         translationMap.put(JWKS, NOT_USED);
         translationMap.put(SECTOR_IDENTIFIER_URI, NOT_USED);
         translationMap.put(SUBJECT_TYPE, NOT_USED);
@@ -158,6 +159,7 @@ public class ConnectClientRegistration extends ServerResource {
         translationMap.put(SCOPES, OAuth2Constants.OAuth2Client.SCOPES);
         translationMap.put(DEFAULT_SCOPES, OAuth2Constants.OAuth2Client.DEFAULT_SCOPES);
         translationMap.put(CLIENT_DESCRIPTION, OAuth2Constants.OAuth2Client.DESCRIPTION);
+        translationMap.put(CLIENT_SESSION_URI, OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI);
 
 
         for (Map.Entry<String, String> entry : translationMap.entrySet()) {
@@ -214,6 +216,7 @@ public class ConnectClientRegistration extends ServerResource {
         response.put(CLIENT_TYPE, oauth2Client.getClientType());
         response.put(CLIENT_ID, oauth2Client.getClientId());
         response.put(REGISTRATION_ACCESS_TOKEN, oauth2Client.getAccessToken());
+        response.put(CLIENT_SESSION_URI, oauth2Client.getClientSessionURI());
 
 
         for( Iterator<Map.Entry<String,Object>> iter = response.entrySet().iterator() ; iter.hasNext();) {
