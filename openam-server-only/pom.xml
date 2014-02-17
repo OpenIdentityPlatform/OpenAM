@@ -237,7 +237,23 @@
                             <includes>
                                 <include>**/**</include>
                             </includes>
-                            <targetPath>WEB-INF/legal-notices</targetPath>
+                            <targetPath>legal-notices</targetPath>
+                        </webResource>
+                        <webResource>
+                            <!-- Copy all third-party licences too. -->
+                            <directory>${project.parent.basedir}/legal</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>legal-notices</targetPath>
+                        </webResource>
+                        <webResource>
+                            <!-- More third party licenses... -->
+                            <directory>${project.parent.basedir}/license</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>legal-notices</targetPath>
                         </webResource>
                         <webResource>
                             <directory>
