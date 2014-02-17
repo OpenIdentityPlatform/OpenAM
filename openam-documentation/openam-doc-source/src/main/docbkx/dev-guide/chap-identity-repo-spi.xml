@@ -381,8 +381,7 @@ $ jar -xvf ../lib/${coreLibrary} amIdRepoService.properties
  --password-file /tmp/pwd.txt
  --servicename sunIdentityRepositoryService
  --schematype Organization
- --filename customIdRepo.xml
- --subschemaname CustomRepo</screen>
+ --filename customIdRepo.xml</screen>
   
   <para>Login to OpenAM console as administrator, then then Browse to Access
   Control &gt; <replaceable>Realm Name</replaceable> &gt; Data Stores. In the

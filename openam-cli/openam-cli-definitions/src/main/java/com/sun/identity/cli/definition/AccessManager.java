@@ -1024,8 +1024,7 @@ public class AccessManager {
             "filename|F|s|Name of file that contains the schema"},
         optionAliases={},
         macro="authentication",
-        optionalOptions={
-            "subschemaname|c|s|Name of sub schema."},
+        optionalOptions={},
         resourceStrings={
             "subcmd-add-sub-schema-__web__-filename=Service Schema XML",
             "add-subschema-succeed=Sub Schema, {2} of type, {1} was added to service {0}."})
