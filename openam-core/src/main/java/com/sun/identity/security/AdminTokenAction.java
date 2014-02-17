@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.security;
 
@@ -101,6 +101,15 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     
     public static final String AMADMIN_MODE =
 	"com.sun.identity.security.amadmin";
+    
+    //OPENAM-1109 admin token doesn't get cleared 
+    //because SSOTokenManager#isValidToken() doesn't get 
+    //real session status. This flag makes AdminTokenAction
+    //to refresh session status and get the true status.
+    public static final String VALIDATE_SESSION = 
+    	"openam.identity.security.validateSession";
+    
+    private static boolean validateSession;
 
     /**
      * Returns a cached instance <code>AdminTokenAction</code>.
@@ -132,6 +141,7 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
 		    "SSOTokenManager", ssoe);
 	    }
 	}
+	validateSession = SystemProperties.getAsBoolean(VALIDATE_SESSION);
     }
 
     /**
@@ -191,8 +201,19 @@ public class AdminTokenAction implements PrivilegedAction<SSOToken> {
     public SSOToken run() {
 	// Check if we have a valid cached SSOToken
 	if ((appSSOToken != null) && tokenManager.isValidToken(appSSOToken)) {
-	    return (appSSOToken);
-	}
+            try {
+                if (validateSession) {
+                    tokenManager.refreshSession(appSSOToken);
+                }
+                if (tokenManager.isValidToken(appSSOToken)) {
+                    return (appSSOToken);
+                }
+            } catch (SSOException ssoe) {
+                debug.error(
+                    "AdminTokenAction.reset: couldn't retrieve valid token.",
+                    ssoe);
+            }
+        }
 
         // Check if internalAppSSOToken is present
         if ((internalAppSSOToken != null) &&
