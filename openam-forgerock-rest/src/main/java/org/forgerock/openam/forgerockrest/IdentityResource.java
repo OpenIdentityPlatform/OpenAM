@@ -1187,7 +1187,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Continue modifying the identity if read success
 
             newDtls = jsonValueToIdentityDetails(jVal, realm);
-            if(newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())){
+            if (!resourceId.equalsIgnoreCase(newDtls.getName())) {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
