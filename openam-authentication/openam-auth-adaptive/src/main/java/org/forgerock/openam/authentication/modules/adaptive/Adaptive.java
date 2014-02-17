@@ -56,6 +56,7 @@ import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.Hash;
 import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.openam.utils.ClientUtils;
@@ -947,18 +948,14 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 addCookieToResponse(response, name, value, autoLoginExpire);
             }
         } catch (Exception e) {
-            debug.message(ADAPTIVE + " Unable to Retreive PostAuthN Params", e);
+            debug.message(ADAPTIVE + " Unable to Retrieve PostAuthN Params", e);
         }
     }
 
     private void addCookieToResponse(HttpServletResponse response, String name, String value, int expire) {
         Set<String> domains = AuthUtils.getCookieDomains();
         for (String domain : domains) {
-            Cookie cookie = new Cookie(name, value);
-            cookie.setMaxAge(expire);
-            cookie.setPath("/");
-            cookie.setDomain(domain);
-            response.addCookie(cookie);
+            CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(name, value, expire, "/", domain));
         }
     }
 
