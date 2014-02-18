@@ -27,7 +27,7 @@
 */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -413,6 +413,10 @@ public class IdServicesImpl implements IdServices {
    public AMIdentity create(SSOToken token, IdType type, String name,
        Map attrMap, String amOrgName) throws IdRepoException, SSOException {
 
+       if (hasBookendSpaces(name)) {
+           throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "233", null);
+       }
+
        if (type.equals(IdType.REALM)) {                        
            return createRealmIdentity(token, type, name, attrMap, amOrgName);
        }
@@ -424,6 +428,7 @@ public class IdServicesImpl implements IdServices {
        checkPermission(token, amOrgName, name, attrMap.keySet(),
                IdOperation.CREATE, type);
        if (type.equals(IdType.USER)) {
+
            IdRepoAttributeValidator attrValidator = 
                IdRepoAttributeValidatorManager.getInstance().
                getIdRepoAttributeValidator(amOrgName);
@@ -498,7 +503,18 @@ public class IdServicesImpl implements IdServices {
 
    }
 
-   private void deleteRealmIdentity(SSOToken token, String realmName,
+    /**
+     * Validates that the username passed to it is not made shorter by performing trim(),
+     * and also that it's not null or empty.
+     *
+     * @param name Username to verify
+     * @return true if the username is not null, not empty and is not made shorter by trim(), false otherwise
+     */
+    private boolean hasBookendSpaces(String name) {
+        return (name == null || name.isEmpty() || name.trim().length() < name.length());
+    }
+
+    private void deleteRealmIdentity(SSOToken token, String realmName,
            String orgDN) throws IdRepoException {
 
        try {
