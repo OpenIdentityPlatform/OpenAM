@@ -258,15 +258,8 @@ public class ClientApplicationImpl implements ClientApplication{
      */
     public String getClientName(){
 
-        Set<String> set = null;
-        try {
-            set = id.getAttribute(OAuth2Constants.OAuth2Client.NAME);
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("Unable to get "+ TOKEN_TYPE +" from repository", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
-        }
-        if (set.iterator().hasNext()){
+        Set<String> set = getDisplayName();
+        if (set != null && !set.isEmpty()){
             return set.iterator().next();
         }
         return null;
