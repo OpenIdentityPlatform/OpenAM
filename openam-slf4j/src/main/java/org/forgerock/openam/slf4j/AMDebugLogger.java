@@ -11,15 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.slf4j;
 
 import com.sun.identity.shared.debug.Debug;
 import org.slf4j.helpers.MarkerIgnoringBase;
-
-import java.text.MessageFormat;
 
 /*
 Delegate logging invocations to the AM Debug instance. Where more expensive MessageFormat formatting of to-be-logged
@@ -184,7 +182,7 @@ public class AMDebugLogger extends MarkerIgnoringBase {
 
     private String format(String pattern, Object... objects) {
         try {
-            return MessageFormat.format(pattern, objects);
+            return String.format(pattern, objects);
         } catch (IllegalArgumentException e) {
             debug.warning("The MessageFormat pattern passed to log method incorrect, or the parameters are of an unexpected type. " +
                     "Pattern of message which can't be logged: " + pattern + ";\t and the object params: " + objects);

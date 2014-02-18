@@ -74,9 +74,9 @@ public class UsernameTokenValidator extends org.apache.ws.security.validate.User
     protected void printConfig(RequestData data) {
         WSSConfig config =  data.getWssConfig();
         if (config != null) {
-            logger.debug("Passwords are encoded: " + config.getPasswordsAreEncoded());
-            logger.debug("Handle custom password types: " + config.getHandleCustomPasswordTypes());
-            logger.debug("Required Password Type: " + config.getRequiredPasswordType());
+            logger.debug("Passwords are encoded: %b", config.getPasswordsAreEncoded());
+            logger.debug("Handle custom password types: %b", config.getHandleCustomPasswordTypes());
+            logger.debug("Required Password Type: %s", config.getRequiredPasswordType());
         }
     }
 }

@@ -143,7 +143,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         if (invalidateInterimAMSession) {
             try {
                 return new AMSAMLTokenProvider(new SAMLTokenProvider(),
-                        new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement, logger), threadLocalAMTokenCache, logger);
+                        new AMSessionInvalidatorImpl(amDeploymentUrl,
+                                jsonRestRoot, realm, restLogoutUriElement, amSessionCookieName, logger), threadLocalAMTokenCache, logger);
             } catch (URISyntaxException e) {
                 throw new STSInitializationException(e.getMessage(), e);
             }

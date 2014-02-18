@@ -32,15 +32,18 @@ import org.slf4j.Logger;
  * {@link org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidator}
  */
 public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
-    /*
-    TODO: is this always hard-coded, or will it correspond to the configured cookie name?
-     */
-    private static final String SESSION_ID_HEADER = "iplanetDirectoryPro";
     private final URI logoutUri;
+    private final String amSessionCookieName;
     private final Logger logger;
 
-    public AMSessionInvalidatorImpl(String amDeploymentUrl, String jsonRestRoot, String realm, String restLogoutUriElement, Logger logger) throws URISyntaxException {
+    public AMSessionInvalidatorImpl(String amDeploymentUrl,
+                                    String jsonRestRoot,
+                                    String realm,
+                                    String restLogoutUriElement,
+                                    String amSessionCookieName,
+                                    Logger logger) throws URISyntaxException {
         this.logoutUri = constituteLogoutUri(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement);
+        this.amSessionCookieName = amSessionCookieName;
         this.logger = logger;
     }
 
@@ -49,7 +52,10 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
     represented by an interface, and injected by Guice. Then the logic to insure proper trailing '/' values, etc, can
     be centralized in a single place.
      */
-    private URI constituteLogoutUri(String amDeploymentUrl, String jsonRestRoot, String realm, String restLogoutUriElement) throws URISyntaxException {
+    private URI constituteLogoutUri(String amDeploymentUrl,
+                                    String jsonRestRoot,
+                                    String realm,
+                                    String restLogoutUriElement) throws URISyntaxException {
         StringBuilder sb = new StringBuilder(amDeploymentUrl);
         sb.append(jsonRestRoot);
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
@@ -69,7 +75,7 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
             headers = new Series<Header>(Header.class);
             resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
         }
-        headers.set(SESSION_ID_HEADER, sessionId);
+        headers.set(amSessionCookieName, sessionId);
         try {
             resource.post(null);
         } catch (ResourceException e) {

@@ -133,6 +133,9 @@
         <jackson.version>2.1.2</jackson.version>
         <guice.version>3.0</guice.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
+        <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
+        <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
+        <cxf-rt-ws-security.version>2.7.8</cxf-rt-ws-security.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <forgerock.guice.version>1.0.0</forgerock.guice.version>
@@ -1561,17 +1564,17 @@
             <dependency>
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
-                <version>1.5.6</version>
+                <version>${santuario.xmlsec.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf.services.sts</groupId>
                 <artifactId>cxf-services-sts-core</artifactId>
-                <version>2.7.8</version>
+                <version>${cxf-services-sts-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-ws-security</artifactId>
-                <version>2.7.8</version>
+                <version>${cxf-rt-ws-security.version}</version>
             </dependency>
 
             <!-- Test dependency -->
