@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.core.guice;
@@ -70,6 +70,8 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -175,6 +177,9 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
                 .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
+
+        bind(String[].class).annotatedWith(Names.named("LICENSE_FILEPATH"))
+                .toInstance(new String[]{"legal-notices/license.txt"});
     }
 
     private static class CTSMonitoringStoreExecutorServiceProvider implements Provider<ExecutorService> {

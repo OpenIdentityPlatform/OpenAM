@@ -36,7 +36,7 @@ public class LicenseSetTest {
 
     @BeforeMethod
     public void givenDefaults() {
-        defaultLicenses = Arrays.asList(new License("a"), new License("b"), new License("c"));
+        defaultLicenses = Arrays.asList(new License("a", "a"), new License("b", "b"), new License("c", "c"));
         defaultLicenseSet = new LicenseSet(defaultLicenses);
     }
 

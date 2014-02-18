@@ -71,7 +71,7 @@ public abstract class ResourceLoaderLicenseLocator implements LicenseLocator {
         for (String licenseFile : licenseFiles) {
             try {
                 final String licenseText = readFully(getResourceAsStream(licenseFile));
-                licenses.add(new License(licenseText));
+                licenses.add(new License(licenseFile, licenseText));
             } catch (IOException ex) {
                 throw new MissingLicenseException(licenseFile);
             }

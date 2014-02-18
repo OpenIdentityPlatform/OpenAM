@@ -26,16 +26,29 @@ import java.util.Arrays;
  * @since 12.0.0
  */
 public class License implements Serializable {
+
     private static final long serialVersionUID = 1l;
+
+    private final String filename;
     private final String text;
     private boolean accepted = false;
 
     /**
      * Creates a new license with the given license text.
+     *
+     * @param filename the non-null filename of the license.
      * @param text the non-null text of the license.
      * @throws NullPointerException if the license text is null.
      */
-    public License(String text) {
+    public License(final String filename, final String text) {
+        if (filename == null) {
+            throw new NullPointerException("license file name is null");
+        }
+        if (filename.isEmpty()) {
+            throw new IllegalArgumentException("license file name is empty");
+        }
+        this.filename = filename;
+
         if (text == null) {
             throw new NullPointerException("license text is null");
         }
@@ -63,11 +76,21 @@ public class License implements Serializable {
 
     /**
      * Rejects the license agreement.
+     *
      * @throws LicenseRejectedException to ensure that installation is aborted immediately.
      */
     public void reject() {
         accepted = false;
         throw new LicenseRejectedException(this);
+    }
+
+    /**
+     * Gets the file name of the license.
+     *
+     * @return The license file name.
+     */
+    public String getFilename() {
+        return filename;
     }
 
     /**
@@ -90,12 +113,12 @@ public class License implements Serializable {
 
         License license = (License) o;
 
-        return accepted == license.accepted && text.equals(license.text);
+        return accepted == license.accepted && text.equals(license.text) && filename.equals(license.filename);
     }
 
     @Override
     public int hashCode() {
-        int result = text.hashCode();
+        int result = text.hashCode() + filename.hashCode();
         result = 31 * result + (accepted ? 1 : 0);
         return result;
     }
@@ -106,6 +129,6 @@ public class License implements Serializable {
      */
     @Override
     public String toString() {
-        return text;
+        return filename + ": " + text;
     }
 }

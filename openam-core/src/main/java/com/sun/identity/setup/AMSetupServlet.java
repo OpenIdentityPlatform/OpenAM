@@ -27,11 +27,13 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.am.util.AdminUtils;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -71,6 +73,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.CachedSMSEntry;
@@ -84,6 +87,11 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseLocator;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.license.ServletContextLicenseLocator;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeServices;
@@ -123,6 +131,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -145,7 +154,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * This class is the first class to get loaded by the Servlet 
@@ -217,6 +227,20 @@ public class AMSetupServlet extends HttpServlet {
         }
         
         isVersionNewer();
+
+        final String[] licenseFilePaths =
+                InjectorHolder.getInstance(Key.get(String[].class, Names.named("LICENSE_FILEPATH")));
+        if (licenseFilePaths == null) {
+            throw new ServletException("Could not get license file paths.");
+        }
+        licenseLocator = new ServletContextLicenseLocator(getServletContext(), Charset.forName("UTF-8"),
+                licenseFilePaths);
+    }
+
+    private static LicenseLocator licenseLocator;
+
+    public static LicenseLocator getLicenseLocator() {
+        return licenseLocator;
     }
 
     /*
@@ -607,24 +631,24 @@ public class AMSetupServlet extends HttpServlet {
         return processRequest(req, res);
     }
 
-    public static boolean processRequest(
-            IHttpServletRequest request,
-            IHttpServletResponse response
-    ) {
+    public static boolean processRequest(final IHttpServletRequest request, final IHttpServletResponse response) {
+
         setLocale(request);
-        InstallLog.getInstance().open((String) request.getParameterMap().get(SetupConstants.CONFIG_VAR_BASE_DIR));
+        final InstallLog installLog = InstallLog.getInstance();
+        installLog.open((String) request.getParameterMap().get(SetupConstants.CONFIG_VAR_BASE_DIR));
+
         /*
          * This logic needs refactoring later. setServiceConfigValues()
          * attempts to check if directory is up and makes a call
          * back to this class. The implementation'd
-         * be cleaner if classes&methods are named better and separated than 
+         * be cleaner if classes&methods are named better and separated than
          * intertwined together.
          */
         ServicesDefaultValues.setServiceConfigValues(request);
 
         // set debug directory
         Map map = ServicesDefaultValues.getDefaultValues();
-        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR); 
+        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
         String uri = (String)map.get(SetupConstants.CONFIG_VAR_SERVER_URI);
         SystemProperties.initializeProperties(
             Constants.SERVICES_DEBUG_DIRECTORY, basedir + uri + "/debug");
@@ -634,8 +658,18 @@ public class AMSetupServlet extends HttpServlet {
             SetupConstants.CONFIG_VAR_SITE_CONFIGURATION);
 
         Map userRepo = (Map)map.remove("UserStore");
-        
+
         try {
+            /*
+             * As we have got this far then the user must have accepted the license, so we log this implicitly.
+             */
+            LicenseSet licenses = getLicenseLocator().getRequiredLicenses();
+            for (final License license : licenses) {
+                installLog.write(String.format("License, %s, has been accepted.%n", license.getFilename()));
+                final String licenseHash = Hash.hash(license.toString());
+                installLog.write(String.format("License Hash: %s.%n", licenseHash));
+            }
+
             isConfiguredFlag = configure(request, map, userRepo);
             if (isConfiguredFlag) {
                 FQDNUtils.getInstance().init();
@@ -740,15 +774,15 @@ public class AMSetupServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            InstallLog.getInstance().write(
-                 "AMSetupServlet.processRequest: error", e);
+            installLog.write(
+                    "AMSetupServlet.processRequest: error", e);
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
                 "AMSetupServlet.processRequest: error", e);
             Object[] params = {e.getMessage(), basedir};
             throw new ConfiguratorException("configuration.failed",
                 params, configLocale);
         } finally {
-            InstallLog.getInstance().close();
+            installLog.close();
             SetupProgress.closeOutputStream();
         }
 

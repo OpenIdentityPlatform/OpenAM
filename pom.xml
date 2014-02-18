@@ -131,6 +131,7 @@
         <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
+        <guice.version>3.0</guice.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
@@ -412,6 +413,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-authz-filter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-servlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1542,12 +1548,12 @@
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
-                <version>3.0</version>
+                <version>${guice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.inject.extensions</groupId>
                 <artifactId>guice-multibindings</artifactId>
-                <version>3.0</version>
+                <version>${guice.version}</version>
             </dependency>
             <!--
               required by the STS

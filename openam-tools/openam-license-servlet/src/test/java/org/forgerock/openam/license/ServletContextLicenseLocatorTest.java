@@ -85,7 +85,7 @@ public class ServletContextLicenseLocatorTest {
         // Then
         assertNotNull(result);
         assertEquals(result.getLicenses().size(), 1);
-        assertEquals(result.getLicenses().get(0), new License(licenseText));
+        assertEquals(result.getLicenses().get(0), new License(licenseName, licenseText));
     }
 
 }

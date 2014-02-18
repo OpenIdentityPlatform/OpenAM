@@ -28,32 +28,43 @@ import static org.testng.Assert.assertTrue;
 public class LicenseTest {
 
     @Test(expectedExceptions = NullPointerException.class)
+    public void shouldRejectNullLicenseFilename() {
+        new License(null, "...");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldRejectEmptyLicenseFilename() {
+        new License("", "...");
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullLicenseText() {
-        new License(null);
+        new License("...", null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldRejectEmptyLicenseText() {
-        new License("");
+        new License("...", "");
     }
 
     @Test
     public void shouldReturnCorrectLicenseText() {
         // Given
+        String filename = "...";
         String licenseText = "Some license text";
-        License license = new License(licenseText);
+        License license = new License(filename, licenseText);
 
         // When
         String result = license.toString();
 
         // Then
-        assertEquals(result, licenseText);
+        assertEquals(result, filename + ": " + licenseText);
     }
 
     @Test
     public void shouldNotBeAcceptedByDefault() {
         // Given
-        License license = new License("...");
+        License license = new License("...", "...");
 
         // When
         boolean result = license.isAccepted();
@@ -65,7 +76,7 @@ public class LicenseTest {
     @Test
     public void shouldRecordAcceptance() {
         // Given
-        License license = new License("...");
+        License license = new License("...", "...");
 
         // When
         license.accept();
@@ -77,7 +88,7 @@ public class LicenseTest {
     @Test(expectedExceptions = LicenseRejectedException.class)
     public void shouldThrowExceptionOnRejection() {
         // Given
-        License license = new License("...");
+        License license = new License("...", "...");
 
         // When
         license.reject();
@@ -88,7 +99,7 @@ public class LicenseTest {
     @Test
     public void shouldRecordRejection() {
         // Given
-        License license = new License("...");
+        License license = new License("...", "...");
         license.accept();
 
         // When
@@ -101,7 +112,7 @@ public class LicenseTest {
     @Test(expectedExceptions = LicenseRejectedException.class)
     public void shouldIncludeRejectedLicenseInException() throws Exception {
         // Given
-        License license = new License("...");
+        License license = new License("...", "...");
 
         // When
         try { license.reject(); }
@@ -118,7 +129,7 @@ public class LicenseTest {
     public void shouldReturnCorrectLines() {
         // Given
         String licenseText = "line1\nline2\nline3\n";
-        License license = new License(licenseText);
+        License license = new License("...", licenseText);
 
         // When
         Iterable<String> lines = license.lines();
@@ -127,5 +138,18 @@ public class LicenseTest {
 
         // Then
         assertEquals(sb.toString(), licenseText);
+    }
+
+    @Test
+    public void shouldGetLicenseFilename() {
+        // Given
+        String licenseFilename = "filename";
+        License license = new License(licenseFilename, "...");
+
+        // When
+        String filename = license.getFilename();
+
+        // Then
+        assertEquals(filename, licenseFilename);
     }
 }

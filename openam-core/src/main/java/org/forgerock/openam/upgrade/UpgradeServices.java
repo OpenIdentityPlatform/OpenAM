@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright 2011-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,10 +36,15 @@ import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.openam.license.License;
+import org.forgerock.openam.license.LicenseSet;
+import org.forgerock.openam.upgrade.steps.UpgradeStep;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +52,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import org.forgerock.openam.upgrade.steps.UpgradeStep;
 
 /**
  * This is the primary upgrade class that determines the how the services need
@@ -186,8 +190,19 @@ public class UpgradeServices {
      * @param adminToken Valid admin SSOToken.
      * @throws UpgradeException If there was an error while writing the report file.
      */
-    protected void writeReport(SSOToken adminToken) throws UpgradeException {
+    protected void writeReport(final SSOToken adminToken) throws UpgradeException {
         try {
+            final LicenseSet licenses = AMSetupServlet.getLicenseLocator().getRequiredLicenses();
+            final StringBuilder sb = new StringBuilder();
+            /*
+             * As we have got this far then the user must have accepted the license, so we log this implicitly.
+             */
+            for (final License license : licenses) {
+                sb.append(String.format("License, %s, has been accepted.%n", license.getFilename()));
+                final String licenseHash = Hash.hash(license.toString());
+                sb.append(String.format("License Hash: %s.%n", licenseHash));
+            }
+
             String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
             String reportFile = baseDir + File.separator + "upgrade" + File.separator + REPORT_FILENAME + "."
                     + createdDate;
@@ -199,7 +214,8 @@ public class UpgradeServices {
                 throw new UpgradeException("File " + f.getName() + " already exist!");
             }
 
-            AMSetupServlet.writeToFile(reportFile, generateDetailedUpgradeReport(adminToken, false));
+            sb.append(generateDetailedUpgradeReport(adminToken, false));
+            AMSetupServlet.writeToFile(reportFile, sb.toString());
         } catch (IOException ioe) {
             throw new UpgradeException(ioe.getMessage());
         }

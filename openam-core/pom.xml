@@ -165,6 +165,10 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-license-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
         <dependency>
