@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -62,7 +62,7 @@ public final class AMSetupFilter implements Filter {
 
     private static String[] fList = { 
         ".htm", ".css", ".js", ".jpg", ".gif", ".png",".JPG", "SMSObjectIF" , "setSetupProgress",
-        "setUpgradeProgress"
+        "setUpgradeProgress", "/legal-notices/"
     }; 
 
     /**
