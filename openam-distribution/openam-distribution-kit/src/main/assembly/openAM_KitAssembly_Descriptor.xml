@@ -3,7 +3,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2011-2014 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -54,11 +54,18 @@
     </dependencySets>
     <fileSets>
         <fileSet>
-            <outputDirectory>legal</outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>license.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>../../legal</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>license</outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>../../license</directory>
         </fileSet>
         <fileSet>
