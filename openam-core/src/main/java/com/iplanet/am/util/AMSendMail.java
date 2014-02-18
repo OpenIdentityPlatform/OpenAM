@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.iplanet.am.util;
 
@@ -164,7 +164,7 @@ public class AMSendMail {
 
         Session session;
         // create some properties and get the mail Session
-        if (user == null) {
+        if (user == null || password == null) {
             session = Session.getInstance(moduleProps);
         } else {
             moduleProps.put("mail.smtp.auth", "true");
