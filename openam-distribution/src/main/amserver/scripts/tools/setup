@@ -25,7 +25,7 @@
 # $Id: setup,v 1.11 2009/01/28 05:34:46 ww203982 Exp $
 #
 
-# Portions Copyrighted 2010-2013 ForgeRock, Inc.
+# Portions Copyrighted 2010-2014 ForgeRock, Inc.
 
 if [ -z "$JAVA_HOME" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
@@ -97,6 +97,15 @@ CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-shared-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-dtd-schema-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-rest-${project.version}.jar"
+CLASSPATH="$CLASSPATH:lib/openam-license-manager-cli-${project.version}.jar"
+CLASSPATH="$CLASSPATH:lib/openam-license-core-${project.version}.jar"
+CLASSPATH="$CLASSPATH:lib/forgerock-guice-core-${forgerock.guice.version}.jar"
+CLASSPATH="$CLASSPATH:lib/guice-3.0.jar"
+CLASSPATH="$CLASSPATH:lib/commons-lang-2.6.jar"
+CLASSPATH="$CLASSPATH:lib/javax.inject-1.jar"
+CLASSPATH="$CLASSPATH:lib/aopalliance-1.0.jar"
+CLASSPATH="$CLASSPATH:lib/slf4j-api-${slf4j.api.version}.jar"
+CLASSPATH="$CLASSPATH:lib/slf4j-nop-${slf4j.api.version}.jar"
 CLASSPATH="$CLASSPATH:resources"
 
 $JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \

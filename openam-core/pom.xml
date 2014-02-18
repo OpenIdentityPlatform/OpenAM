@@ -199,6 +199,10 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-license-manager-cli</artifactId>
+        </dependency>
 
         <!-- LDAP APIs -->
         <dependency>
@@ -393,6 +397,31 @@
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>12.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>12.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>12.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>12.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>12.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

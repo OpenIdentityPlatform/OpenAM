@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -34,6 +34,23 @@
 
     <dependencySets>
         <dependencySet>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>com.google.inject:guice</include>
+                <include>org.forgerock.commons:forgerock-guice-core</include>
+                <include>org.forgerock.openam:openam-license-manager-cli</include>
+                <include>javax.inject:javax.inject</include>
+                <include>org.slf4j:slf4j-api</include>
+                <include>org.slf4j:slf4j-nop</include>
+                <include>commons-lang:commons-lang</include>
+                <include>aopalliance:aopalliance</include>
+                <include>org.forgerock.openam:openam-tools</include>
+                <include>org.forgerock.openam:openam-license-core</include>
+                <include>org.forgerock.openam:openam-installer-utils</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
             <outputDirectory></outputDirectory>
             <includes>
                 <include>org.forgerock.openam:openam-configurator-tool</include>
@@ -49,11 +66,5 @@
             <filtered>true</filtered>
         </fileSet>
     </fileSets>
-    <files>
-        <file>
-            <source>${project.basedir}/../../license/license.txt</source>
-            <outputDirectory></outputDirectory>
-        </file>
-    </files>
 </assembly>
 

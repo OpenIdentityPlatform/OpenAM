@@ -74,3 +74,5 @@ If you have already deployed OpenAM and want to upgrade run the following comman
 |----sampleconfiguration (a sample configuration file)
 |
 |----sampleupgrade (a sample upgrade file)
+|
+|----lib/ (folder containing libraries needed for running the upgrader and configurator)

@@ -131,8 +131,10 @@
         <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
+        <slf4j.api.version>1.7.5</slf4j.api.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
+        <forgerock.guice.version>1.0.0</forgerock.guice.version>
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
 
@@ -709,6 +711,11 @@
                 <artifactId>openam-server-auth-ui</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installer-tools</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -763,6 +770,32 @@
                 <artifactId>openam-cli-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- License -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-manager-cli</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-license-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-installer-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-core</artifactId>
+                <version>${forgerock.guice.version}</version>
+            </dependency>
+
             <!-- Documentation dependencies -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -1123,6 +1156,18 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
                 <version>1.1.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.api.version}</version>
             </dependency>
 
             <dependency>
@@ -1511,11 +1556,6 @@
                 <groupId>org.apache.santuario</groupId>
                 <artifactId>xmlsec</artifactId>
                 <version>1.5.6</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.5</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf.services.sts</groupId>

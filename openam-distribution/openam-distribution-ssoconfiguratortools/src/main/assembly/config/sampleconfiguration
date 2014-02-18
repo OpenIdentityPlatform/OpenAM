@@ -29,6 +29,13 @@
 ### COOKIE_DOMAIN is the name of the trusted DNS domain that OpenAM Server
 ### returns to a browser when it grants a session ID to a user.
 ###
+### ACCEPT_LICENSES is an optional boolean value, which can be set to always
+### skip displaying the license to the user. Use of this variable will
+### take presidence over the --acceptLicense flag which can be passed in
+### to the application. The value true will auto-accept the license, any other
+### value will be assumed to equal false, resulting in presentation of the
+### license.
+###
 #############################################################################
 SERVER_URL=http://server1.example.com:8080
 DEPLOYMENT_URI=/openam
@@ -39,7 +46,7 @@ AM_ENC_KEY=
 ADMIN_PWD=11111111
 AMLDAPUSERPASSWD=00000000
 COOKIE_DOMAIN=.example.com
-
+ACCEPT_LICENSES=false
 
 ##############################################################################
 ###

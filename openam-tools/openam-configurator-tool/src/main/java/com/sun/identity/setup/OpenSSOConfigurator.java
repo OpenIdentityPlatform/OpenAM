@@ -25,8 +25,8 @@
  * $Id: OpenSSOConfigurator.java,v 1.4 2009/08/11 23:50:42 goodearth Exp $
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock Inc
+/**
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -35,50 +35,77 @@ package com.sun.identity.setup;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import javax.inject.Inject;
+import org.forgerock.openam.installer.utils.StatusChecker;
+import org.forgerock.openam.license.LicensePresenter;
+import org.forgerock.openam.license.LicenseRejectedException;
 
+
+/**
+ * Application which accepts a config file, displays licenses to the user
+ * and triggers OpenAM's configurator system. Once begun, uses a second thread
+ * to connect to the installation progress page and print out its status.
+ */
 public class OpenSSOConfigurator {
 
-    private static final String OPENSSO_CONFIGURATOR_PROPERTIES =
-        "OpenSSOConfigurator";
+    private static final String OPENSSO_CONFIGURATOR_PROPERTIES = "OpenSSOConfigurator";
     private static final String SERVER_URL = "SERVER_URL";
-    static final String DEPLOYMENT_URI = "DEPLOYMENT_URI";
+    private static final String DEPLOYMENT_URI = "DEPLOYMENT_URI";
     private static final String ADMIN_PWD = "ADMIN_PWD";
     private static final String ADMIN_CONFIRM_PWD = "ADMIN_CONFIRM_PWD";
     private static final String AMLDAPUSERPASSWD = "AMLDAPUSERPASSWD";
-    private static final String AMLDAPUSERPASSWD_CONFIRM =
-        "AMLDAPUSERPASSWD_CONFIRM";
+    private static final String AMLDAPUSERPASSWD_CONFIRM = "AMLDAPUSERPASSWD_CONFIRM";
     private static final String USERSTORE_TYPE = "USERSTORE_TYPE";
+    private static final String ACCEPT_LICENSES = "ACCEPT_LICENSES";
+    private static final String STATUS_LOCATION = "/setup/setSetupProgress?mode=text";
 
-    public static void main(String[] args) {
+    private final LicensePresenter licensePresenter;
+    private final ResourceBundle rb = ResourceBundle.getBundle(OPENSSO_CONFIGURATOR_PROPERTIES);
 
-        ResourceBundle rb = ResourceBundle.getBundle(
-            OPENSSO_CONFIGURATOR_PROPERTIES);
+    private String userStoreType = null;
+    private StringBuilder postBodySB = new StringBuilder();
+    private boolean acceptLicense = false;
 
-        if ((args.length != 2) ||
-            (!(args[0].equals("--file") || args[0].equals("-f")))) {
+    @Inject
+    public OpenSSOConfigurator(LicensePresenter licensePresenter) {
+        this.licensePresenter = licensePresenter;
+    }
 
+    /**
+     * Runs the configurator
+     *
+     * @param args Program arguments
+     */
+    public void execute(String[] args) {
+        int configArg = 1; //most likely
+
+        if (args.length < 2) {
             System.out.println(rb.getString("usage"));
             System.exit(-1);
         }
 
-        String configFile = args[1];
+        for (int i = 0; i < args.length; i++) {
+            if((i < args.length - 1) && ("--file".equals(args[i]) || "--f".equals(args[i]))) {
+                configArg = i + 1;
+            } else if (args[i].equals("--acceptLicense")) {
+                acceptLicense = true;
+            }
+        }
 
         Properties config = new Properties();
-
         FileInputStream fis = null;
-        
+
         try {
-            fis = new FileInputStream(configFile);
+            fis = new FileInputStream(args[configArg]);
             config.load(fis);
         } catch (IOException ex) {
             System.out.println(rb.getString("errorConfig"));
@@ -88,52 +115,85 @@ public class OpenSSOConfigurator {
                 try {
                     fis.close();
                 } catch (IOException ex) {
+                    System.out.println(rb.getString("errorConfig"));
+                    System.exit(-1);
                 }
             }
         }
 
-        String serverURL = null;
-        String deploymentURI = null;
-        String userStoreType = null;
+        String openAmURL = configure(config);
 
-        StringBuilder postBodySB = new StringBuilder();
-        for(Enumeration e = config.keys(); e.hasMoreElements() ;) {
-            String key = (String)e.nextElement();
-            String val = (String)config.get(key);
+        try {
+            licensePresenter.presentLicenses(acceptLicense);
+        } catch (LicenseRejectedException e) {
+            System.out.println(licensePresenter.getNotice());
+            System.exit(-1);
+        }
 
-            if (val != null) {
-                val = val.trim();
-                if (val.length() > 0) {
-                    if (key.equals(DEPLOYMENT_URI)) {
-                        deploymentURI = val;
-                    } else {
-                        if (key.equals(SERVER_URL)) {
-                            serverURL = val;
-                        }
-                        if (postBodySB.length() > 0) {
-                            postBodySB.append("&");
-                        }
-                        String encodedVal = null;
-                        try {
-                            encodedVal = URLEncoder.encode(val, "UTF-8");
-                        } catch (UnsupportedEncodingException ueex) {
-                            encodedVal = val;
-                        }
-                        postBodySB.append(key).append("=").append(encodedVal);
-                        if (key.equals(ADMIN_PWD)) {
-                            postBodySB.append("&").append(ADMIN_CONFIRM_PWD)
-                                .append("=").append(encodedVal);
-                        } else if (key.equals(AMLDAPUSERPASSWD)) {
-                            postBodySB.append("&")
-                                .append(AMLDAPUSERPASSWD_CONFIRM)
-                                .append("=").append(encodedVal);
-                        }
-                    }
-                    if (key.equals(USERSTORE_TYPE)) {
-                       userStoreType = val;
-                    }
-                }
+        StatusChecker sc = new StatusChecker(openAmURL, STATUS_LOCATION);
+        Thread readProgressThread = new Thread(sc);
+        readProgressThread.start();
+
+        boolean success = postRequestToServer(readProgressThread, openAmURL);
+
+        if (success) {
+            System.exit(0);
+        } else {
+            System.exit(-1);
+        }
+    }
+
+    /**
+     * Sets up the Configurator with the appropriate values read from the supplied file,
+     * may also set the acceptLicense instance variable.
+     *
+     * @param config the properties file to configure from
+     * @return the OpenAM URL to post data to
+     */
+    private String configure(Properties config) {
+
+        String serverURL = config.getProperty(SERVER_URL);
+        String deploymentURI = config.getProperty(DEPLOYMENT_URI);
+        userStoreType = config.getProperty(USERSTORE_TYPE);
+
+        if (config.getProperty(ACCEPT_LICENSES) != null && !config.getProperty(ACCEPT_LICENSES).isEmpty()) {
+            acceptLicense = Boolean.parseBoolean(config.getProperty(ACCEPT_LICENSES));
+        }
+
+        for (String key : config.stringPropertyNames()) {
+
+            if (key.equals(USERSTORE_TYPE) || key.equals(ACCEPT_LICENSES) || key.equals(DEPLOYMENT_URI)) {
+                continue;
             }
+
+            String val = config.getProperty(key);
+
+            if (val == null || val.length() < 1) {
+                continue;
+            }
+
+            if (postBodySB.length() > 0) {
+                postBodySB.append("&");
+            }
+
+            String encodedVal;
+            try {
+                encodedVal = URLEncoder.encode(val, "UTF-8");
+            } catch (UnsupportedEncodingException ueex) {
+                encodedVal = val;
+            }
+
+            postBodySB.append(key).append("=").append(encodedVal);
+
+            if (key.equals(ADMIN_PWD)) {
+                postBodySB.append("&").append(ADMIN_CONFIRM_PWD)
+                        .append("=").append(encodedVal);
+            } else if (key.equals(AMLDAPUSERPASSWD)) {
+                postBodySB.append("&")
+                        .append(AMLDAPUSERPASSWD_CONFIRM)
+                        .append("=").append(encodedVal);
+            }
+
         }
 
         if (serverURL == null) {
@@ -154,59 +214,63 @@ public class OpenSSOConfigurator {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
 
-        String openssoURL = serverURL + deploymentURI;
+        return serverURL + deploymentURI;
+    }
 
-        ReadProgress rp = new ReadProgress(openssoURL);
-        Thread t = new Thread(rp);
-        t.start();
-
+    /**
+     * Talks to the OpenAM server
+     *
+     * @param readProgress Thread that prints out the current progress of the installation
+     * @param openAmURL URL of the OpenAM instance to update
+     *
+     * @return true if installation succeeds, false otherwise
+     */
+    private boolean postRequestToServer(Thread readProgress, String openAmURL) {
         DataOutputStream os = null;
         BufferedReader br = null;
-        boolean isException = false;
         HttpURLConnection conn = null;
+
         try {
-            URL url = new URL(openssoURL + "/config/configurator");
+            URL url = new URL(openAmURL + "/config/configurator");
             conn = (HttpURLConnection)url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.setUseCaches(false);
-            conn.setRequestProperty("Content-Length", Integer.toString(
-                postBodySB.length()));
-            conn.setRequestProperty("Content-Type",
-                "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Content-Length", Integer.toString(postBodySB.length()));
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.connect();
 
             os = new DataOutputStream(conn.getOutputStream());
             os.writeBytes(postBodySB.toString());
             os.flush();
 
-
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
                 br = new BufferedReader(new InputStreamReader(
-                    conn.getInputStream()));
-                String str = null;
+                        conn.getInputStream()));
+                String str;
                 while ((str = br.readLine()) != null) {
                     System.out.println(str);
                 }
             } else {
                 System.out.println(rb.getString("configFailed"));
                 if ((userStoreType != null) &&
-                    (userStoreType.equals("LDAPv3ForADDC"))) {
+                        (userStoreType.equals("LDAPv3ForADDC"))) {
                     System.out.println(rb.getString("cannot.connect.to.UM.datastore"));
                 }
+                return false;
             }
         } catch (ProtocolException ex) {
             ex.printStackTrace();
-            isException = true;
+            return false;
         } catch (IOException ex) {
             ex.printStackTrace();
-            isException = true;
+            return false;
         } finally {
             if (os != null) {
                 try {
                     os.close();
-               } catch (IOException ex) {
+                } catch (IOException ex) {
                 }
             }
             if (br != null) {
@@ -217,7 +281,7 @@ public class OpenSSOConfigurator {
             }
             try {
                 // wait 5 seconds if ReadProgress thread does not finished.
-                t.join(5000);
+                readProgress.join(5000);
             } catch (InterruptedException e) {
             }
             if (conn != null) {
@@ -227,72 +291,8 @@ public class OpenSSOConfigurator {
                 }
             }
         }
-        if (isException) {
-            System.exit(-1);
-        } else {
-            System.exit(0);
-        }
+
+        return true;
     }
 
-    static class ReadProgress implements Runnable {
-        String openssoURL = null;
-
-        public ReadProgress(String openssoURL) {
-            this.openssoURL = openssoURL;
-        }
-
-        public void run() {
-            int retry = 0;
-
-            while (retry <= 1) {
-                retry++;
-                BufferedReader br = null;
-                HttpURLConnection conn = null;
-                try {
-                    URL url = new URL(openssoURL +
-                        "/setup/setSetupProgress?mode=text");
-                    conn = (HttpURLConnection)url.openConnection();
-                    conn.setInstanceFollowRedirects(false);
-                    conn.connect();
-
-                    int responseCode = conn.getResponseCode();
-
-                    if (responseCode == 200) {
-
-                        br = new BufferedReader(new InputStreamReader(
-                            conn.getInputStream()));
-
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            System.out.println(line);
-                        }
-
-                    } else if (responseCode == 302) {
-                        continue;
-                    } else {
-                        System.out.println(conn.getResponseMessage());
-                    }
-
-                } catch (ProtocolException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    if (br != null) {
-                        try {
-                            br.close();
-                        } catch (IOException ex) {
-                        }
-                    }
-                    if (conn != null) {
-                        try {
-                            conn.disconnect();
-                        } catch (Exception ex) {
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
 }

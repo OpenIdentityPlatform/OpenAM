@@ -23,8 +23,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+/**
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -38,37 +38,64 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import javax.inject.Inject;
+import org.forgerock.openam.installer.utils.StatusChecker;
+import org.forgerock.openam.license.LicensePresenter;
+import org.forgerock.openam.license.LicenseRejectedException;
 
 /**
- *
- * @author steve
+ * Application which accepts a config file, displays licenses to the user
+ * and triggers OpenAM's update system. Once begun, uses a second thread
+ * to connect to the upgrade progress page and print out its status.
  */
 public class OpenAMUpgrade {
-    private static final String OPENAM_UPGRADE_PROPERTIES =
-        "OpenAMUpgrade";
+
+    private static final String OPENAM_UPGRADE_PROPERTIES = "OpenAMUpgrade";
+    private static final String URI_LOCATION = "/upgrade/setUpgradeProgress?mode=text";
     private static final String SERVER_URL = "SERVER_URL";
+    private static final String ACCEPT_LICENSES = "ACCEPT_LICENSES";
     private static final String DEPLOYMENT_URI = "DEPLOYMENT_URI";
 
-    public static void main(String[] args) {
-        ResourceBundle rb = ResourceBundle.getBundle(
-            OPENAM_UPGRADE_PROPERTIES);
+    private final LicensePresenter licensePresenter;
+    private final ResourceBundle rb = ResourceBundle.getBundle(OPENAM_UPGRADE_PROPERTIES);
 
-        if ((args.length != 2) ||
-            (!(args[0].equals("--file") || args[0].equals("-f")))) {
+    private boolean acceptLicense = false;
 
+    @Inject
+    public OpenAMUpgrade(LicensePresenter licensePresenter) {
+        this.licensePresenter = licensePresenter;
+    }
+
+    /**
+     * Main method of the class which evaluates supplied arguments,
+     * the supplied config file and sends off necessary requests
+     *
+     * @param args Program arguments
+     */
+    public void execute(String[] args) {
+
+        int configArg = 1; //most likely
+
+        if (args.length < 2) {
             System.out.println(rb.getString("usage"));
             System.exit(-1);
         }
 
-        String configFile = args[1];
+        for (int i = 0; i < args.length; i++) {
+            if((i < args.length - 1) && ("--file".equals(args[i]) || "--f".equals(args[i]))) {
+                configArg = i + 1;
+            } else if (args[i].equals("--acceptLicense")) {
+                acceptLicense = true;
+            }
+        }
+
         Properties config = new Properties();
         FileInputStream fis = null;
 
         try {
-            fis = new FileInputStream(configFile);
+            fis = new FileInputStream(args[configArg]);
             config.load(fis);
         } catch (IOException ex) {
             System.out.println(rb.getString("errorConfig"));
@@ -78,28 +105,119 @@ public class OpenAMUpgrade {
                 try {
                     fis.close();
                 } catch (IOException ex) {
+                    System.out.println(rb.getString("errorConfig"));
+                    System.exit(-1);
                 }
             }
         }
 
-        String serverURL = null;
-        String deploymentURI = null;
+        String openAmURL = configure(config);
 
-        for(Enumeration e = config.keys(); e.hasMoreElements() ;) {
-            String key = (String) e.nextElement();
-            String val = (String) config.get(key);
+        try {
+            licensePresenter.presentLicenses(acceptLicense);
+        } catch (LicenseRejectedException e) {
+            System.out.println(licensePresenter.getNotice());
+            System.exit(-1);
+        }
 
-            if (val != null) {
-                val = val.trim();
+        StatusChecker sc = new StatusChecker(openAmURL, URI_LOCATION);
+        Thread readProgressThread = new Thread(sc);
+        readProgressThread.start();
 
-                if (val.length() > 0) {
-                    if (key.equals(DEPLOYMENT_URI)) {
-                        deploymentURI = val;
-                    } else if (key.equals(SERVER_URL)) {
-                        serverURL = val;
+        boolean success = getRequestToServer(readProgressThread, openAmURL);
+
+        if (success) {
+            System.exit(0);
+        } else {
+            System.exit(-1);
+        }
+    }
+
+    /**
+     * Talks to the OpenAM server
+     *
+     * @param readProgress Thread that prints out the current progress of the update
+     * @param openAmURL URL of the OpenAM instance to update
+     *
+     * @return true if update succeeds, false otherwise
+     */
+    private boolean getRequestToServer(Thread readProgress, String openAmURL) {
+
+        DataOutputStream os = null;
+        BufferedReader br = null;
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(openAmURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setUseCaches(false);
+            conn.setInstanceFollowRedirects(false);
+            conn.connect();
+
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == 200) {
+                br = new BufferedReader(new InputStreamReader(
+                        conn.getInputStream()));
+                String str;
+                while ((str = br.readLine()) != null) {
+                    if (str.equals("true")) {
+                        System.out.println("\nUpgrade Complete.");
+                    } else {
+                        System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
                     }
                 }
+            } else {
+                System.out.println(rb.getString("upgradeFailed"));
             }
+        } catch (ProtocolException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException ex) {
+                }
+            }
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException ex) {
+                }
+            }
+            try {
+                // wait 5 seconds if ReadProgress thread does not finished.
+                readProgress.join(5000);
+            } catch (InterruptedException e) {
+            }
+            if (conn != null) {
+                try {
+                    conn.disconnect();
+                } catch (Exception ex) {
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets up the Upgrader with the appropriate values read from the supplied file
+     *
+     * @param config the properties file to configure from
+     * @return the OpenAM URL to post data to
+     */
+    private String configure(Properties config) {
+
+        String serverURL = config.getProperty(SERVER_URL);
+        String deploymentURI = config.getProperty(DEPLOYMENT_URI);
+
+        if (config.getProperty(ACCEPT_LICENSES) != null && !config.getProperty(ACCEPT_LICENSES).isEmpty()) {
+            acceptLicense = Boolean.parseBoolean(config.getProperty(ACCEPT_LICENSES));
         }
 
         if (serverURL == null) {
@@ -120,137 +238,7 @@ public class OpenAMUpgrade {
             serverURL = serverURL.substring(0, serverURL.length() - 1);
         }
 
-        String openamURL = serverURL + deploymentURI;
-
-        ReadProgress rp = new ReadProgress(openamURL);
-        Thread t = new Thread(rp);
-        t.start();
-
-        DataOutputStream os = null;
-        BufferedReader br = null;
-        boolean isException = false;
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(openamURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade");
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setUseCaches(false);
-            conn.setInstanceFollowRedirects(false);
-            conn.connect();
-
-            int responseCode = conn.getResponseCode();
-
-            if (responseCode == 200) {
-                br = new BufferedReader(new InputStreamReader(
-                    conn.getInputStream()));
-                String str = null;
-                while ((str = br.readLine()) != null) {
-                    if (str.equals("true")) {
-                        System.out.println("\nUpgrade Complete.");
-                    } else {
-                        System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
-                    }
-                }
-            } else {
-                System.out.println(rb.getString("upgradeFailed"));
-            }
-        } catch (ProtocolException ex) {
-            ex.printStackTrace();
-            isException = true;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            isException = true;
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-               } catch (IOException ex) {
-                }
-            }
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ex) {
-                }
-            }
-            try {
-                // wait 5 seconds if ReadProgress thread does not finished.
-                t.join(5000);
-            } catch (InterruptedException e) {
-            }
-            if (conn != null) {
-                try {
-                    conn.disconnect();
-                } catch (Exception ex) {
-                }
-            }
-        }
-        if (isException) {
-            System.exit(-1);
-        } else {
-            System.exit(0);
-        }
+        return serverURL + deploymentURI;
     }
 
-    static class ReadProgress implements Runnable {
-        String openamURL = null;
-
-        public ReadProgress(String openamURL) {
-            this.openamURL = openamURL;
-        }
-
-        public void run() {
-            int retry = 0;
-
-            while (retry <= 1) {
-                retry++;
-                BufferedReader br = null;
-                HttpURLConnection conn = null;
-                try {
-                    URL url = new URL(openamURL +
-                        "/upgrade/setUpgradeProgress?mode=text");
-                    conn = (HttpURLConnection)url.openConnection();
-                    conn.setInstanceFollowRedirects(false);
-                    conn.connect();
-
-                    int responseCode = conn.getResponseCode();
-
-                    if (responseCode == 200) {
-
-                        br = new BufferedReader(new InputStreamReader(
-                            conn.getInputStream()));
-
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            System.out.println(line);
-                        }
-
-                    } else if (responseCode == 302) {
-                        continue;
-                    } else {
-                        System.out.println(conn.getResponseMessage());
-                    }
-
-                } catch (ProtocolException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    if (br != null) {
-                        try {
-                            br.close();
-                        } catch (IOException ex) {
-                        }
-                    }
-                    if (conn != null) {
-                        try {
-                            conn.disconnect();
-                        } catch (Exception ex) {
-                        }
-                    }
-                }
-                break;
-            }
-        }
-    }
 }

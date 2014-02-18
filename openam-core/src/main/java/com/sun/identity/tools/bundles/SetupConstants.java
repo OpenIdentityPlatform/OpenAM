@@ -25,8 +25,9 @@
  * $Id: SetupConstants.java,v 1.5 2009/10/30 21:10:10 weisun2 Exp $
  *
  */
+
 /**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 package com.sun.identity.tools.bundles;
 
@@ -78,6 +79,7 @@ public interface SetupConstants {
     int BUFFER_SIZE = 8192;
     String GZIP_EXT = ".gz";
     String PATH_DEST = "path.dest";
+    String ACCEPT_LICENSE = "--acceptLicense";
 
     /**
      * debug directory system property name.

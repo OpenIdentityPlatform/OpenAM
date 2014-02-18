@@ -26,7 +26,7 @@
 : $Id: setup.bat,v 1.13 2009/01/28 05:34:46 ww203982 Exp $
 :
 
-: Portions Copyrighted 2013 ForgeRock, Inc.
+: Portions Copyrighted 2013-2014 ForgeRock, Inc.
 
 if not "%JAVA_HOME%" == "" goto checkJavaHome
 echo Please define JAVA_HOME environment variable before running this program
@@ -107,7 +107,16 @@ set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar
+set CLASSPATH="%CLASSPATH%;lib/openam-license-manager-cli-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-license-core-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/forgerock-guice-core-${forgerock.guice.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/guice-3.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/commons-lang-2.6.jar"
+set CLASSPATH="%CLASSPATH%;lib/javax.inject-1.jar"
+set CLASSPATH="%CLASSPATH%;lib/aopalliance-1.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/slf4j-api-${slf4j.api.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/slf4j-nop-${slf4j.api.version}.jar"
 set CLASSPATH="%CLASSPATH%;resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main

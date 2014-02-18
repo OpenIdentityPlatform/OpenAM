@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2014 ForgeRock AS All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,13 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: Main.java,v 1.11 2010/01/14 23:38:25 veiming Exp $
- *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
- */
 package com.sun.identity.tools.bundles;
 
 import com.iplanet.am.util.SystemProperties;
@@ -38,8 +33,14 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.license.LicensePresenter;
+import org.forgerock.openam.license.LicenseRejectedException;
 
-public class Main implements SetupConstants{
+public class Main implements SetupConstants {
+
+    private static final LicensePresenter LICENSE_PRESENTER = InjectorHolder.getInstance(LicensePresenter.class);
+
     public static void main(String[] args) {
         ResourceBundle bundle = ResourceBundle.getBundle(System.getProperty(
             SETUP_PROPERTIES_FILE, DEFAULT_PROPERTIES_FILE));
@@ -54,6 +55,22 @@ public class Main implements SetupConstants{
             if (System.getProperty(CHECK_VERSION).equals(YES)) {
                 System.exit(VersionCheck.isValid());
             }
+        }
+
+        boolean acceptLicense = false;
+
+        for (String arg : args) {
+            if (arg.equals(ACCEPT_LICENSE)) {
+                acceptLicense = true;
+                break;
+            }
+        }
+
+        try {
+            LICENSE_PRESENTER.presentLicenses(acceptLicense);
+        } catch (LicenseRejectedException e) {
+            System.out.println(bundle.getString("message.error.license"));
+            System.exit(0);
         }
 
         boolean loadConfig = (System.getProperty(CONFIG_LOAD) != null) &&

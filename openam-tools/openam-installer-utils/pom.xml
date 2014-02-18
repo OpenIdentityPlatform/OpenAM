@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -29,29 +29,15 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam</artifactId>
+        <artifactId>openam-tools</artifactId>
         <version>12.0.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Tools</name>
-    <description>OpenAM Tool Components</description>
-    <artifactId>openam-tools</artifactId>
-    <packaging>pom</packaging>
+    <name>OpenAM Installer Utils</name>
+    <description>OpenAM Installer Utils</description>
+    <artifactId>openam-installer-utils</artifactId>
+    <packaging>jar</packaging>
 
-    <!-- Child Modules -->
-    <modules>
-        <module>build-helper-plugin</module>
-        <module>openam-build-tools</module>
-        <module>openam-configurator-tool</module>
-        <module>openam-installtools</module>
-        <module>openam-installtools-launcher</module>
-        <module>openam-diagnostics</module>
-        <module>openam-upgrade-tool</module>
-        <module>openam-license-core</module>
-        <module>openam-license-manager-cli</module>
-        <module>openam-installer-utils</module>
-        <module>openam-license-servlet</module>
-    </modules>
 </project>
 
