@@ -34,7 +34,7 @@ public class CLILicensePresenterTest {
 
     @BeforeMethod
     public void setup() {
-        LicenseSet licenseSet = new LicenseSet(Arrays.asList(new License("Fake License")));
+        LicenseSet licenseSet = new LicenseSet(Arrays.asList(new License("...", "Fake License")));
         given(locator.getRequiredLicenses()).willReturn(licenseSet);
     }
 
