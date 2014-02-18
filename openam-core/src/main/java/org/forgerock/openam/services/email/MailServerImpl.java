@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2013-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,7 +33,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 
 import javax.mail.MessagingException;
 import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -182,9 +181,7 @@ public class MailServerImpl implements MailServer {
             String tos[] = new String[1];
             tos[0] = to;
 
-            if (smtpHostName == null || smtpHostPort == null ||
-                    smtpUserName == null || smtpUserPassword == null ||
-                    smtpSSLEnabled == null) {
+            if (smtpHostName == null || smtpHostPort == null) {
                 sendMail.postMail(tos, subject, message, from);
             } else {
                 sendMail.postMail(tos, subject, message, from, "UTF-8", smtpHostName,
