@@ -47,6 +47,7 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -133,19 +134,19 @@ public class ConnectClientRegistration extends ServerResource {
         createTranslationMaps();
     }
 
-    public ConnectClientRegistration (ClientApplication clientApplication, ServiceSchemaManager serviceSchemaManager){
+    public ConnectClientRegistration (ClientApplication clientApplication, ServiceSchemaManager serviceSchemaManager) {
         createTranslationMaps();
         try {
             this.oauth2client = clientApplication;
             this.serviceSchemaManager = serviceSchemaManager;
             this.serviceSchema = this.serviceSchemaManager.getOrganizationSchema().getSubSchema(OAUTH2_CLIENT);
-        } catch (Exception e){
+        } catch (Exception e) {
             OAuth2Utils.DEBUG.error("Unable to get Client Schema", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
         }
     }
 
-    private void createTranslationMaps(){
+    private void createTranslationMaps() {
         translationMap.put(REDIRECT_URIS, OAuth2Constants.OAuth2Client.REDIRECT_URI);
         translationMap.put(RESPONSE_TYPES, NOT_USED);
         translationMap.put(GRANT_TYPES, NOT_USED);
@@ -197,21 +198,21 @@ public class ConnectClientRegistration extends ServerResource {
     }
 
     @Get
-    public Representation readRequest(){
+    public Representation readRequest() {
         String clientId= OAuth2Utils.getRequestParameter(
                 getRequest(), OAuth2Constants.OAuth2Client.CLIENT_ID, String.class);
         String accessToken = getRequest().getChallengeResponse().getRawValue();
 
-        if (clientId != null){
+        if (clientId != null) {
             try {
                 AMIdentity client = OAuth2Utils.getClientIdentity(clientId, OAuth2Utils.getRealm(getRequest()));
                 ClientApplication oauth2client;
-                if (this.oauth2client != null){
+                if (this.oauth2client != null) {
                     oauth2client = this.oauth2client;
                 } else {
                     oauth2client = new ClientApplicationImpl(client);
                 }
-                if (!oauth2client.getAccessToken().equals(accessToken)){
+                if (!oauth2client.getAccessToken().equals(accessToken)) {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.readRequest(): Invalid accessToken");
                     throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
                 }
@@ -306,7 +307,7 @@ public class ConnectClientRegistration extends ServerResource {
         AttributeSchema attributeSchema = serviceSchema.getAttributeSchema(value);
         AttributeSchema.UIType uiType = attributeSchema.getUIType();
         if (uiType != null && (uiType.equals(AttributeSchema.UIType.UNORDEREDLIST) ||
-                uiType.equals(AttributeSchema.UIType.ORDEREDLIST))){
+                uiType.equals(AttributeSchema.UIType.ORDEREDLIST))) {
             return false;
         }
         return true;
@@ -416,24 +417,30 @@ public class ConnectClientRegistration extends ServerResource {
 
         setDefaultValues(attrs);
 
+        AMIdentity clientAMIdentity = null;
         try {
             SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             AMIdentityRepository repo = new AMIdentityRepository(token, realm);
-            repo.createIdentity(IdType.AGENTONLY, id, attrs);
+            clientAMIdentity = repo.createIdentity(IdType.AGENTONLY, id, attrs);
         } catch (Exception e) {
             OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
             throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
         }
 
-        result.put(CLIENT_ID, id);
-        result.put(CLIENT_SECRET, secret);
+        ClientApplication clientApplication = new ClientApplicationImpl(clientAMIdentity);
 
-        result.put(REGISTRATION_CLIENT_URI, OAuth2Utils.getDeploymentURL(getRequest()) + "/oauth2/connect/register?client_id=" + id);
-        result.put(ISSUED_AT, System.currentTimeMillis() / 1000);
+        Map<String, Object> results = createReadResponse(clientApplication);
+
+        results.put(CLIENT_ID, id);
+        results.put(CLIENT_SECRET, secret);
+
+        results.put(REGISTRATION_CLIENT_URI, OAuth2Utils.getDeploymentURL(getRequest()) + "/oauth2/connect/register?client_id=" + id);
+        results.put(ISSUED_AT, System.currentTimeMillis() / 1000);
 
         // TODO add expire time if JWT is used as the secret
-        result.put(EXPIRES_AT, 0);
-        return new JsonRepresentation(result.toString());
+        results.put(EXPIRES_AT, 0);
+
+        return new JsonRepresentation(results);
 
     }
 
