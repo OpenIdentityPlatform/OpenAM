@@ -440,6 +440,7 @@ public class ConnectClientRegistration extends ServerResource {
         // TODO add expire time if JWT is used as the secret
         results.put(EXPIRES_AT, 0);
 
+        setStatus(Status.SUCCESS_CREATED);
         return new JsonRepresentation(results);
 
     }
