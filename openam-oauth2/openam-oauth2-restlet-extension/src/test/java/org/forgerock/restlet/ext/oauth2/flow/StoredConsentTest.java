@@ -49,7 +49,7 @@ public class StoredConsentTest extends PowerMockTestCase {
 
         when(OAuth2Utils.getIdentity(anyString(), anyString())).thenReturn(id);
         when(OAuth2Utils.getSettingsProvider(any(Request.class))).thenReturn(settings);
-        when(settings.getSharedConsentAttributeName()).thenReturn(attribute);
+        when(settings.getSavedConsentAttributeName()).thenReturn(attribute);
 
         AuthorizeServerResource resource = new AuthorizeServerResource();
         resource.saveConsent(userID, clientID, scopes);
@@ -77,7 +77,7 @@ public class StoredConsentTest extends PowerMockTestCase {
 
         when(OAuth2Utils.getIdentity(anyString(), anyString())).thenReturn(id);
         when(OAuth2Utils.getSettingsProvider(any(Request.class))).thenReturn(settings);
-        when(settings.getSharedConsentAttributeName()).thenReturn(attribute);
+        when(settings.getSavedConsentAttributeName()).thenReturn(attribute);
         when(OAuth2Utils.getRealm(any(Request.class))).thenReturn("/");
 
         AuthorizeServerResource resource = new AuthorizeServerResource();

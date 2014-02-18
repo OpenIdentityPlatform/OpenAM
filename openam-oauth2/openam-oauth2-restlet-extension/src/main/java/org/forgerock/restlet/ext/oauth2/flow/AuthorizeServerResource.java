@@ -327,7 +327,7 @@ public class AuthorizeServerResource extends AbstractFlow {
 
     protected boolean savedConsent(String userid, String clientId, Set<String> scopes) {
         OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
-        String attribute = settings.getSharedConsentAttributeName();
+        String attribute = settings.getSavedConsentAttributeName();
 
         AMIdentity id = OAuth2Utils.getIdentity(userid, OAuth2Utils.getRealm(getRequest()));
         Set<String> attributeSet = null;
@@ -369,7 +369,7 @@ public class AuthorizeServerResource extends AbstractFlow {
     protected void saveConsent(String userId, String clientId, String scopes) {
         AMIdentity id = OAuth2Utils.getIdentity(userId, OAuth2Utils.getRealm(getRequest()));
         OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
-        String consentAttribute = settings.getSharedConsentAttributeName();
+        String consentAttribute = settings.getSavedConsentAttributeName();
         try {
 
             //get the current set of consents and add our new consent to it.

@@ -448,7 +448,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     @Override
-    public String getSharedConsentAttributeName() {
+    public String getSavedConsentAttributeName() {
         if ((providerConfiguration != null) && (providerConfiguration.savedConsentAttribute != null)) {
             return providerConfiguration.savedConsentAttribute;
         } else {

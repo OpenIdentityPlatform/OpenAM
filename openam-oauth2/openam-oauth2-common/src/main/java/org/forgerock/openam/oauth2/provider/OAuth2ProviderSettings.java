@@ -81,10 +81,10 @@ public interface OAuth2ProviderSettings {
     public Set<String> getListOfAttributesTheResourceOwnerIsAuthenticatedOn();
 
     /**
-     * Gets the OpenAM attribute name to store the list of shared consent values.
+     * Gets the OpenAM attribute name to store the list of saved consent values.
      * @return A string that is the attribute to store and retrieve shared consent from.
      */
-    public String getSharedConsentAttributeName();
+    public String getSavedConsentAttributeName();
 
     /**
      * Gets the OpenAM Authorization endpoint

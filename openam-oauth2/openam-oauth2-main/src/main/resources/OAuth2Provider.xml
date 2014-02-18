@@ -111,7 +111,6 @@
                 <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
                                  type="single"
                                  syntax="string"
-                                 validator="RequiredValueValidator"
                                  i18nKey="a107">
                     <DefaultValues>
                         <Value></Value>
