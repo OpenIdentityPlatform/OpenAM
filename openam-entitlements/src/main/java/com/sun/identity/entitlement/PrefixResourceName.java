@@ -24,7 +24,7 @@
  *
  * $Id: PrefixResourceName.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -179,20 +179,7 @@ public class PrefixResourceName implements ResourceName {
             }
         }
 
-
-        // get rid of ending delimiters if any from requestResource
-        while (requestResource.endsWith(delimiter)) {
-            int len = requestResource.length();
-            requestResource = requestResource.substring(0, len - 1);
-        }
-
-        // get rid of ending delimiters if any from targetResource
-        while (targetResource.endsWith(delimiter)) {
-            int len = targetResource.length();
-            targetResource = targetResource.substring(0, len - 1);
-        }
-
-        // get rid of ending '?*' if any from requestResource 
+        // get rid of ending '?*' if any from requestResource
         // new entitlement engine no longer evaluates parameter wildcard
         while (requestResource.endsWith(PARAM_WILDCARD)) {
             int len = requestResource.length();

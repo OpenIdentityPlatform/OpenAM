@@ -24,7 +24,7 @@
  *
  * $Id: PrefixResourceName.java,v 1.4 2008/12/15 20:53:41 dillidorai Exp $
  *
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 package com.sun.identity.policy.plugins;
 
@@ -210,17 +210,6 @@ public class PrefixResourceName implements ResourceName {
             targetResource = targetResource.toLowerCase();
         }
 
-        // get rid of ending delimiters if any from requestResource
-        while (requestResource.endsWith(delimiter)) {
-            int len = requestResource.length();
-            requestResource = requestResource.substring(0, len - 1);
-        }
-
-        // get rid of ending delimiters if any from targetResource
-        while (targetResource.endsWith(delimiter)) {
-            int len = targetResource.length();
-            targetResource = targetResource.substring(0, len - 1);
-        }
         /**
          * checks if one level wild card pattern is embedded in wildcard pattern
          * and wild card pattern is not in the resource, then implies that

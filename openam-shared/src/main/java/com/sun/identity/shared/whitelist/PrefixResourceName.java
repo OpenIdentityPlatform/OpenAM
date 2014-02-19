@@ -24,10 +24,8 @@
  *
  * $Id: PrefixResourceName.java,v 1.1 2009/11/24 21:42:35 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
-
-
-
 package com.sun.identity.shared.whitelist;
 
 import java.net.MalformedURLException;
@@ -207,17 +205,6 @@ public class PrefixResourceName implements ResourceName {
             targetResource = targetResource.toLowerCase();
         }
 
-        // get rid of ending delimiters if any from requestResource
-        while (requestResource.endsWith(delimiter)) {
-            int len = requestResource.length();
-            requestResource = requestResource.substring(0, len - 1);
-        }
-
-        // get rid of ending delimiters if any from targetResource
-        while (targetResource.endsWith(delimiter)) {
-            int len = targetResource.length();
-            targetResource = targetResource.substring(0, len - 1);
-        }
         /**
          * checks if one level wild card pattern is embedded in wildcard pattern
          * and wild card pattern is not in the resource, then implies that
@@ -785,11 +772,6 @@ public class PrefixResourceName implements ResourceName {
             }
         }
 
-        if (preceedingDelimiter) {
-            // Remove any trailing forward slash on the end.
-            j--;
-        }
-
-        return String.valueOf(newchars, 0, j);         
+        return String.valueOf(newchars, 0, j);
     } 
 }

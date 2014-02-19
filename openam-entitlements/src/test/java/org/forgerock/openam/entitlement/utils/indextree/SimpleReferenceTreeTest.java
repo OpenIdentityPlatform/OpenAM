@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 package org.forgerock.openam.entitlement.utils.indextree;
 
@@ -86,7 +86,10 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.endurl.com/");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.endurl.com/*");
+        expectedResults.add("*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.endurl.com/home");
         expectedResults.clear();
@@ -129,20 +132,25 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/ab/");
         expectedResults.clear();
+        expectedResults.add("*");
         expectedResults.add("http://www.substringurl.com/a*b/");
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/ahellob/");
         expectedResults.clear();
+        expectedResults.add("*");
         expectedResults.add("http://www.substringurl.com/a*b/");
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/a/c/d/e/b/");
         expectedResults.clear();
+        expectedResults.add("*");
         expectedResults.add("http://www.substringurl.com/a*b/");
         assertEquals(expectedResults, results);
     }
@@ -161,10 +169,12 @@ public class SimpleReferenceTreeTest {
         assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.endurl.com/");
-        assertTrue(results.isEmpty());
+        Set<String> expectedResults = new HashSet<String>();
+        expectedResults.add("http://www.endurl.com/^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.endurl.com/home");
-        Set<String> expectedResults = new HashSet<String>();
+        expectedResults.clear();
         expectedResults.add("http://www.endurl.com/^");
         assertEquals(expectedResults, results);
 
