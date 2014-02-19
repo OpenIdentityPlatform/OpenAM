@@ -512,7 +512,7 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
            xlink:href="${opendjDocBase}/install-guide/index.html#chap-install-cli">
            Installing OpenDJ From the Command Line</link>.</para>
       <screen>$ cd /path/to/opendj
-$ sudo ./setup -i</screen>
+$ sudo ./setup --cli</screen>
       <para>Example options are as follows:</para>
              <table xml:id="prepare-configuration-store-ds">
                  <title>Example OpenDJ Setup Parameters</title>
@@ -671,7 +671,7 @@ $ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldi
          </step>
          <step><para>Open <literal>cts-container.ldif</literal> file in a text editor
              and replace the <literal>@SM_CONFIG_ROOT_SUFFIX@</literal> variable with the configuration
-             root suffix "dc=example,dc=com".
+             root suffix for your deployment. For this example, use "dc=example,dc=com".
              The file is required for the CTS token configuration.</para>
          </step>
          <step><para>Add the Schema files.
