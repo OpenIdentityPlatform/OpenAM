@@ -128,6 +128,8 @@
         <configJarFile><![CDATA[openam-distribution-configurator-${serverDocTargetVersion}.jar]]></configJarFile>
         <oauth2JarFile><![CDATA[openam-oauth2-common-${serverDocTargetVersion}.jar]]></oauth2JarFile>
 
+        <opendjDocBase>http://docs.forgerock.org/en/opendj/${opendj.server.version}</opendjDocBase>
+
         <agentApacheSupport>Apache HTTP Server 2.2, 2.4</agentApacheSupport>
         <agentIISSupport>Microsoft IIS 6, 7, 8</agentIISSupport>
         <agentNginxSupport>Nginx 1</agentNginxSupport>

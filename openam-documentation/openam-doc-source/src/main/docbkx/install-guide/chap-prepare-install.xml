@@ -492,6 +492,220 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
              </tbody>
          </tgroup>
      </table>
+  </section>
+  <section xml:id="prepare-config-store-procedure">
+   <title>Preparing an External Configuration Store</title>
+      <para>The following example procedure shows how to prepare a single OpenDJ
+      directory server instance as an external configuration data store.
+      The OpenDJ instance implements a single backend for both OpenAM
+      configuration data and CTS tokens.
+      The procedure assumes that you have also prepared an external identity repository,
+      separate from the configuration data store.</para>
+
+   <procedure xml:id="install-opendj-external-config-store">
+    <title>To Install the External OpenDJ Directory Server</title>
+
+     <step>
+      <para>Prepare your OpenDJ installation, then download the OpenDJ software.
+      See the OpenDJ documentation about
+      <link xlink:show="new"
+           xlink:href="${opendjDocBase}/install-guide/index.html#chap-install-cli">
+           Installing OpenDJ From the Command Line</link>.</para>
+      <screen>$ cd /path/to/opendj
+$ sudo ./setup -i</screen>
+      <para>Example options are as follows:</para>
+             <table xml:id="prepare-configuration-store-ds">
+                 <title>Example OpenDJ Setup Parameters</title>
+
+                 <tgroup cols="2">
+                     <colspec colnum="1" colwidth="1*"/>
+                     <colspec colnum="2" colwidth="1*"/>
+
+                     <thead>
+                         <row>
+                             <entry>Parameter</entry>
+                             <entry>Example Inputs</entry>
+                         </row>
+                     </thead>
+
+                     <tbody>
+                         <row>
+                             <entry><literal>Accept License</literal></entry>
+                             <entry>Yes</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Root User DN</literal></entry>
+                             <entry>cn=Directory Manager</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Root User DN Password</literal></entry>
+                             <entry>(arbitrary)</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Fully Qualified Domain Name</literal></entry>
+                             <entry>opendj.example.com</entry>
+                         </row>
+                         <row>
+                             <entry><literal>LDAP Port</literal></entry>
+                             <entry>1389</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Administration Connector Port</literal></entry>
+                             <entry>4444</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Create Base DN</literal></entry>
+                             <entry>No. This will be created in a later step.</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Enable SSL</literal></entry>
+                             <entry>If you choose this option, make sure that
+                             OpenAM can trust the OpenDJ certificate.</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Enable TLS</literal></entry>
+                             <entry>If you choose this option, make sure that
+                                 OpenAM can trust the OpenDJ certificate.</entry>
+                         </row>
+                         <row>
+                             <entry><literal>Start Server After Config</literal></entry>
+                             <entry>Yes</entry>
+                         </row>
+                     </tbody>
+                 </tgroup>
+             </table>
+         </step>
+  </procedure>
+  <procedure xml:id="prepare-external-configuration-store">
+   <title>To Prepare the OpenDJ External Configuration Store</title>
+         <step><para>Change to the OpenDJ directory.</para>
+<screen>$ cd /path/to/opendj</screen></step>
+         <step><para>Create a directory server backend,
+         and call it <literal>cfgStore</literal>.</para>
+         <screen>$ sudo bin/dsconfig create-backend \
+  --backend-name cfgStore --set base-dn: dc=example,dc=com \
+  --set enabled:true --type local-db --port 4444 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --no-prompt</screen></step>
+         <step><para>Verify that you created the backend.</para>
+         <screen>$ sudo bin/dsconfig list-backends \
+  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+         </step>
+         <step>
+             <para>Create an LDIF file to add the initial entries for the
+             configuration store, and save the file as
+             <literal>add-config-entries.ldif</literal>.
+             The entries include the base DN suffix, an organizational unit entry,
+             and the OpenAM user entry needed to access the directory service.</para>
+             <programlisting language="ldif">dn: dc=example,dc=com
+objectclass: top
+objectclass: domain
+dc: example
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl
+     “Allow persistent search”; allow (search, read)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+
+dn: ou=admins,dc=example,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: admins
+
+dn: uid=openam,ou=admins,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: openam
+sn: openam
+uid: openam
+userPassword: secret12
+ds-privilege-name: subentry-write
+ds-privilege-name: update-schema
+
+</programlisting>
+         </step>
+         <step>
+             <para>Add the initial entries LDIF file using the
+             <literal>ldapmodify</literal> command.</para>
+             <screen>$ bin/ldapmodify --port 1389 --bindDN “cn=Directory Manager” \
+  --bindPassword pwd —-defaultAdd —-filename add-config-entries.ldif</screen>
+         </step>
+         <step><para>Verify the entries using <literal>ldapsearch</literal>.</para>
+         <screen>$ bin/ldapsearch --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --baseDN dc=example,dc=com "(objectclass=*)"</screen>
+         </step>
+         <step><para>Add the Global Access Control Instruction (ACI) to the
+         access control handler.
+         The Global ACI gives OpenAM the privileges to modify the schema for the
+         custom configuration. </para>
+         <screen>$ sudo bin/dsconfig set-access-control-handler-prop \
+  --add global-aci:’(target = “ldap:///cn=schema”)(targetattr = “attributeTypes || \
+  objectClasses”)(version 3.0; acl “Modify schema”; allow (write) \
+  (userdn = “ldap:///uid=openam,ou=admins,dc=example,dc=com”);)’ \
+  --port 4444 --bindDN “cn=Directory Manager” --bindPassword pwd --no-prompt</screen>
+         </step>
+         <step><para>Verify that the Global ACI was added.</para>
+         <screen>$ sudo bin/dsconfig get-access-control-handler-prop \
+  --property global-aci --port 4444 --bindDN “cn=Directory Manager” \
+  --bindPassword pwd --no-prompt</screen>
+         </step>
+         <step><para>Copy the schema files, located at
+             <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
+             to a local folder.
+             The <literal>cts-indices.ldif</literal> and
+             <literal>cts-container.ldif</literal> files require some minor editing.</para>
+         <screen>$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .
+$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .
+$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</screen>
+        </step>
+         <step><para>Open <literal>cts-indices.ldif</literal> file in a text editor
+             and replace the <literal>@DB_NAME@</literal> variable with the backend name "cfgStore".
+             The file adds the indexes needed for the configuration data store.</para>
+         </step>
+         <step><para>Open <literal>cts-container.ldif</literal> file in a text editor
+             and replace the <literal>@SM_CONFIG_ROOT_SUFFIX@</literal> variable with the configuration
+             root suffix "dc=example,dc=com".
+             The file is required for the CTS token configuration.</para>
+         </step>
+         <step><para>Add the Schema files.
+         Make sure to add the <literal>cts-add-schema.ldif</literal> file first.</para>
+         <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --fileName cts-add-schema.ldif
+
+$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --fileName cts-indices.ldif
+
+$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --fileName cts-container.ldif</screen>
+         </step>
+         <step><para>Rebuild the indexes using the <literal>rebuild-index</literal>
+             command.
+             You will need to stop the server before rebuilding the indexes.</para>
+             <screen>$ sudo bin/stop-ds
+$ sudo bin/rebuild-index --baseDN dc=example,dc=com --rebuildAll</screen>
+         </step>
+         <step><para>Verify the indexes. When completed, restart the server.</para>
+             <screen>$ sudo bin/verify-index —-baseDN dc=example,dc=com
+$ sudo bin/start-ds</screen>
+         <para>You have successfully prepared the directory server for an
+         external configuration store. When installing the OpenAM server,
+         you will need to specify the host name, port and root suffix
+         of the external directory server on the Configuration Data Store Settings
+         screen of the OpenAM Configurator.
+         See <link xlink:show="new"
+                   xlink:href="install-guide#configure-openam-custom"
+                   xlink:role="http://docbook.org/xlink/role/olink">
+                 <citetitle>To Configure OpenAM</citetitle></link> for more
+         information.</para>
+         </step>
+    </procedure>
  </section>
 
  <section xml:id="prepare-identity-repository">
