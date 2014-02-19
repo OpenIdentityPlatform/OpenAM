@@ -28,8 +28,16 @@
         }
         setTimeout('writeUpgradeAsync()', 2000);
     }
+
+    function upgradeAcceptChecked(){
+        document.getElementById("upgrade-accept-license-button").disabled = document.getElementById("upgrade-accept-check").checked ? false : true;
+    }
+
+    function upgradeAcceptLicense() {
+       YAHOO.util.Dom.addClass('upgrade', 'license-accepted'); 
+    }
 </script>
-<div id="upgrade" style="width: 500px; background-color: #FFFFFF">
+<div id="upgrade" style="width: 500px; background-color: #FFFFFF" class="clearfix">
     <div class="header">$page.getLocalizedString("upgrade.main.title")</div>
     #if ($error)
     <div id="content" class="tabContent">
@@ -39,7 +47,14 @@
         </div>
     </div>
     #else
-    <div id="content" class="tabContent">
+    <div class="license inner-license">
+        <pre id="upgrade-license-message"> </pre> 
+        <div class="accept-check-container clearfix">
+            <input type="checkbox" onchange="upgradeAcceptChecked();" name="upgrade-accept-check"  id="upgrade-accept-check" >
+            <label for="upgrade-accept-check">I accept the license agreement</label>
+        </div>
+    </div>
+    <div id="content" class="tabContent summary">
         <div style="margin: 10px 23px">
             $page.getLocalizedString("upgrade.current.version") $currentVersion <br/>
             $page.getLocalizedString("upgrade.new.version") $newVersion
@@ -49,17 +64,26 @@
         </div>
     </div>
     <!--    </div>-->
-    <div id="upgradeFooter" style="padding-bottom: 10px">
+    <div id="upgradeFooter" style="padding-bottom: 10px" class="clearfix">
+        
         <div class="col1">&nbsp;</div>
 
-        <div style="float: left; margin-left: 23px">
-            <button id="upgradeButton" type="button" onclick="doUpgrade()">$page.getLocalizedString("upgrade.button")</button>
-        </div>
+        <div align="left" style="float:left; margin-left: 23px" class="license">
+            <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled>Continue</button>
+        </div>   
+        <div class="summary" style="float:left; margin-left: 23px" >
+            <div style="float: left;" >
+                <button id="upgradeButton" type="button" onclick="doUpgrade()">$page.getLocalizedString("upgrade.button")</button>
+            </div>
+
+            <div style="float:left; margin-left: 23px">
+                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
+            </div>
+            
+         </div>
+
         <div style="float: right; margin-right: 23px">
-            <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
-        </div>
-        <div style="text-align: center">
-            <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
+             <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
         </div>
     </div>
     #end

@@ -9,8 +9,7 @@
 
     function closeDefault() {
         YAHOO.sun.identity.config.options.defaultSummary.hide(); 
-    }
-    
+    } 
 
     function createConfig() {
         document.getElementById("returnToConfig").style.display = "none";
@@ -24,18 +23,19 @@
         
         AjaxUtils.call("$context$path?actionLink=createDefaultConfig", writeConfigResponse);         
     }
+
     
     
     function defaultAdminPasswordResponse(response) {
-	if (response.responseText == "true") {
-	    $('defaultAdminPasswordStatus').innerHTML = okString;
-            defaultAdminFieldsValid = true;
-	} else {
-	    $('defaultAdminPasswordStatus').innerHTML = errorImage +
-		'<small>' + response.responseText + '</small>';
-			
-           defaultAdminFieldsValid = false;
-	}
+        if (response.responseText == "true") {
+            $('defaultAdminPasswordStatus').innerHTML = okString;
+                defaultAdminFieldsValid = true;
+        } else {
+            $('defaultAdminPasswordStatus').innerHTML = errorImage +
+            '<small>' + response.responseText + '</small>';
+                
+            defaultAdminFieldsValid = false;
+        }
         $('createDefaultConfig').disabled = !defaultFieldsValid();
     }
 
@@ -43,7 +43,7 @@
         var link = "?actionLink=checkPasswords";
         var cValue = "confirm=" + $('defaultAdminConfirm').value;
         var aValue = "&password=" + $('defaultAdminPassword').value;        
-	var oValue = "&otherPassword=" + $('defaultAgentPassword').value;
+        var oValue = "&otherPassword=" + $('defaultAgentPassword').value;
         var type = "&type=admin";
         ie7fix++;
         AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
@@ -52,22 +52,31 @@
     }
 
     function defaultAgentPasswordResponse(response) {
-	if (response.responseText == "true") {
-	    $('defaultAgentPasswordStatus').innerHTML = okString;
-	   defaultAgentFieldsValid = true;
-	} else {
-	   $('defaultAgentPasswordStatus').innerHTML = errorImage +
-		'<small>' + response.responseText + '</small>';
-	   defaultAgentFieldsValid = false;
-	}
+        if (response.responseText == "true") {
+            $('defaultAgentPasswordStatus').innerHTML = okString;
+           defaultAgentFieldsValid = true;
+        } else {
+           $('defaultAgentPasswordStatus').innerHTML = errorImage +
+            '<small>' + response.responseText + '</small>';
+           defaultAgentFieldsValid = false;
+        }
         $('createDefaultConfig').disabled = !defaultFieldsValid();
     }
-       
+
+
+    function acceptChecked(){
+        document.getElementById("acceptLicenseButton").disabled = document.getElementById("accept-check").checked ? false : true;
+    }
+
+    function acceptLicense() {
+        YAHOO.util.Dom.addClass('defaultSummary', 'license-accepted'); 
+    }
+ 
     function validateDefaultAgentPasswords() {
         var link = "?actionLink=checkPasswords";
         var cValue = "confirm=" + $('defaultAgentConfirm').value;
         var aValue = "&password=" + $('defaultAgentPassword').value;
-	var oValue = "&otherPassword=" + $('defaultAdminPassword').value;
+        var oValue = "&otherPassword=" + $('defaultAdminPassword').value;
         var type = "&type=agent";
         ie7fix++;
         AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
@@ -78,17 +87,26 @@
     function initialize() {
         $('createDefaultConfig').disabled = true;
     }
+
     YAHOO.util.Event.onDOMReady(initialize);
+
 </script>
 
 <link href="$context/assets/css/Specific/wizard.css" rel="stylesheet" type="text/css" />
 
 <div id="defaultSummary" style="width:800px;background-color: #FFFFFF">    
     <div style="background-color: #FFFFFF;padding:0">
-	<div class="header">$page.getLocalizedString("fam.configurator.title")</div>
-        <div id="title">$page.getLocalizedString("default.config.title")</div>
+       <div class="header">$page.getLocalizedString("fam.configurator.title")</div>
+        <div id="title" class="summary">$page.getLocalizedString("default.config.title")</div>
     </div>
-    <div style="margin-left: 5%; margin-top: 5%; margin-bottom:5%; margin-right: 5%;">
+    <div class="inner-license license">
+        <pre id="license-message"> </pre> 
+        <div class="accept-check-container clearfix">
+            <input type="checkbox" onchange="acceptChecked();" name="accept-check"  id="accept-check" >
+            <label for="accept-check">I accept the license agreement</label>
+        </div>
+    </div>
+    <div class="inner-summary summary">
         $page.getLocalizedString("default.config.description")
         <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
         <table class="temp">
@@ -138,7 +156,8 @@
  
     <div id="wizardFooter">        
         <div align="left" style="float:left">
-            <button id="createDefaultConfig" type="button" onclick="createConfig();" class="buttonblue">$page.getLocalizedString("create.button")</button>
+            <button id="createDefaultConfig" type="button" onclick="createConfig();" class="buttonblue summary">$page.getLocalizedString("create.button")</button>
+            <button id="acceptLicenseButton" type="button" onclick="acceptLicense();" class="buttonblue license" disabled>Continue</button>
         </div>
         <div align="right">
             <button id="wizardCancelButton" type="button" onclick="closeDefault();">$page.getLocalizedString("cancel.button")</button>

@@ -52,9 +52,11 @@ var AjaxUtils = {
     * callback method will be executed when the response is returned.  This callback is expected to interpret
     * YUI's Response object, e.g. parse the response.responseText and manipulate the DOM accordingly.
     */
-    call: function(url, successCallback, callbackArgs ) {
-        url += '&' + getLocale();
+    simpleCall: function(url, successCallback, callbackArgs ) {
         AjaxUtils.doGet( null, url, successCallback, null, callbackArgs );
+    },
+    call: function(url, successCallback, callbackArgs ) {
+        this.simpleCall(url, successCallback, callbackArgs);
     },
 
     load: function(elementId, url, successCallback, callbackArgs ) {

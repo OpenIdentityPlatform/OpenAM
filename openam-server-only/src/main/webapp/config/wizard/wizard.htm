@@ -168,8 +168,8 @@
             }
             
             function writeConfiguration() {
-	        document.getElementById("returnToConfig").style.display = "none";
-    	        document.getElementById("setupMessage").innerHTML = "";
+            document.getElementById("returnToConfig").style.display = "none";
+                document.getElementById("setupMessage").innerHTML = "";
                 YAHOO.sun.identity.config.options.inProgress.show();
                 
                 var fr1 = window.frames['progressIframe'];
@@ -302,7 +302,20 @@
                 AjaxUtils.call( callUrl );
             }
 
+            function wizardAcceptChecked(){
+                document.getElementById("wizard-accept-license-button").disabled = document.getElementById("wizard-accept-check").checked ? false : true;
+            }
+
+            function wizardAcceptLicense() {
+               YAHOO.util.Dom.addClass('wizard', 'license-accepted'); 
+            }
+
+
             function wizardInit() {
+
+                //YAHOO.util.Dom.removeClass('wizard', 'license-accepted'); 
+                //AjaxUtils.simpleCall("$context/legal-notices/license.html", renderLicenseWizard);
+
                 YAHOO.sun.identity.config.options.wizard.writeConf = new YAHOO.widget.Panel("writeConf", { width:"240px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
                 YAHOO.sun.identity.config.options.wizard.writeConf.setHeader("Writing configuration.  Please wait...");
                 YAHOO.sun.identity.config.options.wizard.writeConf.setBody('<img src="$context/assets/images/rel_interstitial_loading.gif" />');
@@ -349,8 +362,18 @@
         <div id="wizard" style="width:810px;background-color: #FFFFFF">    
             <div style="background-color: #FFFFFF;padding:0">
                 <div class="header">$page.getLocalizedString("configurator.main.title")</div>
-                <div id="title">$page.getLocalizedString("configurator.custom.title")</div>
-                    <div class="col1">		
+                <div id="title" class="summary">$page.getLocalizedString("configurator.custom.title")</div>
+
+                <div class="license inner-license">
+                    <pre id="wizard-license-message"> </pre> 
+                    <div class="accept-check-container clearfix">
+                        <input type="checkbox" onchange="wizardAcceptChecked();" name="wizard-accept-check"  id="wizard-accept-check" >
+                        <label for="wizard-accept-check">I accept the license agreement</label>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <div class="col1">
                         <ol id="tabList" start="1" type="1">
                             <li id="tab1">$page.getLocalizedString("general.tab")</li>                                
                             <li id="tab2">$page.getLocalizedString("server.tab")</li>
@@ -362,24 +385,31 @@
                         </ol>
                         &nbsp;
                     </div>
-                <div id="tabContents">
-                    <div id="wizardStep1" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep2" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep3" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep4" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep5" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep6" class="tabContent" style="display:none"></div>
-                    <div id="wizardStep7" class="tabContent" style="display:none"></div>
+                    <div id="tabContents">
+                        <div id="wizardStep1" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep2" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep3" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep4" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep5" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep6" class="tabContent" style="display:none"></div>
+                        <div id="wizardStep7" class="tabContent" style="display:none"></div>
+                    </div>
                 </div>
-                <!-- end tabContents -->
-            </div>
-            <div id="wizardFooter">
-                        <div class="col1">&nbsp;</div>		
 
-                <div align="left" style="float:left">
-                    <button id="previousTabButton" type="button" disabled="disabled" onclick="previousWizardTab();">$page.getLocalizedString("previous.button")</button>
-                    <button id="nextTabButton" type="button" onclick="nextWizardTab();" class="buttonblue">$page.getLocalizedString("next.button")</button>
-                    <button id="writeConfigButton" type="button" style="display:none" onclick="writeConfiguration();" class="buttonblue">$page.getLocalizedString("create.button")</button>
+            </div>
+
+            <div id="wizardFooter">
+
+                <div align="left" style="float:left" class="license">
+                    <button id="wizard-accept-license-button" type="button" onclick="wizardAcceptLicense();" class="buttonblue license" disabled>Continue</button>
+                </div>  
+                <div class="col1">&nbsp;</div>  
+
+                <div align="left" style="float:left" class="summary">
+                    <button id="previousTabButton" type="button" disabled="disabled" class="" onclick="previousWizardTab();">$page.getLocalizedString("previous.button")</button>
+                    <button id="nextTabButton" type="button" onclick="nextWizardTab();" class="buttonblue ">$page.getLocalizedString("next.button")</button>
+                    <button id="writeConfigButton" type="button" style="display:none" onclick="writeConfiguration();" class="buttonblue ">$page.getLocalizedString("create.button")</button>
+               
                 </div>
                 <div align="right">
                     <button id="wizardCancelButton" type="button" onclick="cancelWizard();">$page.getLocalizedString("cancel.button")</button>
