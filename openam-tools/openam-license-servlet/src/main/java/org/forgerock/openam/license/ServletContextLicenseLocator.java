@@ -35,7 +35,9 @@ public class ServletContextLicenseLocator extends ResourceLoaderLicenseLocator {
      *
      * @param servletContext the servlet context to use for locating license files.
      * @param charset the character set to use to decode license files.
-     * @param licenseFiles the set of license file names to load.
+     * @param licenseFiles the set of license file names to load. These should all start with a leading '/' as per
+     *                     {@link ServletContext#getResource(String)}. If they do not then a leading '/' will be
+     *                     silently pre-pended.
      * @see ServletContext#getResourceAsStream(String)
      */
     public ServletContextLicenseLocator(ServletContext servletContext, Charset charset, String...licenseFiles) {
@@ -57,6 +59,20 @@ public class ServletContextLicenseLocator extends ResourceLoaderLicenseLocator {
      */
     @Override
     protected InputStream getResourceAsStream(String resourceName) {
-        return servletContext.getResourceAsStream(resourceName);
+        // Prepend a '/' to the resourceName if not present to conform to the spec.
+        return servletContext.getResourceAsStream(prependIfAbsent(resourceName, "/"));
+    }
+
+    /**
+     * Prepends the required prefix to the given string if it is not already present.
+     *
+     * @param str the string to prepend to.
+     * @param requiredPrefix the required prefix.
+     * @return the input string if it already startsWith the required prefix, or requiredPrefix + str if not.
+     */
+    private String prependIfAbsent(String str, String requiredPrefix) {
+        return (str != null && str.startsWith(requiredPrefix))
+                ? str
+                : requiredPrefix + str;
     }
 }

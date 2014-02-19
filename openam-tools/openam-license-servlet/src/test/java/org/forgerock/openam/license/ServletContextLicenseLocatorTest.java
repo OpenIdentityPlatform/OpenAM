@@ -24,7 +24,9 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
@@ -74,7 +76,7 @@ public class ServletContextLicenseLocatorTest {
     @Test
     public void shouldReturnFullLicenseContents() {
         // Given
-        String licenseName = "aaa";
+        String licenseName = "/aaa";
         String licenseText = "some\nsample license\ntext";
         testLocator = new ServletContextLicenseLocator(mockContext, UTF8, licenseName);
         given(mockContext.getResourceAsStream(licenseName)).willReturn(new ByteArrayInputStream(licenseText.getBytes(UTF8)));
@@ -88,4 +90,41 @@ public class ServletContextLicenseLocatorTest {
         assertEquals(result.getLicenses().get(0), new License(licenseName, licenseText));
     }
 
+    /**
+     * The {@link ServletContext#getResourceAsStream(String)} method requires that all resource names begin with a
+     * leading '/' character. Glassfish in particular requires this and will fail to find resources that do not match
+     * this requirement. This test ensures that the license locator adds an initial '/' character if it was not
+     * specified.
+     */
+    @Test
+    public void shouldPrependSlashToLicensePathIfNotSpecified() {
+        // Given
+        String licenseName = "aaa";
+        String licenseText = "...";
+        testLocator = new ServletContextLicenseLocator(mockContext, UTF8, licenseName);
+        given(mockContext.getResourceAsStream(anyString())).willReturn(new ByteArrayInputStream(licenseText.getBytes(UTF8)));
+
+        // When
+        LicenseSet result = testLocator.getRequiredLicenses();
+
+        // Then
+        verify(mockContext).getResourceAsStream("/" + licenseName);
+        assertNotNull(result);
+    }
+
+    @Test
+    public void shouldNotPrependSlashToLicensePathIfAlreadySpecified() {
+        // Given
+        String licenseName = "/aaa";
+        String licenseText = "...";
+        testLocator = new ServletContextLicenseLocator(mockContext, UTF8, licenseName);
+        given(mockContext.getResourceAsStream(anyString())).willReturn(new ByteArrayInputStream(licenseText.getBytes(UTF8)));
+
+        // When
+        LicenseSet result = testLocator.getRequiredLicenses();
+
+        // Then
+        verify(mockContext).getResourceAsStream(licenseName);
+        assertNotNull(result);
+    }
 }
