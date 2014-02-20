@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.guice;
@@ -20,8 +20,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
@@ -38,7 +38,7 @@ import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
  */
-@AMGuiceModule
+@GuiceModule
 public class ForgerockRestGuiceModule extends AbstractModule {
 
     /**

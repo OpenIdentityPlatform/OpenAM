@@ -19,11 +19,11 @@ package org.forgerock.openam.forgerockrest.authn.restlet;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.rest.service.ServiceProvider;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
@@ -49,7 +49,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Base Restlet class for server-side resources. It acts as a wrapper to a given call,

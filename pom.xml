@@ -132,13 +132,13 @@
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
         <guice.version>3.0</guice.version>
+        <forgerock.guice.version>1.0.0</forgerock.guice.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
         <cxf-rt-ws-security.version>2.7.8</cxf-rt-ws-security.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
-        <forgerock.guice.version>1.0.0</forgerock.guice.version>
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
 
@@ -797,12 +797,6 @@
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-installer-utils</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-guice-core</artifactId>
-                <version>${forgerock.guice.version}</version>
             </dependency>
 
             <!-- Documentation dependencies -->
@@ -1557,6 +1551,16 @@
                 <groupId>com.google.inject.extensions</groupId>
                 <artifactId>guice-multibindings</artifactId>
                 <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-core</artifactId>
+                <version>${forgerock.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-guice-servlet</artifactId>
+                <version>${forgerock.guice.version}</version>
             </dependency>
             <!--
               required by the STS

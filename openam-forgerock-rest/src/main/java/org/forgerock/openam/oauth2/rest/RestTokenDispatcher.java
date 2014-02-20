@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -12,14 +12,14 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [2012] [ForgeRock Inc]".
- *
  */
+
 package org.forgerock.openam.oauth2.rest;
 
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 import javax.servlet.ServletException;
 

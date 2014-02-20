@@ -11,14 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
 
 import org.forgerock.authz.AuthorizationFilter;
 import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Implementation of the AM authorization configurator for the NOP Logging Only AuthorizationFilter implementation.

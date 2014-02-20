@@ -13,6 +13,7 @@
  *
  * Copyright 2012-2014 ForgeRock AS
  */
+
 package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.am.util.SystemProperties;
@@ -68,8 +69,8 @@ import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServerImpl;

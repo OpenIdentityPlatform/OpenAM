@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,8 +16,8 @@
  * information:
  *
  * "Portions copyright [year] [name of copyright owner]".
- *
  */
+
 package com.sun.identity.saml2.common;
 
 import com.iplanet.dpro.session.SessionException;
@@ -39,7 +39,7 @@ import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 import java.util.Collection;
 import java.util.Date;

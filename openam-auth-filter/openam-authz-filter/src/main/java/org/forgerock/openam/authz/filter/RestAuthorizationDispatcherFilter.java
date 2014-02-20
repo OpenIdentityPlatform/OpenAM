@@ -18,7 +18,7 @@ package org.forgerock.openam.authz.filter;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.authz.AuthZFilter;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 
 import javax.servlet.Filter;

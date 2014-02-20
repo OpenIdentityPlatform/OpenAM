@@ -20,7 +20,7 @@ import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.authz.AuthorizationConfigurator;
 import org.forgerock.openam.auth.shared.AuthDebugLogger;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Common implementation of the Authorization Configurator that provides the correct AM debug and audit logs for

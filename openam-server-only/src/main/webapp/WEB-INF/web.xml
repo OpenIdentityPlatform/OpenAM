@@ -5,7 +5,7 @@
 
     <!-- Initialises the Guice Injector. -->
     <listener>
-        <listener-class>org.forgerock.openam.guice.GuiceInitialisationFilter</listener-class>
+        <listener-class>org.forgerock.guice.core.GuiceInitialisationFilter</listener-class>
     </listener>
 
     <context-param>

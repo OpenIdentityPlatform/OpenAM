@@ -21,7 +21,7 @@ import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.opendj.ldap.Filter;
 
 import javax.inject.Singleton;

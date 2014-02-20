@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.service;
 
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.restlet.Application;
 import org.restlet.Request;

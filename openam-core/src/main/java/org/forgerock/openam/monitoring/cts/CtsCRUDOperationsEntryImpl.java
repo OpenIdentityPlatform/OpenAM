@@ -12,7 +12,6 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
- *
  */
 
 package org.forgerock.openam.monitoring.cts;
@@ -22,7 +21,7 @@ import com.sun.management.snmp.SnmpStatusException;
 import com.sun.management.snmp.agent.SnmpMib;
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Implementation of the monitoring endpoints for CTS CRUDL operations (query and delete).

@@ -409,6 +409,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-guice-servlet</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-authn-filter-config</artifactId>
         </dependency>

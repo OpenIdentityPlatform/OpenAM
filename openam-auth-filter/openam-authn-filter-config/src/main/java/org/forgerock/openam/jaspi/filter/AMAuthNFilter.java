@@ -19,7 +19,7 @@ package org.forgerock.openam.jaspi.filter;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.jaspi.JaspiRuntimeFilter;
 import org.forgerock.jaspi.utils.FilterConfiguration;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 
 import javax.servlet.FilterChain;

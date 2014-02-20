@@ -19,7 +19,7 @@ package org.forgerock.openam.monitoring.cts;
 import com.sun.management.snmp.SnmpStatusException;
 import com.sun.management.snmp.agent.SnmpMib;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Implementation of the endpoint created by the monitoring framework.

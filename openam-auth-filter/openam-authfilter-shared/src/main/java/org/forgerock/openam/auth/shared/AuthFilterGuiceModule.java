@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,7 +10,10 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
+
 package org.forgerock.openam.auth.shared;
 
 import com.google.inject.AbstractModule;
@@ -21,14 +22,12 @@ import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.openam.guice.AMGuiceModule;
+import org.forgerock.guice.core.GuiceModule;
 
 /**
  * Responsible for defining the mappings needed by the OpenAM Auth Filter module.
- *
- * @author robert.wapshott@forgerock.com
  */
-@AMGuiceModule
+@GuiceModule
 public class AuthFilterGuiceModule extends AbstractModule {
     @Override
     protected void configure() {

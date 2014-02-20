@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,15 +25,13 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.*;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.jws.SignedJwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
@@ -42,7 +40,11 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 
 import java.security.SignatureException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the default scope implementation class. This class by default

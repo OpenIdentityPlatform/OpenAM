@@ -34,6 +34,8 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
@@ -60,8 +62,6 @@ import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
-import org.forgerock.openam.guice.AMGuiceModule;
-import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -70,8 +70,6 @@ import org.forgerock.opendj.ldap.SearchResultHandler;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -81,7 +79,7 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author apforrest
  * @author robert.wapshott@forgerock.com
  */
-@AMGuiceModule
+@GuiceModule
 public class CoreGuiceModule extends AbstractModule {
 
     @Override
@@ -118,9 +116,12 @@ public class CoreGuiceModule extends AbstractModule {
          */
         // CTS General
         bind(CTSPersistentStore.class).to(CTSPersistentStoreImpl.class);
-        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
-        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
-        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG))
+                .toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG))
+                .toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
+                .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);

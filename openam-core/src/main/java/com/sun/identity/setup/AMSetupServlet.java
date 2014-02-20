@@ -87,7 +87,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.license.License;
 import org.forgerock.openam.license.LicenseLocator;
 import org.forgerock.openam.license.LicenseSet;

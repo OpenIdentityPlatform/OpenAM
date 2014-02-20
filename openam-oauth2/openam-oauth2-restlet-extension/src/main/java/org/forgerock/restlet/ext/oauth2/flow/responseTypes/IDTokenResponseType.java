@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 

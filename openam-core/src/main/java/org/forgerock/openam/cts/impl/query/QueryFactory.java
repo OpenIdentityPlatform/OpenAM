@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, AS.
+/*
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,9 +13,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.cts.impl.query;
 
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 /**
  * Responsible for generating instances of a QueryBuilder to perform queries against

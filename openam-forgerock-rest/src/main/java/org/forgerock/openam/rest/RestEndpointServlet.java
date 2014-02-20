@@ -19,7 +19,7 @@ package org.forgerock.openam.rest;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.resource.CrestHttpServlet;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.RestEndpointManager;

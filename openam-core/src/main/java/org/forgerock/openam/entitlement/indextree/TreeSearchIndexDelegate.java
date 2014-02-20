@@ -13,13 +13,14 @@
  *
  * Copyright 2013-2014 ForgeRock AS.
  */
+
 package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.util.ResourceNameSplitter;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 import javax.inject.Inject;
 import java.util.Set;

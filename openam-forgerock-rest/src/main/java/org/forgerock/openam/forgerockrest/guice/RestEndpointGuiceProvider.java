@@ -30,12 +30,11 @@ import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
-import org.forgerock.openam.rest.service.ServiceProvider;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 

@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.rest.router;
 
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 
 import javax.inject.Singleton;
 

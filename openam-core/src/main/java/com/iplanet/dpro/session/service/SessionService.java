@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session.service;
@@ -102,7 +102,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 import javax.servlet.http.HttpSession;

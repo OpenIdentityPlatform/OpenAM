@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,9 +24,8 @@
 
 package org.forgerock.openam.oauth2.openid;
 
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
-import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
