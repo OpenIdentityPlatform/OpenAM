@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-apache-22'
@@ -420,8 +420,7 @@ Install log file location:
     </step>
 
     <step>
-    <para>Run <command>.agentadmin.bat --install</command> to install the agent.
-        When prompted for information,
+    <para>Install the agent. When prompted for information,
         enter the inputs appropriate for your deployment.</para>
     <screen>C:\path\to\web_agents\apache22_agent\bin>agentadmin.bat --install
 
@@ -482,7 +481,6 @@ Verify your settings above and decide from the choices below.
 2. Back to the last interaction
 3. Start Over
 4. Exit
-Please make your selection [1]:
 Please make your selection [1]:
 
 Creating directory layout and configuring Agent file for Agent_001
