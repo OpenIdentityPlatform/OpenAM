@@ -1357,9 +1357,12 @@ public class SPACSUtils {
 
         NameIDInfo info = null;
         String affiID = nameId.getSPNameQualifier();
-        AffiliationDescriptorType affiDesc =
-            metaManager.getAffiliationDescriptor(realm, affiID);
         boolean isDualRole = SAML2Utils.isDualRole(hostEntityId, realm);
+        AffiliationDescriptorType affiDesc = null;
+        if (affiID != null && !affiID.isEmpty()) {
+            affiDesc = metaManager.getAffiliationDescriptor(realm, affiID);
+        }
+
         if (affiDesc != null) {
             if (!affiDesc.getAffiliateMember().contains(hostEntityId)) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString(
