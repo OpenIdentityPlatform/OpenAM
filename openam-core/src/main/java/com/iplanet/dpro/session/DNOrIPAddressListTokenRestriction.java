@@ -37,6 +37,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.net.InetAddress;
@@ -64,6 +65,7 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
 
     private Set<InetAddress> addressList = new HashSet<InetAddress>();
 
+    /** SHA-1 hash of the concatenated string of DN and/or Host Name/IP Address.*/
     private String asString;
      /**
       * boolean to indicate if the restriction checking is strictly based on DN
@@ -101,7 +103,6 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     *            if something goes wrong.
     */
     public DNOrIPAddressListTokenRestriction(String dn, List<String> hostNames) throws Exception {
-
         StringBuilder buf = null;
         if (dn.indexOf('|') > 0) {
             StringTokenizer st = new StringTokenizer(dn, "|");
@@ -146,12 +147,19 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         if (debug.messageEnabled()) {
             debug.message("DNOrIPAddressListTokenRestriction.new " + asString);
         }
+        asString = Hash.hash(asString);
+        if (asString == null){
+            throw new IllegalStateException("DNOrIPAddressListTokenRestriction.hashcode error creating SHA-1 hash, hash was null");
+        }
+        if (debug.messageEnabled()) {
+            debug.message("DNOrIPAddressListTokenRestriction.hashCode " + asString);
+        }
     }
 
     /**
      * This method returns the restriction as a string.
      * 
-     * @return A concatenated string of DN and/or Host Name/IP Address.
+     * @return A SHA-1 hash of the concatenated string of DN and/or Host Name/IP Address.
      */
     @Override
     public String toString() {
