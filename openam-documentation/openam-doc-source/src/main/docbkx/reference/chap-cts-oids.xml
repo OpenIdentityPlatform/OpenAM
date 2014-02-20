@@ -50,7 +50,27 @@ I don't think it's a big deal, but am not sure. -->
 
  <!-- Replace 999 with the actual OID label for CTS when AME-2750 is complete -->
 
+
   <para>
+   So the root OID for all CTS monitored components is:
+   <literal>enterprises.36733.1.2.999</literal>. All individual
+   monitored CTS components are suffixes which are consistent with
+   the image shown here.
+  </para>
+ <mediaobject xml:id="cts-oid-big-diagram">
+  <alt>
+   Diagram of CTS OIDs
+  </alt>
+  <imageobject>
+   <imagedata fileref="images/cts-top-diagram.png" format="PNG" />
+  </imageobject>
+  <textobject>
+   <para>A visual diagram of OIDs related to the Core Token Service.</para>
+  </textobject>
+ </mediaobject>
+
+
+ <para>
    A number of CTS OIDs specify some "in period" time. By default, that period
    is 10 seconds. Four related measures of tokens are included:
   </para>
@@ -110,6 +130,29 @@ I don't think it's a big deal, but am not sure. -->
     for monitoring SAML2 tokens is
     <literal>enterprises.36733.1.2.999.1.1.2</literal></para>
 
+   <para>
+    The options for the token table are shown in the following diagram
+    and table. For example, the token table OID for SAML 2 is based on
+    the entries associated with ForgeRock, <literal>enterprises.36733</literal>,
+    OpenAM <literal>1</literal>, SNMP <literal>2</literal>, CTS Monitoring
+    <literal>999</literal>, token table <literal>1</literal>, entry
+    <literal>1</literal>, and SAML 2 <literal>2</literal>, which is
+    <literal>enterprises.36733.1.2.999.1.1.2</literal>.
+   </para>
+   <mediaobject xml:id="cts-token-table-diagram">
+    <alt>
+     Diagram of CTS Token Table OIDs
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-token-table.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of Token Table OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
+
+
    <table xml:id="cts-monitoring-oid-token-types">
     <title>CTS Monitoring OID Categories</title>
 
@@ -155,6 +198,23 @@ I don't think it's a big deal, but am not sure. -->
     OIDs related to CTS monitoring operations are based on basic CRUD
     operations (plus list).
    </para>
+
+   <para>
+    The options for the operation table are shown in the following diagram
+    and table.
+   </para>
+   <mediaobject xml:id="cts-ops-table-diagram">
+    <alt>
+     Diagram of CTS Operations Table OIDs
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-ops-table.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of Operation Table OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
 
    <table xml:id="cts-monitoring-oid-op-type">
     <title>CTS Monitoring Operation Types</title>
@@ -204,6 +264,25 @@ I don't think it's a big deal, but am not sure. -->
    <para>
     The OIDs in this table relate to all CRUD (and list) operations.
    </para>
+
+   <para>
+    The options for the CRUD operations table are shown in the following diagram
+    and tables. Each value from <literal>cumulativeCount</literal> to
+    <literal>failureMinimum</literal> is associated with CRUD and List
+    operations.
+   </para>
+   <mediaobject xml:id="cts-crudops-table-diagram">
+    <alt>
+     Diagram of CRUD Operations Table CTS OIDs
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-crudops-table.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of Operations Table OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
 
    <table xml:id="cts-monitoring-oid-ops-entries">
     <title>CTS CRUD Operation Entries</title>
@@ -620,6 +699,28 @@ I don't think it's a big deal, but am not sure. -->
    measured over a period of time (default=10 seconds), as an average, minimum, and
    maximum.</para>
 
+   <para>
+    The options for CRUD operations, by token type, are shown in the following
+    diagram and tables. Each entry between <literal>cumulativeCount</literal>,
+    and <literal>minimum</literal> is associated with the four basic token
+    types: <literal>Session</literal>, <literal>SAML 2</literal>,
+    <literal>OAuth2</literal>, and <literal>REST</literal>. Each token type
+    is used in CRUD and List operations. So the following tables describe 80
+    different OIDs.
+   </para>
+   <mediaobject xml:id="cts-crudops-tokentype-diagram">
+    <alt>
+     Diagram of CRUD Operations Table CTS OIDs
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-crudops-tokentype.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of Operation Table OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
+
    <para>For tokens in this section, the following table specifies the base OIDs
    for various values. The token type (Session, SAML2, OAuth 2, REST), followed
    by the CRUD / List value, is added on as the OID suffix.</para>
@@ -822,6 +923,44 @@ I don't think it's a big deal, but am not sure. -->
      </tgroup>
     </table>
 
+    <para>The following table specifies OIDs for session tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-session-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, Session Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed Session Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.1.1.5</entry>
+        <entry>Cumulative count of listed session tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.2.1.5</entry>
+        <entry>Average listed session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.3.1.5</entry>
+        <entry>Minimum listed session tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.4.1.5</entry>
+        <entry>Maximum listed session tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
    </section>
 
    <section xml:id="cts-token-table-oid-saml2">
@@ -982,6 +1121,45 @@ I don't think it's a big deal, but am not sure. -->
       </tbody>
      </tgroup>
     </table>
+
+    <para>OIDs are also assigned for SAML2 tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-saml2-oid-count-list" pgwide="1">
+     <title>CTS CRUD Delete Operations, SAML2 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed SAML2 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.1.2.5</entry>
+        <entry>Cumulative count of listed SAML2 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.2.2.5</entry>
+        <entry>Average listed SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.3.2.5</entry>
+        <entry>Minimum listed SAML2 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.4.2.5</entry>
+        <entry>Maximum listed SAML2 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
    </section>
 
    <section xml:id="cts-token-table-oid-oauth2">
@@ -1142,6 +1320,45 @@ I don't think it's a big deal, but am not sure. -->
       </tbody>
      </tgroup>
     </table>
+
+    <para>OIDs are also assigned for OAuth 2.0 tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-oauth2-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, OAuth 2.0 Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed OAuth 2.0 Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.1.3.5</entry>
+        <entry>Cumulative count of listed OAuth 2.0 tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.2.3.5</entry>
+        <entry>Average listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.3.3.5</entry>
+        <entry>Minimum listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.4.3.5</entry>
+        <entry>Maximum listed OAuth 2.0 tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
    </section>
 
    <section xml:id="cts-token-table-oid-rest">
@@ -1302,6 +1519,45 @@ I don't think it's a big deal, but am not sure. -->
       </tbody>
      </tgroup>
     </table>
+
+    <para>OIDs are also assigned for REST tokens that
+     are listed.</para>
+
+    <table xml:id="cts-token-rest-oid-count-list" pgwide="1">
+     <title>CTS CRUD List Operations, REST Tokens</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="3*"/>
+      <colspec colnum="2" colwidth="4*"/>
+
+      <thead>
+       <row>
+        <entry>Ops, Listed REST Tokens</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.1.4.4</entry>
+        <entry>Cumulative count of listed REST tokens</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.2.4.4</entry>
+        <entry>Average listed REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.3.4.4</entry>
+        <entry>Minimum listed REST tokens (in period)</entry>
+       </row>
+       <row>
+        <entry>enterprises.36733.1.2.999.4.1.4.4.4</entry>
+        <entry>Maximum listed REST tokens (in period)</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
    </section>
 
   </section>
@@ -1312,6 +1568,24 @@ I don't think it's a big deal, but am not sure. -->
    <para>The CTS token OIDs defined in this section specify the
    total number of tokens of each type (Session, SAML 2, OAuth 2.0, REST),
    along with their average current lifetimes.</para>
+
+   <para>
+    The options for Token Operations are shown in the following diagram
+    and tables. Total and Average Current Lifetimes are associated with
+    the four basic token types: Session, SAML 2, OAuth 2, and REST.
+   </para>
+   <mediaobject xml:id="cts-token-ops-diagram">
+    <alt>
+     Diagram of CTS Token Operations OIDs
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-token-ops.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of Token Operation OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
 
    <table xml:id="cts-token-totals" pgwide="1">
     <title>CTS Total Tokens, by Type</title>
@@ -1400,6 +1674,22 @@ I don't think it's a big deal, but am not sure. -->
 
    <!-- I could say "By default, the CTS Reaper is run in 60 second periods."
     but that should be variable.-->
+   <para>
+    For completeness, the one OID related to the CTS Reaper is shown in
+    the following diagram.
+   </para>
+   <mediaobject xml:id="cts-reaper-diagram">
+    <alt>
+     Diagram of the CTS Reaper Operations OID
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-reaper.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of the CTS Reaper Operations OID related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
 
    <para>
     One OID relates to the CTS Reaper, which specifies the average rate of
@@ -1429,6 +1719,28 @@ I don't think it's a big deal, but am not sure. -->
      CTSConnectionFactory OIDs, they end in 0. Success or failure of
      these OIDs are not specific to any operation or token type.
     </para>
+
+   <para>
+    The following diagram describes the OIDs related to the
+    CTSConnectionFactory. A <literal>cumulativeCount</literal>,
+    <literal>average</literal>, <literal>success</literal>, and
+    <literal>failure</literal> OID is associated with CTSConnectionFactory
+    success and failure.
+   </para>
+   <mediaobject xml:id="cts-connections-diagram">
+    <alt>
+     Diagram of the CTS Reaper Operations OID
+    </alt>
+    <imageobject>
+     <imagedata fileref="images/cts-connections.png" format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>A visual diagram of CTSConnectionFactory OIDs related to the
+      Core Token Service.</para>
+    </textobject>
+   </mediaobject>
+
+
 
    <table xml:id="cts-token-factory-success" pgwide="1">
     <title>CTSConnectionFactory, Successful Connections</title>
