@@ -25,8 +25,10 @@
    $Id: post.jsp,v 1.3 2008/06/25 05:48:38 qcheng Exp $
 
 --%>
-
-<%@page
+<%--
+   Portions Copyrighted 2014 ForgeRock AS
+--%>
+<%@page contentType="text/html; charset=UTF-8"
     import="com.sun.identity.wsfederation.common.WSFederationConstants"
 %>
 <%
