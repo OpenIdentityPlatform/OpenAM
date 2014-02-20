@@ -24,7 +24,7 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.saml2.profile;
 
@@ -1353,9 +1353,12 @@ public class SPACSUtils {
 
         NameIDInfo info = null;
         String affiID = nameId.getSPNameQualifier();
-        AffiliationDescriptorType affiDesc =
-            metaManager.getAffiliationDescriptor(realm, affiID);
         boolean isDualRole = SAML2Utils.isDualRole(hostEntityId, realm);
+        AffiliationDescriptorType affiDesc = null;
+        if (affiID != null && !affiID.isEmpty()) {
+            affiDesc = metaManager.getAffiliationDescriptor(realm, affiID);
+        }
+
         if (affiDesc != null) {
             if (!affiDesc.getAffiliateMember().contains(hostEntityId)) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString(
