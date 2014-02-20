@@ -23,13 +23,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.shared.encode.Hash;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.services.util.Hash;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -299,12 +300,12 @@ public final class IdentityResource implements CollectionResourceProvider {
             mailattrs = mailscm.getAttributes();
 
         } catch (SMSException smse) {
-            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot create service " +
+            RestDispatcher.debug.error("IdentityResource.sendNotification() :: Cannot create service " +
                     MailServerImpl.SERVICE_NAME + smse);
             throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, smse);
 
         } catch (SSOException ssoe){
-            RestDispatcher.debug.error("IdentityResource.IdentityResouce() :: Invalid SSOToken " + ssoe);
+            RestDispatcher.debug.error("IdentityResource.sendNotification() :: Invalid SSOToken " + ssoe);
             throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, ssoe);
         }
 
@@ -368,11 +369,6 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("confirmationId not provided");
             }
 
-            // Get full deployment URL
-            HttpContext header = null;
-            header = context.asContext(HttpContext.class);
-            StringBuilder fullDepURL = RestUtils.getFullDeploymentURI(header.getPath());
-
             // Check Token is still in CTS
             // Check that tokenID is not expired
             if(cts.read(tokenID) == null){
@@ -401,8 +397,6 @@ public final class IdentityResource implements CollectionResourceProvider {
                     + email + e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
-
-
     }
     /**
      * {@inheritDoc}
@@ -433,7 +427,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
     /**
      * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
-     * whether the AMIdenity in context is active/inactive
+     * whether the AMIdentity in context is active/inactive
      * @param uid the universal identifier of the user
      * @return true is the user is active;false otherwise
      * @throws NotFoundException invalid SSOToken, invalid UID
@@ -443,10 +437,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
             return userIdentity.isActive();
         } catch (IdRepoException idr) {
-            RestDispatcher.debug.error("IdentityResource.checkUserActive(): Invalid UID: " + uid + " Exception " + idr);
+            RestDispatcher.debug.error("IdentityResource.isUserActive(): Invalid UID: " + uid + " Exception " + idr);
             throw new NotFoundException("Invalid UID, could not retrived " + uid);
         } catch (SSOException ssoe){
-            RestDispatcher.debug.error("IdentityResource.checkUserActive(): Invalid SSOToken" + " Exception " + ssoe);
+            RestDispatcher.debug.error("IdentityResource.isUserActive(): Invalid SSOToken" + " Exception " + ssoe);
             throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage());
         }
     }
@@ -485,7 +479,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("Username not provided");
             }
 
-            // Look up Idenity
+            // Look up Identity
             idsvc = new IdentityServicesImpl();
             dtls = idsvc.read(username, idSvcsAttrList, admin);
 
@@ -606,6 +600,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             if(cts.read(tokenID) == null){
                 throw new NotFoundException("Cannot find tokenID: " + tokenID);
             }
+
             // check confirmationId
             if(!confirmationId.equalsIgnoreCase(Hash.hash(
                     tokenID + username + SystemProperties.get("am.encryption.pwd")))){
@@ -613,14 +608,27 @@ public final class IdentityResource implements CollectionResourceProvider {
                             + confirmationId);
                 throw new BadRequestException("Invalid confirmationId", null);
             }
-            // update Idenitty
+            // update Identity
             SSOToken tok = RestUtils.getToken();
             Token admin = new Token();
             admin.setId(tok.getTokenID().toString());
 
             // Update instance with new password value
-            updateInstance(admin, jVal, handler);
-
+            if (updateInstance(admin, jVal, handler)) {
+                // Only remove the token if the update was successful, errors will be set in the handler.
+                try {
+                    // Even though the generated token will eventually timeout, delete it after a successful read
+                    // so that the reset password request cannot be made again using the same token.
+                    cts.delete(tokenID);
+                } catch (DeleteFailedException e) {
+                     // Catch this rather than letting it stop the process as it is possible that between successfully
+                    // reading and deleting, the token has expired.
+                    if (RestDispatcher.debug.messageEnabled()) {
+                        RestDispatcher.debug.message("IdentityResource.anonymousUpdate(): Deleting token " + tokenID +
+                             " after a successful read failed due to " + e.getMessage(), e);
+                     }
+                }
+            }
         } catch (BadRequestException be){
             RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + be.getMessage());
             handler.handleError(be);
@@ -639,12 +647,15 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param admin Token that has administrative privileges
      * @param details Json Value containing details of user identity
      * @param handler handles result of operation
+     * @return true if the update was successful
      */
-    private void updateInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler){
+    private boolean updateInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler){
         JsonValue jVal = details;
-        IdentityDetails newDtls, identity;
+        IdentityDetails newDtls;
         IdentityServicesImpl idsvc;
         String resourceId = jVal.get("username").asString();
+
+        boolean successfulUpdate = false;
 
         try {
             idsvc = new IdentityServicesImpl();
@@ -657,11 +668,14 @@ public final class IdentityResource implements CollectionResourceProvider {
             IdentityDetails checkIdent = idsvc.read(resourceId, idSvcsAttrList, admin);
             // handle updated resource
             handler.handleResult(identityDetailsToJsonValue(checkIdent));
+            successfulUpdate = true;
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
+
+        return successfulUpdate;
     }
 
 
@@ -708,10 +722,23 @@ public final class IdentityResource implements CollectionResourceProvider {
             SSOToken tok = RestUtils.getToken();
             Token admin = new Token();
             admin.setId(tok.getTokenID().toString());
-            createInstance(admin, jVal, handler);
-
+            if (createInstance(admin, jVal, handler)) {
+                 // Only remove the token if the create was successful, errors will be set in the handler.
+                 try {
+                     // Even though the generated token will eventually timeout, delete it after a successful read
+                     // so that the completed registration request cannot be made again using the same token.
+                     cts.delete(tokenID);
+                 } catch (DeleteFailedException e) {
+                     // Catch this rather than letting it stop the process as it is possible that between successfully
+                     // reading and deleting, the token has expired.
+                     if (RestDispatcher.debug.messageEnabled()) {
+                         RestDispatcher.debug.message("IdentityResource.anonymousCreate: Deleting token " + tokenID +
+                                 " after a successful read failed due to " + e.getMessage(), e);
+                     }
+                 }
+            }
         } catch (BadRequestException be){
-            RestDispatcher.debug.error("IdentityResource.anonymouseCreate() :: Invalid Parameter " + be);
+            RestDispatcher.debug.error("IdentityResource.anonymousCreate() :: Invalid Parameter " + be);
             handler.handleError(be);
         } catch (NotFoundException nfe){
             RestDispatcher.debug.error("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
@@ -736,13 +763,16 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param admin Token that has administrative privileges
      * @param details resource details that needs to be created
      * @param handler handles result of operation
+     * @return true if the create was successful
      */
-    private void createInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler) {
+    private boolean createInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler) {
 
         JsonValue jVal = details;
         IdentityDetails dtls, identity;
         IdentityServicesImpl idsvc;
         String resourceId = null;
+
+        boolean successfulCreate = false;
 
         try {
             idsvc = new IdentityServicesImpl();
@@ -754,6 +784,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Read created resource
             dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
             handler.handleResult(identityDetailsToJsonValue(dtls));
+            successfulCreate = true;
         } catch (final ObjectNotFound notFound) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot READ " +
                     resourceId + ": Resource cannot be found." + notFound);
@@ -775,6 +806,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                     exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
+
+        return successfulCreate;
     }
 
 
@@ -922,7 +955,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     /**
-     * Returns an IdenityDetails from a JsonValue
+     * Returns an IdentityDetails from a JsonValue
      *
      * @param jVal The JsonValue Object to be converted
      * @return The IdentityDetails object
@@ -958,7 +991,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         } catch (final Exception e) {
             RestDispatcher.debug.error("IdentityResource.jsonValueToIdentityDetails() ::" +
-                    " Cannot convert JsonValue to IdentityDetials." + e);
+                    " Cannot convert JsonValue to IdentityDetails." + e);
             //deal with better exceptions
         }
         return identity;
@@ -1137,7 +1170,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         final JsonValue jVal = request.getNewContent();
         final String rev = request.getRevision();
         IdentityDetails dtls, newDtls;
-        IdentityServicesImpl idsvc = new IdentityServicesImpl();;
+        IdentityServicesImpl idsvc = new IdentityServicesImpl();
         Resource resource;
         try {
             // Retrieve details about user to be updated
