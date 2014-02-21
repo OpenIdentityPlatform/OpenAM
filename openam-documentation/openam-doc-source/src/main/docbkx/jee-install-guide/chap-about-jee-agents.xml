@@ -44,6 +44,17 @@
  container intercepts requests from users trying to access resources in
  protected web applications. The agent denies access until the user has
  authorization from OpenAM to access a particular resource.</para>
+
+ <note xml:id="one-agent-per-container">
+  <para>
+   A single policy agent can work with multiple applications.
+   You therefore install only one policy agent per application server.
+  </para>
+
+  <para>
+   Installing more than one policy agent in an application server is not supported.
+  </para>
+ </note>
  
  <section xml:id="example-j2ee-agent-interaction">
   <title>How the User, Application, Policy Agent, &amp; OpenAM Interact</title>

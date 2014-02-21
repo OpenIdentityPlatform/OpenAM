@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-about-web-agents'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>About OpenAM Web Policy Agents</title>
@@ -41,7 +42,18 @@
  requests from users trying to access a protected web resource, and denies
  access until the user has authorization from OpenAM to access the
  resource.</para>
- 
+
+ <note xml:id="one-agent-per-server">
+  <para>
+   A single policy agent can work with multiple applications.
+   You therefore install only one policy agent per web server.
+  </para>
+
+  <para>
+   Installing more than one policy agent in a web server is not supported.
+  </para>
+ </note>
+
  <section xml:id="example-agent-interaction">
   <title>How the User, Web Policy Agent, &amp; OpenAM Interact</title>
   
