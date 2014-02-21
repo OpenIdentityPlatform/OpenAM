@@ -461,7 +461,7 @@ public abstract class AbstractFlow extends ServerResource {
         for (String name : displayNames){
             if (name.contains(DELIMITER)){
                 int locationOfDelimiter = name.indexOf(DELIMITER);
-                if (name.substring(locationOfDelimiter).equalsIgnoreCase(locale)){
+                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale)){
                     return name.substring(locationOfDelimiter+1, name.length());
                 }
             } else {
