@@ -20,16 +20,29 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-whats-new'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
+
+ <important xml:id="eosl-notice">
+  <para>
+   On February 8, 2014 OpenAM 10.1.0 reached
+   <link xlink:href="https://forgerock.zendesk.com/entries/24898647-Product-release-and-EOSL-dates"
+         xlink:show="new">End of Service Life</link> (EOSL).
+  </para>
+
+  <para>
+   ForgeRock customers must upgrade their OpenAM
+   in order to receive continued support.
+  </para>
+ </important>
+
 
  <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
  provides the following additional features.</para>

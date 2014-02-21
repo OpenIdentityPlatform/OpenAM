@@ -6,6 +6,15 @@ the changes here reflect the published updates.
 
 Changes since the original tag:
 
+For Feb 21, 2014
+
+openam-doc-source/src/main/docbkx/agent-release-notes/index.xml
+openam-doc-source/src/main/docbkx/release-notes/index.xml
+openam-doc-source/src/main/docbkx/release-notes/chap-whats-new.xml
+    Fix for AME-3020
+openam-doc-source/src/main/docbkx/reference/index.xml
+    Comment out generated content; should not be republished
+
 For Aug 26, 2013
 
 openam-doc-source/src/main/docbkx/install-guide/chap-install-tools.xml

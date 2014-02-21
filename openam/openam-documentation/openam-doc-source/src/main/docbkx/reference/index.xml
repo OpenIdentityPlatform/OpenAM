@@ -20,14 +20,13 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock Inc
+  !      Copyright 2011-2014 ForgeRock Inc
   !    
 -->
 <book xml:id='reference'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM <?eval ${serverDocTargetVersion}?> Reference</title>
@@ -36,7 +35,7 @@
    Authentication, Authorization, Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2013</year>
+   <year>2011-2014</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -68,11 +67,11 @@
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
-  <xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' />
+  <!--<xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' />-->
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />
- <xinclude:include href='../../../../target/generated-resources/chap-log-messages.xml' />
+ <!--<xinclude:include href='../../../../target/generated-resources/chap-log-messages.xml' />-->
  <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />

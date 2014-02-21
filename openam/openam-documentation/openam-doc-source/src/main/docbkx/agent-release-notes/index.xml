@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <book xml:id='release-notes'
@@ -37,7 +37,7 @@
    Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2013</year>
+   <year>2011-2014</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -59,6 +59,21 @@
  </info>
 
  <toc />
+
+ <chapter xml:id="eosl-notice">
+  <title>Important Notice Regarding End of Service Life</title>
+
+  <para>
+   On February 8, 2014 OpenAM policy agents 3.1.0 reached
+   <link xlink:href="https://forgerock.zendesk.com/entries/24898647-Product-release-and-EOSL-dates"
+   xlink:show="new">End of Service Life</link> (EOSL).
+  </para>
+
+  <para>
+   ForgeRock customers must upgrade their policy agents
+   in order to receive continued support.
+  </para>
+ </chapter>
 
  <xinclude:include href='chap-web-agents.xml' />
  <xinclude:include href='chap-javaee-agents.xml' />
