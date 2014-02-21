@@ -282,9 +282,9 @@
       </para>
 
       <para>
-       For example, <literal>http*://*:*/*</literal> matches
-       <literal>http://www.example.com/index.html</literal>,
-       <literal>https://www.example.com/index.html</literal>, and
+       For example, <literal>*://*:*/*</literal> matches
+       <literal>http://www.example.com:80/index.html</literal>,
+       <literal>https://www.example.com:443/index.html</literal>, and
        <literal>http://www.example.net:8080/index.html</literal>.
       </para>
 
