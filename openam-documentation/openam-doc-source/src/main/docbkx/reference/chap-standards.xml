@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-standards'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Supported Standards</title>
@@ -113,19 +114,28 @@
     systems.</para>
    </listitem>
   </varlistentry>
-  <varlistentry xml:id="saml-2">
-   <term><link xlink:href="http://saml.xml.org/">Security Assertion Markup
-   Language (SAML)</link></term>
+
+  <varlistentry xml:id="saml">
+   <term><link xlink:href="http://saml.xml.org/" xlink:show="new"
+   >Security Assertion Markup Language (SAML)</link></term>
    <listitem>
     <indexterm>
      <primary>Supported standards</primary>
      <secondary>SAML</secondary>
     </indexterm>
-    <para>Standard, XML-based framework for creating and exchanging security
-    information between online partners. OpenAM supports multiple versions
-    of SAML including 2.0.</para>
+    <para>
+     Standard, XML-based framework for creating
+     and exchanging security information between online partners.
+     OpenAM supports multiple versions of SAML including 2.0, 1.1, and 1.0.
+    </para>
+
+    <para>
+     Specifications are available from the <link xlink:show="new"
+     xlink:href="https://www.oasis-open.org/standards">OASIS standards page</link>.
+    </para>
    </listitem>
   </varlistentry>
+
   <varlistentry xml:id="liberty-id-ff">
    <term><link
    xlink:href="http://projectliberty.org/resource_center/specifications/liberty_alliance_id_ff_1_2_specifications/?f=resource_center/specifications/liberty_alliance_id_ff_1_2_specifications"

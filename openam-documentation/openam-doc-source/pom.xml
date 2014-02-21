@@ -120,6 +120,8 @@
         <diagnosticsZipFile><![CDATA[SSODiagnosticTools-${serverDocTargetVersion}.zip]]></diagnosticsZipFile>
         <fedletZipFile><![CDATA[Fedlet-${serverDocTargetVersion}.zip]]></fedletZipFile>
         <sharedLibrary><![CDATA[openam-shared-${serverDocTargetVersion}.jar]]></sharedLibrary>
+        <federationLibrary><![CDATA[openam-federation-library-${serverDocTargetVersion}.jar]]></federationLibrary>
+        <forgerockUtilLibrary><![CDATA[forgerock-util-${commons.forgerock-util.version}.jar]]></forgerockUtilLibrary>
         <ssoadminZipFile><![CDATA[SSOAdminTools-${serverDocTargetVersion}.zip]]></ssoadminZipFile>
         <ssoconfigZipFile><![CDATA[SSOConfiguratorTools-${serverDocTargetVersion}.zip]]></ssoconfigZipFile>
         <ssoconfigJarFile><![CDATA[openam-configurator-tool-${serverDocTargetVersion}.jar]]></ssoconfigJarFile>
