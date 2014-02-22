@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.iplanet.dpro.session.service;
@@ -38,11 +38,8 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -56,6 +53,7 @@ import java.util.Set;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * A <code>ClusterStateService </code> class implements monitoring the state of
@@ -138,14 +136,6 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
     public static final int DEFAULT_TIMEOUT = 1000;
 
-    private static String GET_REQUEST = "";
-    private final static String EMPTY_STRING = "";
-    private final static String SUCCESS_200 = "200";
-    private final static String HTTP = "http";
-
-    private static String hcPath = SystemProperties.
-            get(Constants.URLCHECKER_TARGET_URL, null);
-
     private static boolean doRequest = true;
     private static final String doRequestFlag = SystemProperties.
             get(Constants.URLCHECKER_DOREQUEST, "false");
@@ -165,25 +155,13 @@ public class ClusterStateService extends GeneralTaskRunnable {
     // SessionService
     private static volatile SessionService sessionService = null;
 
-    // Static Initialization Stanza.
     static {
         sessionDebug = Debug.getInstance("amSession");
 
         if (doRequestFlag != null) {
-            if (doRequestFlag.equals("false"))
-                doRequest = false;
+            doRequest = !doRequestFlag.equals("false");
         }
-        if (hcPath == null) {
-            String deployuri = SystemProperties.get
-                    (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
-            hcPath = deployuri + "/namingservice";
-            if (!hcPath.startsWith("/")) {
-                hcPath += "/" + hcPath;
-            }
-
-            GET_REQUEST = "GET " + hcPath + " HTTP/1.0";
-        }
-    }  // End of Static Initialization Stanza
+    }
 
     /**
      * Get Servers within Cluster
@@ -221,10 +199,10 @@ public class ClusterStateService extends GeneralTaskRunnable {
     /**
      * Is Specified ServerId our Local Server Id?
      * @param serverId
-     * @return boolean indicating true if specified server id is our local Server Id or false ir not.
+     * @return boolean indicating true if the serverId matches the local server ID.
      */
     protected boolean isLocalServerId(String serverId) {
-        return ((serverId == null) || (!serverId.equalsIgnoreCase(this.localServerId))) ? false : true;
+        return (serverId != null && serverId.equalsIgnoreCase(localServerId));
     }
 
     /**
@@ -303,7 +281,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         if ((serverId == null) || (serverId.isEmpty()) ) {
             return false;
         }
-        if (serverId.equalsIgnoreCase(this.localServerId)) {
+        if (serverId.equalsIgnoreCase(localServerId)) {
             return true;
         }
         if ( (servers == null) || servers.isEmpty() )
@@ -322,7 +300,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         if ( (serverId == null) || (serverId.isEmpty()) ) {
             return false;
         }
-        if (serverId.equalsIgnoreCase(this.localServerId)) {
+        if (serverId.equalsIgnoreCase(localServerId)) {
             return true;
         }
         if ( (servers == null) || servers.isEmpty() )
@@ -436,105 +414,75 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
 
         boolean result = false;
-        Socket sock = new Socket();
-        PrintWriter out = null;
-        BufferedReader in = null;
+        Socket sock = null;
 
         try {
-            sock.connect(info.address, timeout);
             /*
              * If we need to check for a front end proxy, we need
              * to send a request.  
              */
-            if (doRequest) {
-                if (info.protocol.equals(HTTP)) {
-                    out = new PrintWriter(sock.getOutputStream());
-                    in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-                    out.println(GET_REQUEST);
-                    out.println(EMPTY_STRING);
-                    out.flush();
+            if (!doRequest) {
+                sock = new Socket();
+                sock.connect(info.address, timeout);
+                result = true;
+            } else {
+                HttpURLConnection connection = null;
+                int responseCode = 0;
+                InputStream is = null;
 
-                    String response = in.readLine();
+                try {
+                    connection = (HttpURLConnection) info.url.openConnection();
+                    connection.setConnectTimeout(timeout);
+                    connection.setReadTimeout(timeout);
 
-                    if (response.contains(SUCCESS_200)) {
-                        result = true;
-                    } else {
-                        result = false;
-                    }
-                } else {
-                    HttpsURLConnection connection = null;
-                    int responseCode = 0;
-                    InputStream is = null;
+                    if (connection instanceof HttpsURLConnection) {
+                        ((HttpsURLConnection) connection).setHostnameVerifier(new HostnameVerifier() {
 
-                    try {
-                        connection = (HttpsURLConnection) info.url.openConnection();
-
-
-                        connection.setHostnameVerifier(new HostnameVerifier() {
+                            @Override
                             public boolean verify(String hostname, SSLSession session) {
                                 return true;
                             }
                         });
-
-                        responseCode = connection.getResponseCode();
-                        is = connection.getInputStream();
-                        int ret = 0;
-                        byte[] buf = new byte[512];
-
-                        // clear the stream
-                        while ((ret = is.read(buf)) > 0) {
-                            // do nothing
-                        }
-
-                        // close the inputstream
-                        is.close();
-                    } catch (IOException ioe) {
-                        InputStream es = null;
-
-                        try {
-                            es = ((HttpsURLConnection) connection).getErrorStream();
-                            int ret = 0;
-                            byte[] buf = new byte[512];
-
-                            // read the response body to clear
-                            while ((ret = es.read(buf)) > 0) {
-                                // do nothing
-                            }
-
-                            // close the errorstream
-                            es.close();
-                        } catch (IOException ex) {
-                            // deal with the exception
-                        }
                     }
 
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        result = true;
-                    } else {
-                        result = false;
+                    responseCode = connection.getResponseCode();
+                    readStream(is);
+                } catch (IOException ioe) {
+                    if (connection != null) {
+                        readStream(connection.getErrorStream());
                     }
                 }
-            } else {
-                result = true;
+                result = responseCode == HttpURLConnection.HTTP_OK;
             }
         } catch (Exception ex) {
             result = false;
         } finally {
-            try {
-                sock.close();
-            } catch (Exception ex) {
+            if (sock != null) {
+                try {
+                    sock.close();
+                } catch (IOException ioe) {
+                    //ignored
+                }
             }
         }
         return result;
     }
 
-    // TODO -- Develop Method to write our Server State to the Session Persistence Store.
+    private void readStream(InputStream is) {
+        if (is != null) {
+            byte[] buf = new byte[512];
+            try {
+                while (is.read(buf) > 0) {
+                    // do nothing
+                }
+            } catch (IOException ioe) {
+                //ignore
+            } finally {
+                IOUtils.closeIfNotNull(is);
+            }
+        }
+    }
 
-    /**
-     * Override toString
-     *
-     * @return
-     */
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer();
