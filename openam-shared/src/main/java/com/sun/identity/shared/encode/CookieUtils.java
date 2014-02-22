@@ -25,14 +25,20 @@
  * $Id: CookieUtils.java,v 1.6 2009/10/02 00:08:26 ericow Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.shared.encode;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.Cookie;
@@ -71,6 +77,17 @@ public class CookieUtils {
     private static int defAge = -1;
 
     static Debug debug = Debug.getInstance("amCookieUtils");
+    private static final Method setHttpOnlyMethod;
+
+    static {
+        Method method = null;
+        try {
+            method = Cookie.class.getMethod("setHttpOnly", boolean.class);
+        } catch (NoSuchMethodException nsme) {
+            debug.message("This is not a Java EE 6+ container, Cookie#setHttpOnly(boolean) is not available");
+        }
+        setHttpOnlyMethod = method;
+    }
 
     /**
      * Gets property value of "com.iplanet.am.cookie.name"
@@ -225,6 +242,28 @@ public class CookieUtils {
     }
 
     /**
+     * This method creates Map from the name values of cookies
+     * present in the given <code>HttpServletRequest</code>
+     *
+     * @param request reference to <code>HttpServletRequest</code>
+     * @return Map containing name value pairs from cookies present
+     */
+    public static Map<String, String> getRequestCookies(HttpServletRequest request) {
+        Map<String, String> cookieMap = new HashMap<String, String>();
+        if (request != null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null && cookies.length > 0) {
+                for (Cookie nextCookie : cookies) {
+                    String name = nextCookie.getName();
+                    String value = nextCookie.getValue();
+                    cookieMap.put(name, value);
+                }
+            }
+        }
+        return cookieMap;
+    }
+
+    /**
      * Returns a cookie with a specified name and value.
      * 
      * @param name Name of the cookie.
@@ -357,8 +396,7 @@ public class CookieUtils {
      * @param response
      * @param cookie 
      */
-    public static void addCookieToResponse(HttpServletResponse response,
-            Cookie cookie) {
+    public static void addCookieToResponse(HttpServletResponse response, Cookie cookie) {
         if (cookie == null) {
             return;
         }
@@ -367,9 +405,19 @@ public class CookieUtils {
             return;
         }
 
-        // Once JavaEE6 is available, the following code can be simplified
-        // to be one line response.addCookie(cookie)
-        StringBuffer sb = new StringBuffer(150);
+        if (setHttpOnlyMethod != null) {
+            try {
+                setHttpOnlyMethod.invoke(cookie, true);
+                response.addCookie(cookie);
+                return;
+            } catch (IllegalAccessException iae) {
+                debug.warning("IllegalAccessException while trying to add HttpOnly cookie: " + iae.getMessage());
+            } catch (InvocationTargetException ite) {
+                debug.error("An error occurred while trying to add HttpOnly cookie", ite);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();
         if (path != null && path.length() > 0) {
@@ -385,13 +433,13 @@ public class CookieUtils {
         if (age > -1) {
             sb.append(";max-age=").append(age);
         }
-        if (CookieUtils.isCookieSecure()) {
+        if (CookieUtils.isCookieSecure() || cookie.getSecure()) {
             sb.append(";secure");
         }
         sb.append(";httponly");
         if (debug.messageEnabled()) {
             debug.message("CookieUtils:addCookieToResponse adds " + sb);
         }
-        response.addHeader("SET-COOKIE", sb.toString());
+        response.addHeader("Set-Cookie", sb.toString());
     }
 }
