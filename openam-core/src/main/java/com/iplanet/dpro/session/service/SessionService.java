@@ -1387,8 +1387,13 @@ public class SessionService {
      * @throws SessionException
      */
     public void logout(SessionID sid) throws SessionException {
-        locateSession(sid);
-        logoutInternalSession(sid);
+        if (sid == null || sid.toString().startsWith(SHANDLE_SCHEME_PREFIX)) {
+            throw new SessionException(SessionBundle.getString("invalidSessionID") + sid);
+        }
+        //if the provided sid was a restricted token, resolveToken will always validate the restriction, so there is no
+        //need to check restrictions here.
+        InternalSession session = resolveToken(sid);
+        logoutInternalSession(session.getID());
     }
 
     /**
@@ -1550,23 +1555,6 @@ public class SessionService {
         }
 
         return null;
-    }
-
-    /**
-     * Locate InternalSession by session id
-     *
-     * @param sid
-     * @throws SessionException
-     */
-    protected InternalSession locateSession(SessionID sid)
-            throws SessionException {
-        InternalSession sess = getInternalSession(sid);
-        if (sess == null) {
-            throw new SessionException(SessionBundle
-                    .getString("invalidSessionID")
-                    + sid.toString());
-        }
-        return sess;
     }
 
     /**
