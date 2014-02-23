@@ -22,8 +22,12 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ */
+
+/**
  * Portions Copyrighted 2010-2014 ForgeRock AS
  */
+
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.federation.common.FSUtils;
@@ -67,7 +71,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,6 +84,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -1171,8 +1176,7 @@ public class IDPSSOFederate {
     /**
      *  Returns the <code>AuthnRequest</code> from HttpServletRequest
      */
-    private static AuthnRequest getAuthnRequest(HttpServletRequest request,
-        boolean isFromECP, String binding) {
+    private static AuthnRequest getAuthnRequest(HttpServletRequest request, boolean isFromECP, String binding) {
 
         if (isFromECP) {
             MimeHeaders headers = SAML2Utils.getHeaders(request);
@@ -1187,50 +1191,41 @@ public class IDPSSOFederate {
             }
             return null;
         } else {
-	    if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
-                String samlRequest = 
-                    request.getParameter(SAML2Constants.SAML_REQUEST);
-    
+            String samlRequest = request.getParameter(SAML2Constants.SAML_REQUEST);
+            if (samlRequest == null) {
+                SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: SAMLRequest is null");
+                return null;
+            }
+	        if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: " +
                         "saml request = " + samlRequest);
                 }
-                if (samlRequest == null) { 
-                    return null;
-                }
                 return getAuthnRequest(samlRequest);
             } else if (binding.equals(SAML2Constants.HTTP_POST)) {
-                String samlRequest = request.getParameter(
-                    SAML2Constants.SAML_REQUEST);
                 ByteArrayInputStream bis = null;
                 AuthnRequest authnRequest = null;
                 try {
                     byte[] raw = Base64.decode(samlRequest);
                     if (raw != null) {
                         bis = new ByteArrayInputStream(raw);
-                        Document doc = XMLUtils.toDOMDocument(bis,
-                            SAML2Utils.debug);
-                        SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: decoded SAMl2 Authn Request: " + XMLUtils.print(doc.getDocumentElement()));
+                        Document doc = XMLUtils.toDOMDocument(bis, SAML2Utils.debug);
                         if (doc != null) {
-                            authnRequest = ProtocolFactory.getInstance().
-                                createAuthnRequest(doc.getDocumentElement());
+                            if (SAML2Utils.debug.messageEnabled()) {
+                                SAML2Utils.debug.message("IDPSSOFederate.getAuthnRequest: decoded SAML2 Authn Request: "
+                                        + XMLUtils.print(doc.getDocumentElement()));
+                            }
+                            authnRequest = ProtocolFactory.getInstance().createAuthnRequest(doc.getDocumentElement());
+                        } else {
+                            SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest: Unable to parse SAMLRequest: " +
+                                    samlRequest);
                         }
                     }
                 } catch (Exception ex) {
-                    SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:",
-                        ex);
+                    SAML2Utils.debug.error("IDPSSOFederate.getAuthnRequest:", ex);
                     return null;
                 } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (Exception ie) {
-                            if (SAML2Utils.debug.messageEnabled()) {
-                                SAML2Utils.debug.message(
-                                    "IDPSSOFederate.getAuthnRequest:", ie);
-                            }
-                        }
-                    }
+                    IOUtils.closeIfNotNull(bis);
                 }
                 return authnRequest;
             }
