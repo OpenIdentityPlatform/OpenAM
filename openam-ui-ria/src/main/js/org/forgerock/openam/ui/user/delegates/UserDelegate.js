@@ -100,7 +100,7 @@ define("UserDelegate", [
             type: "PUT",
             success: successCallback, 
             error: errorCallback, 
-            data: JSON.stringify(picked, function(key, value) { return value === "" ? [] : value }),
+            data: JSON.stringify(picked, function(key, value) { return value === "" ? [] : value; }),
             headers: headers
         });
 
