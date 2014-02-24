@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
@@ -26,12 +26,11 @@ import java.util.List;
  * Filter Config wrapper which adds in the Authorization Configurator class name as the "configurator" init parameter
  * name.
  *
- * @author Phill Cunnington
  * @since 12.0.0
  */
 public class RestAuthorizationDispatcherFilterConfig implements FilterConfig {
 
-    private static final String INIT_PARAM_AUTHZ_CONFIGURATOR = "configurator";
+    private static final String INIT_PARAM_AUTHZ_CONFIGURATOR = "module-configurator-factory-class";
 
     private final FilterConfig filterConfig;
     private final String authzConfiguratorClassName;

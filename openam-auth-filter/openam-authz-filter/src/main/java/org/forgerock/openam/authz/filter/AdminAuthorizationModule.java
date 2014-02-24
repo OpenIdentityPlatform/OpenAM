@@ -1,5 +1,5 @@
-/**
- * Copyright 2013-14 ForgeRock, AS.
+/*
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,6 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.authz.filter;
 
 import com.iplanet.dpro.session.service.SessionService;
@@ -20,48 +21,46 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.DebugLogger;
-import org.forgerock.auth.common.LoggingConfigurator;
-import org.forgerock.authz.AuthorizationFilter;
+import org.forgerock.authz.AuthorizationModule;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
+import org.forgerock.openam.utils.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Responsible for validating that the user performing the request is the Admin user.
  * If this is not the case then the request is not allowed to proceed.
  *
- * @author robert.wapshott@forgerock.com
- * @author Phill Cunnington
  * @since 10.2.0
  */
 @Singleton
-public class AdminAuthorizationFilter implements AuthorizationFilter {
+public class AdminAuthorizationModule implements AuthorizationModule {
+
+    private final Logger logger = LoggerFactory.getLogger(AdminAuthorizationModule.class);
 
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
-    private final SessionService sessionService;
+    private final Config<SessionService> sessionService;
     private final AuthUtilsWrapper authUtilsWrapper;
 
-    private DebugLogger debugLogger;
-
     /**
-     * Constructs a new instance of the AdminAuthorizationFilter.
+     * Constructs a new instance of the AdminAuthorizationModule.
      *
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
-     * @param sessionService An instance of the SessionService.
+     * @param sessionService A Future containing an instance of the SessionService.
      * @param authUtilsWrapper An instance of the AuthUtilWrapper.
      */
     @Inject
-    public AdminAuthorizationFilter(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
-            SessionService sessionService, AuthUtilsWrapper authUtilsWrapper) {
+    public AdminAuthorizationModule(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
+            Config<SessionService> sessionService, AuthUtilsWrapper authUtilsWrapper) {
         this.ssoTokenFactory = ssoTokenFactory;
         this.requestUtils = requestUtils;
         this.sessionService = sessionService;
@@ -72,19 +71,17 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initialise(LoggingConfigurator configuration, AuditLogger auditLogger, DebugLogger debugLogger) {
-        this.debugLogger = debugLogger;
+    public void initialise(final JsonValue config) {
     }
 
     /**
      * Filter the request by examining the SSOToken UUID against the Admin user SSOToken.
      *
      * @param servletRequest {@inheritDoc}
-     * @param servletResponse {@inheritDoc}
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public boolean authorize(HttpServletRequest servletRequest) {
 
         // Request must contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(servletRequest);
@@ -106,11 +103,11 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
         try {
             userId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
         } catch (SSOException e) {
-            debugLogger.error("Failed to get userId", e);
+            logger.error("Failed to get userId", e);
             throw new IllegalStateException(e);
         }
 
-        return sessionService.isSuperUser(userId);
+        return sessionService.get().isSuperUser(userId);
     }
 
     /**

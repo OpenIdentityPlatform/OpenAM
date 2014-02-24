@@ -17,10 +17,8 @@
 package org.forgerock.openam.authz.filter;
 
 import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.authz.AuthZFilter;
-import org.forgerock.authz.AuthorizationConfigurator;
-import org.forgerock.authz.AuthorizationFilter;
+import org.forgerock.authz.AuthorizationLoggingConfigurator;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -216,7 +214,7 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
-        assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"), AdminAuthzClass.class.getName());
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"), AdminAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
 
@@ -247,7 +245,7 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
-        assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
                 PassthrouhgAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
@@ -279,7 +277,7 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
-        assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
                 PassthrouhgAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
@@ -311,7 +309,7 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
-        assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
                 PassthrouhgAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
@@ -357,32 +355,16 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
     }
 
-    static final class AdminAuthzClass implements AuthorizationConfigurator {
+    static final class AdminAuthzClass implements AuthorizationLoggingConfigurator {
 
-        public AuthorizationFilter getAuthorizationFilter() {
-            return null;
-        }
-
-        public DebugLogger getDebugLogger() {
-            return null;
-        }
-
-        public AuditLogger getAuditLogger() {
+        public AuditLogger<HttpServletRequest> getAuditLogger() {
             return null;
         }
     }
 
-    static final class PassthrouhgAuthzClass implements AuthorizationConfigurator {
+    static final class PassthrouhgAuthzClass implements AuthorizationLoggingConfigurator {
 
-        public AuthorizationFilter getAuthorizationFilter() {
-            return null;
-        }
-
-        public DebugLogger getDebugLogger() {
-            return null;
-        }
-
-        public AuditLogger getAuditLogger() {
+        public AuditLogger<HttpServletRequest> getAuditLogger() {
             return null;
         }
     }

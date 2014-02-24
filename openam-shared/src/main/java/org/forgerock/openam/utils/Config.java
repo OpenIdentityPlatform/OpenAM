@@ -11,28 +11,29 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter.session;
-
-import org.forgerock.authz.AuthorizationFilter;
-import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
-import org.forgerock.guice.core.InjectorHolder;
+package org.forgerock.openam.utils;
 
 /**
- * AuthZConfigurator sub-type which will get the Authorization Filter for the REST Session Resource.
+ * Simple interface class for lazily retrieving configuration objects.
  *
- * @author Phill Cunnington
- * @since 10.2.0
+ * @since 12.0.0
  */
-public class SessionResourceAuthZConfigurator extends AuthZConfigurator {
+public interface Config<T> {
 
     /**
-     * {@inheritDoc}
+     * Returns true if the config is ready.
+     *
+     * @return If this config is ready.
      */
-    @Override
-    public AuthorizationFilter getAuthorizationFilter() {
-        return InjectorHolder.getInstance(SessionResourceAuthzFilter.class);
-    }
+    boolean isReady();
+
+    /**
+     * Retrieves the config.
+     *
+     * @return The config object.
+     */
+    T get();
 }

@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter;
+package org.forgerock.openam.authz.filter.session;
 
 import org.forgerock.authz.AuthorizationModule;
 import org.forgerock.authz.AuthorizationModuleConfigurator;
@@ -22,17 +22,17 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 
 /**
- * Implementation of the AM authorization configurator for the NOP Logging Only AuthorizationFilter implementation.
+ * AuthZConfigurator sub-type which will get the Authorization Filter for the REST Session Resource.
  *
  * @since 10.2.0
  */
-public class PassThroughAuthorizationConfigurator implements AuthorizationModuleConfigurator {
+public class SessionResourceAuthorizationConfigurator implements AuthorizationModuleConfigurator {
 
     /**
-     * @return An instance of the PassThroughAuthorizationConfigurator.
+     * @return An instance of the SessionResourceAuthorizationConfigurator.
      */
     public static AuthorizationModuleConfigurator getModuleConfigurator() {
-        return new PassThroughAuthorizationConfigurator();
+        return new SessionResourceAuthorizationConfigurator();
     }
 
     /**
@@ -40,7 +40,7 @@ public class PassThroughAuthorizationConfigurator implements AuthorizationModule
      */
     @Override
     public AuthorizationModule getModule() {
-        return InjectorHolder.getInstance(PassThroughAuthorizationModule.class);
+        return InjectorHolder.getInstance(SessionResourceAuthorizationModule.class);
     }
 
     /**

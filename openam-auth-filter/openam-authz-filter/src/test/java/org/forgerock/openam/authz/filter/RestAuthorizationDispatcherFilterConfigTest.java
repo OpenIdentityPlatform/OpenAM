@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
@@ -75,7 +75,7 @@ public class RestAuthorizationDispatcherFilterConfigTest {
         given(wrappedFilterConfig.getInitParameter("other")).willReturn("OTHER");
 
         //When
-        String initParam = filterConfig.getInitParameter("configurator");
+        String initParam = filterConfig.getInitParameter("module-configurator-factory-class");
 
         //Then
         assertEquals(initParam, authzConfiguratorClassName);
@@ -105,6 +105,6 @@ public class RestAuthorizationDispatcherFilterConfigTest {
 
         //Then
         verify(wrappedFilterConfig).getInitParameterNames();
-        assertEquals(initParameterNames.nextElement(), "configurator");
+        assertEquals(initParameterNames.nextElement(), "module-configurator-factory-class");
     }
 }

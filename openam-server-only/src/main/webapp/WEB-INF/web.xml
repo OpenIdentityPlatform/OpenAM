@@ -63,28 +63,40 @@
     </filter>
 
     <filter>
-        <filter-name>SessionAuthorizationFilter</filter-name>
+        <filter-name>SessionAuthorizationModule</filter-name>
         <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
         <init-param>
-            <param-name>configurator</param-name>
-            <param-value>org.forgerock.openam.authz.filter.session.SessionResourceAuthZConfigurator</param-value>
+            <param-name>logging-configurator-factory-class</param-name>
+            <param-value>org.forgerock.openam.authz.filter.configuration.AuthZConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>module-configurator-factory-class</param-name>
+            <param-value>org.forgerock.openam.authz.filter.session.SessionResourceAuthorizationConfigurator</param-value>
         </init-param>
     </filter>
 
     <filter>
-        <filter-name>AdminOnlyFilter</filter-name>
+        <filter-name>AdminOnlyAuthorizationModule</filter-name>
         <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
         <init-param>
-            <param-name>configurator</param-name>
+            <param-name>logging-configurator-factory-class</param-name>
+            <param-value>org.forgerock.openam.authz.filter.configuration.AuthZConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>module-configurator-factory-class</param-name>
             <param-value>org.forgerock.openam.authz.filter.AdminAuthorizationConfigurator</param-value>
         </init-param>
     </filter>
 
     <filter>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
+        <filter-name>PassThroughAuthorizationModule</filter-name>
         <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
         <init-param>
-            <param-name>configurator</param-name>
+            <param-name>logging-configurator-factory-class</param-name>
+            <param-value>org.forgerock.openam.authz.filter.configuration.AuthZConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>module-configurator-factory-class</param-name>
             <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
         </init-param>
     </filter>
@@ -92,6 +104,10 @@
     <filter>
         <filter-name>RestAuthorizationDispatcherFilter</filter-name>
         <filter-class>org.forgerock.openam.authz.filter.RestAuthorizationDispatcherFilter</filter-class>
+        <init-param>
+            <param-name>logging-configurator-factory-class</param-name>
+            <param-value>org.forgerock.openam.authz.filter.configuration.AuthZConfigurator</param-value>
+        </init-param>
         <init-param>
             <param-name>realmsAuthzConfigurator</param-name>
             <param-value>org.forgerock.openam.authz.filter.AdminAuthorizationConfigurator</param-value>
@@ -147,19 +163,19 @@
         <url-pattern>/json/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>SessionAuthorizationFilter</filter-name>
+        <filter-name>SessionAuthorizationModule</filter-name>
         <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>AdminOnlyFilter</filter-name>
+        <filter-name>AdminOnlyAuthorizationModule</filter-name>
         <url-pattern>/json/tokens/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
+        <filter-name>PassThroughAuthorizationModule</filter-name>
         <url-pattern>/json/dashboard/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
+        <filter-name>PassThroughAuthorizationModule</filter-name>
         <url-pattern>/json/serverinfo/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
@@ -167,11 +183,11 @@
         <url-pattern>/frrest/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>AdminOnlyFilter</filter-name>
+        <filter-name>AdminOnlyAuthorizationModule</filter-name>
         <url-pattern>/frrest/oauth2/client/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
+        <filter-name>PassThroughAuthorizationModule</filter-name>
         <url-pattern>/frrest/oauth2/token/*</url-pattern>
     </filter-mapping>
 

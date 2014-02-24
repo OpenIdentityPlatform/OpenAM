@@ -18,26 +18,48 @@ package org.forgerock.openam.auth.shared;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.utils.Config;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Responsible for defining the mappings needed by the OpenAM Auth Filter module.
  */
 @GuiceModule
 public class AuthFilterGuiceModule extends AbstractModule {
+
+    private static final String SSO_TOKEN_COOKIE_NAME_PROPERTY = "com.iplanet.am.cookie.name";
+
     @Override
     protected void configure() {
         bind(String.class)
                 .annotatedWith(Names.named(AuthnRequestUtils.SSOTOKEN_COOKIE_NAME))
                 .toProvider(new Provider<String>() {
                     public String get() {
-                        return SystemProperties.get("com.iplanet.am.cookie.name");
+                        return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
                     }
                 });
+        bind(new TypeLiteral<Config<String>>() {})
+                .annotatedWith(Names.named(AuthnRequestUtils.ASYNC_SSOTOKEN_COOKIE_NAME))
+                .toInstance(new Config<String>() {
+
+            public boolean isReady() {
+                return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY) != null;
+            }
+
+            public String get() {
+                return SystemProperties.get(SSO_TOKEN_COOKIE_NAME_PROPERTY);
+            }
+        });
         bind(SSOTokenManager.class)
                  .toProvider(new Provider<SSOTokenManager>() {
             public SSOTokenManager get() {

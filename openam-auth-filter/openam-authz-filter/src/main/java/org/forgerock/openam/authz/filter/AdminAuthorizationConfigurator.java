@@ -16,23 +16,38 @@
 
 package org.forgerock.openam.authz.filter;
 
-import org.forgerock.authz.AuthorizationFilter;
-import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
+import org.forgerock.authz.AuthorizationModule;
+import org.forgerock.authz.AuthorizationModuleConfigurator;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.fluent.JsonValue;
 
 /**
  * Implementation of the AM authorization configurator for the Admin Only AuthorizationFilter implementation.
  *
- * @author Phill Cunnington
  * @since 10.2.0
  */
-public class AdminAuthorizationConfigurator extends AuthZConfigurator {
+public class AdminAuthorizationConfigurator implements AuthorizationModuleConfigurator {
+
+    /**
+     * @return An instance of the AdminAuthorizationConfigurator.
+     */
+    public static AuthorizationModuleConfigurator getModuleConfigurator() {
+        return new AdminAuthorizationConfigurator();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationFilter getAuthorizationFilter() {
-        return InjectorHolder.getInstance(AdminAuthorizationFilter.class);
+    public AuthorizationModule getModule() {
+        return InjectorHolder.getInstance(AdminAuthorizationModule.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonValue getConfiguration() {
+        return JsonValue.json(JsonValue.object());
     }
 }

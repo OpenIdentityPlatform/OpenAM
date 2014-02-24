@@ -49,6 +49,10 @@
             <artifactId>forgerock-jaspi-runtime</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-auth-filter-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-authn-filter-modules</artifactId>
         </dependency>

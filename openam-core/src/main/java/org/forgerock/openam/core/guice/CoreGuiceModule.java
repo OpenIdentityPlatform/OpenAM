@@ -63,6 +63,7 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.utils.Config;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
@@ -169,6 +170,17 @@ public class CoreGuiceModule extends AbstractModule {
                 return SessionService.getSessionService();
             }
         }).in(Singleton.class);
+        bind(new TypeLiteral<Config<SessionService>>() {}).toInstance(new Config<SessionService>() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public SessionService get() {
+                return SessionService.getSessionService();
+            }
+        });
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));

@@ -40,12 +40,11 @@ import java.io.IOException;
  * Because of this this class contains the mapping logic for the type of resource to the authroization to be applied to
  * it.
  *
- * @author Phill Cunnington
  * @since 12.0.0
  */
 public class RestAuthorizationDispatcherFilter implements Filter {
 
-    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+    private static final Debug DEBUG = Debug.getInstance(RestAuthorizationDispatcherFilter.class.getName());
 
     private static final String INIT_PARAM_REALMS_AUTHZ_CONFIGURATOR = "realmsAuthzConfigurator";
     private static final String INIT_PARAM_USERS_AUTHZ_CONFIGURATOR = "usersAuthzConfigurator";

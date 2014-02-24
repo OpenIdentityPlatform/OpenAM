@@ -11,48 +11,47 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.DebugLogger;
-import org.forgerock.auth.common.LoggingConfigurator;
-import org.forgerock.authz.AuthorizationFilter;
+import org.forgerock.authz.AuthorizationModule;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Responsible for merely logging the request with the requests token id, if present, and not applying any
  * authorization to the request, just letting it pass through to the resource.
  *
- * @author Phill Cunnington
  * @since 10.2.0
  */
 @Singleton
-public class PassThroughAuthorizationFilter implements AuthorizationFilter {
+public class PassThroughAuthorizationModule implements AuthorizationModule {
+
+    private final Logger logger = LoggerFactory.getLogger(PassThroughAuthorizationModule.class);
 
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
 
-    private DebugLogger debugLogger;
 
     /**
-     * Constructs a new instance of the PassThroughAuthorizationFilter.
+     * Constructs a new instance of the PassThroughAuthorizationModule.
      *
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
      */
     @Inject
-    public PassThroughAuthorizationFilter(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils) {
+    public PassThroughAuthorizationModule(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils) {
         this.ssoTokenFactory = ssoTokenFactory;
         this.requestUtils = requestUtils;
     }
@@ -61,8 +60,7 @@ public class PassThroughAuthorizationFilter implements AuthorizationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initialise(LoggingConfigurator loggingConfigurator, AuditLogger auditLogger, DebugLogger debugLogger) {
-        this.debugLogger = debugLogger;
+    public void initialise(final JsonValue config) {
     }
 
     /**
@@ -70,43 +68,44 @@ public class PassThroughAuthorizationFilter implements AuthorizationFilter {
      * the user/client making the request to log the request.
      *
      * @param request {@inheritDoc}
-     * @param response {@inheritDoc}
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest request, HttpServletResponse response) {
+    public boolean authorize(HttpServletRequest request) {
 
         // Request MAY contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(request);
         if (tokenId == null) {
-            debugLogger.debug("Request made without TokenID");
+            logger.debug("Request made without TokenID");
         }
 
-        String authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter, "
-                + "with unauthenticated user. Letting request through.";
+        String authorizationDebugMessage = "%s Accessed using PassThroughAuthorizationModule, with unauthenticated "
+                + "user. Letting request through.";
+        String[] authorizationDebugMessageParams = new String[]{request.getRequestURI()};
 
         if (tokenId != null) {
             // Must generate a valid SSOToken from this TokenID.
             SSOToken token = ssoTokenFactory.getTokenFromId(tokenId);
             if (token == null) {
-                debugLogger.debug(request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter, with "
-                        + tokenId + ", but failed to get SSOToken for it. Letting request through.");
+                logger.debug("%s Accessed using PassThroughAuthorizationModule, with %s, but failed to get SSOToken "
+                        + "for it. Letting request through.", request.getRequestURI(), tokenId);
                 return true;
             }
 
             try {
                 String name = token.getPrincipal().getName();
                 String realm = token.getProperty("Organization");
-                authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter "
-                        + "by user, " + name + " on realm, " + realm + " with token, " + token.getTokenID()
-                        + ". Letting request through.";
+                authorizationDebugMessage = "%s Accessed using PassThroughAuthorizationModule by user, %s on realm, "
+                        + "%s with token, %s. Letting request through.";
+                authorizationDebugMessageParams = new String[]{request.getRequestURI(), name, realm,
+                        token.getTokenID().toString()};
             } catch (SSOException e) {
-                debugLogger.error("Error getting AMIdentity for token. Not letting request through.", e);
+                logger.error("Error getting AMIdentity for token. Not letting request through.", e);
                 return false;
             }
         }
 
-        debugLogger.debug(authorizationDebugMessage);
+        logger.debug(authorizationDebugMessage, authorizationDebugMessageParams);
 
         return true;
     }

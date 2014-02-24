@@ -17,9 +17,7 @@
 package org.forgerock.openam.authz.filter.configuration;
 
 import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.DebugLogger;
-import org.forgerock.authz.AuthorizationConfigurator;
-import org.forgerock.openam.auth.shared.AuthDebugLogger;
+import org.forgerock.authz.AuthorizationLoggingConfigurator;
 import org.forgerock.guice.core.InjectorHolder;
 
 /**
@@ -28,14 +26,13 @@ import org.forgerock.guice.core.InjectorHolder;
  *
  * @since 10.2.0
  */
-public abstract class AuthZConfigurator implements AuthorizationConfigurator {
+public class AuthZConfigurator implements AuthorizationLoggingConfigurator {
 
     /**
-     * {@inheritDoc}
+     * @return An instance of the AuthZConfigurator.
      */
-    @Override
-    public DebugLogger getDebugLogger() {
-        return new AuthDebugLogger("restAuthorizationFilter");
+    public static AuthorizationLoggingConfigurator getLoggingConfigurator() {
+        return new AuthZConfigurator();
     }
 
     /**

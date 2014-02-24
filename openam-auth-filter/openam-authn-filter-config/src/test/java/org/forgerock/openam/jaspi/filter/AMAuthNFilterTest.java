@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.jaspi.filter;
 
+import org.forgerock.auth.common.FilterConfiguration;
 import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.jaspi.runtime.config.inject.RuntimeInjector;
-import org.forgerock.jaspi.utils.FilterConfiguration;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,7 +47,6 @@ public class AMAuthNFilterTest {
 
     @BeforeMethod
     public void setUp() throws AuthException, ServletException {
-
 
         FilterConfiguration filterConfiguration = mock(FilterConfiguration.class);
         RuntimeInjector runtimeInjector = mock(RuntimeInjector.class);

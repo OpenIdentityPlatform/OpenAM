@@ -20,34 +20,32 @@ import com.iplanet.dpro.session.service.SessionService;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
-import org.forgerock.openam.authz.filter.AdminAuthorizationFilter;
+import org.forgerock.openam.authz.filter.AdminAuthorizationModule;
+import org.forgerock.openam.utils.Config;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
  * Extends the Admin Only Authorization Filter to provide an exception case to the ?_action=logout on the
  * SessionResource. As otherwise only admins could logout.
- *
- * @author Phill Cunnington
  */
 @Singleton
-public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
+public class SessionResourceAuthorizationModule extends AdminAuthorizationModule {
 
     /**
-     * Constructs a new instance of the SessionResourceAuthzFilter.
+     * Constructs a new instance of the SessionResourceAuthorizationModule.
      *
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
-     * @param sessionService An instance of the SessionService.
+     * @param sessionService A Future containing an instance of the SessionService.
      * @param authUtilsWrapper An instance of the AuthUtilWrapper.
      */
     @Inject
-    public SessionResourceAuthzFilter(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
-            SessionService sessionService, AuthUtilsWrapper authUtilsWrapper) {
+    public SessionResourceAuthorizationModule(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
+            Config<SessionService> sessionService, AuthUtilsWrapper authUtilsWrapper) {
         super(ssoTokenFactory, requestUtils, sessionService, authUtilsWrapper);
     }
 
@@ -55,11 +53,10 @@ public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
      * Overridden to allow access through to the logout action to any user.
      *
      * @param servletRequest {@inheritDoc}
-     * @param servletResponse {@inheritDoc}
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public boolean authorize(HttpServletRequest servletRequest) {
 
         if (servletRequest != null) {
             Map<String, String[]> parameterMap = servletRequest.getParameterMap();
@@ -71,6 +68,6 @@ public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
             }
         }
 
-        return super.authorize(servletRequest, servletResponse);
+        return super.authorize(servletRequest);
     }
 }
