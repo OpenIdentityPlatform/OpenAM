@@ -83,7 +83,8 @@ define("UserDelegate", [
     };
     
     obj.updateUser = function(oldUserData, realm, objectParam, successCallback, errorCallback) {
-        var headers = {};
+        var headers = {}, 
+            picked = _.pick(objectParam, ["givenname","sn","mail","postaladdress","telephonenumber","userpassword"]);
         
         if(objectParam._rev) {
             headers["If-Match"] = '"' + objectParam._rev + '"';
@@ -99,7 +100,7 @@ define("UserDelegate", [
             type: "PUT",
             success: successCallback, 
             error: errorCallback, 
-            data: JSON.stringify(_.pick(objectParam, ["givenname","sn","mail","postaladdress","telephonenumber","userpassword"])),
+            data: JSON.stringify(picked, function(key, value) { return value === "" ? [] : value }),
             headers: headers
         });
 
