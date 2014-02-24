@@ -896,52 +896,116 @@
   
   <section xml:id="anon-module-conf-hints">
    <title>Hints For the Anonymous Authentication Module</title>
-   <para>This module lets you track and manage anonymous users, perhaps
-   forcing further authentication later when a user moves to access resources
-   that require more protection.</para>
+    <para>This module lets you configure and track anonymous users, who can log in
+     to your application or web site without login credentials.
+     Typically, you would provide such users with very limited access,
+     for example, an anonymous user may have access to public downloads on your site.
+     When the user attempts to access resources that require more protection,
+     the module can force further authentication for those resources.</para>
+
+     <para>You can configure the Anonymous Authentication Module
+      by specifying the <command>ssoadm</command> service name and Anonymous
+      Authentication realm attributes: Valid Anonymous Users, Default User Name,
+      Case Sensitive User IDs, and Authentication Level.
+     </para>
+      <para><command>ssoadm</command> service name:
+          <literal>iPlanetAMAuthAnonymousService</literal></para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>Anonymous</secondary>
    </indexterm>
-   
-   <para><command>ssoadm</command> service name:
-   <literal>iPlanetAMAuthAnonymousService</literal></para>
-   
+
+
    <variablelist>
     <varlistentry>
      <term>Valid Anonymous Users</term>
      <listitem>
-      <para>Specifies valid anonymous user IDs in addition to the default.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-anonymous-users-list</literal></para>
+      <para>Specifies the list of valid anonymous user IDs that can log in without
+       submitting a password.</para>
+
+       <para><command>ssoadm</command> attribute:
+        <literal>iplanet-am-auth-anonymous-users-list</literal></para>
+
+       <para>When user accesses the default module instance login URL, then the
+        module prompts the user to enter a valid anonymous user name.</para>
+
+        <para>The default module instance login URL is defined as follows:</para>
+
+        <literallayout class="monospaced">protocol://hostname:port/deploy_URI/UI/Login?module=Anonymous&amp;org=org_name</literallayout>
+
+        <para>Next, OpenAM checks that the user ID is a valid anonymous user name.
+        If the valid anonymous user ID exists in the list, the user is granted access to
+        the application and the session is assigned to the user.
+        The valid user can bypass the Login page at the following URL:</para>
+
+<literallayout class="monospaced">protocol://hostname:port/deploy_URI/UI/Login?module=Anonymous&amp;org=org_name&amp;
+IDToken1=&lt;valid anonymous username&gt;</literallayout>
+
+      <para>If the valid anonymous user ID does not exist in the list,
+       the user will be authenticated as the Default Anonymous User Name (see below).</para>
+
      </listitem>
     </varlistentry>
+
     <varlistentry>
      <term>Default Anonymous User Name</term>
      <listitem>
       <para>Specifies the user ID assigned by the module if the Valid
-      Anonymous Users list is empty. Default: <literal>anonymous</literal></para>
+      Anonymous Users list is empty. The default value is <literal>anonymous</literal>.
+      Note that the anonymous user must be defined in the realm.</para>
+
+<literallayout class="monospaced">protocol://hostname:port/deploy_URI/UI/Login?module=Anonymous&amp;org=orgName
+&amp;IDToken1=&lt;Default Anonymous User Name&gt;</literallayout>
+
+       <para>For example, the user can bypass the Login page by accessing the URL
+        as the default anonymous user using the value of <literal>anonymous</literal>:</para>
+<literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?module=Anonymous&amp;org=example.com
+&amp;IDToken1=anonymous</literallayout>
+
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-anonymous-default-user-name</literal></para>
+       <literal>iplanet-am-auth-anonymous-default-user-name</literal></para>
+
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Case Sensitive User IDs</term>
      <listitem>
       <para>Determines whether case matters for anonymous user IDs.</para>
+
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-anonymous-case-sensitive</literal></para>
+       <literal>iplanet-am-auth-anonymous-case-sensitive</literal></para>
+
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
       <para>Sets the authentication level used to indicate the level of security
-      associated with the module. The value can range from 0 to any positive integer.</para>
+      associated with the module. The value can range from 0 (default) to any
+      positive integer and is set for each authentication method.
+      The higher number corresponds to a higher level of authentication.
+      If you configured your authentication levels from a 0 to 5 scale, then an
+      authentication level of 5 will require the highest level of authentication.</para>
+
+      <para>After a user has authenticated, OpenAM stores the authentication level in
+      the session token.
+      When the user attempts to access a protected resource, the token is
+      presented to the application.
+      The application uses the token's value to determine if the user has the
+      correct authentication level required to access the resource.
+      If the user does not have the required authentication level,
+      the application can prompt the user to authenticate with a higher
+      authentication level. </para>
+
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-anonymous-auth-level</literal></para></listitem>
+       <literal>iplanet-am-auth-anonymous-auth-level</literal></para>
+     </listitem>
     </varlistentry>
+
    </variablelist>
+      <note><para>You can configure the Anonymous Authentication Module using the
+          OpenAM Console by clicking <literal>Configuration</literal> &gt;
+          <literal>Authentication</literal> &gt; <literal>Anonymous</literal>.</para></note>
   </section>
   
   <section xml:id="cert-module-conf-hints">
