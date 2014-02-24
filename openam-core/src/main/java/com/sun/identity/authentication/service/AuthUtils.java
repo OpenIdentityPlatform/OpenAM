@@ -31,6 +31,8 @@
  */
 package com.sun.identity.authentication.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 import java.util.Map;
@@ -2061,6 +2063,22 @@ public class AuthUtils extends AuthClientUtils {
                 gotoUrl = getBase64DecodedValue(gotoUrl);	 
             }	 
 	 
+            try {
+                URI uri = new URI(gotoUrl);
+                //relative path doesn't need to be compared
+                //against goto valid domain list
+                if (!uri.isAbsolute()) {
+                    return gotoUrl;
+                }
+            } catch (URISyntaxException urise) {
+                //gotoUrl violates RFC 2396
+                if (utilDebug.messageEnabled()) {
+                    utilDebug.message("AuthUtils.getValidGotoURL(): Original goto" 
+                        + " URL is " + gotoUrl + " which is invalid", urise);
+                }
+                return null;
+            }
+
             AuthD authD = AuthD.getAuth();	 
             if (!authD.isGotoUrlValid(gotoUrl, orgDN)) {
                 if (utilDebug.messageEnabled()) {
