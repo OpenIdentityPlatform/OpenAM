@@ -649,6 +649,14 @@
             <artifactId>freemarker</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+        </dependency>
         <!-- XML -->
         <!-- Xerces-J Required for fedlet -->
         <dependency>
