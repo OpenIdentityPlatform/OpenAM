@@ -55,10 +55,10 @@ public class LicenseTest {
         License license = new License(filename, licenseText);
 
         // When
-        String result = license.toString();
+        String result = license.getLicenseText();
 
         // Then
-        assertEquals(result, filename + ": " + licenseText);
+        assertEquals(result, licenseText);
     }
 
     @Test
@@ -151,5 +151,17 @@ public class LicenseTest {
 
         // Then
         assertEquals(filename, licenseFilename);
+    }
+
+    @Test
+    public void shouldCopyLicensesCorrectly() {
+        // Given
+        License original = new License("aaa", "bbb");
+
+        // When
+        License copy = new License(original);
+
+        // Then
+        assertEquals(copy, original);
     }
 }

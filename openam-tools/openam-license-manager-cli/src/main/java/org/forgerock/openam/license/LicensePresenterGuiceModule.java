@@ -28,6 +28,7 @@ public class LicensePresenterGuiceModule extends AbstractModule {
     protected void configure() {
         bind(LicensePresenter.class).to(CLILicensePresenter.class);
         bind(LicenseLocator.class).to(CLIPresenterClasspathLicenseLocator.class);
+        bind(User.class).to(ConsoleUser.class);
     }
 
 }

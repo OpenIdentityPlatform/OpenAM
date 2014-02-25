@@ -14,31 +14,26 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  */
 
-package org.forgerock.openam.license;
+package org.forgerock.openam.install.tools.logs;
 
 /**
- * Indicates that a license file could not be found by the license locator. This is a deployment/packaging error.
+ * Abstracts over the debug logging framework used by the installer, to allow easier unit testing.
+ * Note: eventually this should be replaced throughout the installer by slf4j.
  *
  * @since 12.0.0
  */
-public class MissingLicenseException extends IllegalStateException {
-    private final String licenseName;
+public interface DebugLog {
     /**
-     * Initialises the exception reporting that the given named license could not be found.
+     * Adds a message to the installation debug log.
      *
-     * @param licenseName the name of the license or license file that could not be found.
+     * @param message the message to add to the log.
      */
-    public MissingLicenseException(String licenseName) {
-        super("A required license could not be found: " + licenseName);
-        this.licenseName = licenseName;
-    }
+    void log(String message);
 
     /**
-     * Returns the name of the license that was rejected by the user.
-     *
-     * @return the rejected license name.
+     * Adds a message and a stack trace to the debug log.
+     * @param message the message to add to the log.
+     * @param ex the exception to log the stack trace for.
      */
-    public String getLicenseName() {
-        return licenseName;
-    }
+    void log(String message, Throwable ex);
 }

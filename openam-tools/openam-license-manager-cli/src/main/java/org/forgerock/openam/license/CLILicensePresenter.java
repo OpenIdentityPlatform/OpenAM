@@ -17,8 +17,6 @@
 package org.forgerock.openam.license;
 
 import com.google.inject.Inject;
-import java.io.IOException;
-import java.util.ResourceBundle;
 
 /**
  *
@@ -40,24 +38,20 @@ import java.util.ResourceBundle;
 public class CLILicensePresenter implements LicensePresenter {
 
     private final LicenseLocator licenseModule;
-    private final UserInput userInput;
+    private final User user;
 
     private static final String YES = "yes";
-
-    //properties
-    private static final String LICENSE_PROPERTIES = "LicensePresenter";
-    private final ResourceBundle rb = ResourceBundle.getBundle(LICENSE_PROPERTIES);
 
     /**
      * Injected Constructor
      *
      * @param licenseModule From which to draw the licenses
-     * @param userInput From which to draw user CLI input
+     * @param user From which to draw user CLI input
      */
     @Inject
-    public CLILicensePresenter(LicenseLocator licenseModule, UserInput userInput) {
+    public CLILicensePresenter(LicenseLocator licenseModule, User user) {
         this.licenseModule = licenseModule;
-        this.userInput = userInput;
+        this.user = user;
     }
 
     /**
@@ -83,15 +77,10 @@ public class CLILicensePresenter implements LicensePresenter {
                     continue;
                 }
 
-                String licenseText = license.toString();
-                System.out.println("\n" + licenseText);
+                user.show(""); // Blank line
+                user.show(license.getLicenseText());
 
-                String input = null;
-                try {
-                    input = userInput.getUserInput(rb.getString("prompt"));
-                } catch (IOException e) {
-                    license.reject();
-                }
+                String input = user.ask("prompt");
 
                 if (input != null && YES.startsWith(input.toLowerCase())) {
                     license.accept();
@@ -106,7 +95,7 @@ public class CLILicensePresenter implements LicensePresenter {
      * Returns a String to be displayed to the user in the event they require a prompt.
      */
     public String getNotice() {
-        return rb.getString("notice");
+        return user.getMessage("notice");
     }
 
 }

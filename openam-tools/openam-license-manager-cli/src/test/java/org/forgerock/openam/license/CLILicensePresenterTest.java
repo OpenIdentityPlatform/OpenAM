@@ -16,11 +16,9 @@
 
 package org.forgerock.openam.license;
 
-import java.io.ByteArrayInputStream;
-import java.io.PrintStream;
 import java.util.Arrays;
 import static org.mockito.BDDMockito.given;
-import org.mockito.Mockito;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertFalse;
@@ -30,19 +28,19 @@ import org.testng.annotations.Test;
 public class CLILicensePresenterTest {
 
     private final LicenseLocator locator = mock(LicenseLocator.class);
-    private final PrintStream out = Mockito.mock(PrintStream.class);
+    private User user;
 
     @BeforeMethod
     public void setup() {
         LicenseSet licenseSet = new LicenseSet(Arrays.asList(new License("...", "Fake License")));
         given(locator.getRequiredLicenses()).willReturn(licenseSet);
+        user = mock(User.class);
     }
 
     @Test
     public void acceptLicensesWhenPreAccepted() {
         //given
-        UserInput userInput = new UserInput(out, System.in);
-        LicensePresenter manager = new CLILicensePresenter(locator, userInput);
+        LicensePresenter manager = new CLILicensePresenter(locator, user);
 
         boolean error = false;
 
@@ -59,10 +57,9 @@ public class CLILicensePresenterTest {
 
     @Test
     public void acceptLicensesWhenUserInput() {
-        //give
-        ByteArrayInputStream in = new ByteArrayInputStream("yes".getBytes());
-        UserInput userInput = new UserInput(out, in);
-        LicensePresenter manager = new CLILicensePresenter(locator, userInput);
+        //given
+        given(user.ask(anyString())).willReturn("y");
+        LicensePresenter manager = new CLILicensePresenter(locator, user);
 
         boolean error = false;
 
@@ -80,9 +77,8 @@ public class CLILicensePresenterTest {
     @Test
     public void presentLicensesErrorsWhenNotAcceptLicense() {
         //given
-        ByteArrayInputStream in = new ByteArrayInputStream("no".getBytes());
-        UserInput userInput = new UserInput(out, in);
-        LicensePresenter manager = new CLILicensePresenter(locator, userInput);
+        given(user.ask(anyString())).willReturn("no");
+        LicensePresenter manager = new CLILicensePresenter(locator, user);
 
         boolean error = false;
 

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.install.tools.admin;
 
@@ -41,6 +41,8 @@ import com.sun.identity.install.tools.util.Console;
 import com.sun.identity.install.tools.util.Debug;
 import com.sun.identity.install.tools.util.LocalizedMessage;
 import com.sun.identity.install.tools.util.ConfigUtil;
+import org.forgerock.guice.core.InjectorHolder;
+
 import java.util.List;
 
 public class AdminTool implements IAdminTool {
@@ -115,7 +117,7 @@ public class AdminTool implements IAdminTool {
             boolean licenseAccepted = false;
             try {
                 if (licenseRequired) {
-                    LicenseChecker lc = new LicenseChecker();
+                    LicenseChecker lc = InjectorHolder.getInstance(LicenseChecker.class);
                     licenseAccepted = lc.checkLicenseAcceptance();
                 } else {
                     Debug.log("AdminTool.run(): Skipping license check");

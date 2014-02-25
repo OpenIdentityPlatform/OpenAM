@@ -59,6 +59,15 @@ public class License implements Serializable {
     }
 
     /**
+     * Constructs a license by copying the given license.
+     *
+     * @param toCopy the license to copy.
+     */
+    public License(License toCopy) {
+        this(toCopy.getFilename(), toCopy.getLicenseText());
+    }
+
+    /**
      * Returns true if the user has accepted the license.
      *
      * @return true if the license has been accepted.
@@ -91,6 +100,15 @@ public class License implements Serializable {
      */
     public String getFilename() {
         return filename;
+    }
+
+    /**
+     * Returns the full text of the license.
+     *
+     * @return the full text of the license.
+     */
+    public String getLicenseText() {
+        return text;
     }
 
     /**
