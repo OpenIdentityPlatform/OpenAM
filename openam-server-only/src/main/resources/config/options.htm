@@ -50,11 +50,16 @@
             YAHOO.util.Dom.removeClass('upgrade', 'license-accepted'); 
             document.getElementById("upgrade-accept-check").checked = false;
             document.getElementById("upgrade-accept-license-button").disabled = true;
+            window.location.hash = '';
         });
         YAHOO.sun.identity.config.options.upgrade.renderEvent.subscribe(function() {
             $("upgrade-license-message").innerHTML = licenseTXT;
             YAHOO.util.Dom.removeClass('upgradeLink', 'disabled'); 
             YAHOO.util.Event.addListener("upgradeLink", "click", showUpgradePanel );
+        });
+
+        YAHOO.sun.identity.config.options.upgrade.showEvent.subscribe(function() {
+            window.location.hash = '#upgrade-license-message';
         });
 
         YAHOO.sun.identity.config.options.upgrade.render();
@@ -126,11 +131,15 @@
             YAHOO.util.Dom.removeClass('defaultSummary', 'license-accepted'); 
             document.getElementById("accept-check").checked = false;
             document.getElementById("acceptLicenseButton").disabled = true;
+            window.location.hash = '';
         });
         YAHOO.sun.identity.config.options.defaultSummary.renderEvent.subscribe(function() {
             $("license-message").innerHTML = licenseTXT;
             YAHOO.util.Dom.removeClass('DemoConfiguration', 'disabled'); 
             YAHOO.util.Event.addListener("DemoConfiguration", "click", setOptionOne );
+        });
+        YAHOO.sun.identity.config.options.defaultSummary.showEvent.subscribe(function() {
+            window.location.hash = '#license-message';  
         });
         YAHOO.sun.identity.config.options.defaultSummary.render();
         YAHOO.sun.identity.config.options.defaultSummary.center();
@@ -155,11 +164,15 @@
             YAHOO.util.Dom.removeClass('wizard', 'license-accepted'); 
             document.getElementById("wizard-accept-check").checked = false;
             document.getElementById("wizard-accept-license-button").disabled = true;
+            window.location.hash = '';
         });
         YAHOO.sun.identity.config.options.wizard.renderEvent.subscribe(function() {
             $("wizard-license-message").innerHTML = licenseTXT;
             YAHOO.util.Dom.removeClass('CreateNewConf', 'disabled');
             YAHOO.util.Event.addListener("CreateNewConf", "click", setOptionTwo );
+        });
+        YAHOO.sun.identity.config.options.wizard.showEvent.subscribe(function() {
+            window.location.hash = '#wizard-license-message';  
         });
         YAHOO.sun.identity.config.options.wizard.render();
         YAHOO.sun.identity.config.options.wizard.center();
@@ -340,7 +353,7 @@
      <br>
 
                     <div id="progressDiv">
-                       <iframe id="progressIframe" name="progressIframe"  src="$context/assets/images/rel_interstitial_loading.gif" height=220 width=600 scrolling="no" frameborder="0">This browser cannot dipslay iframes.</iframe>
+                       <iframe id="progressIframe" name="progressIframe"  src="$context/assets/images/rel_interstitial_loading.gif" height=220 width=600 scrolling="no" frameborder="0">Loading...</iframe>
                     </div>
                     <br>
             <hr>

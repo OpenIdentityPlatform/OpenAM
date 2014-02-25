@@ -50,8 +50,8 @@
     <div class="license inner-license">
         <pre id="upgrade-license-message"> </pre> 
         <div class="accept-check-container clearfix">
-            <input type="checkbox" onchange="upgradeAcceptChecked();" name="upgrade-accept-check"  id="upgrade-accept-check" >
-            <label for="upgrade-accept-check">I accept the license agreement</label>
+            <input type="checkbox" onchange="upgradeAcceptChecked();" name="upgrade-accept-check"  id="upgrade-accept-check" tabindex=1/>
+            <label for="upgrade-accept-check" >I accept the license agreement</label>
         </div>
     </div>
     <div id="content" class="tabContent summary">
@@ -63,29 +63,28 @@
             $changelist
         </div>
     </div>
-    <!--    </div>-->
     <div id="upgradeFooter" style="padding-bottom: 10px" class="clearfix">
         
         <div class="col1">&nbsp;</div>
 
         <div align="left" style="float:left; margin-left: 23px" class="license">
-            <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled>Continue</button>
+            <button id="upgrade-accept-license-button" type="button" onclick="upgradeAcceptLicense();" class="buttonblue license" disabled tabindex=2>Continue</button>
         </div>   
         <div class="summary" style="float:left; margin-left: 23px" >
             <div style="float: left;" >
-                <button id="upgradeButton" type="button" onclick="doUpgrade()">$page.getLocalizedString("upgrade.button")</button>
+                <button id="upgradeButton" type="button" onclick="doUpgrade()" tabindex=3>$page.getLocalizedString("upgrade.button")</button>
             </div>
 
             <div style="float:left; margin-left: 23px">
-                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue">$page.getLocalizedString("save.report.button")</button>
+                <button id="saveReportButton" type="button" onclick="saveReport();" class="buttonblue" tabindex=4>$page.getLocalizedString("save.report.button")</button>
             </div>
             
          </div>
 
         <div style="float: right; margin-right: 23px">
-             <button id="cancelButton" type="button" onclick="cancelUpgrade();">$page.getLocalizedString("cancel.button")</button>
+             <button id="cancelButton" type="button" onclick="cancelUpgrade();" tabindex=5>$page.getLocalizedString("cancel.button")</button>
         </div>
     </div>
+
     #end
 </div>
-
