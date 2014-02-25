@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2014 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-lb'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <title>Configuring Java EE Policy Agents Behind Load Balancers</title>
+ <indexterm>
+  <primary>Load balancers</primary>
+ </indexterm>
+
+ <para>
+  This chapter addresses the question of configuring policy agents
+  on protected application servers that operate behind network load balancers.
+ </para>
+
+ <section xml:id="lb-scenarios">
+  <title>The Role of the Load Balancing Layer</title>
+
+  <para>
+   A load balancing layer that stands between clients and protected servers
+   can distribute the client load,
+   and fail client traffic over when a protected server goes offline.
+   In the simplest case, the load balancing layer passes requests
+   from the clients to servers and responses from servers to clients,
+   managing the traffic so the client experience
+   is as smooth as possible.
+  </para>
+
+  <figure xml:id="figure-lb-jee-agents">
+   <title>Load Balancing With Same Protocol and Port</title>
+
+   <mediaobject>
+    <alt>Diagram showing matching protocols and port numbers</alt>
+
+    <imageobject>
+     <imagedata fileref="images/lb-jee-agents.png" />
+    </imageobject>
+
+    <textobject>
+     <para>
+      In some deployments, the protocol scheme and port number
+      on the load balancer matches the protocol and port on the servers.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   A load balancing layer can also offload processor-intensive
+   public-key encryption algorithms involved in SSL transactions
+   to a hardware accelerator, reducing the load on the protected servers.
+   The client connects to the load balancer over HTTPS,
+   but the load balancer connects to the servers over HTTP.
+  </para>
+
+  <figure xml:id="figure-lb-jee-agents-ssl-offload">
+   <title>Load Balancing With SSL Offloading</title>
+
+   <mediaobject>
+    <alt>Diagram showing SSL offloading</alt>
+
+    <imageobject>
+     <imagedata fileref="images/lb-jee-agents-ssl-offload.png" />
+    </imageobject>
+
+    <textobject>
+     <para>
+      In some deployments, the protocol scheme and port number
+      on the load balancer differ from the protocol and port on the servers.
+     </para>
+    </textobject>
+   </mediaobject>
+  </figure>
+
+ </section>
+
+ <section xml:id="lb-configure-agent">
+  <title>Configuring the Agent Behind the Load Balancer</title>
+
+  <para>
+   Configure your agent to map the agent host name
+   to the load balancer host name,
+   and to set alternate agent URL properties.
+   Follow the steps in <xref linkend="lb-fqdn-mapping" />
+   and <xref linkend="lb-alternate-agent-url" />.
+  </para>
+
+  <procedure xml:id="lb-fqdn-mapping">
+   <title>To Map the Agent Host Name to the Load Balancer Host Name</title>
+
+   <para>
+    Follow these steps to map the agent host name to
+    the fully qualified domain name (FQDN) of the load balancer.
+   </para>
+
+   <para>
+    This procedure explains how to do so
+    for a centralized Java EE policy agent profile configured in OpenAM Console.
+    The steps also mention the properties for
+    Java EE agent profiles that rely on local, file-based configurations.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as an administrative user
+     with rights to modify the policy agent profile.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Browse to Access Control > <replaceable>Realm Name</replaceable>
+     > Agents > J2EE > <replaceable>Agent Name</replaceable>
+     to open the Java EE agent profile for editing.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Global tab page section Fully Qualified Domain Name Checking,
+     make sure FQDN checking is selected (the default).
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.check.enable=true</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set FQDN Default to the fully qualified domain name of the load balancer,
+     such as <literal>lb.example.com</literal>,
+     rather than the protected server FQDN where the policy agent is installed.
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.default=lb.example.com</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Set FQDN Virtual Host Map to map the protected server FQDN
+     to the load balancer FQDN, for example where
+     the key <literal>agent.example.com</literal> (protected server)
+     has value <literal>lb.example.com</literal> (load balancer).
+    </para>
+
+    <para>
+     The equivalent property setting is
+     <literal>com.sun.identity.agents.config.fqdn.mapping[agent.example.com]=lb.example.com</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work, and then restart the agent or the protected server.
+    </para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="lb-alternate-agent-url">
+   <title>To Set Alternate Agent URL Properties</title>
+
+   <para>
+    Use the alternate agent URL properties to show the load balancer
+    protocol, host, and port to show client browsers.
+   </para>
+
+   <para>
+    This procedure explains how to do so
+    for a centralized Java EE policy agent profile configured in OpenAM Console.
+    The steps also mention the properties for
+    Java EE agent profiles that rely on local, file-based configurations.
+   </para>
+
+   <step>
+    <para>
+     Login to OpenAM Console as an administrative user
+     with rights to modify the policy agent profile.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Browse to Access Control > <replaceable>Realm Name</replaceable>
+     > Agents > J2EE > <replaceable>Agent Name</replaceable>
+     to open the Java EE agent profile for editing.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In the Advanced tab page section Alternate Agent URL,
+     set the Alternative Agent Host Name to that of the load balancer
+     such as <literal>lb</literal>.
+    </para>
+
+    <para>
+     The equivalent property setting is similar to the following:
+     <literal>com.sun.identity.agents.config.agent.host=lb</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If the host name is different on the load balancer,
+     in the Advanced tab page section Alternate Agent URL,
+     set the Alternative Agent Port number to that of the load balancer
+     such as <literal>80</literal>.
+    </para>
+
+    <para>
+     The equivalent property setting is similar to the following:
+     <literal>com.sun.identity.agents.config.agent.port=80</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     If the protocol is different on the load balancer,
+     in the Advanced tab page section Alternate Agent URL,
+     set the Alternative Agent Protocol
+     to either <literal>http</literal> or <literal>https</literal>.
+    </para>
+
+    <para>
+     The equivalent property setting is similar to the following:
+     <literal>com.sun.identity.agents.config.agent.protocol=https</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Save your work, and then restart the agent or the protected server.
+    </para>
+   </step>
+  </procedure>
+ </section>
+</chapter>

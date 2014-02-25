@@ -28,7 +28,6 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM Java EE Policy Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</title>
@@ -75,6 +74,7 @@
  <xinclude:include href='chap-weblogic.xml' />
  <xinclude:include href='chap-websphere.xml' />
 
+ <xinclude:include href="chap-lb.xml" />
  <xinclude:include href='chap-troubleshooting.xml' />
 
  <index />

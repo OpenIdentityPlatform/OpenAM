@@ -74,6 +74,7 @@
  <xinclude:include href='chap-sun-websvr.xml' />
  <!--<xinclude:include href='chap-varnish.xml' />-->
 
+ <xinclude:include href="chap-lb.xml" />
  <xinclude:include href='chap-troubleshooting.xml' />
 
  <index />
