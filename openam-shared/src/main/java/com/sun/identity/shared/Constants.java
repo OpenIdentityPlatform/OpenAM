@@ -1243,12 +1243,6 @@ public interface Constants {
     static final String ASTERISK = "*";
 
     static final String OBJECTCLASS = "objectClass";
-    
-    /**
-     * Controls how long remote Session objects are held in the sessionTable
-     */
-    public static final String REMOTE_SESSION_CACHE_DURATION =
-        "openam.remote.session.cache.duration";
 
     /**
      * AMSetupFilter will redirect to this external URL in case the configuration store
