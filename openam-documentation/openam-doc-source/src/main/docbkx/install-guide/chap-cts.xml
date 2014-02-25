@@ -156,7 +156,7 @@
   </section>
 
  <section xml:id="cts-schema">
-    <title>Preparing an OpenDJ Directory Service for CTS</title>
+    <title>CTS Schema and Indexes</title>
 
     <para>OpenAM stores volatile CTS token data in an instance of OpenDJ. To make that possible, OpenDJ needs
     the associated configuration store indexes, which allow OpenAM to search CTS token data in an efficient
@@ -379,6 +379,386 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
     ><citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
 
   </section>
+
+  <section xml:id="cts-opendj-preparation">
+   <title>Preparing an OpenDJ Directory Service for CTS</title>
+   <para>The Default Configuration option installs OpenAM with an embedded OpenDJ
+   directory server that stores both configuration and CTS data.
+   The default option is suitable for OpenAM evaluation purposes, or for single
+   site or smaller-scale environments, where lower volume write loads and
+   replication traffic occur.</para>
+
+   <para>In general, CTS causes more volatile replication traffic due to the
+    nature of its short-lived tokens compared to regular configuration data.
+    To handle the data volatility, you can configure OpenAM to use the embedded
+    directory server as a dedicated configuration data store, while using an
+    external OpenDJ directory server instance as a CTS store.
+    This type of deployment is useful if you have multiple OpenAM instances
+    in a fully-replicated topology, communicating with an external CTS data store
+    over WAN.
+    </para>
+
+    <para>The following example procedure shows how to prepare a single OpenDJ
+     instance as an external CTS store.
+     The procedure assumes that you have installed OpenAM with the default
+     configuration settings, which use the embedded directory
+     server as its configuration store.
+     Note that if you have a very large number of policies configured for your
+     applications, consider implementing an external configuration store.
+    </para>
+
+
+   <procedure xml:id="install-external-opendj">
+    <title>To Install the OpenDJ Directory Server for CTS</title>
+
+    <step>
+     <para>Prepare your OpenDJ installation, then download and unzip the
+     OpenDJ software.
+     See the OpenDJ documentation on
+      <link xlink:show="new"
+xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/index.html@chap-install-cli">
+      Installing OpenDJ From the Command Line</link>.</para>
+      <screen>$ cd /path/to/opendj
+$ sudo ./setup --cli</screen>
+      <para>Example options are as follows:</para>
+       <table xml:id="prepare-cts-config-store-ds">
+        <title>Example OpenDJ Setup Parameters</title>
+        <tgroup cols="2">
+         <colspec colnum="1" colwidth="1*"/>
+         <colspec colnum="2" colwidth="1*"/>
+
+         <thead>
+          <row>
+           <entry>Parameter</entry>
+           <entry>Example Inputs</entry>
+          </row>
+         </thead>
+
+         <tbody>
+          <row>
+           <entry><literal>Accept License</literal></entry>
+           <entry>Yes</entry>
+          </row>
+          <row>
+           <entry><literal>Root User DN</literal></entry>
+           <entry>cn=Directory Manager</entry>
+          </row>
+          <row>
+           <entry><literal>Root User DN Password</literal></entry>
+           <entry>(arbitrary)</entry>
+          </row>
+          <row>
+           <entry><literal>Fully Qualified Domain Name</literal></entry>
+           <entry>opendj.example.com</entry>
+          </row>
+          <row>
+           <entry><literal>LDAP Port</literal></entry>
+           <entry>1389</entry>
+          </row>
+          <row>
+           <entry><literal>Administration Connector Port</literal></entry>
+           <entry>4444</entry>
+          </row>
+          <row>
+           <entry><literal>Create Base DN</literal></entry>
+           <entry>No. The base DN for the backend will be configured in a later step.</entry>
+          </row>
+          <row>
+           <entry><literal>Enable SSL</literal></entry>
+           <entry>No</entry>
+          </row>
+          <row>
+           <entry><literal>Enable TLS</literal></entry>
+           <entry>No</entry>
+          </row>
+          <row>
+           <entry><literal>Start Server After Config</literal></entry>
+           <entry>Yes</entry>
+          </row>
+          </tbody>
+         </tgroup>
+        </table>
+       </step>
+   </procedure>
+
+   <procedure xml:id="prepare-external-cts-backend">
+    <title>To Prepare the External CTS Store</title>
+    <step><para>Change to the OpenDJ directory.</para>
+     <screen>$ cd /path/to/opendj</screen></step>
+    <step><para>Create a directory server backend,
+     and call it <literal>ctsStore</literal>.</para>
+     <screen>$ sudo bin/dsconfig create-backend \
+  --backend-name ctsStore --set base-dn:dc=openam-cts,dc=example,dc=com \
+  --set enabled:true --type local-db --port 4444 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --no-prompt</screen></step>
+    <step><para>Verify that you created the backend.</para>
+      <screen>$ sudo bin/dsconfig list-backends \
+  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+    </step>
+    <step>
+     <para>Create an LDIF file to add the initial entries for the CTS backend,
+     and save the file as <literal>add-cts-entries.ldif</literal>.
+     The entries include the root suffix, an organizational unit entry,
+     and the OpenAM user entry needed to access the directory service.
+     Note that the OpenAM user entry provides the Login ID with only those privileges
+     required by the OpenAM server to write to the directory server. </para>
+     <programlisting language="ldif">dn: dc=openam-cts,dc=example,dc=com
+objectclass: top
+objectclass: domain
+dc: openam-cts
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl
+     “Allow persistent search”; allow (search, read)
+      (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)
+     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+
+dn: ou=admins,dc=openam-cts,dc=example,dc=com
+objectclass: top
+objectclass: organizationalUnit
+ou: admins
+
+dn: uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: openam
+sn: openam
+uid: openam
+userPassword: secret12
+ds-privilege-name: subentry-write
+ds-privilege-name: update-schema</programlisting>
+    </step>
+    <step>
+     <para>Add the initial entries LDIF file using the
+     <literal>ldapmodify</literal> command. Note that if you do not see the
+     "Add operation successful" responses, there may be a problem with the
+     <literal>aci</literal> formatting in your LDIF file.</para>
+     <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --defaultAdd --filename add-cts-entries.ldif
+
+Processing ADD request for dc=openam-cts,dc=example,dc=com
+ADD operation successful for DN dc=openam-cts,dc=example,dc=com
+Processing ADD request for ou=admins,dc=openam-cts,dc=example,dc=com
+ADD operation successful for DN ou=admins,dc=openam-cts,dc=example,dc=com
+Processing ADD request for uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com
+ADD operation successful for DN uid=openam,ou=admins,dc=openam-cts,dc=example,
+dc=com</screen>
+    </step>
+    <step><para>Verify the entries using <literal>ldapsearch</literal>.</para>
+     <screen>$ bin/ldapsearch --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --baseDN dc=openam-cts,dc=example,dc=com "(objectclass=*)"</screen>
+    </step>
+    <step><para>Add the Global Access Control Instruction (ACI) to the
+     access control handler.
+     The Global ACI gives OpenAM the privileges to modify the schema for the
+     custom configuration. </para>
+     <para>Note that the Modify Schema privilege is required to update the schema
+      for any custom settings made during the initial OpenAM configuration.
+      If you do not want to grant the privilege to the OpenAM user, you can manually
+      update the schema and skip this step. Also, you will need to
+      remove the <literal>update-schema</literal> privilege from the OpenAM user entry, which
+      was previously added in step 4.</para>
+     <screen>$ sudo bin/dsconfig set-access-control-handler-prop \
+  --add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes \
+    || objectClasses")(version 3.0;acl "Modify schema"; allow (write) \
+    (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)' \
+  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+    </step>
+    <step><para>Verify that the Global ACI was added.</para>
+     <screen>$ sudo bin/dsconfig get-access-control-handler-prop \
+  --property global-aci --port 4444 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --no-prompt</screen>
+    </step>
+    <step><para>Setting up the external configuration data store
+    requires that you manually add three schema files, which OpenAM
+    adds automatically for the default embedded directory server configuration.
+    Copy the schema files, <literal>cts-add-schema.ldif</literal>,
+    <literal>cts-indices.ldif</literal>, and <literal>cts-container.ldif</literal>
+    located at
+    <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
+    to a local folder.</para>
+     <screen>$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .
+$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .
+$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</screen>
+     </step>
+     <step><para>Open <literal>cts-indices.ldif</literal> file in a text editor,
+     replace the <literal>@DB_NAME@</literal> variable with the backend name
+     <literal>ctsStore</literal>, and save the file.
+     The file adds the indexes needed for the CTS store.</para>
+     </step>
+     <step><para>Open <literal>cts-container.ldif</literal> file in a text editor,
+      replace the <literal>@SM_CONFIG_ROOT_SUFFIX@</literal> variable with the
+      configuration root suffix <literal>dc=openam-cts,dc=example,dc=com</literal>, and
+      save the file.
+      The file is required for the CTS token store to handle certain entries.</para>
+     </step>
+     <step><para>Add the Schema files using the <literal>ldapmodify</literal> command.
+      Make sure to add the <literal>cts-add-schema.ldif</literal> file first.
+      The file contains the schema definitions required for both the CTS store
+      and the configuration store.
+      Note that only the <literal>cts-add-schema.ldif</literal> contains an LDIF
+      <literal>changetype</literal> directive. The other files require the
+      <literal>--defaultAdd</literal> argument.</para>
+      <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --fileName cts-add-schema.ldif
+
+$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --defaultAdd --fileName cts-indices.ldif
+
+$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --fileName cts-container.ldif</screen>
+      </step>
+      <step>
+          <para>View the list of local DB indexes for the backend to ensure
+          that they were properly installed.</para>
+          <screen>$ sudo bin/dsconfig list-local-db-indexes \
+  --backend-name ctsStore --port 4444 --bindDN "cn=Directory Manager" \
+  --bindPassword pwd --no-prompt</screen>
+      </step>
+      <step><para>Rebuild the indexes using the <literal>rebuild-index</literal>
+       command.
+       You will need to stop the server before rebuilding the indexes.</para>
+       <screen>$ sudo bin/stop-ds
+$ sudo bin/rebuild-index --baseDN dc=openam-cts,dc=example,dc=com --rebuildAll</screen>
+      </step>
+      <step><para>Verify the indexes. When completed, restart the server.</para>
+       <screen>$ sudo bin/verify-index --baseDN dc=openam-cts,dc=example,dc=com
+$ sudo bin/start-ds</screen>
+       <para>You have successfully prepared the directory server backend for the
+       external CTS store. Next, configure the external CTS store in OpenAM.</para>
+      </step>
+   </procedure>
+
+   <procedure xml:id="configure-cts">
+    <title>To Configure the CTS Data Store</title>
+    <para>The following example procedure assumes that you have implemented
+     the two previous procedures.
+     Also note that the OpenAM server will require a restart for the
+     configuration changes to take effect.</para>
+
+     <step>
+      <para>Log into the OpenAM Console.</para>
+     </step>
+     <step>
+      <para>On the main OpenAM Console screen, click Configuration &gt;
+       Servers and Sites &gt; <literal>Server Name</literal> &gt; CTS.
+       For this example, the <literal>Server Name</literal> is
+       <literal>http://openam.example.com:8080/openam</literal>.</para></step>
+       <step><para>On the Edit <literal>Server Name</literal> screen, click Inheritance
+       Settings. By default, the CTS properties are inherited from the Configuration
+       data store settings created in a previous step. We want to clear or
+       uncheck these properties to modify these properties for CTS.</para>
+     </step>
+     <step>
+      <para>On the Server Property Inheritance Setting screen, uncheck the
+       properties that you want to modify for CTS, and then click Save. </para>
+
+      <mediaobject xml:id="figure-openam-config-store-inheritance">
+       <alt>OpenAM External Configuration Inheritance Settings</alt>
+        <imageobject>
+         <imagedata fileref="images/openam-config-store-inheritance.png" format="PNG" />
+        </imageobject>
+       <textobject><para>Uncheck all of the properties. For example, you must
+        uncheck the <literal>Store Mode</literal> property, which allows you to
+        set up the external store.
+       </para></textobject>
+      </mediaobject>
+
+      <itemizedlist>
+       <listitem>
+         <para>Directory Name</para>
+       </listitem>
+       <listitem>
+           <para>Heartbeat. Default is 10.</para>
+       </listitem>
+       <listitem>
+         <para>Login Id. The login Id refers to the directory server's bind DN.</para>
+       </listitem>
+       <listitem>
+           <para>Max Connections.</para>
+       </listitem>
+       <listitem>
+         <para>Password</para>
+       </listitem>
+       <listitem>
+         <para>Port</para>
+       </listitem>
+       <listitem>
+         <para>Root Suffix</para>
+       </listitem>
+       <listitem>
+         <para>SSL/TLS Enabled</para>
+       </listitem>
+       <listitem>
+         <para>Store Mode. This property is required if you want to configure an
+          external CTS store.</para>
+       </listitem>
+      </itemizedlist>
+     </step>
+     <step><para>On the Edit <literal>Server Name</literal> screen,
+      click External Token Store and then enter the Root Suffix for the CTS store.
+      For this example, enter <literal>dc=openam-cts,dc=example,dc=com</literal>.</para>
+     </step>
+     <step><para>Under External Store Configuration, enter the properties for
+       the CTS backend and then click Save. </para>
+
+       <mediaobject xml:id="figure-openam-cts-store-setup">
+        <alt>OpenAM External CTS Settings</alt>
+         <imageobject>
+          <imagedata fileref="images/openam-cts-store-setup.png" format="PNG" />
+         </imageobject>
+        <textobject><para>The following example inputs are used:</para></textobject>
+       </mediaobject>
+
+       <variablelist>
+        <varlistentry>
+         <term>Directory Name</term>
+         <listitem>
+          <para><literal>opendj.example.com</literal></para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Port</term>
+         <listitem>
+          <para><literal>1389</literal></para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Login Id</term>
+         <listitem>
+          <para><literal>uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com</literal></para>
+         </listitem>
+        </varlistentry>
+        <varlistentry>
+         <term>Password</term>
+          <listitem>
+           <para>Enter the Login ID password. For this example, enter <literal>secret12</literal>.</para>
+          </listitem>
+        </varlistentry>
+       </variablelist>
+       </step>
+       <step><para>Restart the OpenAM server to complete the external CTS store
+        configuration.
+        If there is a problem with the configuration, view the error
+        in the <filename>&lt;openam-installation&gt;/debug/Session</filename>
+        debug log, which will indicate that the External CTS connection could not be
+        established.
+        </para>
+        <para>You have successfully configured an external OpenDJ directory server
+         and configured OpenAM to use the external CTS store.
+         For more CTS configuration options, see
+         <xref linkend="cts-token-size"><citetitle>Managing CTS Tokens</citetitle></xref>.</para>
+       </step>
+      </procedure>
+  </section>
+
 
     <!-- Liberally copied from OpenDJ docs -->
 
