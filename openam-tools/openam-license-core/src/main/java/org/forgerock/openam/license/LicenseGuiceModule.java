@@ -15,23 +15,22 @@
 */
 package org.forgerock.openam.license;
 
-import java.nio.charset.Charset;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.forgerock.guice.core.GuiceModule;
 
-public class CLIPresenterClasspathLicenseLocator extends ClasspathLicenseLocator {
+/**
+ * Responsible for defining the mappings needed by OpenAM License Core.
+ */
+@GuiceModule
+public class LicenseGuiceModule extends AbstractModule {
 
-    final static String[] LICENSES = { "license.txt" };
+    @Override
+    protected void configure() {
 
-    /**
-     * No args constructor to be called via Guice
-     */
-    public CLIPresenterClasspathLicenseLocator() {
-        this(Thread.currentThread().getContextClassLoader(), Charset.forName("UTF-8"));
+        bind(String[].class).annotatedWith(Names.named("LICENSE_FILEPATH"))
+                .toInstance(new String[]{"legal-notices/license.txt"});
+
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public CLIPresenterClasspathLicenseLocator(ClassLoader classLoader, Charset charset) {
-        super(classLoader, charset, LICENSES);
-    }
 }

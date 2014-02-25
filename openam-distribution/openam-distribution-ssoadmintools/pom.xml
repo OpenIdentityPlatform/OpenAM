@@ -44,34 +44,6 @@
     <build>
         <finalName>SSOAdminTools-${project.version}</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>Copy license</id>
-                        <phase>validate</phase>
-
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${forgerock.license.groupId}</groupId>
-                                    <artifactId>${forgerock.license.artifactId}</artifactId>
-                                    <version>${forgerock.license.version}</version>
-                                    <type>txt</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                                    <destFileName>license.txt</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Pre-Packaging step for Zip Elements. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

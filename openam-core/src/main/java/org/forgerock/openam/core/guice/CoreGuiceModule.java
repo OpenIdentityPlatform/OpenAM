@@ -190,9 +190,6 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
                 .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
-
-        bind(String[].class).annotatedWith(Names.named("LICENSE_FILEPATH"))
-                .toInstance(new String[]{"legal-notices/license.txt"});
     }
 
     private static class CTSMonitoringStoreExecutorServiceProvider implements Provider<ExecutorService> {

@@ -98,7 +98,7 @@ set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
 set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
 set CLASSPATH="%CLASSPATH%;lib/webservices-api-2009-14-01.jar"
 set CLASSPATH="%CLASSPATH%;lib/webservices-rt-2009-29-07.jar"
-set CLASSPATH="%CLASSPATH%;lib/wwebservices-tools-2.1-b16.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-tools-2.1-b16.jar"
 set CLASSPATH="%CLASSPATH%;lib/json-20090211.jar"
 set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
 set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
@@ -107,7 +107,7 @@ set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-license-manager-cli-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-license-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/forgerock-guice-core-${forgerock.guice.version}.jar"
@@ -120,6 +120,7 @@ set CLASSPATH="%CLASSPATH%;lib/slf4j-nop-${slf4j.api.version}.jar"
 set CLASSPATH="%CLASSPATH%;resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main
+
 ENDLOCAL
 
 :exit
