@@ -147,11 +147,13 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    >Monitoring and Management Using JMX</link> for instructions on how to
    connect remotely, how to use SSL, and so forth.</para>
 
-   <note id="important"><para>JMX has a limitation in that
+   <important>
+    <para>JMX has a limitation in that
    some Operations and CTS tables cannot be properly serialized from OpenAM to JMX.
    As a result, only a portion of OpenAM's monitoring information is available through JMX.
    SNMP is a preferred monitoring option over JMX and exposes all OpenAM tables,
-   especially for CTS, with no serialization limitations.</para></note>
+   especially for CTS, with no serialization limitations.</para>
+   </important>
   </section>
   
   <section xml:id="monitoring-snmp">
