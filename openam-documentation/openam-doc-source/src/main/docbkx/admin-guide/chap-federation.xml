@@ -3382,12 +3382,14 @@ Bulk Federation for this host was completed.</screen>
 
     <para>
      The basic process for installing policy agents is available in the
-     <link xlink:href="web-install-guide" xlink:show="new"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-     >Web Policy Agent Installation Guide</citetitle></link>
-     and the <link xlink:href="jee-install-guide" xlink:show="new"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-     >Java EE Policy Agent Installation Guide</citetitle></link>.
+     <link xlink:href="web-install-guide#web-install-guide"
+           xlink:show="new"
+           xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Web Policy Agent Installation Guide</citetitle></link>
+     and the <link xlink:href="jee-install-guide#jee-install-guide"
+                   xlink:show="new"
+                   xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Java EE Policy Agent Installation Guide</citetitle></link>.
     </para>
    </step>
 

@@ -98,8 +98,11 @@
   While using SAML 2.0 adds complexity, it supports attribute mapping,
   which may be useful when the two domains are associated
   with data stores that use different attribute names.
-  See the section <link xlink:href="admin-guide#using-saml2-with-policy-agents"
-  ><citetitle>SAML 2.0 &amp; Policy Agents</citetitle></link> for details.
+  See the section,
+  <link xlink:href="admin-guide#using-saml2-with-policy-agents"
+        xlink:show="new"
+        xlink:role="http://docbook.org/xlink/role/olink"
+  ><citetitle>SAML 2.0 &amp; Policy Agents</citetitle></link>, for details.
  </para>
 
  <procedure xml:id="enable-cdsso-jee-agent">
