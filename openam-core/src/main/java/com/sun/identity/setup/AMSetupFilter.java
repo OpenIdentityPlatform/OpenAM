@@ -57,7 +57,10 @@ public final class AMSetupFilter implements Filter {
     private ServletContext servletCtx;
     private boolean initialized;
     private boolean passthrough;
-    private static final String SETUPURI = "/config/options.htm";
+    private static final String SETUP_URI = "/config/options.htm";
+    private static final String UPGRADE_URI = "/config/upgrade/upgrade.htm";
+    private static final String SETUP_PROGRESS_URI = "/setup/setSetupProgress";
+    private static final String UPGRADE_PROGESS_URI = "/upgrade/setUpgradeProgress";
     private static final String NOWRITE_PERMISSION = "/nowritewarning.jsp";
 
     private static String[] fList = { 
@@ -86,9 +89,8 @@ public final class AMSetupFilter implements Filter {
         try {
             if (AMSetupServlet.isCurrentConfigurationValid()) {
                 String incomingURL = httpRequest.getRequestURI();
-                if (incomingURL.endsWith("/config/options.htm")
-                        || incomingURL.endsWith("/config/upgrade/upgrade.htm"))
-                {
+                if (incomingURL.endsWith(SETUP_URI) || incomingURL.endsWith(UPGRADE_URI)
+                        || incomingURL.endsWith(SETUP_PROGRESS_URI) || incomingURL.endsWith(UPGRADE_PROGESS_URI)) {
                     String url = httpRequest.getScheme() + "://" +
                         httpRequest.getServerName() + ":" +
                         httpRequest.getServerPort() +
@@ -119,7 +121,7 @@ public final class AMSetupFilter implements Filter {
                                 httpRequest.getServerPort() +
                                 httpRequest.getContextPath();
                             if ((new File(System.getProperty("user.home"))).canWrite()){
-                                url += SETUPURI;
+                                url += SETUP_URI;
                             } else {
                                 url += NOWRITE_PERMISSION;
                             }
