@@ -19,6 +19,9 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
@@ -108,6 +111,17 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
         public Connection getConnection() throws ErrorResultException {
             return cf.getConnection();
         }
+    }
+
+    protected Callback[] getCredentials(String username, String password) {
+        Callback[] credentials = new Callback[2];
+        NameCallback nc = new NameCallback("dummy");
+        nc.setName(username);
+        PasswordCallback pc = new PasswordCallback("dummy", false);
+        pc.setPassword(password.toCharArray());
+        credentials[0] = nc;
+        credentials[1] = pc;
+        return credentials;
     }
 
     protected String getIdRepoExceptionMessage(String code, Object... args) {
