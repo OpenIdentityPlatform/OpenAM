@@ -29,9 +29,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.opendj.ldap.Filter;
@@ -331,23 +328,25 @@ public class GenericRepoTest extends IdRepoTestBase {
     @Test
     public void searchReturnsMatchesForSearchAttribute() throws Exception {
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "hello*", 0, 0, null, true, IdRepo.AND_MOD, null, true);
+                idrepo.search(null, IdType.USER, "searchTester*", 0, 0, null, true, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
-        assertThat(results.getSearchResults()).hasSize(2).containsOnly("searchTester1", "searchTester2");
+        assertThat(results.getSearchResults()).hasSize(4).containsOnly("searchTester1", "searchTester2",
+                "searchTester3", "searchTester4");
     }
 
     @Test
     public void searchReturnsRequestedAttributes() throws Exception {
         RepoSearchResults results =
-                idrepo.search(null, IdType.USER, "hello", 0, 0, asSet("sn"), false, IdRepo.AND_MOD, null, true);
+                idrepo.search(null, IdType.USER, "searchTester1", 0, 0, asSet("sn"), false, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
         assertThat(results.getType()).isEqualTo(IdType.USER);
         assertThat(results.getSearchResults()).hasSize(1).containsOnly("searchTester1");
         Map<String, Map<String, Set<String>>> resultAttrs = results.getResultAttributes();
         assertThat(resultAttrs).hasSize(1);
-        assertThat(resultAttrs.get("searchTester1")).hasSize(1);
+        assertThat(resultAttrs.get("searchTester1")).hasSize(2);
         assertThat(resultAttrs.get("searchTester1").get("sn")).containsOnly("hello");
+        assertThat(resultAttrs.get("searchTester1").get("uid")).containsOnly("searchTester1");
     }
 
     //need to depend on deleteSuccessful, otherwise testuser1 would ruin the day :)
@@ -634,16 +633,5 @@ public class GenericRepoTest extends IdRepoTestBase {
             assertThat(ire.getLDAPErrorCode()).isNotNull().isEqualTo(
                     String.valueOf(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED.intValue()));
         }
-    }
-
-    private Callback[] getCredentials(String username, String password) {
-        Callback[] credentials = new Callback[2];
-        NameCallback nc = new NameCallback("dummy");
-        nc.setName(username);
-        PasswordCallback pc = new PasswordCallback("dummy", false);
-        pc.setPassword(password.toCharArray());
-        credentials[0] = nc;
-        credentials[1] = pc;
-        return credentials;
     }
 }

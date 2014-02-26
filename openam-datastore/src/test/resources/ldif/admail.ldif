@@ -12,12 +12,12 @@ dn: ou=groups,dc=openam,dc=forgerock,dc=org
 ou: Groups
 objectClass: organizationalUnit
 objectClass: top
-numSubordinates: 0
 
 dn: cn=Demo,cn=users,dc=openam,dc=forgerock,dc=org
 cn: Demo
 sn: demo
 givenName: demo
+mail: demo@example.com
 userpassword: changeit
 objectclass: inetorgperson
 objectclass: organizationalPerson
@@ -30,6 +30,7 @@ dn: cn=Administrator,cn=users,dc=openam,dc=forgerock,dc=org
 cn: Administrator
 sn: admin
 givenName: admin
+mail: admin@example.com
 userpassword: helloworld
 objectclass: inetorgperson
 objectclass: organizationalPerson
@@ -42,6 +43,7 @@ dn: cn=duplicate,cn=users,dc=openam,dc=forgerock,dc=org
 cn: duplicate
 sn: duplicate
 givenName: duplicate
+mail: duplicate@example.com
 userpassword: changeit
 objectclass: inetorgperson
 objectclass: organizationalPerson
@@ -58,6 +60,7 @@ dn: cn=duplicate,cn=domain users,cn=users,dc=openam,dc=forgerock,dc=org
 cn: duplicate
 sn: duplicate
 givenName: duplicate
+mail: duplicate@example.com
 userpassword: changeit
 objectclass: inetorgperson
 objectclass: organizationalPerson

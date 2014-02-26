@@ -348,7 +348,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (username == null || password == null) {
             throw newIdRepoException("221", CLASS_NAME);
         }
-        String dn = getDN(IdType.USER, username, false);
+        String dn = findDNForAuth(IdType.USER, username);
         Connection conn = null;
         try {
             BindRequest bindRequest = Requests.newSimpleBindRequest(dn, password);
@@ -398,7 +398,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (!type.equals(IdType.USER)) {
             throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME, "229", new Object[]{CLASS_NAME});
         }
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
         BindRequest bindRequest = Requests.newSimpleBindRequest(dn, oldPassword.toCharArray());
         ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
         byte[] encodedPwd = null;
@@ -435,7 +435,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("getFullyQualifiedName invoked");
         }
-        return ldapServers + "/" + getDN(type, name, false);
+        return ldapServers + "/" + getDN(type, name);
     }
 
     /**
@@ -553,7 +553,7 @@ public class DJLDAPv3Repo extends IdRepo {
         }
         try {
             //get the user DN, if there is no such entry, this will already fail.
-            getDN(type, name, false);
+            getDN(type, name);
         } catch (IdRepoException ire) {
             return false;
         }
@@ -589,7 +589,7 @@ public class DJLDAPv3Repo extends IdRepo {
             DEBUG.message("Create invoked on " + type + ": " + name + " attrMap = "
                     + IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrMap, null));
         }
-        String dn = getDN(type, name, true);
+        String dn = generateDN(type, name);
         Set<String> objectClasses = getObjectClasses(type);
         //First we should make sure that we wrap the attributes with a case insensitive hashmap.
         attrMap = new CaseInsensitiveHashMap(attrMap);
@@ -607,7 +607,7 @@ public class DJLDAPv3Repo extends IdRepo {
         } else {
             attrMap.put(OBJECT_CLASS_ATTR, objectClasses);
         }
-        attrMap.put(getNamingAttribute(type), asSet(name));
+        attrMap.put(getSearchAttribute(type), asSet(name));
 
         Entry entry = new LinkedHashMapEntry(dn);
         Set<String> attributeValue;
@@ -736,7 +736,7 @@ public class DJLDAPv3Repo extends IdRepo {
             }
         }
         Map<String, T> result = new HashMap<String, T>();
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
         if (type.equals(IdType.USER)) {
             if (attrs.contains(DEFAULT_USER_STATUS_ATTR)) {
                 attrs.add(userStatusAttr);
@@ -888,7 +888,7 @@ public class DJLDAPv3Repo extends IdRepo {
      */
     private void setAttributes(SSOToken token, IdType type, String name, Map attributes,
             boolean isAdd, boolean isString, boolean changeOCs) throws IdRepoException {
-        ModifyRequest modifyRequest = Requests.newModifyRequest(getDN(type, name, false));
+        ModifyRequest modifyRequest = Requests.newModifyRequest(getDN(type, name));
         attributes = removeUndefinedAttributes(type, attributes);
         //TODO should we really allow to use #setAttributes instead of #changePassword for changing passwords?
         byte[] encodedPwd = helper.encodePassword(type, attributes);
@@ -1032,7 +1032,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (attrNames.isEmpty()) {
             throw newIdRepoException("201");
         }
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
         ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
         for (String attr : attrNames) {
             modifyRequest.addModification(ModificationType.DELETE, attr);
@@ -1116,7 +1116,7 @@ public class DJLDAPv3Repo extends IdRepo {
                 Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
                 if (reader.isEntry()) {
                     SearchResultEntry entry = reader.readEntry();
-                    String name = LDAPUtils.getName(entry.getName());
+                    String name = entry.parseAttribute(searchAttr).asString();
                     names.add(name);
                     if (returnAllAttrs) {
                         for (Attribute attribute : entry.getAllAttributes()) {
@@ -1186,7 +1186,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("delete invoked");
         }
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
@@ -1228,7 +1228,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (!membersType.equals(IdType.USER)) {
             throw newIdRepoException("204", CLASS_NAME, membersType.getName(), type.getName());
         }
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
 
         if (type.equals(IdType.GROUP)) {
             return getGroupMembers(dn);
@@ -1412,7 +1412,7 @@ public class DJLDAPv3Repo extends IdRepo {
         if (!type.equals(IdType.USER)) {
             throw newIdRepoException("206", CLASS_NAME);
         }
-        String dn = getDN(IdType.USER, name, false);
+        String dn = getDN(IdType.USER, name);
         if (membershipType.equals(IdType.GROUP)) {
             return getGroupMemberships(dn);
         } else if (membershipType.equals(IdType.ROLE)) {
@@ -1579,10 +1579,10 @@ public class DJLDAPv3Repo extends IdRepo {
         if (!membersType.equals(IdType.USER)) {
             throw newIdRepoException("206", CLASS_NAME);
         }
-        String dn = getDN(type, name, false);
+        String dn = getDN(type, name);
         Set<String> memberDNs = new HashSet<String>(members.size());
         for (String member : members) {
-            memberDNs.add(getDN(membersType, member, false));
+            memberDNs.add(getDN(membersType, member));
         }
         if (type.equals(IdType.GROUP)) {
             modifyGroupMembership(dn, memberDNs, operation);
@@ -2140,13 +2140,6 @@ public class DJLDAPv3Repo extends IdRepo {
                     }
                 }
             }
-        } else if (type.equals(IdType.GROUP)) {
-            String rdn = getNamingAttribute(type);
-            if (rdn == null || rdn.isEmpty()) {
-                Set<String> cn = new HashSet<String>(1);
-                cn.add(name);
-                attributes.put(rdn, cn);
-            }
         }
         if (DEBUG.messageEnabled()) {
             DEBUG.message("After adding creation attributes: attrMap =  "
@@ -2222,20 +2215,34 @@ public class DJLDAPv3Repo extends IdRepo {
         }
     }
 
-    private String getDN(IdType type, String name, boolean shouldGenerate) throws IdRepoException {
+    private String getDN(IdType type, String name) throws IdRepoException {
+        return getDN(type, name, false, null);
+    }
+
+    private String generateDN(IdType type, String name) throws IdRepoException {
+        return getDN(type, name, true, null);
+    }
+
+    private String findDNForAuth(IdType type, String name) throws IdRepoException {
+        return getDN(type, name, false, userNamingAttr);
+    }
+
+    private String getDN(IdType type, String name, boolean shouldGenerate, String searchAttr) throws IdRepoException {
         Object cachedDn = dnCache.get(name + "," + type);
         if (cachedDn != null) {
             return cachedDn.toString();
         }
         String dn = null;
         DN searchBase = getBaseDN(type);
-        String namingAttr = getNamingAttribute(type);
 
         if (shouldGenerate) {
-            return searchBase.child(namingAttr, name).toString();
+            return searchBase.child(getSearchAttribute(type), name).toString();
         }
 
-        Filter filter = Filter.and(Filter.equality(namingAttr, name), getObjectClassFilter(type));
+        if (searchAttr == null) {
+            searchAttr = getSearchAttribute(type);
+        }
+        Filter filter = Filter.and(Filter.equality(searchAttr, name), getObjectClassFilter(type));
         SearchRequest searchRequest = Requests.newSearchRequest(searchBase, defaultScope, filter, DN_ATTR);
         Connection conn = null;
         try {
