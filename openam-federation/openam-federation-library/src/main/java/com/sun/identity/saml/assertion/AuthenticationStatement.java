@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.saml.assertion;
 
 import java.text.*; 
@@ -451,7 +453,7 @@ public class AuthenticationStatement extends SubjectStatement {
         if (_authenticationMethod != null &&
             _authenticationMethod.length() != 0){
             result.append(" AuthenticationMethod=\"").
-                   append(_authenticationMethod).append("\""); 
+                   append(_authenticationMethod.replace("|", "%7C")).append("\"");
         }
 
         if (_authenticationInstant != null &&
