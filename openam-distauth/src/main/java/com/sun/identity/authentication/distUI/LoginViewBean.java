@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.distUI;
@@ -371,15 +371,12 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 }
                 ac = new AuthContext(ssoToken);
                 newRequest = true;
-            } else if ((ssoToken == null && (session.isNew() || 
-                    (authCookieValue == null) || 
-                    (authCookieValue.length() == 0))) ||
-                    (authCookieValue != null && 
-                     authCookieValue.equalsIgnoreCase("LOGOUT")) ||
-                    (authCookieValue != null && 
-                     isOrgChanged()) ||                     
-                    (!isOrgSame()) || 
-                     AuthClientUtils.newSessionArgExists(reqDataHash)) {
+            } else if ((ssoToken == null && (!isPost || session.isNew() || authCookieValue == null
+                    || authCookieValue.isEmpty()))
+                    || (authCookieValue != null && authCookieValue.equalsIgnoreCase("LOGOUT"))
+                    || (authCookieValue != null && isOrgChanged())
+                    || !isOrgSame()
+                    || AuthClientUtils.newSessionArgExists(reqDataHash)) {
             	if (loginDebug.messageEnabled()) {
                     loginDebug.message("New AuthContext with OrgName = "
                     + orgName);
