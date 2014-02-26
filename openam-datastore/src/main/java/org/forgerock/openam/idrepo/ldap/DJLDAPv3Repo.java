@@ -336,19 +336,19 @@ public class DJLDAPv3Repo extends IdRepo {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("authenticate invoked");
         }
-        String username = null;
+        String userName = null;
         char[] password = null;
         for (Callback callback : credentials) {
             if (callback instanceof NameCallback) {
-                username = ((NameCallback) callback).getName();
+                userName = ((NameCallback) callback).getName();
             } else if (callback instanceof PasswordCallback) {
                 password = ((PasswordCallback) callback).getPassword();
             }
         }
-        if (username == null || password == null) {
+        if (userName == null || password == null) {
             throw newIdRepoException("221", CLASS_NAME);
         }
-        String dn = findDNForAuth(IdType.USER, username);
+        String dn = findDNForAuth(IdType.USER, userName);
         Connection conn = null;
         try {
             BindRequest bindRequest = Requests.newSimpleBindRequest(dn, password);
@@ -361,7 +361,7 @@ public class DJLDAPv3Repo extends IdRepo {
                 DEBUG.message("An error occurred while trying to authenticate a user: " + ere.toString());
             }
             if (resultCode.equals(ResultCode.INVALID_CREDENTIALS)) {
-                throw new InvalidPasswordException(AM_AUTH, "InvalidUP", null, dn, null);
+                throw new InvalidPasswordException(AM_AUTH, "InvalidUP", null, userName, null);
             } else if (resultCode.equals(ResultCode.UNWILLING_TO_PERFORM)
                     || resultCode.equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 throw new AuthLoginException(AM_AUTH, "FAuth", null);

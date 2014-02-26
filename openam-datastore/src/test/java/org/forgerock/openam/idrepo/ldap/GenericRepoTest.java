@@ -60,13 +60,13 @@ public class GenericRepoTest extends IdRepoTestBase {
         assertThat(idrepo.authenticate(getCredentials(DEMO, "changeit"))).isTrue();
     }
 
-    @Test
-    public void authenticationFailsWithInvalidPassword() {
+    @Test(description = "OPENAM-3666")
+    public void authenticationFailsWithInvalidPassword() throws Exception {
         try {
             idrepo.authenticate(getCredentials(DEMO, "invalid"));
             fail();
-        } catch (Exception ex) {
-            assertThat(ex).isInstanceOf(InvalidPasswordException.class);
+        } catch (InvalidPasswordException ipe) {
+            assertThat(ipe.getTokenId()).isEqualTo(DEMO);
         }
     }
 
