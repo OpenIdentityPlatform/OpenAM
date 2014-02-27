@@ -17,8 +17,6 @@ package com.iplanet.dpro.session.service;
 
 /**
  * Responsible for tracking shared constants for the Session Service.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class SessionConstants {
     public static final String SESSION_DEBUG = "amSession";

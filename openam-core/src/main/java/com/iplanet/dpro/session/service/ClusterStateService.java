@@ -32,39 +32,48 @@
 
 package com.iplanet.dpro.session.service;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import org.forgerock.openam.utils.IOUtils;
 
 /**
- * A <code>ClusterStateService </code> class implements monitoring the state of
- * server instances that are participating in the cluster environment. It is
- * used in making routing decisions in "internal request routing" mode
+ * The <code>ClusterStateService</code> monitors the state of Server instances
+ * that are part of the current Site. It also monitors the state of remote
+ * Sites via the same mechanism.
+ *
+ * This functionality is used as part of making "internal request routing"
+ * requests.
+ *
+ * Note: This service will monitor all provided Sites regardless of whether they are
+ * the same Site as the current Server.
  */
 public class ClusterStateService extends GeneralTaskRunnable {
 
-    // Inner Class definition of ServerInfo Object.
+    // Inner Class definition of StateInfo Object.
     // Contains information about each Server.
-    private class ServerInfo implements Comparable {
+    private class StateInfo implements Comparable {
         String id;
 
         String protocol;
@@ -78,7 +87,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         boolean isLocal;
 
         public int compareTo(Object o) {
-            return id.compareTo(((ServerInfo) o).id);
+            return id.compareTo(((StateInfo) o).id);
         }
 
         /**
@@ -87,7 +96,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
          */
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("ServerInfo ID:[").append(this.id).append("], ");
+            sb.append("StateInfo ID:[").append(this.id).append("], ");
             sb.append("Protocol:[").append(this.protocol).append("], ");
             sb.append("URL:[").append(((this.url == null) ? "null" : this.url.toString()));
             sb.append("], ");
@@ -113,18 +122,22 @@ public class ClusterStateService extends GeneralTaskRunnable {
     /**
      * Servers in the cluster environment
      */
-    private static Map<String, ServerInfo> servers =
-            new HashMap<String, ServerInfo>();
+    private static Map<String, StateInfo> servers = new HashMap<String, StateInfo>();
 
     /**
-     * Servers are down in the cluster environment
+     * Sites in the environment
      */
-    private static Set<String> downServers = new HashSet<String>();
+    private static Map<String, StateInfo> sites = new HashMap<String, StateInfo>();
+
+    /**
+     * Sites and Servers that are currently down.
+     */
+    private static Set<String> down = new HashSet<String>();
 
     /**
      * Server Information
      */
-    private static ServerInfo[] serverSelectionList = new ServerInfo[0];
+    private static StateInfo[] serverSelectionList = new StateInfo[0];
 
     /**
      * Last selected Server
@@ -143,7 +156,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
     /**
-     * default ServerInfo check time 10 milliseconds
+     * default StateInfo check time 10 milliseconds
      */
     public static final long DEFAULT_PERIOD = 1000;
 
@@ -165,26 +178,28 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Get Servers within Cluster
-     * @return Map<String, ServerInfo>
+     * @return Map<String, StateInfo>
      */
-    protected Map<String, ServerInfo> getServers() {
+    protected Map<String, StateInfo> getServers() {
         return servers;
     }
 
     /**
-     * Get Server IDs which are in a Down State.
-     * @return Set<String>
+     * Get Server and Site IDs which are in a Down State.
+     *
+     * @return Possibly empty set of IDs.
      */
-    protected Set<String> getDownServers() {
-        return downServers;
+    protected Set<String> getDownServersAndSites() {
+        return down;
     }
+
     /**
      * Get the Server Selection List, common to all Servers
      * in Cluster.
-     * @return ServerInfo[] Array of Servers in Selection list in
+     * @return StateInfo[] Array of Servers in Selection list in
      *         proper order.
      */
-    protected ServerInfo[] getServerSelectionList() {
+    protected StateInfo[] getServerSelectionList() {
         return serverSelectionList;
     }
 
@@ -209,13 +224,15 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * Constructs an instance for the cluster service
      * @param localServerId id of the server instance in which this
      *                      ClusterStateService instance is running
-     * @param timeout       timeout for waiting on an individual server (millisec)
-     * @param period        checking cycle period (millisecs)
-     * @param members       map if server id - > url for all cluster members
-     * @throws Exception
+     * @param timeout timeout for waiting on an individual server (millisec)
+     * @param period checking cycle period (millisecs)
+     * @param serverMembers map of Server ID to URL for all cluster Server members.
+     * @param siteMembers Mapping of Site ID to URL for all Sites.
+     * @throws Exception If there was an unexpected error initialising the ClusterStateService.
      */
     protected ClusterStateService(SessionService sessionService, String localServerId,
-                                  int timeout, long period, Map<String, String> members) throws Exception {
+                                  int timeout, long period, Map<String, String> serverMembers,
+                                  Map<String, String> siteMembers) throws Exception {
         if ( (localServerId == null)||(localServerId.isEmpty()) )
         {
             String message = "ClusterStateService: Local Server Id argument is null, unable to instantiate Cluster State Service!";
@@ -228,37 +245,69 @@ public class ClusterStateService extends GeneralTaskRunnable {
             this.localServerId = localServerId;
             this.timeout = timeout;
             this.period = period;
-            serverSelectionList = new ServerInfo[members.size()];
 
-            for (Map.Entry<String, String> entry : members.entrySet()) {
-                ServerInfo info = new ServerInfo();
-                info.id = entry.getKey();
-                URL url = new URL(entry.getValue() + "/namingservice");
-                info.url = url;
-                info.protocol = url.getProtocol();
-                info.address = new InetSocketAddress(url.getHost(), url.getPort());
-                // Fix for Deadlock. If this is our server, set to true, else false.
-                info.isUp = isLocalServerId(info.id);
-                info.isLocal = info.isUp; // Set our Local Server Indicator, per above interrogation.
+            serverSelectionList = new StateInfo[serverMembers.size() + siteMembers.size()];
 
-                // Check for Down Servers.
-                if (!info.isUp) {
-                    downServers.add(info.id);
-                }
+            for (Map.Entry<String, String> entry : serverMembers.entrySet()) {
+                populateMap(servers, getServerInfo(entry.getKey(), entry.getValue()));
+            }
 
-                // Add Server to Server List.
-                servers.put(info.id, info);
-                // Associate to a Server Selection Bucket.
-                serverSelectionList[getNextSelected()] = info;
-                if (sessionDebug.messageEnabled())
-                    { sessionDebug.error("Added Server to ClusterStateService: " + info.toString()); }
-            } // End of For Loop.
+            for (Map.Entry<String, String> entry : siteMembers.entrySet()) {
+                populateMap(sites, getServerInfo(entry.getKey(), entry.getValue()));
+            }
 
             // to ensure that ordering in different server instances is identical
             Arrays.sort(serverSelectionList);
             SystemTimer.getTimer().schedule(this, new Date((
                     System.currentTimeMillis() / 1000) * 1000));
         } // End of Synchronized Block.
+    }
+
+    /**
+     * Generates a StateInfo instance based on the ServerID and ServerURL.
+     *
+     * @param serverId Non null.
+     * @param serverUrl Non null.
+     * @return A non null StateInfo instance.
+     * @throws MalformedURLException
+     */
+    private StateInfo getServerInfo(String serverId, String serverUrl) throws MalformedURLException {
+        StateInfo info = new StateInfo();
+        info.id = serverId;
+        URL url = new URL(serverUrl + "/namingservice");
+        info.url = url;
+        info.protocol = url.getProtocol();
+        info.address = new InetSocketAddress(url.getHost(), url.getPort());
+
+        // Fix for Deadlock. If this is our server, set to true, else false.
+        info.isUp = isLocalServerId(info.id);
+        info.isLocal = info.isUp; // Set our Local Server Indicator, per above interrogation.
+
+        if (sessionDebug.messageEnabled()) {
+            sessionDebug.error("Added Server to ClusterStateService: " + info.toString());
+        }
+
+        return info;
+    }
+
+    /**
+     * Populates the StateInfo into the required data structures for this class.
+     * @param map Non null map to store the StateInfo in.
+     * @param stateInfo Non null StateInfo to store.
+     */
+    private void populateMap(Map<String, StateInfo> map, StateInfo stateInfo) {
+        String serverId = stateInfo.id;
+
+        // Add Server to Server List.
+        map.put(serverId, stateInfo);
+
+        // Check for Down Servers.
+        if (!stateInfo.isUp) {
+            down.add(serverId);
+        }
+
+        // Associate to a Server Selection Bucket.
+        serverSelectionList[getNextSelected()] = stateInfo;
     }
 
     /**
@@ -278,15 +327,29 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return true if server is up, false otherwise
      */
     boolean isUp(String serverId) {
-        if ((serverId == null) || (serverId.isEmpty()) ) {
+        return isUp(servers, serverId);
+    }
+
+    /**
+     * Indicates the state of a given Site ID.
+     *
+     * This method functions in the same way as {@link ClusterStateService#isUp(String)}
+     * however, it actively validates that the ID provided is a Site ID.
+     *
+     *
+     */
+    public boolean isSiteUp(String siteId) {
+        return isUp(sites, siteId);
+    }
+
+    private boolean isUp(Map<String, StateInfo> map, String id) {
+        if (id == null || id.isEmpty()) {
             return false;
         }
-        if (serverId.equalsIgnoreCase(localServerId)) {
-            return true;
+        if (map == null || map.isEmpty()) {
+            return false;
         }
-        if ( (servers == null) || servers.isEmpty() )
-            { return false; }
-        return (servers.get(serverId)!=null) ? servers.get(serverId).isUp : false;
+        return map.get(id) != null ? map.get(id).isUp : false;
     }
 
     /**
@@ -305,7 +368,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
         if ( (servers == null) || servers.isEmpty() )
             { return false; }
-        ServerInfo info = servers.get(serverId);
+        StateInfo info = servers.get(serverId);
         info.isUp = checkServerUp(info);
         return info.isUp;
     }
@@ -374,20 +437,24 @@ public class ClusterStateService extends GeneralTaskRunnable {
     public void run() {
         try {
             boolean cleanRemoteSessions = false;
-            synchronized (servers) {
-                for (Map.Entry<String, ServerInfo> server : servers.entrySet()) {
-                    ServerInfo info = server.getValue();
+            synchronized (this) {
+
+                Collection<StateInfo> infos = new ArrayList<StateInfo>();
+                infos.addAll(servers.values());
+                infos.addAll(sites.values());
+
+                for (StateInfo info : infos) {
                     info.isUp = checkServerUp(info);
 
                     if (!info.isUp) {
-                        downServers.add(info.id);
+                        down.add(info.id);
                     } else {
-                        if (!downServers.isEmpty() &&
-                                downServers.remove(info.id)) {
+                        if (!down.isEmpty() && down.remove(info.id)) {
                             cleanRemoteSessions = true;
                         }
                     }
                 }
+
             }
             if (cleanRemoteSessions) {
                 sessionService.cleanUpRemoteSessions();
@@ -405,7 +472,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @param info server info instance
      * @return true if server is up, false otherwise
      */
-    private boolean checkServerUp(ServerInfo info) {
+    private boolean checkServerUp(StateInfo info) {
         if (info == null) {
             return false;
         }
@@ -490,8 +557,8 @@ public class ClusterStateService extends GeneralTaskRunnable {
         sb.append("{ lastSelected=").append(lastSelected);
         sb.append(", timeout=").append(timeout).append("\n");
         sb.append(" Current Server Selection List:").append("\n");
-        for (ServerInfo serverInfo : getServerSelectionList()) {
-            sb.append(serverInfo.toString());
+        for (StateInfo stateInfo : getServerSelectionList()) {
+            sb.append(stateInfo.toString());
         }
         sb.append('}');
         return sb.toString();

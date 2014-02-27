@@ -32,8 +32,6 @@
 
 package com.iplanet.dpro.session.service;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
@@ -42,12 +40,12 @@ import com.iplanet.dpro.session.SessionEvent;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.SessionNotificationHandler;
-import com.iplanet.dpro.session.SessionTimedOutException;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.TokenRestrictionFactory;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.dpro.session.share.SessionNotification;
+import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
@@ -377,6 +375,7 @@ public class SessionService {
     private TokenIdFactory tokenIdFactory;
     private CoreTokenConfig coreTokenConfig;
     private SessionAdapter tokenAdapter;
+    private SessionInfoFactory sessionInfoFactory;
 
     /**
      * Static initialisation section will be called the first time the SessionService is initailised.
@@ -384,8 +383,7 @@ public class SessionService {
      * Note: This function depends on the singleton pattern that the SessionService follows.
      */
     private static void initialiseStatic() {
-        Key<Debug> key = Key.get(Debug.class, Names.named(SessionConstants.SESSION_DEBUG));
-        sessionDebug = InjectorHolder.getInstance(key);
+        sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
         stats = Stats.getInstance("amMasterSessionTableStats");
 
@@ -558,7 +556,7 @@ public class SessionService {
                         + masterSid);
             }
         }
-        checkSession(session, masterSid);
+        sessionInfoFactory.validateSession(session, masterSid);
         // attempt to reuse the token if restriction is the same
         SessionID restrictedSid = session
                 .getRestrictedTokenForRestriction(restriction);
@@ -1104,9 +1102,7 @@ public class SessionService {
             sess.setIsISStored(false);
         }
         if (sess != null && sess.getState() != Session.INVALID) {
-            logEvent(sess, SessionEvent.DESTROY);
-            sess.setState(Session.DESTROYED);
-            sendEvent(sess, SessionEvent.DESTROY);
+            signalRemove(sess, SessionEvent.DESTROY);
         }
         Session.removeSID(sid);
     }
@@ -1122,10 +1118,19 @@ public class SessionService {
             sess.setIsISStored(false);
         }
         if (sess != null && sess.getState() != Session.INVALID) {
-            logEvent(sess, SessionEvent.LOGOUT);
-            sess.setState(Session.DESTROYED);
-            sendEvent(sess, SessionEvent.LOGOUT);
+            signalRemove(sess, SessionEvent.LOGOUT);
         }
+    }
+
+    /**
+     * Simplifies the signalling that a Session has been removed.
+     * @param session Non null InternalSession.
+     * @param event An integrate from the SessionEvent class.
+     */
+    private void signalRemove(InternalSession session, int event) {
+        logEvent(session, event);
+        session.setState(Session.DESTROYED);
+        sendEvent(session, event);
     }
 
     /**
@@ -1227,52 +1232,11 @@ public class SessionService {
             throws SessionException {
 
         InternalSession sess = resolveToken(sid);
-        checkSession(sess, sid);
-        SessionInfo info = makeSessionInfo(sess, sid);
+        SessionInfo info = sessionInfoFactory.getSessionInfo(sess, sid);
         if (reset) {
             sess.setLatestAccessTime();
         }
         return info;
-    }
-
-    private SessionInfo makeSessionInfo(InternalSession sess, SessionID sid)
-            throws SessionException {
-        SessionInfo info = sess.toSessionInfo();
-        TokenRestriction restriction = sess.getRestrictionForToken(sid);
-        if (restriction != null) {
-            try {
-                info.properties.put(Session.TOKEN_RESTRICTION_PROP,
-                        TokenRestrictionFactory.marshal(restriction));
-            } catch (Exception e) {
-                throw new SessionException(e);
-            }
-        } else if (!sid.equals(sess.getID())) {
-            throw new IllegalArgumentException("Session id mismatch");
-        }
-        // replace master sid with the sid from the request (either master or
-        // restricted) in order not to leak the master sid
-        info.sid = sid.toString();
-        return info;
-    }
-
-    private void checkSession(InternalSession sess, SessionID sid)
-            throws SessionException {
-        if (!sid.equals(sess.getID())
-                && sess.getRestrictionForToken(sid) == null) {
-            throw new IllegalArgumentException("Session id mismatch");
-        }
-
-        if (sess.getState() != Session.VALID) {
-            if (sess.getTimeLeftBeforePurge() > 0) {
-                throw new SessionTimedOutException(SessionBundle
-                        .getString("sessionTimedOut")
-                        + " " + sid);
-            } else {
-                throw new SessionException(SessionBundle
-                        .getString("invalidSessionState")
-                        + " " + sid);
-            }
-        }
     }
 
     /**
@@ -1748,6 +1712,7 @@ public class SessionService {
         tokenIdFactory = InjectorHolder.getInstance(TokenIdFactory.class);
         coreTokenConfig = InjectorHolder.getInstance(CoreTokenConfig.class);
         tokenAdapter = InjectorHolder.getInstance(SessionAdapter.class);
+        sessionInfoFactory = InjectorHolder.getInstance(SessionInfoFactory.class);
 
         try {
             dsameAdminDN = (String) AccessController
@@ -1890,9 +1855,11 @@ public class SessionService {
     } // End of private single constructor.
 
     /**
-     * Initialization Helper Class.
+     * Initialise the ClusterStateService to monitor all Servers within the current
+     * Site, and also all Sites except the current Site. This will allow the
+     * ClusterStateService to provide an answer to whether a Site is up or down.
      *
-     * @throws Exception
+     * @throws Exception If there was an unexpected error during initialisation.
      */
     private synchronized void initializationClusterService() throws Exception {
         int timeout = ClusterStateService.DEFAULT_TIMEOUT;
@@ -1925,8 +1892,22 @@ public class SessionService {
         // Initialize Our Cluster State Service
         // Ensure we place our Server in Member Map.
         clusterMemberMap.put(thisSessionServerID, thisSessionServiceURL.toExternalForm());
+
+        // Collect all Sites to monitor
+        Map<String, String> siteMemberMap = new HashMap<String, String>();
+        for (Object nodeId : WebtopNaming.getAllServerIDs()) {
+            String serverOrSiteId = (String) nodeId;
+            if (WebtopNaming.isSite(serverOrSiteId)) {
+                // Excluding the current local site, as it is not needed for intra-cluster failover.
+                if (isLocalSite(serverOrSiteId)) {
+                    continue;
+                }
+                siteMemberMap.put(serverOrSiteId, WebtopNaming.getServerFromID(serverOrSiteId));
+            }
+        }
+
         // Instantiate the State Service.
-        clusterStateService = new ClusterStateService(this, thisSessionServerID, timeout, period, clusterMemberMap);
+        clusterStateService = new ClusterStateService(this, thisSessionServerID, timeout, period, clusterMemberMap, siteMemberMap);
         // Show our State Server Info Map
         if (sessionDebug.messageEnabled())
             { sessionDebug.message("SessionService's ClusterStateService Initialized Successfully, "+
@@ -2103,6 +2084,16 @@ public class SessionService {
      */
     public boolean checkServerUp(String serverID) {
         return ((serverID == null) || (serverID.isEmpty())) ? false : clusterStateService.checkServerUp(serverID);
+    }
+
+    /**
+     * Indicates that the Site is up.
+     *
+     * @param siteId A possibly null Site Id.
+     * @return True if the Site is up, False if it failed to respond to a query.
+     */
+    public boolean checkSiteUp(String siteId) {
+        return clusterStateService.isSiteUp(siteId);
     }
 
     /**
@@ -2433,7 +2424,7 @@ public class SessionService {
 
                             if (sessionService.isLocalSessionService(parsedUrl)) {
                                 for (SessionID sid : entry.getValue()) {
-                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionInfo info = sessionInfoFactory.getSessionInfo(session, sid);
                                     SessionNotification sn = new SessionNotification(
                                             info, eventType, System.currentTimeMillis());
                                     SessionNotificationHandler.handler.processNotification(sn);
@@ -2496,7 +2487,7 @@ public class SessionService {
 
                             if (!sessionService.isLocalSessionService(parsedUrl)) {
                                 for (SessionID sid : entry.getValue()) {
-                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionInfo info = sessionInfoFactory.getSessionInfo(session, sid);
                                     SessionNotification sn = new SessionNotification(
                                         info, eventType, System.currentTimeMillis());
                                     Notification not = new Notification(sn.toXMLString());

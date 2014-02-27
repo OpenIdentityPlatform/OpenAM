@@ -18,8 +18,11 @@ package org.forgerock.openam.core.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
+import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
@@ -35,7 +38,6 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
@@ -69,6 +71,7 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
@@ -144,27 +147,16 @@ public class CoreGuiceModule extends AbstractModule {
                 return ConfigurationObserver.getInstance();
             }
         }).in(Singleton.class);
-        // CTS Worker Thread Pools
-        bind(ScheduledExecutorService.class)
-                .annotatedWith(Names.named(CoreTokenConstants.CTS_SCHEDULED_SERVICE))
-                .toProvider(new Provider<ScheduledExecutorService>() {
-                    public ScheduledExecutorService get() {
-                        ExecutorServiceFactory factory = InjectorHolder.getInstance(ExecutorServiceFactory.class);
-                        return factory.createScheduledService(1);
-                    }
-                });
-        bind(ExecutorService.class)
-                .annotatedWith(Names.named(CoreTokenConstants.CTS_WORKER_POOL))
-                .toProvider(new Provider<ExecutorService>() {
-                    public ExecutorService get() {
-                        ExecutorServiceFactory factory = InjectorHolder.getInstance(ExecutorServiceFactory.class);
-                        return factory.createThreadPool(5);
-                    }
-                });
+
+        // CTS Monitoring
+        bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
 
         /**
          * Session related dependencies.
          */
+        bind(SessionOperationStrategy.class).to(ServerSessionOperationStrategy.class);
         bind(SessionService.class).toProvider(new Provider<SessionService>() {
             public SessionService get() {
                 return SessionService.getSessionService();
@@ -181,29 +173,25 @@ public class CoreGuiceModule extends AbstractModule {
                 return SessionService.getSessionService();
             }
         });
+
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
-
-        bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
-        bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
-        bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
-        bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
-                .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
     }
 
-    private static class CTSMonitoringStoreExecutorServiceProvider implements Provider<ExecutorService> {
+    @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
+    ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
+        return esf.createThreadPool(5);
+    }
 
-        private final ExecutorServiceFactory executorServiceFactory;
+    @Provides @Inject @Named(CoreTokenConstants.CTS_WORKER_POOL)
+    ExecutorService getCTSWorkerExecutorService(ExecutorServiceFactory esf) {
+        return esf.createThreadPool(5);
+    }
 
-        @Inject
-        public CTSMonitoringStoreExecutorServiceProvider(final ExecutorServiceFactory executorServiceFactory) {
-            this.executorServiceFactory = executorServiceFactory;
-        }
-
-        public ExecutorService get() {
-            return executorServiceFactory.createThreadPool(5);
-        }
+    @Provides @Inject @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE)
+    ScheduledExecutorService getCTSScheduledService(ExecutorServiceFactory esf) {
+        return esf.createScheduledService(1);
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

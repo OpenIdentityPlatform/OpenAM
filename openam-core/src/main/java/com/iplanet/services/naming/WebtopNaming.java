@@ -31,20 +31,6 @@
  */
 package com.iplanet.services.naming;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.monitoring.Agent;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.client.SendRequestException;
@@ -55,20 +41,34 @@ import com.iplanet.services.naming.service.NamingService;
 import com.iplanet.services.naming.share.NamingBundle;
 import com.iplanet.services.naming.share.NamingRequest;
 import com.iplanet.services.naming.share.NamingResponse;
+import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.SystemTimer;
+import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SSOServerInfo;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 /*
  *  these are here temporarily, just to see how long it takes to
  *  build the monitoring stuff
  */
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import com.sun.identity.monitoring.SSOServerInfo;
 
 /*
  *  and this stuff is here for retrieving session config

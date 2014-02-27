@@ -139,6 +139,10 @@
                                 <include>com/iplanet/am/util/**</include>
                                 <include>com/iplanet/dpro/session/service/InternalSession*</include>
                                 <include>com/iplanet/dpro/session/service/SessionService*</include>
+                                <include>com/iplanet/dpro/session/operations/SessionOperations*</include>
+                                <include>com/iplanet/dpro/session/operations/SessionOperationStrategy*</include>
+                                <include>com/iplanet/dpro/session/operations/RemoteSessionOperationStrategy*</include>
+                                <include>com/iplanet/dpro/session/operations/strategies/RemoteOperations*</include>
                                 <include>com/iplanet/dpro/session/share/**</include>
                                 <include>com/iplanet/dpro/session/*</include>
                                 <include>com/iplanet/services/**</include>

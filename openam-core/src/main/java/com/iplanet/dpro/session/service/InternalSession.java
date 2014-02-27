@@ -1262,8 +1262,10 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Sets the last time the client sent a request associated with this
      * session, as the number of seconds since midnight January 1, 1970 GMT.
+     *
+     * Once updated the Session will be persisted.
      */
-    void setLatestAccessTime() {
+    public void setLatestAccessTime() {
         long oldLatestAccessTime = latestAccessTime; 
         latestAccessTime = System.currentTimeMillis() / 1000;
         if ((latestAccessTime - oldLatestAccessTime) > interval) {
@@ -1326,7 +1328,13 @@ public class InternalSession implements TaskRunnable, Serializable {
         updateForFailover();
     }
 
-    TokenRestriction getRestrictionForToken(SessionID sid) {
+    /**
+     * Returns the TokenRestriction for the given SessionID.
+     * 
+     * @param sid Possibly null SessionID.
+     * @return Null indicates there is no restriction on the Session.
+     */
+    public TokenRestriction getRestrictionForToken(SessionID sid) {
         return (TokenRestriction) restrictedTokensBySid.get(sid);
     }
 

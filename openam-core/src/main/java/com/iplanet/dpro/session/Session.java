@@ -35,7 +35,12 @@ package com.iplanet.dpro.session;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
-import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.dpro.session.operations.RemoteSessionOperationStrategy;
+import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
+import com.iplanet.dpro.session.operations.SessionOperationStrategy;
+import com.iplanet.dpro.session.operations.SessionOperations;
+import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
@@ -60,6 +65,7 @@ import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.guice.core.InjectorHolder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
@@ -111,6 +117,7 @@ import java.util.Vector;
 
 public class Session extends GeneralTaskRunnable {
 
+    private static SessionOperationStrategy sessionStrategy;
     /**
      * Used for uniquely referencing this Session object.
      */
@@ -256,7 +263,7 @@ public class Session extends GeneralTaskRunnable {
     private static long purgeDelay;
 
     // Debug instance
-    private static Debug sessionDebug = Debug.getInstance("amSession");
+    private static Debug sessionDebug = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     /**
      * Indicates whether session to use polling or notifications to clear the
@@ -334,7 +341,9 @@ public class Session extends GeneralTaskRunnable {
         } catch (Exception le) {
             appSSOTokenRefreshTime = 3;
         }
-    }        
+    }
+
+    private Requests requests;
 
     static private String getAMServerID() {
         String serverid = null;
@@ -434,8 +443,20 @@ public class Session extends GeneralTaskRunnable {
      */
     Session(SessionID sid) {
         sessionID = sid;
+
         if (isServerMode()) {
-            sessionService = SessionService.getSessionService();
+            // Server Mode has Guice
+            sessionService = InjectorHolder.getInstance(SessionService.class);
+            requests = InjectorHolder.getInstance(Requests.class);
+            sessionStrategy = InjectorHolder.getInstance(ServerSessionOperationStrategy.class);
+        } else {
+            /**
+             * Client Mode initialisation.
+             *
+             * We are aware that SessionService is null in client mode, the Requests code handles this condition.
+             */
+            requests = new Requests(null);
+            sessionStrategy = new RemoteSessionOperationStrategy(new RemoteOperations(sessionDebug, requests));
         }
     }
 
@@ -873,24 +894,8 @@ public class Session extends GeneralTaskRunnable {
             throw new SessionException("Session property name/value cannot be null");
         }
         try {
-            if (isLocal()) {
-                sessionService.setProperty(sessionID, name, value);
-            } else {
-                SessionRequest sreq = new SessionRequest(
-                       SessionRequest.SetProperty, sessionID.toString(), false);
-                sreq.setPropertyName(name);
-                sreq.setPropertyValue(value);
-                if ( isServerMode() && InternalSession.isProtectedProperty(name) ) {
-                    SSOToken admSSOToken = SessionUtils.getAdminToken();
-                    sreq.setRequester(RestrictedTokenContext.marshal(admSSOToken));
-                    if (sessionDebug.messageEnabled()) {
-                        sessionDebug.message("Session.setProperty: "
-                            + "added admSSOToken in sreq to set "
-                            + "externalProtectedProperty in remote server");
-                    }
-                }
-                getSessionResponse(getSessionServiceURL(), sreq);
-            }
+            SessionOperations operation = sessionStrategy.getOperation(this);
+            operation.setProperty(this, name, value);
             sessionProperties.put(name, value);
         } catch (Exception e) {
             throw new SessionException(e);
@@ -941,19 +946,8 @@ public class Session extends GeneralTaskRunnable {
      */
     public void destroySession(Session session) throws SessionException {
         try {
-            if (session.isLocal()) {
-                sessionService.destroySession(this, session.getID());
-                removeSID(session.getID());
-            } else {
-                SessionRequest sreq = new SessionRequest(
-                        SessionRequest.DestroySession, sessionID.toString(),
-                        false);
-                sreq.setDestroySessionID(session.getID().toString());
-                session
-                        .getSessionResponse(session.getSessionServiceURL(),
-                                sreq);
-            }
-
+            SessionOperations operation = sessionStrategy.getOperation(session);
+            operation.destroy(session);
         } catch (Exception e) {
             throw new SessionException(e);
         }
@@ -971,15 +965,9 @@ public class Session extends GeneralTaskRunnable {
      */
     public void logout() throws SessionException {
         try {
-            if (isLocal()) {
-                sessionService.logout(sessionID);
-                removeSID(sessionID);
-            } else {
-                SessionRequest sreq = new SessionRequest(SessionRequest.Logout,
-                        sessionID.toString(), false);
-                getSessionResponse(getSessionServiceURL(), sreq);
-                removeSID(sessionID);
-            }
+            SessionOperations operation = sessionStrategy.getOperation(this);
+            operation.logout(this);
+            removeSID(sessionID);
 
         } catch (Exception e) {
             throw new SessionException(e);
@@ -1376,7 +1364,7 @@ public class Session extends GeneralTaskRunnable {
                     sreq.setPattern(pattern);
                 }
                 
-                SessionResponse sres = getSessionResponseWithoutRetry(svcurl, sreq);
+                SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, this);
                 infos = sres.getSessionInfo();
                 status[0] = sres.getStatus();
             }
@@ -1476,28 +1464,12 @@ public class Session extends GeneralTaskRunnable {
     * @param <code>true</code> refreshes the Session Information
     */
    private void doRefresh(boolean reset) throws SessionException {
-        SessionInfo info = null;
         boolean flag = reset || needToReset;
         needToReset = false;
-        if (isLocal()) {
-            info = sessionService.getSessionInfo(sessionID, flag);
-        } else {
-            SessionRequest sreq = new SessionRequest(SessionRequest.GetSession,
-                    sessionID.toString(), flag);
-            SessionResponse sres = getSessionResponse(getSessionServiceURL(),
-                    sreq);
-            if (sres.getException() != null) {
-                throw new SessionException(SessionBundle.rbName,
-                        "invalidSessionState", null);
-            }
-            
-            List<SessionInfo> infos = sres.getSessionInfo();
-            if (infos.size() != 1) {
-                throw new SessionException(SessionBundle.rbName,
-                        "unexpectedSession", null);
-            }
-            info = infos.get(0);
-        }
+
+       SessionOperations operation = sessionStrategy.getOperation(this);
+       SessionInfo info = operation.refresh(this, reset);
+
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
         long oldMaxSessionTime = maxSessionTime;
@@ -1569,7 +1541,7 @@ public class Session extends GeneralTaskRunnable {
       * @param appSSOToken application SSO Token to bet set
       */
 
-     private void createContext(SSOToken appSSOToken) throws SessionException
+     void createContext(SSOToken appSSOToken) throws SessionException
      {
 
         if (appSSOToken == null) {
@@ -1587,50 +1559,13 @@ public class Session extends GeneralTaskRunnable {
          }
      }
 
-    /**
-     * Sends remote session request without retries.
-     * 
-     * @param svcurl Session Service URL.
-     * @param sreq Session Request object.
-     * @exception SessionException
-     */
-    private SessionResponse getSessionResponseWithoutRetry(URL svcurl,
-            SessionRequest sreq) throws SessionException {
-         SessionResponse sres = null;
-         context = RestrictedTokenContext.getCurrent();
-         SSOToken appSSOToken = null;
-         if (!isServerMode() && !(this.sessionID.getComingFromAuth())) {
-             appSSOToken = (SSOToken) AccessController.doPrivileged(
-                     AdminTokenAction.getInstance());
-             createContext(appSSOToken);
-         }
-         try {
-            if (context != null) {
-                sreq.setRequester(RestrictedTokenContext.marshal(context));
-            }
-            sres = sendPLLRequest(svcurl, sreq);
-            while (sres.getException() != null) {
-                processSessionResponseException(sres, appSSOToken);
-                if (context != null) {
-                    sreq.setRequester(RestrictedTokenContext.marshal(context));
-                }
-                // send request again
-                sres = sendPLLRequest(svcurl, sreq);
-            }
-        } catch (Exception e) {
-            throw new SessionException(e);
-        }
-
-        return sres;
-    }
-
-    /**
+   /**
      * Handle exception coming back from server in the Sessionresponse
      * @exception SessionException
      * @param sres SessionResponse object holding the exception
      */
 
-    private void processSessionResponseException(SessionResponse sres, 
+    void processSessionResponseException(SessionResponse sres,
             SSOToken appSSOToken)
     throws SessionException {
         try {
@@ -1674,7 +1609,7 @@ public class Session extends GeneralTaskRunnable {
                     }
                     SSOToken newAppSSOToken = (SSOToken) 
                         AccessController.doPrivileged(
-                            AdminTokenAction.getInstance());
+                                AdminTokenAction.getInstance());
 
                     if (sessionDebug.messageEnabled()) {
                         sessionDebug.message("Session."
@@ -1699,47 +1634,6 @@ public class Session extends GeneralTaskRunnable {
         }
     }
 
-
-    /**
-     * When used in internal request routing mode, it sends remote session
-     * request with retries. If not in internal request routing mode simply
-     * calls <code>getSessionResponseWithoutRetry</code>.
-     * 
-     * @param svcurl Session Service URL.
-     * @param sreq Session Request object.
-     * @exception SessionException
-     */    
-    private SessionResponse getSessionResponse(URL svcurl, SessionRequest sreq)
-            throws SessionException {
-        if (isServerMode() && SessionService.getUseInternalRequestRouting()) {
-            try {
-                return getSessionResponseWithoutRetry(svcurl, sreq);
-            } catch (SessionException e) {
-                // attempt retry if appropriate
-                String hostServer = sessionService
-                        .getCurrentHostServer(sessionID);
-                if (!sessionService.checkServerUp(hostServer)) {
-                    // proceed with retry
-                    // Note that there is a small risk of repeating request
-                    // twice (e.g., normal exception followed by server failure)
-                    // This danger is insignificant because most of our requests
-                    // are idempotent. For those which are not (e.g.,
-                    // logout/destroy)
-                    // it is not critical if we get an exception attempting to
-                    // repeat this type of request again.
-
-                    URL retryURL = getSessionServiceURL();
-                    if (!retryURL.equals(svcurl)) {
-                        return getSessionResponseWithoutRetry(retryURL, sreq);
-                    }
-                }
-                throw e;
-            }
-        } else {
-            return getSessionResponseWithoutRetry(svcurl, sreq);
-        }
-    }
-
     /**
      * Add listener to Internal Session.
      */
@@ -1759,7 +1653,7 @@ public class Session extends GeneralTaskRunnable {
                         SessionRequest.AddSessionListener,
                         sessionID.toString(), false);
                 sreq.setNotificationURL(url);
-                getSessionResponse(getSessionServiceURL(), sreq);
+                requests.sendRequestWithRetry(getSessionServiceURL(), sreq, this);
             }
         } catch (Exception e) {
         }
@@ -2011,7 +1905,7 @@ public class Session extends GeneralTaskRunnable {
      * 
      * @return true if running in core server mode, false otherwise
      */
-    static boolean isServerMode() {
+    public static boolean isServerMode() {
         return SystemProperties.isServerMode();
     }
 
