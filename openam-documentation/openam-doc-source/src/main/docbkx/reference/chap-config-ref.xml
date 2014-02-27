@@ -2240,7 +2240,7 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Shared Consent Attribute Name</term>
+    <term>Saved Consent Attribute Name</term>
     <listitem>
      <para>Name of a multi-valued attribute on resource owner profiles where
      OpenAM can save authorization consent decisions. When the resource owner

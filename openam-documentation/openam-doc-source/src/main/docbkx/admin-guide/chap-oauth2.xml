@@ -624,7 +624,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      Set a multi-valued, string syntax profile attribute
      where OpenAM can store a resource owner's decisions to authorize clients
      without further interaction
-     in the Shared Consent Attribute Name field.
+     in the Saved Consent Attribute Name field.
     </para>
 
     <para>
@@ -638,7 +638,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      When moving to production, however, use
      a dedicated, multi-valued, string syntax profile attribute
      that clearly is not used for other purposes. For example,
-     you might call the attribute <literal>oAuth2SharedConsent</literal>.
+     you might call the attribute <literal>oAuth2SavedConsent</literal>.
     </para>
 
     <para>
