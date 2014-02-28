@@ -109,6 +109,15 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term><option>--acceptLicense</option></term>
+    <listitem>
+     <para>Auto-accepts the software license agreement. If this option is present
+      on the command line with the <option>--install</option> or <option>--custom-install</option>
+      option, the license agreement prompt is suppressed and the agent install continues.
+      To view the license agreement, open <filename>license.txt</filename>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term><option>--uninstall</option></term>
     <listitem>
      <para>Uninstalls an existing Agent instance.</para>
@@ -213,7 +222,7 @@
   <para>The following example installs an Apache HTTP Server 2.2 interactively,
   where Apache HTTP Server has been installed under
   <filename>/path/to/apache22</filename>.</para>
-  <screen>$ ./agentadmin --install
+  <screen>$ ./agentadmin --install --acceptLicense
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES

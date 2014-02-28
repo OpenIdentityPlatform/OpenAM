@@ -449,6 +449,9 @@ CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
     <para>Browse to OpenAM where it is deployed in Tomcat, for example
     <literal>http://openam.example.com:8080/openam/</literal>, to configure
     the application.</para>
+   </step>
+   <step>
+    <para>On the OpenAM home page, click Create Default Configuration. </para>
 
     <mediaobject xml:id="figure-openam-home-page">
      <alt>OpenAM home page</alt>
@@ -461,10 +464,22 @@ CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
      </textobject>
     </mediaobject>
    </step>
-
    <step>
-    <para>On the OpenAM home page, click the link to Create Default
-    Configuration, set the Default User [amAdmin] password to
+    <para>Review the software license agreement. If you agree to the license,
+    click "I accept the license agreement", and then click Continue. </para>
+
+    <mediaobject xml:id="figure-openam-license-default">
+     <alt>OpenAM License Agreement</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-license-default.png" format="PNG"/>
+     </imageobject>
+     <textobject>
+      <para>You must accept the license agreement to continue the install.</para>
+     </textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>Set the Default User [amAdmin] password to
     <literal>password</literal> and the Default Policy Agent [UrlAccessAgent]
     password to <literal>secret12</literal>, and then click Create
     Configuration to configure OpenAM.</para>
@@ -740,8 +755,18 @@ $ unzip ~/Downloads/apache_v22_Linux_agent*.zip</screen>
     you provide the correct information to the installer as shown in the
     following example.</para>
 
-    <screen>$ cd /path/to/web_agents/apache22_agent/bin
-$ ./agentadmin --install
+    <para>When you run the command, you will be prompted to read and accept the
+     software license agreement for the agent install. If you agree to its terms,
+     enter <literal>yes</literal> to continue the install.</para>
+
+    <para>You can suppress the license agreement prompt by including the
+     <option>--acceptLicense</option> option on the command line.
+     The inclusion of the option indicates that you have read and accepted
+     the terms stated in the license.
+     To view the license agreement, open <filename>license.txt</filename>.</para>
+
+       <screen>$ cd /path/to/web_agents/apache22_agent/bin
+$ ./agentadmin --install --acceptLicense
 ...
 
 -----------------------------------------------

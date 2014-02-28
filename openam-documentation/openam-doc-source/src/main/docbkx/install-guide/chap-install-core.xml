@@ -241,6 +241,18 @@
    Create Default Configuration under Default Configuration.</para>
   </step>
   <step>
+   <para>Review the software license agreement. If you agree to the license,
+       click "I accept the license agreement", and then click Continue.</para>
+
+   <mediaobject xml:id="figure-openam-license">
+    <alt>OpenAM default configuration license</alt>
+     <imageobject>
+      <imagedata fileref="images/openam-license-dialog.png" format="PNG" />
+     </imageobject>
+    <textobject><para>You must accept the license agreement to continue.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
    <para>Provide different passwords for the default OpenAM administrator,
    <literal>amadmin</literal>, and default Policy Agent users.</para>
    <mediaobject xml:id="figure-openam-default-conf">
@@ -333,7 +345,7 @@ Using CLASSPATH:
  </procedure>
 
  <procedure xml:id="configure-openam-custom">
-  <title>To Configure OpenAM</title>
+  <title>To Custom Configure OpenAM</title>
   <indexterm>
    <primary>Installing</primary>
    <secondary>Interactive configuration</secondary>
@@ -343,8 +355,12 @@ Using CLASSPATH:
    Create New Configuration under Custom Configuration.</para>
   </step>
   <step>
-   <para>Provide a password having at least 8 characters for the OpenAM
-   Administrator, <literal>amadmin</literal>.</para>
+   <para>Read the license agreement. If you agree to the license, click
+   "I agree to the license agreement", and then click Continue.</para>
+  </step>
+  <step>
+   <para>On the Default User Password page, provide a password having at least
+    8 characters for the OpenAM Administrator, <literal>amadmin</literal>.</para>
    <mediaobject xml:id="figure-openam-conf-amadmin">
     <alt>OpenAM amadmin password</alt>
     <imageobject>

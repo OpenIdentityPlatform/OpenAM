@@ -79,135 +79,22 @@ $ which java
   policy agent. The agent you install stores its configuration and logs
   under this directory.</para>
   
-  <variablelist>
-   <para>When you unzip the policy agent .zip download, you find the following
+
+  <para>When you unzip the policy agent .zip download, you find the following
    directories under the <filename>web_agents/apache22_agent</filename>
    directory.</para>
-   <varlistentry>
-    <term><filename>bin</filename></term>
-    <listitem>
-     <para>Contains the installation and configuration program,
-     <command>agentadmin</command>; the certificate management tool
-     <command>certutil</command> and the password hashing tool
-     <command>crypt_util</command>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>config</filename></term>
-    <listitem>
-     <para>Configuration templates used by the <command>agentadmin</command>
-     command during installation</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>data</filename></term>
-    <listitem>
-     <para>Not used</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>etc</filename></term>
-    <listitem>
-     <para>Apache configuration template used during installation</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>installer-logs</filename></term>
-    <listitem>
-     <para>Location for log files written during installation</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>lib</filename></term>
-    <listitem>
-     <para>Shared libraries used by the web policy agent</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>locale</filename></term>
-    <listitem>
-     <para>Property files used by the installation program</para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
+
+  <xinclude:include href="../shared/variablelist-agentadmin-folders.xml" />
  </section>
  
  <section xml:id="install-apache22-web-agent">
   <title>Installing Apache 2.2 Web Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
-  
-  <procedure xml:id="create-apache22-agent-profile">
-   <title>To Create the Apache 2.2 Web Agent Profile</title>
-   
-   <para>Regardless of whether you store configurations centrally in OpenAM
-   or locally with your agents, the agent requires a profile so that it can
-   connect to and communicate with OpenAM.</para>
-   <step>
-    <para>In the OpenAM console, browse to Access Control &gt;
-    <replaceable>Realm Name</replaceable>&gt; Agents &gt; Web,
-    and then click the New... button in the Agent table.</para>
-   </step>
-   <step>
-    <para>Complete the web form using the following hints.</para>
-    <variablelist>
-     <varlistentry>
-      <term>Name</term>
-      <listitem>
-       <para>The name for the agent profile used when you install the
-       agent</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Password</term>
-      <listitem>
-       <para>Password the agent uses to authenticate to OpenAM</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Configuration</term>
-      <listitem>
-       <para>Centralized configurations are stored in the OpenAM configuration
-       store. You can manage the centralized configuration through the OpenAM
-       console. Local configurations are stored in a file alongside the
-       agent.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Server URL</term>
-      <listitem>
-       <para>The full URL to an OpenAM instance, or if OpenAM is deployed in
-       a site configuration (behind a load balancer) then the site URL</para>
-       <para>In centralized configuration mode, the Server URL is used to
-       populate the agent profile for services such as Login, Logout, Naming,
-       and Cross Domain SSO.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Agent URL</term>
-      <listitem>
-       <para>The web server URL that the agent protects</para>
-       <para>In centralized configuration mode, the Agent URL is used to
-       populate the Agent Profile for services such as notifications.</para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-   </step>
-  </procedure>
-  
-  <procedure xml:id="create-apache22-agent-pwdfile">
-   <title>To Create the Password File</title>
-   
-   <step>
-    <para>Create a text file containing only the password.</para>
-    <screen>$ echo password > /tmp/pwd.txt</screen>
-   </step>
-   <step>
-    <para>Protect the password file you create as appropriate for your
-    operating system.</para>
-    <screen>$ chmod 400 /tmp/pwd.txt</screen>
-   </step>
-  </procedure>
+
+  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
+
+  <xinclude:include href="../shared/procedure-create-password-file.xml" />
   
   <procedure xml:id="install-agent-into-apache22">
    <title>To Install the Policy Agent into Apache 2.2</title>
@@ -222,8 +109,19 @@ $ which java
    </step>
    <step>
     <para>Run <command>./agentadmin --install</command> to install the agent.</para>
+
+    <para>When you run the command, you will be prompted to read and accept the
+     software license agreement for the agent installation. If you agree to its terms,
+     enter <literal>yes</literal> to continue.</para>
+
+    <para>You can suppress the license agreement prompt by including the
+     <sbr/><option>--acceptLicense</option> option on the command line.
+     The inclusion of the option indicates that you have read and accepted
+     the terms stated in the license.
+     To view the license agreement, open <filename>license.txt</filename>.</para>
+
     <screen>$ cd /path/to/web_agents/apache22_agent/bin/
-$ ./agentadmin --install
+$ ./agentadmin --install --acceptLicense
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
@@ -553,13 +451,15 @@ Thank you for using OpenAM Policy Agent</screen>
   <title>Custom Apache 2.2 Web Policy Agent Installation</title>
   
   <para>When running multiple Apache 2.2 servers on the same host, use
-  <command>./agentadmin --custom-install</command>.</para>
+  <command>./agentadmin --custom-install</command>. If you want to suppress
+  the license agreement prompt, add the <command>--acceptLicense</command> option to
+  the command.</para>
   
   <para>When performing a scripted, silent installation, use
   <command>./agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
   to create a response file for scripted installation. Then install silently
-  using <command>./agentadmin --install --useResponse
+  using <command>./agentadmin --install --acceptLicense --useResponse
   <replaceable>response-file</replaceable></command>.</para>
 
   <para>With <command>./agentadmin --custom-install</command>, you can opt to

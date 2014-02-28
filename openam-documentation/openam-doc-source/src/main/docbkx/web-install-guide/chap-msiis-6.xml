@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-msiis-6'
@@ -30,6 +30,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
  <title>Installing the Microsoft IIS 6 Policy Agent</title>
  <indexterm><primary>Microsoft IIS</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Microsoft 
@@ -95,65 +96,9 @@
   <title>Installing IIS 6 Web Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
-  
-  <procedure xml:id="create-iis6-agent-profile">
-   <title>To Create the IIS 6 Web Agent Profile</title>
-   
-   <para>Regardless of whether you store configurations centrally in OpenAM
-   or locally with your agents, the agent requires a profile so that it can
-   connect to and communicate with OpenAM.</para>
-   <step>
-    <para>In the OpenAM console, browse to Access Control &gt;
-    <replaceable>Realm Name</replaceable>&gt; Agents &gt; Web,
-    and then click the New... button in the Agent table.</para>
-   </step>
-   <step>
-    <para>Complete the web form using the following hints.</para>
-    <variablelist>
-     <varlistentry>
-      <term>Name</term>
-      <listitem>
-       <para>The name for the agent profile used when you install the
-       agent</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Password</term>
-      <listitem>
-       <para>Password the agent uses to authenticate to OpenAM</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Configuration</term>
-      <listitem>
-       <para>Centralized configurations are stored in the OpenAM configuration
-       store. You can manage the centralized configuration through the OpenAM
-       console. Local configurations are stored in a file alongside the
-       agent.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Server URL</term>
-      <listitem>
-       <para>The full URL to an OpenAM instance, or if OpenAM is deployed in
-       a site configuration (behind a load balancer) then the site URL</para>
-       <para>In centralized configuration mode, the Server URL is used to
-       populate the agent profile for services such as Login, Logout, Naming,
-       and Cross Domain SSO.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Agent URL</term>
-      <listitem>
-       <para>The web server URL that the agent protects</para>
-       <para>In centralized configuration mode, the Agent URL is used to
-       populate the Agent Profile for services such as notifications.</para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-   </step>
-  </procedure>
-  
+
+  <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
+
   <procedure xml:id="create-iis6-agent-pwdfile">
    <title>To Create the Password File</title>
    

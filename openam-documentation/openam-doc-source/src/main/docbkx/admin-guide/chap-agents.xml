@@ -346,7 +346,9 @@ Agent configuration was created.</screen>
     <option>--custom-install</option> option, the system administrator can
     choose the option to create the profile during installation, and then
     provide the agent administrator user name and the path to a read-only
-    file containing the agent administrator password.</para>
+    file containing the agent administrator password. For silent installs,
+    you can add the <option>--acceptLicense</option> option to auto-accept the
+    software license agreement. </para>
    </step>
   </procedure>
  </section>

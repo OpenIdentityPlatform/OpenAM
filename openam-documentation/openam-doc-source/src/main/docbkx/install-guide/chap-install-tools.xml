@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-tools'
@@ -40,7 +40,7 @@
 
  <variablelist>
   <varlistentry>
-   <term><filename><?eval ${ssoadminZipFile}?></filename></term>
+   <term><filename>${ssoadminZipFile}</filename></term>
    <listitem>
     <para>Administration tools: <command>ampassword</command>,
     <command>ssoadm</command> and <command>amverifyarchive</command></para>
@@ -79,7 +79,13 @@
    The <command>ssoadm</command> tool is not designed to run on a host
    where only the distributed authentication service (DAS) is installed.
   </para>
-
+  <para>The <command>ssoadm</command> tool also provides the ability to auto-accept
+   the software license agreement and suppress the license acceptance screen
+   to the user.
+   To do so, you can add the <literal>--acceptLicense</literal> option to the
+   <command>setup</command> or <command>setup.bat</command>
+   script before you install the tool. If the option is not present, you must
+   scroll through and accept the license interactively.</para>
   <step>
    <para>Make sure OpenAM is installed and running before proceeding.</para>
   </step>
@@ -100,9 +106,23 @@
    <para>Unpack the tools.</para>
 
    <screen>$ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?></screen>
+$ unzip ~/Downloads/openam/${ssoadminZipFile}</screen>
   </step>
+  <step performance="optional">
 
+   <para>Optional. Add <literal>--acceptLicense</literal> to the
+    <command>java</command> command at the end of the <command>setup</command> or
+    <command>setup.bat</command> script to auto-accept the license agreement and
+    suppress the license acceptance screen to the user.</para>
+    <screen>$JAVA_HOME/bin/java -D"load.config=yes" \
+             -D"help.print=$help_print" \
+             -D"path.AMConfig=$path_AMConfig" \
+             -D"path.debug=$path_debug" \
+             -D"path.log=$path_log" \
+             -cp "$CLASSPATH" \
+             com.sun.identity.tools.bundles.Main \
+             --acceptLicense</screen>
+     </step>
   <step performance="optional">
    <para>If you use IBM Java, add
    <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
@@ -113,17 +133,23 @@ $ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?></screen>
    <para>The options should be set for the <command>java</command> command
    at the end of the script.</para>
 
+   <para>You can optionally apply the <literal>--acceptLicense</literal> argument
+   to the end of the script if you want to auto-accept the software
+   license agreement and suppress the license acceptance screen to the user.</para>
+
    <screen>$ tail setup
 CLASSPATH="$CLASSPATH:resources"
 
-$JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
-                      -D"path.AMConfig=$path_AMConfig" \
-                      -D"path.debug=$path_debug" \
-                      -D"path.log=$path_log" \
-                      -D"amCryptoDescriptor.provider=IBMJCE" \
-                      -D"amKeyGenDescriptor.provider=IBMJCE" \
-                      -cp "$CLASSPATH" \
-                      com.sun.identity.tools.bundles.Main</screen>
+$JAVA_HOME/bin/java -D"load.config=yes" \
+                    -D"help.print=$help_print" \
+                    -D"path.AMConfig=$path_AMConfig" \
+                    -D"path.debug=$path_debug" \
+                    -D"path.log=$path_log" \
+                    -D"amCryptoDescriptor.provider=IBMJCE" \
+                    -D"amKeyGenDescriptor.provider=IBMJCE" \
+                    -cp "$CLASSPATH" \
+                    com.sun.identity.tools.bundles.Main \
+                    --acceptLicense</screen>
   </step>
 
   <step>
@@ -271,7 +297,7 @@ http://openam.example.com:8080/openam</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <informalexample><?dbfo pgwide="1"?>
+   <informalexample><!--?dbfo pgwide="1"?-->
    <screen>$ cd /path/to/openam-tools/config
 $ unzip ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
 Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
@@ -282,6 +308,8 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
  extracting: <?eval ${ssoconfigUpgradeJarFile}?>
   inflating: license.txt</screen>
    </informalexample>
+  </step>
+  <step>
    <para>Set up configuration files based on the
    <filename>sampleconfiguration</filename> example, and then apply the
    configuration to a deployed OpenAM .war file using the following
@@ -294,6 +322,19 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
    <link xlink:show="new" xlink:href="reference#man-configurator-jar-1"
    xlink:role="http://docbook.org/xlink/role/olink"
    ><command>configurator.jar</command></link>.</para>
+   <note>
+       <para>OpenAM supports two methods to auto-accept the software licensing
+        agreement and suppress the display of the licence acceptance screen to
+        the user: using the configuration file or using a command-line option.
+        You can include an optional <literal>ACCEPT_LICENSES=true</literal> property
+        in the ${ssoconfigJarFile} configuration file.
+        You can also use the <option>--acceptLicense</option> option with the
+        configurator tool on the command line. The configuration file property
+        has precedence over the command-line option. The default value is
+        <literal>false</literal>, which always displays the license acceptance screen.</para>
+       <screen>$ java -jar ${ssoconfigJarFile} -f <replaceable>config.file</replaceable> \
+  --acceptLicense</screen>
+   </note>
   </step>
  </procedure>
 

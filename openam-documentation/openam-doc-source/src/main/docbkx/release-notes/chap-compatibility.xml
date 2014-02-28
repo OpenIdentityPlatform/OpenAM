@@ -38,7 +38,18 @@
   <title>Important Changes to Existing Functionality</title>
 
   <itemizedlist>
-
+   <!-- Update docs for click-through license acceptance KEEP THIS AT TOP -->
+   <listitem>
+       <para>All OpenAM core server, tools, and agent installers now display a
+        software license acceptance screen prior to configuration.
+        You must agree to the license to continue the configuration. </para>
+       <para>For users implementing scripted or silent installs, the installers
+       and upgrader tools provide a <option>--acceptLicense</option> command-line
+       option, indicating that you have read and accepted the terms of the
+       license. If the option is not present on the command-line invocation,
+       the installer or upgrader will interactively present a license agreement
+       screen to the user.</para>
+   </listitem>
    <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
    <listitem>
     <para>When you create a new OpenAM custom configuration that uses an

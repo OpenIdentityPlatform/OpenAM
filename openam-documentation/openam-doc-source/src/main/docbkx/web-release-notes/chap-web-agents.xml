@@ -40,23 +40,47 @@
 
   <itemizedlist>
    <listitem>
-    <para>All of the web policy agents have been updated to include support for
-    Internet Protocol version 6 (IPv6) support, in addition to support for
-    IPv4.</para>
+    <para><emphasis role="bold">Click-Through Licensing</emphasis>. The
+     <command>agentadmin --install</command>command now displays a
+     software license acceptance prompt prior to installing a J2EE agent. You can
+     scroll through the license by pressing &lt;Enter&gt;.
+     At the prompt, enter <literal>yes</literal> to accept the license and
+     continue the installation.</para>
+     <screen>$ bin/agentadmin --install
+
+Please read the following License Agreement carefully:
+
+[Press &lt;Enter> to continue...] or [Enter n To Finish]
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]:
+          </screen>
+     <para>For scripted or silent installs, you can include the
+      <option>--acceptLicense</option> option on the command line to suppress the
+      license acceptance prompt. Using the option indicates that you have read and
+      accepted the terms stated in the license.</para>
+    </listitem>
+   <listitem>
+    <para><emphasis role="bold">IPv4 &amp; IPv6</emphasis>. All of the web policy
+     agents have been updated to include support for
+     Internet Protocol version 6 (IPv6) support, in addition to support for
+     IPv4.</para>
    </listitem>
 
    <listitem>
-    <para>Web policy agents now encrypt the value of the
+    <para><emphasis role="bold">Certdb Password Encryption</emphasis>Web policy
+        agents now encrypt the value of the
     <literal>com.sun.identity.agents.config.certdb.password</literal> property
     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2479"
     xlink:show="new">OPENAM-2479</link>).</para>
    </listitem>
 
    <listitem>
-    <para>Web policy agents debug logs now show the full REST URL accessed
-    during the bootstrap process (<link xlink:show="new"
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2397"
-    >OPENAM-2397</link>).</para>
+    <para><emphasis role="bold">Debug Logs Show Bootstrap REST URLs</emphasis>.
+     Web policy agents debug logs now show the full REST URL accessed
+     during the bootstrap process (<link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2397"
+     >OPENAM-2397</link>).</para>
    </listitem>
 
 <!--

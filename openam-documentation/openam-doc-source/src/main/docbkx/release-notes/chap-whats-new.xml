@@ -38,8 +38,92 @@
 
   <listitem>
     <para>
-     TODO: Update for next version
+     <!-- KEEP THIS AT TOP -->
+     <emphasis role="bold">Click-Through Licensing</emphasis>. OpenAM now
+      displays a software license acceptance screen when
+      configuring the core server, OpenAM tools, and Web and J2EE agents.
+      You must agree to the license to complete the installation of OpenAM and
+      its components.</para>
+
+     <para>You can view a copy of the license at
+      <filename>&lt;server-root>/license.txt</filename>.
+      The default folder location for the licenses is stored at
+      <filename>WEB-INF/legal-notices</filename>.
     </para>
+    <itemizedlist>
+     <listitem>
+      <para><emphasis>GUI Installer</emphasis>. When you select either the
+       Create Default Configuration or Create New Configuration link on the
+       OpenAM Configurator page, the software license agreement screen is
+       displayed. Click the checkbox to accept the license and
+       continue the configuration.</para>
+
+      <mediaobject xml:id="openam-license-dialog">
+       <alt>OpenAM License Agreement</alt>
+       <imageobject>
+        <imagedata fileref="images/openam-license-dialog.png" format="PNG"/>
+       </imageobject>
+       <textobject>
+        <para>You must accept the license agreement to continue the install.</para>
+       </textobject>
+      </mediaobject>
+     </listitem>
+     <listitem>
+      <para><emphasis>Web and J2EE Agent Installers</emphasis>. The
+       <command>agentadmin --install</command> command now displays the
+       software license acceptance screen prior to installing the agent.
+       You can scroll through the license by pressing &lt;Enter&gt;.
+       At the prompt, enter <literal>yes</literal> to accept the license and
+       continue the installation.</para>
+       <screen>$ bin/agentadmin --install
+
+Please read the following License Agreement carefully:
+
+Press &lt;Enter> to continue...] or [Enter n To Finish]
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]:</screen>
+      <para>For scripted or silent installs, OpenAM provides a new command-line
+       option, <option>--acceptLicense</option>, to suppress the license acceptance
+       screen.
+       Using the option indicates that you have read and accepted the terms
+       stated in the license.</para>
+     </listitem>
+     <listitem>
+      <para><emphasis>SSOADM</emphasis>. The <command>ssoadm</command> tool
+       has been updated to display the license acceptance screen when the
+       <command>setup</command> or <command>setup.bat</command> command is run.
+       Enter <literal>yes</literal> to accept the license and continue the
+       configuration.</para>
+<screen>Do you accept the license? yes</screen>
+      <para>For scripted or silent installs, you can modify the
+       <command>setup</command> or <command>setup.bat</command> script
+       with the addition of the <sbr/><option>--acceptLicense</option> option.
+       Simply append the option to the end of the script as follows:</para>
+       <programlisting>$JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
+ -D"path.AMConfig=$path_AMConfig" -D"path.debug=$path_debug" \
+ -D"path.log=$path_log" \
+ -cp "$CLASSPATH" com.sun.identity.tools.bundles.Main \
+ --acceptLicense</programlisting>
+      </listitem>
+      <listitem>
+       <para><emphasis>Configurator and Upgrader Jar Files</emphasis>. The
+        executable jar files, ${ssoconfigJarFile} and ${ssoconfigUpgradeJarFile},
+        now support an optional <property>ACCEPT_LICENSES</property> property
+        that can be added to the configuration file.
+        If <property>ACCEPT_LICENSES=true</property>, the license acceptance
+        screen will be skipped when the jar file is run with the configuration file.
+        Any other value will be assumed to equal <literal>false</literal>, resulting
+        in the presentation of the license acceptance screen. Default value is
+        <literal>false</literal>.</para>
+
+       <para>The configurator and upgrader executable jar files also accept the
+        <option>--acceptLicense</option> option on the command line.
+        The configuration property, <property>ACCEPT_LICENSES</property>, has
+        precedence over the command-line option, <option>--acceptLicense</option>.
+       </para>
+      </listitem>
+    </itemizedlist>
   </listitem>
 
  </itemizedlist>
@@ -48,7 +132,7 @@
   <title>Additional New Features</title>
 
   <listitem><!-- Enhancement: AME-2210 -->
-   <para>
+   <para><emphasis role="bold">Persistent Cookie from Client IP Issued</emphasis>.
     The Persistent Cookie module has been enhanced to enforce
     that the persistent cookie can only be used from the same client IP
     to which the cookie was issued.

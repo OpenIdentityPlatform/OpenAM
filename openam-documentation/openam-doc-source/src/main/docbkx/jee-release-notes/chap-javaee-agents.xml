@@ -40,7 +40,28 @@
 
   <itemizedlist>
    <listitem>
-    <para>A new Java EE policy agent for JBoss 7 has been added. The new agent
+    <para><emphasis role="bold">Click-Through Licensing</emphasis>. The
+     <command>agentadmin --install</command>command now displays a
+     software license acceptance prompt prior to installing a J2EE agent. You can
+     scroll through the license by pressing &lt;Enter&gt;.
+     At the prompt, enter <literal>yes</literal> to accept the license and
+     continue the installation.</para>
+    <screen>$ bin/agentadmin --install
+
+Please read the following License Agreement carefully:
+
+[Press &lt;Enter> to continue...] or [Enter n To Finish]
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]:
+ </screen>
+    <para>For scripted or silent installs, you can include the
+     <option>--acceptLicense</option> option on the command line to suppress the
+     license acceptance prompt. Using the option indicates that you have read and
+     accepted the terms stated in the license.</para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">JBoss 7 Support</emphasis>. A new Java EE policy agent for JBoss 7 has been added. The new agent
     simplifies integration with JBoss AS 7 (EAP 6) application servers by
     leveraging the module system introduced in JBoss 7 (<link xlink:show="new"
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1806"
@@ -49,28 +70,28 @@
     >OPENAM-1735</link>).</para>
    </listitem>
    <listitem>
-    <para>Java EE policy agents now fully support Java 7 environments.</para>
+    <para><emphasis role="bold">Java 7 Support</emphasis>. Java EE policy agents now fully support Java 7 environments.</para>
    </listitem>
    <listitem>
-    <para>The Java EE agent goto URL can now be modified (<link
+    <para><emphasis role="bold">Modifiable goto URL</emphasis>. The Java EE agent goto URL can now be modified (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
     xlink:show="new">OPENAM-1299</link>).</para>
    </listitem>
    <listitem>
-    <para>The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
+    <para><emphasis role="bold">Tomcat 7 Support</emphasis>. The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
     xlink:show="new">OPENAM-1273</link>, <link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-591"
     xlink:show="new">OPENAM-591</link>).</para>
    </listitem>
    <listitem>
-    <para>Java EE policy agents can now conditionally redirect users based on
+    <para><emphasis role="bold">Conditional Redirect</emphasis>. Java EE policy agents can now conditionally redirect users based on
     the incoming request URL (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
     xlink:show="new">OPENAM-1265</link>).</para>
    </listitem>
    <listitem>
-    <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
+    <para><emphasis role="bold">Auto-Submitting Form Parses Valid XML</emphasis>. The auto-submitting form in <filename>FormLoginContent.txt</filename>
     now parses as valid XML (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
     xlink:show="new">OPENAM-674</link>).</para>
