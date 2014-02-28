@@ -74,7 +74,15 @@ namespace Sun.Identity.Saml2
         /// <param name="context">HttpContext used for reading application data.</param>
         public ServiceProviderUtility(HttpContext context)
         {
-            this.Initialize(context.Server.MapPath(@"App_Data"));
+             DirectoryInfo dirInfoCheck = new DirectoryInfo(context.Server.MapPath(@"/App_Data"));
+             if (dirInfoCheck.Exists)
+             {
+                 this.Initialize(context.Server.MapPath(@"/App_Data"));
+             }
+             else
+             {
+                 this.Initialize(context.Server.MapPath(@"App_Data"));
+             }
         }
 
         /// <summary>
