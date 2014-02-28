@@ -132,7 +132,7 @@ $ which java
      enter <literal>yes</literal> to continue.</para>
 
     <para>You can suppress the license agreement prompt by including the
-     <sbr/><option>--acceptLicense</option> option on the command line.
+     <option>--acceptLicense</option> option on the command line.
      The inclusion of the option indicates that you have read and accepted
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
