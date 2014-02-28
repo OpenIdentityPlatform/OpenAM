@@ -3113,7 +3113,7 @@ CookieWriterServlet.doGetPost: Redirect to
  </section>
 
  <section xml:id="auto-federation">
-   <title>Configuring Auto-Federation</title>
+   <title>Configuring How Remote Accounts Map To Local Accounts</title>
 
    <para>OpenAM lets you configure the service provider to link an account
    based on an attribute value from the identity provider. When you know
@@ -3139,9 +3139,9 @@ CookieWriterServlet.doGetPost: Redirect to
    />.</para>
 
    <procedure xml:id="auto-federate-based-on-attribute">
-    <title>To Auto-Federate Accounts Based on an Attribute Value</title>
+    <title>To Map Accounts Based on an Attribute Value</title>
 
-    <para>The following steps demonstrate how to auto-federate accounts based
+    <para>The following steps demonstrate how to map accounts based
     on an attribute value that is the same in both accounts.</para>
 
     <para>Perform the following steps on the hosted identity provider(s), and
@@ -3154,9 +3154,11 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Browse to Federation &gt; <replaceable
      >hosted-provider-name</replaceable> &gt; Assertion Processing.</para>
     </step>
-    <step performance="optional">
-     <para>If the attribute to use for auto-federation is not yet in the
-     attribute map, add the attribute mapping, and then Save your work.</para>
+    <step>
+     <para>
+      If the attribute to use when linking accounts is not yet included
+      in the attribute map, add the attribute mapping, and then Save your work.
+     </para>
     </step>
     <step>
      <para>On the hosted service provider, under Auto Federation, select
@@ -3166,7 +3168,7 @@ CookieWriterServlet.doGetPost: Redirect to
    </procedure>
 
    <procedure xml:id="auto-federate-using-anonymous">
-    <title>To Auto-Federate Using a Single Service Provider Account</title>
+    <title>To Map Remote Accounts to a Single Service Provider Account</title>
 
     <para>The following steps demonstrate how to auto-federate using a single
     anonymous user account on the service provider.</para>
@@ -3181,9 +3183,9 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Browse to Federation &gt; <replaceable
      >hosted-provider-name</replaceable> &gt; Assertion Processing.</para>
     </step>
-    <step performance="optional">
+    <step>
      <para>If you want to get attributes from the identity provider and the
-     attributes are is not yet in the attribute map, add the attribute mapping,
+     attributes are not yet in the attribute map, add the attribute mappings,
      and then Save your work.</para>
     </step>
     <step>
@@ -3199,13 +3201,15 @@ CookieWriterServlet.doGetPost: Redirect to
    </procedure>
 
    <procedure xml:id="auto-federate-with-dynamic-creation">
-    <title>To Auto-Federate With Dynamic Service Provider Account Creation</title>
+    <title>To Map Accounts With Dynamic Service Provider Account Creation</title>
 
-    <para>The following steps demonstrate how to auto-federate, dynamically
-    creating an account on the service provider if necessary.</para>
+    <para>
+     The following steps demonstrate how to map accounts
+     with dynamic creation of missing accounts on the service provider side.
+    </para>
 
     <step>
-     <para>Set up auto-federation as described in <xref
+     <para>Set up a mapping based on an attribute value as described in <xref
      linkend="auto-federate-based-on-attribute" />. The attributes you map
      from the identity provider are those that the service provider sets on
      the dynamically created accounts.</para>
@@ -3330,6 +3334,38 @@ Bulk Federation for this host was completed.</screen>
    </orderedlist>
 
    <para>At this point the accounts are linked.</para>
+  </section>
+
+  <section xml:id="saml2-authentication">
+   <title>Authentication &amp; Linked Accounts</title>
+
+   <para>
+    In a SAML 2.0 federation where accounts are durably linked,
+    authentication is required only on the identity provider side.
+   </para>
+
+   <para>
+    Authentication is also required however on the service provider side
+    when the OpenAM account mapper on the service provider is not able to map
+    the user identified in the SAML assertion from the identity provider
+    to a local user account.
+   </para>
+
+   <para>
+    This can happen for example the first time accounts are linked
+    as described in <xref linkend="persistent-federation" />,
+    after which the persistent identifier establishes the mapping.
+   </para>
+
+   <para>
+    This also happens when transient identifiers are used to map accounts.
+    When accounts are linked as described in
+    <xref linkend="transient-federation" />,
+    then the service provider must locally authenticate the user
+    for every SAML assertion received.
+    This is because the identifier used to link the accounts is transient:
+    it does not provide a durable means to link the accounts.
+   </para>
   </section>
  </section>
 
