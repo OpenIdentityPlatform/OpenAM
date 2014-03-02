@@ -1092,7 +1092,7 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         NameIDInfoKey infoKey = null;
         String affiliationID = nameID.getSPNameQualifier();
-        if (affiliationID != null) {
+        if (affiliationID != null && !affiliationID.isEmpty()) {
             AffiliationDescriptorType affiDesc =
                 saml2MetaManager.getAffiliationDescriptor(realm, affiliationID);
             if (affiDesc == null) {
