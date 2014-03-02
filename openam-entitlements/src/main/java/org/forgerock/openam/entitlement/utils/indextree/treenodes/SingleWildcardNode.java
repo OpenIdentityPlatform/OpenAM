@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
@@ -52,11 +52,6 @@ public class SingleWildcardNode extends BasicTreeNode {
         }
 
         if (value == '/') {
-            if (context.has(ContextKey.LAST_CHARACTER)) {
-                // '^' after a '/' matches one or more characters.
-                return false;
-            }
-
             // Make a note that the end of a URL level has been reached.
             context.add(ContextKey.LEVEL_REACHED, Boolean.TRUE);
             return true;
