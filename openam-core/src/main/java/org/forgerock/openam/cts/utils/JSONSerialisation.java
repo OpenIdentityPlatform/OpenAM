@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, AS.
+/*
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -43,17 +43,14 @@ import java.text.MessageFormat;
  */
 public class JSONSerialisation {
 
-    private final ObjectMapper mapper;
-
     /**
-     * New default instance of the JSONSerialsation.
+     * Use a static singleton as per <a href="http://wiki.fasterxml.com/JacksonBestPracticesPerformance">performance best practice.</a>
      */
-    public JSONSerialisation() {
-        mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true)
+            .configure(DeserializationConfig.Feature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
 
-        mapper.configure(SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        mapper.configure(DeserializationConfig.Feature.CAN_OVERRIDE_ACCESS_MODIFIERS, true);
-
+    static {
         /**
          * @see http://stackoverflow.com/questions/7105745/how-to-specify-jackson-to-only-use-fields-preferably-globally
          */
@@ -63,6 +60,13 @@ public class JSONSerialisation {
                 .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
                 .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
                 .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+    }
+
+    /**
+     * New default instance of the JSONSerialsation.
+     */
+    public JSONSerialisation() {
+        // Nothing to do
     }
 
     /**

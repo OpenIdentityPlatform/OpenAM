@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.sun.identity.shared.configuration;
 
 import java.util.Properties;
@@ -147,6 +151,28 @@ public final class SystemPropertiesManager {
         String value = get(key);
         return ((value != null) && (value.trim().length() > 0)) 
             ? value : defaultValue;
+    }
+
+    /**
+     * Returns property as an integer, returning the default if the property is not set or cannot be parsed as an
+     * integer.
+     *
+     * @since 12.0.0
+     * @param key the system property name.
+     * @param defaultValue the default value to use if the property is not present or not an integer.
+     * @return the property value if present and a valid integer, otherwise the default value.
+     */
+    public static int getAsInt(String key, int defaultValue) {
+        int result = defaultValue;
+        String value = get(key);
+        if (value != null && !value.trim().isEmpty()) {
+            try {
+                result = Integer.parseInt(value.trim());
+            } catch (NumberFormatException ex) {
+                // Return default value
+            }
+        }
+        return result;
     }
 
     /**
