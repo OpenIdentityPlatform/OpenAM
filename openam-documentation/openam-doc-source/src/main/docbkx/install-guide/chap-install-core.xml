@@ -629,7 +629,7 @@ Using CLASSPATH:
   
   <para>High availability requires redundant servers in case of failure.
   With OpenAM, you configure an OpenAM site with multiple servers in a
-  pool behind a load balancing service the exposes a single URL as an entry
+  pool behind a load balancing service that exposes a single URL as an entry
   point to the site.</para>
 
   <para>Follow these steps to configure a server to belong to an existing
