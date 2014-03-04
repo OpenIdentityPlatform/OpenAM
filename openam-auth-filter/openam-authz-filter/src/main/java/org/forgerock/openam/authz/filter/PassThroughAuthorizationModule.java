@@ -18,6 +18,7 @@ package org.forgerock.openam.authz.filter;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import org.forgerock.authz.AuthorizationContext;
 import org.forgerock.authz.AuthorizationModule;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
@@ -71,7 +72,7 @@ public class PassThroughAuthorizationModule implements AuthorizationModule {
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest request) {
+    public boolean authorize(HttpServletRequest request, AuthorizationContext context) {
 
         // Request MAY contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(request);

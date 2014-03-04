@@ -20,6 +20,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import org.forgerock.authz.AuthorizationContext;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
@@ -44,6 +45,7 @@ public class AdminAuthorizationFilterTest {
     private SessionService sessionService;
     private SSOTokenFactory ssoTokenFactory;
     private AuthUtilsWrapper authUtilsWrapper;
+    private AuthorizationContext context;
 
     @BeforeMethod
     public void setup() throws ExecutionException, InterruptedException {
@@ -51,6 +53,7 @@ public class AdminAuthorizationFilterTest {
         sessionService = mock(SessionService.class);
         ssoTokenFactory = mock(SSOTokenFactory.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
+        context = mock(AuthorizationContext.class);
 
         Config<SessionService> sessionServiceConfig = mock(Config.class);
         given(sessionServiceConfig.isReady()).willReturn(true);
@@ -69,7 +72,7 @@ public class AdminAuthorizationFilterTest {
         given(requestUtils.getTokenId(request)).willReturn(null);
 
         // When
-        boolean authorized = module.authorize(request);
+        boolean authorized = module.authorize(request, context);
 
         // Then
         assertFalse(authorized);
@@ -85,7 +88,7 @@ public class AdminAuthorizationFilterTest {
         given(ssoTokenFactory.getTokenFromId("TOKEN_ID")).willReturn(null);
 
         // When
-        boolean authorized = module.authorize(request);
+        boolean authorized = module.authorize(request, context);
 
         // Then
         assertFalse(authorized);
@@ -104,7 +107,7 @@ public class AdminAuthorizationFilterTest {
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willThrow(SSOException.class);
 
         // When
-        module.authorize(request);
+        module.authorize(request, context);
 
         // Then
         fail();
@@ -122,7 +125,7 @@ public class AdminAuthorizationFilterTest {
         given(token.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("USER_ID");
 
         // When
-        module.authorize(request);
+        module.authorize(request, context);
 
         // Then
         verify(sessionService).isSuperUser("USER_ID");

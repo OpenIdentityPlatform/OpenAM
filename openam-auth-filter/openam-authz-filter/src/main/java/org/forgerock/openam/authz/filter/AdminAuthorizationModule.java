@@ -21,6 +21,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.authz.AuthorizationContext;
 import org.forgerock.authz.AuthorizationModule;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
@@ -81,7 +82,7 @@ public class AdminAuthorizationModule implements AuthorizationModule {
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest servletRequest) {
+    public boolean authorize(HttpServletRequest servletRequest, AuthorizationContext context) {
 
         // Request must contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(servletRequest);

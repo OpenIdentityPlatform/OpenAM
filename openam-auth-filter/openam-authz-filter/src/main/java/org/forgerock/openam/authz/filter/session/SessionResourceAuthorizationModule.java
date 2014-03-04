@@ -17,6 +17,7 @@
 package org.forgerock.openam.authz.filter.session;
 
 import com.iplanet.dpro.session.service.SessionService;
+import org.forgerock.authz.AuthorizationContext;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
@@ -56,7 +57,7 @@ public class SessionResourceAuthorizationModule extends AdminAuthorizationModule
      * @return {@inheritDoc}
      */
     @Override
-    public boolean authorize(HttpServletRequest servletRequest) {
+    public boolean authorize(HttpServletRequest servletRequest, AuthorizationContext context) {
 
         if (servletRequest != null) {
             Map<String, String[]> parameterMap = servletRequest.getParameterMap();
@@ -68,6 +69,6 @@ public class SessionResourceAuthorizationModule extends AdminAuthorizationModule
             }
         }
 
-        return super.authorize(servletRequest);
+        return super.authorize(servletRequest, context);
     }
 }

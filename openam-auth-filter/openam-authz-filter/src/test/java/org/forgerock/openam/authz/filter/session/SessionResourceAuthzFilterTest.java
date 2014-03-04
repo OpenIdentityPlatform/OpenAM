@@ -17,6 +17,7 @@
 package org.forgerock.openam.authz.filter.session;
 
 import com.iplanet.dpro.session.service.SessionService;
+import org.forgerock.authz.AuthorizationContext;
 import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
@@ -69,7 +70,7 @@ public class SessionResourceAuthzFilterTest {
         parameterMap.put("_action", new String[]{"logOUT"});
 
         //When
-        boolean authorized = sessionResourceAuthzModule.authorize(request);
+        boolean authorized = sessionResourceAuthzModule.authorize(request, mock(AuthorizationContext.class));
 
         //Then
         assertTrue(authorized);
@@ -85,7 +86,7 @@ public class SessionResourceAuthzFilterTest {
         given(request.getParameterMap()).willReturn(parameterMap);
 
         //When
-        boolean authorized = sessionResourceAuthzModule.authorize(request);
+        boolean authorized = sessionResourceAuthzModule.authorize(request, mock(AuthorizationContext.class));
 
         //Then
         assertFalse(authorized);
