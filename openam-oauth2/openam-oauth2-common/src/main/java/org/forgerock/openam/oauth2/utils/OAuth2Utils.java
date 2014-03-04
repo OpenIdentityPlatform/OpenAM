@@ -972,4 +972,23 @@ public class OAuth2Utils {
             }
         }
     }
+
+    /**
+     * Returns the OAuth2ProviderSettings instance from the local cache for the given realm. If the realm does not
+     * have a OAuth2ProviderSettings instance in the cache a OAuthProblemException.
+     *
+     * @param realm The realm.
+     * @return The OAuth2ProviderSettings instance.
+     * @throws OAuthProblemException If a OAuth2ProviderSettings has not been configured for the realm.
+     */
+    public static OAuth2ProviderSettings getSettingsProvider(final String realm) {
+        synchronized (settingsProviderMap) {
+            OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
+            if (setting != null) {
+                return setting;
+            }
+            throw OAuthProblemException.
+                    handleOAuthProblemException("OAuth2ProviderSettings not configured for realm, " + realm);
+        }
+    }
 }

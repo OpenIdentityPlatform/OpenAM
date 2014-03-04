@@ -24,8 +24,12 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.utils.Config;
 
+import javax.inject.Inject;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +72,15 @@ public class AuthFilterGuiceModule extends AbstractModule {
                 } catch (SSOException e) {
                     throw new IllegalStateException(e);
                 }
+            }
+        });
+        bind(new TypeLiteral<Config<OAuth2TokenStore>>() {}).toInstance(new Config<OAuth2TokenStore>() {
+            public boolean isReady() {
+                return true;
+            }
+
+            public OAuth2TokenStore get() {
+                return InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
             }
         });
     }

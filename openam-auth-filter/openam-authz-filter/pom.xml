@@ -47,8 +47,16 @@
             <artifactId>forgerock-authz-filter</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-authz-oauth2-module</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-forgerock-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet</artifactId>
         </dependency>
     </dependencies>
 

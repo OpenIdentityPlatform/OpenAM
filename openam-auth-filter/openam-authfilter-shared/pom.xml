@@ -37,6 +37,14 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-auth-filter-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-core-token-service</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

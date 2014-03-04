@@ -1476,6 +1476,11 @@
                 <artifactId>forgerock-authz-filter</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-authz-oauth2-module</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
             <!-- JASPIC -->
             <dependency>
                 <groupId>org.glassfish</groupId>
