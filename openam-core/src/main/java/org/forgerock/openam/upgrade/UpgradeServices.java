@@ -22,6 +22,11 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
+
 package org.forgerock.openam.upgrade;
 
 import com.iplanet.am.util.SystemProperties;
@@ -76,6 +81,7 @@ public class UpgradeServices {
     private final List<UpgradeStep> upgradeSteps = new ArrayList<UpgradeStep>();
     private final SimpleDateFormat dateFormat;
     private final String createdDate;
+    private final String existingVersion = UpgradeUtils.getCurrentVersion();
 
     private UpgradeServices() throws UpgradeException {
         dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -250,7 +256,7 @@ public class UpgradeServices {
         Map<String, String> tags = new HashMap<String, String>();
         tags.put(LF, delimiter);
         tags.put(CREATED_DATE, createdDate);
-        tags.put(EXISTING_VERSION, UpgradeUtils.getCurrentVersion());
+        tags.put(EXISTING_VERSION, existingVersion);
         tags.put(NEW_VERSION, UpgradeUtils.getWarFileVersion());
         StringBuilder report = new StringBuilder(tagSwapReport(tags, "report"));
         for (UpgradeStep upgradeStep : upgradeSteps) {
