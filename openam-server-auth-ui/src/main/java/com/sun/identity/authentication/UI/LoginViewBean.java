@@ -32,7 +32,6 @@
  */
 package com.sun.identity.authentication.UI;
 
-//import com.iplanet.am.util.AMURLEncDec;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
@@ -68,9 +67,10 @@ import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -590,8 +590,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                     Cookie appendCookie = AuthUtils.getCookieString(ac, null);
                     clearGlobals();
                     if (doForward || redirect_url.startsWith(SSO_REDIRECT) || redirect_url.startsWith(SSO_POST)) {
-                        loginDebug.message("LoginViewBean.forwardRequest=true");
                         if(loginDebug.messageEnabled()){
+                            loginDebug.message("LoginViewBean.forwardRequest=true");
                             loginDebug.message("LoginViewBean.forwardTo():" +
                             "Forward URL before appending cookie is " + 
                             redirect_url); 
@@ -625,8 +625,14 @@ public class LoginViewBean extends AuthViewBeanBase {
                     forward = false;
                     
                     return;
-                } catch (Exception e) { // Servlet redirect error.
+                } catch (IOException e) {
+                    loginDebug.error("LoginViewBean.forwardTo(): There was an IOException doing the forward/redirect",
+                            e);
                     ResultVal = rb.getString("redirect.error");
+                } catch (Exception e) {
+                    loginDebug.error("LoginViewBean.forwardTo(): There was an Exception doing the forward/redirect", e);
+                    setErrorMessage(e);
+                    redirect_url = null;
                 }
             }
         }
