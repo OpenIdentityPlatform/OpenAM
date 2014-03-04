@@ -45,4 +45,13 @@ public class TokenTransformConfigTest {
         assertFalse(ttc1.equals(ttc2));
         assertFalse(ttc1.hashCode() == ttc2.hashCode());
     }
+
+    @Test
+    public void testJsonRoundTrip() {
+        TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+        assertTrue(ttc1.equals(TokenTransformConfig.fromJson(ttc1.toJson())));
+
+        TokenTransformConfig ttc4 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+        assertTrue(ttc4.equals(TokenTransformConfig.fromJson(ttc4.toJson())));
+    }
 }

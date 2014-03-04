@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.marshal;
 
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
 
@@ -33,7 +34,7 @@ public interface TokenRequestMarshaller {
      * @return a ReceivedToken instance which has an xml representation of the json token.
      * @throws org.forgerock.openam.sts.TokenMarshalException if the json string cannot be marshalled into a recognized token.
      */
-    ReceivedToken marshallTokenRequest(String token) throws TokenMarshalException;
+    ReceivedToken marshallTokenRequest(JsonValue token) throws TokenMarshalException;
 
     /**
      * Returns the TokenType corresponding to this json token. The json token will specify its token type with
@@ -42,5 +43,5 @@ public interface TokenRequestMarshaller {
      * @return The TokenType represented by the json string.
      * @throws org.forgerock.openam.sts.TokenMarshalException if the TOKEN_TYPE_KEY is missing or unrecognized.
      */
-    TokenType getTokenType(String token) throws TokenMarshalException;
+    TokenType getTokenType(JsonValue token) throws TokenMarshalException;
 }

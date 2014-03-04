@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.sts.rest.operation;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 
@@ -28,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
  * operations of the WS-Trust STS.
  */
 public interface TokenTranslateOperation {
-    String translateToken(String inputToken, String desiredToken, HttpServletRequest request) throws
-            TokenValidationException, TokenCreationException;
+    JsonValue translateToken(JsonValue inputToken,
+                             String desiredToken,
+                             HttpContext httpContext,
+                             SecurityContext securityContext) throws TokenValidationException, TokenCreationException;
 }

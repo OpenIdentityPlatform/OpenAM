@@ -26,6 +26,8 @@ import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.slf4j.Logger;
@@ -49,6 +51,7 @@ public class TokenTransformFactoryImplTest {
             bindConstant().annotatedWith(Names.named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)).to("faux_id_from_session_url");
             bindConstant().annotatedWith(Names.named(AMSTSConstants.AM_SESSION_COOKIE_NAME)).to("faux_cookie_name");
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
+            bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
         }
 

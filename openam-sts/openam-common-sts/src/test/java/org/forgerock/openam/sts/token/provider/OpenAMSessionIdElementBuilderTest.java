@@ -11,23 +11,26 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.sts.token.provider;
 
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.w3c.dom.Element;
+import org.slf4j.Logger;
+import org.testng.annotations.Test;
+import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertTrue;
 
-/**
- * Tokens are always represented as XML elements. This interface defines the functionality to create an XML element
- * encapsulating the OpenAM sessionId.
- *
- * It also defines functionality to go in the other direction - i.e. to go from an OpenAM session id element, and extract
- * the session id. This is useful in the Rest STS.
- */
-public interface OpenAMSessionIdElementBuilder {
-    Element buildOpenAMSessionIdElement(String sessionId) throws TokenMarshalException;
 
-    String extractOpenAMSessionId(Element element) throws TokenMarshalException;
+public class OpenAMSessionIdElementBuilderTest {
+    private static final String SESSION_ID =
+            "AQIC5wM2LY4SfcyV6vjt7OmHgqDVcjDHanTaTPjbzsxXWKo.*AAJTSQACMDEAAlNLABQtMzAyMzI5NDAzNTIxODIzMjMyOA..*";
+
+    @Test
+    public void testRountripTransformation() throws TokenMarshalException {
+        Logger mockLogger = mock(Logger.class);
+        OpenAMSessionIdElementBuilderImpl builder = new OpenAMSessionIdElementBuilderImpl(mockLogger);
+        assertTrue(SESSION_ID.equals(builder.extractOpenAMSessionId(builder.buildOpenAMSessionIdElement(SESSION_ID))));
+    }
 }

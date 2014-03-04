@@ -20,6 +20,7 @@ import org.apache.ws.security.handler.RequestData;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
 
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ import java.net.URISyntaxException;
 public class AuthenticationUriProviderImpl implements AuthenticationUriProvider {
     private static final Character QUESTION_MARK = '?';
     private static final Character AMPERSAND = '&';
-    private static final String REALM_PARAM = "realm=";
+    private static final String SLASH = "/";
     private static final String AUTH_INDEX_TYPE_PARAM = "authIndexType=";
     private static final String AUTH_INDEX_VALUE_PARAM = "authIndexValue=";
 
@@ -41,6 +42,7 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
     private final String restAuthnUriElement;
     private final String amDeploymentUrl;
     private final String jsonRoot;
+    private final UrlConstituentCatenator urlConstituentCatenator;
 
 
     @Inject
@@ -49,27 +51,28 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
             @Named(AMSTSConstants.REST_AUTHN_URI_ELEMENT) String restAuthnUriElement,
             AuthTargetMapping authTargetMapping,
             @Named(AMSTSConstants.REALM) String realm,
-            @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRoot) {
+            @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRoot,
+            UrlConstituentCatenator urlConstituentCatenator) {
         this.amDeploymentUrl = amDeploymentUrl;
         this.restAuthnUriElement = restAuthnUriElement;
         this.authTargetMapping = authTargetMapping;
         this.realm = realm;
         this.jsonRoot = jsonRoot;
+        this.urlConstituentCatenator = urlConstituentCatenator;
     }
 
     @Override
     public URI authenticationUri(Object token) throws TokenValidationException {
-        //TODO - some checking to see a / is between the various url elements
-        StringBuilder stringBuilder = new StringBuilder(amDeploymentUrl);
-        stringBuilder.append(jsonRoot);
+        StringBuilder stringBuilder =
+                new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRoot));
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            stringBuilder.append(realm);
+            stringBuilder = urlConstituentCatenator.catentateUrlConstituent(stringBuilder, realm);
         }
-        stringBuilder.append(restAuthnUriElement);
+        stringBuilder = urlConstituentCatenator.catentateUrlConstituent(stringBuilder, restAuthnUriElement);
         AuthTargetMapping.AuthTarget target = authTargetMapping.getAuthTargetMapping(token.getClass());
         if (target != null) {
             stringBuilder.append(QUESTION_MARK);
-            stringBuilder.append(AMPERSAND).append(AUTH_INDEX_TYPE_PARAM).append(target.getAuthIndexType());
+            stringBuilder.append(AUTH_INDEX_TYPE_PARAM).append(target.getAuthIndexType());
             stringBuilder.append(AMPERSAND).append(AUTH_INDEX_VALUE_PARAM).append(target.getAuthIndexValue());
         }
         try {
@@ -78,5 +81,4 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
             throw new TokenValidationException(e.getMessage(), e);
         }
     }
-
 }

@@ -16,10 +16,14 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AuthTargetMapping;
 
-import javax.xml.namespace.QName;
 import org.forgerock.util.Reject;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 
 /**
@@ -60,9 +64,9 @@ public class RestDeploymentConfig {
     private final AuthTargetMapping authTargetMapping;
 
     private RestDeploymentConfig(RestDeploymentConfigBuilder builder) {
-        this.uriElement = builder.uriElement;
-        this.realm = builder.realm;
-        this.authTargetMapping = builder.authTargetMapping;
+        uriElement = builder.uriElement;
+        realm = builder.realm;
+        authTargetMapping = builder.authTargetMapping;
         Reject.ifNull(uriElement, "UriElement String cannot be null");
         Reject.ifNull(realm, "Realm String cannot be null");
         Reject.ifNull(authTargetMapping, "AuthTargetMapping cannot be null");
@@ -109,5 +113,18 @@ public class RestDeploymentConfig {
     @Override
     public int hashCode() {
         return (uriElement + realm + authTargetMapping).hashCode();
+    }
+
+    public JsonValue toJson() {
+        return json(object(field("uriElement", uriElement), field("realm", realm),
+                field("authTargetMapping", authTargetMapping.toJson())));
+    }
+
+    public static RestDeploymentConfig fromJson(JsonValue json) {
+        return RestDeploymentConfig.builder()
+                .authTargetMapping(AuthTargetMapping.fromJson(json.get("authTargetMapping")))
+                .uriElement(json.get("uriElement").asString())
+                .realm(json.get("realm").asString())
+                .build();
     }
 }

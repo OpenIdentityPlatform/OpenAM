@@ -22,6 +22,7 @@ import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.restlet.representation.Representation;
+import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -37,6 +38,7 @@ public class AMTokenParserTest {
         @Override
         protected void configure() {
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
+            bind(Logger.class).toInstance(mock(Logger.class));
         }
     }
 

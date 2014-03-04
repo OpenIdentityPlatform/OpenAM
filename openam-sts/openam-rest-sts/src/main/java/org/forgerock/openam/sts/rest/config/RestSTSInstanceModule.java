@@ -38,6 +38,8 @@ import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.persistence.STSInstancePersister;
+import org.forgerock.openam.sts.persistence.STSInstancePersisterImpl;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.STSCallbackHandler;
@@ -48,11 +50,10 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
-import org.forgerock.openam.sts.token.AMTokenParser;
-import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
@@ -60,8 +61,6 @@ import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
@@ -107,7 +106,8 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {});
 
-        bind(WebServiceContextFactory.class).to(WebServiceContextFactoryImpl.class);
+//        bind(WebServiceContextFactory.class).to(WebServiceContextFactoryImpl.class);
+        bind(WebServiceContextFactory.class).to(CrestWebServiceContextFactoryImpl.class);
         bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
         bind(TokenResponseMarshaller.class).to(TokenResponseMarshallerImpl.class);
         bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
@@ -121,6 +121,9 @@ public class RestSTSInstanceModule extends AbstractModule {
         Needed by the AMTokenProvider.
          */
         bind(OpenAMSessionIdElementBuilder.class).to(OpenAMSessionIdElementBuilderImpl.class);
+
+        bind(STSInstancePersister.class).to(STSInstancePersisterImpl.class);
+        bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
     }
 
     /**

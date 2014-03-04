@@ -16,12 +16,18 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.ws.security.message.token.UsernameToken;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static org.testng.AssertJUnit.assertFalse;
@@ -58,8 +64,49 @@ public class RestSTSInstanceConfigTest {
         createIncompleteInstanceConfig();
     }
 
+    @Test
+    public void testJsonMarshalling() throws IOException {
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam");
+        assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(origConfig.toJson())));
+    }
+
+    @Test
+    public void testJsonStringMarhalling() throws IOException {
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam");
+        /*
+        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
+        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
+        for details. This is using the older version of jackson
+        (org.codehaus.jackson.map.ObjectMapper), and I will do the same (albeit with the newer version), to reproduce
+        the same behavior.
+         */
+        JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
+        final Object content = parser.readValueAs(Object.class);
+
+        Assert.assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(new JsonValue(content))));
+    }
+
+    @Test
+    public void testOldJacksonJsonStringMarhalling() throws IOException {
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam");
+        /*
+        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
+        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
+        for details. This is using the older version of jackson
+        (org.codehaus.jackson.map.ObjectMapper), and I will do the same, to reproduce
+        the same behavior.
+         */
+        org.codehaus.jackson.JsonParser parser =
+                new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
+        final Object content = parser.readValueAs(Object.class);
+
+        Assert.assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(new JsonValue(content))));
+    }
+
     private RestSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl) throws UnsupportedEncodingException {
-        AuthTargetMapping mapping = AuthTargetMapping.builder().build();
+        AuthTargetMapping mapping = AuthTargetMapping.builder()
+                .addMapping(UsernameToken.class, "service", "ldapService")
+                .build();
 
         RestDeploymentConfig deploymentConfig =
                 RestDeploymentConfig.builder()

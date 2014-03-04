@@ -8,10 +8,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.token.AMTokenParser;
-import org.forgerock.openam.sts.token.AMTokenParserImpl;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
@@ -52,6 +49,7 @@ public class TokenOperationFactoryImplTest {
                     .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {
                     });
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
+            bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class);
         }
 

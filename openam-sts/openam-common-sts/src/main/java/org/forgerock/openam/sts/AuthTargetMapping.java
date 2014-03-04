@@ -16,15 +16,25 @@
 
 package org.forgerock.openam.sts;
 
+
+import org.forgerock.json.fluent.JsonValue;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * Each deployed STS instance will be configured with a mapping which specifies the rest authN authIndexType and authIndexValue
  * against which a particular token type will be validated.
  * An instance of this class will be harvested from the UI elements configuring STS instances.
  *
+ * See the org.forgerock.openam.forgerockrest.authn.core.AuthIndexType class for valid values for the authIndexType
+ * below. The authIndexValue is the actual name of the service, module, etc. (for an authIndexType of "service" the
+ * authIndexValue could be "ldapService").
  */
 public class AuthTargetMapping {
 
@@ -81,8 +91,15 @@ public class AuthTargetMapping {
          return (authIndexType + authIndexValue).hashCode();
         }
 
-    }
+        JsonValue toJson() {
+            return json(object(field("authIndexType", authIndexType), field("authIndexValue", authIndexValue)));
+        }
 
+        static AuthTarget fromJson(JsonValue json) {
+            return new AuthTarget(json.get("authIndexType").asString(), json.get("authIndexValue").asString());
+        }
+
+    }
     private final Map<Class<?>, AuthTarget> mappings;
 
     private AuthTargetMapping(AuthTargetMappingBuilder builder) {
@@ -115,5 +132,31 @@ public class AuthTargetMapping {
             return mappings.equals(otherMapping.mappings);
         }
         return false;
+    }
+
+    public JsonValue toJson() {
+        JsonValue jsonMappings = new JsonValue(new HashMap<String, Object>());
+        Map<String, Object> map = jsonMappings.asMap();
+        for (Map.Entry<Class<?>, AuthTarget> entry : mappings.entrySet()) {
+            map.put(entry.getKey().getName(), entry.getValue().toJson());
+        }
+        return jsonMappings;
+    }
+
+    public static AuthTargetMapping fromJson(JsonValue json) throws IllegalStateException {
+        AuthTargetMappingBuilder builder = AuthTargetMapping.builder();
+        if (!json.isMap()) {
+            throw new IllegalArgumentException("JsonValue passed to AuthTargetMapping.fromJson not map!");
+        }
+        Map<String, Object> map = json.asMap();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            try {
+                AuthTarget target = AuthTarget.fromJson(new JsonValue(entry.getValue()));
+                builder.addMapping(Class.forName(entry.getKey()), target.getAuthIndexType(), target.getAuthIndexValue());
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("Could not fine class in AuthTargetMapping.fromJson corresponding to key: " + entry.getKey());
+            }
+        }
+        return builder.build();
     }
 }

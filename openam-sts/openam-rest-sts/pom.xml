@@ -61,12 +61,16 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -84,6 +88,19 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <!--
+        Right now, I toggle between deploying this as a
+        stand-alone .war, and as integrated in the openam .war
+        file. When deploying standalone, I want the jdk14 logger,
+        and when deploying in openam, I want the openam-slf4j
+        logger.
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.7.6</version>
+        </dependency>
+        -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-slf4j</artifactId>
@@ -91,6 +108,10 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-servlet</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

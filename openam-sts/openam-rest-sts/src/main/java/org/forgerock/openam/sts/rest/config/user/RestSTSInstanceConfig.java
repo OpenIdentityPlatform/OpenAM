@@ -16,14 +16,18 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.util.Reject;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 
 /**
@@ -34,6 +38,12 @@ import java.util.Set;
  *
  * For an explanation of what's going on with the builders in this class,
  * see https://weblogs.java.net/blog/emcmanus/archive/2010/10/25/using-builder-pattern-subclasses
+ *
+ * Also attempted to marshal the RestSTSInstanceConfig to/from json with the jackson ObjectMapper. But I was adding
+ * @JsonSerialize and @JsonDeserialize annotations, and because builder-based classes don't expose ctors which
+ * take the complete field set, I would have to create @JsonCreator instances which would have to pull all of the
+ * values out of a map anyway, which is 75% of the way towards a hand-rolled json marshalling implementation based on
+ * json-fluent. So a hand-rolled implementation it is.
  */
 public class RestSTSInstanceConfig extends STSInstanceConfig {
     public abstract static class RestSTSInstanceConfigBuilderBase<T extends RestSTSInstanceConfigBuilderBase<T>> extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
@@ -58,6 +68,11 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             return self();
         }
 
+        public T setSupportedTokenTranslations(Collection<TokenTransformConfig> transforms) {
+            supportedTokenTranslations.addAll(transforms);
+            return self();
+        }
+
         public RestSTSInstanceConfig build() {
             return new RestSTSInstanceConfig(this);
         }
@@ -72,19 +87,15 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
 
     private final Set<TokenTransformConfig> supportedTokenTranslations;
     private final RestDeploymentConfig deploymentConfig;
+    private static final String DEPLOYMENT_CONFIG = "deploymentConfig";
+    private static final String SUPPORTED_TOKEN_TRANSLATIONS = "supportedTokenTranslations";
+
     private RestSTSInstanceConfig(RestSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
         this.supportedTokenTranslations = Collections.unmodifiableSet(builder.supportedTokenTranslations);
         this.deploymentConfig = builder.deploymentConfig;
-        Reject.ifNull(keystoreConfig, "KeystoreConfig cannot be null");
-        Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(supportedTokenTranslations, "Supported token translations cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
-        Reject.ifNull(amDeploymentUrl, "AM deployment url cannot be null");
-        Reject.ifNull(amRestAuthNUriElement, "AM REST authN url element cannot be null");
-        Reject.ifNull(amRestLogoutUriElement, "AM REST logout url element cannot be null");
-        Reject.ifNull(amRestIdFromSessionUriElement, "AM REST id from Session url element cannot be null");
-        Reject.ifNull(amSessionCookieName, "AM session cookie name cannot be null");
     }
 
     public static RestSTSInstanceConfigBuilderBase<?> builder() {
@@ -112,7 +123,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         StringBuilder sb = new StringBuilder("STSInstanceConfig instance:\n");
         sb.append('\t').append("KeyStoreConfig: ").append(keystoreConfig).append('\n');
         sb.append('\t').append("issuerName: ").append(issuerName).append('\n');
-        sb.append('\t').append("validateTokenTransformTypes: ").append(supportedTokenTranslations).append('\n');
+        sb.append('\t').append("supportedTokenTranslations: ").append(supportedTokenTranslations).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
         sb.append('\t').append("amDeploymentUrl: ").append(amDeploymentUrl).append('\n');
         sb.append('\t').append("amRestAuthNUriElement: ").append(amRestAuthNUriElement).append('\n');
@@ -134,7 +145,8 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
                     amRestAuthNUriElement.equals(otherConfig.getAMRestAuthNUriElement()) &&
                     amRestIdFromSessionUriElement.equals(otherConfig.getAMRestIdFromSessionUriElement()) &&
                     amSessionCookieName.equals(otherConfig.getAMSessionCookieName()) &&
-                    amRestLogoutUriElement.equals(otherConfig.getAMRestLogoutUriElement());
+                    amRestLogoutUriElement.equals(otherConfig.getAMRestLogoutUriElement()) &&
+                    amJsonRestBase.equals(otherConfig.getJsonRestBase());
         }
         return false;
     }
@@ -142,5 +154,46 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     @Override
     public int hashCode() {
         return this.toString().hashCode();
+    }
+
+    public JsonValue toJson() {
+        JsonValue baseValue = super.toJson();
+        baseValue.add(DEPLOYMENT_CONFIG, deploymentConfig.toJson());
+        JsonValue supportedTranslations = new JsonValue(new ArrayList<Object>());
+        List<Object> translationList = supportedTranslations.asList();
+        Iterator<TokenTransformConfig> iter = supportedTokenTranslations.iterator();
+        while (iter.hasNext()) {
+            translationList.add(iter.next().toJson());
+        }
+        baseValue.add(SUPPORTED_TOKEN_TRANSLATIONS, supportedTranslations);
+        return baseValue;
+    }
+
+    public static RestSTSInstanceConfig fromJson(JsonValue json) {
+        if (json == null) {
+            throw new NullPointerException("JsonValue cannot be null!");
+        }
+        RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
+                .amJsonRestBase(json.get(AM_JSON_REST_BASE).asString())
+                .amDeploymentUrl(json.get(AM_DEPLOYMENT_URL).asString())
+                .amRestAuthNUriElement(json.get(AM_REST_AUTHN_URI_ELEMENT).asString())
+                .amRestLogoutUriElement(json.get(AM_REST_LOGOUT_URI_ELEMENT).asString())
+                .amRestIdFromSessionUriElement(json.get(AM_REST_ID_FROM_SESSION_URI_ELEMENT).asString())
+                .amSessionCookieName(json.get(AM_SESSION_COOKIE_NAME).asString())
+                .keystoreConfig(KeystoreConfig.fromJson(json.get(KEYSTORE_CONFIG)))
+                .issuerName(json.get(ISSUER_NAME).asString())
+                .deploymentConfig(RestDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
+        JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSLATIONS);
+        if (!supportedTranslations.isList()) {
+            throw new IllegalStateException("Unexpected value for the " + SUPPORTED_TOKEN_TRANSLATIONS + " field: "
+                    + supportedTranslations.asString());
+        }
+        List<TokenTransformConfig> transformConfigList = new ArrayList<TokenTransformConfig>();
+        Iterator<Object> iter = supportedTranslations.asList().iterator();
+        while (iter.hasNext()) {
+            transformConfigList.add(TokenTransformConfig.fromJson(new JsonValue(iter.next())));
+        }
+        builder.setSupportedTokenTranslations(transformConfigList);
+        return builder.build();
     }
 }

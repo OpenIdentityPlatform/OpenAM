@@ -117,4 +117,17 @@ public class KeystoreConfigTest {
         assertTrue("b".equals(new String(kc1.getEncryptionKeyPassword())));
         assertTrue("f".equals(new String(kc1.getSignatureKeyPassword())));
     }
+
+    @Test
+    public void testJsonRountTrip() throws UnsupportedEncodingException {
+        KeystoreConfig kc1 = KeystoreConfig.builder()
+                .encryptionKeyAlias("a")
+                .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .fileName("c")
+                .password("d".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .signatureKeyAlias("e")
+                .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .build();
+        assertTrue(kc1.equals(KeystoreConfig.fromJson(kc1.toJson())));
+    }
 }

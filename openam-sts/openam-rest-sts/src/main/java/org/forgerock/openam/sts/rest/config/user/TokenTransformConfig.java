@@ -16,8 +16,13 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.util.Reject;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * This class defines the support token transformation operations supported by a REST STS deployment. The
@@ -65,5 +70,28 @@ public class TokenTransformConfig {
     @Override
     public int hashCode() {
         return (inputTokenType.name() + outputTokenType.name()).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("inputTokenType: ")
+                .append(inputTokenType.name())
+                .append(";outputTokenType: ")
+                .append(outputTokenType.name())
+                .append("invalidateInterimimOpenAMSession: ")
+                .append(invalidateInterimOpenAMSession)
+                .toString();
+    }
+
+    public JsonValue toJson() {
+        return json(object(field("inputTokenType", inputTokenType.name()), field("outputTokenType", outputTokenType.name()),
+                field("invalidateInterimOpenAMSession", invalidateInterimOpenAMSession)));
+    }
+
+    public static TokenTransformConfig fromJson(JsonValue json) {
+        return new TokenTransformConfig(
+                Enum.valueOf(TokenType.class, json.get("inputTokenType").asString()),
+                Enum.valueOf(TokenType.class, json.get("outputTokenType").asString()),
+                json.get("invalidateInterimOpenAMSession").asBoolean());
     }
 }

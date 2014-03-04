@@ -76,4 +76,17 @@ public class RestDeploymentConfigTest {
                 .uriElement("b")
                 .build();
     }
+
+    @Test
+    public void testJsonRoundTrip() {
+        AuthTargetMapping atm = AuthTargetMapping.builder()
+                .addMapping(UsernameToken.class, "module", "untmodule")
+                .build();
+        RestDeploymentConfig rdc = RestDeploymentConfig.builder()
+                .realm("a")
+                .uriElement("b")
+                .authTargetMapping(atm)
+                .build();
+        assertTrue(rdc.equals(RestDeploymentConfig.fromJson(rdc.toJson())));
+    }
 }

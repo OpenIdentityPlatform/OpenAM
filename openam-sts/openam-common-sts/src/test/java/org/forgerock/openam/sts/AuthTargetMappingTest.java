@@ -16,10 +16,14 @@
 
 package org.forgerock.openam.sts;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.cxf.common.security.UsernameToken;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import static org.testng.Assert.assertFalse;
@@ -104,4 +108,56 @@ public class AuthTargetMappingTest {
         assertNull(mapping2.getAuthTargetMapping(String.class));
 
     }
+
+    @Test
+    public void testJsonRoundTrip() {
+        AuthTargetMapping mapping = AuthTargetMapping
+                .builder()
+                .addMapping(X509Certificate[].class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
+                .addMapping(UsernameToken.class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "username")
+                .build();
+        assertTrue(mapping.equals(AuthTargetMapping.fromJson(mapping.toJson())));
+    }
+
+    @Test
+    public void testJsonStringRoundTrip() throws IOException {
+        AuthTargetMapping mapping = AuthTargetMapping
+                .builder()
+                .addMapping(X509Certificate[].class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
+                .addMapping(UsernameToken.class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "username")
+                .build();
+        /*
+        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
+        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
+        for details. This is using the older version of jackson
+        (org.codehaus.jackson.map.ObjectMapper), and I will do the same (albeit with the newer version), to reproduce
+        the same behavior.
+         */
+        JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(mapping.toJson().toString());
+        final Object content = parser.readValueAs(Object.class);
+
+        assertTrue(mapping.equals(AuthTargetMapping.fromJson(new JsonValue(content))));
+    }
+
+    @Test
+    public void testOlderJacksonJsonStringRoundTrip() throws IOException {
+        AuthTargetMapping mapping = AuthTargetMapping
+                .builder()
+                .addMapping(X509Certificate[].class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
+                .addMapping(UsernameToken.class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "username")
+                .build();
+        /*
+        This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
+        org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
+        for details. This is using the older version of jackson
+        (org.codehaus.jackson.map.ObjectMapper), and I will do the same, to reproduce
+        the same behavior.
+         */
+        org.codehaus.jackson.JsonParser parser =
+                new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(mapping.toJson().toString());
+        final Object content = parser.readValueAs(Object.class);
+
+        assertTrue(mapping.equals(AuthTargetMapping.fromJson(new JsonValue(content))));
+    }
+
 }

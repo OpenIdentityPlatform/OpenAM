@@ -14,7 +14,17 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
+package org.forgerock.openam.sts.rest.publish;
+
+import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.rest.RestSTS;
+import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+
 /**
- * Contains the classes corresponding to the REST application which will expose REST-STS functionality.
+ * Defines the interface consumed to publish a Rest STS instance, and to remove this instance once its functionality
+ * should no longer be exposed.
  */
-package org.forgerock.openam.sts.rest.application;
+public interface RestSTSInstancePublisher {
+    void publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, String subPath) throws STSInitializationException;
+    void removeInstance(String subPath) throws IllegalArgumentException;
+}

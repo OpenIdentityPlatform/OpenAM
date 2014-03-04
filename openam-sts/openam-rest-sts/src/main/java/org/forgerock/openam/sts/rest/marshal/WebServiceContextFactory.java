@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.sts.rest.marshal;
 
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 
@@ -26,5 +29,6 @@ import javax.xml.ws.WebServiceContext;
  * context, where the container creates this instance, a factory must provide this functionality.
  */
 public interface WebServiceContextFactory {
-    public WebServiceContext getWebServiceContext(HttpServletRequest request);
+    //public WebServiceContext getWebServiceContext(HttpServletRequest request);
+    public WebServiceContext getWebServiceContext(HttpContext httpContext, SecurityContext securityContext);
 }

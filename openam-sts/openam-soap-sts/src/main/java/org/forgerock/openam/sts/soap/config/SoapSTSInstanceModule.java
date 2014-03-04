@@ -48,13 +48,10 @@ import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisherImpl;
 import org.forgerock.openam.sts.soap.token.config.*;
+import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
-import org.forgerock.openam.sts.token.AMTokenParser;
-import org.forgerock.openam.sts.token.AMTokenParserImpl;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
@@ -127,6 +124,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
 
         //bind the class defining the core STS functionality - necessary for its dependencies to be injected
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
+        bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
+
     }
     /**
      * This method will provide the instance of the STSPropertiesMBean necessary both for the STS proper, and for the

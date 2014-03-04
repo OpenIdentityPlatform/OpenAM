@@ -17,10 +17,12 @@
 package org.forgerock.openam.sts.token;
 
 import javax.inject.Inject;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.restlet.representation.Representation;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Map;
@@ -31,9 +33,11 @@ import java.util.Map;
  */
 public class AMTokenParserImpl implements AMTokenParser {
     private static final String TOKEN_ID = "tokenId";
+    private final Logger logger;
 
     @Inject
-    AMTokenParserImpl() {
+    AMTokenParserImpl(Logger logger) {
+        this.logger = logger;
     }
 
     @Override

@@ -20,12 +20,16 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.restlet.engine.header.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -52,13 +56,14 @@ public class AMTokenValidator implements TokenValidator {
     private final String amSessionCookieName;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final String sessionToUsernameUrl;
+    private final UrlConstituentCatenator urlConstituentCatenator;
     private final Logger logger;
 
     /*
     The lifecycle for this class is controlled by the TokenOperationFactoryImpl, and thus needs no @Inject.
      */
     public AMTokenValidator(String amDeploymentUri, String amJsonRestBase, String realm, String amRestIdFromSessionUriElement, String amSessionCookieName,
-                            ThreadLocalAMTokenCache threadLocalAMTokenCache, Logger logger) {
+                            ThreadLocalAMTokenCache threadLocalAMTokenCache, UrlConstituentCatenator urlConstituentCatenator, Logger logger) {
         this.amDeploymentUri = amDeploymentUri;
         this.amJsonRestBase = amJsonRestBase;
         this.realm = realm;
@@ -66,6 +71,7 @@ public class AMTokenValidator implements TokenValidator {
         sessionToUsernameUrl = amDeploymentUri + amRestIdFromSessionUriElement;
         this.amSessionCookieName = amSessionCookieName;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
+        this.urlConstituentCatenator = urlConstituentCatenator;
         this.logger = logger;
     }
 
@@ -111,17 +117,13 @@ public class AMTokenValidator implements TokenValidator {
      * Creates the String representing the url at which the principal id from session token functionality can be
      * consumed.
      * @return A String representing the url of OpenAM's Restful principal from session id service
-     * TODO: proper creation of the url - including insuring proper '/' values in the right places. Should be a first-class
-     * concern - an interface/implimentation, bound by guice, which can also be used to validate user input when STS instances
-     * are being configured.
      */
     private String constitutePrincipalFromSessionUrl() {
-        StringBuilder sb = new StringBuilder(amDeploymentUri);
-        sb.append(amJsonRestBase);
+        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUri, amJsonRestBase));
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            sb.append(realm);
+            sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
         }
-        sb.append(amRestIdFromSessionUriElement);
+        sb = urlConstituentCatenator.catentateUrlConstituent(sb, amRestIdFromSessionUriElement);
         return sb.toString();
     }
 

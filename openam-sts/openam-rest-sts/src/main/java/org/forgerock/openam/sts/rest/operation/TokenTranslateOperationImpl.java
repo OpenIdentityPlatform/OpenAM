@@ -24,6 +24,9 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.*;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
@@ -91,7 +94,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
     }
 
     @Override
-    public String translateToken(String inputToken, String desiredStringTokenType, HttpServletRequest request)
+    public JsonValue translateToken(JsonValue inputToken, String desiredStringTokenType, HttpContext httpContext, SecurityContext securityContext)
             throws TokenValidationException, TokenCreationException {
         TokenType desiredTokenType = null;
         try {
@@ -134,7 +137,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             logger.warn(message);
             throw new TokenValidationException(message, e);
         }
-        WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(request);
+        WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(httpContext, securityContext);
         TokenValidatorParameters validatorParameters = buildTokenValidatorParameters(receivedToken, webServiceContext);
         TokenProviderParameters providerParameters = buildTokenProviderParameters(receivedToken, desiredTokenType, webServiceContext);
 

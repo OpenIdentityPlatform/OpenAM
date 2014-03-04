@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.sts.rest;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 
@@ -33,10 +36,28 @@ public interface RestSTS {
      * @param inputToken The json representation of the input token
      * @param desiredTokenType The specification of the desired token type
      * @param request
-     * @return A String representation of the translated token. It almost certainly will be json, but this detail is TBD. TODO:
+     * @return A json representation of the translated token.
      * @throws TokenValidationException TokenCreationException If the token translation could not be completed, due to failed token
      * validation, creation, invalid arguments, etc.
-     */
-    public String translateToken(String inputToken, String desiredTokenType, HttpServletRequest request)
+
+    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpServletRequest request)
             throws TokenValidationException, TokenCreationException;
+    */
+
+    /**
+     *
+     * @param inputToken
+     * @param desiredTokenType
+     * @param httpContext
+     * @param securityContext
+     * @return
+     * @throws TokenValidationException
+     * @throws TokenCreationException
+     */
+    public JsonValue translateToken(JsonValue inputToken,
+                                    String desiredTokenType,
+                                    HttpContext httpContext,
+                                    SecurityContext securityContext)
+                                    throws TokenValidationException, TokenCreationException;
+
 }

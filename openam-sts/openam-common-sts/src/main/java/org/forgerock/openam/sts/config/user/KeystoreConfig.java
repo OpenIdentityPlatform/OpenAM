@@ -16,10 +16,16 @@
 
 package org.forgerock.openam.sts.config.user;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.util.Reject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * The classes in this package define the objects which must be populated in order to create a fully-configured
@@ -72,6 +78,15 @@ public class KeystoreConfig {
             return new KeystoreConfig(this);
         }
     }
+    /*
+    Define the names of fields to aid in json marshalling.
+     */
+    private static final String KEYSTORE_FILE_NAME = "keystoreFileName";
+    private static final String KEYSTORE_PASSWORD = "keystorePassword";
+    private static final String SIGNATURE_KEY_ALIAS = "signatureKeyAlias";
+    private static final String ENCRYPTION_KEY_ALIAS = "encryptionKeyAlias";
+    private static final String SIGNATURE_KEY_PASSWORD = "signatureKeyPassword";
+    private static final String ENCRYPTION_KEY_PASSWORD = "encryptionKeyPassword";
 
     private final String keystoreFileName;
     private final byte[] keystorePassword;
@@ -157,5 +172,32 @@ public class KeystoreConfig {
     public int hashCode() {
         return (keystoreFileName + new String(keystorePassword) + signatureKeyAlias + encryptionKeyAlias +
                 new String(signatureKeyPassword) + new String(encryptionKeyPassword)).hashCode();
+    }
+
+    public JsonValue toJson() {
+        try {
+            return json(object(field(KEYSTORE_FILE_NAME, keystoreFileName),
+                    field(KEYSTORE_PASSWORD, new String(keystorePassword, AMSTSConstants.UTF_8_CHARSET_ID)),
+                    field(SIGNATURE_KEY_ALIAS, signatureKeyAlias), field(ENCRYPTION_KEY_ALIAS, encryptionKeyAlias),
+                    field(SIGNATURE_KEY_PASSWORD, new String(signatureKeyPassword, AMSTSConstants.UTF_8_CHARSET_ID)),
+                    field(ENCRYPTION_KEY_PASSWORD, new String(encryptionKeyPassword, AMSTSConstants.UTF_8_CHARSET_ID))));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unsupported encoding when marshalling from byte[] to String: " + e, e);
+        }
+    }
+
+    public static KeystoreConfig fromJson(JsonValue json) throws IllegalStateException {
+        try {
+            return KeystoreConfig.builder()
+                    .fileName(json.get(KEYSTORE_FILE_NAME).asString())
+                    .password(json.get(KEYSTORE_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                    .signatureKeyAlias(json.get(SIGNATURE_KEY_ALIAS).asString())
+                    .encryptionKeyAlias(json.get(ENCRYPTION_KEY_ALIAS).asString())
+                    .signatureKeyPassword(json.get(SIGNATURE_KEY_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                    .encryptionKeyPassword(json.get(ENCRYPTION_KEY_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                    .build();
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unsupported encoding when marshalling from String to to byte[]: " + e, e);
+        }
     }
 }

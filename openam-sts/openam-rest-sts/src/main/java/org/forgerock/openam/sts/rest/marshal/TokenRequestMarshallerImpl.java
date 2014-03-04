@@ -24,6 +24,7 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.ws.security.WSConstants;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenType;
@@ -49,16 +50,8 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     }
 
     @Override
-    public ReceivedToken marshallTokenRequest(String receivedToken) throws TokenMarshalException {
-        Map<String,Object> tokenAsMap = null;
-        try {
-            tokenAsMap = new ObjectMapper().readValue(receivedToken,
-                    new TypeReference<Map<String,Object>>() {});
-        } catch (IOException ioe) {
-            String message = "Exception caught getting the text of the json token: " + ioe;
-            logger.error(message, ioe);
-            throw new TokenMarshalException(message, ioe);
-        }
+    public ReceivedToken marshallTokenRequest(JsonValue receivedToken) throws TokenMarshalException {
+        Map<String,Object> tokenAsMap = receivedToken.asMap();
         String tokenType = (String)tokenAsMap.get(AMSTSConstants.TOKEN_TYPE_KEY);
         if (tokenType == null) {
             String message = "The to-be-translated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
@@ -77,16 +70,8 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     }
 
     @Override
-    public TokenType getTokenType(String receivedToken) throws TokenMarshalException {
-        Map<String,Object> responseAsMap = null;
-        try {
-            responseAsMap = new ObjectMapper().readValue(receivedToken,
-                    new TypeReference<Map<String,Object>>() {});
-        } catch (IOException ioe) {
-            String message = "Exception caught getting the text of the json token: " + ioe;
-            logger.error(message, ioe);
-            throw new TokenMarshalException(message, ioe);
-        }
+    public TokenType getTokenType(JsonValue receivedToken) throws TokenMarshalException {
+        Map<String,Object> responseAsMap = receivedToken.asMap();
         String tokenType = (String)responseAsMap.get(AMSTSConstants.TOKEN_TYPE_KEY);
         if (tokenType == null) {
             String message = "REST authN response does not contain " + AMSTSConstants.TOKEN_TYPE_KEY + " entry. The response map: " + responseAsMap;

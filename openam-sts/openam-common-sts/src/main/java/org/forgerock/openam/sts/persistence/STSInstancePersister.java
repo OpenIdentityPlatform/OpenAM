@@ -11,26 +11,18 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.rest.application;
+package org.forgerock.openam.sts.persistence;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.core.Application;
+import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 
 /**
- * Currently, Jersey and JAX-RS are being used. Restlet is the framework of choice. If Restlet supports programmatic
- * publish of REST endpoints, and the singleton model, then the REST-STS will migrate to Restlet.
+ * Interface defining the act of persisting, or of removing, state corresponding to a published STS instance so that
+ * this instance may be reconstituted following a server restart.
  */
-public class RestSTSApplication extends Application {
-
-    @Override
-    public Set<Object> getSingletons() {
-        Set<Object> singletons = new HashSet<Object>();
-        singletons.add(new RestSTSResource());
-        return singletons;
-    }
-
+public interface STSInstancePersister {
+    void persistSTSInstance(STSInstanceConfig instance);
+    void removeSTSInstance(String realmPath);
 }

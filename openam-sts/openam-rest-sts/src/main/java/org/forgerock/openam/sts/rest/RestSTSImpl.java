@@ -19,6 +19,9 @@ package org.forgerock.openam.sts.rest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
@@ -40,8 +43,8 @@ public class RestSTSImpl implements RestSTS {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.slf4jLogger = slf4jLogger;
     }
-
-    public String translateToken(String inputToken, String desiredTokenType, HttpServletRequest request)
+/*
+    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpServletRequest request)
             throws TokenValidationException, TokenCreationException {
         try {
             return translateOperation.translateToken(inputToken, desiredTokenType, request);
@@ -49,4 +52,14 @@ public class RestSTSImpl implements RestSTS {
             threadLocalAMTokenCache.clearAMToken();
         }
     }
+*/
+    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpContext httpContext, SecurityContext securityContext)
+            throws TokenValidationException, TokenCreationException {
+        try {
+            return translateOperation.translateToken(inputToken, desiredTokenType, httpContext, securityContext);
+        } finally {
+            threadLocalAMTokenCache.clearAMToken();
+        }
+    }
+
 }

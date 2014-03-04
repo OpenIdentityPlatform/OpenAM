@@ -17,18 +17,30 @@
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <display-name>OpenAM Rest STS</display-name>
-    <distributable/>
-
     <servlet>
         <servlet-name>rest-sts</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.forgerock.openam.sts.rest.application.RestSTSApplication</param-value>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceConnectionFactoryProvider</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>rest-sts</servlet-name>
         <url-pattern>/rest_sts/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>rest-sts-publish</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.rest.publish.service.RestSTSPublishServiceConnectionFactoryProvider</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rest-sts-publish</servlet-name>
+        <url-pattern>/rest_sts_publish/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -192,4 +192,10 @@ public class AMSTSConstants {
     Used for marshalling between byte[] and string representations. Does not seem to be defined anywhere in the pre 1.7 JDK.
      */
     public static final String UTF_8_CHARSET_ID = "UTF-8";
+
+    /*
+    Used to identify the json-resource ConnectionFactory which will be bound globally to all Rest STS instances.
+     */
+    public static final String REST_STS_CONNECTION_FACTORY_NAME = "rest_sts_connection_factory_name";
+
 }

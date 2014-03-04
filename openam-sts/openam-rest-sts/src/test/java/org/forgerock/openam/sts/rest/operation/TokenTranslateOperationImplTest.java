@@ -25,6 +25,9 @@ import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.*;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.*;
@@ -39,6 +42,9 @@ import javax.inject.Named;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertTrue;
 
@@ -49,7 +55,8 @@ Note that an injector is created in each test as the behavior of mocks need to b
  */
 public class TokenTranslateOperationImplTest {
     static final boolean INVALIDATE_INTERIM_AM_SESSIONS = true;
-    static final String fauxJsonUnt = "{\"token_type\": \"USERNAME\", \"username\" : \"username\", \"password\" : \"password\"}";
+    static final JsonValue fauxJsonUnt = json(object(field("token_type", "USERNAME"),
+            field("username", "bobo"), field("password", "cornholio")));
     class MyModule extends AbstractModule {
         @Override
         protected void configure() {
@@ -68,7 +75,7 @@ public class TokenTranslateOperationImplTest {
             bind(TokenTransform.class).toInstance(mockTokenTransform);
             bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
             bind(TokenResponseMarshaller.class).to(TokenResponseMarshallerImpl.class);
-            bind(WebServiceContextFactory.class).to(WebServiceContextFactoryImpl.class);
+            bind(WebServiceContextFactory.class).to(CrestWebServiceContextFactoryImpl.class);
             bind(TokenStore.class).toInstance(mock(TokenStore.class));
             bind(OpenAMSessionIdElementBuilder.class).to(OpenAMSessionIdElementBuilderImpl.class);
             bind(TokenTranslateOperation.class).to(TokenTranslateOperationImpl.class);
@@ -112,19 +119,13 @@ public class TokenTranslateOperationImplTest {
         TokenTranslateOperation tokenTranslateOperation = injector.getInstance(TokenTranslateOperation.class);
         TokenTransform mockTokenTransform = injector.getInstance(TokenTransform.class);
         when(mockTokenTransform.isTransformSupported(any(TokenType.class), any(TokenType.class))).thenReturn(Boolean.FALSE);
-        tokenTranslateOperation.translateToken(fauxJsonUnt, "SAML2", null);
+        tokenTranslateOperation.translateToken(fauxJsonUnt, "SAML2", null, null);
     }
 
     @Test(expectedExceptions = TokenValidationException.class)
     public void testUnknownTransform() throws TokenValidationException, TokenCreationException {
         TokenTranslateOperation tokenTranslateOperation = Guice.createInjector(new MyModule()).getInstance(TokenTranslateOperation.class);
-        tokenTranslateOperation.translateToken(fauxJsonUnt, "unknown_token_type", null);
-    }
-
-    @Test(expectedExceptions = TokenValidationException.class)
-    public void testIncorrectJson() throws TokenValidationException, TokenCreationException {
-        TokenTranslateOperation tokenTranslateOperation = Guice.createInjector(new MyModule()).getInstance(TokenTranslateOperation.class);
-        tokenTranslateOperation.translateToken("not_json", "SAML2", null);
+        tokenTranslateOperation.translateToken(fauxJsonUnt, "unknown_token_type", null, null);
     }
 
     @Test
@@ -136,8 +137,9 @@ public class TokenTranslateOperationImplTest {
         TokenProviderResponse mockTokenProviderResponse = mock(TokenProviderResponse.class);
         when(mockTokenTransform.transformToken(any(TokenValidatorParameters.class), any(TokenProviderParameters.class))).thenReturn(mockTokenProviderResponse);
         String fauxSessionId = "faux_session_id";
-        when(mockTokenProviderResponse.getToken()).thenReturn(new OpenAMSessionIdElementBuilderImpl().buildOpenAMSessionIdElement(fauxSessionId));
-        String result = tokenTranslateOperation.translateToken(fauxJsonUnt, "OPENAM", null);
-        assertTrue(result.contains(fauxSessionId));
+        when(mockTokenProviderResponse.getToken()).thenReturn(new OpenAMSessionIdElementBuilderImpl(injector.getInstance(Logger.class)).buildOpenAMSessionIdElement(fauxSessionId));
+        JsonValue result = tokenTranslateOperation.translateToken(fauxJsonUnt, "OPENAM", null, null);
+        assertTrue(result.toString().contains(fauxSessionId));
     }
+
 }

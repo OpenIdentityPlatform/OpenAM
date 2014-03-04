@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.marshal;
 
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
 
@@ -31,8 +32,7 @@ import org.forgerock.openam.sts.TokenType;
  * It may be decided that either xml or json can be returned from the REST-STS - if so, the interface will be enhanced with
  * the specification of the returned type.
  *
- * TODO: it may make sense to return a JsonValue from this interface - for now, a String will be returned. Furthermore,
- * it probably makes sense to return any token encapsulated in a jws signed by the STS' signing key, and the contents of this
+ * TODO: it probably makes sense to return any token encapsulated in a jws signed by the STS' signing key, and the contents of this
  * jws may well be a jwt, which contains the SAML assertion. These issues will be resolved in a future story. For now,
  * the REST STS will simply return issued tokens as an xml string.
  */
@@ -42,8 +42,8 @@ public interface TokenResponseMarshaller {
      * @param desiredTokenType The token type returned by the transformation. Allows the implementation to know the nature
      *                         of the xml in the TokenProviderResponse
      * @param response The response from the TokenProvider
-     * @return A string with the json representation of the returned token.
+     * @return A JsonValue with the json representation of the returned token.
      * @throws TokenMarshalException if the marshalling fails
      */
-    String marshalTokenResponse(TokenType desiredTokenType, TokenProviderResponse response) throws TokenMarshalException;
+    JsonValue marshalTokenResponse(TokenType desiredTokenType, TokenProviderResponse response) throws TokenMarshalException;
 }

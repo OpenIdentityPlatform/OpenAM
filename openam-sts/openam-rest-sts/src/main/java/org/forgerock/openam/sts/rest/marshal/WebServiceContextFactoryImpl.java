@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts.rest.marshal;
 
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.w3c.dom.Element;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +40,11 @@ import java.util.Set;
  * This instance, and the associated MessageContext, are mocked-up in the CXF STS unit-tests with regularity. It seems like
  * a faux, but valid, WebServiceContext instance can be made with the HttpServletRequest available to invocations against
  * the REST-STS. The more elaborate EndpointReference getEndpointReference calls don't seem to be made by the cxf-sts engine.
+ *
+ * @deprecated This class is deprecated, as it has been superceded by the CrestWebServiceContextFactoryImpl. It will be
+ * kept around for a while for reference purposes.
  */
-public class WebServiceContextFactoryImpl implements WebServiceContextFactory {
+public class WebServiceContextFactoryImpl /*implements WebServiceContextFactory*/ {
     private static final String HTTP_REQUEST_KEY = "HTTP.REQUEST"; //TODO: is this defined in some jdk class?
 
     static final class MessageContextImpl implements MessageContext {
@@ -163,8 +168,12 @@ public class WebServiceContextFactoryImpl implements WebServiceContextFactory {
             throw new IllegalStateException("getEndpointReference called on the faux WebServiceContext for class " + clazz);
         }
     }
-    @Override
+
     public WebServiceContext getWebServiceContext(HttpServletRequest request) {
         return new WebServiceContextImpl(request);
+    }
+
+    public WebServiceContext getWebServiceContext(HttpContext httpContext, SecurityContext securityContext) {
+        throw new IllegalArgumentException("Cannot call this method on the WebServiceContextFactoryImpl - only for crest-based impl.");
     }
 }

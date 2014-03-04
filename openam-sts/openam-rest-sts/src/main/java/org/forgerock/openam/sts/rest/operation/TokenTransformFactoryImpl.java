@@ -29,6 +29,7 @@ import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.rest.token.provider.AMSAMLTokenProvider;
 import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidatorImpl;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
@@ -66,6 +67,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider;
     private final Provider<AMTokenProvider> amTokenProviderProvider;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
+    private final UrlConstituentCatenator urlConstituentCatenator;
     private final Logger logger;
 
     @Inject
@@ -79,6 +81,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider,
             Provider<AMTokenProvider> amTokenProviderProvider,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
+            UrlConstituentCatenator urlConstituentCatenator,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -90,6 +93,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.amTokenProviderProvider = amTokenProviderProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
+        this.urlConstituentCatenator = urlConstituentCatenator;
         this.logger = logger;
     }
 
@@ -136,7 +140,15 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     }
 
     private TokenValidator buildOpenAMTokenValidator() {
-        return new AMTokenValidator(amDeploymentUrl, jsonRestRoot, realm, idFromSessionUriElement, amSessionCookieName, threadLocalAMTokenCache, logger);
+        return new AMTokenValidator(
+                                amDeploymentUrl,
+                                jsonRestRoot,
+                                realm,
+                                idFromSessionUriElement,
+                                amSessionCookieName,
+                                threadLocalAMTokenCache,
+                                urlConstituentCatenator,
+                                logger);
     }
 
     private TokenProvider buildOpenSAMLTokenProvider(boolean invalidateInterimAMSession) throws STSInitializationException {
