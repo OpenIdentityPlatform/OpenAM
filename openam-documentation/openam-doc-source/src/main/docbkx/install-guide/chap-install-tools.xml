@@ -296,7 +296,8 @@ http://openam.example.com:8080/openam</screen>
 /path/to/jdk</screen>
   </step>
   <step>
-   <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <para>Unpack the tools from the directory where you unzipped the
+    SSOAdminTools.</para>
    <informalexample><!--?dbfo pgwide="1"?-->
    <screen>$ cd /path/to/openam-tools/config
 $ unzip ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
