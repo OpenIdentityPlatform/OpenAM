@@ -310,7 +310,7 @@ com.sun.identity.agents.filter.AmAgentFilter</screen>
    <para>WebLogic is unique in that it requires additional configuration
    after the installation is complete.</para>
    <step>
-    <para>Go to the WebLogic Server Administratotion Console and login.</para>
+    <para>Go to the WebLogic Server Administration Console and login.</para>
    </step>
    <step>
     <para>Click <literal>Security realms</literal>.</para>
@@ -347,6 +347,126 @@ com.sun.identity.agents.filter.AmAgentFilter</screen>
     <para>You will need to restart the WebLogic Server to implement the changes.</para>
    </step>
   
+  </procedure>
+ </section>
+
+ <section xml:id="weblogic-agents-multi-server">
+  <title>Installing WebLogic Policy Agents in Multi-Server Domains</title>
+
+  <para>
+   In many WebLogic domains, the administration server provides
+   a central point for controlling and managing the configuration of
+   the managed servers that host protected applications.
+  </para>
+
+  <para>
+   If WebLogic managed servers run on different hosts,
+   you must create separate agent profiles
+   and perform separate installations for each
+   so that OpenAM can send notifications to the appropriate addresses.
+  </para>
+
+  <procedure xml:id="web-logic-agents-for-admin-and-managed-servers">
+   <title>To Install the Policy Agent on Administration &amp; Managed Servers</title>
+
+   <para>
+    For multi-server WebLogic domains, install policy agent as follows.
+   </para>
+
+   <step>
+    <para>
+     If servers are on different hosts, create agent profiles for each server
+     where you plan to install the policy agent.
+    </para>
+
+    <para>
+     The steps are described under <xref linkend="install-weblogic-agent" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Prepare your protected web applications
+     by adding the policy agent filter configuration as described in
+     <xref linkend="protect-weblogic-apps-after-agent-installation" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Use the <command>agentadmin</command> command to install
+     the policy agent either interactively, or silently
+     on each server in the domain.
+    </para>
+
+    <stepalternatives>
+     <step>
+      <para>
+       For interactive installation,
+       prepare password files for the servers as described under
+       <xref linkend="install-weblogic-agent" />.
+      </para>
+
+      <para>
+       Then install the policy agent on the servers as described in
+       <xref linkend="install-agent-into-weblogic" />.
+     </para>
+     </step>
+
+     <step>
+      <para>
+       For silent installation, follow the instructions in
+       <xref linkend="silent-weblogic-agent-installation" />.
+      </para>
+     </step>
+    </stepalternatives>
+   </step>
+
+   <step>
+    <para>
+     Start WebLogic, and then set up an authentication provider
+     as described in <xref linkend="configure-weblogic-agent" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On each server in the domain, deploy the policy agent
+     <filename>agentapp.war</filename>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     On each managed server in the domain,
+     update the classpath to include policy agent .jar files.
+    </para>
+
+    <para>
+     In WebLogic Node Manager console, browse to
+     Environment > Servers > <replaceable>server</replaceable>
+     > Server Start > Class Path,
+     and then edit the classpath as in the following example,
+     but all on a single line.
+    </para>
+
+    <programlisting language="shell"
+    >/path/to/j2ee_agents/weblogic_v10_agent/lib/agent.jar:
+/path/to/j2ee_agents/weblogic_v10_agent/lib/openssoclientsdk.jar:
+/path/to/j2ee_agents/weblogic_v10_agent/locale:
+/path/to/j2ee_agents/weblogic_v10_agent/Agent_001/config:
+$CLASSPATH</programlisting>
+
+    <para>
+     Replace the paths in the example with the actual paths for your domain.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Restart the managed servers.
+    </para>
+   </step>
   </procedure>
  </section>
  
