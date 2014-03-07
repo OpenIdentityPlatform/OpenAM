@@ -28,24 +28,15 @@
 
 package org.forgerock.openam.oauth2.utils;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.security.AccessController;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SignatureException;
-import java.util.*;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.*;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchOpModifier;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
@@ -55,17 +46,33 @@ import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jose.jws.JwsAlgorithm;
-import org.forgerock.json.jose.jws.SignedJwt;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.json.jose.utils.KeystoreManager;
-import org.forgerock.openam.oauth2.model.CoreToken;
-import org.forgerock.openam.oauth2.model.JWTToken;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -79,9 +86,6 @@ import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
-import com.sun.identity.shared.debug.Debug;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Utilities related to OAuth2.
@@ -938,12 +942,11 @@ public class OAuth2Utils {
         //get private key password
 
         KeystoreManager keystoreManager = new KeystoreManager(
-                keypass,
                 SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS"),
                 SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP),
                 keystorePass);
 
-        PrivateKey privateKey = keystoreManager.getPrivateKey(alias);
+        PrivateKey privateKey = keystoreManager.getPrivateKey(alias, keypass);
         PublicKey publicKey = keystoreManager.getPublicKey(alias);
         return new KeyPair(publicKey, privateKey);
     }

@@ -125,7 +125,7 @@
         <commons.forgerock-util.version>1.3.0</commons.forgerock-util.version>
         <commons.i18n-core.version>1.4.0</commons.i18n-core.version>
         <commons.authfilter.version>1.4.0-SNAPSHOT</commons.authfilter.version>
-        <forgerock.json.version>2.2.1</forgerock.json.version>
+        <forgerock.json.version>2.2.3-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>1.0.7</forgerock-ui.version>
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>

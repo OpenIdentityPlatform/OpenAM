@@ -22,6 +22,12 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -38,19 +44,8 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrappe
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import static org.mockito.BDDMockito.given;
+import org.mockito.Matchers;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyObject;
 import static org.mockito.Mockito.anyString;
@@ -63,6 +58,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class AuthIdHelperTest {
 
@@ -95,7 +92,7 @@ public class AuthIdHelperTest {
         given(claimsSetBuilder.build()).willReturn(claimsSet);
 
 
-        given(jwtBuilderFactory.jws(Matchers.<Key>anyObject())).willReturn(signedJwtBuilder);
+        given(jwtBuilderFactory.jws(Matchers.<PrivateKey>anyObject())).willReturn(signedJwtBuilder);
         given(signedJwtBuilder.headers()).willReturn(jwsHeaderBuilder);
         given(jwsHeaderBuilder.alg(Matchers.<Algorithm>anyObject())).willReturn(jwsHeaderBuilder);
         given(jwsHeaderBuilder.done()).willReturn(signedJwtBuilder);
