@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -715,4 +715,9 @@ public interface SetupConstants {
      * Name of the config param file
      */
     static final String CONFIG_PARAM_FILE = "/.configParam";
+
+    /**
+     * Request parameter used to indicate acceptance of all license terms.
+     */
+    final String ACCEPT_LICENSE_PARAM = "acceptLicense";
 }

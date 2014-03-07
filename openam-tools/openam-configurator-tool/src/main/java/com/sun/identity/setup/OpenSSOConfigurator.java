@@ -66,6 +66,7 @@ public class OpenSSOConfigurator {
     private static final String AMLDAPUSERPASSWD_CONFIRM = "AMLDAPUSERPASSWD_CONFIRM";
     private static final String USERSTORE_TYPE = "USERSTORE_TYPE";
     private static final String ACCEPT_LICENSES = "ACCEPT_LICENSES";
+    private static final String ACCEPT_LICENSES_PARAM = "acceptLicense";
     private static final String STATUS_LOCATION = "/setup/setSetupProgress?mode=text";
 
     private final LicensePresenter licensePresenter;
@@ -129,6 +130,12 @@ public class OpenSSOConfigurator {
             System.out.println(licensePresenter.getNotice());
             System.exit(-1);
         }
+
+        // User must have accepted all license terms now, so ensure parameter is added to request
+        if (postBodySB.length() > 0) {
+            postBodySB.append("&");
+        }
+        postBodySB.append(ACCEPT_LICENSES_PARAM).append("=").append("true");
 
         StatusChecker sc = new StatusChecker(openAmURL, STATUS_LOCATION);
         Thread readProgressThread = new Thread(sc);

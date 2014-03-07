@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -85,6 +85,9 @@ public class Wizard extends AjaxPage implements Constants {
         HttpServletResponseWrapper response =                
             new HttpServletResponseWrapper(getContext().getResponse());        
         initializeResourceBundle();
+
+        // User must have accepted license terms to reach this point
+        request.addParameter(SetupConstants.ACCEPT_LICENSE_PARAM, "true");
         
         /* 
          * Get the admin password. use the same value for password and confirm

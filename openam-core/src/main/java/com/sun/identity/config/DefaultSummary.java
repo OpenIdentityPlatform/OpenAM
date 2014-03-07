@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2012] [ForgeRock AS]
+ * Portions Copyrighted [2010-2014] [ForgeRock AS]
  */
 
 package com.sun.identity.config;
@@ -56,7 +56,10 @@ public class DefaultSummary extends AjaxPage {
         HttpServletRequestWrapper request = 
             new HttpServletRequestWrapper(getContext().getRequest());          
         HttpServletResponseWrapper response =                
-            new HttpServletResponseWrapper(getContext().getResponse());        
+            new HttpServletResponseWrapper(getContext().getResponse());
+
+        // License terms must have been accepted to reach this point
+        request.addParameter(SetupConstants.ACCEPT_LICENSE_PARAM, "true");
         
         String adminPassword = (String)getContext().getSessionAttribute(
             SessionAttributeNames.CONFIG_VAR_ADMIN_PWD);

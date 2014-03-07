@@ -660,6 +660,15 @@ public class AMSetupServlet extends HttpServlet {
         Map userRepo = (Map)map.remove("UserStore");
 
         try {
+
+            // Check for click-through license acceptance before processing the request.
+            SetupProgress.reportStart("configurator.progress.license.check", new Object[0]);
+            if (!isLicenseAccepted(request)) {
+                SetupProgress.reportEnd("configurator.progress.license.rejected", new Object[]{SetupConstants.ACCEPT_LICENSE_PARAM});
+                return false;
+            }
+            SetupProgress.reportEnd("configurator.progress.license.accepted", new Object[0]);
+
             /*
              * As we have got this far then the user must have accepted the license, so we log this implicitly.
              */
@@ -795,6 +804,22 @@ public class AMSetupServlet extends HttpServlet {
         }
 
         return isConfiguredFlag;
+    }
+
+    /**
+     * Verify that the user has accepted the terms of all required licenses. This is indicated by the presence of a
+     * request parameter {@code licenseAccepted=true}.
+     *
+     * @param request the servlet request.
+     * @return true if the license acceptance parameter is present and correct, otherwise false.
+     */
+    private static boolean isLicenseAccepted(IHttpServletRequest request) {
+        try {
+            return Boolean.parseBoolean(request.getParameterMap().get(SetupConstants.ACCEPT_LICENSE_PARAM).toString());
+        } catch (NullPointerException ex) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Invalid license acceptance parameter", ex);
+            return false;
+        }
     }
     
     private static void writeInputToFile(IHttpServletRequest request)

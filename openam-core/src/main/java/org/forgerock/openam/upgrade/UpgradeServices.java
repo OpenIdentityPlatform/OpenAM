@@ -160,9 +160,14 @@ public class UpgradeServices {
      * Kick off the upgrade process.
      *
      * @param adminToken A valid admin SSOToken.
+     * @param licenseAccepted Whether the license has been accepted or not.
      * @throws UpgradeException If an error occurred while performing upgrade.
      */
-    public void upgrade(SSOToken adminToken) throws UpgradeException {
+    public void upgrade(SSOToken adminToken, boolean licenseAccepted) throws UpgradeException {
+        if (!licenseAccepted) {
+            throw new UpgradeException("License terms have not been accepted");
+        }
+
         createUpgradeDirectories(SystemProperties.get(SystemProperties.CONFIG_PATH));
         if (debug.messageEnabled()) {
             debug.message("Upgrade startup.");

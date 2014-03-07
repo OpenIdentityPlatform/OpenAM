@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,6 +27,7 @@ package com.sun.identity.config.upgrade;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
 import org.apache.click.control.ActionLink;
@@ -36,8 +37,7 @@ import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
- *
- * @author Peter Major
+ * OpenAM upgrade page.
  */
 public class Upgrade extends AjaxPage {
 
@@ -76,7 +76,7 @@ public class Upgrade extends AjaxPage {
 
     public boolean doUpgrade() {
         try {
-            upgrade.upgrade(adminToken);
+            upgrade.upgrade(adminToken, isLicenseAccepted());
             writeToResponse("true");
         } catch (UpgradeException ue) {
             writeToResponse(ue.getMessage());
@@ -96,5 +96,14 @@ public class Upgrade extends AjaxPage {
         writeToResponse(upgrade.generateDetailedUpgradeReport(adminToken, false));
         setPath(null);
         return false;
+    }
+
+    /**
+     * Checks whether the user has accepted the terms of the license agreement.
+     *
+     * @return true if the license acceptance parameter is present and correct, otherwise false.
+     */
+    private boolean isLicenseAccepted() {
+        return Boolean.parseBoolean(getContext().getRequestParameter(SetupConstants.ACCEPT_LICENSE_PARAM));
     }
 }
