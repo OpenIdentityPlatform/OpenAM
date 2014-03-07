@@ -136,6 +136,14 @@
                            <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
+                  <AttributeSchema name="com.forgerock.openam.oauth2provider.clientName"
+                                   type="single"
+                                   syntax="string"
+                                   i18nKey="a746">
+                      <DefaultValues>
+                          <Value></Value>
+                      </DefaultValues>
+                  </AttributeSchema>
               <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.grantTypes"
@@ -151,6 +159,7 @@
                           <Value>[3]=urn:ietf:params:oauth:grant-type:jwt-bearer</Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  -->
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.responseTypes"
                           type="list"
@@ -161,8 +170,12 @@
                           <Value>[0]=code</Value>
                           <Value>[1]=token</Value>
                           <Value>[2]=id_token</Value>
+                          <Value>[3]=code token</Value>
+                          <Value>[4]=token id_token</Value>
+                          <Value>[5]=code token id_token</Value>
                       </DefaultValues>
                   </AttributeSchema>
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.contacts"
                           type="list"
@@ -290,7 +303,7 @@
                           syntax="string"
                           i18nKey="a731">
                       <DefaultValues>
-                          <Value>HmacSHA256</Value>
+                          <Value>HS256</Value>
                       </DefaultValues>
                   </AttributeSchema>
                   <!--

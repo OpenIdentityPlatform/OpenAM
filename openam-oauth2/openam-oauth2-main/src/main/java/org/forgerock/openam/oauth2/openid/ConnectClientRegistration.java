@@ -1,25 +1,17 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Copyright 2012-2014 ForgeRock AS. All rights reserved.
  */
 
 /*
@@ -28,25 +20,19 @@
 
 package org.forgerock.openam.oauth2.openid;
 
-import com.iplanet.sso.SSOException;
+
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.ClientApplication;
-import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
+import org.forgerock.openam.oauth2.model.Client;
+import org.forgerock.openam.oauth2.model.ClientBuilder;
+import org.forgerock.openam.oauth2.provider.ClientDAO;
+import org.forgerock.openam.oauth2.provider.ClientDAOFactory;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
@@ -59,165 +45,256 @@ import java.io.IOException;
 import java.security.AccessController;
 import java.util.*;
 
+import static com.sun.identity.shared.OAuth2Constants.ShortClientAttributeNames.*;
+
 public class ConnectClientRegistration extends ServerResource {
-
-    private ClientApplication oauth2client = null;
-    private ServiceSchemaManager serviceSchemaManager = null;
-    private ServiceSchema serviceSchema = null;
-
-    Map<String, String> translationMap = new HashMap<String, String>();
-    Map<String, String> reverseTranslationMap = new HashMap<String, String>();
-
-    private static final String REDIRECT_URIS = "redirect_uris";
-    private static final String RESPONSE_TYPES = "response_types";
-    private static final String GRANT_TYPES = "grant_types";
-    private static final String APPLICATION_TYPE = "application_type";
-    private static final String CONTACTS = "contacts";
-    private static final String CLIENT_NAME = "client_name";
-    private static final String LOGO_URI = "logo_uri";
-    private static final String CLIENT_URI = "client_uri";
-    private static final String POLICY_URI = "policy_uri";
-    private static final String TOS_URI = "tos_uri";
-    private static final String JWKS_URI = "jwks_uri";
-    private static final String JWKS = "jwks";
-    private static final String SECTOR_IDENTIFIER_URI = "sector_identifier_uri";
-    private static final String SUBJECT_TYPE = "subject_type";
-    private static final String ID_TOKEN_SIGNED_RESPONSE_ALG = "id_token_signed_response_alg";
-    private static final String ID_TOKEN_ENCRYPTED_RESPONSE_ALG = "id_token_encrypted_response_alg";
-    private static final String ID_TOKEN_ENCRYPTED_RESONSE_ENC = "id_token_encrypted_response_enc";
-    private static final String USERINFO_SIGNED_RESPONSE_ALG = "userinfo_signed_response_alg";
-    private static final String USERINFO_ENCRYPTED_RESPONSE_ALG = "userinfo_encrypted_response_alg";
-    private static final String USERINFO_ENCRYPTED_RESONSE_ENC = "userinfo_encrypted_response_enc";
-    private static final String REQUEST_OBJECT_SIGNING_ALG = "request_object_signing_alg";
-    private static final String REQUEST_OBJECT_ENCRYPTION_ALG = "request_object_encryption_alg";
-    private static final String REQUEST_OBJECT_ENCRYPTION_ENC = "request_object_encryption_enc";
-    private static final String TOKEN_ENDPOINT_AUTH_METHOD = "token_endpoint_auth_method";
-    private static final String TOKEN_ENDPOINT_AUTH_SIGNING_ALG = "token_endpoint_auth_signing_alg";
-    private static final String DEFAULT_MAX_AGE = "default_max_age";
-    private static final String REQUIRE_AUTH_TIME = "require_auth_time";
-    private static final String DEFAULT_ACR_VALUES = "default_acr_values";
-    private static final String INITIATE_LOGIN_URI = "initiate_login_uri";
-    private static final String REQUEST_URIS = "request_uris";
-    private static final String POST_LOGOUT_REDIRECT_URIS = "post_logout_redirect_uris";
-    private static final String REGISTRATION_ACCESS_TOKEN = "registration_access_token";
-    private static final String CLIENT_SESSION_URI = "client_session_uri";
-
-    private static final String CLIENT_ID = "client_id";
-    private static final String CLIENT_SECRET = "client_secret";
-    private static final String CLIENT_TYPE = "client_type";
-    private static final String SCOPES = "scopes";
-    private static final String DEFAULT_SCOPES = "default_scopes";
-    private static final String CLIENT_DESCRIPTION = "client_description";
+    private static final String ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT = "HS256";
     private static final String REALM = "realm";
-
-    private static final String NOT_USED = null;
+    private static final String DEFAULT_REALM = "/";
+    private static final String DEFAULT_APPLICATION_TYPE = "web";
 
     private static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
     private static final String ISSUED_AT = "client_id_issued_at";
     private static final String EXPIRES_AT = "client_secret_expires_at";
 
-    private static final String OAUTH2_CLIENT = "OAuth2Client";
-    private static final String AGENT_TYPE = "AgentType";
-    private static final String ACTIVE = "Active";
-    private static final String SUN_IDENTITY_SERVER_DEVICE_STATUS = "sunIdentityServerDeviceStatus";
 
-
-    private static final String SCOPES_DEFAULT = "[0]=openid|Using the OpenID Connect Protocol";
-    private static final String SUBJECT_TYPE_DEFAULT = "Public";
-    private static final String ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT = "HmacSsHA256";
-    private static final String CLIENT_TYPE_DEFAULT = "Confidential";
-
-    public ConnectClientRegistration () throws SMSException, SSOException {
-        this(null,
-                new ServiceSchemaManager("AgentService",
-                        AccessController.doPrivileged(AdminTokenAction.getInstance())));
-        createTranslationMaps();
-    }
-
-    public ConnectClientRegistration (ClientApplication clientApplication, ServiceSchemaManager serviceSchemaManager) {
-        createTranslationMaps();
-        try {
-            this.oauth2client = clientApplication;
-            this.serviceSchemaManager = serviceSchemaManager;
-            this.serviceSchema = this.serviceSchemaManager.getOrganizationSchema().getSubSchema(OAUTH2_CLIENT);
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("Unable to get Client Schema", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-        }
-    }
-
-    private void createTranslationMaps() {
-        translationMap.put(REDIRECT_URIS, OAuth2Constants.OAuth2Client.REDIRECT_URI);
-        translationMap.put(RESPONSE_TYPES, NOT_USED);
-        translationMap.put(GRANT_TYPES, NOT_USED);
-        translationMap.put(APPLICATION_TYPE, NOT_USED);
-        translationMap.put(CONTACTS, NOT_USED);
-        translationMap.put(CLIENT_NAME, OAuth2Constants.OAuth2Client.NAME);
-        translationMap.put(LOGO_URI, NOT_USED);
-        translationMap.put(CLIENT_URI, NOT_USED);
-        translationMap.put(POLICY_URI, NOT_USED);
-        translationMap.put(TOS_URI, NOT_USED);
-        translationMap.put(JWKS_URI, NOT_USED);
-        translationMap.put(JWKS, NOT_USED);
-        translationMap.put(SECTOR_IDENTIFIER_URI, NOT_USED);
-        translationMap.put(SUBJECT_TYPE, NOT_USED);
-        translationMap.put(ID_TOKEN_SIGNED_RESPONSE_ALG, OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG);
-        translationMap.put(ID_TOKEN_ENCRYPTED_RESPONSE_ALG, NOT_USED);
-        translationMap.put(ID_TOKEN_ENCRYPTED_RESONSE_ENC, NOT_USED);
-        translationMap.put(USERINFO_SIGNED_RESPONSE_ALG, NOT_USED);
-        translationMap.put(USERINFO_ENCRYPTED_RESPONSE_ALG, NOT_USED);
-        translationMap.put(USERINFO_ENCRYPTED_RESONSE_ENC, NOT_USED);
-        translationMap.put(REQUEST_OBJECT_SIGNING_ALG, NOT_USED);
-        translationMap.put(REQUEST_OBJECT_ENCRYPTION_ALG, NOT_USED);
-        translationMap.put(REQUEST_OBJECT_ENCRYPTION_ENC, NOT_USED);
-        translationMap.put(TOKEN_ENDPOINT_AUTH_METHOD, NOT_USED);
-        translationMap.put(TOKEN_ENDPOINT_AUTH_SIGNING_ALG, NOT_USED);
-        translationMap.put(DEFAULT_MAX_AGE, NOT_USED);
-        translationMap.put(REQUIRE_AUTH_TIME, NOT_USED);
-        translationMap.put(DEFAULT_ACR_VALUES, NOT_USED);
-        translationMap.put(INITIATE_LOGIN_URI, NOT_USED);
-        translationMap.put(REQUEST_URIS, NOT_USED);
-        translationMap.put(POST_LOGOUT_REDIRECT_URIS, OAuth2Constants.OAuth2Client.POST_LOGOUT_URI);
-        translationMap.put(REGISTRATION_ACCESS_TOKEN, OAuth2Constants.OAuth2Client.ACCESS_TOKEN);
-
-        translationMap.put(CLIENT_SECRET, OAuth2Constants.OAuth2Client.USERPASSWORD);
-        translationMap.put(CLIENT_TYPE, OAuth2Constants.OAuth2Client.CLIENT_TYPE);
-        translationMap.put(SCOPES, OAuth2Constants.OAuth2Client.SCOPES);
-        translationMap.put(DEFAULT_SCOPES, OAuth2Constants.OAuth2Client.DEFAULT_SCOPES);
-        translationMap.put(CLIENT_DESCRIPTION, OAuth2Constants.OAuth2Client.DESCRIPTION);
-        translationMap.put(CLIENT_SESSION_URI, OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI);
-
-
-        for (Map.Entry<String, String> entry : translationMap.entrySet()) {
-            if (entry.getValue() != null) {
-                reverseTranslationMap.put(entry.getValue(), entry.getKey());
+    private boolean containsCaseInsensitive(Set<String> collection1, List<String> values) {
+        Iterator<String> valuesIterator = values.iterator();
+        while (valuesIterator.hasNext()) {
+            boolean containsValue = false;
+            String value = valuesIterator.next();
+            for (String string : collection1) {
+                if (string.equalsIgnoreCase(value)) {
+                    containsValue = true;
+                    break;
+                }
+            }
+            if (containsValue == false) {
+                return false;
             }
         }
+        return true;
+    }
 
+    private boolean containsCaseInsensitive(Set<String> collection, String value) {
+        Iterator<String> iteratorCollection1 = collection.iterator();
+        while (iteratorCollection1.hasNext()) {
+            if (iteratorCollection1.next().equalsIgnoreCase(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Post
+    public Representation createClient(Representation entity) {
+        String accessToken = getRequest().getChallengeResponse().getRawValue();
+        String realm = OAuth2Utils.getRealm(getRequest());
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+        JsonValue input = null;
+        //read input
+        try {
+            JacksonRepresentation<Map> rep = new JacksonRepresentation<Map>(entity, Map.class);
+            input = new JsonValue(rep.getObject());
+        } catch (IOException e) {
+            OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unable to parse json input.", e);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+        }
+
+        //check input to ensure it is valid
+        Set<String> inputKeys = input.keys();
+        for (String key : inputKeys) {
+            if (OAuth2Constants.ShortClientAttributeNames.fromString(key) == null) {
+                //input is unknown
+                OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unknown input given. Key: " + key);
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+            }
+        }
+        //create client given input
+        ClientBuilder clientBuilder = new ClientBuilder();
+        try {
+            if ((realm == null || realm.isEmpty()) && input.get(REALM).asString() != null) {
+                realm = input.get(REALM).asString();
+            } else {
+                realm = DEFAULT_REALM;
+            }
+
+            if (input.get(CLIENT_ID.getType()).asString() != null) {
+                clientBuilder.setClientID(input.get(CLIENT_ID.getType()).asString());
+            } else {
+                clientBuilder.setClientID(UUID.randomUUID().toString());
+            }
+
+            if (input.get(CLIENT_SECRET.getType()).asString() != null) {
+                clientBuilder.setClientSecret(input.get(CLIENT_SECRET.getType()).asString());
+            } else {
+                clientBuilder.setClientSecret(UUID.randomUUID().toString());
+            }
+
+            if (input.get(CLIENT_TYPE.getType()).asString() != null ) {
+                if (Client.ClientType.fromString(input.get(CLIENT_TYPE.getType()).asString()) != null) {
+                    clientBuilder.setClientType(input.get(CLIENT_TYPE.getType()).asString());
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid client_type requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            } else {
+                clientBuilder.setClientType(Client.ClientType.CONFIDENTIAL.getType());
+            }
+
+            if (input.get(REDIRECT_URIS.getType()).asList() != null) {
+                clientBuilder.setRedirectionURIs(input.get(REDIRECT_URIS.getType()).asList(String.class));
+            }
+
+            if (input.get(SCOPES.getType()).asList() != null) {
+                if (containsCaseInsensitive(settings.getSupportedClaims(), input.get(SCOPES.getType()).asList(String.class))) {
+                    clientBuilder.setAllowedGrantScopes(input.get(SCOPES.getType()).asList(String.class));
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid scopes requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            }
+
+            if (input.get(DEFAULT_SCOPES.getType()).asList() != null) {
+                if (containsCaseInsensitive(settings.getSupportedClaims(), input.get(DEFAULT_SCOPES.getType()).asList(String.class))) {
+                    clientBuilder.setDefaultGrantScopes(input.get(DEFAULT_SCOPES.getType()).asList(String.class));
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid default_scopes requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            }
+
+            if (input.get(CLIENT_NAME.getType()).asString() != null) {
+                clientBuilder.setClientName(input.get(CLIENT_NAME.getType()).asString());
+            }
+
+            if (input.get(CLIENT_DESCRIPTION.getType()).asList() != null) {
+                clientBuilder.setDisplayDescription(input.get(CLIENT_DESCRIPTION.getType()).asList(String.class));
+            }
+
+            if (input.get(SUBJECT_TYPE.getType()).asString() != null) {
+                if (Client.SubjectType.fromString(input.get(SUBJECT_TYPE.getType()).asString()) != null) {
+                    clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid subject_type requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            } else {
+                clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
+            }
+
+            if (input.get(ID_TOKEN_SIGNED_RESPONSE_ALG.getType()).asString() != null) {
+                if (containsCaseInsensitive(settings.getTheIDTokenSigningAlgorithmsSupported(), input.get(ID_TOKEN_SIGNED_RESPONSE_ALG.getType()).asString())) {
+                    clientBuilder.setIdTokenSignedResponseAlgorithm(input.get(ID_TOKEN_SIGNED_RESPONSE_ALG.getType()).asString());
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unsupported id_token_response_signed_alg requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            } else {
+                clientBuilder.setIdTokenSignedResponseAlgorithm(ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT);
+            }
+
+            if (input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asString() != null) {
+                clientBuilder.setPostLogoutRedirectionURI(input.get(POST_LOGOUT_REDIRECT_URIS.getType()).asString());
+            }
+
+            if (input.get(REGISTRATION_ACCESS_TOKEN.getType()).asString() != null) {
+                clientBuilder.setAccessToken(input.get(REGISTRATION_ACCESS_TOKEN.getType()).asString());
+            } else {
+                clientBuilder.setAccessToken(accessToken);
+            }
+
+            if (input.get(CLIENT_SESSION_URI.getType()).asString() != null) {
+                clientBuilder.setClientSessionURI(input.get(CLIENT_SESSION_URI.getType()).asString());
+            }
+
+            if (input.get(APPLICATION_TYPE.getType()).asString() != null) {
+                if (Client.ApplicationType.fromString(input.get(APPLICATION_TYPE.getType()).asString()) != null) {
+                    clientBuilder.setApplicationType(Client.ApplicationType.WEB.getType());
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid application_type requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            } else {
+                clientBuilder.setApplicationType(DEFAULT_APPLICATION_TYPE);
+            }
+
+            if (input.get(DISPLAY_NAME.getType()).asList() != null) {
+                clientBuilder.setDisplayName(input.get(DISPLAY_NAME.getType()).asList(String.class));
+            }
+
+            if (input.get(RESPONSE_TYPES.getType()).asList() != null) {
+                if (containsCaseInsensitive(settings.getResponseTypes(), input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
+                    clientBuilder.setResponseTypes(input.get(RESPONSE_TYPES.getType()).asList(String.class));
+                } else {
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid response_types requested.");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                }
+            } else {
+                List<String> defaultResponseTypes = new ArrayList<String>();
+                defaultResponseTypes.add("code");
+                clientBuilder.setResponseTypes(defaultResponseTypes);
+            }
+
+        } catch (JsonValueException e) {
+            OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unable to build client.", e);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+        }
+
+        //build the client
+        Client client = clientBuilder.createClient();
+
+        //get the ClientDAO
+        ClientDAO clientDAO = ClientDAOFactory.newOpenAMClientDAO(realm,
+                getRequest(),
+                (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance()));
+
+        //write the client to the storage
+        clientDAO.create(client);
+
+        //return the response json data
+        Map<String, Object> response = client.asMap();
+
+        response.put(REGISTRATION_CLIENT_URI,
+                OAuth2Utils.getDeploymentURL(getRequest()) + "/oauth2/connect/register?client_id=" + client.getClientID());
+        response.put(ISSUED_AT, System.currentTimeMillis() / 1000);
+
+        // TODO add expire time if JWT is used as the secret
+        response.put(EXPIRES_AT, 0);
+
+        setStatus(Status.SUCCESS_CREATED);
+        return new JsonRepresentation(response);
 
     }
 
     @Get
-    public Representation readRequest() {
-        String clientId= OAuth2Utils.getRequestParameter(
-                getRequest(), OAuth2Constants.OAuth2Client.CLIENT_ID, String.class);
+    public Representation getClient() {
+        String realm = OAuth2Utils.getRealm(getRequest());
+        String clientId = OAuth2Utils.getRequestParameter(getRequest(),
+                OAuth2Constants.OAuth2Client.CLIENT_ID,
+                String.class);
         String accessToken = getRequest().getChallengeResponse().getRawValue();
 
         if (clientId != null) {
             try {
-                AMIdentity client = OAuth2Utils.getClientIdentity(clientId, OAuth2Utils.getRealm(getRequest()));
-                ClientApplication oauth2client;
-                if (this.oauth2client != null) {
-                    oauth2client = this.oauth2client;
-                } else {
-                    oauth2client = new ClientApplicationImpl(client);
-                }
-                if (!oauth2client.getAccessToken().equals(accessToken)) {
-                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.readRequest(): Invalid accessToken");
+                //read the client from storage
+                ClientDAO clientDAO = ClientDAOFactory.newOpenAMClientDAO(realm,
+                        getRequest(),
+                        (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance()));
+                Client client = clientDAO.read(clientId);
+
+                if (!client.getAccessToken().equals(accessToken)) {
+                    //client access token doesn't match the access token supplied in the request
+                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.getClient(): Invalid accessToken");
                     throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
                 }
-                Map<String, Object> responseMap = createReadResponse(oauth2client);
-                return new JsonRepresentation(responseMap);
+
+                //remove the client fields that don't need to be reported.
+                client.remove(CLIENT_SECRET.getType());
+                client.remove(REGISTRATION_ACCESS_TOKEN.getType());
+
+                //return the client attributes as json
+                return new JsonRepresentation(client.toString());
             } catch (Exception e) {
                 OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
@@ -226,223 +303,6 @@ public class ConnectClientRegistration extends ServerResource {
             OAuth2Utils.DEBUG.error("ConnectClientRegistration.readRequest(): No client id sent");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
         }
-    }
-
-    private Map<String, Object> createReadResponse(ClientApplication oauth2Client) {
-        Map<String, Object> response = new HashMap<String, Object>();
-        response.put(REDIRECT_URIS, oauth2Client.getRedirectionURIs());
-        response.put(SCOPES, oauth2Client.getAllowedGrantScopes());
-        response.put(DEFAULT_SCOPES, oauth2Client.getDefaultGrantScopes());
-        response.put(CLIENT_NAME, oauth2Client.getClientName());
-        response.put(CLIENT_DESCRIPTION, oauth2Client.getDisplayDescription());
-        response.put(JWKS_URI, oauth2Client.getJwksURI());
-        response.put(SUBJECT_TYPE, oauth2Client.getSubjectType());
-        response.put(ID_TOKEN_SIGNED_RESPONSE_ALG, oauth2Client.getIDTokenSignedResponseAlgorithm());
-        response.put(POST_LOGOUT_REDIRECT_URIS, oauth2Client.getPostLogoutRedirectionURI());
-        response.put(CLIENT_TYPE, oauth2Client.getClientType());
-        response.put(CLIENT_ID, oauth2Client.getClientId());
-        response.put(REGISTRATION_ACCESS_TOKEN, oauth2Client.getAccessToken());
-        response.put(CLIENT_SESSION_URI, oauth2Client.getClientSessionURI());
-
-
-        for( Iterator<Map.Entry<String,Object>> iter = response.entrySet().iterator() ; iter.hasNext();) {
-            Map.Entry<String,Object> entry = iter.next();
-            if (entry.getValue() == null) {
-                iter.remove();
-            } else if (entry.getValue() instanceof Set && ((Set) entry.getValue()).isEmpty()) {
-                iter.remove();
-            } else if (entry.getValue() instanceof String && ((String) entry.getValue()).isEmpty()) {
-                iter.remove();
-            } else if (entry.getValue() instanceof ClientApplication.ClientType) {
-                //do nothing this will be set
-            } else {
-                //do nothing has a value
-            }
-        }
-
-        return response;
-    }
-
-    private void setDefaultValues(Map<String, Set<String>> attrs) {
-        Set<String> temp;
-        if (!attrs.containsKey(OAuth2Constants.OAuth2Client.SCOPES)) {
-            temp = new HashSet<String>();
-            temp.add(SCOPES_DEFAULT);
-            attrs.put(OAuth2Constants.OAuth2Client.SCOPES, temp);
-        }
-
-        if (!attrs.containsKey(OAuth2Constants.OAuth2Client.DEFAULT_SCOPES)) {
-            temp = new HashSet<String>();
-            temp.add(SCOPES_DEFAULT);
-            attrs.put(OAuth2Constants.OAuth2Client.DEFAULT_SCOPES, temp);
-        }
-
-        if (!attrs.containsKey(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG)) {
-            temp = new HashSet<String>();
-            temp.add(ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT);
-            attrs.put(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG, temp);
-        }
-
-        if (!attrs.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)) {
-            temp = new HashSet<String>();
-            temp.add(CLIENT_TYPE_DEFAULT);
-            attrs.put(OAuth2Constants.OAuth2Client.CLIENT_TYPE, temp);
-        }
-
-    }
-
-    private String getValue(JsonValue value) throws OAuthProblemException {
-        if (value.isString()) {
-            return value.asString();
-        } else if (value.isList()) {
-            return value.asList().get(0).toString();
-        } else {
-            OAuth2Utils.DEBUG.error("ConnectClientRegistration.getValue(): Error parsing input");
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
-        }
-    }
-
-
-    private boolean isSingle(String value) {
-        AttributeSchema attributeSchema = serviceSchema.getAttributeSchema(value);
-        AttributeSchema.UIType uiType = attributeSchema.getUIType();
-        if (uiType != null && (uiType.equals(AttributeSchema.UIType.UNORDEREDLIST) ||
-                uiType.equals(AttributeSchema.UIType.ORDEREDLIST))) {
-            return false;
-        }
-        return true;
-    }
-
-    private void formatSet(Set<String> set, boolean isSingleValue, Map<String, Set<String>> attrs, String key) {
-        if (isSingleValue) {
-            attrs.put(translationMap.get(key), set);
-        } else {
-            Set newset = new HashSet<String>();
-            Iterator<String> iter = set.iterator();
-            for (int i = 0; iter.hasNext(); i++) {
-                String string = iter.next();
-                string = ("[" + i + "]=" + string);
-                newset.add(string);
-            }
-            attrs.put(translationMap.get(key), newset);
-        }
-    }
-
-    private void setAttr(JsonValue jsonValue, boolean isSingleValue, Map<String, Set<String>> attrs) {
-        String key = jsonValue.getPointer().leaf();
-        if (jsonValue.isList()) {
-            Set<String> set = new HashSet<String>(jsonValue.asList(String.class));
-            formatSet(set, isSingleValue, attrs, key);
-        } else if (jsonValue.isString()) {
-            Set<String> set = new HashSet<String>();
-            set.add(jsonValue.asString());
-            formatSet(set, isSingleValue, attrs, key);
-        } else if (jsonValue.isBoolean()) {
-            Set<String> set = new HashSet<String>();
-            set.add(jsonValue.asBoolean().toString());
-            formatSet(set, isSingleValue, attrs, key);
-        }
-    }
-
-    @Post
-    public Representation validate(Representation entity) {
-
-        String accessToken = getRequest().getChallengeResponse().getRawValue();
-
-        Map<String, Set<String>> attrs;
-        JsonValue result = null;
-        String realm = null, id = null, secret = null;
-        try {
-            JacksonRepresentation<Map> rep =
-                    new JacksonRepresentation<Map>(entity, Map.class);
-            result = new JsonValue(rep.getObject());
-
-            JsonValue value = result.get(OAuth2Constants.OAuth2Client.REALM);
-            if (result.isDefined(OAuth2Constants.OAuth2Client.REALM)) {
-                realm = getValue(value);
-                result.remove(OAuth2Constants.OAuth2Client.REALM);
-            } else {
-                realm = null;
-            }
-
-            value = result.get(OAuth2Constants.OAuth2Client.CLIENT_ID);
-            if (result.isDefined(OAuth2Constants.OAuth2Client.CLIENT_ID)) {
-                id = getValue(value);
-                result.remove(OAuth2Constants.OAuth2Client.CLIENT_ID);
-            } else {
-                id = UUID.randomUUID().toString();
-            }
-
-            if (!result.isDefined(OAuth2Constants.OAuth2Client.CLIENT_SECRET)) {
-                secret = UUID.randomUUID().toString();
-                result.put(OAuth2Constants.OAuth2Client.CLIENT_SECRET, secret);
-            }
-
-            if (!result.isDefined(REGISTRATION_ACCESS_TOKEN)) {
-                result.put(REGISTRATION_ACCESS_TOKEN, accessToken);
-            }
-
-            for (Map.Entry<String, String> entry : translationMap.entrySet()) {
-                if (entry.getValue() == NOT_USED && result.isDefined(entry.getKey())) {
-                    result.remove(entry.getKey());
-                }
-            }
-
-
-            attrs = new HashMap<String, Set<String>>();
-            Iterator<JsonValue> iter = result.iterator();
-            while (iter.hasNext()) {
-                JsonValue jsonValue = iter.next();
-                String key = jsonValue.getPointer().leaf();
-
-                if (!translationMap.containsKey(key)) {
-                    OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Input parameter " + key + "unrecognized");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
-                }
-
-                setAttr(jsonValue, isSingle(translationMap.get(key)), attrs);
-            }
-        } catch (IOException e) {
-            OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Error parsing input", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
-        }
-
-        Set<String> temp = new HashSet<String>();
-        temp.add(OAUTH2_CLIENT);
-        attrs.put(AGENT_TYPE, temp);
-
-        temp = new HashSet<String>();
-        temp.add(ACTIVE);
-        attrs.put(SUN_IDENTITY_SERVER_DEVICE_STATUS, temp);
-
-        setDefaultValues(attrs);
-
-        AMIdentity clientAMIdentity = null;
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            AMIdentityRepository repo = new AMIdentityRepository(token, realm);
-            clientAMIdentity = repo.createIdentity(IdType.AGENTONLY, id, attrs);
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
-        }
-
-        ClientApplication clientApplication = new ClientApplicationImpl(clientAMIdentity);
-
-        Map<String, Object> results = createReadResponse(clientApplication);
-
-        results.put(CLIENT_ID, id);
-        results.put(CLIENT_SECRET, secret);
-
-        results.put(REGISTRATION_CLIENT_URI, OAuth2Utils.getDeploymentURL(getRequest()) + "/oauth2/connect/register?client_id=" + id);
-        results.put(ISSUED_AT, System.currentTimeMillis() / 1000);
-
-        // TODO add expire time if JWT is used as the secret
-        results.put(EXPIRES_AT, 0);
-
-        setStatus(Status.SUCCESS_CREATED);
-        return new JsonRepresentation(results);
-
     }
 
     @Override

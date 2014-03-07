@@ -1,25 +1,17 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions copyright [year] [name of copyright owner]"
+ * Copyright 2012-2014 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.openam.oauth2.model;
@@ -37,7 +29,6 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
-import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 
@@ -90,7 +81,7 @@ public class JWTToken extends CoreToken implements Token {
         AMIdentity id = OAuth2Utils.getClientIdentity(clientID, getRealm());
         ClientApplication clientApplication = new ClientApplicationImpl(id);
         String algorithm = clientApplication.getIDTokenSignedResponseAlgorithm();
-        JwsAlgorithm jwsAlgorithm = JwsAlgorithm.getJwsAlgorithm(algorithm);
+        JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
         if (jwsAlgorithm == null){
             OAuth2Utils.DEBUG.error("JWTToken.sign()::Unable to find jws algorithm for: " + algorithm);
             throw new SignatureException();

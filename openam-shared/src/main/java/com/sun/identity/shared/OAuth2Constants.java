@@ -1,25 +1,17 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions copyright [year] [name of copyright owner]"
+ * Copyright 2012-2014 ForgeRock AS. All rights reserved.
  */
 
 package com.sun.identity.shared;
@@ -237,6 +229,8 @@ public class OAuth2Constants {
          *      Authorization Request</a>
          */
         public static final String TOKEN = "token";
+
+        public static final String ID_TOKEN = "id_token";
     }
 
     /**
@@ -788,6 +782,7 @@ public class OAuth2Constants {
         public static final String CLIENT_SECRET = "client_secret";
         public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
         public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
+        public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
     }
 
     public class JWTTokenParams{
@@ -803,5 +798,74 @@ public class OAuth2Constants {
         public static final String NONCE = "nonce";
         public static final String OPS = "ops";
 
+    }
+
+    /**
+     * List of client attributes and their names as specified in the OAuth2/OpenID Connect Spec
+     */
+    public enum ShortClientAttributeNames {
+        REDIRECT_URIS("redirect_uris"),
+        RESPONSE_TYPES("response_types"),
+        GRANT_TYPES("grant_types"),
+        APPLICATION_TYPE("application_type"),
+        CONTACTS("contacts"),
+        CLIENT_NAME("client_name"),
+        LOGO_URI("logo_uri"),
+        CLIENT_URI("client_uri"),
+        POLICY_URI("policy_uri"),
+        TOS_URI("tos_uri"),
+        JWKS_URI("jwks_uri"),
+        JWKS("jwks"),
+        SECTOR_IDENTIFIER_URI("sector_identifier_uri"),
+        SUBJECT_TYPE("subject_type"),
+        ID_TOKEN_SIGNED_RESPONSE_ALG("id_token_signed_response_alg"),
+        ID_TOKEN_ENCRYPTED_RESPONSE_ALG("id_token_encrypted_response_alg"),
+        ID_TOKEN_ENCRYPTED_RESONSE_ENC("id_token_encrypted_response_enc"),
+        USERINFO_SIGNED_RESPONSE_ALG("userinfo_signed_response_alg"),
+        USERINFO_ENCRYPTED_RESPONSE_ALG("userinfo_encrypted_response_alg"),
+        USERINFO_ENCRYPTED_RESONSE_ENC("userinfo_encrypted_response_enc"),
+        REQUEST_OBJECT_SIGNING_ALG("request_object_signing_alg"),
+        REQUEST_OBJECT_ENCRYPTION_ALG("request_object_encryption_alg"),
+        REQUEST_OBJECT_ENCRYPTION_ENC("request_object_encryption_enc"),
+        TOKEN_ENDPOINT_AUTH_METHOD("token_endpoint_auth_method"),
+        TOKEN_ENDPOINT_AUTH_SIGNING_ALG("token_endpoint_auth_signing_alg"),
+        DEFAULT_MAX_AGE("default_max_age"),
+        REQUIRE_AUTH_TIME("require_auth_time"),
+        DEFAULT_ACR_VALUES("default_acr_values"),
+        INITIATE_LOGIN_URI("initiate_login_uri"),
+        REQUEST_URIS("request_uris"),
+        POST_LOGOUT_REDIRECT_URIS("post_logout_redirect_uris"),
+        REGISTRATION_ACCESS_TOKEN("registration_access_token"),
+        CLIENT_SESSION_URI("client_session_uri"),
+
+        CLIENT_ID("client_id"),
+        CLIENT_SECRET("client_secret"),
+        CLIENT_TYPE("client_type"),
+        SCOPES("scopes"),
+        DEFAULT_SCOPES("default_scopes"),
+        DISPLAY_NAME("display_name"),
+        CLIENT_DESCRIPTION("client_description"),
+        REALM("realm");
+
+        private String name;
+
+        ShortClientAttributeNames(String name) {
+            this.name = name;
+        }
+
+        public String getType() {
+            return this.name;
+        }
+
+        public static ShortClientAttributeNames fromString(String type) {
+            if (type != null) {
+                for (ShortClientAttributeNames shortClientAttributeNames : ShortClientAttributeNames.values()) {
+                    if (type.equalsIgnoreCase(shortClientAttributeNames.name)) {
+                        return shortClientAttributeNames;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }
