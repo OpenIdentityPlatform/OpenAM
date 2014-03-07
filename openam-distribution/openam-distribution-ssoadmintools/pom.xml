@@ -176,6 +176,12 @@
             <artifactId>openam-license-manager-cli</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
 </project>
 
