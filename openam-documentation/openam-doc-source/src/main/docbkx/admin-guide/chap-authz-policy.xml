@@ -203,18 +203,28 @@
 
      <listitem>
       <para>
-       The wildcard <literal>*</literal> matches multiple levels in a path.
+       The wildcards you can use are
+       <literal>*</literal> and <literal>-*-</literal>.
+      </para>
 
-       When used at the end of a rule
-       <literal>*</literal> matches one or more characters,
-       not zero or more characters.
+      <para>
+       These wildcards can be used throughout Rules
+       to match URLs or resource names.
+       For a Rule used to match URLs, wildcards can be employed
+       in the scheme, host, port, path, and query string of the Rule.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       The wildcard <literal>*</literal> matches multiple levels in a path.
       </para>
 
       <para>
        For example, <literal>http://www.example.com/*</literal> matches
-       <literal>http://www.example.com/index.html</literal> and also
-       <literal>http://www.example.com/company/images/logo.png</literal>,
-       but not <literal>http://www.example.com/</literal>.
+       <literal>http://www.example.com/index.html</literal>,
+       <literal>http://www.example.com/</literal>, and also
+       <literal>http://www.example.com/company/images/logo.png</literal>.
       </para>
      </listitem>
 
@@ -236,11 +246,26 @@
        You must explicitly add Rules to match URLs with query strings.
       </para>
 
+      <!-- The following is very likely to change before 12.0.0,
+           meaning wildcards will match 0 or more characters.
+           TBC -->
+      <para>
+       When used at the end of a rule after a <literal>?</literal> character,
+       <literal>*</literal> matches one or more characters,
+       not zero or more characters.
+      </para>
+
+      <para>
+       For example, <literal>http://www.example.com/*?*</literal> matches
+       <literal>http://www.example.com/users?_action=create</literal>, but not
+       <literal>http://www.example.com/users?</literal>.
+      </para>
+
       <para>
        For example, to match everything under
        <literal>http://www.example.com/</literal> specify three Rules,
-       one for <literal>http://www.example.com/</literal>,
-       one for <literal>http://www.example.com/*</literal>, and
+       one for <literal>http://www.example.com/*</literal>,
+       one for <literal>http://www.example.com/*?</literal>, and
        one for <literal>http://www.example.com/*?*</literal>.
       </para>
 
