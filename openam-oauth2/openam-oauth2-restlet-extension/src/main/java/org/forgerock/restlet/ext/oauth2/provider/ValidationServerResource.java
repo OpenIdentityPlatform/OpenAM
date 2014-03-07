@@ -1,25 +1,17 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * Copyright 2012-2014 ForgeRock AS. All rights reserved.
  */
 
 package org.forgerock.restlet.ext.oauth2.provider;
@@ -69,6 +61,9 @@ public class ValidationServerResource extends ServerResource implements
 
     private OAuth2TokenStore tokenStore = null;
     private Reference validationServerRef;
+
+    private final static String CONNECTION_TIMEOUT_MS = "30000";
+    private final static String SOCKET_TIMEOUT = "socketTimeout";
 
     public ValidationServerResource() {
         this.validationServerRef = null;
@@ -178,9 +173,10 @@ public class ValidationServerResource extends ServerResource implements
     public BearerToken verify(BearerToken token) throws OAuthProblemException {
         Reference reference = new Reference(validationServerRef);
         reference.addQueryParameter(OAuth2Constants.Params.ACCESS_TOKEN, token.getTokenID());
-        Client client = new Client(new Context(), Protocol.HTTP);
+        Client client = new Client(new Context(), validationServerRef.getSchemeProtocol());
         ClientResource clientResource = new ClientResource(reference.toUri());
         clientResource.setNext(client);
+        client.getContext().getParameters().set(SOCKET_TIMEOUT, CONNECTION_TIMEOUT_MS);
         clientResource.get();
         try {
             // Actually handle the call

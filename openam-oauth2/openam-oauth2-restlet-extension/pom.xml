@@ -82,6 +82,17 @@
             </exclusions>
             <!--scope>provided</scope-->
         </dependency>
+
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.net</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.ssl</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
