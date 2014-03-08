@@ -172,7 +172,8 @@
                           <Value>[2]=id_token</Value>
                           <Value>[3]=code token</Value>
                           <Value>[4]=token id_token</Value>
-                          <Value>[5]=code token id_token</Value>
+                          <Value>[5]=code id_token</Value>
+                          <Value>[6]=code token id_token</Value>
                       </DefaultValues>
                   </AttributeSchema>
               <!--
