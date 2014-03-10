@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ The contents of this file are subject to the terms of the Common Development and
+ Distribution License (the License). You may not use this file except in compliance with the
+ License.
+
+ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ specific language governing permission and limitations under the License.
+
+ When distributing Covered Software, include this CDDL Header Notice in each file and include
+ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ Header, with the fields enclosed by brackets [] replaced by your own identifying
+ information: "Portions copyright [year] [name of copyright owner]".
+
+ Copyright 2014 ForgeRock AS.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="crestPolicyService" version="1.0">
+        <Schema i18nFileName="crestPolicyService" i18nKey="crest-policy-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses" type="list" syntax="string" i18nKey="">
+                    <DefaultValues>
+                        <Value>crest-policy-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
+            <Policy>
+                <AttributeSchema name="CREATE" type="single" syntax="boolean" uitype="radio" i18nKey="CREATE">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="READ" type="single" syntax="boolean" uitype="radio" i18nKey="READ">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="UPDATE" type="single" syntax="boolean" uitype="radio" i18nKey="UPDATE">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="DELETE" type="single" syntax="boolean" uitype="radio" i18nKey="DELETE">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="PATCH" type="single" syntax="boolean" uitype="radio" i18nKey="PATCH">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="ACTION" type="single" syntax="boolean" uitype="radio" i18nKey="ACTION">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+                <AttributeSchema name="QUERY" type="single" syntax="boolean" uitype="radio" i18nKey="QUERY">
+                    <IsResourceNameAllowed />
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="allow">allow</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="deny">deny</BooleanFalseValue>
+                    </BooleanValues>
+                </AttributeSchema>
+            </Policy>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

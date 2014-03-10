@@ -26,10 +26,7 @@
 
    $Id: entitlement.xml,v 1.9 2010/01/07 00:19:12 veiming Exp $
 
--->
-
-<!--
-    Portions copyright 2011-2013 ForgeRock, Inc.
+   Portions copyright 2011-2014 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -304,6 +301,30 @@
                             <Value>com.sun.identity.entitlement.URLResourceName</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="crestPolicyService" id="applicationType">
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>CREATE=true</Value>
+                            <Value>READ=true</Value>
+                            <Value>UPDATE=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>PATCH=true</Value>
+                            <Value>ACTION=true</Value>
+                            <Value>QUERY=true</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="searchIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSearchIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="saveIndexImpl" />
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSaveIndex</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resourceComparator" />
+                            <Value>com.sun.identity.entitlement.URLResourceName</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                     <SubConfiguration name="sunIdentityServerDiscoveryService"
                         id="applicationType">
                         <AttributeValuePair>
@@ -466,6 +487,44 @@
                         <AttributeValuePair>
                             <Attribute name="conditions" />
                             <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
+                            <Value>dateRange</Value>
+                            <Value>daysOfWeek</Value>
+                            <Value>dnsName</Value>
+                            <Value>ipRange</Value>
+                            <Value>timeRange</Value>
+                            <Value>timezone</Value>
+                            <Value>or</Value>
+                            <Value>and</Value>
+                            <Value>not</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="entitlementCombiner" />
+                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="crestPolicyService" id="application">
+                        <AttributeValuePair>
+                            <Attribute name="applicationType" />
+                            <Value>crestPolicyService</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="resources" />
+                            <Value>http://*</Value>
+                            <Value>https://*</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="subjects" />
+                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.OrViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="conditions" />
                             <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
