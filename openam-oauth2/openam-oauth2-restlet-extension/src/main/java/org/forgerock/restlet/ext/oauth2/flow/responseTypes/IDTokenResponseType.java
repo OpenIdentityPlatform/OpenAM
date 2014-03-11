@@ -31,18 +31,10 @@ import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 
 import java.util.Map;
-import java.util.Set;
 
 public class IDTokenResponseType implements ResponseType {
 
-    public static final String OPENID = "openid";
-
     public CoreToken createToken(Map<String, Object> data){
-        Set<String> scopes = (Set) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
-        if (!scopes.contains(OPENID)) {
-            return null;
-        }
-
         DefaultOAuthTokenStoreImpl store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
         return store.createJWT((String)data.get(OAuth2Constants.CoreTokenParams.REALM),
                 (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
