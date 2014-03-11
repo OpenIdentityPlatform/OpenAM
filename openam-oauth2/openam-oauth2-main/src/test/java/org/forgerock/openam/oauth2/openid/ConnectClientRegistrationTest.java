@@ -114,6 +114,7 @@ public class ConnectClientRegistrationTest extends PowerMockTestCase {
         RESPONSE_TYPES_DEFAULT.add("code token");
         RESPONSE_TYPES_DEFAULT.add("code token id_token");
         RESPONSE_TYPES_DEFAULT.add("token id_token");
+        RESPONSE_TYPES_DEFAULT.add("code id_token");
         CONTACTS_DEFAULT.add("contact1");
         CONTACTS_DEFAULT.add("contact2");
         CLIENT_DESCRIPTION_DEFAULT.add("Description1");
@@ -135,9 +136,9 @@ public class ConnectClientRegistrationTest extends PowerMockTestCase {
         GRANT_TYPES_DEFAULT.add("grant1");
         GRANT_TYPES_DEFAULT.add("grant2");
         REQUEST_URIS_DEFAULT.add("uri1");
-        REQUEST_URIS_DEFAULT.add("uri1");
+        REQUEST_URIS_DEFAULT.add("uri2");
         REDIRECT_URIS_DEFAULT.add("redirect1");
-        REDIRECT_URIS_DEFAULT.add("redirect1");
+        REDIRECT_URIS_DEFAULT.add("redirect2");
 
         testInput = new HashMap<String, Object>();
         testInput.put(APPLICATION_TYPE.getType(), APPLICATION_TYPE_DEFAULT);
@@ -193,12 +194,9 @@ public class ConnectClientRegistrationTest extends PowerMockTestCase {
         idTokenSigningAlgsSupported.add("HS256");
 
         responseTypesSupported = new HashSet<String>();
-        responseTypesSupported.add("code");
-        responseTypesSupported.add("token");
-        responseTypesSupported.add("id_token");
-        responseTypesSupported.add("code token");
-        responseTypesSupported.add("token id_token");
-        responseTypesSupported.add("code token id_token");
+        responseTypesSupported.add("code|class");
+        responseTypesSupported.add("token|class");
+        responseTypesSupported.add("id_token|class");
 
         claimsSupported = new HashSet<String>();
         claimsSupported.add("phone");

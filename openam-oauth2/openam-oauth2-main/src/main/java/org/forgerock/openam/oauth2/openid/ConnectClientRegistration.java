@@ -57,6 +57,43 @@ public class ConnectClientRegistration extends ServerResource {
     private static final String ISSUED_AT = "client_id_issued_at";
     private static final String EXPIRES_AT = "client_secret_expires_at";
 
+    /**
+     * Strip the class from the response type settings.
+     *
+     * Example:
+     *    Format is "type|class" we want only "type".
+     *
+     * @param responseTypeSet The set of response types that are type|class
+     * @return A set of supported response types without the class data.
+     */
+    private Set<String> formatResponseTypes(Set<String> responseTypeSet) {
+        Set<String> responseTypes = new HashSet<String>();
+        for (String responseType : responseTypeSet){
+            String[] parts = responseType.split("\\|");
+            if (parts.length != 2){
+                continue;
+            }
+            responseTypes.add(parts[0]);
+        }
+
+        if (responseTypes.contains("code") && responseTypes.contains("token") &&
+                responseTypes.contains("id_token")) {
+            responseTypes.add("code token id_token");
+        }
+
+        if (responseTypes.contains("code") && responseTypes.contains("token")) {
+            responseTypes.add("code token");
+        }
+
+        if (responseTypes.contains("code") && responseTypes.contains("id_token")) {
+            responseTypes.add("code id_token");
+        }
+
+        if (responseTypes.contains("token") && responseTypes.contains("id_token")) {
+            responseTypes.add("token id_token");
+        }
+        return responseTypes;
+    }
 
     private boolean containsCaseInsensitive(Set<String> collection1, List<String> values) {
         Iterator<String> valuesIterator = values.iterator();
@@ -87,7 +124,7 @@ public class ConnectClientRegistration extends ServerResource {
     }
 
     @Post
-    public Representation createClient(Representation entity) {
+    public Representation createClient(Representation entity) throws OAuthProblemException {
         String accessToken = getRequest().getChallengeResponse().getRawValue();
         String realm = OAuth2Utils.getRealm(getRequest());
         OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
@@ -98,7 +135,7 @@ public class ConnectClientRegistration extends ServerResource {
             input = new JsonValue(rep.getObject());
         } catch (IOException e) {
             OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unable to parse json input.", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
         }
 
         //check input to ensure it is valid
@@ -107,7 +144,7 @@ public class ConnectClientRegistration extends ServerResource {
             if (OAuth2Constants.ShortClientAttributeNames.fromString(key) == null) {
                 //input is unknown
                 OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unknown input given. Key: " + key);
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
             }
         }
         //create client given input
@@ -136,7 +173,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setClientType(input.get(CLIENT_TYPE.getType()).asString());
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid client_type requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             } else {
                 clientBuilder.setClientType(Client.ClientType.CONFIDENTIAL.getType());
@@ -151,7 +188,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setAllowedGrantScopes(input.get(SCOPES.getType()).asList(String.class));
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid scopes requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             }
 
@@ -160,7 +197,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setDefaultGrantScopes(input.get(DEFAULT_SCOPES.getType()).asList(String.class));
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid default_scopes requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             }
 
@@ -177,7 +214,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid subject_type requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             } else {
                 clientBuilder.setSubjectType(Client.SubjectType.PUBLIC.getType());
@@ -188,7 +225,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setIdTokenSignedResponseAlgorithm(input.get(ID_TOKEN_SIGNED_RESPONSE_ALG.getType()).asString());
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unsupported id_token_response_signed_alg requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             } else {
                 clientBuilder.setIdTokenSignedResponseAlgorithm(ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT);
@@ -213,7 +250,7 @@ public class ConnectClientRegistration extends ServerResource {
                     clientBuilder.setApplicationType(Client.ApplicationType.WEB.getType());
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid application_type requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             } else {
                 clientBuilder.setApplicationType(DEFAULT_APPLICATION_TYPE);
@@ -224,11 +261,11 @@ public class ConnectClientRegistration extends ServerResource {
             }
 
             if (input.get(RESPONSE_TYPES.getType()).asList() != null) {
-                if (containsCaseInsensitive(settings.getResponseTypes(), input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
+                if (containsCaseInsensitive(formatResponseTypes(settings.getResponseTypes()), input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
                     clientBuilder.setResponseTypes(input.get(RESPONSE_TYPES.getType()).asList(String.class));
                 } else {
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Invalid response_types requested.");
-                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
                 }
             } else {
                 List<String> defaultResponseTypes = new ArrayList<String>();
@@ -238,7 +275,7 @@ public class ConnectClientRegistration extends ServerResource {
 
         } catch (JsonValueException e) {
             OAuth2Utils.DEBUG.error("ConnectClientRegistration.createClient(): Unable to build client.", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
         }
 
         //build the client
@@ -268,7 +305,7 @@ public class ConnectClientRegistration extends ServerResource {
     }
 
     @Get
-    public Representation getClient() {
+    public Representation getClient() throws OAuthProblemException {
         String realm = OAuth2Utils.getRealm(getRequest());
         String clientId = OAuth2Utils.getRequestParameter(getRequest(),
                 OAuth2Constants.OAuth2Client.CLIENT_ID,
@@ -286,7 +323,7 @@ public class ConnectClientRegistration extends ServerResource {
                 if (!client.getAccessToken().equals(accessToken)) {
                     //client access token doesn't match the access token supplied in the request
                     OAuth2Utils.DEBUG.error("ConnectClientRegistration.getClient(): Invalid accessToken");
-                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
                 }
 
                 //remove the client fields that don't need to be reported.
@@ -297,11 +334,11 @@ public class ConnectClientRegistration extends ServerResource {
                 return new JsonRepresentation(client.toString());
             } catch (Exception e) {
                 OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(null);
             }
         } else {
             OAuth2Utils.DEBUG.error("ConnectClientRegistration.readRequest(): No client id sent");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
         }
     }
 
