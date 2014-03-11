@@ -31,11 +31,11 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.*;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.shared.encode.Base64;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.util.encode.Base64;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -98,14 +98,14 @@ public class SAML20BearerServerResource extends AbstractFlow {
         client = validateRemoteClient();
 
         String assertion = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.SAML20.ASSERTION, String.class);
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Assertion:\n" + assertion);
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Assertion:\n" + assertion);
 
         byte[] decodedAsertion = Base64.decode(assertion.replace(" ", "+"));
         if (decodedAsertion == null) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.represent(): Decoding assertion failed\nassertion:" + assertion);
         }
         String finalAssertion = new String(decodedAsertion);
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Decoded assertion:\n" + finalAssertion);
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Decoded assertion:\n" + finalAssertion);
 
         Assertion assertionObject;
         boolean valid = false;
@@ -125,16 +125,16 @@ public class SAML20BearerServerResource extends AbstractFlow {
                     "Assertion is invalid.");
         }
 
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Assertion is valid");
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Assertion is valid");
 
         String scope_before =
                 OAuth2Utils
                         .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Granting scope: " + checkedScope.toString());
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Granting scope: " + checkedScope.toString());
 
 
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Creating token with data: " +
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Creating token with data: " +
                 client.getClient().getAccessTokenType() + "\n" +
                 checkedScope.toString() + "\n" +
                 OAuth2Utils.getRealm(getRequest()) + "\n" +
@@ -143,7 +143,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
         CoreToken token = getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
                 OAuth2Utils.getRealm(getRequest()), assertionObject.getSubject().getNameID().getValue(),
                 client.getClient().getClientId(), null, null, null, getGrantType());
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Token created: " + token.toString());
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.represent(): Token created: " + token.toString());
 
         Map<String, Object> response = token.convertToMap();
 
@@ -187,7 +187,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
         boolean found = false;
         //String oauthTokenURL = OAuth2Utils.getDeploymentURL(getRequest());
         String deploymentURL = OAuth2Utils.getDeploymentURL(getRequest());
-        OAuth2Utils.DEBUG.message("SAML20BearerServerResource.validAssertion(): URL of authorization server: " + deploymentURL);
+        OAuth2Utils.DEBUG.trace("SAML20BearerServerResource.validAssertion(): URL of authorization server: " + deploymentURL);
         for (AudienceRestriction restriction : audienceRestriction) {
             List<String> audiences = restriction.getAudience();
             if (audiences == null || audiences.isEmpty()) {

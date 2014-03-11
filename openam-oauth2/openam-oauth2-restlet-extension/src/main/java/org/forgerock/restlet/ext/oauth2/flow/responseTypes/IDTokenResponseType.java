@@ -24,10 +24,10 @@
 
 package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 
-import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
-import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class IDTokenResponseType implements ResponseType {
 
     public CoreToken createToken(Map<String, Object> data){
-        DefaultOAuthTokenStoreImpl store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
+        OAuth2TokenStore store = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getTokenStore();
         return store.createJWT((String)data.get(OAuth2Constants.CoreTokenParams.REALM),
                 (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
                 (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),

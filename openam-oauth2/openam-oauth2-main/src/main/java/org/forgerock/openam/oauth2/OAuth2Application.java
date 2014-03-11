@@ -24,31 +24,28 @@
 
 package org.forgerock.openam.oauth2;
 
-import java.net.URI;
-
-import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
-import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
-import org.forgerock.openam.oauth2.openid.EndSession;
+import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.openam.oauth2.openid.UserInfo;
-import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
-import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
-import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenVerifier;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Authenticator;
 import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
-import org.forgerock.restlet.ext.oauth2.provider.*;
+import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
+import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
+import org.forgerock.restlet.ext.oauth2.provider.ValidationServerResource;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Restlet;
-import org.restlet.data.Reference;
 import org.restlet.data.MediaType;
+import org.restlet.data.Reference;
 import org.restlet.routing.Router;
 import org.restlet.security.Verifier;
+
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 
 /**
  * Sets up the OAuth 2 provider end points and their handlers
@@ -65,6 +62,9 @@ public class OAuth2Application extends Application {
 
     @Override
     public Restlet createInboundRoot() {
+        setOAuth2ConfigurationFactory(getContext().getParameters().getFirst("oauth2-configuration-factory-class")
+                .getValue());
+
         Router root = new Router(getContext());
 
         //default route goes to the flows
@@ -84,7 +84,7 @@ public class OAuth2Application extends Application {
         OAuth2Authenticator authenticator =
                 new OAuth2Authenticator(getContext(), null,
                         OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
-        authenticator.setNext(ConnectClientRegistration.class);
+        authenticator.setNext(OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getConnectionClientRegistration());
         root.attach("/connect/register", authenticator);
 
         //connect userinfo
@@ -99,7 +99,7 @@ public class OAuth2Application extends Application {
         root.attach("/userinfo", authenticator);
 
         //connect session management
-        root.attach("/connect/endSession", EndSession.class);
+        root.attach("/connect/endSession", OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getEndSession());
 
         return root;
     }
@@ -149,7 +149,7 @@ public class OAuth2Application extends Application {
      *              A client verifier
      */
     public org.forgerock.openam.oauth2.provider.ClientVerifier getClientVerifier() {
-        return new ClientVerifierImpl();
+        return OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getClientVerifier();
     }
 
     /**
@@ -159,7 +159,7 @@ public class OAuth2Application extends Application {
      *              A new UserVerifier
      */
     public Verifier getUserVerifier() {
-        return new UserIdentityVerifier();
+        return OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getUserVerifier();
     }
 
     /**
@@ -168,8 +168,24 @@ public class OAuth2Application extends Application {
      * @return OAuthTokenStore
      *              A new token store.
      */
-    public org.forgerock.openam.oauth2.provider.OAuth2TokenStore getTokenStore() {
-        return InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
+    public OAuth2TokenStore getTokenStore() {
+        return OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getTokenStore();
     }
 
+    private void setOAuth2ConfigurationFactory(final String oAuth2ConfigurationFactoryClassName) {
+        try {
+            OAuth2ConfigurationFactory configurationFactory =
+                    (OAuth2ConfigurationFactory) Class.forName(oAuth2ConfigurationFactoryClassName)
+                            .getDeclaredMethod("getOAuth2ConfigurationFactory").invoke(null);
+            OAuth2ConfigurationFactory.Holder.setConfigurationFactory(configurationFactory);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

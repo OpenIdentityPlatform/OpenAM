@@ -23,9 +23,9 @@
  */
 package org.forgerock.openam;
 
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.openam.oauth2.OAuth2StatusService;
 import org.forgerock.openam.oauth2.openid.OpenIDConnectConfiguration;
-import org.forgerock.openam.oauth2.openid.OpenIDConnectDiscovery;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
@@ -47,7 +47,7 @@ public class WebFinger extends Application {
          * For now we only use webfinger for OpenID Connect. Once the standard is finalized
          * or we decide to use it for other tasks we dont need a full blown handler
          */
-        root.attach("/webfinger", OpenIDConnectDiscovery.class);
+        root.attach("/webfinger", OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOpenIDConnectionDiscovery());
         root.attach("/openid-configuration", OpenIDConnectConfiguration.class);
 
         return root;

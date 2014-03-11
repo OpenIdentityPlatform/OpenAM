@@ -29,6 +29,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
+import org.forgerock.jaspi.runtime.HttpServletCallbackHandler;
 import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthModuleWrapper;
@@ -37,6 +38,7 @@ import org.forgerock.openam.utils.ClientUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +77,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     private Integer maxTokenLife;
     private boolean enforceClientIP;
 
-    private Principal principal;
+    private final CallbackHandler callbackHandler;
+    private Subject clientSubject;
 
     /**
      * Constructs an instance of the PersistentCookieAuthModule.
@@ -97,6 +100,12 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     public PersistentCookieAuthModule(JwtSessionModule jwtSessionModule, AMKeyProvider amKeyProvider) {
         super(jwtSessionModule, AUTH_RESOURCE_BUNDLE_NAME);
         this.amKeyProvider = amKeyProvider;
+        this.callbackHandler = new HttpServletCallbackHandler();
+    }
+
+    @Override
+    public CallbackHandler getCallbackHandler() {
+        return callbackHandler;
     }
 
     /**
@@ -204,6 +213,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     protected boolean process(MessageInfo messageInfo, Subject clientSubject, Callback[] callbacks)
             throws LoginException {
 
+        this.clientSubject = clientSubject;
+
         final Jwt jwt = getServerAuthModule().validateJwtSessionCookie(messageInfo);
 
         if (jwt == null) {
@@ -231,11 +242,11 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
 
             // Need to get user from jwt to use in Principal
             final String username = (String) claimsSetContext.get(OPENAM_USER_CLAIM_KEY);
-            principal = new Principal() {
-                public String getName() {
-                    return username;
-                }
-            };
+//            principal = new Principal() {
+//                public String getName() {
+//                    return username;
+//                }
+//            };
 
             setUserSessionProperty(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.TRUE.toString());
 
@@ -270,7 +281,19 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
      */
     @Override
     public Principal getPrincipal() {
-        return principal;
+        String principalName = null;
+        for (Principal principal : clientSubject.getPrincipals()) {
+            if (principal.getName() != null) {
+                principalName = principal.getName();
+                break;
+            }
+        }
+        final String principal = principalName;
+        return new Principal() {
+            public String getName() {
+                return principal;
+            }
+        };
     }
 
     /**

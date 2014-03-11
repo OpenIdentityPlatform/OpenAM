@@ -16,12 +16,12 @@
 
 package org.forgerock.openam.oauth2.provider;
 
-import java.security.PrivateKey;
-import java.util.Set;
-
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.*;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.SessionClient;
+
+import java.util.Set;
 
 /**
  * Interface to govern the high level store interactions, applying configuration

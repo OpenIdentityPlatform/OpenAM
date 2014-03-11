@@ -17,16 +17,11 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.OAuth2Constants;
-import java.util.Arrays;
-
-import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.OpenIDPromptParameter;
-import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Form;
@@ -38,11 +33,10 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class AuthorizeServerResource extends AbstractFlow {
 
@@ -83,7 +77,7 @@ public class AuthorizeServerResource extends AbstractFlow {
         String prompt =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.PROMPT, String.class);
 
-        if (StringUtils.isBlank(prompt)){
+        if (prompt == null || prompt.isEmpty()) {
             prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom._PROMPT, String.class);
         }
 
@@ -97,11 +91,11 @@ public class AuthorizeServerResource extends AbstractFlow {
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class);
         if (responseType != null && !responseType.isEmpty()) {
             if (!validResponseTypes(OAuth2Utils.stringToSet(responseType))) {
-                OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
+                OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
                 throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
             }
         } else {
-            OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
+            OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
         }
 
@@ -116,7 +110,7 @@ public class AuthorizeServerResource extends AbstractFlow {
         resourceOwner = getAuthenticatedResourceOwner();
 
         //check for saved consent
-        boolean savedConsent = savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope);
+        boolean savedConsent = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope, getRequest());
 
         if (openIDPromptParameter.noPrompts() && !savedConsent){
             throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest());
@@ -153,7 +147,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                     OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
             if (save_consent != null && save_consent.equalsIgnoreCase("on")) {
-                saveConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), scope_after);
+                OAuth2ConfigurationFactory.Holder.getConfigurationFactory().saveConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), scope_after, getRequest());
             }
 
             String state =
@@ -180,7 +174,7 @@ public class AuthorizeServerResource extends AbstractFlow {
             data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, sessionClient.getRedirectUri());
             data.put(OAuth2Constants.Custom.NONCE, nonce);
             data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
-                    SystemProperties.get("com.iplanet.am.cookie.name")));
+                    OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getSSOCookieName()));
 
 
             if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()) {
@@ -196,7 +190,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                         }
                         String responseClass = responseTypes.get(request);
                         if (responseClass == null || responseClass.isEmpty()) {
-                            OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
+                            OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
                             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
                                     "Response type is not supported");
                         } else if (responseClass.equalsIgnoreCase("none")) {
@@ -289,7 +283,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                             Redirector.MODE_CLIENT_FOUND);
             dispatcher.handle(getRequest(), getResponse());
         } else {
-            OAuth2Utils.DEBUG.warning("AuthorizeServerResource::Resource Owner did not authorize the request");
+            OAuth2Utils.DEBUG.warn("AuthorizeServerResource::Resource Owner did not authorize the request");
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                     "Resource Owner did not authorize the request");
         }
@@ -322,73 +316,6 @@ public class AuthorizeServerResource extends AbstractFlow {
 
         }
         return result;
-    }
-
-    protected boolean savedConsent(String userid, String clientId, Set<String> scopes) {
-        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
-        String attribute = settings.getSavedConsentAttributeName();
-
-        AMIdentity id = OAuth2Utils.getIdentity(userid, OAuth2Utils.getRealm(getRequest()));
-        Set<String> attributeSet = null;
-
-        if (id != null) {
-            try {
-                attributeSet = id.getAttribute(attribute);
-            } catch (Exception e) {
-                OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to get profile attribute", e);
-                return false;
-            }
-        }
-
-        //check the values of the attribute set vs the scope and client requested
-        //attribute set is in the form of client_id|scope1 scope2 scope3
-        for (String consent : attributeSet) {
-            int loc = consent.indexOf(" ");
-            String consentClientId = consent.substring(0, loc);
-            String[] scopesArray = null;
-            if (loc + 1 < consent.length()) {
-                scopesArray = consent.substring(loc + 1, consent.length()).split(" ");
-            }
-            Set<String> consentScopes = null;
-            if (scopesArray != null && scopesArray.length > 0) {
-                consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
-            } else {
-                consentScopes = new HashSet<String>();
-            }
-
-            //if both the client and the scopes are identical to the saved consent then approve
-            if (clientId.equals(consentClientId) && scopes.equals(consentScopes)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected void saveConsent(String userId, String clientId, String scopes) {
-        AMIdentity id = OAuth2Utils.getIdentity(userId, OAuth2Utils.getRealm(getRequest()));
-        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
-        String consentAttribute = settings.getSavedConsentAttributeName();
-        try {
-
-            //get the current set of consents and add our new consent to it.
-            Set<String> consents = new HashSet<String>(id.getAttribute(consentAttribute));
-            StringBuilder sb = new StringBuilder();
-            if (scopes == null || scopes.isEmpty()) {
-                sb.append(clientId.trim()).append(" ");
-            } else {
-                sb.append(clientId.trim()).append(" ").append(scopes.trim());
-            }
-            consents.add(sb.toString());
-
-            //update the user profile with our new consent settings
-            Map<String, Set<String>> attrs = new HashMap<String, Set<String>>();
-            attrs.put(consentAttribute, consents);
-            id.setAttributes(attrs);
-            id.store();
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to save consent ", e);
-        }
     }
 
     private boolean validResponseTypes(Set<String> responseTypesRequested) {

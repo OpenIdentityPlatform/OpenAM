@@ -24,11 +24,11 @@
 
 package org.forgerock.restlet.ext.openam.server;
 
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuth2Utils;
+import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -125,7 +125,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
      */
     @Override
     protected boolean authenticate(Request request, Response response) {
-        String prompt = OAuth2Utils.getRequestParameter(request, OAuth2Constants.Custom.PROMPT,String.class);
+        String prompt = OAuth2Utils.getRequestParameter(request, OAuth2Constants.Custom.PROMPT, String.class);
         String[] prompts = null;
         Set<String> promptSet = null;
 

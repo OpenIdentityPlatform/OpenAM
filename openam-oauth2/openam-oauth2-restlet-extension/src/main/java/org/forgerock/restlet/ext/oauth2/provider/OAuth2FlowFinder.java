@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2.provider;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.flow.*;
@@ -107,7 +107,7 @@ public class OAuth2FlowFinder extends Finder {
                 result = (AbstractFlow) targetClass.newInstance();
                 result.setEndpointType(endpointType);
             } catch (Exception e) {
-                OAuth2Utils.DEBUG.warning("OAuth2FlowFinder::Exception while instantiating the target server resource.", e);
+                OAuth2Utils.DEBUG.warn("OAuth2FlowFinder::Exception while instantiating the target server resource.", e);
                 OAuthProblemException.OAuthError.SERVER_ERROR.handle(request, e.getMessage())
                         .pushException();
                 result = new ErrorServerResource();

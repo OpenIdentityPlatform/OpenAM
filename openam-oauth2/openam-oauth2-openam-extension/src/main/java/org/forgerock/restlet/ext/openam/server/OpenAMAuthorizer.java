@@ -30,8 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.provider.AbstractOpenAMAuthorizer;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.provider.impl.AbstractOpenAMAuthorizer;
+import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
 import org.restlet.Request;
 import org.restlet.Response;

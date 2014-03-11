@@ -24,12 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.model.CoreToken;
@@ -37,6 +32,10 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements the Client Credentials Flow
@@ -52,7 +51,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         Representation rep = null;
         client = getAuthenticatedClient();
         if (client.getClient().getClientType().equals(ClientApplication.ClientType.PUBLIC)) {
-            OAuth2Utils.DEBUG.warning("Public clients can't use client credentials grant.");
+            OAuth2Utils.DEBUG.warn("Public clients can't use client credentials grant.");
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(getRequest(),
                     "Public clients can't use client credentials grant.");
         }

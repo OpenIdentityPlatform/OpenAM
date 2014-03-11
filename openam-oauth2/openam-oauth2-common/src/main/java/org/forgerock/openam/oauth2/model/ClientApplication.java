@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
+
 package org.forgerock.openam.oauth2.model;
 
 import java.net.URI;
@@ -112,7 +113,7 @@ public interface ClientApplication {
      * <p/>
      * If "auto_grant" is true then the server does not require the Resource
      * Owner's approval unless the request has the
-     * {@link com.sun.identity.shared.OAuth2Constants.Custom#APPROVAL_PROMPT}
+     * {@link org.forgerock.openam.oauth2.OAuth2Constants.Custom#APPROVAL_PROMPT}
      * property and the value is null.
      * <p/>
      * This function is not part of the OAuth2 specification

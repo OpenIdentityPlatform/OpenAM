@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.util.*;
 
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.SessionClient;
 import org.forgerock.openam.oauth2.model.SessionClientImpl;
@@ -73,7 +73,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
                     "Token was issued to a different client");
         } else {
             if (refreshToken.isExpired()) {
-                OAuth2Utils.DEBUG.warning("Refresh Token is expired for id: " + refresh_token);
+                OAuth2Utils.DEBUG.warn("Refresh Token is expired for id: " + refresh_token);
                 throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
             }
 

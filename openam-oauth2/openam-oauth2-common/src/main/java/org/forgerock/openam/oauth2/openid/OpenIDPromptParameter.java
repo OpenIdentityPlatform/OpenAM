@@ -24,8 +24,6 @@
 
 package org.forgerock.openam.oauth2.openid;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -77,7 +75,7 @@ public class OpenIDPromptParameter {
     }
 
     private void parsePromptString(String promptString) {
-        if (StringUtils.isBlank(promptString)){
+        if (promptString == null || promptString.isEmpty()) {
             prompts = new HashSet<String>();
         } else {
             prompts = new HashSet<String>(Arrays.asList(promptString.toLowerCase().split(PROMPT_DELIMITER)));

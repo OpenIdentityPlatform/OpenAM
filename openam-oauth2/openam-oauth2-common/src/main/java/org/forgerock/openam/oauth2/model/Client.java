@@ -16,9 +16,8 @@
 
 package org.forgerock.openam.oauth2.model;
 
-import com.sun.identity.shared.OAuth2Constants;
-import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
 import java.net.URI;
@@ -225,7 +224,7 @@ public class Client extends JsonValue {
      *            the client_id to set.
      */
     public void setClientID(String clientID) {
-        if (!StringUtils.isBlank(clientID)) {
+        if (clientID != null && !clientID.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_ID.getType(), clientID);
         }
     }
@@ -247,7 +246,7 @@ public class Client extends JsonValue {
      *            the client_id to set.
      */
     public void setClientType(String clientType) {
-        if (!StringUtils.isBlank(clientType)) {
+        if (clientType != null && !clientType.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_TYPE.getType(), clientType);
         }
     }
@@ -427,7 +426,7 @@ public class Client extends JsonValue {
      *            the client_name to set.
      */
     public void setClientName(String clientName) {
-        if (!StringUtils.isBlank(clientName)) {
+        if (clientName != null && !clientName.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME.getType(), clientName);
         }
     }
@@ -449,7 +448,7 @@ public class Client extends JsonValue {
      *            the subject_type to set.
      */
     public void setSubjectType(String subjectType) {
-        if (!StringUtils.isBlank(subjectType)) {
+        if (subjectType != null && !subjectType.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.SUBJECT_TYPE.getType(), subjectType);
         }
     }
@@ -471,7 +470,7 @@ public class Client extends JsonValue {
      *            the id_token_signed_response_alg to set.
      */
     public void setIdTokenSignedResponseAlgorithm(String idTokenSignedResponseAlgorithm) {
-        if (!StringUtils.isBlank(idTokenSignedResponseAlgorithm)) {
+        if (idTokenSignedResponseAlgorithm != null && !idTokenSignedResponseAlgorithm.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.ID_TOKEN_SIGNED_RESPONSE_ALG.getType(), idTokenSignedResponseAlgorithm);
         } else {
             put(OAuth2Constants.ShortClientAttributeNames.ID_TOKEN_SIGNED_RESPONSE_ALG.getType(), "HS256");
@@ -495,7 +494,7 @@ public class Client extends JsonValue {
      *            the post_logout_redirection_uri to set.
      */
     public void setPostLogoutRedirectionURI(String postLogoutRedirectionURI) {
-        if (!StringUtils.isBlank(postLogoutRedirectionURI)) {
+        if (postLogoutRedirectionURI != null && !postLogoutRedirectionURI.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS.getType(), postLogoutRedirectionURI);
         }
     }
@@ -517,7 +516,7 @@ public class Client extends JsonValue {
      *            the registration_access_token to set.
      */
     public void setAccessToken(String accessToken) {
-        if (!StringUtils.isBlank(accessToken)) {
+        if (accessToken != null && !accessToken.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.REGISTRATION_ACCESS_TOKEN.getType(), accessToken);
         }
     }
@@ -539,7 +538,7 @@ public class Client extends JsonValue {
      *            the client_session_uri to set.
      */
     public void setClientSessionURI(String clientSessionURI) {
-        if (!StringUtils.isBlank(clientSessionURI)) {
+        if (clientSessionURI != null && !clientSessionURI.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_SESSION_URI.getType(), clientSessionURI);
         }
     }
@@ -561,7 +560,7 @@ public class Client extends JsonValue {
      *            the application_type to set.
      */
     public void setApplicationType(String applicationType) {
-        if (!StringUtils.isBlank(applicationType)) {
+        if (applicationType != null && !applicationType.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.APPLICATION_TYPE.getType(), applicationType);
         }
     }
@@ -583,7 +582,7 @@ public class Client extends JsonValue {
      *            the client_secret to set.
      */
     public void setClientSecret(String clientSecret) {
-        if (!StringUtils.isBlank(clientSecret)) {
+        if (clientSecret != null && !clientSecret.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET.getType(), clientSecret);
         }
     }

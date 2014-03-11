@@ -136,11 +136,7 @@
         <!-- OAuth2 Dependencies -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-core-token-service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-common</artifactId>
+            <artifactId>openam-oauth2-integration</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->

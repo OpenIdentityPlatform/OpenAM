@@ -20,9 +20,8 @@
  */
 package org.forgerock.openam.oauth2.model;
 
-
-import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
 import java.util.*;

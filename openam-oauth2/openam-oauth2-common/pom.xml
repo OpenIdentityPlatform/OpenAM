@@ -33,13 +33,16 @@
         <version>12.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-common</artifactId>
-    <packaging>jar</packaging>
 
     <name>OpenAM OAuth2 Common</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
         <!-- Restlet -->
         <dependency>
             <groupId>org.restlet.osgi</groupId>
@@ -72,10 +75,6 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>

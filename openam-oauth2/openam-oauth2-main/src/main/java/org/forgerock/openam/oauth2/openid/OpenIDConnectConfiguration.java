@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.oauth2.openid;
 
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -66,7 +66,7 @@ public class OpenIDConnectConfiguration extends ServerResource {
     @Get
     public Representation getConfiguration(){
         Map<String, Object> response = new HashMap<String, Object>();
-        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+        OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
         response.put("version", settings.getOpenIDConnectVersion());
         response.put("issuer", settings.getOpenIDConnectIssuer());
         response.put("authorization_endpoint", settings.getAuthorizationEndpoint());

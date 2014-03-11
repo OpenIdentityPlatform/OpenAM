@@ -30,8 +30,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.*;
-import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.shared.encode.Base64;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.util.encode.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,7 +110,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
             sb.append(OAuth2Constants.SAML20.GRANT_TYPE_URI);
             sb.append("\">");
             sb.append("<input type=\"hidden\" name=\"assertion\" value=\"");
-            sb.append(Base64.encode(assertion.toXMLString(false,false).getBytes("UTF-8")));
+            sb.append(Base64.encode(assertion.toXMLString(false, false).getBytes("UTF-8")));
             sb.append("\">");
             sb.append("<input type=\"hidden\" name=\"client_id\" value=\"");
             sb.append(hostedEntityID);

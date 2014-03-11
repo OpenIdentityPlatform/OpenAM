@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.oauth2.model;
 
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jwe.EncryptedJwt;
@@ -27,8 +25,9 @@ import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsHeader;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 
@@ -77,9 +76,9 @@ public class JWTToken extends CoreToken implements Token {
     }
 
     public SignedJwt sign(PrivateKey pk) throws SignatureException {
-        String clientID = getClientID();
-        AMIdentity id = OAuth2Utils.getClientIdentity(clientID, getRealm());
-        ClientApplication clientApplication = new ClientApplicationImpl(id);
+        OAuth2ConfigurationFactory configurationFactory = OAuth2ConfigurationFactory.Holder.getConfigurationFactory();
+        Object id = configurationFactory.getClientIdentity(this);
+        ClientApplication clientApplication = configurationFactory.createClientApplication(id);
         String algorithm = clientApplication.getIDTokenSignedResponseAlgorithm();
         JwsAlgorithm jwsAlgorithm = JwsAlgorithm.valueOf(algorithm);
         if (jwsAlgorithm == null){

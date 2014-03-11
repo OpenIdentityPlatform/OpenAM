@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -121,7 +121,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             String nonce = code.getNonce();
             data.put(OAuth2Constants.Custom.NONCE, nonce);
             data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
-                    SystemProperties.get("com.iplanet.am.cookie.name")));
+                    OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getSSOCookieName()));
             response.putAll(executeExtraDataScopePlugin(data, token));
 
             String scope_before =

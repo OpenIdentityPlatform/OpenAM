@@ -43,7 +43,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-core-token-service</artifactId>
+            <artifactId>openam-oauth2-integration</artifactId>
         </dependency>
     </dependencies>
 

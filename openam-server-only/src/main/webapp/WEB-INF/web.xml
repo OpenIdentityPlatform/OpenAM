@@ -1082,6 +1082,10 @@
             <param-value>true</param-value>
         </init-param>
 
+        <init-param>
+            <param-name>oauth2-configuration-factory-class</param-name>
+            <param-value>org.forgerock.openam.oauth2.OpenAMOAuth2ConfigurationFactory</param-value>
+        </init-param>
     </servlet>
 
     <servlet>

@@ -24,27 +24,20 @@
 
 package org.forgerock.restlet.ext.oauth2.consumer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.ChallengeRequest;
-import org.restlet.data.ChallengeResponse;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
-import org.restlet.data.Status;
-import org.restlet.engine.security.AuthenticatorHelper;
+import org.restlet.data.*;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.util.Series;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An AccessTokenExtractor extracts the AccessToken from the Request.

@@ -16,30 +16,19 @@
 
 package org.forgerock.restlet.ext.oauth2.provider;
 
-import java.security.AccessController;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.oauth2.model.CoreToken;
-import org.forgerock.openam.oauth2.model.BearerToken;
-import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.BearerToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenExtractor;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenExtractor;
 import org.restlet.Client;
 import org.restlet.Context;
-import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.*;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -48,7 +37,9 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
-import org.forgerock.openam.oauth2.provider.Scope;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Validates the token and returns to the subject the tokeninfo and scope evaluation if it is used.
@@ -100,9 +91,7 @@ public class ValidationServerResource extends ServerResource implements
 
     @Get()
     public Representation validate() throws ResourceException {
-        if (OAuth2Utils.DEBUG.messageEnabled()){
-            OAuth2Utils.DEBUG.message("ValidationServerResource::In Validator resource");
-        }
+        OAuth2Utils.DEBUG.trace("ValidationServerResource::In Validator resource");
 
         OAuthProblemException error = null;
         Map<String, Object> response = new HashMap<String, Object>();
@@ -125,14 +114,12 @@ public class ValidationServerResource extends ServerResource implements
                     OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to read token from token store for id: " + token);
                     error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                 } else {
-                    String pluginClass = getPluginClass(t.getRealm());
+                    Class<? extends Scope> pluginClass = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getScopePluginClass(t.getRealm());
                     //instantiate plugin class
-                    scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+                    scopeClass = pluginClass.newInstance();
 
                     //call plugin class init
-                    if (OAuth2Utils.DEBUG.messageEnabled()){
-                        OAuth2Utils.DEBUG.message("ValidationServerResource::In Validator resource - got token = " + t);
-                    }
+                    OAuth2Utils.DEBUG.trace("ValidationServerResource::In Validator resource - got token = " + t);
 
                     if (t.isExpired()) {
                         error = OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
@@ -199,22 +186,4 @@ public class ValidationServerResource extends ServerResource implements
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(null, e.getMessage());
         }
     }
-
-    private String getPluginClass(String realm) throws OAuthProblemException {
-        String pluginClass = null;
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to get plugin class", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
-        }
-
-        return pluginClass;
-    }
-
 }
