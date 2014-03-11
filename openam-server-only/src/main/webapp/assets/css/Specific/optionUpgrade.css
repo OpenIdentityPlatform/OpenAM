@@ -25,6 +25,24 @@ p {
     text-align:justify;
 }
 
+span.yellowBlock {
+    background: #eeea07;
+    border: 1px solid;
+    border-color: #eeea07;
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+    padding: 5px;
+    margin-left: -5px;
+    margin-bottom: 5px;
+    width:100%;
+    display:block;
+    line-height: 17px;
+}
+
+span.currentVersion{
+    font-weight: normal;
+}
 
 
 /*licensing*/

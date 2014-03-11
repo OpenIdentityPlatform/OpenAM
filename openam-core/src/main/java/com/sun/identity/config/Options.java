@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.config;
@@ -61,6 +61,10 @@ public class Options extends TemplatedPage {
         addModel("upgradeCompleted", Boolean.valueOf(upgradeCompleted));
         addModel( "upgrade", Boolean.valueOf( upgrade ) );
 
+        if (upgrade) {
+             addModel("currentVersion", UpgradeUtils.getCurrentVersion());
+        }
+
         isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();
         addModel("isOpenDS1x", Boolean.valueOf(isOpenDS1x));
 
@@ -86,4 +90,5 @@ public class Options extends TemplatedPage {
             return true;
         }
     }
+
 }
