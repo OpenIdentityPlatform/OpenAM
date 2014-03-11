@@ -380,11 +380,16 @@ public final class IdentityResource implements CollectionResourceProvider {
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
             email = jVal.get(EMAIL).asString();
 
-            if(email == null || email.isEmpty()){
+            if (email == null || email.isEmpty()) {
                 throw new BadRequestException("Email not provided");
             }
-            if(confirmationId == null || confirmationId.isEmpty()){
+
+            if (confirmationId == null || confirmationId.isEmpty()) {
                 throw new BadRequestException("confirmationId not provided");
+            }
+
+            if (tokenID == null || tokenID.isEmpty()) {
+                throw new BadRequestException("tokenId not provided");
             }
 
             // Check Token is still in CTS
@@ -683,6 +688,11 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             idsvc = new IdentityServicesImpl();
             newDtls = jsonValueToIdentityDetails(jVal, realm);
+
+            if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
+                throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
+            }
+
             newDtls.setName(resourceId);
 
             // update resource with new details
@@ -717,14 +727,18 @@ public final class IdentityResource implements CollectionResourceProvider {
             jVal.remove(CONFIRMATION_ID);
             email = jVal.get(EMAIL).asString();
 
-            if(email == null || email.isEmpty()){
+            if (email == null || email.isEmpty()) {
                 throw new BadRequestException("Email not provided");
             }
             // Convert to IDRepo Attribute schema
             jVal.put("mail",email);
 
-            if(confirmationId == null || confirmationId.isEmpty()){
+            if (confirmationId == null || confirmationId.isEmpty()) {
                 throw new BadRequestException("confirmationId not provided");
+            }
+
+            if (tokenID == null || tokenID.isEmpty()) {
+                throw new BadRequestException("tokenId not provided");
             }
 
             // Check Token is still in CTS
@@ -1220,6 +1234,11 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Continue modifying the identity if read success
 
             newDtls = jsonValueToIdentityDetails(jVal, realm);
+
+            if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
+                throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
+            }
+
             if(newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())){
                 throw new BadRequestException("id in path does not match id in request body");
             }
@@ -1298,4 +1317,5 @@ public final class IdentityResource implements CollectionResourceProvider {
             return toEncode;
         }
     }
+    
 }
