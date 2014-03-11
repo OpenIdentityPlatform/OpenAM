@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             
         },
         render: function() {
-            this.actions = {};
+            this.actions = [];
             this.addAction($.t("common.form.update"), "submit");
             this.delegate = userDelegate;
 

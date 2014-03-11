@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
         data : {
             width: 512
         },
-        actions: {},
+        actions: [],
         el: '#dialogs',
         parentRender: function (completed) {
             var genericDialog = new Dialog();

@@ -81,7 +81,7 @@ define("config/AppConfiguration", [
                    moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
                    configuration: {
                        defaultHeaders: {
-                       }                                         
+                       }
                    } 
                },
                {
@@ -92,21 +92,6 @@ define("config/AppConfiguration", [
                        loader: [
                                 {"defaultHandlers":"config/errorhandlers/CommonErrorHandlers"}
                        ]
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
-                   configuration: {
-                       links: {                          
-                           "user" : {
-                               "urls": {
-                                   "dashboard": {
-                                       "url": "#dashboard/",
-                                       "name": "config.AppConfiguration.Navigation.links.dashboard"
-                                   }
-                               }    
-                           }
-                       }                                       
                    } 
                },
                {
@@ -122,6 +107,7 @@ define("config/AppConfiguration", [
                        messages: {
                        },
                        loader: [
+                                {"messages":"config/messages/CommonMessages"},
                                 {"messages":"config/messages/UserMessages"}
                        ]
                    } 
@@ -145,7 +131,9 @@ define("config/AppConfiguration", [
                                 "urls": {
                                     "dashboard": {
                                         "url": "#dashboard/",
-                                        "name": "config.AppConfiguration.Navigation.links.dashboard"
+                                        "name": "config.AppConfiguration.Navigation.links.dashboard",
+                                        "icon": "glyph-icon-th-list",
+                                        "inactive": false
                                     }/*,
                                     "oauth2": {
                                         "url": "#oauth2/tokens",

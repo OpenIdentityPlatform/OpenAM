@@ -31,6 +31,7 @@ define("config/main", [
     "./routes/CommonRoutesConfig",
     "./routes/AMRoutesConfig",
     "./routes/UserRoutesConfig",
+    "./messages/CommonMessages",
     "./messages/UserMessages",
     "./AppConfiguration",
     "./process/CommonConfig",
