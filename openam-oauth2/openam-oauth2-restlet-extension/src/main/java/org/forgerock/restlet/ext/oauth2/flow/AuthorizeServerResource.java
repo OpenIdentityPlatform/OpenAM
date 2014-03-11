@@ -209,6 +209,12 @@ public class AuthorizeServerResource extends AbstractFlow {
                         //create the response type token
                         CoreToken token = classObj.createToken(data);
 
+                        if (token == null) {
+                            OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Response type failed to " +
+                                    "create a token. Response Type: " + request);
+                            continue;
+                        }
+
                         //get the response type return location
                         String paramName = classObj.URIParamValue();
                         if (listOfTokens.containsKey(paramName)) {
