@@ -27,6 +27,7 @@
     $Id: amPolicyConfig.xml,v 1.9 2009/05/05 18:53:03 mrudul_uchil Exp $
 
 -->
+<!-- Portions Copyrighted 2014 ForgeRock, AS. -->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -359,6 +360,7 @@
                         <ChoiceValue i18nKey="a141fc">LDAPFilterCondition</ChoiceValue>
                         <ChoiceValue i18nKey="a141amc">AMIdentityMembershipCondition</ChoiceValue>
                         <ChoiceValue i18nKey="a151">ResourceEnvIPCondition</ChoiceValue>
+                        <ChoiceValue i18nKey="oauth2Scope">OAuth2ScopeCondition</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>AuthLevelCondition</Value>
@@ -373,6 +375,7 @@
                         <Value>LDAPFilterCondition</Value>
                         <Value>AMIdentityMembershipCondition</Value>
                         <Value>ResourceEnvIPCondition</Value>
+                        <Value>OAuth2ScopeCondition</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="sun-am-policy-selected-responseproviders"

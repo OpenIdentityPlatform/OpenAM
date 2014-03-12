@@ -27,6 +27,7 @@
     $Id: amPolicy.xml,v 1.10 2009/08/19 05:40:40 veiming Exp $
 
 -->
+<!-- Portions Copyrighted 2014 ForgeRock, AS. -->
 
 
 <!DOCTYPE ServicesConfiguration
@@ -268,6 +269,12 @@
                 className="com.sun.identity.policy.plugins.ResourceEnvIPCondition"
                 i18nFileName="amPolicy"
                 i18nKey="sun-resourceenvip-condition-name"/>
+        <PluginSchema
+                name="OAuth2ScopeCondition"
+                interfaceName="Condition"
+                className="org.forgerock.openam.policy.plugins.OAuth2ScopeCondition"
+                i18nFileName="amPolicy"
+                i18nKey="org-forgerock-oauth2scope-condition-name"/>
         <PluginSchema
                 name="IDRepoResponseProvider"
                 interfaceName="ResponseProvider"

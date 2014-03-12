@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.sun.identity.policy.interfaces;
 
 import com.sun.identity.policy.ConditionDecision;
@@ -605,7 +609,7 @@ public interface Condition extends Cloneable {
      *
      * @return list of property names
      */
-    public List getPropertyNames();
+    public List<String> getPropertyNames();
 
     /**
      * Returns the syntax for a property name
@@ -642,7 +646,7 @@ public interface Condition extends Cloneable {
      * @return Set of valid values for the property.
      * @exception PolicyException if unable to get the Syntax.
      */
-    public Set getValidValues(String property) throws PolicyException;
+    public Set<String> getValidValues(String property) throws PolicyException;
 
     /** Sets the properties of the condition.  
      *  This influences the <code>ConditionDecision</code> that would be
@@ -668,13 +672,13 @@ public interface Condition extends Cloneable {
      *  @throws PolicyException for any abnormal condition
      * @see com.sun.identity.policy.ConditionDecision
      */
-    public void setProperties(Map properties) throws PolicyException;
+    public void setProperties(Map<String, Set<String>> properties) throws PolicyException;
 
     /** Gets the properties of the condition
      *  @return properties of the condition
      *  @see #setProperties
      */
-    public Map getProperties();
+    public Map<String, Set<String>> getProperties();
 
     /**
      * Gets the decision computed by this condition object, based on the 
@@ -705,7 +709,7 @@ public interface Condition extends Cloneable {
      *
      * @see com.sun.identity.policy.ConditionDecision
      */
-    public ConditionDecision getConditionDecision(SSOToken token, Map env)
+    public ConditionDecision getConditionDecision(SSOToken token, Map<String, Set<String>> env)
             throws PolicyException, SSOException;
 
     /**
