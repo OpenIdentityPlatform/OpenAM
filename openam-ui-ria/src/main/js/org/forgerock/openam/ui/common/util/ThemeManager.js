@@ -32,50 +32,51 @@ define("ThemeManager", [
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function(constants,conf) {
     
-    var obj = {};
+    var obj = {},
+        themeCSSPromise,
+        themeConfigPromise;
 
     obj.loadThemeCSS = function(theme){
-        $('head').find('link[href*=less]').remove();
-        $('head').find('link[href*=favicon]').remove();
-        
-        $("<link/>", {
-            rel: "stylesheet/less",
-            type: "text/css",
-            href: theme.path + "css/styles.less"
-         }).appendTo("head");
 
-        $("<link/>", {
-            rel: "icon",
-            type: "image/x-icon",
-            href: theme.path + theme.icon
-         }).appendTo("head");
-        
-        $("<link/>", {
-            rel: "shortcut icon",
-            type: "image/x-icon",
-            href: theme.path + theme.icon
-         }).appendTo("head");
-        
-        return $.ajax({
-            url: constants.LESS_VERSION,
-            cache:true,
-            error: function (request, status, error) {
-                console.log(request.responseText);
-            }
-          });
+        if (themeCSSPromise === undefined) {
+            $('head').find('link[href*=less]').remove();
+            $('head').find('link[href*=favicon]').remove();
+            
+            $("<link/>", {
+                rel: "stylesheet/less",
+                type: "text/css",
+                href: theme.path + "css/styles.less"
+             }).appendTo("head");
+
+            $("<link/>", {
+                rel: "icon",
+                type: "image/x-icon",
+                href: theme.path + theme.icon
+             }).appendTo("head");
+            
+            $("<link/>", {
+                rel: "shortcut icon",
+                type: "image/x-icon",
+                href: theme.path + theme.icon
+             }).appendTo("head");
+            
+            themeCSSPromise = $.ajax({
+                url: constants.LESS_VERSION,
+                cache:true,
+                error: function (request, status, error) {
+                    console.log(request.responseText);
+                }
+              });
+        }
+
+        return themeCSSPromise;
     };
     
     obj.loadThemeConfig = function(){
-        var prom = $.Deferred();
-        //check to see if the config file has been loaded already
-        //if so use what is already there if not load it
-        if(conf.globalData.themeConfig){
-            prom.resolve(conf.globalData.themeConfig);
-            return prom;
+        if (themeConfigPromise === undefined) {
+            themeConfigPromise = $.getJSON(constants.THEME_CONFIG_PATH);
         }
-        else{
-            return $.getJSON(constants.THEME_CONFIG_PATH);
-        }
+        return themeConfigPromise;
     };
     
     obj.getTheme = function(){
