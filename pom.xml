@@ -1699,6 +1699,7 @@
                         <goals>
                             <goal>revision</goal>
                         </goals>
+                        <phase>validate</phase>
                     </execution>
                 </executions>
                 <configuration>

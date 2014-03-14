@@ -55,6 +55,7 @@
                             <target>
 
                                 <property name="openam.version" value="${project.version}" />
+                                <property name="openam.svn.revision" value="${svn-revision.revision}" />
 
                                 <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP" />
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -44,7 +44,10 @@ public class UpgradeDetectionTest {
             {"OpenAM 11.0.0 (2012-July-05 00:12)", "OpenAM 10.0.0 (2012-April-13 10:24)", false},
             {"OpenAM 9.5.5 Build 3685 (2012-November-23 14:23)", "OpenAM 11.0.0 (2013-November-08 10:40)", true},
             {"OpenAM 10.0.0 (2012-April-13 10:24)", "OpenAM 11.0.0 (2013-November-08 10:40)", true},
-            {"OpenAM 11.0.0 (2013-November-08 10:40)", "OpenAM 10.0.2 (2013-December-08 18:52)", false}
+            {"OpenAM 11.0.0 (2013-November-08 10:40)", "OpenAM 10.0.2 (2013-December-08 18:52)", false},
+            // SVN revision number should not count in comparisons:
+            {"OpenAM 12.0.0-SNAPSHOT Build 2000 (2013-March-13 08:43)", "OpenAM 12.0.1-SNAPSHOT Build 1000 (2013-March-13 08:43)", true},
+            {"OpenAM 12.0.0-SNAPSHOT Build 2000 (2013-March-13 08:43)", "OpenAM 12.0.0-SNAPSHOT Build 1000 (2013-March-13 08:43)", false}
         };
     }
 
