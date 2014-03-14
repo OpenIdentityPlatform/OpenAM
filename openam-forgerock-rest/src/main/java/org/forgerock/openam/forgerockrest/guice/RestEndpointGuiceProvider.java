@@ -31,6 +31,7 @@ import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
@@ -164,17 +165,23 @@ public final class RestEndpointGuiceProvider {
 
             collectionResourceEndpoints.addBinding(RestEndpointManager.USERS).toProvider(new Provider<IdentityResource>() {
                 public IdentityResource get() {
-                    return new IdentityResource(IdentityResource.USER_TYPE);
+                    return new IdentityResource(
+                            IdentityResource.USER_TYPE,
+                            InjectorHolder.getInstance(MailServerLoader.class));
                 }
             });
             collectionResourceEndpoints.addBinding(RestEndpointManager.GROUPS).toProvider(new Provider<IdentityResource>() {
                 public IdentityResource get() {
-                    return new IdentityResource(IdentityResource.GROUP_TYPE);
+                    return new IdentityResource(
+                            IdentityResource.GROUP_TYPE,
+                            InjectorHolder.getInstance(MailServerLoader.class));
                 }
             });
             collectionResourceEndpoints.addBinding(RestEndpointManager.AGENTS).toProvider(new Provider<IdentityResource>() {
                 public IdentityResource get() {
-                    return new IdentityResource(IdentityResource.AGENT_TYPE);
+                    return new IdentityResource(
+                            IdentityResource.AGENT_TYPE,
+                            InjectorHolder.getInstance(MailServerLoader.class));
                 }
             });
             collectionResourceEndpoints.addBinding(RestEndpointManager.REALMS).to(RealmResource.class);

@@ -41,12 +41,13 @@ import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 
-import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
@@ -62,6 +63,7 @@ import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
  */
 public final class IdentityResource implements CollectionResourceProvider {
 
+    private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
     private static Debug debug = Debug.getInstance("frRest");
 
     public static final String USER_TYPE = "user";
@@ -87,12 +89,13 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
 
+    private final MailServerLoader mailServerLoader;
+
     /**
      * Creates a backend
      */
-    @Inject
-    public IdentityResource(final String userType) {
-        this(userType, null, null);
+    public IdentityResource(String userType, MailServerLoader mailServerLoader) {
+        this(userType, null, null, mailServerLoader);
     }
 
     /**
@@ -113,10 +116,11 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     // Constructor used for testing...
-    IdentityResource(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm) {
+    IdentityResource(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm, MailServerLoader mailServerLoader) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
+        this.mailServerLoader = mailServerLoader;
     }
 
     /**
@@ -275,7 +279,8 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param confirmationLink Confirmation Link to be sent
      * @throws Exception when message cannot be sent
      */
-    private void sendNotification(String to, String subject, String message, String realm, String confirmationLink) throws Exception{
+    private void sendNotification(String to, String subject, String message,
+                                  String realm, String confirmationLink) throws ResourceException {
 
         try {
             mailmgr = new ServiceConfigManager(RestUtils.getToken(),
@@ -284,47 +289,60 @@ public final class IdentityResource implements CollectionResourceProvider {
             mailattrs = mailscm.getAttributes();
 
         } catch (SMSException smse) {
-            debug.error("IdentityResource.sendNotification() :: Cannot create service " +
-                    MailServerImpl.SERVICE_NAME + smse);
-            throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, smse);
+            debug.error(SEND_NOTIF_TAG + "Cannot create service " + MailServerImpl.SERVICE_NAME + smse);
+            throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, smse);
 
-        } catch (SSOException ssoe){
-            debug.error("IdentityResource.sendNotification() :: Invalid SSOToken " + ssoe);
-            throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, ssoe);
+        } catch (SSOException ssoe) {
+            debug.error(SEND_NOTIF_TAG + "Invalid SSOToken " + ssoe);
+            throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, ssoe);
         }
 
-        if(mailattrs == null || mailattrs.isEmpty()){
-            debug.error("IdentityResource.sendNotification() :: no attrs set"  + mailattrs );
+        if (mailattrs == null || mailattrs.isEmpty()) {
+            debug.error(SEND_NOTIF_TAG + "no attrs set" + mailattrs);
             throw new NotFoundException("No service Config Manager found for realm " + realm);
         }
 
         // Get MailServer Implementation class
         String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
-        MailServer mailServer = (MailServer) Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
+        MailServer mailServer;
+        try {
+            mailServer = mailServerLoader.load(attr, realm);
+        } catch (IllegalStateException e) {
+            String error = "Failed to load mail server implementation: " + attr;
+            debug.error(SEND_NOTIF_TAG + error);
+            throw new InternalServerErrorException(error, e);
+        }
 
         try {
             // Check if subject has not  been included
-            if(subject == null || subject.isEmpty()) {
+            if (subject == null || subject.isEmpty()) {
                 // Use default email service subject
                 subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
             }
-        } catch (Exception e){
-            debug.warning("IdentityResource.sendNotification() :: no subject found"  + e.getMessage());
+        } catch (Exception e) {
+            debug.warning(SEND_NOTIF_TAG + "no subject found" + e.getMessage());
             subject = "";
         }
         try {
             // Check if Custom Message has been included
-            if(message == null || message.isEmpty()){
+            if (message == null || message.isEmpty()) {
                 // Use default email service message
                 message = mailattrs.get(MAIL_MESSAGE).iterator().next();
             }
-            message = message + System.getProperty("line.separator")  + confirmationLink;
-        } catch (Exception e){
-            debug.warning("IdentityResource.sendNotification() :: no message found"  + e.getMessage());
+            message = message + System.getProperty("line.separator") + confirmationLink;
+        } catch (Exception e) {
+            debug.warning(SEND_NOTIF_TAG + "no message found" + e.getMessage());
             message = confirmationLink;
         }
+
         // Send the emails via the implementation class
-        mailServer.sendEmail(to, subject, message);
+        try {
+            mailServer.sendEmail(to, subject, message);
+        } catch (MessagingException e) {
+            String error = "Failed to send mail";
+            debug.warning(SEND_NOTIF_TAG + error, e);
+            throw new InternalServerErrorException(error, e);
+        }
     }
 
     /**
@@ -559,10 +577,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
                     + " Exception " + ise);
             handler.handleError(ise);
-        }catch (Exception e){
+        } catch (Exception e){
             debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
                     + " Exception " + e);
-            handler.handleError(new NotFoundException("Email not sent"));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, "Failed to send mail", e));
         }
     }
 

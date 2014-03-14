@@ -38,6 +38,8 @@ import java.util.Set;
 
 public class MailServerImpl implements MailServer {
 
+    private static final String DEBUG_TAG = "MailServerImpl.sendEmail() : ";
+
     protected Debug debug = null;
 
     private static String SMTP_HOSTNAME = "forgerockEmailServiceSMTPHostName";
@@ -189,14 +191,11 @@ public class MailServerImpl implements MailServer {
                         sslEnabled);
             }
             if (debug.messageEnabled()) {
-                debug.message("MailServerImpl.sendEmail() : " +
-                        "Email sent to : " + to + ".");
+                debug.message(DEBUG_TAG + "Email sent to : " + to + ".");
             }
-        } catch (Exception e) {
-            debug.error("SendMessageImple.sendEmail() : " +
-                    "Exception in sending Email: " , e);
-            throw new MessagingException("Failed to send Email to " + to, e);
+        } catch (MessagingException e) {
+            debug.error(DEBUG_TAG + "Exception in sending Email" , e);
+            throw e;
         }
-
     }
 }
