@@ -119,7 +119,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.6.0</opendj.server.version>
+        <opendj.server.version>2.6.1</opendj.server.version>
         <opendj.sdk.version>2.6.6</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0</commons.forgerock-util.version>
@@ -290,13 +290,6 @@
 
     <!-- Maven Repositories -->
     <repositories>
-        <!-- For the ForgeRock binary license, only available from ForgeRock internal repository. -->
-        <repository>
-          <id>forgerock-internal</id>
-          <name>Forgerock Internal Repository</name>
-          <url>http://maven.forgerock.org/repo/internal</url>
-        </repository>
-
         <!-- ForgeRock Common Internal Project Repositories -->
         <repository>
             <id>forgerock-staging-repo</id>
@@ -316,6 +309,19 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <!-- For the ForgeRock binary license, only available from ForgeRock internal repository. -->
+        <repository>
+            <id>forgerock-internal</id>
+            <name>ForgeRock Internal Repository</name>
+            <url>http://maven.forgerock.org/repo/internal</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
 
@@ -1166,7 +1172,7 @@
                 <artifactId>opendj-ldap-sdk</artifactId>
                 <version>${opendj.sdk.version}</version>
             </dependency>
-            <!-- OpenDJ Server - 2.6 -->
+            <!-- OpenDJ Server -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-server</artifactId>

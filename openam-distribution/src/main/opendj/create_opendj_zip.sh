@@ -2,7 +2,7 @@
 
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
+# Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved
 #
 # The contents of this file are subject to the terms
 # of the Common Development and Distribution License
@@ -25,7 +25,6 @@
 # This script creates the cut down OpenDJ.zip for inclusion in the build
 # OpenDJ libraries must be copied into extlib manually
 
-#Portions Copyrighted 2013 ForgeRock, AS.
 
 SED=`which sed`
 UNZIP=`which unzip`
@@ -48,12 +47,6 @@ cd "${@}"
 cp ../${LDIF_FILE} ${LDIF}
 for i in ${CONFIG} template/config/config.ldif ; do
         ${SED} -i -e '/dn: cn=SNMP/,/^$/d' $i
-done
-
-#strip out the HTTP Connection Handler class so we don't get a classloader issues with tomcat 6
-#and we can use a smaller set of jars
-for i in ${CONFIG} template/config/config.ldif ; do
-        ${SED} -i -e '/dn: cn=HTTP/,/^$/d' $i
 done
 
 #add a config.ldif.${VERSION_NO} file to the upgrade

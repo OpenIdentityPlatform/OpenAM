@@ -1,5 +1,5 @@
 instance.loc
-opends_logo.png
+opendj_logo.png
 bat/
 bat/backup.bat
 bat/base64.bat
@@ -34,7 +34,15 @@ bin/
 bin/backup
 bin/base64
 bin/control-panel
-bin/ControlPanel.app
+bin/ControlPanel.app/
+bin/ControlPanel.app/Contents/
+bin/ControlPanel.app/Contents/Info.plist
+bin/ControlPanel.app/Contents/MacOS/
+bin/ControlPanel.app/Contents/MacOS/JavaApplicationStub
+bin/ControlPanel.app/Contents/PkgInfo
+bin/ControlPanel.app/Contents/Resources/
+bin/ControlPanel.app/Contents/Resources/Java/
+bin/ControlPanel.app/Contents/Resources/OpenDJ.icns
 bin/create-rc-script
 bin/dbtest
 bin/dsconfig
@@ -93,6 +101,7 @@ template/config/schema/00-core.ldif
 template/config/schema/01-pwpolicy.ldif
 template/config/schema/02-config.ldif
 template/config/schema/03-changelog.ldif
+template/config/schema/03-pwpolicyextension.ldif
 template/config/schema/03-rfc2713.ldif
 template/config/schema/03-rfc2714.ldif
 template/config/schema/03-rfc2739.ldif
@@ -130,6 +139,7 @@ lib/_server-script.bat
 lib/_server-script.sh
 lib/setcp.bat
 lib/bootstrap.jar
+lib/forgerock-util.jar
 lib/i18n-core.jar
 lib/je.jar
 lib/mail.jar
