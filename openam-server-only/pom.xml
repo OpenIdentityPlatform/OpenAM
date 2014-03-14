@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -115,6 +115,26 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>Copy license</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${forgerock.license.groupId}</groupId>
+                                    <artifactId>${forgerock.license.artifactId}</artifactId>
+                                    <version>${forgerock.license.version}</version>
+                                    <type>txt</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/legal-notices</outputDirectory>
+                                    <destFileName>license.txt</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -211,7 +231,7 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${project.parent.build.directory}/legal-notices</directory>
+                            <directory>${project.build.directory}/legal-notices</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>

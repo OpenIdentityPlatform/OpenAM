@@ -136,6 +136,11 @@
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+
+        <!-- ForgeRock Binary License to package into the artifacts -->
+        <forgerock.license.groupId>com.forgerock</forgerock.license.groupId>
+        <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
+        <forgerock.license.version>1.0.0</forgerock.license.version>
     </properties>
 
     <!-- Profiles -->
@@ -175,35 +180,6 @@
             <properties>
                 <generate.clientsdk.sources>true</generate.clientsdk.sources>
             </properties>
-        </profile>
-        <profile>
-            <id>binary-licensing</id>
-            <activation>
-                <property>
-                    <name>!skipBinaryLicensing</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-scm-plugin</artifactId>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <id>Grab binary license</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>checkout</goal>
-                                </goals>
-                                <configuration>
-                                    <connectionUrl>scm:svn:https://svn.forgerock.org/internal/trunk/QA/OpenDJ/builds/b2.6/license/</connectionUrl>
-                                    <checkoutDirectory>${project.build.directory}/legal-notices</checkoutDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
@@ -314,6 +290,13 @@
 
     <!-- Maven Repositories -->
     <repositories>
+        <!-- For the ForgeRock binary license, only available from ForgeRock internal repository. -->
+        <repository>
+          <id>forgerock-internal</id>
+          <name>Forgerock Internal Repository</name>
+          <url>http://maven.forgerock.org/repo/internal</url>
+        </repository>
+
         <!-- ForgeRock Common Internal Project Repositories -->
         <repository>
             <id>forgerock-staging-repo</id>
