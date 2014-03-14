@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.forgerockrest.utils;
 
+import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.testng.annotations.Test;
 
@@ -24,7 +25,7 @@ public class MailServerLoaderTest {
     @Test
     public void shouldLoadTestClass() {
         MailServerLoader loader = new MailServerLoader();
-        MailServerImpl result = loader.load(TestMailServer.class.getName(), "badger");
+        MailServer result = loader.load(TestMailServer.class.getName(), "badger");
         assertThat(result).isInstanceOf(TestMailServer.class);
     }
 
