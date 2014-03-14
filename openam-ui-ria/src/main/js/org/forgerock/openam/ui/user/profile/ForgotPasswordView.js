@@ -71,13 +71,17 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
-                    _this.$el.find("input[type=submit]").prop('disabled', false);
+                    _this.$el.find("input[type=submit]").prop('disabled', true);
                     if(response.message.indexOf("No email provided in profile.") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "noEmailProvided");
                     }
                     else if(response.reason.indexOf("Not Found") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "usernameNotFound");
                     } 
+                    else{
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "emailNotSent");
+                        console.error(response);
+                    }
                 };
             
             this.$el.find("input[type=submit]").prop('disabled', true);

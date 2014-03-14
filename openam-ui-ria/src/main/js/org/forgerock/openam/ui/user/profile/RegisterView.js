@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
-                    _this.$el.find("input[type=submit]").prop('disabled', false);
+                    _this.$el.find("input[type=submit]").prop('disabled', true);
                     if(response.message.indexOf("Email not sent") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
                     }else{

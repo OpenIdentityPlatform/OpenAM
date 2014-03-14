@@ -10,7 +10,7 @@
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
                 "serviceUnavailable" : "Service unavailable",
-                "unknown" : "Unknown error. Please contact with administrator",
+                "unknown" : "Unknown error. Please contact your Administrator",
                 "loggedIn" : "You have been successfully logged in.",
                 "errorFetchingData" : "Error fetching user data",
                 "loggedOut" : "You have been logged out.",
