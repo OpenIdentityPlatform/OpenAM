@@ -24,18 +24,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.CreateResponse;
-import com.sun.identity.idsvcs.DeleteResponse;
-import com.sun.identity.idsvcs.DuplicateObject;
-import com.sun.identity.idsvcs.GeneralFailure;
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.NeedMoreCredentials;
-import com.sun.identity.idsvcs.ObjectNotFound;
-import com.sun.identity.idsvcs.Token;
-import com.sun.identity.idsvcs.TokenExpired;
-import com.sun.identity.idsvcs.UpdateResponse;
+import com.sun.identity.idsvcs.*;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
@@ -43,36 +32,18 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.apache.commons.lang.RandomStringUtils;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.ForbiddenException;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.PermanentException;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 
 import javax.inject.Inject;
@@ -81,12 +52,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
@@ -334,7 +300,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         // Get MailServer Implementation class
         String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
-        MailServerImpl mailServImpl = (MailServerImpl)Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
+        MailServer mailServer = (MailServer) Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
 
         try {
             // Check if subject has not  been included
@@ -358,7 +324,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             message = confirmationLink;
         }
         // Send the emails via the implementation class
-        mailServImpl.sendEmail(to, subject, message);
+        mailServer.sendEmail(to, subject, message);
     }
 
     /**
