@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -239,7 +243,7 @@ public class AMPropertySheet
                     list.add(val.substring(idx+1).trim());
                 }
                 m.setOptionList(AMViewBeanBase.createOptionList(
-                    list, amModel.getUserLocale(), false));
+                        list, amModel.getUserLocale(), false));
             }
             set = true;
         }
@@ -516,7 +520,8 @@ public class AMPropertySheet
                 } else {
                     values = (Set)multipleChoiceValues.get(name);
                     if (values == null) {
-                        values = AMAdminUtils.toSet(model.getValues(name));
+                        // Convert to a set of values, excluding any empty strings
+                        values = AMAdminUtils.toSetIgnoreEmpty(model.getValues(name));
                     }
                 }
 
@@ -740,7 +745,7 @@ public class AMPropertySheet
         throws ModelControlException 
     {
         ViewBean parent = getParentViewBean();
-        String[] names = parent.getChildNames();
+        String[] names = parent == null ? null : parent.getChildNames();
 
         if ((names != null) && (names.length > 0)) {
             for (int i = 0; i < names.length; i++) {

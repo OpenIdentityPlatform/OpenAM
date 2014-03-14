@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock, AS.
  */
 package com.sun.identity.console.base.model;
 
@@ -141,24 +141,38 @@ public class AMAdminUtils {
     }
 
     /**
-     * Returns a set that contains all items in array.
+     * Returns a set that contains all items in array, converted to trimmed strings.
      *
      * @param array Array which contains the items.
      * @return a set that contains all items in array.
+     * @throws NullPointerException if any item in the array is null.
      */
-    public static Set toSet(Object[] array) {
-        Set set = null;
+    public static Set<String> toSet(Object... array) {
+        Set<String> set = new HashSet<String>(array == null ? 0 : array.length);
 
-        if ((array != null) && (array.length > 0)) {
-            set = new HashSet(array.length *2);
-
-            for (int i = 0; i < array.length; i++) {
-                set.add((array[i].toString()).trim());
+        if (array != null) {
+            for (Object item : array) {
+                set.add(item.toString().trim());
             }
         }
-        
-        return (set == null) ? Collections.EMPTY_SET : set;
+
+        return set;
     }
+
+    /**
+     * Converts an array of objects into a set of strings by calling the {@link Object#toString()} method on each item
+     * and trimming the result. If the item's trimmed string is empty then it is excluded from the set.
+     *
+     * @param items array of items to add to the set.
+     * @return a set of all items in the array, converted to trimmed strings. Excludes any empty string elements.
+     * @throws NullPointerException if any item in the array is null.
+     */
+    public static Set<String> toSetIgnoreEmpty(Object... items) {
+        Set<String> set = toSet(items);
+        set.remove("");
+        return set;
+    }
+
 
     /**
      * Returns a set that contains all items in array.
