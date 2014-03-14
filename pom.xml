@@ -127,7 +127,7 @@
         <commons.authfilter.version>1.4.0-SNAPSHOT</commons.authfilter.version>
         <forgerock.json.version>2.2.3-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>1.0.9</forgerock-ui.version>
-        <restlet.version>2.1.1</restlet.version>
+        <restlet.version>2.1.7</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
