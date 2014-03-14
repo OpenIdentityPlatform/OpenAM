@@ -24,7 +24,6 @@ import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 import org.restlet.security.SecretVerifier;
-import org.restlet.security.User;
 import org.restlet.security.Verifier;
 
 import java.util.HashMap;
@@ -42,19 +41,16 @@ public class PasswordServerResource extends AbstractFlow {
 
     @Post("form:json")
     public Representation represent(Representation entity) {
-        Representation rep = null;
         client = getAuthenticatedClient();
 
         String username =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.USERNAME, String.class);
-        String password =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.PASSWORD, String.class);
 
         // Authenticate ResourceOwner
         if (getContext().getDefaultVerifier() instanceof SecretVerifier) {
             if (Verifier.RESULT_VALID == ((SecretVerifier) getContext().getDefaultVerifier())
                     .verify(getRequest(), getResponse())) {
-                resourceOwner = new User(username, password.toCharArray());
+                resourceOwner = getRequest().getClientInfo().getUser();
             } else {
                 OAuth2Utils.DEBUG.error("Unable to verify user: " + username);
                 throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
@@ -71,8 +67,8 @@ public class PasswordServerResource extends AbstractFlow {
         // Validate the granted scope
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
-        CoreToken token = null;
-        Map<String, Object> result = null;
+        CoreToken token;
+        Map<String, Object> result;
 
         if (checkIfRefreshTokenIsRequired(getRequest())) {
             CoreToken refreshToken = createRefreshToken(checkedScope);
