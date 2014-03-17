@@ -79,7 +79,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "usernameNotFound");
                     } 
                     else{
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "emailNotSent");
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "serviceUnavailable");
                         console.error(response);
                     }
                 };
