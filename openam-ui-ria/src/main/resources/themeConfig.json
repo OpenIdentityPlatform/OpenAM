@@ -29,7 +29,7 @@
                         "medium-container-width": "592px",
                         "site-width": "960px",
             
-                        "message-background-color": "#fff",
+                        "message-background-color": "rgba(255,255,255,0.8)",
                         "content-background": "#f9f9f9",
                         "font-color": "#5a646d",
                         "font-size": "14px",

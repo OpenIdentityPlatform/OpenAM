@@ -6,7 +6,7 @@
             {{#each reqs.callbacks}}
             
             {{#if isSubmit}}
-            <div class="field field-checkbox">
+            <div class="field field-checkbox short">
                 <label class="align-left"  for="remember">
                     <input type="checkbox"  id="remember" name="loginRemember" />
                     {{t "templates.user.LoginTemplate.loginRemember"}}
@@ -14,22 +14,19 @@
             </div>
             {{/if}}
             
-            <div class="field {{#if isSubmit}}field-submit{{/if}}">
-                {{callbackRender}} 
-                {{#if isSubmit}}
-                    <br/><br/>
-                    {{#if ../../showForgotPassword}}
-                    <a href="#forgotPassword/" class="SelfService">{{t "common.user.forgotPassword" }}</a>
-                    {{/if}}
-                    {{#if ../../showSpacer}}
-                    &nbsp;|&nbsp;
-                    {{/if}}
-                    {{#if ../../showRegister}}
-                    <a href="#register/" class="SelfService">{{t "common.form.register" }}</a>
-                    {{/if}}
-                {{/if}}
+            <div class="group-field-block{{#if isSubmit}} float-right{{/if}}">
+                {{callbackRender}}     
             </div>
-            
+
+            {{#if isSubmit}}
+            <ul class="link-box float-left">  
+                {{#if ../../showForgotPassword}}<li><a href="#forgotPassword/" id="forgotPassword">{{t "common.user.forgotPassword" }}</a></li>{{/if}}
+                {{#if ../../showRegister}}<li><a href="#register/" id="register">{{t "common.form.register" }}</a></li>{{/if}}
+            </ul>
+            {{/if}}
+
+
+
             {{/each}}
             
         </fieldset>
