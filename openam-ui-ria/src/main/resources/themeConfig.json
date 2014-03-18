@@ -21,7 +21,7 @@
                         "background-position": "950px -100px",
                         "footer-background-color": "#eee",
                         "background-font-color": "#5a646d",
-                        "column-padding": "160px",
+                        "column-padding": "111px",
                   
                         "login-container-label-align": "right",
 
@@ -55,7 +55,7 @@
 
 
                         "input-background-color": "#fff",
-                        "input-background-invalid-color": "#fee",
+                        "input-background-invalid-color": "#fff",
                         "input-border-invalid-color": "#f8b9b3",
                         "input-border-basic": "#DBDBDB",
                         "header-border-color": "#5D5D5D",

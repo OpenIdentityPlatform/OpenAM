@@ -1,12 +1,12 @@
 <div class="container-shadow">
     {{#if isStageOne}}
         <form id="forgotPassword" action="" class="form" method="post" onsubmit="return false">
-            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1><br/>
+            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
             <div id="step1">
                 <fieldset>
 
                     <div class="group-field-row group-field-short">
-                        <label for="email" >{{t "common.user.emailAddress"}}</label>
+                        <label class="light" for="email" >{{t "common.user.emailAddress"}}</label>
                         <input type="email" id="email" name="email" value="" required autofocus data-validator="required"  data-validator-event="keyup change"/>
                         <span class="error">x</span>
                     </div>        
@@ -24,7 +24,7 @@
         </form>
     {{else}}
         <form id="registration" action="" class="form" method="post" onsubmit="return false">
-            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1><br/>
+            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
          
             <fieldset id="step2">
 
