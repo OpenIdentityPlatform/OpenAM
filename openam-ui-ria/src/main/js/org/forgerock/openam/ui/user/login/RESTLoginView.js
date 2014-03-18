@@ -48,8 +48,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         data: {},
         events: {
             "click input[type=submit]": "formSubmit",
-            "click #forgotPassword": "selfServiceClick",
-            "click #register": "selfServiceClick"
+            "click .SelfService": "selfServiceClick"
         },
         selfServiceClick: function(e) {
             e.preventDefault();
