@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-upgrade-servers'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Upgrading OpenAM Servers</title>
 
@@ -101,6 +102,14 @@
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
    Configuration Tools</citetitle></link>, describes how to install the
    tool.</para>
+
+   <para>
+    For examples showing how to use the command-line tool,
+    see the reference documentation for
+    <link xlink:show="new"
+          xlink:href="reference#man-upgrade-jar"
+          xlink:role="http://docbook.org/xlink/role/olink">upgrade.jar</link>.
+   </para>
   </step>
 
   <step performance="optional">
