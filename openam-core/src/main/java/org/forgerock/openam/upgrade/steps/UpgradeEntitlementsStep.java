@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,6 +16,7 @@
 package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.opensso.EntitlementService;
@@ -27,6 +28,8 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.security.PrivilegedAction;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +37,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
@@ -50,6 +55,8 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.json.JSONObject;
+
+import javax.inject.Inject;
 
 /**
  * Upgrades the entitlements stored in the configuration. The following steps are taken:
@@ -92,6 +99,12 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
     private final Map<String, Map<PolicyType, Set<String>>> upgradableConfigs =
             new LinkedHashMap<String, Map<PolicyType, Set<String>>>();
     private int policyRuleCount = 0;
+
+    @Inject
+    public UpgradeEntitlementsStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                                   final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {

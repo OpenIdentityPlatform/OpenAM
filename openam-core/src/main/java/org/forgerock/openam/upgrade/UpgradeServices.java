@@ -41,6 +41,7 @@ import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.license.License;
 import org.forgerock.openam.license.LicenseSet;
 import org.forgerock.openam.upgrade.steps.UpgradeStep;
@@ -88,7 +89,7 @@ public class UpgradeServices {
         createdDate = dateFormat.format(new Date());
         for (String className : UpgradeUtils.getPropertyValues("upgradesteps", "upgrade.step.order")) {
             try {
-                UpgradeStep step = Class.forName(className).asSubclass(UpgradeStep.class).newInstance();
+                UpgradeStep step = getUpgradeStep(className);
                 step.initialize();
                 if (step.isApplicable()) {
                     upgradeSteps.add(step);
@@ -98,6 +99,11 @@ public class UpgradeServices {
                 throw new UpgradeException("Unable to initialize upgrade steps");
             }
         }
+    }
+
+    private UpgradeStep getUpgradeStep(final String className) throws ClassNotFoundException {
+        final Class<? extends UpgradeStep> upgradeStepClass = Class.forName(className).asSubclass(UpgradeStep.class);
+        return InjectorHolder.getInstance(upgradeStepClass);
     }
 
     /**

@@ -375,6 +375,12 @@
         </dependency>
 
         <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>

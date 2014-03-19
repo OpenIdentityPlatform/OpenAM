@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,15 +15,20 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
@@ -31,6 +36,8 @@ import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.opendj.ldap.Filter;
+
+import javax.inject.Inject;
 
 /**
  * This upgrade steps if there is any data store configured to use the Netscape LDAPv3Repo implementation, and if there
@@ -47,6 +54,12 @@ public class UpgradeIdRepoSubConfigs extends AbstractUpgradeStep {
     private static final String NEW_IDREPO_CLASS = "org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo";
     private static final String PSEARCH_FILTER = "sun-idrepo-ldapv3-config-psearch-filter";
     private final Map<String, Set<String>> repos = new HashMap<String, Set<String>>();
+
+    @Inject
+    public UpgradeIdRepoSubConfigs(final PrivilegedAction<SSOToken> adminTokenAction,
+                                   final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {

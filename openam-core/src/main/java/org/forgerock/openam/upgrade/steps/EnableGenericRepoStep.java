@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -16,17 +16,24 @@
 package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+
+import javax.inject.Inject;
 
 /**
  * A very simple step to reenable the Generic LDAPv3 data store (i.e. making it available on the admin console as an
@@ -39,6 +46,12 @@ import org.forgerock.openam.upgrade.UpgradeStepInfo;
 public class EnableGenericRepoStep extends AbstractUpgradeStep {
 
     private boolean applicable = false;
+
+    @Inject
+    public EnableGenericRepoStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                                 final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {

@@ -22,14 +22,17 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ResourceBundle;
 import java.util.Set;
-import org.forgerock.guice.core.InjectorHolder;
+
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ErrorResultException;
+
+import javax.inject.Inject;
 
 /**
  * An abstract class that provides utility methods for upgrade steps.
@@ -42,8 +45,15 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
     protected static final String INDENT = "\t";
     protected static final Debug DEBUG = Debug.getInstance("amUpgrade");
     protected static ResourceBundle BUNDLE = ResourceBundle.getBundle("amUpgrade");
-    private final DataLayerConnectionFactory connFactory =
-            InjectorHolder.getInstance(DataLayerConnectionFactory.class);
+    private final PrivilegedAction<SSOToken> adminTokenAction;
+    private final DataLayerConnectionFactory connectionFactory;
+
+    @Inject
+    public AbstractUpgradeStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                               final DataLayerConnectionFactory connectionFactory) {
+        this.adminTokenAction = adminTokenAction;
+        this.connectionFactory = connectionFactory;
+    }
 
     /**
      * Returns a valid admin SSOToken.
@@ -51,7 +61,7 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
      * @return A valid admin SSOToken.
      */
     protected final SSOToken getAdminToken() {
-        return AccessController.doPrivileged(AdminTokenAction.getInstance());
+        return AccessController.doPrivileged(adminTokenAction);
     }
 
     /**
@@ -83,6 +93,6 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
      * @throws ErrorResultException If there was a problem establishing a connection to a valid server.
      */
     protected final Connection getConnection() throws ErrorResultException {
-        return connFactory.getConnection();
+        return connectionFactory.getConnection();
     }
 }

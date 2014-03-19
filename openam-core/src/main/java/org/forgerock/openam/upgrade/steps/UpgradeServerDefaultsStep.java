@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,13 +15,18 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_CONFIG;
 import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_ID;
+
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.ServerUpgrade;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
@@ -29,6 +34,8 @@ import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.UpgradeUtils;
+
+import javax.inject.Inject;
 
 /**
  * Detects changes made to default server properties and upgrades them if required.
@@ -46,6 +53,12 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     private Map<String, String> modifiedAttrs;
     private Set<String> deletedAttrs;
     private Map<String, String> upgradedValues;
+
+    @Inject
+    public UpgradeServerDefaultsStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                                     final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {

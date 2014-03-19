@@ -263,90 +263,92 @@ public class XMLUtils {
      *         an AV pair. The key is the attribute name and the value is a Set
      *         of String objects.
      */
-    public static Map parseAttributeValuePairTags(Node parentNode) {
+    public static Map<String, Set<String>> parseAttributeValuePairTags(Node parentNode) {
+        NodeList keyValueList = parentNode.getChildNodes();
+        int keyValueSize = keyValueList.getLength();
 
-        NodeList avList = parentNode.getChildNodes();
-        Map map = null;
-        int numAVPairs = avList.getLength();
-        
-        if (numAVPairs <= 0) {
+        if (keyValueSize <= 0) {
             return EMPTY_MAP;
         }
-        
-        for (int l = 0; l < numAVPairs; l++) {
-            Node avPair = avList.item(l);
-            if ((avPair.getNodeType() != Node.ELEMENT_NODE) ||
-                !avPair.getNodeName().equals("AttributeValuePair")
-            ) {
+
+        Map<String, Set<String>> resultMap = null;
+
+        for (int l = 0; l < keyValueSize; l++) {
+            Node keyValueNode = keyValueList.item(l);
+
+            if (keyValueNode.getNodeType() != Node.ELEMENT_NODE ||
+                    !keyValueNode.getNodeName().equals("AttributeValuePair")) {
                 continue;
             }
-            NodeList leafNodeList = avPair.getChildNodes();
-            long numLeafNodes = leafNodeList.getLength();
-            if (numLeafNodes < 2) {
+
+            NodeList keyValueEntryList = keyValueNode.getChildNodes();
+            int keyValueEntrySize = keyValueEntryList.getLength();
+            if (keyValueEntrySize < 2) {
                 // TODO: More error handling required later for missing
-                // 'Attribute' or
-                // 'Value' tags.
+                // 'Attribute' or 'Value' tags.
                 continue;
             }
-            String key = null;
-            Set values = null;
-            // Since Attribute tag is always the first leaf node as per the
-            // DTD,and
-            // values can one or more, Attribute tag can be parsed first and
-            // then
-            // iterate over the values, if any.
-            Node attributeNode = null;
-            for (int i = 0; i < numLeafNodes; i++) {
-                attributeNode = leafNodeList.item(i);
-                if ((attributeNode.getNodeType() == Node.ELEMENT_NODE)
-                        && (attributeNode.getNodeName().equals("Attribute"))) {
-                    i = (int) numLeafNodes;
-                } else {
-                    continue;
+
+            Node keyNode = null;
+
+            // Since Attribute tag is always the first leaf node as per the DTD, and values can one or more,
+            // Attribute tag can be parsed first and then iterate over the values, if any.
+            for (int i = 0; i < keyValueEntrySize; i++) {
+                keyNode = keyValueEntryList.item(i);
+
+                if (keyNode.getNodeType() == Node.ELEMENT_NODE &&
+                        keyNode.getNodeName().equals("Attribute")) {
+                    break;
                 }
             }
-            key = ((Element) attributeNode).getAttribute("name");
-            // Now parse the Value tags. If there are not 'Value' tags, ignore
-            // this key
+
+            final String key = ((Element)keyNode).getAttribute("name");
+            Set<String> values = null;
+
+            // Now parse the Value tags. If there are not 'Value' tags, ignore this key
             // TODO: More error handling required later for zero 'Value' tags.
-            for (int m = 0; m < numLeafNodes; m++) {
-                Node valueNode = leafNodeList.item(m);
-                if ((valueNode.getNodeType() != Node.ELEMENT_NODE)
+            for (int m = 0; m < keyValueEntrySize; m++) {
+                Node valueNode = keyValueEntryList.item(m);
+
+                if (valueNode.getNodeType() != Node.ELEMENT_NODE
                         || !valueNode.getNodeName().equals("Value")) {
                     // TODO: Error handling required here
                     continue;
                 }
+
                 if (values == null) {
-                    values = new HashSet();
+                    values = new HashSet<String>();
                 }
-                Node fchild = (Text) valueNode.getFirstChild();
-                if (fchild != null) {
-                    String value = fchild.getNodeValue();
+
+                Node firstChild = valueNode.getFirstChild();
+                if (firstChild != null) {
+                    String value = firstChild.getNodeValue();
+
                     if (value != null) {
                         values.add(value.trim());
                     }
                 }
             }
+
             if (values == null) {
                 // No 'Value' tags found. So ignore this key.
                 // TODO: More error handling required later for zero
-                // 'Value'tags.
+                // 'Value' tags.
                 continue;
             }
-            if (map == null) {
-                map = new HashMap();
+
+            if (resultMap == null) {
+                resultMap = new HashMap<String, Set<String>>();
             }
-            Set oldValues = (Set)map.get(key);
+
+            Set<String> oldValues = resultMap.get(key);
             if (oldValues != null) {
                 values.addAll(oldValues);
             }
-            map.put(key, values);
-
-            // now reset values to prepare for the next AV pair.
-            values = null;
+            resultMap.put(key, values);
         }
         
-        return (map == null) ? EMPTY_MAP : map;
+        return resultMap == null ? EMPTY_MAP : resultMap;
     }
 
     /**

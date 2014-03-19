@@ -48,18 +48,7 @@ public abstract class EntitlementConfiguration {
     public static final String INDEX_CACHE_SIZE = "indexCacheSize";
     public static final String RESOURCE_COMPARATOR = "resourceComparator";
     
-    private static Class clazz;
     private Subject adminSubject;
-
-    static {
-        try {
-            //RFE: load different configuration plugin
-            clazz = Class.forName(
-                "com.sun.identity.entitlement.opensso.EntitlementService");
-        } catch (ClassNotFoundException e) {
-            PrivilegeManager.debug.error("EntitlementConfiguration.<init>", e);
-        }
-    }
 
     /**
      * Returns an instance of entitlement configuration.
@@ -71,9 +60,17 @@ public abstract class EntitlementConfiguration {
      */
     public static EntitlementConfiguration getInstance(
         Subject adminSubject, String realm) {
-        if (clazz == null) {
+
+        final Class clazz;
+        try {
+            //RFE: load different configuration plugin
+            clazz = Class.forName(
+                    "com.sun.identity.entitlement.opensso.EntitlementService");
+        } catch (ClassNotFoundException e) {
+            PrivilegeManager.debug.error("EntitlementConfiguration.<init>", e);
             return null;
         }
+
         Class[] parameterTypes = {String.class};
         try {
             Constructor constructor = clazz.getConstructor(parameterTypes);

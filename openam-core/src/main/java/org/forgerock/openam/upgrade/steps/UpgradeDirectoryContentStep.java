@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,16 +15,23 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.sm.SMSEntry;
+
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+
+import javax.inject.Inject;
 
 /**
  * This upgrade step is meant to upgrade the directory schema/content for external configuration stores. For the
@@ -37,6 +44,12 @@ public class UpgradeDirectoryContentStep extends AbstractUpgradeStep {
 
     private static final String DIRECTORY_DATA = "%DIRECTORY_DATA%";
     private DirectoryContentUpgrader upgrader;
+
+    @Inject
+    public UpgradeDirectoryContentStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                                       final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
 import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
 import org.forgerock.openam.upgrade.ServerUpgrade;
@@ -58,6 +60,8 @@ import org.forgerock.openam.upgrade.UpgradeUtils;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Document;
+
+import javax.inject.Inject;
 
 /**
  * Detects changes in the service schema and upgrades them if required.
@@ -85,6 +89,12 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
     private final Map<String, Map<String, SubSchemaUpgradeWrapper>> modifiedSubSchemas =
             new HashMap<String, Map<String, SubSchemaUpgradeWrapper>>();
     private final Set<String> deletedServices = new HashSet<String>();
+
+    @Inject
+    public UpgradeServiceSchemaStep(final PrivilegedAction<SSOToken> adminTokenAction,
+                                    final DataLayerConnectionFactory connectionFactory) {
+        super(adminTokenAction, connectionFactory);
+    }
 
     @Override
     public boolean isApplicable() {
