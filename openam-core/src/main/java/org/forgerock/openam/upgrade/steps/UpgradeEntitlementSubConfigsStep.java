@@ -102,6 +102,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     @Override
     public void initialize() throws UpgradeException {
+        DEBUG.message("Initialising the upgrade entitlement sub-config step");
+
         final Set<String> presentTypes = extract(entitlementService.getApplicationTypes(), new TypeNameExtractor());
         final Set<String> presentApps = extract(entitlementService.getApplications(), new AppNameExtractor());
 
@@ -137,6 +139,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         final String name = getNodeAttributeValue(subConfig, NAME);
 
         if (!presentValues.contains(name)) {
+            DEBUG.message("New entitlement sub-configuration found: " + name);
             missingNodes.add(subConfig);
         }
     }
@@ -173,6 +176,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             final ApplicationType type = new TypeBuilder().build(keyValueMap);
 
             try {
+                DEBUG.message("Saving new entitlement application type: " + name);
                 entitlementService.storeApplicationType(type);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
@@ -207,6 +211,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             final Application application = new ApplicationBuilder(type).build(keyValueMap);
 
             try {
+                DEBUG.message("Saving new entitlement application: " + name);
                 entitlementService.storeApplication(application);
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
@@ -297,6 +302,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         final Document doc;
 
         try {
+            DEBUG.message("Reading entitlements configuration file: " + ENTITLEMENTS_XML);
             serviceStream = getClass().getClassLoader().getResourceAsStream(ENTITLEMENTS_XML);
             doc = UpgradeUtils.parseServiceFile(serviceStream, getAdminToken());
         } finally {
