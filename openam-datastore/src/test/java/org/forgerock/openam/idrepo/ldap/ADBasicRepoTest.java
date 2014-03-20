@@ -59,11 +59,13 @@ public class ADBasicRepoTest extends IdRepoTestBase {
     @Test
     public void noMatchingUserResultsInException() throws Exception {
         try {
-            idrepo.getFullyQualifiedName(null, IdType.USER, "badger");
+            //using getAttributes to test the error case as getFullyQualifiedName should return with null if the user
+            //does not exist
+            idrepo.getAttributes(null, IdType.USER, "badger");
             fail();
-        } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("223", "badger", IdType.USER.getName()));
-            assertThat(ire.getLDAPErrorCode()).isNotNull().isEqualTo(
+        } catch (IdentityNotFoundException infe) {
+            assertThat(infe).hasMessage(getIdRepoExceptionMessage("223", "badger", IdType.USER.getName()));
+            assertThat(infe.getLDAPErrorCode()).isNotNull().isEqualTo(
                     String.valueOf(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED.intValue()));
         }
     }
