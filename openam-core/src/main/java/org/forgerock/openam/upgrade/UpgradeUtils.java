@@ -29,7 +29,6 @@
 /*
  * Portions Copyrighted 2011-2014 ForgeRock AS
  */
-
 package org.forgerock.openam.upgrade;
 
 //import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
@@ -126,6 +125,7 @@ import org.w3c.dom.NodeList;
  */
 public class UpgradeUtils {
 
+    public static final Integer ELEVEN_VERSION_NUMBER = Integer.valueOf(1100);
     private static final Pattern VERSION_FORMAT_PATTERN =
             Pattern.compile("^(?:.*?(\\d+\\.\\d+\\.?\\d*).*)?\\((.*)\\)");
     static Properties configTags;
@@ -309,25 +309,34 @@ public class UpgradeUtils {
         }
         boolean isBefore = currentVersionDate.before(warVersionDate);
         if (isBefore) {
-            if (Integer.valueOf(current[0]) <= Integer.valueOf(war[0])) {
-                return true;
-            } else {
-                return false;
-            }
+            return Integer.valueOf(current[0]) <= Integer.valueOf(war[0]);
         } else {
-            if (Integer.valueOf(current[0]) < Integer.valueOf(war[0])) {
-                return true;
-            } else {
-                return false;
-            }
+            return Integer.valueOf(current[0]) < Integer.valueOf(war[0]);
         }
     }
+
     public static String getCurrentVersion() {
         return SystemProperties.get(Constants.AM_VERSION);
     }
 
     public static String getWarFileVersion() {
         return ServerConfiguration.getWarFileVersion();
+    }
+
+    /**
+     * Checks if the currently deployed OpenAM has the same version number as the expected version number.
+     *
+     * @param expectedVersion The version we should match OpenAM's current version against.
+     * @return <code>false</code> if the version number cannot be detected or if the local version does not match,
+     * <code>true</code> otherwise.
+     */
+    public static boolean isCurrentVersionEqualTo(Integer expectedVersion) {
+        String[] parsedVersion = parseVersion(getCurrentVersion());
+        if (parsedVersion == null) {
+            //unable to determine current version, we can't tell if it matches the expected.
+            return false;
+        }
+        return expectedVersion.equals(Integer.valueOf(parsedVersion[0]));
     }
 
     private static String[] parseVersion(String version) {
