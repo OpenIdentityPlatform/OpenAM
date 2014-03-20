@@ -1911,7 +1911,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
          where requests are load balanced across multiple servers,
          then you must also edit the advanced OpenAM server property,
          <literal>openam.retained.http.request.headers</literal>,
-         to include the <literal>user-agent</literal> header.
+         to include the <literal>User-Agent</literal> header.
          This ensures that OpenAM correctly identifies the user agent
          to the Device Print authentication module
          when requests are forwarded between OpenAM servers in the site.
