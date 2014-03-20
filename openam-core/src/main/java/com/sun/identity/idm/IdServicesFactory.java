@@ -26,13 +26,19 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.sun.identity.idm;
 
-import java.security.ProviderException;
-
 import com.iplanet.am.sdk.AMSDKBundle;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.idm.LowerCaseIdCachedServicesDecorator;
+import org.forgerock.openam.idm.LowerCaseIdServicesDecorator;
+
+import java.security.ProviderException;
 
 /**
  * A Factory which provides access to the Directory Services. This Class
@@ -41,11 +47,11 @@ import com.iplanet.am.util.SystemProperties;
  */
 public class IdServicesFactory {
 
-    private static IdServices idServices;
+    private static volatile IdServices idServices;
 
-    private static Debug debug = Debug.getInstance("amIdm");
+    private static final Debug DEBUG = Debug.getInstance("amIdm");
 
-    private static boolean isInitialized = false;
+    private static volatile boolean isInitialized = false;
 
     private final static String CONFIGURED_SDK_PACKAGE_PROPERTY = 
         "com.iplanet.am.sdk.package";
@@ -70,9 +76,21 @@ public class IdServicesFactory {
 
     private final static String PACKAGE_SEPARATOR = ".";
 
+    /**
+     * System property to set to force all attribute names to be converted to lower case. Defaults to true.
+     */
+    private static final String USE_LOWERCASE_NAMES_PROPERTY = "org.forgerock.openam.idm.attribute.names.lower.case";
+
+    /**
+     * Whether to convert all attribute names to lower case or not.
+     */
+    private static volatile boolean useLowerCaseNames = true;
+
     private static void initialize() {
         String configuredSDK = SystemProperties.get(
                 CONFIGURED_SDK_PACKAGE_PROPERTY);
+
+        useLowerCaseNames = SystemProperties.getAsBoolean(USE_LOWERCASE_NAMES_PROPERTY, true);
 
         boolean isCriticalErrorIfClassNotFound = true;
         if ((configuredSDK == null) || (configuredSDK.equals(SERVER_PACKAGE))) {
@@ -87,8 +105,8 @@ public class IdServicesFactory {
                 // Probably remote mode without the property being configured.
                 // So try initializing the REMOTE packages. Use try Remote SDK
                 // Package
-                if (debug.messageEnabled()) {
-                    debug.message("IdServicesFactory.static{} - Initializing "
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdServicesFactory.static{} - Initializing "
                             + "the server packages failed. Hence trying the "
                             + "remote client sdk pacakage");
                 }
@@ -121,15 +139,25 @@ public class IdServicesFactory {
 
             IdServicesProvider idServicesProvider = (IdServicesProvider) Class
                     .forName(providerClass).newInstance();
-            idServices = idServicesProvider.getProvider();
+            IdServices impl = idServicesProvider.getProvider();
+
+            // OPENAM-3159: Ensure attribute keys are always lower case for consistency
+            if (useLowerCaseNames) {
+                // Use correct decorator for cached vs non-cached implementations
+                impl = (impl instanceof IdCachedServices)
+                        ? new LowerCaseIdCachedServicesDecorator((IdCachedServices) impl)
+                        : new LowerCaseIdServicesDecorator(impl);
+            }
+
+            idServices = impl;
 
         } catch (InstantiationException e) {
-            debug.error("IdServicesFactory.instantiateImpls()- "
+            DEBUG.error("IdServicesFactory.instantiateImpls()- "
                     + "Initializing Impls from package: " + packageName
                     + " FAILED!", e);
             throw new ProviderException(AMSDKBundle.getString("300"));
         } catch (IllegalAccessException e) {
-            debug.error("IdServicesFactory.instantiateImpls()- "
+            DEBUG.error("IdServicesFactory.instantiateImpls()- "
                     + "Initializing Impls from package: " + packageName
                     + " FAILED!", e);
             throw new ProviderException(AMSDKBundle.getString("300"));
@@ -138,15 +166,15 @@ public class IdServicesFactory {
                     + "Initializing Impls from package: " + packageName
                     + " FAILED!";
             if (isCriticalErrorIfClassNotFound) {
-                debug.error(message, e);
+                DEBUG.error(message, e);
             } else {
-                debug.warning(message, e);
+                DEBUG.warning(message, e);
             }
             throw new ProviderException(AMSDKBundle.getString("300"));
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("IdServicesFactory.instantiateImpls() - "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdServicesFactory.instantiateImpls() - "
                     + "Successfully initialized Impls Using Impl Package: "
                     + packageName + " for accessing Directory Services");
         }
