@@ -202,7 +202,7 @@ public class AuthClientUtils {
     
     private static Map<String, Set<String>> distAuthSitesMap = new HashMap();
     private static final List<String> RETAINED_HTTP_REQUEST_HEADERS = new ArrayList<String>();
-    private static final List<String> FORBIDDEN_TO_COPY_REQUEST_HEADERS = new ArrayList<String>();
+    private static final List<String> RETAINED_HTTP_HEADERS = new ArrayList<String>();
 
     static {
         // Initialzing variables
@@ -324,22 +324,24 @@ public class AuthClientUtils {
                         "dist auth server to site: " + distAuthSitesMap);
             }
         }
-        String retainedHeaders = SystemProperties.get(
-                Constants.RETAINED_HTTP_REQUEST_HEADERS_LIST);
-        String forbiddenHeaders = SystemProperties.get(
-                Constants.FORBIDDEN_TO_COPY_REQUEST_HEADERS);
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("Retained request headers: " + retainedHeaders);
-            utilDebug.message("Forbidden to copy request headers: " + forbiddenHeaders);
-        }
-        if (retainedHeaders != null) {
-            RETAINED_HTTP_REQUEST_HEADERS.addAll(Arrays.asList(retainedHeaders.toLowerCase().split(",")));
-        }
-        if (forbiddenHeaders != null) {
-            FORBIDDEN_TO_COPY_REQUEST_HEADERS.addAll(Arrays.asList(forbiddenHeaders.toLowerCase().split(",")));
-        }
+
+        RETAINED_HTTP_REQUEST_HEADERS.addAll(getHeaderNameListForProperty(
+                Constants.RETAINED_HTTP_REQUEST_HEADERS_LIST));
         //configuration sanity check
-        RETAINED_HTTP_REQUEST_HEADERS.removeAll(FORBIDDEN_TO_COPY_REQUEST_HEADERS);
+        RETAINED_HTTP_REQUEST_HEADERS.removeAll(getHeaderNameListForProperty(
+                Constants.FORBIDDEN_TO_COPY_REQUEST_HEADERS));
+
+        RETAINED_HTTP_HEADERS.addAll(getHeaderNameListForProperty(
+                Constants.RETAINED_HTTP_HEADERS_LIST));
+        //configuration sanity check
+        RETAINED_HTTP_HEADERS.removeAll(getHeaderNameListForProperty(
+                Constants.FORBIDDEN_TO_COPY_HEADERS));
+        //we need to ensure that set-cookie headers are always retained for the response.
+        RETAINED_HTTP_HEADERS.add("set-cookie");
+        if (utilDebug.messageEnabled()) {
+            utilDebug.message("Retained request headers: " + RETAINED_HTTP_REQUEST_HEADERS);
+            utilDebug.message("Retained response headers: " + RETAINED_HTTP_HEADERS);
+        }
     }
 
     /*
@@ -348,6 +350,14 @@ public class AuthClientUtils {
      */
     protected AuthClientUtils() {
     }        
+
+    private static List<String> getHeaderNameListForProperty(String property) {
+        String value = SystemProperties.get(property);
+        if (value != null) {
+            return Arrays.asList(value.toLowerCase().split(","));
+        }
+        return Collections.EMPTY_LIST;
+    }
 
     public static Hashtable parseRequestParameters(
         HttpServletRequest request) {
@@ -591,45 +601,6 @@ public class AuthClientUtils {
             utilDebug.message("createCookie Cookie is set : " + cookie);
         }
         return (cookie);
-    }
-
-    /**
-     * Creates a Cookie with the <code>cookieName</code>,
-     * <code>cookieValue</code> for the cookie domains specified.
-     *
-     * @param cookieName is the name of the cookie
-     * @param cookieValue is the value fo the cookie
-     * @param cookieDomain Domain for which the cookie is to be set.
-     * @param path The path into which the cookie shall be set
-     * @return the cookie object.
-     */
-    public static Cookie createCookie(String cookieName,
-                               String cookieValue,
-                               String cookieDomain,
-                               String path) {
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("cookieName   : " + cookieName);
-            utilDebug.message("cookieValue  : " + cookieValue);
-            utilDebug.message("cookieDomain : " + cookieDomain);
-            utilDebug.message("path : " + path);
-        }
-
-        Cookie cookie = null;
-
-        try {
-            cookie = CookieUtils.newCookie(cookieName, cookieValue,
-                        path, cookieDomain);
-        } catch (Exception ex) {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("Error creating cookie. : " + ex.getMessage());
-            }
-        }
-
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("createCookie Cookie is set : " + cookie);
-        }
-
-        return cookie;
     }
 
     public static void clearlbCookie(HttpServletRequest request,
@@ -2555,18 +2526,17 @@ public class AuthClientUtils {
      * @return HashMap of the result data from the original server's response
      *
      */
-    public static HashMap sendAuthRequestToOrigServer(HttpServletRequest request,
+    public static Map<String, Object> sendAuthRequestToOrigServer(HttpServletRequest request,
         HttpServletResponse response, String cookieURL) {
-        HashMap origRequestData = new HashMap();
+        Map<String, Object> origRequestData = new HashMap<String, Object>();
 
         // Print request Headers
         if (utilDebug.messageEnabled()) {
-            Enumeration requestHeaders = request.getHeaderNames();
+            Enumeration<String> requestHeaders = request.getHeaderNames();
             while (requestHeaders.hasMoreElements()) {
-                String name = (String) requestHeaders.nextElement();
-                Enumeration value = (Enumeration)request.getHeaders(name);
-                utilDebug.message("Header name = " + name + 
-                                  " Value = " + value);
+                String name = requestHeaders.nextElement();
+                Enumeration value = (Enumeration) request.getHeaders(name);
+                utilDebug.message("Header name = " + name + " Value = " + value);
             }
         }
 
@@ -2592,7 +2562,8 @@ public class AuthClientUtils {
             conn.setUseCaches(useCache);
             conn.setFollowRedirects(false);
             conn.setInstanceFollowRedirects(false);
-            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER, request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
+            conn.setRequestProperty(ISAuthConstants.ACCEPT_LANG_HEADER,
+                    request.getHeader(ISAuthConstants.ACCEPT_LANG_HEADER));
             // We should preserve the original host, so the target server will also see the accessed URL
             // If we don't do this the server might going to deny the request because of invalid domain access.
             conn.setRequestProperty("Host", request.getHeader("host"));
@@ -2722,10 +2693,8 @@ public class AuthClientUtils {
             }
             origRequestData.put("RESPONSE_CODE", conn.getResponseCode());
 
-            // retrieves cookies from the response
-            Map headers = conn.getHeaderFields();
-            processCookies(headers, request, response);
-            origRequestData.put("HTTP_HEADERS", headers);
+            //replay received headers to the original response
+            copyResponseHeaders(conn.getHeaderFields(), response);
         } catch (IOException ioe) {
             //the catcher will log the exception
             origRequestData.put("EXCEPTION", ioe);
@@ -2775,10 +2744,23 @@ public class AuthClientUtils {
         }
     }
 
+    private static void copyResponseHeaders(Map<String, List<String>> headers, HttpServletResponse response) {
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String headerName = entry.getKey();
+            if (headerName != null && RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
+                List<String> headerValues = entry.getValue();
+                if (headerValues != null) {
+                    for (String headerValue : headerValues) {
+                        response.addHeader(headerName, headerValue);
+                    }
+                }
+            }
+        }
+    }
+
     // Gets the request form data in the form of string
     private static String getFormData(Map<String, Set<String>> params) {
         StringBuilder sb = new StringBuilder();
-        sb.append("");
         for (Map.Entry<String, Set<String>> entry : params.entrySet()) {
             String key = entry.getKey();
             for (String value : entry.getValue()) {
@@ -2792,95 +2774,6 @@ public class AuthClientUtils {
         sb.deleteCharAt(sb.length() -1);
 
         return(sb.toString());
-    }
-
-    // parses the cookies from the response header and adds them in
-    // the HTTP response.
-    private static void processCookies(Map headers,
-            HttpServletRequest request, HttpServletResponse response) {
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("processCookies : headers : " + headers);
-        }
-
-        if (headers == null || headers.isEmpty()) {
-            return;
-        }
-
-        for (Iterator hrs = headers.entrySet().iterator(); hrs.hasNext();) {
-            Map.Entry me = (Map.Entry)hrs.next();
-            String key = (String) me.getKey();
-            if (key != null && (key.equalsIgnoreCase("Set-cookie") ||
-                (key.equalsIgnoreCase("Cookie")))) {
-                List list = (List)me.getValue();
-
-                if (list == null || list.isEmpty()) {
-                    continue;
-                }
-
-                Cookie cookie = null;
-                String domain = null;
-                String path = null;
-                String cookieName = null;
-                String cookieValue = null;
-
-                for (Iterator it = list.iterator(); it.hasNext(); ) {
-                    String cookieStr = (String)it.next();
-
-                    if (utilDebug.messageEnabled()) {
-                        utilDebug.message("processCookies : cookie : " 
-                                          + cookieStr);
-                    }
-
-                    StringTokenizer stz = new StringTokenizer(cookieStr, ";");
-
-                    while (stz.hasMoreTokens()) {
-                        String nameValue = (String)stz.nextToken();
-                        int index = nameValue.indexOf("=");
-
-                        if (index == -1) {
-                            continue;
-                        }
-
-                        String nameofParam = nameValue.substring(0, index).trim();
-                        String nameOfValue = nameValue.substring(index + 1);
-
-                        /* decode the cookie if it is already URLEncoded,
-                         * we have to pass non URLEncoded cookie to 
-                         * createCookie method
-                         */
-                        if (isURLEncoded(nameOfValue)) {
-                            try {
-                                nameOfValue = URLDecoder.decode(nameOfValue, "UTF-8");
-                            } catch (java.io.UnsupportedEncodingException e) {
-                                // this would not happen for UTF-8
-                            }
-                        }
-
-                        if (nameofParam.equalsIgnoreCase("Domain")) {
-                            domain = nameOfValue;
-                        } else if (nameofParam.equalsIgnoreCase("Expires") ||
-                                   nameofParam.equalsIgnoreCase("Max-Age") ||
-                                   nameofParam.equalsIgnoreCase("Version")) {
-                            // we don't care about these cookie values
-                            continue;
-                        } else if (nameofParam.equalsIgnoreCase("Path")) {
-                            path = nameOfValue;
-                        } else {
-                            cookieName = nameofParam;
-                            cookieValue = nameOfValue;
-                        }
-                    }
-
-                    cookie = createCookie(cookieName, cookieValue, domain, path);
-
-                    if("LOGOUT".equals(cookieValue)){
-                        cookie.setMaxAge(0);
-                    }
-
-                    response.addCookie(cookie);
-                }
-            }
-        }
     }
 
     // Get cookies string from HTTP request object
@@ -3163,25 +3056,6 @@ public class AuthClientUtils {
             return SystemProperties.get(Constants.AM_DISTAUTH_DEPLOYMENT_DESCRIPTOR);
         }
     }
-
-    /**
-     * Checks if the provided <code>String</code> is URLEncoded. Our logic
-     * is simple. If the string has % or + character we treat as URL encoded
-     *
-     * @param s the <code>String</code> we want to check
-     * @return <code>true</code> if the provided string is URLEncoded, 
-     *         <code>false</code> otherwise.
-     */
-    private static boolean isURLEncoded(String s) {
-        boolean urlEncoded = false;
-        if (s != null) {
-            if ((s.indexOf("%") != -1) || (s.indexOf("+") != -1)) {
-                urlEncoded = true;
-            }
-        }
-        return urlEncoded;
-    }
-
 
     public static void setHostUrlCookie(HttpServletResponse response) {
         if (isSessionHijackingEnabled) {

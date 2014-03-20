@@ -27,12 +27,11 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.UI;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
@@ -49,7 +48,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -180,7 +178,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
     private void rerouteRequest(HttpServletRequest request, HttpServletResponse response, String cookieURL) {
         debug.message("Routing the request to Original Auth server");
         try {
-            HashMap origRequestData =
+            Map<String, Object> origRequestData =
                     AuthUtils.sendAuthRequestToOrigServer(
                     request, response, cookieURL);
             Exception fwdEx = (Exception) origRequestData.get("EXCEPTION");
@@ -194,40 +192,19 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             String clientType = null;
             String output_data = null;
             String contentType = null;
-            Map<String, List<String>> headers = null;
             int responseCode = HttpServletResponse.SC_OK; // OK by default, origRequestData should override it
-            if (origRequestData != null && !origRequestData.isEmpty()) {
-                redirect_url =
-                        (String) origRequestData.get("AM_REDIRECT_URL");
-                output_data =
-                        (String) origRequestData.get("OUTPUT_DATA");
-                clientType =
-                        (String) origRequestData.get("AM_CLIENT_TYPE");
-                contentType =
-                        (String) origRequestData.get("CONTENT_TYPE");
-                headers =
-                        (Map<String, List<String>>) origRequestData.get("HTTP_HEADERS");
+            if (!origRequestData.isEmpty()) {
+                redirect_url = (String) origRequestData.get("AM_REDIRECT_URL");
+                output_data = (String) origRequestData.get("OUTPUT_DATA");
+                clientType = (String) origRequestData.get("AM_CLIENT_TYPE");
+                contentType = (String) origRequestData.get("CONTENT_TYPE");
                 responseCode = (Integer) origRequestData.get("RESPONSE_CODE");
             }
             if (debug.messageEnabled()) {
                 debug.message("redirect_url : " + redirect_url);
                 debug.message("clientType : " + clientType);
             }
-            if (headers != null) {
-                for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                    String headerName = entry.getKey();
-                    if (headerName != null) {
-                        if (RETAINED_HTTP_HEADERS.contains(headerName.toLowerCase())) {
-                            List<String> headerValues = entry.getValue();
-                            if (headerValues != null) {
-                                for (String headerValue : headerValues) {
-                                    response.addHeader(headerName, headerValue);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+
             response.setStatus(responseCode);
             if (responseCode >= HttpServletResponse.SC_BAD_REQUEST) {
                 if (debug.warningEnabled()) {
@@ -456,34 +433,10 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
     
     private static final String REDIRECT_JSP = "Redirect.jsp";
     private static final String DEFAULT_CONTENT_TYPE = "text/html; charset=" + G11NSettings.CDM_DEFAULT_CHARSET;
-    private static final List<String> RETAINED_HTTP_HEADERS = new ArrayList<String>();
-    private static final List<String> FORBIDDEN_TO_COPY_HEADERS = new ArrayList<String>();
     // the debug file
     private static final Debug debug = Debug.getInstance("amLoginServlet");
     
     private static String serviceURI = SystemProperties.get(
-        Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";    
-    
-    static {
-        initialize();
-    }
-
-    private static void initialize() {
-        String retainedHeaders = SystemProperties.get(
-                Constants.RETAINED_HTTP_HEADERS_LIST);
-        String forbiddenHeaders = SystemProperties.get(
-                Constants.FORBIDDEN_TO_COPY_HEADERS);
-        if (retainedHeaders != null) {
-            RETAINED_HTTP_HEADERS.addAll(Arrays.asList(retainedHeaders.toLowerCase().split(",")));
-        }
-        if (forbiddenHeaders != null) {
-            FORBIDDEN_TO_COPY_HEADERS.addAll(Arrays.asList(forbiddenHeaders.toLowerCase().split(",")));
-        }
-        //configuration sanity check
-        RETAINED_HTTP_HEADERS.removeAll(FORBIDDEN_TO_COPY_HEADERS);
-    }
-    ////////////////////////////////////////////////////////////////////////////
-    // Instance variables
-    ////////////////////////////////////////////////////////////////////////////
+        Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
 }
 
