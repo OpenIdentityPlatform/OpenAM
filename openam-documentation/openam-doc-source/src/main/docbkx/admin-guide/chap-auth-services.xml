@@ -1905,6 +1905,29 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
                 username. Appropriate modules include Active Directory, Data Store, LDAP, RADIUS, and Windows NT.
             </para></textobject>
         </mediaobject>
+
+        <para>
+         When you use the Device Print authentication module in an OpenAM site,
+         where requests are load balanced across multiple servers,
+         then you must also edit the advanced OpenAM server property,
+         <literal>openam.retained.http.request.headers</literal>,
+         to include the <literal>user-agent</literal> header.
+         This ensures that OpenAM correctly identifies the user agent
+         to the Device Print authentication module
+         when requests are forwarded between OpenAM servers in the site.
+        </para>
+
+        <para>
+         For more information on the advanced server property,
+         <literal>openam.retained.http.request.headers</literal>,
+         see the <citetitle>Reference</citetitle> section,
+         <link
+          xlink:show="new"
+          xlink:href="reference#servers-advanced-configuration"
+          xlink:role="http://docbook.org/xlink/role/olink"
+         ><citetitle>Servers > Advanced</citetitle></link>.
+        </para>
+
         <para>A device fingerprint is based on the unique characteristics of a user like yourself and your
             associated device. You can configure the characteristics that should be part of the fingerprint.
             These characteristics can include:</para>
