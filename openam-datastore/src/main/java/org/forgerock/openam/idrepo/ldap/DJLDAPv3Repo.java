@@ -426,16 +426,22 @@ public class DJLDAPv3Repo extends IdRepo {
      * @param token Not used.
      * @param type The type of the identity.
      * @param name The name of the identity.
-     * @return Fully qualified name of this identity.
-     * @throws IdRepoException If the identity cannot be found.
+     * @return Fully qualified name of this identity or <code>null</code> if the identity cannot be found.
+     * @throws IdRepoException If there was an error while looking up the user.
      */
     @Override
-    public String getFullyQualifiedName(SSOToken token, IdType type, String name)
-            throws IdRepoException {
+    public String getFullyQualifiedName(SSOToken token, IdType type, String name) throws IdRepoException {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("getFullyQualifiedName invoked");
         }
-        return ldapServers + "/" + getDN(type, name);
+        try {
+            return ldapServers + "/" + getDN(type, name);
+        } catch (IdentityNotFoundException infe) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Unable to find identity with name " + name + " and type " + type);
+            }
+            return null;
+        }
     }
 
     /**
@@ -554,7 +560,7 @@ public class DJLDAPv3Repo extends IdRepo {
         try {
             //get the user DN, if there is no such entry, this will already fail.
             getDN(type, name);
-        } catch (IdRepoException ire) {
+        } catch (IdentityNotFoundException infe) {
             return false;
         }
         return true;
@@ -2252,7 +2258,8 @@ public class DJLDAPv3Repo extends IdRepo {
             while (reader.hasNext()) {
                 if (reader.isEntry()) {
                     if (entry != null) {
-                        throw ErrorResultException.newErrorResult(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED);
+                        throw newIdRepoException(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED, "306", CLASS_NAME,
+                                ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue());
                     }
                     entry = reader.readEntry();
                 } else {
@@ -2263,7 +2270,8 @@ public class DJLDAPv3Repo extends IdRepo {
             if (entry == null) {
                 DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
                         + " with scope: " + defaultScope);
-                throw newIdRepoException(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED, "223", name, type.getName());
+                throw new IdentityNotFoundException(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED, "223", name,
+                        type.getName());
             }
             dn = entry.getName().toString();
         } catch (ErrorResultException ere) {
@@ -2401,8 +2409,7 @@ public class DJLDAPv3Repo extends IdRepo {
             throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313",
                     new Object[]{CLASS_NAME, resultCode.intValue(), ere.getResult().getDiagnosticMessage()});
         } else if (resultCode.equals(ResultCode.NO_SUCH_OBJECT)) {
-            throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "220",
-                    new Object[]{CLASS_NAME, ere.getResult().getDiagnosticMessage()});
+            throw new IdentityNotFoundException(resultCode, "220", CLASS_NAME, ere.getResult().getDiagnosticMessage());
         } else {
             throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());
         }

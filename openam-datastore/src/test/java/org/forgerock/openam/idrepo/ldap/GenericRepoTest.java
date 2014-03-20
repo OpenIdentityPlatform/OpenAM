@@ -111,6 +111,17 @@ public class GenericRepoTest extends IdRepoTestBase {
     }
 
     @Test
+    public void getFullyQualifiedNameWorksForExistingUser() throws Exception {
+        String fqn = idrepo.getFullyQualifiedName(null, IdType.USER, DEMO);
+        assertThat(fqn).isNotNull().isEqualTo("[localhost:50389]/" + DEMO_DN);
+    }
+
+    @Test
+    public void getFullyQualifiedNameReturnsNullIfUserDoesNotExist() throws Exception {
+        assertThat(idrepo.getFullyQualifiedName(null, IdType.USER, "badger")).isNull();
+    }
+
+    @Test
     public void isActiveReturnsFalseForNonExistentUser() throws Exception {
         assertThat(idrepo.isActive(null, IdType.USER, "invalid")).isFalse();
     }
