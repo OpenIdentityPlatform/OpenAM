@@ -25,10 +25,12 @@ import org.apache.ws.security.WSConstants;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
@@ -38,6 +40,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 /**
+ * @see org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller
  */
 public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
     private final OpenAMSessionIdElementBuilder openAMSessionIdElementBuilder;
@@ -57,15 +60,18 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
             String message = "The to-be-translated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
                     " entry. The token: " + receivedToken;
             logger.error(message);
-            throw new TokenMarshalException(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
         if (TokenType.USERNAME.name().equals(tokenType)) {
             return marshallUsernameToken(tokenAsMap);
         } else if (TokenType.OPENAM.name().equals(tokenType)) {
             return marshallAMSessionToken(tokenAsMap);
+        } else if (TokenType.OPENIDCONNECT.name().equals(tokenType)) {
+            return marshallOpenIdConnectIdToken(tokenAsMap);
         }
 
-        throw new TokenMarshalException("Unsupported token translation operation for token: " + receivedToken);
+        throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                "Unsupported token translation operation for token: " + receivedToken);
 
     }
 
@@ -76,7 +82,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         if (tokenType == null) {
             String message = "REST authN response does not contain " + AMSTSConstants.TOKEN_TYPE_KEY + " entry. The response map: " + responseAsMap;
             logger.error(message);
-            throw new TokenMarshalException(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
         return TokenType.valueOf(tokenType);
     }
@@ -86,13 +92,13 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         if (tokenUserName == null) {
             String message = "Exception: json representation of UNT does not contain a username field. The representation: " + tokenAsMap;
             logger.error(message);
-            throw new TokenMarshalException(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
         String password = (String)tokenAsMap.get(AMSTSConstants.USERNAME_TOKEN_PASSWORD);
         if (password == null) {
             String message = "Exception: json representation of UNT does not contain a password field. The representation: " + tokenAsMap;
             logger.error(message);
-            throw new TokenMarshalException(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
 
         UsernameTokenType usernameTokenType = new UsernameTokenType();
@@ -136,9 +142,24 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         if (sessionId == null) {
             String message = "Exception: json representation of AM Session Token does not contain a session_id field. The representation: " + tokenAsMap;
             logger.error(message);
-            throw new TokenMarshalException(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         } else {
             ReceivedToken token = new ReceivedToken(openAMSessionIdElementBuilder.buildOpenAMSessionIdElement(sessionId));
+            token.setState(ReceivedToken.STATE.NONE);
+            token.setUsernameToken(false);
+            return token;
+        }
+    }
+
+    private ReceivedToken marshallOpenIdConnectIdToken(Map<String, Object> tokenAsMap) throws TokenMarshalException {
+        String tokenValue = (String)tokenAsMap.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY);
+        if (tokenValue == null) {
+            String message = "Exception: json representation of Open ID Connect ID Token does not contain a "
+                    + AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY + " field. The representation: " + tokenAsMap;
+            logger.error(message);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } else {
+            ReceivedToken token = new ReceivedToken(new OpenIdConnectIdToken(tokenValue).toXmlElement());
             token.setState(ReceivedToken.STATE.NONE);
             token.setUsernameToken(false);
             return token;

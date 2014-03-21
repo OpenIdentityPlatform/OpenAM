@@ -21,6 +21,7 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
@@ -30,8 +31,12 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.rest.token.provider.AMSAMLTokenProvider;
 import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidatorImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
+import org.forgerock.openam.sts.token.validator.OpenIdConnectIdTokenValidator;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 
 import javax.inject.Inject;
@@ -61,13 +66,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final String amDeploymentUrl;
     private final String jsonRestRoot;
     private final String restLogoutUriElement;
-    private final String idFromSessionUriElement;
     private final String amSessionCookieName;
     private final String realm;
     private final Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider;
     private final Provider<AMTokenProvider> amTokenProviderProvider;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
-    private final UrlConstituentCatenator urlConstituentCatenator;
+    private final PrincipalFromSession principalFromSession;
+    private final AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler;
     private final Logger logger;
 
     @Inject
@@ -75,25 +80,25 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
             @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestRoot,
             @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT) String restLogoutUriElement,
-            @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT) String idFromSessionUriElement,
             @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
             @Named (AMSTSConstants.REALM) String realm,
             Provider<UsernameTokenValidator> wssUsernameTokenValidatorProvider,
             Provider<AMTokenProvider> amTokenProviderProvider,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
-            UrlConstituentCatenator urlConstituentCatenator,
+            PrincipalFromSession principalFromSession,
+            AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
         this.jsonRestRoot = jsonRestRoot;
         this.restLogoutUriElement = restLogoutUriElement;
-        this.idFromSessionUriElement = idFromSessionUriElement;
         this.amSessionCookieName = amSessionCookieName;
         this.realm = realm;
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.amTokenProviderProvider = amTokenProviderProvider;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
-        this.urlConstituentCatenator = urlConstituentCatenator;
+        this.principalFromSession = principalFromSession;
+        this.openIdConnectIdTokenAuthenticationHandler = openIdConnectIdTokenAuthenticationHandler;
         this.logger = logger;
     }
 
@@ -106,10 +111,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             tokenValidator = buildUsernameTokenValidator();
         } else if (TokenType.OPENAM.equals(inputTokenType)) {
             tokenValidator = buildOpenAMTokenValidator();
-        } else {
+        } else if (TokenType.OPENIDCONNECT.equals(inputTokenType)) {
+            tokenValidator = buildOpenIdConnectValidator();
+        }
+        else {
             String message = "Unexpected input token type of: " + inputTokenType;
             logger.error(message);
-            throw new STSInitializationException(message);
+            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, message);
         }
 
         TokenProvider tokenProvider = null;
@@ -120,15 +128,21 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         } else {
             String message = "Unexpected output token type of: " + outputTokenType;
             logger.error(message);
-            throw new STSInitializationException(message);
+            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, message);
         }
         return new TokenTransformImpl(tokenValidator, tokenProvider, inputTokenType, outputTokenType, logger);
     }
 
     private TokenValidator buildUsernameTokenValidator() {
-        org.apache.cxf.sts.token.validator.UsernameTokenValidator validator = new org.apache.cxf.sts.token.validator.UsernameTokenValidator();
+        org.apache.cxf.sts.token.validator.UsernameTokenValidator validator =
+                new org.apache.cxf.sts.token.validator.UsernameTokenValidator();
         validator.setValidator(wssUsernameTokenValidatorProvider.get());
         return validator;
+    }
+
+    private TokenValidator buildOpenIdConnectValidator() {
+        return new OpenIdConnectIdTokenValidator(openIdConnectIdTokenAuthenticationHandler,
+                threadLocalAMTokenCache, principalFromSession, logger);
     }
 
     /*
@@ -140,15 +154,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     }
 
     private TokenValidator buildOpenAMTokenValidator() {
-        return new AMTokenValidator(
-                                amDeploymentUrl,
-                                jsonRestRoot,
-                                realm,
-                                idFromSessionUriElement,
-                                amSessionCookieName,
-                                threadLocalAMTokenCache,
-                                urlConstituentCatenator,
-                                logger);
+        return new AMTokenValidator(threadLocalAMTokenCache, principalFromSession, logger);
     }
 
     private TokenProvider buildOpenSAMLTokenProvider(boolean invalidateInterimAMSession) throws STSInitializationException {
@@ -158,7 +164,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                         new AMSessionInvalidatorImpl(amDeploymentUrl,
                                 jsonRestRoot, realm, restLogoutUriElement, amSessionCookieName, logger), threadLocalAMTokenCache, logger);
             } catch (URISyntaxException e) {
-                throw new STSInitializationException(e.getMessage(), e);
+                throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
             }
         } else {
             return new AMSAMLTokenProvider(new SAMLTokenProvider(), NULL_AM_SESSION_INVALIDATOR, threadLocalAMTokenCache, logger);

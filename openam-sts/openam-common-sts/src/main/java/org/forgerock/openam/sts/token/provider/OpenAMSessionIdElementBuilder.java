@@ -24,7 +24,9 @@ import org.w3c.dom.Element;
  * encapsulating the OpenAM sessionId.
  *
  * It also defines functionality to go in the other direction - i.e. to go from an OpenAM session id element, and extract
- * the session id. This is useful in the Rest STS.
+ * the session id. This is needed by the Rest STS.
+ *
+ * TODO: think about moving this to the model directory.
  */
 public interface OpenAMSessionIdElementBuilder {
     Element buildOpenAMSessionIdElement(String sessionId) throws TokenMarshalException;

@@ -62,6 +62,7 @@
         <module>openam-auth-windowsdesktopsso</module>
         <module>openam-auth-persistentcookie</module>
         <module>deviceprint</module>
+        <module>openam-auth-oidc</module>
     </modules>
 
     <dependencies>

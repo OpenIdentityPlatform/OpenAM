@@ -16,17 +16,17 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.json.resource.ResourceException;
+
 /**
  * An instance of this exception is thrown for all errors related to token validation.
  */
-public class TokenValidationException extends Exception {
-    //no exception without a cause/message
-    private TokenValidationException() {}
+public class TokenValidationException extends ResourceException {
 
-    public TokenValidationException(String message) {
-        super(message);
+    public TokenValidationException(int code, String message) {
+        super(code, message);
     }
-    public TokenValidationException(String message, Throwable cause) {
-        super(message, cause);
+    public TokenValidationException(int code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 }

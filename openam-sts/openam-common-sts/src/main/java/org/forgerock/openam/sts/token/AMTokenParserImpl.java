@@ -20,6 +20,7 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.restlet.representation.Representation;
 import org.slf4j.Logger;
@@ -47,7 +48,8 @@ public class AMTokenParserImpl implements AMTokenParser {
         try {
             responseBody = representation.getText();
         } catch (IOException e) {
-            throw new TokenValidationException("Exception caught pulling text from Representation in the context of " +
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught pulling text from Representation in the context of " +
                     "parsing the AM Session from the authentication response: " + e.getMessage(), e);
         }
         Map<String,Object> responseAsMap = null;
@@ -56,12 +58,12 @@ public class AMTokenParserImpl implements AMTokenParser {
                     new TypeReference<Map<String,Object>>() {});
         } catch (IOException ioe) {
             String message = "Exception caught getting the text of the json authN response: " + ioe;
-            throw new TokenValidationException(message, ioe);
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message, ioe);
         }
         String sessionId = (String)responseAsMap.get(TOKEN_ID);
         if (sessionId == null) {
             String message = "REST authN response does not contain " + TOKEN_ID + " entry. The response map: " + responseAsMap;
-            throw new TokenValidationException(message);
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message);
         }
         return sessionId;
     }

@@ -52,6 +52,8 @@ import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
@@ -121,6 +123,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind(IssueOperation.class).toProvider(TokenIssueOperationProvider.class);
         bind(ValidateOperation.class).toProvider(TokenValidateOperationProvider.class);
         bind(RenewOperation.class).toProvider(TokenRenewOperationProvider.class);
+        bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
         //bind the class defining the core STS functionality - necessary for its dependencies to be injected
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);

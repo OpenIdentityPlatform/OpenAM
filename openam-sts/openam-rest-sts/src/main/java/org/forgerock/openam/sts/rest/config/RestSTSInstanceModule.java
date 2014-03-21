@@ -51,10 +51,14 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
 import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
@@ -106,13 +110,19 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(new TypeLiteral<AuthenticationHandler<UsernameToken>>(){})
                 .to(new TypeLiteral<AuthenticationHandlerImpl<UsernameToken>>() {});
 
-//        bind(WebServiceContextFactory.class).to(WebServiceContextFactoryImpl.class);
+        bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken>>(){})
+                .to(OpenIdConnectAuthenticationRequestDispatcher.class);
+
+        bind(new TypeLiteral<AuthenticationHandler<OpenIdConnectIdToken>>(){})
+                .to(new TypeLiteral<AuthenticationHandlerImpl<OpenIdConnectIdToken>>() {});
+
         bind(WebServiceContextFactory.class).to(CrestWebServiceContextFactoryImpl.class);
         bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
         bind(TokenResponseMarshaller.class).to(TokenResponseMarshallerImpl.class);
         bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
         bind(TokenTranslateOperation.class).to(TokenTranslateOperationImpl.class);
         bind(AMTokenParser.class).to(AMTokenParserImpl.class);
+        bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
 
         bind(RestSTS.class).to(RestSTSImpl.class);
 

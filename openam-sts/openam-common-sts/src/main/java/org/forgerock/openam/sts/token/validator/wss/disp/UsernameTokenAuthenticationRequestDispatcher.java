@@ -19,9 +19,12 @@ package org.forgerock.openam.sts.token.validator.wss.disp;
 import com.google.inject.Inject;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.TokenValidationException;
 import org.restlet.engine.header.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 
 import java.net.URI;
@@ -35,7 +38,8 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String APPLICATION_JSON = "application/json";
 
-    public Representation dispatch(URI uri, UsernameToken token) {
+    @Override
+    public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
         ClientResource resource = new ClientResource(uri);
         resource.setFollowingRedirects(false);
         Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
@@ -46,7 +50,10 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
         headers.set(USERNAME, token.getName());
         headers.set(PASSWORD, token.getPassword());
         headers.set(CONTENT_TYPE, APPLICATION_JSON);
-        //TODO: this throws the unchecked ResourceException - catch and rethrow as unchecked exception, or ??
-        return resource.post(null);
+        try {
+            return resource.post(null);
+        } catch (ResourceException e) {
+            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting to json client: " + e, e);
+        }
     }
 }

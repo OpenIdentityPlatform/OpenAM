@@ -596,6 +596,11 @@
         </dependency>
 
         <dependency>
+            <artifactId>openam-auth-oidc</artifactId>
+            <groupId>org.forgerock.openam</groupId>
+        </dependency>
+
+        <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>org.forgerock.commons</groupId>
         </dependency>

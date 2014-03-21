@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
+import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.TokenValidationException;
 import org.restlet.representation.Representation;
 
 import java.net.URI;
@@ -27,10 +29,10 @@ public interface TokenAuthenticationRequestDispatcher<T> {
      *
      * @param uri The URI against which the request should be dispatched. It is effectively a URL, but the Restlet ClientResource
      *            expects a URI, not a URL instance.
+     * @param authTarget Necessary to access the Map<String, Object> which can contain necessary context information - e.g. configured
+     *                   parameters for the targeted authN module. This reference can be null.
      * @param token The token which will be dispatched to the OpenAM authN context.
      * @return The state corresponding to a successful invocation.
-     * The Restlet ClientResource class throws a ResourceException - should probably put checked exception in signature.
-     * Also should be clear on the semantics of this throw - is it for every non-200 response? TODO
      */
-    Representation dispatch(URI uri, T token);
+    Representation dispatch(URI uri, AuthTargetMapping.AuthTarget authTarget, T token) throws TokenValidationException;
 }

@@ -17,16 +17,17 @@
 package org.forgerock.openam.sts;
 
 import org.apache.ws.security.WSConstants;
+import org.forgerock.json.resource.ResourceException;
 
 /**
  * This enum represents the types of transformed tokens.
  */
 public enum TokenType {
-    SAML2, USERNAME, OPENAM;
+    SAML2, USERNAME, OPENAM, OPENIDCONNECT;
 
     /**
      * Used to marshal the TokenType to a String recognized by TokenProvider implementations, in particular those
-     * provided in the CXF-STS. Not including USERNAME, as a UsernameToken is not a token type which token transformation
+     * provided in the CXF-STS. Not including USERNAME or OPEN_ID_CONNECT, as neither is not a token type which token transformation
      * will return.
      */
     public static String getProviderParametersTokenType(TokenType tokenType) throws TokenCreationException {
@@ -35,7 +36,8 @@ public enum TokenType {
         } else if (SAML2.equals(tokenType)) {
             return WSConstants.WSS_SAML2_TOKEN_TYPE;
         } else {
-            throw new TokenCreationException("The specified tokenType, " + tokenType.name() + ", is unknown.");
+            throw new TokenCreationException(ResourceException.BAD_REQUEST,
+                    "The specified tokenType, " + tokenType.name() + ", is unknown.");
         }
     }
 }

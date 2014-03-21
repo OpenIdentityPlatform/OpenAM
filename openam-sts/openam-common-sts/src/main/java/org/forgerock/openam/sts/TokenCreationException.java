@@ -16,17 +16,17 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.json.resource.ResourceException;
+
 /**
  * An instance of this exception is thrown for errors encountered during token creation.
  */
-public class TokenCreationException extends Exception {
-    //no exception without a cause/message
-    private TokenCreationException() {}
-    public TokenCreationException(String message) {
-        super(message);
+public class TokenCreationException extends ResourceException {
+    public TokenCreationException(int code, String message) {
+        super(code, message);
     }
-    public TokenCreationException(String message, Throwable cause) {
-        super(message, cause);
+    public TokenCreationException(int code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
 }

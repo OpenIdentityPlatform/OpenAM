@@ -16,18 +16,17 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.json.resource.ResourceException;
+
 /**
  * Thrown when error encountered marshalling tokens between json/xml.
  */
-public class TokenMarshalException extends Exception {
-    //no exception without a cause/message
-    private TokenMarshalException() {}
-
-    public TokenMarshalException(String message) {
-        super(message);
+public class TokenMarshalException extends ResourceException {
+    public TokenMarshalException(int code, String message) {
+        super(code, message);
     }
-    public TokenMarshalException(String message, Throwable cause) {
-        super(message, cause);
+    public TokenMarshalException(int code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
 }

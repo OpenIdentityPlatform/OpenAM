@@ -25,6 +25,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.*;
@@ -102,11 +103,11 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         } catch (IllegalArgumentException e) {
             String message = "The specified desiredTokenType, " + desiredStringTokenType + " is an unknown token type.";
             logger.warn(message);
-            throw new TokenValidationException(message);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         } catch (NullPointerException e) {
             String message = "Must specify a non-null desiredTokenType.";
             logger.warn(message);
-            throw new TokenValidationException(message);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
         TokenType inputTokenType = null;
         try {
@@ -114,7 +115,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         } catch (TokenMarshalException e) {
             String message = "Exception caught obtaining toke type from input token json: " + e.getMessage();
             logger.warn(message);
-            throw new TokenValidationException(message, e);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message, e);
         }
         TokenTransform targetedTransform = null;
         for (TokenTransform transform : tokenTransforms) {
@@ -127,7 +128,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             String message = "The desired transformation, from " + inputTokenType + " to " + desiredTokenType +
                     ", is not a supported token translation.";
             logger.warn(message);
-            throw new TokenValidationException(message);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
         ReceivedToken receivedToken = null;
         try {
@@ -135,7 +136,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         } catch (TokenMarshalException e) {
             String message = "Exception caught marshalling token request: " + e.getMessage();
             logger.warn(message);
-            throw new TokenValidationException(message, e);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message, e);
         }
         WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(httpContext, securityContext);
         TokenValidatorParameters validatorParameters = buildTokenValidatorParameters(receivedToken, webServiceContext);
@@ -147,7 +148,7 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         } catch (TokenMarshalException e) {
             String message = "Exception caught marshalling created token to string/json: " + e.getMessage();
             logger.warn(message);
-            throw new TokenCreationException(message, e);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message, e);
         }
     }
 

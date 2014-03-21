@@ -23,6 +23,7 @@ import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
@@ -66,27 +67,14 @@ public class TokenTransformImpl implements TokenTransform {
     public TokenProviderResponse transformToken(TokenValidatorParameters validatorParameters, TokenProviderParameters providerParameters)
             throws TokenValidationException, TokenCreationException {
         TokenValidatorResponse validatorResponse = null;
-        try {
-            validatorResponse = tokenValidator.validateToken(validatorParameters);
-        } catch (Exception e) {
-            String message = "Exception caught validating token of type " + inputTokenType + ". Exception: " + e;
-            logger.error(message, e);
-            throw new TokenValidationException(message, e);
-        }
+        validatorResponse = tokenValidator.validateToken(validatorParameters);
         if (ReceivedToken.STATE.VALID.equals(validatorResponse.getToken().getState())) {
             providerParameters.setPrincipal(validatorResponse.getPrincipal());
-            try {
-                return tokenProvider.createToken(providerParameters);
-            } catch (Exception e) {
-                String message = "Exception caught providing token of type " + outputTokenType + ". Exception: " + e;
-                logger.error(message, e);
-                throw new TokenCreationException(message, e);
-            }
+            return tokenProvider.createToken(providerParameters);
         } else {
-            //TODO - look into better error messages - i.e. does the ValidatorResponse contain anything?
             String message = "Validation of token of type " + inputTokenType + " failed.";
             logger.error(message);
-            throw new TokenValidationException(message);
+            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
     }
 

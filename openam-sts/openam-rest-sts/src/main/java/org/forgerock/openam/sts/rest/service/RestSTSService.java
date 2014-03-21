@@ -16,10 +16,12 @@
 
 package org.forgerock.openam.sts.rest.service;
 
+import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.RestSTS;
@@ -49,7 +51,6 @@ public class RestSTSService implements SingletonResourceProvider {
 
     public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         if (TRANSLATE.equals(request.getAction())) {
-            //TODO: do I have to check the context objects for null? Seems like Security and Http will always be present.
             SecurityContext securityContext = context.asContext(SecurityContext.class);
             HttpContext httpContext = context.asContext(HttpContext.class);
             String desiredTokenType = httpContext.getParameterAsString(DESIRED_TOKEN_TYPE); //TODO: in AMSTSConstants?
@@ -59,11 +60,23 @@ public class RestSTSService implements SingletonResourceProvider {
             try {
                 JsonValue result = restSts.translateToken(request.getContent(), desiredTokenType, httpContext, securityContext);
                 handler.handleResult(result);
-            } catch (TokenValidationException e) {
-                //TODO - proper error codes - perhaps propagate in the TokenValidationException and TokenCreationException
-                handler.handleError(new PermanentException(401, e.getMessage(), e));
-            } catch (TokenCreationException e) {
-                handler.handleError(new PermanentException(500, e.getMessage(), e));
+            } catch (ResourceException e) {
+                /*
+                This block entered for both TokenValidationException and TokenCreationException instances
+                 */
+                handler.handleError(e);
+            } catch (AMSTSRuntimeException e) {
+                /*
+                RuntimeException thrown by the AM implementation of CXF-STS-defined interfaces
+                 */
+                logger.error("AMSTSException caught in the RestSTSService: " + e, e);
+                handler.handleError(new InternalServerErrorException(e.getMessage()));
+            } catch (STSException e) {
+                /*
+                RuntimeException thrown by the CXF-STS engine
+                 */
+                logger.error("Unexpected: STSException caught in the RestSTSService: " + e, e);
+                handler.handleError(new InternalServerErrorException(e.getMessage()));
             }
         } else {
             handler.handleError(new BadRequestException("_action " + request.getAction() + " is not supported."));

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.rest.publish;
 
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.sts.STSInitializationException;
@@ -80,7 +81,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         published Routes in order to be able to remove them.
          */
         if (publishedRoutes.containsKey(subPath)) {
-            throw new STSInitializationException("A rest-sts instance at sub-path " + subPath + " has already been published.");
+            throw new STSInitializationException(ResourceException.BAD_REQUEST, "A rest-sts instance at sub-path " + subPath + " has already been published.");
         }
         Route route = router.addRoute(subPath, new RestSTSService(restSTSInstance, logger));
         /*

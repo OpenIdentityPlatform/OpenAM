@@ -79,7 +79,8 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
         try {
             resource.post(null);
         } catch (ResourceException e) {
-            throw new TokenCreationException("Exception caught in AM Session invalidation invocation: " + e.getMessage(), e);
+            throw new TokenCreationException(e.getStatus().getCode(),
+                    "Exception caught in AM Session invalidation invocation: " + e.getMessage(), e);
         }
     }
 }

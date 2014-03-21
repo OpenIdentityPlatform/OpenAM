@@ -41,7 +41,7 @@ public interface ThreadLocalAMTokenCache {
 
     /**
      *
-     * @return the OpenAM session id stored in the thread-local. An IllegalStateException is thrown if no value is set
+     * @return the OpenAM session id stored in the thread-local. A TokenCreationException is thrown if no value is set
      * in the thread-local.
      */
     String getAMToken() throws TokenCreationException;

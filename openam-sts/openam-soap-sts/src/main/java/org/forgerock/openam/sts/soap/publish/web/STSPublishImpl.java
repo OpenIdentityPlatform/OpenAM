@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.soap.publish.web;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
@@ -56,11 +57,7 @@ public class STSPublishImpl implements STSPublish {
 
     @Override
     public void publishSTSEndpoint(String uriElement, String securityPolicyBindingId, String amDeploymentUrl) throws STSInitializationException {
-        try {
-            publishSTS(uriElement, securityPolicyBindingId, amDeploymentUrl);
-        } catch (Exception e) {
-            throw new STSInitializationException(e.getMessage(), e);
-        }
+        publishSTS(uriElement, securityPolicyBindingId, amDeploymentUrl);
     }
 
     private void publishSTS(String uriElement, String securityPolicyBindingId, String amDeploymentUrl) throws STSInitializationException {
@@ -116,7 +113,7 @@ public class STSPublishImpl implements STSPublish {
                     .signatureKeyPassword("frstssrvpw".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                     .build();
         } catch (UnsupportedEncodingException e) {
-            throw new STSInitializationException("Unsupported encoding in creating KeystoreConfig instance:" + e, e);
+            throw new STSInitializationException(ResourceException.INTERNAL_ERROR, "Unsupported encoding in creating KeystoreConfig instance:" + e, e);
         }
 
         return SoapSTSInstanceConfig.builder()

@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 
 import com.google.inject.Inject;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.AuthTargetMapping;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
@@ -58,7 +59,7 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
     }
 
     @Override
-    public Representation dispatch(URI uri, X509Certificate[] certificates) {
+    public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) {
         //TODO: log if there is more than one cert - or do I just dispatch multiple requests, or ??  - for now, just log
         if (certificates.length > 1) {
             StringBuilder stringBuilder = new StringBuilder("Dealing with more than a single certificate. Their DNs:");

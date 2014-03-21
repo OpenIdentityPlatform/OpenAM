@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.token;
 
 
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 
 import javax.inject.Inject;
@@ -64,7 +65,7 @@ public class ThreadLocalAMTokenCacheImpl implements ThreadLocalAMTokenCache {
         String sessionId = sessionHolder.get();
         if (sessionId ==  null) {
             String message = "No sessionId cached in ThreadLocal. Illegal State!!";
-            throw new TokenCreationException(message);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message);
         }
         return sessionId;
     }

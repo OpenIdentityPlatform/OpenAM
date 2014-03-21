@@ -18,8 +18,10 @@ package org.forgerock.openam.sts.rest.marshal;
 
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 
 import javax.inject.Inject;
@@ -49,7 +51,8 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
     }
 
     @Override
-    public JsonValue marshalTokenResponse(TokenType desiredTokenType, TokenProviderResponse tokenProviderResponse) throws TokenMarshalException {
+    public JsonValue marshalTokenResponse(TokenType desiredTokenType, TokenProviderResponse tokenProviderResponse)
+            throws TokenMarshalException {
         if (TokenType.SAML2.equals(desiredTokenType)) {
             Transformer transformer = null;
             try {
@@ -59,14 +62,19 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
                 String token = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());
                 return json(object(field(ISSUED_TOKEN, token)));
             } catch (TransformerConfigurationException e) {
-                throw new TokenMarshalException("Could not marshall saml2 token to string: " + e.getMessage(), e);
+                throw new TokenMarshalException(ResourceException.INTERNAL_ERROR,
+                        "Could not marshall saml2 token to string: " + e.getMessage(), e);
             } catch (TransformerException e) {
-                throw new TokenMarshalException("Could not marshall saml2 token to string: " + e.getMessage(), e);
+                throw new TokenMarshalException(ResourceException.INTERNAL_ERROR,
+                        "Could not marshall saml2 token to string: " + e.getMessage(), e);
             }
         } else if (TokenType.OPENAM.equals(desiredTokenType)) {
             return json(object(field(ISSUED_TOKEN, elementBuilder.extractOpenAMSessionId(tokenProviderResponse.getToken()))));
+        } else if (TokenType.OPENIDCONNECT.equals(desiredTokenType)) {
+            return OpenIdConnectIdToken.fromXml(tokenProviderResponse.getToken()).toJson();
         } else {
-            throw new TokenMarshalException("Unexpected token type,  " + desiredTokenType + " passed to marshallTokenResponse");
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "Unexpected token type,  "
+                    + desiredTokenType + " passed to marshallTokenResponse");
         }
     }
 }

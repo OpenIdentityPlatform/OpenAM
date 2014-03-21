@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.ws.security.handler.RequestData;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenValidationException;
 
@@ -77,7 +78,7 @@ public class AMTokenCacheImpl implements AMTokenCache {
                     "ServletRequest cannot be obtained from Message. Type: " +
                     (servletRequestObject != null ? servletRequestObject.getClass().getCanonicalName() : null);
             logger.error(err);
-            throw new TokenValidationException(err);
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, err);
         }
         ((ServletRequest)servletRequestObject).setAttribute(AM_SESSION_ID_KEY, sessionId);
 /*
@@ -101,14 +102,14 @@ public class AMTokenCacheImpl implements AMTokenCache {
             String message = "Unexpected state in getAMSessionId: did not find ServletRequest, but class: " +
                     (servletRequestObject != null ? servletRequestObject.getClass().getCanonicalName() : null);
             logger.error(message);
-            throw new TokenCreationException(message);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message);
         }
         Object amSessionIdObject = ((ServletRequest)servletRequestObject).getAttribute(AM_SESSION_ID_KEY);
         if (!(amSessionIdObject instanceof String)) {
             String message = "Unexpected state in getAMSessionId: cached AM session id not string, but class: " +
                     (amSessionIdObject != null ? amSessionIdObject.getClass().getCanonicalName() : null);
             logger.error(message);
-            throw new TokenCreationException(message);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message);
         }
         return (String)amSessionIdObject;
     }

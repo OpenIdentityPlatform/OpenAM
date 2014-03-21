@@ -35,14 +35,41 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * See the org.forgerock.openam.forgerockrest.authn.core.AuthIndexType class for valid values for the authIndexType
  * below. The authIndexValue is the actual name of the service, module, etc. (for an authIndexType of "service" the
  * authIndexValue could be "ldapService").
+ *
+ * This class also allows for the creation of a Map<String, Object> to be associated with a given AuthTarget. This is
+ * required to provide some context to the TokenAuthenticationRequestDispatcher<T> responsible for dispatching the
+ * authentication request for token-type T to the OpenAM Rest authN context. For example the dispatcher for
+ * OpenIdConnectIdTokens must know what header name should reference the Id Token, a value dependant upon the value
+ * configured for the OpenAM OIDC authN module.
  */
 public class AuthTargetMapping {
+    public static final String AUTH_INDEX_TYPE = "authIndexType";
+    public static final String AUTH_INDEX_VALUE = "authIndexValue";
+    public static final String CONTEXT = "context";
+    public static final String COLON = " : ";
+    public static final String SEMICOLON = " ; ";
 
     public static class AuthTargetMappingBuilder {
         private final Map<Class<?>, AuthTarget> mappings = new HashMap<Class<?>, AuthTarget>();
 
+        /**
+         * Associates a particular token class with authIndexType and authIndexValue values. For the associated STS
+         * instance, the particular token type will be authenticated against the Rest authN context specified by the
+         * authIndexType and authIndexValue.
+         */
         public AuthTargetMappingBuilder addMapping(Class<?> tokenClass, String authIndexType, String authIndexValue)  {
             mappings.put(tokenClass, new AuthTarget(authIndexType, authIndexValue));
+            return this;
+        }
+
+        /**
+         * Associates a particular token class with authIndexType and authIndexValue values. For the associated STS
+         * instance, the particular token type will be authenticated against the Rest authN context specified by the
+         * authIndexType and authIndexValue. The context will provide state to the dispatcher of the authN request necessary
+         * by the associated authN module (e.g. the name of the header referencing the OpenID Connect ID Token).
+         */
+        public AuthTargetMappingBuilder addMapping(Class<?> tokenClass, String authIndexType, String authIndexValue, Map<String, Object> context)  {
+            mappings.put(tokenClass, new AuthTarget(authIndexType, authIndexValue, context));
             return this;
         }
 
@@ -54,13 +81,23 @@ public class AuthTargetMapping {
     public static class AuthTarget {
         private final String authIndexType;
         private final String authIndexValue;
+        private final Map<String, Object> context;
 
         AuthTarget(String authIndexType, String authIndexValue) {
+            this(authIndexType, authIndexValue, null);
+        }
+
+        AuthTarget(String authIndexType, String authIndexValue, Map<String, Object> context) {
             if ((authIndexType == null) || (authIndexValue == null)) {
-                throw new IllegalArgumentException("authIndexType or authIndexValue were null!");
+                throw new IllegalArgumentException(AUTH_INDEX_TYPE + " or " + AUTH_INDEX_VALUE + " were null!");
             }
             this.authIndexType = authIndexType;
             this.authIndexValue = authIndexValue;
+            if (context != null) {
+                this.context = Collections.unmodifiableMap(context);
+            } else {
+                this.context = null;
+            }
         }
 
         public String getAuthIndexType() {
@@ -71,32 +108,52 @@ public class AuthTargetMapping {
             return authIndexValue;
         }
 
+        public Map<String, Object> getContext() { return context; }
+
         @Override
         public String toString() {
-            return "AuthIndexType: " + authIndexType + "; AuthIndexValue: " + authIndexValue;
+            return AUTH_INDEX_TYPE + COLON + authIndexType + SEMICOLON + AUTH_INDEX_VALUE + COLON + authIndexValue +
+                    SEMICOLON + CONTEXT + COLON +(context != null ? context.toString() : null);
         }
 
         @Override
         public boolean equals(Object other) {
             if (other instanceof AuthTarget) {
                 AuthTarget otherTarget = (AuthTarget)other;
-                return authIndexType.equals(otherTarget.getAuthIndexType()) &&
+                if ((context == null) && (otherTarget.context == null)) {
+                    return authIndexType.equals(otherTarget.getAuthIndexType()) &&
                         authIndexValue.equals(otherTarget.getAuthIndexValue());
+                } else if ((context != null) && (otherTarget.context != null)) {
+                    return authIndexType.equals(otherTarget.getAuthIndexType()) &&
+                            authIndexValue.equals(otherTarget.getAuthIndexValue()) &&
+                            context.equals(otherTarget.context);
+                }
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-         return (authIndexType + authIndexValue).hashCode();
+            //does not have to include the map as the authIndexType and authIndex value should be unique
+            return (authIndexType + authIndexValue).hashCode();
         }
 
         JsonValue toJson() {
-            return json(object(field("authIndexType", authIndexType), field("authIndexValue", authIndexValue)));
+            if (context == null) {
+                return json(object(field(AUTH_INDEX_TYPE, authIndexType), field(AUTH_INDEX_VALUE, authIndexValue)));
+            } else {
+                return json(object(field(AUTH_INDEX_TYPE, authIndexType), field(AUTH_INDEX_VALUE, authIndexValue),
+                        field(CONTEXT, context)));
+            }
         }
 
         static AuthTarget fromJson(JsonValue json) {
-            return new AuthTarget(json.get("authIndexType").asString(), json.get("authIndexValue").asString());
+            if (json.get(CONTEXT) == null) {
+                return new AuthTarget(json.get(AUTH_INDEX_TYPE).asString(), json.get(AUTH_INDEX_VALUE).asString());
+            } else {
+                return new AuthTarget(json.get(AUTH_INDEX_TYPE).asString(),
+                        json.get(AUTH_INDEX_VALUE).asString(), json.get(CONTEXT).asMap());
+            }
         }
 
     }
@@ -152,9 +209,11 @@ public class AuthTargetMapping {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             try {
                 AuthTarget target = AuthTarget.fromJson(new JsonValue(entry.getValue()));
-                builder.addMapping(Class.forName(entry.getKey()), target.getAuthIndexType(), target.getAuthIndexValue());
+                builder.addMapping(Class.forName(entry.getKey()), target.getAuthIndexType(),
+                        target.getAuthIndexValue(), target.getContext());
             } catch (ClassNotFoundException e) {
-                throw new IllegalStateException("Could not fine class in AuthTargetMapping.fromJson corresponding to key: " + entry.getKey());
+                throw new IllegalStateException("Could not fine class in AuthTargetMapping.fromJson corresponding to key: "
+                        + entry.getKey());
             }
         }
         return builder.build();

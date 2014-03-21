@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.token.provider;
 
 import org.apache.ws.security.WSConstants;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.slf4j.Logger;
@@ -38,7 +39,8 @@ import java.io.ByteArrayOutputStream;
  * element to the original session id. This marshalling is necessary as the CXF-STS engine needs all issued tokens
  * to be in XML format, yet this xml format cannot be returned from the rest-sts.
  *
- * TODO: maybe rename to the OpenAMSessionIdMarshaller?
+ * TODO: maybe rename to the OpenAMSessionIdMarshaller? And maybe this should be put in the model directory as a token
+ * class, with XML marshalling methods
  */
 public class OpenAMSessionIdElementBuilderImpl implements OpenAMSessionIdElementBuilder {
     private final Logger logger;
@@ -54,7 +56,7 @@ public class OpenAMSessionIdElementBuilderImpl implements OpenAMSessionIdElement
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
-            throw new TokenMarshalException(e.getMessage(), e);
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
         Element rootElement = document.createElementNS(AMSTSConstants.AM_SESSION_ID_ELEMENT_NAMESPACE,
                 AMSTSConstants.AM_SESSION_ID_ELEMENT_NAME);
@@ -83,7 +85,8 @@ public class OpenAMSessionIdElementBuilderImpl implements OpenAMSessionIdElement
             } catch (Exception e) {
                 logger.error("exception caught marshalling unexpected token type to string: " + e);
             }
-            throw new TokenMarshalException("Not dealing with an OpenAM session token: "  + tokenString);
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                    "Not dealing with an OpenAM session token: "  + tokenString);
         }
     }
 }

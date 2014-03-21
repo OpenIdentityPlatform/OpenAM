@@ -19,17 +19,30 @@ package org.forgerock.openam.sts.rest.operation;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
+import org.forgerock.openam.sts.token.AMTokenParser;
+import org.forgerock.openam.sts.token.AMTokenParserImpl;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
+import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
+import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
+import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
+import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
@@ -53,6 +66,15 @@ public class TokenTransformFactoryImplTest {
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
             bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
             bind(TokenTransformFactory.class).to(TokenTransformFactoryImpl.class);
+            bind(PrincipalFromSession.class).to(PrincipalFromSessionImpl.class);
+            bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken>>(){})
+                    .to(OpenIdConnectAuthenticationRequestDispatcher.class);
+            bind(new TypeLiteral<AuthenticationHandler<OpenIdConnectIdToken>>(){})
+                    .to(new TypeLiteral<AuthenticationHandlerImpl<OpenIdConnectIdToken>>() {
+                    });
+            bind(AuthenticationUriProvider.class)
+                    .to(AuthenticationUriProviderImpl.class);
+            bind(AMTokenParser.class).to(AMTokenParserImpl.class);
         }
 
         @Provides
@@ -82,6 +104,17 @@ public class TokenTransformFactoryImplTest {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
 
+        @Provides
+        @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
+        String restAuthnUriElement() {
+            return "cho_mama";
+        }
+
+        @Provides
+        AuthTargetMapping authTargetMapping() {
+            return AuthTargetMapping.builder().addMapping(String.class, "index_type", "index_value").build();
+        }
+
     }
 
     @BeforeTest
@@ -101,6 +134,10 @@ public class TokenTransformFactoryImplTest {
         assertTrue(transform.isTransformSupported(TokenType.OPENAM, TokenType.SAML2));
         assertFalse(transform.isTransformSupported(TokenType.USERNAME, TokenType.SAML2));
 
+        ttc = new TokenTransformConfig(TokenType.OPENIDCONNECT, TokenType.SAML2, INVALIDATE_INTERIM_AM_SESSIONS);
+        transform = transformFactory.buildTokenTransform(ttc);
+        assertTrue(transform.isTransformSupported(TokenType.OPENIDCONNECT, TokenType.SAML2));
+        assertFalse(transform.isTransformSupported(TokenType.USERNAME, TokenType.SAML2));
     }
 
     @Test(expectedExceptions = STSInitializationException.class)

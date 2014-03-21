@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.token.validator.wss.uri;
 
 import org.apache.ws.security.handler.RequestData;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
@@ -78,7 +79,7 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
         try {
             return new URI(stringBuilder.toString());
         } catch (URISyntaxException e) {
-            throw new TokenValidationException(e.getMessage(), e);
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
     }
 }

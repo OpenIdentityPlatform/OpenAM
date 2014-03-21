@@ -27,6 +27,7 @@ import org.apache.cxf.sts.token.renewer.TokenRenewer;
 import org.apache.cxf.sts.token.validator.SAMLTokenValidator;
 import org.apache.cxf.sts.token.validator.UsernameTokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidator;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
@@ -34,6 +35,7 @@ import org.forgerock.openam.sts.token.provider.AMTokenProvider;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.AMTokenValidator;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.slf4j.Logger;
 
 /**
@@ -41,41 +43,23 @@ import org.slf4j.Logger;
  * plugged-into the top-level operation classes corresponding to the fundamental operations defined in WS-Trust.
  */
 public class TokenOperationFactoryImpl implements TokenOperationFactory {
-    private final String amDeploymentUrl;
-    private final String jsonRestRoot;
-    private final String realm;
     private final Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider;
     private final Provider<AMTokenProvider> amTokenProviderProvider;
-    private final String restLogoutUriElement;
-    private final String idFromSessionUriElement;
-    private final String amSessionCookieName;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
-    private final UrlConstituentCatenator urlConstituentCatenator;
+    private final PrincipalFromSession principalFromSession;
     private final Logger logger;
 
     @Inject
     public TokenOperationFactoryImpl(
-            @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
-            @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestRoot,
-            @Named (AMSTSConstants.REALM) String realm,
             Provider<org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator> wssUsernameTokenValidatorProvider,
             Provider<AMTokenProvider> amTokenProviderProvider,
-            @Named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT) String restLogoutUriElement,
-            @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT) String idFromSessionUriElement,
-            @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
-            UrlConstituentCatenator urlConstituentCatenator,
+            PrincipalFromSession principalFromSession,
             Logger logger) {
-        this.amDeploymentUrl = amDeploymentUrl;
-        this.jsonRestRoot = jsonRestRoot;
-        this.realm = realm;
         this.wssUsernameTokenValidatorProvider = wssUsernameTokenValidatorProvider;
         this.amTokenProviderProvider = amTokenProviderProvider;
-        this.restLogoutUriElement = restLogoutUriElement;
-        this.idFromSessionUriElement = idFromSessionUriElement;
-        this.amSessionCookieName = amSessionCookieName;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
-        this.urlConstituentCatenator = urlConstituentCatenator;
+        this.principalFromSession = principalFromSession;
         this.logger = logger;
     }
     /**
@@ -100,7 +84,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             validator.setValidator(wssUsernameTokenValidatorProvider.get());
             return validator;
         } else {
-            throw new STSInitializationException("In TokenOperationFactory, unknown TokenType provided to obtain status TokenValidator: "
+            throw new STSInitializationException(ResourceException.BAD_REQUEST, "In TokenOperationFactory, unknown TokenType provided to obtain status TokenValidator: "
                     + tokenType);
         }
     }
@@ -128,7 +112,7 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         if (TokenType.OPENAM.equals(outputTokenType)) {
             return amTokenProviderProvider.get();
         }
-        throw new STSInitializationException("Unhandled outputTokenType specified in " +
+        throw new STSInitializationException(ResourceException.BAD_REQUEST, "Unhandled outputTokenType specified in " +
                 "getTokenProviderForTransformOperation. OutputTokenType: " + outputTokenType);
     }
 
@@ -138,7 +122,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             return new SAMLTokenProvider();
         } else {
             //we are only supporting issuing SAML tokens at this point.
-            throw new STSInitializationException("In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
+            throw new STSInitializationException(ResourceException.BAD_REQUEST,
+                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenProvider: "
                     + tokenType);
         }
     }
@@ -150,7 +135,8 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
         } else if (TokenType.OPENAM.equals(tokenType)) {
             return buildAMTokenValidator();
         } else {
-            throw new STSInitializationException("In TokenOperationFactory, unknown TokenType provided to obtain TokenValidator: "
+            throw new STSInitializationException(ResourceException.BAD_REQUEST,
+                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenValidator: "
                     + tokenType);
         }
     }
@@ -168,13 +154,13 @@ public class TokenOperationFactoryImpl implements TokenOperationFactory {
             samlTokenRenewer.setVerifyProofOfPossession(false);
             return samlTokenRenewer;
         } else {
-            throw new STSInitializationException("In TokenOperationFactory, unknown TokenType provided to obtain TokenRenewer: "
+            throw new STSInitializationException(ResourceException.BAD_REQUEST,
+                    "In TokenOperationFactory, unknown TokenType provided to obtain TokenRenewer: "
                     + tokenType);
         }
     }
 
     private AMTokenValidator buildAMTokenValidator() {
-        return new AMTokenValidator(amDeploymentUrl, jsonRestRoot, realm, idFromSessionUriElement, amSessionCookieName,
-                threadLocalAMTokenCache, urlConstituentCatenator, logger);
+        return new AMTokenValidator(threadLocalAMTokenCache, principalFromSession, logger);
     }
 }

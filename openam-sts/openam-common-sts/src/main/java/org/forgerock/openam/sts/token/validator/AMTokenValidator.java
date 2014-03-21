@@ -24,6 +24,7 @@ import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -46,32 +47,28 @@ import java.security.Principal;
 import java.util.Map;
 import org.slf4j.Logger;
 
+/**
+ * Validates OpenAM tokens by making a Rest call to OpenAM to obtain the principal corresponding to the session id. Part
+ * of establishing this correlation in OpenAM includes determining that the session id is valid. This class is not in the
+ * wss package, and is not implemented via classes in the disp and uri packages because it is not explicitly consuming
+ * the OpenAM Rest authN context, but rather consumes a standard OpenAM Rest interface to correlate a session id to a
+ * principal.
+ *
+ * TODO: it may make sense to move the actual token validation into the wss abstraction set - i.e. create a
+ * TokenAuthenticationRequestDispatcher<TokenClassSpecificToOpenAMSessionId> and the corresponding AuthenticationHandler, and have
+ * this class encapsulate that instance, and delegate authN to it.
+ */
 public class AMTokenValidator implements TokenValidator {
-    private static final String TRUE = "true";
-    private static final String ID = "id";
-    private final String amDeploymentUri;
-    private final String amJsonRestBase;
-    private final String realm;
-    private final String amRestIdFromSessionUriElement;
-    private final String amSessionCookieName;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
-    private final String sessionToUsernameUrl;
-    private final UrlConstituentCatenator urlConstituentCatenator;
+    private final PrincipalFromSession principalFromSession;
     private final Logger logger;
 
     /*
     The lifecycle for this class is controlled by the TokenOperationFactoryImpl, and thus needs no @Inject.
      */
-    public AMTokenValidator(String amDeploymentUri, String amJsonRestBase, String realm, String amRestIdFromSessionUriElement, String amSessionCookieName,
-                            ThreadLocalAMTokenCache threadLocalAMTokenCache, UrlConstituentCatenator urlConstituentCatenator, Logger logger) {
-        this.amDeploymentUri = amDeploymentUri;
-        this.amJsonRestBase = amJsonRestBase;
-        this.realm = realm;
-        this.amRestIdFromSessionUriElement = amRestIdFromSessionUriElement;
-        sessionToUsernameUrl = amDeploymentUri + amRestIdFromSessionUriElement;
-        this.amSessionCookieName = amSessionCookieName;
+    public AMTokenValidator(ThreadLocalAMTokenCache threadLocalAMTokenCache, PrincipalFromSession principalFromSession, Logger logger) {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
-        this.urlConstituentCatenator = urlConstituentCatenator;
+        this.principalFromSession = principalFromSession;
         this.logger = logger;
     }
 
@@ -91,7 +88,6 @@ public class AMTokenValidator implements TokenValidator {
 
     @Override
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
-        logger.debug("canHandleToken called with a realm of " + realm);
         return canHandleToken(validateTarget);
     }
 
@@ -104,27 +100,13 @@ public class AMTokenValidator implements TokenValidator {
         try {
             String sessionId = parseSessionIdFromRequest(tokenParameters.getToken());
             threadLocalAMTokenCache.cacheAMToken(sessionId);
-            Principal principal = obtainPrincipalFromSession(constitutePrincipalFromSessionUrl(), sessionId);
+            Principal principal = principalFromSession.getPrincipalFromSession(sessionId);
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);
         } catch (Exception e) {
             logger.info("Exception caught obtaining principal from session id: " + e, e);
         }
         return response;
-    }
-
-    /**
-     * Creates the String representing the url at which the principal id from session token functionality can be
-     * consumed.
-     * @return A String representing the url of OpenAM's Restful principal from session id service
-     */
-    private String constitutePrincipalFromSessionUrl() {
-        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUri, amJsonRestBase));
-        if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
-        }
-        sb = urlConstituentCatenator.catentateUrlConstituent(sb, amRestIdFromSessionUriElement);
-        return sb.toString();
     }
 
     private String parseSessionIdFromRequest(ReceivedToken receivedToken) throws TokenCreationException {
@@ -142,9 +124,9 @@ public class AMTokenValidator implements TokenValidator {
                             "not the following token element: " +
                             new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());
                     logger.error(message);
-                    throw new TokenCreationException(message);
+                    throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message);
                 } catch (Exception e) {
-                    throw new TokenCreationException("Unexpected state: should be dealing with a DOM Element defining an " +
+                    throw new TokenCreationException(ResourceException.INTERNAL_ERROR, "Unexpected state: should be dealing with a DOM Element defining an " +
                             "AM Session, but this is not the case.");
                 }
             }
@@ -152,46 +134,7 @@ public class AMTokenValidator implements TokenValidator {
             String message = "Unexpected state in AMTokenValidator: validated token of unexpected type: " +
                     (token != null ? token.getClass().getCanonicalName() : null);
             logger.error(message);
-            throw new TokenCreationException(message);
-        }
-    }
-
-    /*
-    TODO: it may well be that the name of the Principal should not just correspond to the id of the subject whose authentication
-    the session represents, but any given (user configured) attribute that the user wants to pull from this particular principal.
-    And will there always be a id? Obviously if we are authenticating via LDAP, but what if the sessionId corresponds to some other
-    type of authentication?
-     */
-    private Principal obtainPrincipalFromSession(String sessionToUsernameUrl, String sessionId) throws TokenCreationException {
-        logger.debug("sessionToUsernameUrl: " + sessionToUsernameUrl);
-        ClientResource resource = new ClientResource(sessionToUsernameUrl);
-        resource.setFollowingRedirects(false);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
-        headers.set(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
-        headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-        headers.set(AMSTSConstants.ACCEPT, AMSTSConstants.APPLICATION_JSON);
-        //TODO: this throws the unchecked ResourceException - catch and rethrow as checked exception, or ??
-        Representation representation = resource.post(null);
-        Map<String,Object> responseAsMap = null;
-        try {
-            //TODO: do I want to do some buffered reading on the representation, instead of pulling it all into a String via the getText call?
-            //could run into memory issues if the return value is gigantic - but this is not the case for the given call, so...
-            responseAsMap = new ObjectMapper().readValue(representation.getText(),
-                    new TypeReference<Map<String,Object>>() {});
-        } catch (IOException ioe) {
-            String message = "Exception caught getting the text of idFromSession response: " + ioe;
-            logger.error(message, ioe);
-            throw new TokenCreationException(message, ioe);
-        }
-        String principalName = (String)responseAsMap.get(ID);
-        if ((principalName != null) && !principalName.isEmpty()) {
-            return new STSPrincipal(principalName);
-        } else {
-            throw new TokenCreationException("id returned from idFromSession is null or empty. The returned value: " + principalName);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message);
         }
     }
 }

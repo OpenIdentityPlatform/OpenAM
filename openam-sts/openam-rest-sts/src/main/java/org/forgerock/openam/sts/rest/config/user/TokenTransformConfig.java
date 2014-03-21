@@ -76,9 +76,9 @@ public class TokenTransformConfig {
     public String toString() {
         return new StringBuilder("inputTokenType: ")
                 .append(inputTokenType.name())
-                .append(";outputTokenType: ")
+                .append("; outputTokenType: ")
                 .append(outputTokenType.name())
-                .append("invalidateInterimimOpenAMSession: ")
+                .append("; invalidateInterimimOpenAMSession: ")
                 .append(invalidateInterimOpenAMSession)
                 .toString();
     }

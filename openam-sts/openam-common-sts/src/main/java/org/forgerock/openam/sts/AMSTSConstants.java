@@ -198,4 +198,21 @@ public class AMSTSConstants {
      */
     public static final String REST_STS_CONNECTION_FACTORY_NAME = "rest_sts_connection_factory_name";
 
+    /*
+    used to identify the key referencing the OIDC ID Token in both the json and xml representation of the OIDC ID Token
+     */
+    public static final String OPEN_ID_CONNECT_ID_TOKEN_KEY = "oidc_id_token";
+
+    /*
+    The namespace of the DOM Element used to communicate an OpenID Connect ID Token. Yes, it is strange to provide an XML
+    representation of a token which is only defined in json, but the CXF-STS engine handles only tokens defined in xml.
+     */
+    public static final String OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE="http://forgerock.org/token/type/OpenAM/oidc_id_token";
+
+    /*
+    When validating OIDC ID Tokens, the OpenAM authN module needs to be configured with the header which will reference
+    the Id token. This value needs to be set in the context map associated with the AuthTargetMapping corresponding to
+    the token transformation which takes the OIDC token as input.
+     */
+    public static final String OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY = "oidc_id_token_auth_target_header_key";
 }

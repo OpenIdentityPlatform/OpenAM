@@ -71,7 +71,7 @@ public class RestSTSInstanceConfigTest {
     }
 
     @Test
-    public void testJsonStringMarhalling() throws IOException {
+    public void testJsonStringMarshalling() throws IOException {
         RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam");
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
@@ -146,6 +146,10 @@ public class RestSTSInstanceConfigTest {
                         TokenType.OPENAM,
                         TokenType.SAML2,
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .addSupportedTokenTranslation(
+                        TokenType.OPENIDCONNECT,
+                        TokenType.SAML2,
+                        AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .build();
     }
 

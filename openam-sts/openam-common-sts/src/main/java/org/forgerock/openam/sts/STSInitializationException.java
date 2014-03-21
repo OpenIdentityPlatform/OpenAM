@@ -16,17 +16,17 @@
 
 package org.forgerock.openam.sts;
 
+import org.forgerock.json.resource.ResourceException;
+
 /**
  * An instance of this exception is thrown for all errors encountered in the process of initializing and deploying an
  * STS instance.
  */
-public class STSInitializationException extends Exception {
-    //no exception without a cause/message
-    private STSInitializationException() {}
-    public STSInitializationException(String message) {
-        super(message);
+public class STSInitializationException extends ResourceException {
+    public STSInitializationException(int code, String message) {
+        super(code, message);
     }
-    public STSInitializationException(String message, Throwable cause) {
-        super(message, cause);
+    public STSInitializationException(int code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 }
