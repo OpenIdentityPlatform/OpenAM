@@ -50,7 +50,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.1</version>
     </parent>
 
     <!-- Component Definition -->
@@ -372,9 +372,9 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-        <url>http://sources.forgerock.org/browse/openam/trunk</url>
+        <url>https://svn.forgerock.org/openam/fr-branches/11.0.x/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/fr-branches/11.0.x/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/fr-branches/11.0.x/</developerConnection>
     </scm>
 
     <!-- Dependency Management -->
@@ -1611,8 +1611,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <updateBranchVersions>true</updateBranchVersions>
+                    <tagBase>https://svn.forgerock.org/openam/fr-tags</tagBase>
+                    <releaseProfiles>release,forgerock-release</releaseProfiles>
                 </configuration>
             </plugin>
 
