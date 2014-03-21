@@ -410,7 +410,21 @@
     <primary>Authentication</primary>
     <secondary>Adaptive risk</secondary>
    </indexterm>
-   
+
+   <para>
+    When the Adaptive Risk module relies on the client IP address,
+    and OpenAM lies behind a load balancer or proxy layer,
+    configure the load balancer or proxy to send the address
+    by using the <literal>X-Forwarded-For</literal> header,
+    and configure OpenAM to consume and forward the header as necessary.
+    For details, see the <citetitle>Installation Guide</citetitle> section,
+    <link
+     xlink:show="new"
+     xlink:href="install-guide#handle-request-headers"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Handling HTTP Request Headers</citetitle></link>.
+   </para>
+
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthAdaptiveService</literal></para>
    
@@ -3831,6 +3845,20 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
               </listitem>
           </varlistentry>
       </variablelist>
+
+      <para>
+       When the Persistent Cookie module enforces the client IP address,
+       and OpenAM lies behind a load balancer or proxy layer,
+       configure the load balancer or proxy to send the address
+       by using the <literal>X-Forwarded-For</literal> header,
+       and configure OpenAM to consume and forward the header as necessary.
+       For details, see the <citetitle>Installation Guide</citetitle> section,
+       <link
+        xlink:show="new"
+        xlink:href="install-guide#handle-request-headers"
+        xlink:role="http://docbook.org/xlink/role/olink"
+       ><citetitle>Handling HTTP Request Headers</citetitle></link>.
+      </para>
 
       <para>The Persistent Cookie module belongs with a second module in an authentication chain. To see how
       this works, navigate to Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Authentication &gt; New.

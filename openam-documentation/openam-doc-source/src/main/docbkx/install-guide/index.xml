@@ -70,6 +70,7 @@
 
  <xinclude:include href='chap-install-core.xml' />
  <xinclude:include href='chap-install-tools.xml' />
+ <xinclude:include href='chap-install-multiple.xml' />
  <xinclude:include href='chap-install-das.xml' />
  <xinclude:include href='chap-custom-ui.xml' />
  <xinclude:include href='chap-cts.xml' />

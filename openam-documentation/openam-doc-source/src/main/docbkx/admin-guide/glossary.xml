@@ -20,15 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <glossary xml:id='openam-glossary'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>OpenAM Glossary</title>
 
  <glossentry>
@@ -453,7 +452,7 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Session failover</glossterm>
+  <glossterm>Session failover (SFO)</glossterm>
   <glossdef>
    <para>Capability to allow another OpenAM server to manage a session when
    the OpenAM server that initially authenticated the principal goes
@@ -482,6 +481,26 @@
   <glossdef>
    <para>Capability allowing a principal to authenticate once and gain access
    to multiple applications without authenticating again</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Site</glossterm>
+  <glossdef>
+   <para>
+    Group of OpenAM servers configured the same way,
+    accessed through a load balancer layer
+   </para>
+
+   <para>
+    The load balancer handles failover to provide service-level availability.
+    Use sticky load balancing based on <literal>amlbcookie</literal> values
+    to minimize cross-talk in the site.
+   </para>
+
+   <para>
+    The load balancer can also be used to protect OpenAM services.
+   </para>
   </glossdef>
  </glossentry>
 

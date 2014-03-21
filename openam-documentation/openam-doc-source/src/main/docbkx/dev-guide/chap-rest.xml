@@ -115,7 +115,7 @@
 / is replaced with _
 = is replaced with .
 @ is replaced with *
-# is repalced with *
+# is replaced with *
 * (first instance) is replaced with @
 * (subsequent instances) is replaced with #</programlisting>
 
@@ -154,6 +154,22 @@
     <para>See <xref linkend="rest-api-auth-legacy" /> below.</para>
    </listitem>
   </itemizedlist>
+
+  <tip>
+   <para>
+    When authentication depends on the client IP address,
+    and OpenAM lies behind a load balancer or proxy layer,
+    configure the load balancer or proxy to send the address
+    by using the <literal>X-Forwarded-For</literal> header,
+    and configure OpenAM to consume and forward the header as necessary.
+    For details, see the <citetitle>Installation Guide</citetitle> section,
+    <link
+    xlink:show="new"
+    xlink:href="install-guide#handle-request-headers"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Handling HTTP Request Headers</citetitle></link>.
+   </para>
+  </tip>
 
   <section xml:id="rest-api-auth-json">
    <title>Authentication &amp; Logout</title>
