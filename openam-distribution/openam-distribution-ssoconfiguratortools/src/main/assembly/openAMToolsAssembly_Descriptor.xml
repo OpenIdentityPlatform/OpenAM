@@ -34,17 +34,16 @@
 
     <dependencySets>
         <dependencySet>
-            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>com.google.inject:guice</include>
+                <include>com.google.inject:guice:jar:no_aop</include>
                 <include>org.forgerock.commons:forgerock-guice-core</include>
                 <include>org.forgerock.openam:openam-license-manager-cli</include>
                 <include>javax.inject:javax.inject</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:slf4j-nop</include>
                 <include>commons-lang:commons-lang</include>
-                <include>aopalliance:aopalliance</include>
                 <include>org.forgerock.openam:openam-tools</include>
                 <include>org.forgerock.openam:openam-license-core</include>
                 <include>org.forgerock.openam:openam-installer-utils</include>

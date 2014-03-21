@@ -132,7 +132,7 @@
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
         <guice.version>3.0</guice.version>
-        <forgerock.guice.version>1.0.0</forgerock.guice.version>
+        <forgerock.guice.version>1.0.1</forgerock.guice.version>
         <slf4j.api.version>1.7.5</slf4j.api.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
@@ -1546,11 +1546,25 @@
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
+                <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
+                <classifier>no_aop</classifier>
+                <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.google.inject.extensions</groupId>
                 <artifactId>guice-multibindings</artifactId>
                 <version>${guice.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.inject</groupId>
+                        <artifactId>guice</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
