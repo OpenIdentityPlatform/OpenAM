@@ -21,6 +21,7 @@
   ! CCPL HEADER END
   !
   !      Copyright 2013-2014 ForgeRock AS
+  !      Copyright 2014 Nomura Research Institute, Ltd
   !    
 -->
 <chapter xml:id='chap-openid-connect'
@@ -320,8 +321,8 @@
     the profile to match the client configuration.</para>
 
     <para>In order to read and edit the client configuration dynamically later
-    without using OpenAM console, be sure to set an access token in the field
-    titled, "The access token used to update the client."</para>
+    without using OpenAM console, be sure to set an access token in the Access
+    Token field.</para>
    </step>
   </procedure>
 
