@@ -362,14 +362,10 @@ public class AuthClientUtils {
     public static Hashtable parseRequestParameters(
         HttpServletRequest request) {
 
-        Enumeration requestEnum = request.getParameterNames();
-
-        return (decodeHash(request,requestEnum));
-
+    	return (decodeHash(request));
     }
 
-    private static Hashtable decodeHash(
-        HttpServletRequest request, Enumeration names) {
+    private static Hashtable decodeHash(HttpServletRequest request) {
 
         Hashtable data = new Hashtable();
         String clientEncoding = request.getCharacterEncoding();
@@ -379,12 +375,14 @@ public class AuthClientUtils {
                     + clientEncoding
                     + ", encoding=" + encoding);
         }
+        @SuppressWarnings("unchecked")
+        Enumeration<String> names = request.getParameterNames();
         String encoded = request.getParameter("encoded");
         if(encoded == null){
         	encoded = "false"; 
         }
         while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
+            String name = names.nextElement();
             String value = request.getParameter(name);
             if(name.equalsIgnoreCase("SunQueryParamsString")){
                 // This will nornally be the case when browser back button is 
