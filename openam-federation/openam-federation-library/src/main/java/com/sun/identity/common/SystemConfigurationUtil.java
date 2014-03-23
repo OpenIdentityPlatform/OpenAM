@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.common;
@@ -506,48 +506,49 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
                 event.getConfigurationName() + ", component name = " +
                 event.getComponentName() + ", realm = " + event.getRealm());
         }
-        update();
+
+        try {
+            update();
+        } catch (ConfigurationException ex) {
+            getDebug().error("SystemConfigurationUtil.configChanged: ", ex);
+        }
     }
 
-    private static synchronized void update() {
-        try {
-            Map avPairs = platformConfig.getConfiguration(null, null);
-            if ((avPairs == null) || avPairs.isEmpty()) {
+    private static synchronized void update() throws ConfigurationException {
+        Map avPairs = platformConfig.getConfiguration(null, null);
+        if ((avPairs == null) || avPairs.isEmpty()) {
+            authenticationURL = null;
+            cookieDomains = Collections.EMPTY_LIST;
+            serverList = Collections.EMPTY_LIST;
+            serverToIdTable = null;
+            idToServerTable = null;
+        } else {
+            Set values = (Set)avPairs.get(Constants.ATTR_LOGIN_URL);
+            if ((values == null) || values.isEmpty()) {
                 authenticationURL = null;
-                cookieDomains = Collections.EMPTY_LIST;
-                serverList = Collections.EMPTY_LIST;
-                serverToIdTable = null;
-                idToServerTable = null;
             } else {
-                Set values = (Set)avPairs.get(Constants.ATTR_LOGIN_URL);
-                if ((values == null) || values.isEmpty()) {
-                    authenticationURL = null;
-                } else {
-                    authenticationURL = (String)values.iterator().next();
-                }
-
-                values =(Set)avPairs.get(Constants.ATTR_COOKIE_DOMAINS);
-                if ((values == null) || values.isEmpty()) {
-                    cookieDomains = Collections.EMPTY_LIST;
-                } else {
-                    cookieDomains = new ArrayList();
-                    cookieDomains.addAll(values);
-                }
-
-                Set<String> servers = (Set)avPairs.get(Constants.PLATFORM_LIST);
-                Set<String> sites = (Set)avPairs.get(Constants.SITE_LIST);
-
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("SystemConfigUtil.update: " +
-                        "servers=" + servers);
-                    getDebug().message("SystemConfigUtil.update: " +
-                        "sites=" + sites);
-                }
-
-                storeServerAndSiteList(servers, sites);
+                authenticationURL = (String)values.iterator().next();
             }
-        } catch (ConfigurationException ex) {
-            getDebug().error("SystemConfigurationUtil.update:", ex);
+
+            values =(Set)avPairs.get(Constants.ATTR_COOKIE_DOMAINS);
+            if ((values == null) || values.isEmpty()) {
+                cookieDomains = Collections.EMPTY_LIST;
+            } else {
+                cookieDomains = new ArrayList();
+                cookieDomains.addAll(values);
+            }
+
+            Set<String> servers = (Set)avPairs.get(Constants.PLATFORM_LIST);
+            Set<String> sites = (Set)avPairs.get(Constants.SITE_LIST);
+
+            if (getDebug().messageEnabled()) {
+                getDebug().message("SystemConfigUtil.update: " +
+                    "servers=" + servers);
+                getDebug().message("SystemConfigUtil.update: " +
+                    "sites=" + sites);
+            }
+
+            storeServerAndSiteList(servers, sites);
         }
     }
 
@@ -563,7 +564,7 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
             platformConfig.addListener(new SystemConfigurationUtil());
 
         } catch (ConfigurationException cex) {
-            getDebug().error("SystemConfigurationUtil.static: unable to get " +
+            getDebug().error("SystemConfigurationUtil.initPlatformNaming: unable to get " +
                 "platform configuration.", cex);
         }
 
@@ -571,12 +572,16 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
             namingConfig =
                 ConfigurationManager.getConfigurationInstance(SVC_NAMING);
         } catch (ConfigurationException cex) {
-            getDebug().error("SystemConfigurationUtil.static: unable to get " +
+            getDebug().error("SystemConfigurationUtil.initPlatformNaming: unable to get " +
                 "naming configuration.", cex);
         }
-        update();
-
-        platformNamingInitialized = true;
+        
+        try {
+            update();
+            platformNamingInitialized = true;
+        } catch (ConfigurationException ex) {
+            getDebug().error("SystemConfigurationUtil.initPlatformNaming: ", ex);
+        }
     }
 
     /**

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.sm;
@@ -287,7 +287,6 @@ public class ServiceConfig {
      */
     public ServiceConfig getSubConfig(String subConfigName)
             throws SSOException, SMSException {
-        validateServiceConfigImpl();
         ServiceConfigImpl sci = sc.getSubConfig(token, subConfigName);
         return ((sci == null) ? null : new ServiceConfig(scm, sci));
     }
