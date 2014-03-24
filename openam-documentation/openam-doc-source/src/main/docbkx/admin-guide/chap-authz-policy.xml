@@ -552,18 +552,6 @@
        </listitem>
 
        <listitem>
-        <para>
-         OAuth2 Scope lets you make the policy depend on
-         whether the specified OAuth 2.0 scope names are part of the environment
-         for the authorization request.
-        </para>
-t
-        <para>
-
-        </para>
-       </listitem>
-
-       <listitem>
         <para>Resource/Environment/IP Address lets you make the policy apply
         using a complex condition such as whether the user is making a request
         from the localhost and has authenticated with the LDAP authentication
