@@ -180,21 +180,22 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
      */
     private static final boolean PROPAGATE_EXCEPTIONS = false;
 
-    public OAuth2ProviderSettingsImpl(Request request) {
-        HttpServletRequest req = ServletUtils.getRequest(request);
-        initializeClass(req);
+    public OAuth2ProviderSettingsImpl(final HttpServletRequest request) {
+        final String deploymentUrl = OAuth2Utils.getDeploymentURL(request);
+        final String realm = OAuth2Utils.getRealm(request);
+        initializeClass(deploymentUrl, realm);
     }
 
-    public OAuth2ProviderSettingsImpl(HttpServletRequest request) {
-        initializeClass(request);
+    public OAuth2ProviderSettingsImpl(final String deploymentUrl, final String realm) {
+        initializeClass(deploymentUrl, realm);
     }
 
-    private void initializeClass(HttpServletRequest request){
+    private void initializeClass(final String deploymentUrl, final String realm) {
 
-        deploymentUrl = OAuth2Utils.getDeploymentURL(request);
-        realm = OAuth2Utils.getRealm(request);
-        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-        ServiceConfigManager serviceConfigManager = null;
+        this.deploymentUrl = deploymentUrl;
+        this.realm = realm;
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final ServiceConfigManager serviceConfigManager;
         try {
             serviceConfigManager = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
         } catch (Exception e) {
@@ -211,7 +212,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     private void initializeSettings(boolean propagateException) {
-        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
         try {
             initializeSettings(propagateException, new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION));
         } catch (Exception e) {

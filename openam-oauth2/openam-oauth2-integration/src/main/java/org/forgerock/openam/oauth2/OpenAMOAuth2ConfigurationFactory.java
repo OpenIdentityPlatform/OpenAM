@@ -62,6 +62,24 @@ import java.util.Set;
 
 public class OpenAMOAuth2ConfigurationFactory implements OAuth2ConfigurationFactory {
 
+    private enum OAuth2ProviderSettingsHolder {
+        INSTANCE;
+
+        private final Map<String, OAuth2ProviderSettings> oAuth2ProviderSettingsMap =
+                new HashMap<String, OAuth2ProviderSettings>();
+
+        private static OAuth2ProviderSettings getInstance(final String deploymentUrl, final String realm) {
+            synchronized (INSTANCE.oAuth2ProviderSettingsMap) {
+                OAuth2ProviderSettings oAuth2ProviderSettings = INSTANCE.oAuth2ProviderSettingsMap.get(realm);
+                if (oAuth2ProviderSettings == null) {
+                    oAuth2ProviderSettings = new OAuth2ProviderSettingsImpl(deploymentUrl, realm);
+                    INSTANCE.oAuth2ProviderSettingsMap.put(realm, oAuth2ProviderSettings);
+                }
+                return oAuth2ProviderSettings;
+            }
+        }
+    }
+
     public static OAuth2ConfigurationFactory getOAuth2ConfigurationFactory() {
         return new OpenAMOAuth2ConfigurationFactory();
     }
@@ -79,7 +97,9 @@ public class OpenAMOAuth2ConfigurationFactory implements OAuth2ConfigurationFact
     }
 
     public OAuth2ProviderSettings getOAuth2ProviderSettings(final Request request) {
-        return new OAuth2ProviderSettingsImpl(request);
+        final String deploymentUrl = OAuth2Utils.getDeploymentURL(request);
+        final String realm = OAuth2Utils.getRealm(request);
+        return OAuth2ProviderSettingsHolder.getInstance(deploymentUrl, realm);
     }
 
     public ServerAuthorizer getServerAuthorizer() {
