@@ -28,6 +28,7 @@ import org.forgerock.openam.forgerockrest.IdentityResource;
 import org.forgerock.openam.forgerockrest.RealmResource;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
+import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.guice.core.InjectorHolder;
@@ -190,6 +191,7 @@ public final class RestEndpointGuiceProvider {
             collectionResourceEndpoints.addBinding(RestEndpointManager.TOKENS)
                     .toProvider(CoreTokenResourceProvider.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.SERVER_INFO).to(ServerInfoResource.class);
+            collectionResourceEndpoints.addBinding(RestEndpointManager.ENTITLEMENTS).to(EntitlementsResource.class);
 
             return collectionResourceEndpoints;
         }

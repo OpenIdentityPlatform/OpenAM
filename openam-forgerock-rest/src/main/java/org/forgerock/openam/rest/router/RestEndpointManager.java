@@ -69,6 +69,11 @@ public interface RestEndpointManager {
     String AUTHENTICATE = "/authenticate";
 
     /**
+     * The entitlements service endpoint.
+     */
+    String ENTITLEMENTS = "/entitlements";
+
+    /**
      * Determines whether the given token matches one of the registered endpoints.
      *
      * @param token The token to check.
