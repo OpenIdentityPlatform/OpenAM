@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
-                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
 
  <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
@@ -98,7 +99,7 @@ Agreement (yes/no): [no]:</screen>
 <screen>Do you accept the license? yes</screen>
       <para>For scripted or silent installs, you can modify the
        <command>setup</command> or <command>setup.bat</command> script
-       with the addition of the <sbr/><option>--acceptLicense</option> option.
+       with the addition of the <option>--acceptLicense</option> option.
        Simply append the option to the end of the script as follows:</para>
        <programlisting>$JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
  -D"path.AMConfig=$path_AMConfig" -D"path.debug=$path_debug" \
@@ -138,6 +139,24 @@ Agreement (yes/no): [no]:</screen>
     to which the cookie was issued.
    </para>
   </listitem>
+
+  <listitem><!-- AME-2972 -->
+    <para>
+     <emphasis role="bold">CREST Policy Filter Rules</emphasis>.
+     OpenAM now provides supports CREST Policy Filter rules
+     that simplify the configuration to protect ForgeRock common REST APIs.
+    </para>
+
+    <para>
+     For instructions on configuration a CREST Policy Filter rule, see
+     <link
+      xlink:show="new"
+      xlink:href="admin-guide#define-crest-policy-rules"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Define CREST Policy Filter Rules</citetitle></link>
+     in the <citetitle>Administration Guide</citetitle>.
+    </para>
+   </listitem>
 
   <listitem>
     <para>
