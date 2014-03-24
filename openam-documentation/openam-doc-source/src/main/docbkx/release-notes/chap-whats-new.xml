@@ -143,7 +143,7 @@ Agreement (yes/no): [no]:</screen>
   <listitem><!-- AME-2972 -->
     <para>
      <emphasis role="bold">CREST Policy Filter Rules</emphasis>.
-     OpenAM now provides supports CREST Policy Filter rules
+     OpenAM now supports CREST Policy Filter rules
      that simplify the configuration to protect ForgeRock common REST APIs.
     </para>
 
