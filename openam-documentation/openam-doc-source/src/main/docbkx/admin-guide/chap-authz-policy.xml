@@ -159,8 +159,27 @@
    conditions, and response providers.</para>
    
    <itemizedlist>
-    <para>OpenAM has, by default, three kinds of resources that you can protect
-    with a policy.</para>
+    <para>
+     By default OpenAM has four kinds of resources that you can protect with a policy.
+    </para>
+
+    <listitem>
+     <para>
+      A <firstterm>CREST Policy Filter</firstterm> protects
+      a ForgeRock Commons REST API that applications use
+      to create, read, update, delete, and patch resources,
+      and also to perform queries on resource collections
+      as well as pre-defined actions on resources or resource collections.
+      Your policy protects access for each of these operations.
+     </para>
+
+     <para>
+      When creating rules for a CREST Policy Filter,
+      see <xref linkend="define-crest-policy-rules" />
+      in addition to the steps in this procedure.
+     </para>
+    </listitem>
+
     <listitem>
      <para>A <firstterm>Discovery Service</firstterm>, used in federated access
      management, locates the web service providing the data needed to complete
@@ -586,6 +605,56 @@
    </step>
    <step>
     <para>Save your work.</para>
+   </step>
+  </procedure>
+
+  <procedure xml:id="define-crest-policy-rules">
+   <title>To Define CREST Policy Filter Rules</title>
+
+   <para>
+    CREST Policy Filter rules make it easier to write a policy
+    for a ForgeRock common REST API.
+    CREST Policy Filter rules match the ForgeRock common REST requests:
+    create, read, update, delete, patch, action, and query.
+   </para>
+
+   <step>
+    <para>
+     When editing a policy, click New in the Rules table.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Select CREST Policy Filter (with resource name) for the new rule,
+     and then click Next.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Name the rule and set a Resource name
+     as described in <xref linkend="define-rules" />.
+    </para>
+
+    <para>
+     Some requests take query string parameters, and others do not,
+     so you might want to create more than one CREST Policy Filter rule
+     for each CREST API to protect.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     For each CREST request type, select the request type
+     and then set whether to Allow or Deny requests according to the policy.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Click Finish to save your rule.
+    </para>
    </step>
   </procedure>
  </section>

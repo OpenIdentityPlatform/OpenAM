@@ -657,7 +657,10 @@ boolean=true</screen>
     </listitem>
 
     <listitem>
-     <para><literal>application=iPlanetAMWebAgentService</literal></para>
+     <para>
+      <literal>application=iPlanetAMWebAgentService</literal>
+      or <literal>application=crestPolicyService</literal>
+     </para>
     </listitem>
 
     <listitem>
