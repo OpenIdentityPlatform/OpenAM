@@ -128,7 +128,7 @@
         <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${serverDocTargetVersion}.jar]]></ssoconfigUpgradeJarFile>
         <serveronlyWarFile><![CDATA[OpenAM-ServerOnly-${serverDocTargetVersion}.war]]></serveronlyWarFile>
         <configJarFile><![CDATA[openam-distribution-configurator-${serverDocTargetVersion}.jar]]></configJarFile>
-        <oauth2JarFile><![CDATA[openam-oauth2-common-${serverDocTargetVersion}.jar]]></oauth2JarFile>
+        <oauth2JarFile><![CDATA[oauth2-core-${serverDocTargetVersion}.jar]]></oauth2JarFile>
 
         <opendjDocBase>http://docs.forgerock.org/en/opendj/${opendj.server.version}</opendjDocBase>
 

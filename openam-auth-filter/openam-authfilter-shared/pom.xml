@@ -39,11 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-integration</artifactId>
+            <artifactId>openam-oauth2</artifactId>
         </dependency>
     </dependencies>
 

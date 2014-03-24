@@ -23,7 +23,7 @@ import org.forgerock.authz.modules.oauth2.OAuth2AccessTokenValidator;
 import org.forgerock.authz.modules.oauth2.OAuth2Exception;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;

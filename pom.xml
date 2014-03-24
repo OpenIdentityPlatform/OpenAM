@@ -254,6 +254,7 @@
         <module>openam-oauth</module>
 
         <!-- OpenAM OAuth2 Token Service -->
+        <module>openam-oauth2-common</module>
         <module>openam-oauth2</module>
 
         <module>openam-common-auth-ui</module>
@@ -624,27 +625,17 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-common</artifactId>
+                <artifactId>openam-oauth2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-integration</artifactId>
+                <artifactId>oauth2-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-main</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-openam-extension</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-restlet-extension</artifactId>
+                <artifactId>oauth2-restlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -19,7 +19,7 @@ package org.forgerock.openam.authz.modules;
 import org.forgerock.authz.modules.oauth2.AccessTokenValidationResponse;
 import org.forgerock.authz.modules.oauth2.OAuth2Exception;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.utils.Config;
 import org.testng.annotations.BeforeMethod;

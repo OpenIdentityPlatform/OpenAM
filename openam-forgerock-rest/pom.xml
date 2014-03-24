@@ -136,7 +136,7 @@
         <!-- OAuth2 Dependencies -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-integration</artifactId>
+            <artifactId>openam-oauth2</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->

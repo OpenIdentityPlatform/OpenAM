@@ -32,7 +32,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;

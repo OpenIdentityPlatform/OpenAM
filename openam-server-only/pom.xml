@@ -614,23 +614,19 @@
         <!-- Oauth2 dependencies -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-restlet-extension</artifactId>
+            <artifactId>oauth2-core</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-openam-extension</artifactId>
+            <artifactId>oauth2-restlet</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-main</artifactId>
+            <artifactId>openam-oauth2</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-common</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest-sts</artifactId>

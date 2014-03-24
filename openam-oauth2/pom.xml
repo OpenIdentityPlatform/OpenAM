@@ -34,23 +34,69 @@
     </parent>
 
     <artifactId>openam-oauth2</artifactId>
-    <packaging>pom</packaging>
 
     <name>OpenAM OAuth2</name>
-
-    <modules>
-        <!-- Common OAuth2 modules -->
-        <module>openam-oauth2-common</module>
-        <module>openam-oauth2-restlet-extension</module>
-        <module>openam-oauth2-main</module>
-
-        <!-- OpenAM Specific OAuth2 modules -->
-        <module>openam-oauth2-integration</module>
-        <module>openam-oauth2-openam-extension</module>
-    </modules>
+    <description></description><!-- TODO -->
 
     <properties>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
+        <skipTests>true</skipTests>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>oauth2-restlet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet</artifactId>
+        </dependency>
+
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+
+        <!-- Powermock -->
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-reflect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+        </dependency>
+    </dependencies>
 </project>
