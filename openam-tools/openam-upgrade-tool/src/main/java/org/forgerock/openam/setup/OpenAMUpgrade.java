@@ -147,7 +147,8 @@ public class OpenAMUpgrade {
         BufferedReader br = null;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(openAmURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade");
+            URL url = new URL(openAmURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade&acceptLicense="
+                    + acceptLicense);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setUseCaches(false);
