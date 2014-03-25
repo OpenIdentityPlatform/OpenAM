@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2010-2014 ForgeRock AS
+ */
 package com.iplanet.services.util;
 
 import java.io.BufferedReader;
@@ -339,6 +342,12 @@ public class Crypt {
         // object for every call. Its a trade off b/w CPU and mem usage.
         encData = Base64.decode(encoded.trim());
 
+        //The return value of Base64.decode can be null
+        //if the value isn't divisible by 4. (i.e. corrupted).
+        if (encData == null) {
+            return null;
+        }
+        
         // Decrypt the data
         byte[] rawData = encr.decrypt(encData);
         if (rawData == null) {
