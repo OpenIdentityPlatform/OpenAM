@@ -1026,7 +1026,13 @@ public class LoginViewBean extends AuthViewBeanBase {
                     processLoginDisplay();
                 } else {
                     addLoginCallbackMessage(callbacks);
-                    AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    if (!LoginFail) {
+                        //if the login already failed, then LoginState is already
+                        //nullified, hence any attempt of calling this method
+                        //the errormessage/code/template should be already set
+                        //so a proper error page is shown.
+                        AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    }
                 }
             } else {
                 if (loginDebug.messageEnabled()) {
@@ -1396,7 +1402,13 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                     
                     addLoginCallbackMessage(callbacks);
-                    AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    if (!LoginFail) {
+                        //if the login already failed, then LoginState is already
+                        //nullified, hence any attempt of calling this method
+                        //the errormessage/code/template should be already set
+                        //so a proper error page is shown.
+                        AuthUtils.setCallbacksPerState(ac, pageState, callbacks);
+                    }
                 } else {
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
