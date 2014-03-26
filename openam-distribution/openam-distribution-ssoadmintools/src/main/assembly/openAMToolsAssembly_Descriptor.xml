@@ -89,7 +89,7 @@
     <fileSets>
 
         <fileSet>
-            <outputDirectory></outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>${project.basedir}/../../license</directory>
             <includes>
                 <include>**/**</include>

@@ -60,6 +60,13 @@
     <!-- Single Files -->
     <fileSets>
         <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.basedir}/../../license</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/src/main/assembly/config</directory>
             <outputDirectory></outputDirectory>
             <filtered>true</filtered>
