@@ -677,14 +677,6 @@ boolean=true</screen>
      where <replaceable>time-zone</replaceable> is from Java
      <literal>TimeZone.getTimeZone().getID()</literal>. The
      <literal>env</literal> parameters thus express conditions.</para>
-
-     <para>
-      In order to express a condition that specifies OAuth 2.0 scopes,
-      set the value of the parameter
-      to <literal>scope=<replaceable>scopes</replaceable></literal>.
-      To set scopes to <literal>openid</literal> and <literal>profile</literal>,
-      use <literal>env=scope%3Dopenid%20profile</literal> for example.
-     </para>
     </listitem>
    </itemizedlist>
 
