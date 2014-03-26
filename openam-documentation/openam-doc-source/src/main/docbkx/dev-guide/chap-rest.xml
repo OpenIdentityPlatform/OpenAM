@@ -563,7 +563,7 @@ userdetails.attribute.name=uid
 userdetails.attribute.value=bjensen
 userdetails.attribute.name=mail
 userdetails.attribute.value=bjensen@example.com</screen>
-  
+
   <para>When retrieving attributes, you can refresh the session thus setting
   the idle time to 0, by adding the boolean parameter
   <literal>refresh=true</literal> to the query string.</para>
@@ -577,6 +577,43 @@ userdetails.token.id=
 userdetails.attribute.name=cn
 userdetails.attribute.value=Babs Jensen
 userdetails.attribute.value=Barbara Jensen</screen>
+
+  <para>
+   You can specify the following attributes to retrieve information
+   about the user's session time limits and current session:
+   <literal>maxsessiontime</literal> (maximum length of a session),
+   <literal>maxidletime</literal> (maximum idle time allowed during a session),
+   <literal>idletime</literal> (actual idle time during the current session),
+   <literal>timeleft</literal> (actual time left in session).
+   The unit for maximum times is minutes.
+   The unit for actual times is seconds.
+  </para>
+
+  <para>
+   Also use the parameter <literal>refresh=false</literal>
+   to avoid changing the <literal>idletime</literal> with your request.
+  </para>
+
+  <screen>
+$ <userinput>curl \
+--data "subjectid=AQIC5w....*AAJTSQACMDE.*\
+ &amp;attributenames=idletime\
+ &amp;attributenames=maxidletime\
+ &amp;attributenames=timeleft\
+ &amp;attributenames=maxsessiontime\
+ &amp;refresh=false" \
+ https://openam.example.com:8443/openam/identity/attributes</userinput>
+
+userdetails.token.id=AQIC5w....*AAJTSQACMDE.*
+userdetails.attribute.name=maxsessiontime
+userdetails.attribute.value=120
+userdetails.attribute.name=maxidletime
+userdetails.attribute.value=30
+userdetails.attribute.name=idletime
+userdetails.attribute.value=664
+userdetails.attribute.name=timeleft
+userdetails.attribute.value=6319
+   </screen>
 
  </section>
  
