@@ -32,8 +32,8 @@ public class OpenIdConnectGuiceModule extends AbstractModule {
      property relating to http connect/read timeouts, available during OpenAM startup, which could be leveraged to
      configure these values?
      */
-    private static final int RESOLVER_FACTORY_CONNECT_TIMEOUT_MILLIS = 5000;
-    private static final int RESOLVER_FACTORY_READ_TIMEOUT_MILLIS = 5000;
+    static final int RESOLVER_FACTORY_CONNECT_TIMEOUT_MILLIS = 5000;
+    static final int RESOLVER_FACTORY_READ_TIMEOUT_MILLIS = 5000;
 
     @Override
     protected void configure() {

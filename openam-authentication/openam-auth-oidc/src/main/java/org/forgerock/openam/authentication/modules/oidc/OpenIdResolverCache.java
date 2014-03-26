@@ -25,28 +25,30 @@ import java.net.URL;
  * Interface consumed by the OpenIdConnect authN module. It provides thread-safe access and creation to OpenIdResolver
  * instances, the interface defining the verification of OpenID Connect ID Tokens. Fundamentally, OpenIdResolver instances
  * may need to pull web-based key state to verify ID Tokens, and the latency of this initialization should not be incurred
- * by each instantiation of the OpenIdConnect authN module. This interface defines a concern that ultimately relates to
- * the memoization of OpenIdResolver instances.
+ * by each instantiation of the OpenIdConnect authN module.
  */
 public interface OpenIdResolverCache {
     /**
-     * @param issuer The issuer (iss claim) for the OpenID Connect ID Token jwt
+     * @param cryptoContextDefinitionValue Either the discovery url, jwk url, or client_secret used to configure the authN module.
+     *                                     This value is the key into the Map of OpenIdResolver instances.
      * @return The OpenIdResolver instance which can validate jwts issued by the specified issuer. If no issuer has
      * been configured, null will be returned.
      */
-    OpenIdResolver getResolverForIssuer(String issuer);
+    OpenIdResolver getResolverForIssuer(String cryptoContextDefinitionValue);
 
     /**
-     * @param  issuer The string corresponding to the issuer. This information is present in the OIDC discovery data, but
-     *                because it is possible that the OpenIdResolverCache is called concurrently to create the same OpenIdResolver,
-     *                the issuer String will allow the implementation to short-circuit concurrent calls if the desired state
-     *                has already been created by a previous call.
-     * @param wellKnownProviderUrl The url referencing the json object defining the OIDC discovery data
-     *                             (http://openid.net/specs/openid-connect-discovery-1_0-21.html) defining the specifics
-     *                             of a particular OIDC Provider
+     * @param  issuerFromJwk The string corresponding to the issuer. This information is present in the OIDC discovery data, but
+     *                it is used to insure that the issuer string configured for the login module, and the issuer string
+     *                pulled from the configuration url, match.
+     * @param cryptoContextType Identifies the manner in which the crypto context was defined (discovery url, jwk url, or client_secret)
+     * @param cryptoContextValue The specific value of the discovery url, jwk url, or client_secret
+     * @param cryptoContextValueUrl If the cryptoContextType corresponds to the discovery or jwk url, the URL format of the
+     *                              string. Passed so that the implementation does not need to handle the MalformedURLException
      * @return The OpenIdResolver instantiated with this OIDC discovery data.
-     * @throws IllegalStateException if the issuer parameter does not match the discovery document referenced by url.
-     *         FailedToLoadJWKException If the jwk descriptor could not be loaded from url referenced in config url
+     * @throws IllegalStateException if the issuer parameter does not match the discovery document referenced by the discovery url.
+     *         FailedToLoadJWKException If the jwk descriptor could not be loaded from url referenced by the discovery or jwk url
+     *         IllegalArgumentException if the cryptoContextType specification is unknown
      */
-    OpenIdResolver createResolver(String issuer, URL wellKnownProviderUrl) throws IllegalStateException, FailedToLoadJWKException;
+    OpenIdResolver createResolver(String issuerFromJwk, String cryptoContextType, String cryptoContextValue, URL cryptoContextValueUrl)
+            throws FailedToLoadJWKException;
 }

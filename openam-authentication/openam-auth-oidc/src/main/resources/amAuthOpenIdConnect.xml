@@ -26,28 +26,84 @@
                 i18nKey="openidconnect-service-description">
 
             <Organization>
+                <AttributeSchema name="RequiredValueValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-header-name"
-                                 type="single" syntax="string" i18nKey="header_name">
+                                 type="single" syntax="string" i18nKey="header_name"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>oidc_id_token</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                 type="single" syntax="string" i18nKey="issuer_name">
+                                 type="single" syntax="string" i18nKey="issuer_name"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>accounts.google.com</Value>
+                    </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="openam-auth-openidconnect-configuration-url"
-                                 type="single" syntax="string" i18nKey="configuration_url">
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                 type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                 validator="RequiredValueValidator">
+                    <ChoiceValues>
+                        <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                        <ChoiceValue>jwk_url</ChoiceValue>
+                        <ChoiceValue>client_secret</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>.well-known/openid-configuration_url</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                 type="single" syntax="string" i18nKey="crypto_context_value"
+                                 validator="RequiredValueValidator">
                     <DefaultValues>
                         <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="RequiredValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-header-name"
-                                     type="single" syntax="string" i18nKey="header_name">
+                                     type="single" syntax="string" i18nKey="header_name"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>oidc_id_token</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-issuer-name"
-                                     type="single" syntax="string" i18nKey="issuer_name">
+                                     type="single" syntax="string" i18nKey="issuer_name"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>accounts.google.com</Value>
+                        </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="openam-auth-openidconnect-configuration-url"
-                                     type="single" syntax="string" i18nKey="configuration_url">
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                     type="single_choice" syntax="string" i18nKey="crypto_context_type"
+                                     validator="RequiredValueValidator">
+                        <ChoiceValues>
+                            <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                            <ChoiceValue>jwk_url</ChoiceValue>
+                            <ChoiceValue>client_secret</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>.well-known/openid-configuration_url</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                     type="single" syntax="string" i18nKey="crypto_context_value"
+                                     validator="RequiredValueValidator">
                         <DefaultValues>
                             <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                         </DefaultValues>

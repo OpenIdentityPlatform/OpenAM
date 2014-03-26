@@ -37,24 +37,44 @@ public class OpenIdResolverCacheImpl implements OpenIdResolverCache {
         resolverMap = new ConcurrentHashMap<String, OpenIdResolver>();
     }
 
-    public OpenIdResolver getResolverForIssuer(String issuer) {
-        return resolverMap.get(issuer);
+    public OpenIdResolver getResolverForIssuer(String cryptoContextDefinitionValue) {
+        return resolverMap.get(cryptoContextDefinitionValue);
     }
 
-    /*
+    /**
     It is possible that two callers are calling this method at once. I want to leverage the uncontested reads
     of the ConcurrentHashMap, and I don't want to synchronize the writes to the ConcurrentHashMap above the
     synchronization applied by the CHM in puts. The drawback of this approach is the possible redundant creation of
-    a OpenIdResolver if two concurrent calls target the currently-uncreated OpenIdResolver.
+    a OpenIdResolver if two concurrent calls target the currently-uncreated OpenIdResolver, but the redundant creation will
+    only occur once.
+     @see org.forgerock.openam.authentication.modules.oidc.OpenIdResolverCache
      */
-    public OpenIdResolver createResolver(String issuer, URL wellKnownProviderUrl) throws IllegalStateException, FailedToLoadJWKException {
-        OpenIdResolver newResolver = openIdResolverFactory.createFromOpenIDConfigUrl(wellKnownProviderUrl);
-        if (!issuer.equals(newResolver.getIssuer())) {
-            throw new IllegalStateException("The specified issuer, " + issuer + ", does not match the issuer, "
-                    + newResolver.getIssuer() + " referenced by the configuration url, " + wellKnownProviderUrl.toString());
+    @Override
+    public OpenIdResolver createResolver(String issuerFromJwk, String cryptoContextType, String cryptoContextValue,
+                                         URL cryptoContextValueUrl) throws FailedToLoadJWKException {
+        OpenIdResolver newResolver = null;
+        if (OpenIdConnect.CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(cryptoContextType)) {
+            newResolver = openIdResolverFactory.createSharedSecretResolver(issuerFromJwk, cryptoContextValue);
+        } else if (OpenIdConnect.CRYPTO_CONTEXT_TYPE_CONFIG_URL.equals(cryptoContextType)) {
+            newResolver = openIdResolverFactory.createFromOpenIDConfigUrl(cryptoContextValueUrl);
+            //check is only relevant in this block, as issuer is specified in the json blob referenced by url.
+            if (!issuerFromJwk.equals(newResolver.getIssuer())) {
+                throw new IllegalStateException("The specified issuer, " + issuerFromJwk + ", does not match the issuer, "
+                        + newResolver.getIssuer() + " referenced by the configuration url, " + cryptoContextValue);
+            }
+        } else if (OpenIdConnect.CRYPTO_CONTEXT_TYPE_JWK_URL.equals(cryptoContextType)) {
+            newResolver = openIdResolverFactory.createJWKResolver(issuerFromJwk, cryptoContextValueUrl,
+                    OpenIdConnectGuiceModule.RESOLVER_FACTORY_READ_TIMEOUT_MILLIS,
+                    OpenIdConnectGuiceModule.RESOLVER_FACTORY_CONNECT_TIMEOUT_MILLIS);
+        } else {
+            /*
+            Should not enter this block, as the cryptoContextType was validated to be of the three expected types in
+            OpenIdModule.init, but all bases should be covered. This exception is not caught by the OpenIdConnect caller.
+             */
+            throw new IllegalArgumentException("The specified cryptoContextType, " + cryptoContextType + " was unexpected!");
         }
         OpenIdResolver oldResolver = null;
-        if ((oldResolver = resolverMap.putIfAbsent(issuer, newResolver)) != null) {
+        if ((oldResolver = resolverMap.putIfAbsent(cryptoContextValue, newResolver)) != null) {
             return oldResolver;
         }
         return newResolver;

@@ -41,23 +41,50 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.Map;
 
+/**
+ * Because the OpenIdResolver instances, responsible for validating ID Tokens for a given issuer, require pulling
+ * url state to initialize, I want to cache these instances once created. This raises concerns of cache coherence, especially
+ * if the OpenIdResolvers are mapped with the issuer key, which could be the same for different OIDC ID Token providers
+ * (at least nothing in the specs was found that mandate this uniqueness, and nothing enforces this uniqueness either).
+ * So the OpenIdResolver instances will be mapped with unique keys corresponding to their crypto context - so either:
+ * 1. the .well-known/openid-connect configuration url or 2. the jwk url or 3. the client_secret. Caching the OpenIdResolvers
+ * with keys unique to a given crypto context excludes the cache conflict resulting from multiple OpenIdConnect modules
+ * being created with the same issuer name (previously, the issuer name was used as the cache key). This will allow
+ * for the definition of multiple OpenIdConnect modules with the same name, and if these multiple modules reference the
+ * same crypto state with this name (e.g. they share the same config url, jwk url, or client_secret), a single cache entry
+ * will satisfy both, as the cache key defines the crypto context. Likewise, if multiple OpenIdConnect instances are created
+ * with the same issuer name, but different crypto context, cache entries will exist for both, as the respective OpenIdResolver
+ * instances are cached with a key corresponding to the crypto context. And because the authN framework insures that a given
+ * OpenIdConnect instance is initialized with the appropriate configuration state, it will be possible to determine which cache key to use,
+ * as each module will be created with the specification of only a single crypto context (config url, jwk url, or client_secret).
+ * Finally, I will validate the configured issuer name against the iss field in the ID Token jwk, so I can catch scenarios
+ * where a ID Token is dispatched for validation against the wrong, or incorrectly configured, OpenIdConnect module.
+ */
 public class OpenIdConnect extends AMLoginModule {
     private static Debug logger = Debug.getInstance("amAuth");
 
     private static final String RESOURCE_BUNDLE_NAME = "amAuthOpenIdConnect";
     private static final String HEADER_NAME_KEY = "openam-auth-openidconnect-header-name";
     private static final String ISSUER_NAME_KEY = "openam-auth-openidconnect-issuer-name";
-    private static final String CONFIGURATION_URL_KEY = "openam-auth-openidconnect-configuration-url";
+    private static final String CRYPTO_CONTEXT_TYPE_KEY = "openam-auth-openidconnect-crypto-context-type";
+    private static final String CRYPTO_CONTEXT_VALUE_KEY = "openam-auth-openidconnect-crypto-context-value";
+
+    static final String CRYPTO_CONTEXT_TYPE_CONFIG_URL = ".well-known/openid-configuration_url";
+    static final String CRYPTO_CONTEXT_TYPE_JWK_URL = "jwk_url";
+    static final String CRYPTO_CONTEXT_TYPE_CLIENT_SECRET = "client_secret";
 
     private static final String BUNDLE_KEY_VERIFICATION_FAILED = "verification_failed";
     private static final String BUNDLE_KEY_ISSUER_MISMATCH = "issuer_mismatch";
+    private static final String BUNDLE_KEY_TOKEN_ISSUER_MISMATCH = "token_issuer_mismatch";
     private static final String BUNDLE_KEY_JWT_PARSE_ERROR = "jwt_parse_error";
     private static final String BUNDLE_KEY_MISSING_HEADER = "missing_header";
     private static final String BUNDLE_KEY_JWK_NOT_LOADED = "jwk_not_loaded";
 
     private String headerName;
-    private String clientId;
-    private URL configurationUrl;
+    private String configuredIssuer;
+    private String cryptoContextType;
+    private String cryptoContextValue;
+    private URL cryptoContextUrlValue;
     private OpenIdResolverCache openIdResolverCache;
     private JwtReconstruction jwtReconstruction;
 
@@ -65,17 +92,25 @@ public class OpenIdConnect extends AMLoginModule {
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         headerName = CollectionHelper.getMapAttr(options, HEADER_NAME_KEY);
-        clientId = CollectionHelper.getMapAttr(options, ISSUER_NAME_KEY);
-        String configurationUrlString = CollectionHelper.getMapAttr(options, CONFIGURATION_URL_KEY);
+        configuredIssuer = CollectionHelper.getMapAttr(options, ISSUER_NAME_KEY);
+        cryptoContextType = CollectionHelper.getMapAttr(options, CRYPTO_CONTEXT_TYPE_KEY);
+        cryptoContextValue = CollectionHelper.getMapAttr(options, CRYPTO_CONTEXT_VALUE_KEY);
         Reject.ifNull(headerName, HEADER_NAME_KEY + " must be set in LoginModule options.");
-        Reject.ifNull(clientId, ISSUER_NAME_KEY + " must be set in LoginModule options.");
-        Reject.ifNull(configurationUrlString, CONFIGURATION_URL_KEY + " must be set in LoginModule options.");
-        try {
-            configurationUrl = new URL(configurationUrlString);
-        } catch (MalformedURLException e) {
-            final String message = "The provider configuration string, " + configurationUrlString + " is not in valid URL format: " + e;
-            logger.error(message, e);
-            throw new IllegalArgumentException(message);
+        Reject.ifNull(configuredIssuer, ISSUER_NAME_KEY + " must be set in LoginModule options.");
+        Reject.ifNull(cryptoContextType, CRYPTO_CONTEXT_TYPE_KEY + " must be set in LoginModule options.");
+        Reject.ifNull(cryptoContextValue, CRYPTO_CONTEXT_VALUE_KEY + " must be set in LoginModule options.");
+        Reject.ifFalse(CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(cryptoContextType) ||
+                CRYPTO_CONTEXT_TYPE_JWK_URL.equals(cryptoContextType) ||
+                CRYPTO_CONTEXT_TYPE_CONFIG_URL.equals(cryptoContextType), "The value corresponding to key " +
+                CRYPTO_CONTEXT_TYPE_KEY + " does not correspond to an expected value. Its value:" + cryptoContextType);
+        if (CRYPTO_CONTEXT_TYPE_CONFIG_URL.equals(cryptoContextType) || CRYPTO_CONTEXT_TYPE_JWK_URL.equals(cryptoContextType)) {
+            try {
+                cryptoContextUrlValue = new URL(cryptoContextValue);
+            } catch (MalformedURLException e) {
+                final String message = "The crypto context value string, " + cryptoContextValue + " is not in valid URL format: " + e;
+                logger.error(message, e);
+                throw new IllegalArgumentException(message);
+            }
         }
         openIdResolverCache = InjectorHolder.getInstance(OpenIdResolverCache.class);
         Reject.ifNull(openIdResolverCache, "OpenIdResolverCache could not be obtained from the InjectorHolder!");
@@ -85,7 +120,8 @@ public class OpenIdConnect extends AMLoginModule {
     @Override
     public int process(Callback[] callbacks, int state) throws LoginException {
         /*
-        See if a resolver is present corresponding to jwt issuer, and if not, add. Then dispatch validation to resolver.
+        See if a resolver is present corresponding to jwt issuer, and if not, add.
+        Then dispatch validation to resolver.
          */
         final HttpServletRequest request = getHttpServletRequest();
         final String jwtValue = request.getHeader(headerName);
@@ -106,22 +142,34 @@ public class OpenIdConnect extends AMLoginModule {
         }
 
         final JwtClaimsSet jwtClaimSet = retrievedJwt.getClaimsSet();
-        final String issuer = jwtClaimSet.getIssuer();
-        OpenIdResolver resolver = openIdResolverCache.getResolverForIssuer(issuer);
+        final String jwtClaimSetIssuer = jwtClaimSet.getIssuer();
+        if (!configuredIssuer.equals(jwtClaimSetIssuer)) {
+            logger.error("The issuer configured for the module, " + configuredIssuer + ", and the issuer found in the token, " +
+                jwtClaimSetIssuer +", do not match. This means that the token authentication was directed at the wrong module, " +
+                    "or the targeted module is mis-configured.");
+            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_TOKEN_ISSUER_MISMATCH, null);
+        }
+        OpenIdResolver resolver = openIdResolverCache.getResolverForIssuer(cryptoContextValue);
 
         if (resolver == null) {
             if (logger.messageEnabled()) {
-                logger.message("Creating OpenIdResolver for issuer " + issuer + " using config url " + configurationUrl);
+                if (CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(cryptoContextType)) {
+                    logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using client secret");
+                } else {
+                    logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using config url "
+                            + cryptoContextValue);
+                }
             }
             try {
-                resolver = openIdResolverCache.createResolver(issuer, configurationUrl);
+                resolver = openIdResolverCache.createResolver(
+                        jwtClaimSetIssuer, cryptoContextType, cryptoContextValue, cryptoContextUrlValue);
             } catch (IllegalStateException e) {
-                logger.error("Could not create OpenIdResolver for issuer " + issuer +
-                        " using configuration url " + configurationUrl + " :" + e);
+                logger.error("Could not create OpenIdResolver for issuer " + jwtClaimSetIssuer +
+                        " using crypto context value " + cryptoContextValue + " :" + e);
                 throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_ISSUER_MISMATCH, null);
             } catch (FailedToLoadJWKException e) {
-                logger.error("Could not create OpenIdResolver for issuer " + issuer +
-                        " using configuration url " + configurationUrl + " :" + e, e);
+                logger.error("Could not create OpenIdResolver for issuer " + jwtClaimSetIssuer +
+                        " using crypto context value " + cryptoContextValue + " :" + e, e);
                 throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWK_NOT_LOADED, null);
             }
         }
@@ -137,7 +185,7 @@ public class OpenIdConnect extends AMLoginModule {
     @Override
     public Principal getPrincipal() {
         /*
-        TODO. In Sprint 52, a story will be added to allow this authN module to be configured with an OIDC profile
+        TODO. A story will be added in sprint 53 to allow this authN module to be configured with an OIDC profile
         url, which will be hit with the sub in the OIDC ID Token jwt, to pull some user-specific attributes, which will
         then be mapped to the corresponding OpenAM attributes (like the OAuth2 LoginModule), which will then drive
         user lookup in the OpenAM data store.

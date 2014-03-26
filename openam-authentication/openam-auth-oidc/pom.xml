@@ -35,7 +35,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM AuthN OpenId Connect</name>
-    <description>OpenAM authentication module which consumes the jaspi OpenId Connect authentication module</description>
+    <description>OpenAM authentication module which consumes the jaspi OpenId Connect authentication module domain logic</description>
     <artifactId>openam-auth-oidc</artifactId>
     <packaging>jar</packaging>
 
