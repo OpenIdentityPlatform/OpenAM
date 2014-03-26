@@ -3793,23 +3793,34 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="persistent-cookie">
-      <title>Hints for the Persistent Cookie Module</title>
-      <para>The Persistent Cookie module supports configuration of cookie lifetimes, based
-      on requests and a maximum time. It is the preferred method for creating a persistent cookie.
-      If you choose this method, be aware that it does not interact with the persistent cookie
-      options associated with the Core Authentication module.</para>
+   <title>Hints for the Persistent Cookie Module</title>
+   <para>The Persistent Cookie module supports the configuration of cookie lifetimes,
+    based on requests and a maximum time. It is the preferred method for creating
+    a persistent cookie. If you choose this method, be aware that it does not
+    interact with the persistent cookie options associated with the Core
+    Authentication module.</para>
 
-      <indexterm>
-          <primary>Cookie</primary>
-          <secondary>Persistent</secondary>
-      </indexterm>
+   <para>Note that, by default, the persistent cookie is called <literal>session-jwt</literal>.</para>
 
-      <para><command>ssoadm</command> service name:
-      <literal>iPlanetAMAuthPersistentCookieService</literal></para>
+   <indexterm>
+    <primary>Cookie</primary>
+    <secondary>Persistent</secondary>
+   </indexterm>
 
-      <para>To configure the Persistent Cookie Module globally in the console, navigate to
-      Configuration &gt; Authentication &gt; Persistent Cookie. In the window that appears
-      you should see the following attributes:</para>
+   <para><command>ssoadm</command> service name:
+    <literal>iPlanetAMAuthPersistentCookieService</literal></para>
+
+   <para>Before you begin, make sure a public key alias is defined in OpenAM.
+    The Persistent Cookie module encrypts a JSON Web Token (JWT) using a public key
+    from the OpenAM keystore. The public key alias must be configured under
+    Authentication &gt; All Core Settings &gt; Security. If the keystore changes
+    and the default <literal>test</literal> key is no longer present, the public
+    key alias must be updated to reflect the change, otherwise the module will
+    fail.</para>
+
+   <para>To configure the Persistent Cookie Module globally in the console,
+    navigate to Configuration &gt; Authentication &gt; Persistent Cookie.
+    In the window that appears you should see the following attributes:</para>
 
       <variablelist>
           <varlistentry>
