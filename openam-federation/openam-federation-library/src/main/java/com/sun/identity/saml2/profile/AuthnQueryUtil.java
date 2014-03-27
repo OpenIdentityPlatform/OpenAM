@@ -24,10 +24,8 @@
  *
  * $Id: AuthnQueryUtil.java,v 1.8 2008/12/03 00:32:31 hengming Exp $
  *
- */
-
-/*
- * Portions copyright 2010-2013 ForgeRock, Inc.
+ *
+ *  Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -243,7 +241,7 @@ public class AuthnQueryUtil {
             }
             List list = null;
             try {
-                   SAML2RepositoryFactory.getInstance().retrieveSAML2TokenWithSecondaryKey(cacheKey);
+                list = SAML2RepositoryFactory.getInstance().retrieveSAML2TokenWithSecondaryKey(cacheKey);
             } catch(StoreException se) {
                 SAML2Utils.debug.error("AuthnQueryUtil.processAuthnQuery: " +
                         "Unable to obtain user assertions from CTS Repository. user = " + cacheKey+", "+se.getMessage(),se);
