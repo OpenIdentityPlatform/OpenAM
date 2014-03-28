@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing OpenAM Tools</title>
  <indexterm>
@@ -295,6 +296,15 @@ http://openam.example.com:8080/openam</screen>
    <screen>$ echo $JAVA_HOME
 /path/to/jdk</screen>
   </step>
+
+  <step>
+   <para>
+    Create a file system directory to unpack the tools.
+   </para>
+
+   <screen>$ mkdir -p /path/to/openam-tools/config</screen>
+  </step>
+
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <informalexample><!--?dbfo pgwide="1"?-->
