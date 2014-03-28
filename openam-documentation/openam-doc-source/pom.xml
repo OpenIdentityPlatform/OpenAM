@@ -319,6 +319,8 @@
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
                 <configuration>
                     <projectName>OpenAM</projectName>
+                    <projectVersion>${serverDocTargetVersion}</projectVersion>
+                    <latestJson>http://mcraig.org/fr/latest.php</latestJson><!-- Temporary workaround pending #QOZ-985-23233 -->
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
                     <runLinkTester>false</runLinkTester>
                 </configuration>
