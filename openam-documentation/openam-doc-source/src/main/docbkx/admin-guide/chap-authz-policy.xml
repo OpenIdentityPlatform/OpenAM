@@ -552,6 +552,38 @@
        </listitem>
 
        <listitem>
+        <para>
+         OAuth2 Scope lets the policy depend on whether an authorization request
+         includes all of the specified OAuth 2.0 scopes.
+        </para>
+
+        <para>
+         Scope names must follow OAuth 2.0 scope syntax described in RFC 6749,
+         <link
+          xlink:show="new"
+          xlink:href="https://tools.ietf.org/html/rfc6749#section-3.3"
+         ><citetitle>Access Token Scope</citetitle></link>.
+         As described in that section,
+         separate multiple scope strings with spaces,
+         such as <literal>openid profile</literal>.
+        </para>
+
+        <para>
+         The scope strings match regardless of order in which they occur,
+         so <literal>openid profile</literal>
+         is equivalent to <literal>profile openid</literal>.
+        </para>
+
+        <para>
+         The condition is also met when additional scope strings are provided
+         beyond those required to match the specified list.
+         For example,
+         if the condition specifies <literal>openid profile</literal>,
+         then <literal>openid profile email</literal> also matches.
+        </para>
+       </listitem>
+
+       <listitem>
         <para>Resource/Environment/IP Address lets you make the policy apply
         using a complex condition such as whether the user is making a request
         from the localhost and has authenticated with the LDAP authentication

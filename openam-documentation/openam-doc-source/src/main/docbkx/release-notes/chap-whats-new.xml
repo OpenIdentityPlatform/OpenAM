@@ -158,6 +158,14 @@ Agreement (yes/no): [no]:</screen>
     </para>
    </listitem>
 
+  <listitem><!-- AME-2975 -->
+   <para>
+     <emphasis role="bold">OAuth 2.0 Scope Conditions</emphasis>.
+     OpenAM now supports an OAuth2 Scope condition
+     that lets the you set required OAuth 2.0 scopes as a policy condition.
+    </para>
+   </listitem>
+
   <listitem>
     <para>
      TODO: Update for next version
