@@ -103,6 +103,8 @@
         </license>
     </licenses>
     <properties>
+        <projectName>OpenAM</projectName>
+
         <serverDocTargetVersion>${project.version}</serverDocTargetVersion>
         <agentsDocTargetVersion>4.0.0-SNAPSHOT</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
@@ -318,7 +320,7 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
                 <configuration>
-                    <projectName>OpenAM</projectName>
+                    <projectName>${projectName}</projectName>
                     <projectVersion>${serverDocTargetVersion}</projectVersion>
                     <latestJson>http://mcraig.org/fr/latest.php</latestJson><!-- Temporary workaround pending #QOZ-985-23233 -->
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
