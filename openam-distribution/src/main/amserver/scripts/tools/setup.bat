@@ -68,6 +68,7 @@ SET java_version=%1
 goto exit
 
 :runSetup
+IF "%1" == "--acceptLicense" SET accept_license=--acceptLicense
 IF "%1" == "-h" SET help_print=yes
 IF "%1" == "--help" SET help_print=yes
 IF "%1" == "-l" SET path_log=%~2
@@ -76,12 +77,26 @@ IF "%1" == "-d" SET path_debug=%~2
 IF "%1" == "--debug" SET path_debug=%~2
 IF "%1" == "-p" SET path_AMConfig=%~2
 IF "%1" == "--path" SET path_AMConfig=%~2
+IF "%2" == "-l" SET path_log=%~3
+IF "%2" == "--log" SET path_log=%~3
+IF "%2" == "-d" SET path_debug=%~3
+IF "%2" == "--debug" SET path_debug=%~3
+IF "%2" == "-p" SET path_AMConfig=%~3
+IF "%2" == "--path" SET path_AMConfig=%~3
+IF "%3" == "--acceptLicense" SET accept_license=--acceptLicense
 IF "%3" == "-l" SET path_log=%~4
 IF "%3" == "--log" SET path_log=%~4
 IF "%3" == "-d" SET path_debug=%~4
 IF "%3" == "--debug" SET path_debug=%~4
 IF "%3" == "-p" SET path_AMConfig=%~4
 IF "%3" == "--path" SET path_AMConfig=%~4
+IF "%4" == "-l" SET path_log=%~5
+IF "%4" == "--log" SET path_log=%~5
+IF "%4" == "-d" SET path_debug=%~5
+IF "%4" == "--debug" SET path_debug=%~5
+IF "%4" == "-p" SET path_AMConfig=%~5
+IF "%4" == "--path" SET path_AMConfig=%~5
+IF "%5" == "--acceptLicense" SET accept_license=--acceptLicense
 IF "%5" == "-l" SET path_log=%~6
 IF "%5" == "--log" SET path_log=%~6
 IF "%5" == "-d" SET path_debug=%~6
@@ -118,7 +133,7 @@ set CLASSPATH="%CLASSPATH%;lib/slf4j-api-${slf4j.api.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/slf4j-nop-${slf4j.api.version}.jar"
 set CLASSPATH="%CLASSPATH%;resources"
 
-"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main
+"%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main %accept_license%
 
 ENDLOCAL
 

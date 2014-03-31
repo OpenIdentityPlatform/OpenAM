@@ -54,36 +54,36 @@ case $JAVA_VER in
   ;;
 esac
 
-if [ "$1" = "-h" -o "$1" = "--help" ] ; then
-  help_print=yes
-fi
-if [ "$1" = "-l" -o "$1" = "--log" ] ; then
-  path_log="$2"
-fi
-if [ "$1" = "-d" -o "$1" = "--debug" ] ; then
-  path_debug="$2"
-fi
-if [ "$1" = "-p" -o "$1" = "--path" ] ; then
-  path_AMConfig="$2"
-fi
-if [ "$3" = "-l" -o "$3" = "--log" ] ; then
-  path_log="$4"
-fi
-if [ "$3" = "-d" -o "$3" = "--debug" ] ; then
-  path_debug="$4"
-fi
-if [ "$3" = "-p" -o "$3" = "--path" ] ; then
-  path_AMConfig="$4"
-fi
-if [ "$5" = "-l" -o "$5" = "--log" ] ; then
-  path_log="$6"
-fi
-if [ "$5" = "-d" -o "$5" = "--debug" ] ; then
-  path_debug="$6"
-fi
-if [ "$5" = "-p" -o "$5" = "--path" ] ; then
-  path_AMConfig="$6"
-fi
+while test $# -gt 0
+do
+    case "$1" in
+        --acceptLicense) accept_license=--acceptLicense
+                    ;;
+        -h) help_print=yes
+            ;;
+        --help) help_print=yes
+            ;;
+        -d) shift
+        	path_debug=$1
+            ;;
+    	--debug) shift
+        	path_debug=$1
+            ;;
+        -p) shift
+        	path_AMConfig=$1
+            ;;
+    	--path) shift
+        	path_AMConfig=$1
+            ;;
+        -l) shift
+        	path_log=$1
+            ;;
+    	--log) shift
+        	path_log=$1
+            ;;
+    esac
+    shift
+done
 
 CLASSPATH=""
 CLASSPATH="$CLASSPATH:lib/opendj-server-${opendj.server.version}.jar"
@@ -111,4 +111,4 @@ $JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
                       -D"path.AMConfig=$path_AMConfig" -D"path.debug=$path_debug" \
                       -D"path.log=$path_log" \
                       -cp "$CLASSPATH" \
-                      com.sun.identity.tools.bundles.Main
+                      com.sun.identity.tools.bundles.Main $accept_license

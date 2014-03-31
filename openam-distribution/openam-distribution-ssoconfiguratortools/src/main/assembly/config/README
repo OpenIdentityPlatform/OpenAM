@@ -69,7 +69,7 @@ If you have already deployed OpenAM and want to upgrade run the following comman
 |
 |----openam-upgrade-tool-${project.version}.jar (binaries needed for the upgrade tool)
 |
-|----license.txt (license file)
+|----legal-notices/ (folder containing license files)
 |
 |----sampleconfiguration (a sample configuration file)
 |
