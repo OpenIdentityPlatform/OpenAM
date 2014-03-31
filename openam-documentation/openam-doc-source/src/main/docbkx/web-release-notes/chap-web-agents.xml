@@ -306,6 +306,11 @@
     <title>Important Changes to Web Policy Agent Functionality</title>
 
     <itemizedlist>
+
+     <para>
+      These changes are new in OpenAM 11.0.1.
+     </para>
+
      <listitem>
       <para>
        Consistency has been improved in how OpenAM policy rules match resources.
@@ -404,6 +409,12 @@
        This is the only compatibility change since release 3.3.0.
       </para>
      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+     <para>
+      These changes were listed for OpenAM Web Policy Agents 3.3.0.
+     </para>
 
      <listitem>
       <para>IIS web policy agents no longer rely on the Windows registry to
@@ -414,27 +425,6 @@
 
       <para>The cleanest upgrade path is to uninstall the previous version of
       the IIS agent, and then install the new version of the IIS agent.</para>
-     </listitem>
-
-     <listitem>
-         <para>The IIS web policy agents no longer depend on third-party libraries.
-         They are now built and shipped as single Dynamic-Link Libraries (DLLs). </para>
-     </listitem>
-
-     <listitem>
-         <para>The IIS 6 agent, installed on older versions (pre R2) of Windows 2003,
-         may require the installation of Microsoft Core XML Services (MSXML) 6.0 and
-         any applicable service packs and updates. The IIS7 agent also requires
-         MSXML 6.0 or above. For installation instructions, see the <link xlink:show="new"
-         xlink:href="http://www.microsoft.com/en-us/download/details.aspx?id=3988"
-         ><citetitle>Microsoft Download Center page for MSXML 6.0</citetitle></link>.</para>
-     </listitem>
-
-     <listitem>
-         <para>When SSL is used, the Linux/Solaris agents no longer include independent
-         NSS/NSPR libraries. They rely on the libraries included in the OS native
-         <filename>libxml2</filename> and <filename>openssl</filename> packages.
-         The package names may vary slightly, depending on release / distribution.</para>
      </listitem>
 
      <listitem>
@@ -499,6 +489,12 @@
  <section xml:id="web-agent-issues">
   <title>Web Policy Agents Fixes, Limitations, &amp; Known Issues</title>
 
+  <para>
+   OpenAM web policy agent issues are tracked at
+   <link xlink:show="new"
+         xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM" />.
+  </para>
+
   <important>
    <para>
     OpenAM web policy agents 3.3.1 together with OpenAM 11.0.1
@@ -506,12 +502,6 @@
     For details, make you read <xref linkend="web-agent-major-changes" />.
    </para>
   </important>
-
-  <para>
-   OpenAM web policy agent issues are tracked at
-   <link xlink:show="new"
-         xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM" />.
-  </para>
 
   <section xml:id="web-agent-fixes">
    <title>Key Fixes</title>
