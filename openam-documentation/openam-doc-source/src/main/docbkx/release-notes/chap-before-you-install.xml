@@ -20,19 +20,25 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-before-you-install'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Before You Install OpenAM <?eval ${serverDocTargetVersion}?> Software</title>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Before You Install OpenAM ${serverDocTargetVersion} Software</title>
 
  <para>This chapter covers software and hardware prerequisites for installing
  and running OpenAM software.</para>
+
+ <note>
+  <para>
+   The content of this chapter has not changed since OpenAM 11.0.0.
+  </para>
+ </note>
  
  <section xml:id="java-requirements">
   <title>Java Requirements</title>
@@ -218,9 +224,7 @@
   <para>Minimum requirements are enough to start and to evaluate OpenAM.
   Recommended hardware resources depend on your specific deployment
   requirements. For more information, see the <citetitle>Administration
-  Guide</citetitle> chapter on <link xlink:href="admin-guide#chap-tuning"
-  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Tuning
-  OpenAM</citetitle></link>.</para>
+  Guide</citetitle> chapter on <citetitle>Tuning OpenAM</citetitle>.</para>
 
   <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
   based systems.</para>

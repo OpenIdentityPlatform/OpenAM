@@ -20,14 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <book xml:id='web-agent-release-notes'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM Web Policy Agent <?eval ${agentsDocTargetVersion}?> Release Notes</title>
@@ -37,7 +37,7 @@
    Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2013</year>
+   <year>2011-2014</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -58,9 +58,9 @@
    </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
-  <date><?dbtimestamp format="B d, Y"?></date>
-  <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
-  <releaseinfo><?eval ${softwareReleaseDate}?></releaseinfo>
+  <date>${publicationDate}</date>
+  <pubdate>${publicationDate}</pubdate>
+  <releaseinfo>${softwareReleaseDate}</releaseinfo>
  </info>
 
  <toc />

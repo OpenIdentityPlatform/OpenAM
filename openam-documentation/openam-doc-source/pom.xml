@@ -103,8 +103,8 @@
         </license>
     </licenses>
     <properties>
-        <serverDocTargetVersion>${project.version}</serverDocTargetVersion>
-        <agentsDocTargetVersion>3.2.0-SNAPSHOT</agentsDocTargetVersion>
+        <serverDocTargetVersion>11.0.1</serverDocTargetVersion>
+        <agentsDocTargetVersion>3.3.1</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
@@ -141,26 +141,30 @@
         <agentWebLogicSupport>Oracle WebLogic Server 10g, 11g, 12c</agentWebLogicSupport>
         <agentWebSphereSupport>IBM WebSphere Application Server 7, 8, 8.5</agentWebSphereSupport>
 
-        <docbkxSourceDirectory>${basedir}/target/docbkx-filtered</docbkxSourceDirectory>
         <site-out>${project.build.outputDirectory}/site</site-out>
         <javadocBase>http://openam.forgerock.org/apidocs/</javadocBase>
         <dotnetFedletBase>http://openam.forgerock.org/dotnet-fedlet</dotnetFedletBase>
 
         <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
+
         <!--
-             Release date is specified only when building the documentation
-             for publication. For example:
-                 -D"releaseDate=Software release date: January 1, 1970"
-             Otherwise release date should remain empty.
+          Release date and publication date are set at release build time.
+            -D"releaseDate=Software release date: January 1, 1970"
+            -D"pubDate=Publication date: December 31, 1969"
+          At all other times, the dates should be empty.
         -->
         <releaseDate />
         <softwareReleaseDate>${releaseDate}</softwareReleaseDate>
+        <pubDate />
+        <publicationDate>${pubDate}</publicationDate>
+
         <defaultRootSuffix>dc=openam,dc=forgerock,dc=org</defaultRootSuffix>
     </properties>
 
     <build>
         <plugins>
+<!-- Ignore generated content for the reference when building 11.0.x release notes.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -184,6 +188,7 @@
                     </execution>
                 </executions>
             </plugin>
+-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -191,6 +196,7 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+<!-- Ignore generated content for the reference when building 11.0.x release notes.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xml-maven-plugin</artifactId>
@@ -255,7 +261,7 @@
                                             openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WSFederationLogMessageIDs.xml
                                         </include>
 
-                                        <!--  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST -->
+                                        &lt;!&ndash;  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST &ndash;&gt;
                                     </includes>
                                     <stylesheet>${basedir}/src/main/xslt/logs.xsl</stylesheet>
                                     <outputProperties>
@@ -306,50 +312,15 @@
                     </execution>
                 </executions>
             </plugin>
+-->
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>filter-docbkx-resources</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <!-- Filter XML to allow ${property} in attribute values. -->
-                            <outputDirectory>${docbkxSourceDirectory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/docbkx</directory>
-                                    <filtering>true</filtering>
-                                    <includes>
-                                        <include>**/*.xml</include>
-                                    </includes>
-                                </resource>
-                                <resource>
-                                    <directory>src/main/docbkx</directory>
-                                    <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/*.xml</exclude>
-                                    </excludes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
+         <plugin>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
                 <configuration>
                     <projectName>OpenAM</projectName>
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
-                    <runLinkTester>false</runLinkTester>
-                    <docbkxSourceDirectory>${docbkxSourceDirectory}</docbkxSourceDirectory> <!-- Use filtered XML -->
+                    <!--runLinkTester>false</runLinkTester-->
                 </configuration>
                 <executions>
                     <execution>
@@ -357,7 +328,21 @@
                         <phase>pre-site</phase>
                         <goals>
                             <goal>boilerplate</goal>
-                        </goals>                     
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>filter-sources</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>filter</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>prepare-sources</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>prepare</goal>
+                        </goals>
                     </execution>
                     <execution>
                         <id>build-doc</id>
@@ -380,11 +365,13 @@
 
     </build>
 
+<!-- Ignore generated content for the reference when building 11.0.x release notes.
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-doc-content</artifactId>
         </dependency>
     </dependencies>
+-->
 
 </project>

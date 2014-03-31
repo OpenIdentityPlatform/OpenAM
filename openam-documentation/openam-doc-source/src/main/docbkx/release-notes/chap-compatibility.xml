@@ -20,13 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-compatibility'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>OpenAM Changes &amp; Deprecated Functionality</title>
 
@@ -37,6 +38,166 @@
   <title>Important Changes to Existing Functionality</title>
 
   <itemizedlist>
+
+   <para>
+    These changes are new in OpenAM ${serverDocTargetVersion}.
+   </para>
+
+   <listitem>
+    <para>
+     Consistency has been improved in how OpenAM policy rules match resources.
+     Policy rules are now interpreted more consistently
+     in line with the documentation,
+     and more consistently across platforms and across self and subtree modes.
+     Before you upgrade, consider how these changes affect policy rules.
+    </para>
+
+    <itemizedlist>
+     <para>
+      Although the changes introduced by the improvements affect mainly edge cases,
+      they do impact deployments relying on previous, inconsistent behaviors.
+      The following points describe how OpenAM and policy agents behave
+      following upgrade to OpenAM 11.0.1 and web policy agents 3.3.1.
+     </para>
+
+     <listitem>
+      <para>
+       Policy agents configured to use subtree mode behave
+       as they did prior to 3.3.0.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       If you created your policies with OpenAM 11.0.0 and web policy agents 3.3.0,
+       then note that trailing slashes are no longer stripped from resource names
+       (<link xlink:show="new"
+              xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3509"
+      >OPENAM-3509</link>).
+      </para>
+
+      <para>
+       In order to match a trailing slash, your rule must end in a slash,
+       or a slash followed by a wildcard.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       When policy agents are configured to use self mode,
+       trailing wildcards, except after <literal>?</literal>,
+       match zero or more characters.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       When policy agents are configured to use self mode,
+       previously a trailing wildcard after a slash, <literal>/*</literal>,
+       matched one or more characters, whereas it now matches zero or more.
+       This means that a resource ending in <literal>/</literal>
+       previously would not match a rule ending in <literal>/*</literal>,
+       whereas it now does.
+      </para>
+
+      <para>
+       If you already have two rules to allow access,
+       one ending in <literal>/</literal> and the other in <literal>/*</literal>,
+       then you have nothing to do.
+       Only the latter rule is now required.
+      </para>
+
+      <para>
+       If however you have only rules ending in <literal>/*</literal>
+       and intend these to deny access to resources ending in <literal>/</literal>,
+       then add rules ending in <literal>/</literal>
+       specifically to deny access to resources ending in <literal>/</literal>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       When web policy agents are configured to use self mode,
+       trailing wildcards after <literal>?</literal>
+       match <emphasis>one</emphasis> or more characters.
+       This means that a resource with a trailing <literal>?</literal>
+       no longer matches a rule of the form <literal>/*?*</literal>,
+       whereas it would have matched with earlier versions.
+      </para>
+
+      <para>
+       To match the behavior of previous releases,
+       when using self mode with resources having empty query strings,
+       add additional rules without trailing wildcards as in <literal>/*?</literal>
+       before you upgrade OpenAM.
+      </para>
+     </listitem>
+
+<!--
+     <listitem>
+      <para>
+       When Java EE policy agents are configured to use subtree mode,
+       resources ending in a trailing slash
+       match rules that end in a slash, or in a slash followed by a wildcard.
+      </para>
+
+      <para>
+       To ensure behavior like Java EE policy agents prior to 3.3.0,
+       configure the policy agents to use self mode (the new default).
+      </para>
+     </listitem>
+-->
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>
+     OpenAM now handles SAML single logout (SLO) requests differently
+     when the user presents an invalid session
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3437"
+     >OPENAM-3437</link>).
+    </para>
+
+    <para>
+     In this scenario OpenAM no longer follows
+     the <literal>RelayState</literal> without validation.
+     To ensure that the <literal>RelayState</literal> validation succeeds,
+     include the <literal>metaAlias</literal> request parameter
+     when invoking the SLO JSPs.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     For LDAP and Active Directory data store configurations
+     the settings for the Authentication Naming Attribute
+     (<literal>sun-idrepo-ldapv3-config-auth-naming-attr</literal>)
+     and the LDAP Users Search Attribute
+     (<literal>sun-idrepo-ldapv3-config-users-search-attribute</literal>)
+     now have the same effects as they did in versions prior to 11.0.0
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3428"
+      >OPENAM-3428</link>).
+    </para>
+
+    <para>
+     The Authentication Naming Attribute
+     is now used only to find the user when performing authentication.
+     The LDAP Users Search Attribute is used in other cases
+     when searching for users.
+     When upgrading from OpenAM 11.0.0,
+     make sure these attributes are correctly set in data store configurations.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+
+  <itemizedlist>
+
+   <para>
+    The following changes were listed for OpenAM 11.0.0.
+   </para>
 
    <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
    <listitem>
@@ -168,9 +329,10 @@
  <section xml:id="deprecated">
   <title>Deprecated Functionality</title>
   
-  <para>The following functionality is deprecated in OpenAM
-  <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
-  release.</para>
+  <para>
+   The following functionality is deprecated in OpenAM 11.0.0,
+   and is likely to be removed in a future release.
+  </para>
 
   <itemizedlist>
 
@@ -229,10 +391,8 @@
 
       <thead>
        <row>
-        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
-        xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
-        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
-        xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+        <entry>Deprecated URIs</entry>
+        <entry>Newer Evolving URIs</entry>
        </row>
       </thead>
 
@@ -300,10 +460,8 @@
      </tgroup>
     </table>
 
-    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on <link
-    xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
-    xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link> in
-    OpenAM.</para>
+    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on
+    <citetitle>Using RESTful Web Services</citetitle> OpenAM.</para>
 
     <para>Support for the older REST services is likely to be removed in a
     future release in favor of the newer REST services. Older REST services
@@ -342,8 +500,7 @@
 
    <listitem>
     <para>Javadoc for the client SDK is no longer delivered with the
-    distribution, but instead is <link xlink:show="new"
-    xlink:href="${javadocBase}">available online</link>.</para>
+    distribution, but instead is available online.</para>
    </listitem>
   </itemizedlist>
  </section>
