@@ -25,7 +25,8 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock Inc.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint.comparators;
@@ -202,7 +203,7 @@ public class DevicePrintComparator {
      */
     public ComparisonResult compare(String currentValue, String storedValue, int maxDifferences,
             int maxDifferencesPercentage, long penaltyPoints) {
-        return multiValueAttributeComparator.compare(currentValue, storedValue, maxDifferences, maxDifferencesPercentage,
+        return multiValueAttributeComparator.compare(currentValue, storedValue, maxDifferencesPercentage, maxDifferences,
                 penaltyPoints);
     }
 
