@@ -19,7 +19,7 @@
                         "background-image": "url('../images/box-bg.png')",
                         "background-repeat": "no-repeat",
                         "background-position": "950px -100px",
-                        "footer-background-color": "#eee",
+                        "footer-background-color": "rgba(238, 238, 238, 0.7)",
                         "background-font-color": "#5a646d",
                         "column-padding": "111px",
                   
