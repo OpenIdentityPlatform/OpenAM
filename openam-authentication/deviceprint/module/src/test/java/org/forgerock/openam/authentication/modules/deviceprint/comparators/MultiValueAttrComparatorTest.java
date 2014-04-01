@@ -25,7 +25,8 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint.comparators;
@@ -82,8 +83,8 @@ public class MultiValueAttrComparatorTest {
     public void shouldCompareMultiValueStringsWhenBothAreEqual() {
 
         //Given
-        String currentValue = "VALUE_A, VALUE_B, VALUE_C, VALUE_D, VALUE_E";
-        String storedValue = "VALUE_A, VALUE_B, VALUE_C, VALUE_D, VALUE_E";
+        String currentValue = "VALUE_A; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
+        String storedValue = "VALUE_A; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
 
         //When
         ComparisonResult comparisonResult = multiValueAttrComparator.compare(currentValue, storedValue, 20, 1, 111L);
@@ -98,8 +99,8 @@ public class MultiValueAttrComparatorTest {
     public void shouldCompareMultiValueStringWhenThereAreLessDifferencesThanMax() {
 
         //Given
-        String currentValue = "VALUE_AA, VALUE_B, VALUE_C, VALUE_D, VALUE_E";
-        String storedValue = "VALUE_B, VALUE_C, VALUE_D, VALUE_E";
+        String currentValue = "VALUE_AA; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
+        String storedValue = "VALUE_B; VALUE_C; VALUE_D; VALUE_E";
 
         //When
         ComparisonResult comparisonResult = multiValueAttrComparator.compare(currentValue, storedValue, 20, 1, 111L);
@@ -114,8 +115,8 @@ public class MultiValueAttrComparatorTest {
     public void shouldCompareMultiValueStringWhenThereAreMoreDifferencesThanMax() {
 
         //Given
-        String currentValue = "VALUE_AA, VALUE_BB, VALUE_C, VALUE_D, VALUE_E";
-        String storedValue = "VALUE_B, VALUE_C, VALUE_D, VALUE_E";
+        String currentValue = "VALUE_AA; VALUE_BB; VALUE_C; VALUE_D; VALUE_E";
+        String storedValue = "VALUE_B; VALUE_C; VALUE_D; VALUE_E";
 
         //When
         ComparisonResult comparisonResult = multiValueAttrComparator.compare(currentValue, storedValue, 20, 1, 111L);
@@ -130,8 +131,8 @@ public class MultiValueAttrComparatorTest {
     public void shouldCompareMultiValueStringWhenThereIsLessPercentageDiffThanMax() {
 
         //Given
-        String currentValue = "VALUE_AA, VALUE_B, VALUE_C, VALUE_D, VALUE_E";
-        String storedValue = "VALUE_B, VALUE_C, VALUE_D, VALUE_E";
+        String currentValue = "VALUE_AA; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
+        String storedValue = "VALUE_B; VALUE_C; VALUE_D; VALUE_E";
 
         //When
         ComparisonResult comparisonResult = multiValueAttrComparator.compare(currentValue, storedValue, 20, 1, 111L);
@@ -146,8 +147,8 @@ public class MultiValueAttrComparatorTest {
     public void shouldCompareMultiValueStringWhenThereIsMorePercentageDiffThanMax() {
 
         //Given
-        String currentValue = "VALUE_AA, VALUE_BB, VALUE_C, VALUE_D, VALUE_E";
-        String storedValue = "VALUE_B, VALUE_C, VALUE_D, VALUE_E";
+        String currentValue = "VALUE_AA; VALUE_BB; VALUE_C; VALUE_D; VALUE_E";
+        String storedValue = "VALUE_B; VALUE_C; VALUE_D; VALUE_E";
 
         //When
         ComparisonResult comparisonResult = multiValueAttrComparator.compare(currentValue, storedValue, 20, 1, 111L);
