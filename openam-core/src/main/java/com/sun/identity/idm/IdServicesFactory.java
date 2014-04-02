@@ -84,13 +84,13 @@ public class IdServicesFactory {
     /**
      * Whether to convert all attribute names to lower case or not.
      */
-    private static volatile boolean useLowerCaseNames = true;
+    private static volatile boolean useLowerCaseNames = false;
 
     private static void initialize() {
         String configuredSDK = SystemProperties.get(
                 CONFIGURED_SDK_PACKAGE_PROPERTY);
 
-        useLowerCaseNames = SystemProperties.getAsBoolean(USE_LOWERCASE_NAMES_PROPERTY, true);
+        useLowerCaseNames = SystemProperties.getAsBoolean(USE_LOWERCASE_NAMES_PROPERTY, false);
 
         boolean isCriticalErrorIfClassNotFound = true;
         if ((configuredSDK == null) || (configuredSDK.equals(SERVER_PACKAGE))) {

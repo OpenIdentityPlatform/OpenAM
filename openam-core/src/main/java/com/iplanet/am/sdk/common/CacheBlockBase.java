@@ -27,12 +27,13 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.iplanet.am.sdk.common;
 
 import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.sdk.AMObject;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.shared.debug.Debug;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
@@ -442,17 +443,17 @@ public abstract class CacheBlockBase {
     class CacheEntry {
         private boolean completeSet = false;
 
-        private Set readableAttrNames;
+        private final Set readableAttrNames;
 
         // Names of attributes which are either
         // 1 - not readable by the principal corresponding to this entry or
         // 2 - not present in the directory entry.
         // Either way there is not need to explictly distinguish them.
-        private Set inAccessibleAttrNames;
+        private final Set inAccessibleAttrNames;
 
         CacheEntry() {
-            readableAttrNames = new HashSet();
-            inAccessibleAttrNames = new HashSet();
+            readableAttrNames = new CaseInsensitiveHashSet();
+            inAccessibleAttrNames = new CaseInsensitiveHashSet();
         }
 
         /**
@@ -469,7 +470,7 @@ public abstract class CacheBlockBase {
             Set attributesPresent = new HashSet();
             Iterator itr = attrNames.iterator();
             while (itr.hasNext()) {
-                String name = ((String) itr.next()).toLowerCase();
+                String name = (String) itr.next();
                 if (readableAttrNames.contains(name)) {
                     attributesPresent.add(name);
                 }
@@ -487,7 +488,7 @@ public abstract class CacheBlockBase {
             // Iterator itr = inAccessibleAttrNames.iterator();
             Iterator itr = attrNames.iterator();
             while (itr.hasNext()) {
-                String name = ((String) itr.next()).toLowerCase();
+                String name = (String) itr.next();
                 if (inAccessibleAttrNames.contains(name)) {
                     attributesPresent.add(name);
                 }
@@ -503,7 +504,7 @@ public abstract class CacheBlockBase {
                 // readableAttrNames.addAll(attrNames);
                 Iterator it = attrNames.iterator();
                 while (it.hasNext()) {
-                    String name = ((String) it.next()).toLowerCase();
+                    String name = (String) it.next();
                     readableAttrNames.add(name);
                     inAccessibleAttrNames.remove(name);
                 }
@@ -512,7 +513,7 @@ public abstract class CacheBlockBase {
                 // inAccessibleAttrNames.addAll(invalidAttrs);
                 Iterator it = invalidAttrs.iterator();
                 while (it.hasNext()) {
-                    String name = ((String) it.next()).toLowerCase();
+                    String name = (String) it.next();
                     inAccessibleAttrNames.add(name);
                     readableAttrNames.remove(name);
                 }
@@ -523,7 +524,7 @@ public abstract class CacheBlockBase {
             completeSet = false;
             Iterator iter = attrNames.iterator();
             while (iter.hasNext()) {
-                String name = ((String) iter.next()).toLowerCase();
+                String name = (String) iter.next();
                 boolean removed = readableAttrNames.remove(name);
                 if (!removed) { // May be in accessible attr. Try removing it.
                     inAccessibleAttrNames.remove(name);
