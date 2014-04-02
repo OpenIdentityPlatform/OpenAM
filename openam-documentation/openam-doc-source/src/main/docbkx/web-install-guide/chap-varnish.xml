@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock, Inc.
+  !      Copyright 2014 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-varnish'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the Varnish Policy Agent</title>
  <indexterm><primary>Varnish HTTP Accelerator</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Varnish
@@ -171,12 +171,20 @@
    
      <step>
       <para>Create a text file containing only the password.</para>
-      <screen>$ echo password > /tmp/pwd.txt</screen>
+
+      <screen>
+$ <userinput>echo password > /tmp/pwd.txt</userinput>
+      </screen>
+
      </step>
      <step>
       <para>Protect the password file you create as appropriate for your
       operating system.</para>
-      <screen>$ chmod 400 /tmp/pwd.txt</screen>
+
+      <screen>
+$ <userinput>chmod 400 /tmp/pwd.txt</userinput>
+      </screen>
+
      </step>
     </procedure> 
      <procedure xml:id="prepare-web-policy-agent">
@@ -209,15 +217,23 @@
    
    <step>
     <para>Stop Varnish.</para>
-    <screen>$ sudo service varnish stop</screen>
+
+    <screen>
+$ <userinput>sudo service varnish stop</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
    </step>
    <step>
     <para>Run <command>./agentadmin</command> to install the agent.</para>
-    <screen>$ cd /path/to/web_agents/varnish/bin/
-$ ./agentadmin</screen>
+
+    <screen>
+$ <userinput>cd /path/to/web_agents/varnish/bin/</userinput>
+$ <userinput>./agentadmin</userinput>
+    </screen>
+
     <note>
      <para>If the agent is in a different domain than the server, refer to the <citetitle>Administration Guide</citetitle> chapter, <link
      xlink:href="admin-guide#chap-cdsso"
@@ -234,41 +250,61 @@ $ ./agentadmin</screen>
     <para>Click on Configure Varnish Web Policy Agent instance and enter the 
     following information for each consecutive screen.</para>
     <para>Press F3 to move to the next field, or F2 to return to the previous 
-    field to make a correction. Be careful as you make your entires, backspace will
+    field to make a correction. Be careful as you make your entries. Backspace will
     erase the entire entry, not just the last character.</para>
      <itemizedlist>
       <listitem>
        <para>URL where the OpenAM server runs</para>
-       <screen>Enter URL where the OpenAM server is running:
-   http://openam.example.com:8080/openam</screen>
+
+       <screen>
+<computeroutput>Enter URL where the OpenAM server is running:</computeroutput>
+   <userinput>http://openam.example.com:8080/openam</userinput>
+       </screen>
+
       </listitem>
       <listitem>
        <para>Agent URL that protects the web container</para>
-       <screen>Enter URL where Agent is protecting the Web Container:
-   http://www.website.example.com:80</screen>
+
+       <screen>
+<computeroutput>Enter URL where Agent is protecting the Web Container:</computeroutput>
+   <userinput>http://www.website.example.com:80</userinput>
+       </screen>
+
       </listitem>
       <listitem>
        <para>Profile ID and password</para>
-       <screen>Enter the Agent profile attributes in the OpenAM server:
-   Profile ID: webagent
-   Password: cangetin</screen>
+
+       <screen>
+<computeroutput>Enter the Agent profile attributes in the OpenAM server:
+   Profile ID:</computeroutput> <userinput>webagent</userinput>
+<computeroutput>   Password:</computeroutput> <userinput>cangetin</userinput>
+       </screen>
+
       </listitem>
       <listitem>
        <para>Path to Varnish modules directory</para>
-       <screen>Enter the path to Varnish modules directory    
-   /usr/lib/varnish/vmods</screen>
+
+       <screen>
+<computeroutput>Enter the path to Varnish modules directory</computeroutput>
+   <userinput>/usr/lib/varnish/vmods</userinput>
+       </screen>
+
       </listitem>
      </itemizedlist>
  
     <para>Once you have configured your agent, you will get a page displaying
     the agent configuration results. Verify the information. Click F4 when you
     are done.</para>
-    <screen>Agent configuration results:
+
+    <programlisting language="none">
+Agent configuration results:
  OpenAM URL: http://openam.example.com:8080/openam
   Agent URL: http://website.example.com
     Profile: webagent
  WebServer configuration:
-  /opt/webagent/web_agents/varnish/bin/instances/agent_1/config/am.vcl</screen>
+  /opt/webagent/web_agents/varnish/bin/instances/agent_1/config/am.vcl
+    </programlisting>
+
    </step>
    <step>
     <para>Encrypt the password if you want additional security.</para>
@@ -330,18 +366,28 @@ $ ./agentadmin</screen>
     <step>
      <para>Setup the backend by updating the following lines in the VLC script.
      Make sure port and host are set correctly.</para>
-     <screen>$ vi /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
+
+     <screen>
+$ <userinput>cat /path/to/web_agents/varnish/instances/agent_1/config/am.vcl</userinput>
+<computeroutput>...
  import am;
  backend default {
  .host = "127.0.0.1";
  .port = "8080";
- }</screen>
+ }</computeroutput>
+     </screen>
+
     </step>
     <step>
      <para>Start Varnish with the following command. It will also load the 
      VLC script.</para>
-      <screen>varnishd -u root -F -T localhost:8080 -f
-  /path/to/web_agents/varnish/instances/agent_1/config/am.vcl -a :80 -s malloc,50M</screen>
+
+      <screen>
+$ <userinput>varnishd -u root -F -T localhost:8080 \
+ -f /path/to/web_agents/varnish/instances/agent_1/config/am.vcl \
+ -a :80 -s malloc,50M</userinput>
+      </screen>
+
     </step>
 
   </procedure>
@@ -358,13 +404,17 @@ $ ./agentadmin</screen>
    <step>
     <para>Check the <filename>amAgent</filename> debug log to verify that
     no errors occurred on startup.</para>
-    <screen>$ tail /path/to/web_agents/varnish/instances/agent_1/logs/debug/amAgent
-2011-09-03 13:28:16.971    -1 32686:9daae60 all: ==============...=====
+
+    <screen>
+$ <userinput>tail /path/to/web_agents/varnish/instances/agent_1/logs/debug/amAgent</userinput>
+<computeroutput>2011-09-03 13:28:16.971    -1 32686:9daae60 all: ==============...=====
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Version: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Revision: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Date: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Machine: ..forgerock.com
-2011-09-03 13:28:16.972    -1 32686:9daae60 all: ==============...=====</screen>
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: ==============...=====</computeroutput>
+    </screen>
+
    </step>
    <step performance="optional">
     <para>If you have a policy configured, you can test your policy agent.
@@ -444,12 +494,18 @@ $ ./agentadmin</screen>
   
   <para>Shut down the Varnish server before you uninstall the
   policy agent.</para>
-  <screen>$ sudo service varnish stop</screen>
+
+  <screen>
+$ <userinput>sudo service varnish stop</userinput>
+  </screen>
   
   <para>To remove the web policy agent, use <command>./agentadmin</command>.</para>
   
-    <screen>$ cd /path/to/web_agents/varnish/bin/
-$ ./agentadmin</screen>
+    <screen>
+$ <userinput>cd /path/to/web_agents/varnish/bin/</userinput>
+$ <userinput>./agentadmin</userinput>
+    </screen>
+
    <para>Scroll down and select Remove <replaceable>'agent'</replaceable> instance.</para>
    
  </section>

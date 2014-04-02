@@ -62,10 +62,10 @@
   <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
   of Java, and set the <literal>JAVA_HOME</literal> environment variable accordingly.</para>
 
-      <screen>$ echo $JAVA_HOME
-/path/to/java
-$ which java
-/usr/bin/java</screen>
+      <screen>
+$ <userinput>echo $JAVA_HOME</userinput>
+<computeroutput>/path/to/java</computeroutput>
+      </screen>
 
   <para>Go to <link xlink:href="install-guide#download-openam-software"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
@@ -99,8 +99,9 @@ $ which java
      If you want to include an application-specific module, make sure to
      type in <literal>false</literal> when prompted with the following question:
     </para>
-    <screen>Install agent as global module? [true]:</screen>
-   
+
+    <literallayout class="monospaced">Install agent as global module? [true]:</literallayout>
+
    <step>
     <para>Shut down the JBoss server where you plan to install the
     agent.</para>
@@ -121,8 +122,9 @@ $ which java
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
 
-    <screen>$ /path/to/j2ee_agents/jboss_v7_agent/bin/agentadmin --install --acceptLicense
-...
+    <screen>
+$ <userinput>/path/to/j2ee_agents/jboss_v7_agent/bin/agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -152,7 +154,9 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/j2ee_agents/jboss_v7_agent/installer-logs/audit/install.log
-...</screen>
+...</computeroutput>
+    </screen>
+
     <para>Upon successful completion, the installer has updated the JBoss
     configuration, added the agent web application under
     <filename>JBOSS_HOME/server/standalone/deployments</filename>, and also set up

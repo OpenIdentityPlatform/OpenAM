@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-cts'
          xmlns='http://docbook.org/ns/docbook'
          version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
   <title>Configuring the Core Token Service (CTS)</title>
 
@@ -416,10 +417,14 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
      OpenDJ software.
      See the OpenDJ documentation on
       <link xlink:show="new"
-xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/index.html@chap-install-cli">
+xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/#chap-install-cli">
       Installing OpenDJ From the Command Line</link>.</para>
-      <screen>$ cd /path/to/opendj
-$ sudo ./setup --cli</screen>
+
+     <!-- Why install OpenDJ as root? -->
+      <screen>
+$ <userinput>sudo /path/to/opendj/setup --cli</userinput>
+      </screen>
+
       <para>Example options are as follows:</para>
        <table xml:id="prepare-cts-config-store-ds">
         <title>Example OpenDJ Setup Parameters</title>
@@ -484,16 +489,41 @@ $ sudo ./setup --cli</screen>
    <procedure xml:id="prepare-external-cts-backend">
     <title>To Prepare the External CTS Store</title>
     <step><para>Change to the OpenDJ directory.</para>
-     <screen>$ cd /path/to/opendj</screen></step>
+
+     <screen>
+$ <userinput>cd /path/to/opendj</userinput>
+     </screen>
+
+    </step>
     <step><para>Create a directory server backend,
      and call it <literal>ctsStore</literal>.</para>
-     <screen>$ sudo bin/dsconfig create-backend \
-  --backend-name ctsStore --set base-dn:dc=openam-cts,dc=example,dc=com \
-  --set enabled:true --type local-db --port 4444 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --no-prompt</screen></step>
+
+     <screen>
+$ <userinput>sudo \
+ bin/dsconfig create-backend \
+ --backend-name ctsStore \
+ --set base-dn:dc=openam-cts,dc=example,dc=com \
+ --set enabled:true \
+ --type local-db \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+     </screen>
+
+    </step>
     <step><para>Verify that you created the backend.</para>
-      <screen>$ sudo bin/dsconfig list-backends \
-  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+
+      <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ list-backends \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+      </screen>
+
     </step>
     <step>
      <para>Create an LDIF file to add the initial entries for the CTS backend,
@@ -540,20 +570,34 @@ ds-privilege-name: update-schema</programlisting>
      <literal>ldapmodify</literal> command. Note that if you do not see the
      "Add operation successful" responses, there may be a problem with the
      <literal>aci</literal> formatting in your LDIF file.</para>
-     <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --defaultAdd --filename add-cts-entries.ldif
 
-Processing ADD request for dc=openam-cts,dc=example,dc=com
+     <screen>
+$ <userinput>bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --defaultAdd \
+ --filename add-cts-entries.ldif</userinput>
+
+<computeroutput>Processing ADD request for dc=openam-cts,dc=example,dc=com
 ADD operation successful for DN dc=openam-cts,dc=example,dc=com
 Processing ADD request for ou=admins,dc=openam-cts,dc=example,dc=com
 ADD operation successful for DN ou=admins,dc=openam-cts,dc=example,dc=com
 Processing ADD request for uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com
 ADD operation successful for DN uid=openam,ou=admins,dc=openam-cts,dc=example,
-dc=com</screen>
+dc=com</computeroutput>
+     </screen>
     </step>
     <step><para>Verify the entries using <literal>ldapsearch</literal>.</para>
-     <screen>$ bin/ldapsearch --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --baseDN dc=openam-cts,dc=example,dc=com "(objectclass=*)"</screen>
+
+     <screen>
+$ <userinput>bin/ldapsearch \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --baseDN dc=openam-cts,dc=example,dc=com "(objectclass=*)"</userinput>
+     </screen>
+
     </step>
     <step><para>Add the Global Access Control Instruction (ACI) to the
      access control handler.
@@ -565,16 +609,34 @@ dc=com</screen>
       update the schema and skip this step. Also, you will need to
       remove the <literal>update-schema</literal> privilege from the OpenAM user entry, which
       was previously added in step 4.</para>
-     <screen>$ sudo bin/dsconfig set-access-control-handler-prop \
-  --add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes \
+
+     <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ set-access-control-handler-prop \
+ --add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes \
     || objectClasses")(version 3.0;acl "Modify schema"; allow (write) \
     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)' \
-  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+     </screen>
+
     </step>
     <step><para>Verify that the Global ACI was added.</para>
-     <screen>$ sudo bin/dsconfig get-access-control-handler-prop \
-  --property global-aci --port 4444 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --no-prompt</screen>
+
+     <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ get-access-control-handler-prop \
+ --property global-aci \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+     </screen>
+
     </step>
     <step><para>Setting up the external configuration data store
     requires that you manually add three schema files, which OpenAM
@@ -584,9 +646,13 @@ dc=com</screen>
     located at
     <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
     to a local folder.</para>
-     <screen>$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .
-$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .
-$ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</screen>
+
+     <screen>
+$ <userinput>cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .</userinput>
+$ <userinput>cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .</userinput>
+$ <userinput>cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</userinput>
+     </screen>
+
      </step>
      <step><para>Open <literal>cts-indices.ldif</literal> file in a text editor,
      replace the <literal>@DB_NAME@</literal> variable with the backend name
@@ -606,31 +672,65 @@ $ cp /tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</scr
       Note that only the <literal>cts-add-schema.ldif</literal> contains an LDIF
       <literal>changetype</literal> directive. The other files require the
       <literal>--defaultAdd</literal> argument.</para>
-      <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --fileName cts-add-schema.ldif
 
-$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --defaultAdd --fileName cts-indices.ldif
+      <screen>
+$ <userinput>bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --fileName cts-add-schema.ldif</userinput>
 
-$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --fileName cts-container.ldif</screen>
+$ <userinput>bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --defaultAdd \
+ --fileName cts-indices.ldif</userinput>
+
+$ <userinput>bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --fileName cts-container.ldif</userinput>
+      </screen>
+
       </step>
       <step>
           <para>View the list of local DB indexes for the backend to ensure
           that they were properly installed.</para>
-          <screen>$ sudo bin/dsconfig list-local-db-indexes \
-  --backend-name ctsStore --port 4444 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --no-prompt</screen>
+
+          <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ list-local-db-indexes \
+ --backend-name ctsStore \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+          </screen>
+
       </step>
       <step><para>Rebuild the indexes using the <literal>rebuild-index</literal>
        command.
        You will need to stop the server before rebuilding the indexes.</para>
-       <screen>$ sudo bin/stop-ds
-$ sudo bin/rebuild-index --baseDN dc=openam-cts,dc=example,dc=com --rebuildAll</screen>
+
+       <screen>
+$ <userinput>sudo bin/stop-ds</userinput>
+$ <userinput>sudo \
+ bin/rebuild-index \
+ --baseDN dc=openam-cts,dc=example,dc=com \
+ --rebuildAll</userinput>
+       </screen>
+
       </step>
       <step><para>Verify the indexes. When completed, restart the server.</para>
-       <screen>$ sudo bin/verify-index --baseDN dc=openam-cts,dc=example,dc=com
-$ sudo bin/start-ds</screen>
+
+       <screen>
+$ <userinput>sudo bin/verify-index --baseDN dc=openam-cts,dc=example,dc=com</userinput>
+$ <userinput>sudo bin/start-ds</userinput>
+       </screen>
+
        <para>You have successfully prepared the directory server backend for the
        external CTS store. Next, configure the external CTS store in OpenAM.</para>
       </step>
@@ -754,7 +854,7 @@ $ sudo bin/start-ds</screen>
         <para>You have successfully configured an external OpenDJ directory server
          and configured OpenAM to use the external CTS store.
          For more CTS configuration options, see
-         <xref linkend="cts-token-size"><citetitle>Managing CTS Tokens</citetitle></xref>.</para>
+         <xref linkend="cts-token-size" />.</para>
        </step>
       </procedure>
   </section>
@@ -780,16 +880,18 @@ $ sudo bin/start-ds</screen>
     may be required. One way to set a new period for <literal>replication-purge-delay</literal> of
     <replaceable>n</replaceable> hours is with the following command:</para>
 
-    <screen>$ dsconfig
-set-replication-server-prop
---port 4444
---hostname opendj-cts.example.org
---bindDN "cn=Directory Manager"
---bindPassword password
---provider-name "Multimaster Synchronization"
---set replication-purge-delay:<replaceable>n</replaceable>h
---no-prompt
---trustStorePath /path/to/truststore</screen>
+    <screen>
+$ <userinput>dsconfig \
+ set-replication-server-prop \
+ --port 4444 \
+ --hostname opendj-cts.example.org \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --provider-name "Multimaster Synchronization" \
+ --set replication-purge-delay:<replaceable>n</replaceable> \
+ --no-prompt \
+ --trustStorePath /path/to/truststore</userinput>
+    </screen>
 
      <para>At this point, you need to understand whether CTS data backups are important in your deployment.
      Session, SAML 2.0, and OAuth 2.0 token data is often short-lived. In some deployments, the "worst-case"
@@ -801,15 +903,17 @@ set-replication-server-prop
      <literal>crontab</literal> format to configure daily backups
      for a hypothetical Base DN of <literal>ctsData</literal> at x minutes after every hour:</para>
 
-     <screen> $ backup
---port 4444
---bindDN "cn="Directory Manager"
---bindPassword password
---backendID ctsData
---backupDirectory /path/to/opendj/backup
---recurringTask "x * * * *"
---completionNotify backupadmin@example.com
---errorNotify backupadmin@example.com</screen>
+     <screen>
+$ <userinput>backup \
+ --port 4444 \
+ --bindDN "cn="Directory Manager" \
+ --bindPassword password \
+ --backendID ctsData \
+ --backupDirectory /path/to/opendj/backup \
+ --recurringTask "x * * * *" \
+ --completionNotify backupadmin@example.com \
+ --errorNotify backupadmin@example.com</userinput>
+     </screen>
 
     <para>While you may choose to adjust the time periods associated with
     <literal>replication-purge-delay</literal> and backups, be sure that backups are performed more frequently.

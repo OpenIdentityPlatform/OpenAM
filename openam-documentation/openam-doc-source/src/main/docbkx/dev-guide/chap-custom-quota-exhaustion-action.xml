@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-custom-quota-exhaustion-action'
@@ -29,8 +29,7 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing Session Quota Exhaustion Actions</title>
 
  <para>
@@ -174,9 +173,10 @@ public class SampleQuotaExhaustionAction implements QuotaExhaustionAction {
    Build the module using Apache Maven.
   </para>
 
-  <screen>$cd /path/to/openam-examples-quotaexhaustionaction
-$ mvn install
-[INFO] Scanning for projects...
+  <screen>
+$ <userinput>cd /path/to/openam-examples-quotaexhaustionaction</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] Building OpenAM Example Quota Exhaustion Action 1.0.0-SNAPSHOT
@@ -196,14 +196,16 @@ $ mvn install
 [INFO] Total time: 10.138s
 [INFO] Finished at: Mon Nov 25 15:59:10 CET 2013
 [INFO] Final Memory: 18M/129M
-[INFO] ------------------------------------------------------------------------
-</screen>
+[INFO] ------------------------------------------------------------------------</computeroutput>
+  </screen>
 
   <para>
    Copy the .jar to <filename>WEB-INF/lib/</filename> where OpenAM is deployed.
   </para>
 
-  <screen>$ cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+  <screen>
+$ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+  </screen>
 
   <para>
    Using the <command>ssoadm</command> command
@@ -211,18 +213,20 @@ $ mvn install
    update the Session service configuration.
   </para>
 
-  <screen>$ ssoadm
- set-attr-choicevals
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --servicename iPlanetAMSessionService
- --schematype Global
- --attributename iplanet-am-session-constraint-handler
- --add
- --choicevalues myKey=
- org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction
+  <screen>
+$ <userinput>ssoadm \
+ set-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler \
+ --add \
+ --choicevalues myKey=\
+org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction</userinput>
 
-Choice Values were set.</screen>
+<computeroutput>Choice Values were set.</computeroutput>
+  </screen>
 
   <para>
    Extract <filename>amSession.properties</filename>
@@ -234,9 +238,11 @@ Choice Values were set.</screen>
    then you could run the following commands.
   </para>
 
-  <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
-$ jar -xvf ../lib/${coreLibrary} amSession.properties
- inflated: amSession.properties</screen>
+  <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
+$ <userinput>jar -xvf ../lib/${coreLibrary} amSession.properties</userinput>
+ <computeroutput>inflated: amSession.properties</computeroutput>
+  </screen>
 
   <para>
    Add the following line to <filename>amSession.properties</filename>.
@@ -272,21 +278,23 @@ $ jar -xvf ../lib/${coreLibrary} amSession.properties
    or by using the <literal>ssoadm.jsp</literal> page.
   </para>
 
-  <screen>$ ssoadm
- get-attr-choicevals
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --servicename iPlanetAMSessionService
- --schematype Global
- --attributename iplanet-am-session-constraint-handler
-
+  <screen>
+$ <userinput>ssoadm \
+ get-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler</userinput>
+<computeroutput>
 I18n Key                  Choice Value
 ------------------------- ---...-----------------------------------------
 choiceDestroyOldSession   org...session.service.DestroyOldestAction
 choiceDenyAccess          org...session.service.DenyAccessAction
 choiceDestroyNextExpiring org...session.service.DestroyNextExpiringAction
 choiceDestroyAll          org...session.service.DestroyAllAction
-myKey                     org...examples...SampleQuotaExhaustionAction</screen>
+myKey                     org...examples...SampleQuotaExhaustionAction</computeroutput>
+  </screen>
  </section>
 
  <section xml:id="remove-custom-quota-exhaustion-actions">
@@ -298,16 +306,18 @@ myKey                     org...examples...SampleQuotaExhaustionAction</screen>
    or by using the <literal>ssoadm.jsp</literal> page.
   </para>
 
-  <screen>$ ssoadm
- remove-attr-choicevals
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --servicename iPlanetAMSessionService
- --schematype Global
- --attributename iplanet-am-session-constraint-handler
- --choicevalues
- org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction
+  <screen>
+$ <userinput>ssoadm \
+ remove-attr-choicevals \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMSessionService \
+ --schematype Global \
+ --attributename iplanet-am-session-constraint-handler \
+ --choicevalues \
+ org.forgerock.openam.examples.quotaexhaustionaction.SampleQuotaExhaustionAction</userinput>
 
-Choice Values were removed.</screen>
+<computeroutput>Choice Values were removed.</computeroutput>
+  </screen>
  </section>
 </chapter>

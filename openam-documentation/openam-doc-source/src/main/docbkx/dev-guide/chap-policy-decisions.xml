@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-policy-decisions'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Requesting Policy Decisions Using OpenAM Java SDK</title>
  <indexterm>
@@ -204,8 +205,9 @@ action.name=GET</programlisting>
  from OpenAM using the script,
  <filename>scripts/run-policy-evaluation-sample.sh</filename>.</para>
 
- <screen>$ sh scripts/run-policy-evaluation-sample.sh
-Using properties file:policyEvaluationSample
+ <screen>
+$ <userinput>sh scripts/run-policy-evaluation-sample.sh</userinput>
+<computeroutput>Using properties file:policyEvaluationSample
 sample properties:
 user.password:changeit
 service.name:iPlanetAMWebAgentService
@@ -231,7 +233,8 @@ policyDecision:&lt;PolicyDecision&gt;
 &lt;/ActionDecision&gt;
 &lt;/PolicyDecision&gt;
 
-returning from getPolicyDecision()</screen>
+returning from getPolicyDecision()</computeroutput>
+ </screen>
 
  <para>As you see, the policy decision response is formatted here as an XML
  document.<footnote><para>The <literal>PolicyDecision</literal> element is

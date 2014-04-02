@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-post-auth'
@@ -29,8 +29,7 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Creating a Post Authentication Plugin</title>
  <indexterm>
   <primary>Authentication</primary>
@@ -190,9 +189,10 @@ public class SamplePAP implements AMPostAuthProcessInterface {
    Build the module using Apache Maven.
   </para>
 
-  <screen>$ cd /path/to/openam-post-auth-sample
-$ mvn install
-[INFO] Scanning for projects...
+  <screen>
+$ <userinput>cd /path/to/openam-post-auth-sample</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] Building openam-post-auth-sample 1.0.0-SNAPSHOT
@@ -212,14 +212,17 @@ $ mvn install
 [INFO] Total time: 6.727s
 [INFO] Finished at: Mon Nov 25 17:07:23 CET 2013
 [INFO] Final Memory: 20M/227M
-[INFO] ------------------------------------------------------------------------</screen>
+[INFO] ------------------------------------------------------------------------</computeroutput>
+  </screen>
   
   <para>
    Copy the .jar to the <filename>WEB-INF/lib</filename> directory
    where you deployed OpenAM.
   </para>
   
-  <screen>$ cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+  <screen>
+$ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+  </screen>
   
   <para>
    Restart OpenAM or the container in which it runs.
@@ -252,16 +255,18 @@ $ mvn install
    by using the <command>ssoadm</command> command.
   </para>
   
-  <screen>$ ssoadm
+  <screen>
+$ <userinput>ssoadm
  set-svc-attrs
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --servicename iPlanetAMAuthService
  --realm /realm
  --attributevalues iplanet-am-auth-post-login-process-class=
- com.forgerock.openam.examples.SamplePAP
+ com.forgerock.openam.examples.SamplePAP</userinput>
 
-iPlanetAMAuthService under /realm was modified.</screen>
+<computeroutput>iPlanetAMAuthService under /realm was modified.</computeroutput>
+  </screen>
  </section>
 
  <section xml:id="test-post-authentication-plugin">

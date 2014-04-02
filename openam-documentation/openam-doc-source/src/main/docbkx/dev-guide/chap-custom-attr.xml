@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-custom-attr'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing Profile Attributes</title>
  <indexterm>
   <primary>User data</primary>
@@ -59,8 +59,11 @@
   <step>
    <para>Create a backup copy of the configuration file for the
    <literal>iPlanetAmUserService</literal>.</para>
-   <screen>$ cd $HOME
-$ cp openam/config/xml/amUser.xml openam/config/xml/amUser.xml.orig</screen>
+
+   <screen>
+$ <userinput>cp ~/openam/config/xml/amUser.xml ~/openam/config/xml/amUser.xml.orig</userinput>
+   </screen>
+
   </step>
   <step>
    <para>Edit the file to add your attribute as one of the list of
@@ -78,21 +81,25 @@ $ cp openam/config/xml/amUser.xml openam/config/xml/amUser.xml.orig</screen>
   <step>
    <para>Delete <literal>iPlanetAMUserService</literal>, and then create it
    from your updated configuration file.</para>
-   <screen>$ cd /path/to/tools/openam/bin/
-$ ssoadm
- delete-svc
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --servicename iPlanetAMUserService
 
-Service was deleted.
-$ ssoadm
- create-svc
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --xmlfile $HOME/openam/config/xml/amUser.xml
+   <screen>
+$ <userinput>cd /path/to/tools/openam/bin/</userinput>
+$ <userinput>ssoadm \
+ delete-svc \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename iPlanetAMUserService</userinput>
 
-Service was added.</screen>
+<computeroutput>Service was deleted.</computeroutput>
+$ <userinput>ssoadm \
+ create-svc \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --xmlfile $HOME/openam/config/xml/amUser.xml</userinput>
+
+<computeroutput>Service was added.</computeroutput>
+   </screen>
+
   </step>
  </procedure>
 
@@ -117,8 +124,10 @@ Service was added.</screen>
   <step>
    <para>Prepare the attribute type object class definitions in LDIF
    format.</para>
-   <screen>$ cat custom-attr.ldif 
-dn: cn=schema
+
+   <screen>
+$ <userinput>cat custom-attr.ldif</userinput>
+<computeroutput>dn: cn=schema
 changetype: modify
 add: attributeTypes
 attributeTypes: ( temp-custom-attr-oid NAME 'customAttribute' EQUALITY case
@@ -127,19 +136,23 @@ attributeTypes: ( temp-custom-attr-oid NAME 'customAttribute' EQUALITY case
 -
 add: objectClasses
 objectClasses: ( temp-custom-oc-oid NAME 'customObjectclass' SUP top AUX
- ILIARY MAY customAttribute )
-</screen>
+ ILIARY MAY customAttribute )</computeroutput>
+   </screen>
   </step>
   <step>
    <para>Add the schema definitions to the directory.</para>
-   <screen>$ /path/to/OpenDJ/bin/ldapmodify
- --port 1389
- --hostname openam.example.com
- --bindDN "cn=Directory Manager"
- --bindPassword password
- --filename custom-attr.ldif
-Processing MODIFY request for cn=schema
-MODIFY operation successful for DN cn=schema</screen>
+
+   <screen>
+$ <userinput>/path/to/opendj/bin/ldapmodify \
+ --port 1389 \
+ --hostname openam.example.com \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --filename custom-attr.ldif</userinput>
+<computeroutput>Processing MODIFY request for cn=schema
+MODIFY operation successful for DN cn=schema</computeroutput>
+   </screen>
+
   </step>
   <step>
    <para>In OpenAM console, browse to Access Control &gt; <replaceable>Realm
@@ -168,7 +181,11 @@ MODIFY operation successful for DN cn=schema</screen>
   <step>
    <para>Login to the control panel for the embedded configuration
    directory.</para>
-   <screen>$ ./openam/opends/bin/control-panel &amp;</screen>
+
+   <screen>
+$ <userinput>./openam/opends/bin/control-panel &amp;</userinput>
+   </screen>
+
    <para>Connect using bind DN <literal>cn=Directory Manager</literal> and the
    the password for <literal>amadmin</literal>.</para>
   </step>
@@ -195,8 +212,12 @@ MODIFY operation successful for DN cn=schema</screen>
   </step>
   <step>
    <para>Restart OpenAM or the web container where it runs. The following example applies to Tomcat.</para>
-   <screen>$ /path/to/tomcat/bin/shutdown.sh
-$ /path/to/tomcat/bin/startup.sh</screen>
+
+   <screen>
+$ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
+$ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
+   </screen>
+
   </step>
   <step>
    <para>Login to OpenAM console as a user to check that a user can save a

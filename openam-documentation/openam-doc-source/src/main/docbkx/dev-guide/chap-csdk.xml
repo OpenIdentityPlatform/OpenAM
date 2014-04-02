@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-csdk'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Using the OpenAM C API</title>
  <indexterm>
   <primary>Installing</primary>
@@ -44,9 +44,11 @@
  <para>To prepare to install OpenAM C SDK, first download the version for your
  platform and unpack the archive as in the following example.</para>
 
- <screen># mkdir -p /path/to/openam-client
-# cd /path/to/openam-client
-$ unzip ~/Downloads/common_3_0_Linux_64bit.zip</screen>
+ <screen>
+$ <userinput>mkdir -p /path/to/openam-client</userinput>
+$ <userinput>cd /path/to/openam-client</userinput>
+$ <userinput>unzip ~/Downloads/common_3_0_Linux_64bit.zip</userinput>
+ </screen>
 
  <para>All C SDK deliveries are .zip files, and the filenames are self-explanatory.
  The <filename>SunOS</filename> in some of the .zip files refer to the Solaris
@@ -123,10 +125,13 @@ $ unzip ~/Downloads/common_3_0_Linux_64bit.zip</screen>
    any specific instructions required for your platform. The two commands
    shown here confirm that the specified system is a 64-bit Linux OS. Make
    sure it matches the C SDK package that you have downloaded.</para>
-   <screen>$ uname -s
-Linux
-$ uname -m
-x86_64</screen>
+
+   <screen>
+$ <userinput>uname -s</userinput>
+<computeroutput>Linux</computeroutput>
+$ <userinput>uname -m</userinput>
+<computeroutput>x86_64</computeroutput>
+   </screen>
   </step>
   <step>
    <para>Set up <filename>OpenSSOAgentBootstrap.properties</filename>
@@ -139,13 +144,15 @@ x86_64</screen>
   </step>
   <step>
    <para>Try one of the samples you built to test your build.</para>
-   <screen>$ LD_LIBRARY_PATH=../lib
- ./am_auth_test
- -f ../config/<?eval ${agentsBootstrapFile}?>
- -u demo
- -p changeit
- -o /
-   Login  1 Succeeded!
+
+   <screen>
+$ <userinput>LD_LIBRARY_PATH=../lib \
+ ./am_auth_test \
+ -f ../config/${agentsBootstrapFile} \
+ -u demo \
+ -p changeit \
+ -o /</userinput>
+<computeroutput>   Login  1 Succeeded!
       SSOToken = AQIC5wM2LY4SfcxZfk4EzC9Y46P9cXG9ogwf2ixnYOeZ0K0.*AAJTSQACMDE.*
       Organization = /
       Module Instance Name [0] = SAE
@@ -154,7 +161,8 @@ x86_64</screen>
       Module Instance Name [3] = Federation
       Module Instance Name [4] = HOTP
       Module Instance Name [5] = DataStore
-   Logout 1 Succeeded!</screen>
+   Logout 1 Succeeded!</computeroutput>
+   </screen>
   </step>
  </procedure>
 </chapter>

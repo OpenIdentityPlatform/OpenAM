@@ -101,8 +101,12 @@
   <step>
    <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
    <filename>webapps/</filename> directory.</para>
-   <screen>cp ~/Downloads/openam/<?eval ${distauthWarFile}?>
- /path/to/tomcat/webapps</screen>
+
+   <screen>
+$ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
+ /path/to/tomcat/webapps</userinput>
+   </screen>
+
   </step>
   <step>
    <para>Check that you see the initial DAS configuration screen

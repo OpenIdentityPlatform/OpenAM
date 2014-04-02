@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
@@ -107,7 +108,11 @@
    </step>
    <step>
     <para>Create a text file containing only the password.</para>
-    <screen>C:\&gt;notepad C:\Windows\Temp\pwd.txt</screen>
+
+    <screen>
+C:\><userinput>notepad C:\Windows\Temp\pwd.txt</userinput>
+    </screen>
+
    </step>
   </procedure>
   
@@ -119,7 +124,11 @@
    </step>
    <step>
     <para>Change to the directory where you unpacked the agent download.</para>
-    <screen>C:\&gt;cd web_agents\iis6_agent\bin</screen>
+
+    <screen>
+C:\><userinput>cd web_agents\iis6_agent\bin</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Create a configuration file using the
@@ -128,32 +137,35 @@
      <para>The Web Site Identifier is the value of <literal>id</literal>,
      not the site name.</para>
     </note>
-    <screen>C:\web_agents\iis6_agent\bin&gt;cscript IIS6CreateConfig.vbs config.txt
-...
+
+    <screen>
+C:\web_agents\iis6_agent\bin><userinput>cscript IIS6CreateConfig.vbs config.txt</userinput>
+<computeroutput>...
 Enter the Agent Resource File Name [IIS6Resource.en] :
 
-Enter the Agent URL (Example: http://agent.example.com:80) :
+Enter the Agent URL (Example: http://agent.example.com:80) :</computeroutput>
 <userinput>http://windows2003.example.com:80</userinput>
 
-Displaying the list of Web Sites and its corresponding Identifiers
+<computeroutput>Displaying the list of Web Sites and its corresponding Identifiers
 Site Name (Site Id)
 Default Web Site (1)
 
-Web Site Identifier :
+Web Site Identifier :</computeroutput>
 <userinput>1</userinput>
-...
-Enter the URL where the OpenAM server is running...:
+<computeroutput>...
+Enter the URL where the OpenAM server is running...:</computeroutput>
 <userinput>http://openam.example.com:8080/openam</userinput>
 
-Please enter the Agent Profile name :
+<computeroutput>Please enter the Agent Profile name :</computeroutput>
 <userinput>IIS 6 Web Agent</userinput>
 
-Enter the Agent profile password file :
+<computeroutput>Enter the Agent profile password file :</computeroutput>
 <userinput>C:\Windows\Temp\pwd.txt</userinput>
-
+<computeroutput>
 -----------------------------------------------------
 Agent Configuration file created : config.txt
------------------------------------------------------</screen>
+-----------------------------------------------------</computeroutput>
+    </screen>
    </step>
   </procedure>
   
@@ -168,27 +180,36 @@ Agent Configuration file created : config.txt
    </step>
    <step>
     <para>Run <command>IIS6Admin.vbs</command> to install the agent.</para>
-    <screen>C:\web_agents\iis6_agent\bin&gt;cscript IIS6Admin.vbs -config config.txt
-...
+
+    <screen>
+C:\web_agents\iis6_agent\bin><userinput>cscript IIS6Admin.vbs -config config.txt</userinput>
+<computeroutput>...
 Enter the Agent Resource File Name [IIS6Resource.en] :
 
 Creating the Agent Config Directory
-Creating the <?eval ${agentsBootstrapFile}?> and
- <?eval ${agentsConfigurationFile}?> File
+Creating the ${agentsBootstrapFile} and
+ ${agentsConfigurationFile} File
 Updating the Windows Product Registry
 Loading the IIS 6.0 Agent
-Completed Configuring the IIS 6.0 Agent</screen>
+Completed Configuring the IIS 6.0 Agent</computeroutput>
+    </screen>
+
    </step>
    <step>
     <para>Restart IIS 6.</para>
-    <screen>C:\web_agents\iis6_agent\bin&gt;iisreset
 
+    <screen>
+C:\web_agents\iis6_agent\bin><userinput>iisreset</userinput>
+<computeroutput>
 Attempting stop...
 Internet services successfully stopped
 Attempting start...
-Internet services successfully restarted</screen>
+Internet services successfully restarted</computeroutput>
+    </screen>
+
     <note>
-     <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
+     <para>If the agent is in a different domain than the server, refer to
+      the <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
    Single Sign On</citetitle></link>.</para>
@@ -276,7 +297,9 @@ Internet services successfully restarted</screen>
   plus the encrypted password retrieved originally from the password
   file. Encrypt passwords using <command>cryptit.exe</command>.</para>
   
-  <screen>C:\web_agents\iis6_agent\bin&gt;cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></screen>
+  <screen>
+C:\web_agents\iis6_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></userinput>
+  </screen>
 
   <para>The <command>cryptit.exe</command> command uses its own implementation of the
   Rivest Cipher 5 (RC5) encryption algorithm.</para>

@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Preparing For Installation</title>
 
@@ -171,8 +172,9 @@ openam soft nofile 65536
 openam hard nofile 131072
   </programlisting>
 
-  <screen>$ ulimit -n
-65536</screen>
+  <screen>
+$ <userinput>ulimit -n</userinput>
+<computeroutput>65536</computeroutput></screen>
 
   <para>
    The example above assumes the system has enough file descriptors overall.
@@ -185,8 +187,10 @@ openam hard nofile 131072
    You can check the Linux system overall maximum as follows.
   </para>
 
-  <screen>$ cat /proc/sys/fs/file-max
-204252</screen>
+  <screen>
+$ <userinput>cat /proc/sys/fs/file-max</userinput>
+<computeroutput>204252</computeroutput>
+  </screen>
 
   <orderedlist>
    <para>
@@ -511,8 +515,13 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
       <link xlink:show="new"
            xlink:href="${opendjDocBase}/install-guide/index.html#chap-install-cli">
            Installing OpenDJ From the Command Line</link>.</para>
-      <screen>$ cd /path/to/opendj
-$ sudo ./setup --cli</screen>
+
+      <!-- Why install OpenDJ as root? -->
+      <screen>
+$ <userinput>cd /path/to/opendj</userinput>
+$ <userinput>sudo ./setup --cli</userinput>
+      </screen>
+
       <para>Example options are as follows:</para>
              <table xml:id="prepare-configuration-store-ds">
                  <title>Example OpenDJ Setup Parameters</title>
@@ -579,16 +588,42 @@ $ sudo ./setup --cli</screen>
   <procedure xml:id="prepare-external-configuration-store">
    <title>To Prepare the OpenDJ External Configuration Store</title>
          <step><para>Change to the OpenDJ directory.</para>
-<screen>$ cd /path/to/opendj</screen></step>
+
+          <screen>
+$ <userinput>cd /path/to/opendj</userinput>
+          </screen>
+
+         </step>
          <step><para>Create a directory server backend,
          and call it <literal>cfgStore</literal>.</para>
-         <screen>$ sudo bin/dsconfig create-backend \
-  --backend-name cfgStore --set base-dn: dc=example,dc=com \
-  --set enabled:true --type local-db --port 4444 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --no-prompt</screen></step>
+
+         <screen>
+$ <userinput>sudo \
+ bin/dsconfig create-backend \
+ --backend-name cfgStore \
+ --set base-dn:dc=example,dc=com \
+ --set enabled:true \
+ --type local-db \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+         </screen>
+
+         </step>
          <step><para>Verify that you created the backend.</para>
-         <screen>$ sudo bin/dsconfig list-backends \
-  --port 4444 --bindDN "cn=Directory Manager" --bindPassword pwd --no-prompt</screen>
+
+         <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ list-backends \
+ --port 4444 \
+ --bindDN \
+ "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+         </screen>
+
          </step>
          <step>
              <para>Create an LDIF file to add the initial entries for the
@@ -605,7 +640,7 @@ aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
 aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)
      (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
 aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl
-     “Allow persistent search”; allow (search, read)
+     "Allow persistent search"; allow (search, read)
      (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
 aci: (version 3.0;acl "Add config entry"; allow (add)
      (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
@@ -634,36 +669,72 @@ ds-privilege-name: update-schema
          <step>
              <para>Add the initial entries LDIF file using the
              <literal>ldapmodify</literal> command.</para>
-             <screen>$ bin/ldapmodify --port 1389 --bindDN “cn=Directory Manager” \
-  --bindPassword pwd —-defaultAdd —-filename add-config-entries.ldif</screen>
+
+             <screen>
+$ <userinput>bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ —-defaultAdd \
+ —-filename add-config-entries.ldif</userinput>
+             </screen>
+
          </step>
          <step><para>Verify the entries using <literal>ldapsearch</literal>.</para>
-         <screen>$ bin/ldapsearch --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --baseDN dc=example,dc=com "(objectclass=*)"</screen>
+
+         <screen>
+$ <userinput>bin/ldapsearch \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword pwd \
+--baseDN dc=example,dc=com \
+"(objectclass=*)"</userinput></screen>
+
          </step>
          <step><para>Add the Global Access Control Instruction (ACI) to the
          access control handler.
          The Global ACI gives OpenAM the privileges to modify the schema for the
          custom configuration. </para>
-         <screen>$ sudo bin/dsconfig set-access-control-handler-prop \
-  --add global-aci:’(target = “ldap:///cn=schema”)(targetattr = “attributeTypes || \
-  objectClasses”)(version 3.0; acl “Modify schema”; allow (write) \
-  (userdn = “ldap:///uid=openam,ou=admins,dc=example,dc=com”);)’ \
-  --port 4444 --bindDN “cn=Directory Manager” --bindPassword pwd --no-prompt</screen>
+
+         <screen>
+$ <userinput>sudo \
+bin/dsconfig \
+set-access-control-handler-prop \
+--add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes || \
+  objectClasses")(version 3.0; acl "Modify schema"; allow (write) \
+  (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)' \
+--port 4444 \
+--bindDN "cn=Directory Manager" \
+--bindPassword pwd \
+--no-prompt</userinput></screen>
+
          </step>
          <step><para>Verify that the Global ACI was added.</para>
-         <screen>$ sudo bin/dsconfig get-access-control-handler-prop \
-  --property global-aci --port 4444 --bindDN “cn=Directory Manager” \
-  --bindPassword pwd --no-prompt</screen>
+
+         <screen>
+$ <userinput>sudo \
+ bin/dsconfig \
+ get-access-control-handler-prop \
+ --property global-aci \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword pwd \
+ --no-prompt</userinput>
+         </screen>
+
          </step>
          <step><para>Copy the schema files, located at
              <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
              to a local folder.
              The <literal>cts-indices.ldif</literal> and
              <literal>cts-container.ldif</literal> files require some minor editing.</para>
-         <screen>$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .
-$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .
-$ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</screen>
+
+         <screen width="85">
+$ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .</userinput>
+$ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .</userinput>
+$ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</userinput>
+         </screen>
+
         </step>
          <step><para>Open <literal>cts-indices.ldif</literal> file in a text editor
              and replace the <literal>@DB_NAME@</literal> variable with the backend name "cfgStore".
@@ -676,24 +747,45 @@ $ cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldi
          </step>
          <step><para>Add the Schema files.
          Make sure to add the <literal>cts-add-schema.ldif</literal> file first.</para>
-         <screen>$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --fileName cts-add-schema.ldif
 
-$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --fileName cts-indices.ldif
+         <screen>
+$ <userinput>bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword pwd \
+--fileName cts-add-schema.ldif</userinput>
 
-$ bin/ldapmodify --port 1389 --bindDN "cn=Directory Manager" \
-  --bindPassword pwd --fileName cts-container.ldif</screen>
+$ <userinput>bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword pwd \
+--fileName cts-indices.ldif</userinput>
+
+$ <userinput>bin/ldapmodify \
+--port 1389 \
+--bindDN "cn=Directory Manager" \
+--bindPassword pwd \
+--fileName cts-container.ldif</userinput>
+         </screen>
+
          </step>
          <step><para>Rebuild the indexes using the <literal>rebuild-index</literal>
              command.
              You will need to stop the server before rebuilding the indexes.</para>
-             <screen>$ sudo bin/stop-ds
-$ sudo bin/rebuild-index --baseDN dc=example,dc=com --rebuildAll</screen>
+
+             <screen>
+$ <userinput>sudo bin/stop-ds</userinput>
+$ <userinput>sudo bin/rebuild-index --baseDN dc=example,dc=com --rebuildAll</userinput>
+             </screen>
+
          </step>
          <step><para>Verify the indexes. When completed, restart the server.</para>
-             <screen>$ sudo bin/verify-index —-baseDN dc=example,dc=com
-$ sudo bin/start-ds</screen>
+
+             <screen>
+$ <userinput>sudo bin/verify-index —-baseDN dc=example,dc=com</userinput>
+$ <userinput>sudo bin/start-ds</userinput>
+             </screen>
+
          <para>You have successfully prepared the directory server for an
          external configuration store. When installing the OpenAM server,
          you will need to specify the host name, port and root suffix
@@ -886,9 +978,12 @@ aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
 
   <para>After you download the <filename>.zip</filename> file, create a new 
   openam folder, and unzip the <filename>.zip</filename> file to access the content:</para>
-  <screen>$ cd ~/Downloads
-$ mkdir openam ; cd openam
-$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?></screen>
+
+  <screen>
+$ <userinput>cd ~/Downloads</userinput>
+$ <userinput>mkdir openam ; cd openam</userinput>
+$ <userinput>unzip ~/Downloads/${coreDirectoryFile}</userinput>
+  </screen>
 
   <variablelist>
    <para>When you unzip the archive of the entire package, you get ldif, license, and 
@@ -978,7 +1073,8 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?></screen>
   is allocated to OpenDJ. See <xref linkend="prepare-java" /> for
   details.</para>
 
-  <programlisting language="shell">#!/bin/sh
+  <programlisting language="shell">
+#!/bin/sh
 #
 # tomcat
 #
@@ -1005,7 +1101,7 @@ stop)
   exit 1
   ;;
 esac
-</programlisting>
+  </programlisting>
  </section>
 
  <section xml:id="prepare-glassfish">
@@ -1035,29 +1131,35 @@ esac
      <para>Extract the OpenAM server .war file content to a working
      directory.</para>
 
-     <screen>$ mkdir /tmp/openam ; cd /tmp/openam
-$ jar -xf ~/Downloads/openam.war</screen>
+     <screen>
+$ <userinput>mkdir /tmp/openam ; cd /tmp/openam</userinput>
+$ <userinput>jar -xf ~/Downloads/openam.war</userinput>
+     </screen>
     </listitem>
 
     <listitem>
      <para>Add a <filename>WEB-INF/sun-web.xml</filename> file to set
      class-loading delegation to false.</para>
 
-     <screen>$ vi WEB-INF/sun-web.xml
-$ cat WEB-INF/sun-web.xml
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+     <screen>
+$ <userinput>vi WEB-INF/sun-web.xml</userinput>
+$ <userinput>cat WEB-INF/sun-web.xml</userinput>
+<computeroutput>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE sun-web-app PUBLIC
  &quot;-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN&quot;
  &quot;http://www.sun.com/software/appserver/dtds/sun-web-app_2_5-0.dtd&quot;&gt;
 &lt;sun-web-app error-url=&quot;&quot;&gt;
   &lt;class-loader delegate=&quot;false&quot;/&gt;
-&lt;/sun-web-app&gt;</screen>
+&lt;/sun-web-app&gt;</computeroutput>
+     </screen>
     </listitem>
 
     <listitem>
      <para>Pack the updated .war file to deploy.</para>
 
-     <screen>$ jar -cf ../openam.war *</screen>
+     <screen>
+$ <userinput>jar -cf ../openam.war *</userinput>
+     </screen>
     </listitem>
 
     <listitem>
@@ -1083,9 +1185,11 @@ $ cat WEB-INF/sun-web.xml
       Stop GlassFish if it is running.
      </para>
 
-     <screen>$ /path/to/glassfish3/bin/asadmin stop-domain domain1
-Waiting for the domain to stop ....
-Command stop-domain executed successfully.</screen>
+     <screen>
+$ <userinput>/path/to/glassfish3/bin/asadmin stop-domain domain1</userinput>
+<computeroutput>Waiting for the domain to stop ....
+Command stop-domain executed successfully.</computeroutput>
+     </screen>
     </listitem>
 
     <listitem>
@@ -1093,10 +1197,12 @@ Command stop-domain executed successfully.</screen>
       Remove the packages by using the <command>pkg</command> command.
      </para>
 
-     <screen>$ cd /path/to/glassfish3/bin/
-./pkg uninstall glassfish-full-profile metro
-PHASE                                        ACTIONS
-Removal Phase                                  56/56</screen>
+     <screen>
+$ <userinput>cd /path/to/glassfish3/bin/</userinput>
+$ <userinput>./pkg uninstall glassfish-full-profile metro</userinput>
+<computeroutput>PHASE                                        ACTIONS
+Removal Phase                                  56/56</computeroutput>
+     </screen>
     </listitem>
 
     <listitem>
@@ -1104,13 +1210,15 @@ Removal Phase                                  56/56</screen>
       Start GlassFish.
      </para>
 
-     <screen>$ /path/to/glassfish3/bin/asadmin start-domain domain1
-Waiting for domain1 to start ...
+     <screen>
+$ <userinput>/path/to/glassfish3/bin/asadmin start-domain domain1</userinput>
+<computeroutput>Waiting for domain1 to start ...
 Successfully started the domain : domain1
 domain  Location: /path/to/glassfish3/glassfish/domains/domain1
 Log File: /path/to/glassfish3/glassfish/domains/domain1/logs/server.log
 Admin Port: 4848
-Command start-domain executed successfully.</screen>
+Command start-domain executed successfully.</computeroutput>
+     </screen>
 
      <para>
       If the domain fails to start the first time you run the command,
@@ -1130,22 +1238,24 @@ Command start-domain executed successfully.</screen>
   <literal>configuration.dir</literal> property to the location where OpenAM
   has write access to store its configuration.</para>
 
-  <screen>$ mkdir openam
-$ cd openam
-$ jar -xf ~/Downloads/openam/<?eval ${coreWarFile}?>
-$ vi WEB-INF/classes/bootstrap.properties
-$ grep ^config WEB-INF/classes/bootstrap.properties
-configuration.dir=/home/jboss-user/openam</screen>
+  <screen>
+$ <userinput>mkdir openam</userinput>
+$ <userinput>cd openam</userinput>
+$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+$ <userinput>vi WEB-INF/classes/bootstrap.properties</userinput>
+$ <userinput>grep ^config WEB-INF/classes/bootstrap.properties</userinput>
+<computeroutput>configuration.dir=/home/jboss-user/openam</computeroutput>
+  </screen>
 
   <para>Also, OpenAM .jar libraries that conflict with JBoss libraries must
   be loaded first. Add a <filename>WEB-INF/jboss-web.xml</filename> to ensure
   this happens. (If you deploy the exploded .war, you also need to add this
   file.)</para>
 
-  <screen>$ vi WEB-INF/jboss-web.xml
-$ cat WEB-INF/jboss-web.xml</screen>
-
-  <programlisting language="xml">&lt;!DOCTYPE jboss-web PUBLIC
+  <screen>
+$ <userinput>vi WEB-INF/jboss-web.xml</userinput>
+$ <userinput>cat WEB-INF/jboss-web.xml</userinput>
+<computeroutput>&lt;!DOCTYPE jboss-web PUBLIC
   &quot;-//JBoss//DTD Web Application 5.0//EN&quot;
   &quot;http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd&quot;&gt;
 &lt;jboss-web&gt;
@@ -1155,11 +1265,14 @@ $ cat WEB-INF/jboss-web.xml</screen>
     &lt;loader-repository-config&gt;java2ParentDelegaton=true&lt;/loader-repository-config&gt;
     &lt;/loader-repository&gt;
   &lt;/class-loading&gt;
-&lt;/jboss-web&gt;</programlisting>
+&lt;/jboss-web&gt;</computeroutput>
+  </screen>
 
   <para>Repack the .war file that you can then deploy.</para>
 
-  <screen>$ jar -cf ../openam.war *</screen>
+  <screen>
+$ <userinput>jar -cf ../openam.war *</userinput>
+  </screen>
 
   <para>Before you deploy OpenAM, update the JVM options as described in
   <xref linkend="prepare-java" />.</para>
@@ -1236,21 +1349,27 @@ $ cat WEB-INF/jboss-web.xml</screen>
                     <step>
                         <para>The following example is based on JBoss 7.1.0 standalone mode. Remember to
                             remove all subsystems and extension tags associated with <literal>urn:jboss:domain:jaxrs:1.0</literal>.</para>
-                        <screen>$ vi /path/to/jboss/standalone/configuration/standalone.xml
-&lt;extension module="org.jboss.as.ejb3"/&gt;
+
+                        <screen>
+$ <userinput>vi /path/to/jboss/standalone/configuration/standalone.xml</userinput>
+<computeroutput>&lt;extension module="org.jboss.as.ejb3"/&gt;
 -  &lt;extension module="org.jboss.as.jaxrs"/&gt;
 ....
 -  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
-&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</computeroutput>
+                        </screen>
                     </step>
                     <step>
                         <para>The following example is based on JBoss 7.1.0 for a managed domain.</para>
-                        <screen>$ vi /path/to/jboss7/domain/configuration/domain.xml
-&lt;extension module="org.jboss.as.ejb3"/&gt;
+
+                        <screen>
+$ <userinput>vi /path/to/jboss7/domain/configuration/domain.xml</userinput>
+<computeroutput>&lt;extension module="org.jboss.as.ejb3"/&gt;
 -  &lt;extension module="org.jboss.as.jaxrs"/&gt;
 ....
 -  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
-&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</computeroutput>
+                        </screen>
                     </step>
                 </stepalternatives>
             </step>
@@ -1260,9 +1379,12 @@ $ cat WEB-INF/jboss-web.xml</screen>
                     files, you will also need to delete <literal>org.jboss.as.webservices</literal> references.
                     Depending on the file, this includes one or more groups of <literal>subsystem</literal> lines
                     such as:</para>
-                <screen>&lt;subsystem xmlns="urn:jboss:domain:webservices:1.1"/&gt;
+
+                <programlisting language="xml">
+&lt;subsystem xmlns="urn:jboss:domain:webservices:1.1"/&gt;
 ....
-&lt;/subsystem&gt;</screen>
+&lt;/subsystem&gt;
+                </programlisting>
             </step>
 
             <step>
@@ -1288,15 +1410,19 @@ $ cat WEB-INF/jboss-web.xml</screen>
                 <orderedlist numeration="arabic">
                     <listitem>
                         <para>Create a temporary directory and expand the <filename>openam.war</filename>.</para>
-                        <screen> $ mkdir /tmp/openam ; cd /tmp/openam
-                            $ jar xvf /path/to/<?eval ${coreWarFile}?></screen>
+
+                        <screen>
+$ <userinput>mkdir /tmp/openam ; cd /tmp/openam</userinput>
+$ <userinput>jar xvf /path/to/${coreWarFile}</userinput>
+                        </screen>
                     </listitem>
                     <listitem>
                         <para>Create a new <filename>jboss-deployment-structure.xml</filename> file in the
                             <filename>WEB-INF</filename> subdirectory so that it appears as follows, and save
                             the change.</para>
-                        <screen>$ vi WEB-INF/jboss-deployment-structure.xml</screen>
-                        <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+
+                        <programlisting language="xml">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
  &lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2"&gt;
   &lt;deployment&gt;
    &lt;exclusions&gt;
@@ -1328,7 +1454,10 @@ $ cat WEB-INF/jboss-web.xml</screen>
                     </listitem>
                     <listitem>
                         <para>Rebuild the <filename>openam.war</filename> file.</para>
-                        <screen>$ jar cvf ../openam.war *</screen>
+
+                     <screen>
+$ <userinput>jar cvf ../openam.war *</userinput>
+                     </screen>
                     </listitem>
                 </orderedlist>
 
@@ -1420,27 +1549,35 @@ $ cat WEB-INF/jboss-web.xml</screen>
             <step>
                 <para>If you have not already done so, create a temporary directory and
                     expand the <filename>openam.war</filename>.</para>
-                <screen> $ cd /tmp
-$ mkdir /tmp/openam ; cd /tmp/openam
-$ jar xvf ~/Downloads/<?eval ${coreWarFile}?></screen>
+
+                <screen>
+$ <userinput>cd /tmp</userinput>
+$ <userinput>mkdir /tmp/openam ; cd /tmp/openam</userinput>
+$ <userinput>jar xvf ~/Downloads/${coreWarFile}</userinput>
+                </screen>
             </step>
 
             <step>
                 <para>Update the <literal># configuration.dir=</literal> line in the
                     <filename>bootstrap.properties</filename> file so that it appears as follows,
                     and save the change.</para>
-                <screen>$ vi WEB-INF/classes/bootstrap.properties
+
+                <programlisting language="ini">
 # This property should also be used when the system user that
 # is running the web/application server process does not have
 # a home directory. i.e. System.getProperty("user.home") returns
 # null.
 
-configuration.dir=$HOME/openamJboss</screen>
+configuration.dir=$HOME/openamJboss
+                </programlisting>
             </step>
 
             <step>
                 <para>Rebuild the <filename>openam.war</filename> file.</para>
-                <screen>$ jar cvf ../openam.war *</screen>
+
+                <screen>
+$ <userinput>jar cvf ../openam.war *</userinput>
+                </screen>
             </step>
 
         </procedure>
@@ -1454,8 +1591,10 @@ configuration.dir=$HOME/openamJboss</screen>
   <para>When you deploy OpenAM, make sure you start Jetty with enough
   memory.</para>
 
-  <screen>$ cd /path/to/jetty
-$ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
+  <screen>
+$ <userinput>cd /path/to/jetty</userinput>
+$ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinput>
+  </screen>
 
   <para>If you are using the embedded version of OpenDJ, the required
   JVM memory may be higher. For details on the JVM options to use, see
@@ -1623,24 +1762,29 @@ com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</li
    <listitem>
     <para>Unpack the OpenAM .war file.</para>
 
-    <screen>$ mkdir /tmp/openam
-$ cd /tmp/openam/
-$ jar -xf ~/Downloads/openam/<?eval ${coreWarFile}?></screen>
+    <screen>
+$ <userinput>mkdir /tmp/openam</userinput>
+$ <userinput>cd /tmp/openam/</userinput>
+$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+    </screen>
    </listitem>
 
    <listitem>
     <para>Add the JAXP Reference Implementation .jar in
     <filename>WEB-INF/lib/</filename>.</para>
 
-    <screen width="89"
-    >$ wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar
-$ mv jaxp-ri-1.4.5.jar WEB-INF/lib/</screen>
+    <screen width="89">
+$ <userinput>wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar</userinput>
+$ <userinput>mv jaxp-ri-1.4.5.jar WEB-INF/lib/</userinput>
+    </screen>
    </listitem>
 
    <listitem>
     <para>Pack up the OpenAM .war file to deploy in WebSphere.</para>
 
-    <screen>$ jar -cf ../openam.war *</screen>
+    <screen>
+$ <userinput>jar -cf ../openam.war *</userinput>
+    </screen>
    </listitem>
 
    <listitem>

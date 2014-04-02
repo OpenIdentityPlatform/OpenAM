@@ -119,7 +119,11 @@
    </step>
    <step>
     <para>Create a text file containing only the password.</para>
-    <screen>C:\&gt;notepad C:\Windows\Temp\pwd.txt</screen>
+
+    <screen>
+C:\><userinput>notepad C:\Windows\Temp\pwd.txt</userinput>
+    </screen>
+
    </step>
   </procedure>
   
@@ -131,7 +135,11 @@
    </step>
    <step>
     <para>Change to the directory where you unpacked the agent download.</para>
-    <screen>C:\&gt;cd web_agents\iis7_agent\bin</screen>
+
+    <screen>
+C:\><userinput>cd web_agents\iis7_agent\bin</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Create a configuration file using the
@@ -140,32 +148,35 @@
      <para>The Web Site Identifier is the value of <literal>id</literal>,
      not the site name.</para>
     </note>
-    <screen>C:\web_agents\iis7_agent\bin&gt;cscript IIS7CreateConfig.vbs config.txt
-...
+
+    <screen>
+C:\web_agents\iis7_agent\bin><userinput>cscript IIS7CreateConfig.vbs config.txt</userinput>
+<computeroutput>...
 Enter the Agent Resource File Name [IIS7Resource.en] :
 
-Enter the Agent URL (Example: http://agent.example.com:80) :
+Enter the Agent URL (Example: http://agent.example.com:80) :</computeroutput>
 <userinput>http://windows7.example.com:80</userinput>
-
+<computeroutput>
 Displaying the list of Web Sites and its corresponding Identifiers (id)
 
-SITE "Default Web Site" (<emphasis role="strong">id:1</emphasis>,bindings:http/*:80:,state:Started)
+SITE "Default Web Site" (id:1,bindings:http/*:80:,state:Started)
 
-Web Site Identifier :
+Web Site Identifier :</computeroutput>
 <userinput>1</userinput>
-...
-Enter the URL where the OpenAM server is running...:
+<computeroutput>...
+Enter the URL where the OpenAM server is running...:</computeroutput>
 <userinput>http://openam.example.com:8080/openam</userinput>
 
-Please enter the Agent Profile name :
+<computeroutput>Please enter the Agent Profile name :</computeroutput>
 <userinput>IIS 7 Web Agent</userinput>
 
-Enter the Agent profile password file :
+<computeroutput>Enter the Agent profile password file :</computeroutput>
 <userinput>C:\Windows\Temp\pwd.txt</userinput>
-
+<computeroutput>
 -----------------------------------------------------
 Agent Configuration file created : config.txt
------------------------------------------------------</screen>
+-----------------------------------------------------</computeroutput>
+    </screen>
    </step>
   </procedure>
   
@@ -180,8 +191,10 @@ Agent Configuration file created : config.txt
    </step>
    <step>
     <para>Run <command>IIS7Admin.vbs</command> to install the agent.</para>
-    <screen>C:\web_agents\iis7_agent\bin&gt;cscript IIS7Admin.vbs -config config.txt
-...
+
+    <screen>
+C:\web_agents\iis7_agent\bin><userinput>cscript IIS7Admin.vbs -config config.txt</userinput>
+<computeroutput>...
 Enter the Agent Resource File Name [IIS7Resource.en] :
 
 Creating the Agent Config Directory
@@ -190,7 +203,9 @@ Creating the <?eval ${agentsBootstrapFile}?> and
 Updating the Windows Product Registry
 Installing policy web agent module in IIS (status: 0)
 Adding policy web agent module to "Default Web Site" (status: 0)
-Completed Configuring the IIS 7.0 Agent</screen>
+Completed Configuring the IIS 7.0 Agent</computeroutput>
+    </screen>
+
    </step>
    <step>
     <para>Make sure the authentication method for IIS 7 is set to
@@ -198,14 +213,19 @@ Completed Configuring the IIS 7.0 Agent</screen>
    </step>
    <step>
     <para>Restart IIS 7.</para>
-    <screen>C:\web_agents\iis7_agent\bin&gt;iisreset
 
+    <screen>
+C:\web_agents\iis7_agent\bin><userinput>iisreset</userinput>
+<computeroutput>
 Attempting stop...
 Internet services successfully stopped
 Attempting start...
-Internet services successfully restarted</screen>
+Internet services successfully restarted</computeroutput>
+    </screen>
+
     <note>
-     <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
+     <para>If the agent is in a different domain than the server, refer to
+      the <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
    Single Sign On</citetitle></link>.</para>
@@ -284,7 +304,10 @@ Internet services successfully restarted</screen>
   plus the encrypted password retrieved originally from the password
   file. Encrypt passwords using <command>cryptit.exe</command>.</para>
   
-  <screen>C:\web_agents\iis7_agent\bin&gt;cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></screen>
+  <screen>
+C:\web_agents\iis7_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></userinput>
+  </screen>
+
  </section>
 
  <!-- OPENAM-1644: Document changes to IIS 7 PA support for Basic Auth and password replay -->
@@ -461,23 +484,24 @@ Internet services successfully restarted</screen>
       <literal>com.sun.identity.common.DESGenKey</literal> using the .jars
       where you deployed OpenAM, as in the following example. The Java command below is
       broken out into multiple lines for display purposes only.</para>
-      <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib
-$ java -cp forgerock-util-1.1.0.jar:\
-     openam-core-<?eval ${serverDocTargetVersion}?>.jar:\
-     openam-shared-<?eval ${serverDocTargetVersion}?>.jar \
-     com.sun.identity.common.DESGenKey
-Key ==> sxVoaDRAN0o=</screen>
 
-         <note>
-             <para>Windows users should use semi-colons (";"), instead of colons (":") in the commands.
-             The Java command below is broken out into multiple lines for display purposes only.</para>
-             <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib
-$ java -cp forgerock-util-1.1.0.jar;^
-     openam-core-<?eval ${serverDocTargetVersion}?>.jar;^
-     openam-shared-<?eval ${serverDocTargetVersion}?>.jar ^
-     com.sun.identity.common.DESGenKey
-Key ==> sxVoaDRAN0o=</screen>
-         </note>
+      <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/lib</userinput>
+$ <userinput>java -cp ${forgerockUtilLibrary}:${coreLibrary}:${sharedLibrary} \
+ com.sun.identity.common.DESGenKey</userinput>
+<computeroutput>Key ==> sxVoaDRAN0o=</computeroutput>
+      </screen>
+
+      <para>Windows users should use semi-colons (";"), instead of colons (":") in the commands.
+      The Java command below is broken out into multiple lines for display purposes only.</para>
+
+      <screen>
+C:><userinput>cd path\to\tomcat\webapps\openam\WEB-INF\lib</userinput>
+C:><userinput>java -cp ${forgerockUtilLibrary};${coreLibrary};${sharedLibrary} ^
+ com.sun.identity.common.DESGenKey</userinput>
+<computeroutput>Key ==> sxVoaDRAN0o=</computeroutput>
+      </screen>
+
      </step>
 
      <step>

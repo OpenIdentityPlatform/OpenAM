@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-session'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Handling Single Sign-On Using OpenAM Java SDK</title>
  <indexterm>
@@ -167,21 +168,23 @@ public class SSOTokenSample {
  following example, or alternatively run the
  <literal>SSOTokenSampleServlet</literal> web-based sample.</para>
 
- <screen>$ curl
- --request POST
- --data "username=demo&amp;password=changeit"
- http://openam.example.com:8080/openam/identity/authenticate
-token.id=AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
-$ sh scripts/SSOTokenSample.sh
-Enter SSOToken ID: AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
-SSOToken host name: 172.16.203.239
+ <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=demo&amp;password=changeit" \
+ http://openam.example.com:8080/openam/identity/authenticate</userinput>
+<computeroutput>token.id=AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*</computeroutput>
+$ <userinput>sh scripts/SSOTokenSample.sh</userinput>
+<computeroutput>Enter SSOToken ID:</computeroutput> <userinput>AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*</userinput>
+<computeroutput>SSOToken host name: 172.16.203.239
 SSOToken Principal name: id=demo,ou=user,dc=openam,dc=forgerock,dc=org
 Authentication type used: DataStore
 IPAddress of the host: 172.16.203.239
 SSO Token validation test Succeeded.
 Token ID: AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
 Property: TimeZone: PST
-Property: County: SantaClara</screen>
+Property: County: SantaClara</computeroutput>
+ </screen>
 
  <para>Notice both the properties populated by OpenAM, and also the two
  properties, <literal>TimeZone</literal> and <literal>County</literal>, that

@@ -20,16 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-identity-repo-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Customizing Identity Data Storage</title>
  <indexterm>
   <primary>User data</primary>
@@ -368,20 +367,24 @@ public void setActiveStatus(
    then you could run the following commands.
   </para>
 
-  <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
-$ jar -xvf ../lib/${coreLibrary} amIdRepoService.properties
- inflated: amIdRepoService.properties</screen>
+  <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
+$ <userinput>jar -xvf ../lib/${coreLibrary} amIdRepoService.properties</userinput>
+ <computeroutput>inflated: amIdRepoService.properties</computeroutput>
+  </screen>
 
   <para>Register your plugin using the <command>ssoadm</command> command after
   copy the files into place.</para>
   
-  <screen>$ ssoadm
- add-sub-schema
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --servicename sunIdentityRepositoryService
- --schematype Organization
- --filename customIdRepo.xml</screen>
+  <screen>
+$ <userinput>ssoadm \
+ add-sub-schema \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --servicename sunIdentityRepositoryService \
+ --schematype Organization \
+ --filename customIdRepo.xml</userinput>
+  </screen>
   
   <para>Login to OpenAM console as administrator, then then Browse to Access
   Control &gt; <replaceable>Realm Name</replaceable> &gt; Data Stores. In the

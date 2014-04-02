@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Using the OpenAM Java SDK</title>
 
@@ -61,7 +62,10 @@
    <step>
     <para>Deploy the .war in your Java web application container such as
     Apache Tomcat or JBoss.</para>
-    <screen>$ cp <?eval ${clientSDKExamplesWarFile}?> /path/to/tomcat/webapps/client.war</screen>
+
+    <screen>
+$ <userinput>cp ${clientSDKExamplesWarFile} /path/to/tomcat/webapps/client.war</userinput>
+    </screen>
    </step>
 
    <step>
@@ -179,35 +183,41 @@ User Attributes: {... givenName=[amAdmin], ...roles=[Top-level Admin Role], ...}
    <step>
     <para>Unpack the sample applications and related libraries.</para>
 
-    <screen>$ mkdir sdk &amp;&amp; cd sdk
-$ unzip ~/Downloads/<?eval ${clientSDKExamplesCliFile}?></screen>
+    <screen>
+$ <userinput>mkdir sdk &amp;&amp; cd sdk</userinput>
+$ <userinput>unzip ~/Downloads/${clientSDKExamplesCliFile}</userinput>
+    </screen>
    </step>
 
    <step>
     <para>Configure the samples to access OpenAM.</para>
-    <screen>$ sh scripts/setup.sh
-Debug directory (make sure this directory exists): /Users/me/openam/openam/debug
-Application user (e.g. URLAccessAgent) password: secret12
-Protocol of the server: http
-Host name of the server: openam.example.com
-Port of the server: 8080
-Server's deployment URI: openam
-Naming URL (hit enter to accept default value,
- http://openam.example.com:8080/openam/namingservice):
+
+    <screen>
+$ <userinput>sh scripts/setup.sh</userinput>
+<computeroutput>Debug directory (make sure this directory exists):</computeroutput> <userinput>/Users/me/openam/openam/debug</userinput>
+<computeroutput>Application user (e.g. URLAccessAgent) password:</computeroutput> <userinput>secret12</userinput>
+<computeroutput>Protocol of the server:</computeroutput> <userinput>http</userinput>
+<computeroutput>Host name of the server:</computeroutput> <userinput>openam.example.com</userinput>
+<computeroutput>Port of the server:</computeroutput> <userinput>8080</userinput>
+<computeroutput>Server's deployment URI:</computeroutput> <userinput>openam</userinput>
+<computeroutput>Naming URL (hit enter to accept default value,
+ http://openam.example.com:8080/openam/namingservice):</computeroutput>
 $</screen>
    </step>
 
    <step>
     <para>Verify that you have properly configured the samples.</para>
-    <screen>$ sh scripts/Login.sh
-Realm (e.g. /): /
-Login module name (e.g. DataStore or LDAP): DataStore
-Login locale (e.g. en_US or fr_FR): fr_FR
-DataStore: Obtained login context
-Nom d'utilisateur :demo
-Mot de passe :changeit
-Login succeeded.
-Logged Out!!</screen>
+
+    <screen>
+$ <userinput>sh scripts/Login.sh</userinput>
+<computeroutput>Realm (e.g. /):</computeroutput> <userinput>/</userinput>
+<computeroutput>Login module name (e.g. DataStore or LDAP):</computeroutput> <userinput>DataStore</userinput>
+<computeroutput>Login locale (e.g. en_US or fr_FR):</computeroutput> <userinput>fr_FR</userinput>
+<computeroutput>DataStore: Obtained login context</computeroutput>
+<computeroutput>Nom d'utilisateur :</computeroutput><userinput>demo</userinput>
+<computeroutput>Mot de passe :</computeroutput><userinput>changeit</userinput>
+<computeroutput>Login succeeded.
+Logged Out!!</computeroutput></screen>
    </step>
   </procedure>
  </section>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <book xml:id='getting-started'
@@ -29,7 +29,7 @@
       xml:lang='en'
       xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
       xsi:schemaLocation='http://docbook.org/ns/docbook
-       http://docbook.org/xml/5.0/xsd/docbook.xsd'
+                          http://docbook.org/xml/5.0/xsd/docbook.xsd'
       xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>Getting Started With OpenAM</title>
@@ -39,7 +39,7 @@
    Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2013</year>
+   <year>2013-2014</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>

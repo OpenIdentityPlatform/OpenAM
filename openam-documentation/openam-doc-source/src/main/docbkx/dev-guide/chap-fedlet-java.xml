@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-fedlet-java'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Using Fedlets in Java Web Applications</title>
  <indexterm>
   <primary>Fedlets</primary>
@@ -125,8 +125,11 @@
 
    <step>
     <para>Deploy the Fedlet in your web container.</para>
-    <screen>$ unzip Fedlet.zip
-$ mv fedlet.war /path/to/tomcat/webapps</screen>
+
+    <screen>
+$ <userinput>unzip Fedlet.zip</userinput>
+$ <userinput>mv fedlet.war /path/to/tomcat/webapps</userinput>
+    </screen>
    </step>
    <step>
     <para>Browse to the Fedlet URL, and then click the links to set up the
@@ -271,7 +274,9 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
      <step>
       <para>Copy the test key store from OpenAM, and prepare password files.</para>
 
-      <screen>$ scp user@openam:/home/user/openam/openam/keystore.jks ~/fedlet/</screen>
+      <screen>
+$ <userinput>scp user@openam:/home/user/openam/openam/keystore.jks ~/fedlet/</userinput>
+      </screen>
 
       <para>The Fedlet uses password files when accessing the keystore. These
       password files contain encoded passwords, where the encoding is specific
@@ -287,8 +292,10 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
       <para>Use the encoded value to create the password files as in the
       following example.</para>
 
-      <screen>$ echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.storepass
-$ echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.keypass</screen>
+      <screen>
+$ <userinput>echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.storepass</userinput>
+$ <userinput>echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.keypass</userinput>
+      </screen>
      </step>
 
      <step>
@@ -768,8 +775,9 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     <para>Export the certificate to use for signing and encryption
     purposes.</para>
 
-    <screen>$ keytool -export -rfc -keystore keystore.jks -alias test
-Enter keystore password:
+    <screen>
+$ <userinput>keytool -export -rfc -keystore keystore.jks -alias test</userinput>
+<computeroutput>Enter keystore password:
 -----BEGIN CERTIFICATE-----
 MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
 bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
@@ -781,7 +789,8 @@ RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
 Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
 QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
 cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
-/FfwWigmrW0Y0Q==</screen>
+/FfwWigmrW0Y0Q==</computeroutput>
+    </screen>
    </step>
 
    <step>
@@ -1205,8 +1214,12 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
    the Fedlet.</para>
    <step>
     <para>Backup <filename>fedletSampleApp.jsp</filename>.</para>
-    <screen>$ cd /path/to/tomcat/webapps/fedlet/
-$ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
+
+    <screen>
+$ <userinput>cd /path/to/tomcat/webapps/fedlet/</userinput>
+$ <userinput>cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Edit <filename>fedletSampleApp.jsp</filename> to reduce it to a single

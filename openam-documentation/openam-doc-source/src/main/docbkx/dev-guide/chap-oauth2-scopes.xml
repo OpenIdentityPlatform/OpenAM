@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2-scopes'
@@ -28,8 +28,7 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing OAuth 2.0 Scope Handling</title>
  <indexterm>
   <primary>OAuth 2.0</primary>
@@ -273,9 +272,10 @@ public class CustomScope implements Scope {
    Build the module using Apache Maven.
   </para>
 
-  <screen>$ cd /path/to/openam-scope-sample
-$ mvn install
-[INFO] Scanning for projects...
+  <screen>
+$ <userinput>cd /path/to/openam-scope-sample</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] Building openam-scope-sample 1.0.0-SNAPSHOT
@@ -295,7 +295,8 @@ $ mvn install
 [INFO] Total time: 10.799s
 [INFO] Finished at: Mon Nov 25 13:43:37 CET 2013
 [INFO] Final Memory: 20M/162M
-[INFO] ------------------------------------------------------------------------</screen>
+[INFO] ------------------------------------------------------------------------</computeroutput>
+  </screen>
 
   <para>
    After you successfully build the module,
@@ -358,21 +359,23 @@ $ mvn install
    Next try the provider as shown in the following example.
   </para>
 
-  <screen>$ curl --request POST
- --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit
-         &amp;client_id=myClientID&amp;client_secret=password&amp;scope=read"
- https://openam.example.com:8443/openam/oauth2/access_token
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit\
+&amp;client_id=myClientID&amp;client_secret=password&amp;scope=read" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
 
-{
+<computeroutput>{
     "scope": "read",
     "expires_in": 59,
     "token_type": "Bearer",
     "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
-}
+}</computeroutput>
 
-$ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
- ?access_token=0d492486-11a7-4175-b116-2fc1cbff6d78
-{
+$ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
+?access_token=0d492486-11a7-4175-b116-2fc1cbff6d78</userinput>
+<computeroutput>{
     "scope": [
         "read"
     ],
@@ -382,7 +385,8 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
     "token_type": "Bearer",
     "expires_in": 22,
     "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
-}</screen>
+}</computeroutput>
+  </screen>
 
   <para>
    As seen in this example, the requested scope <literal>read</literal> is

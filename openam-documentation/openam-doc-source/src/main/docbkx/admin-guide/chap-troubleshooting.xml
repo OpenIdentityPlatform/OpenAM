@@ -55,8 +55,12 @@
      the <command>ps</command> command to check. In the following example, the
      user is <literal>mark</literal>, the web container
      <literal>tomcat</literal>.</para>
-     <screen>$ ps -ef | grep tomcat
-mark      1739     1  0 14:47...</screen>
+
+     <screen>
+$ <userinput>ps -ef | grep tomcat</userinput>
+<computeroutput>mark      1739     1  0 14:47...</computeroutput>
+     </screen>
+
      <para>For a container installed from native packages with a dedicated
      user, $HOME may not be where you think it is. Look at the user's entry in
      <filename>/etc/passwd</filename> to locate the home directory.
@@ -68,13 +72,17 @@ mark      1739     1  0 14:47...</screen>
      <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
      with appropriate permissions, and repack <filename>openam.war</filename>
      with the adjusted file before deploying that.</para>
-     <screen>$ cd ~/Downloads/openam/<?eval ${coreWarFile}?>
-$ mkdir unpacked ; cd unpacked
-$ jar xf ../<?eval ${coreWarFile}?>
-$ vi WEB-INF/classes/bootstrap.properties 
-$ grep ^config WEB-INF/classes/bootstrap.properties 
-configuration.dir=/my/readwrite/config/dir
-$ jar cf ../openam.war *</screen>
+
+     <screen>
+$ <userinput>cd ~/Downloads/openam/${coreWarFile}</userinput>
+$ <userinput>mkdir unpacked ; cd unpacked</userinput>
+$ <userinput>jar xf ../${coreWarFile}</userinput>
+$ <userinput>vi WEB-INF/classes/bootstrap.properties</userinput>
+$ <userinput>grep ^config WEB-INF/classes/bootstrap.properties</userinput>
+<computeroutput>configuration.dir=/my/readwrite/config/dir</computeroutput>
+$ <userinput>jar cf ../openam.war *</userinput>
+     </screen>
+
     </answer>
    </qandaentry>
    <qandaentry xml:id="deploy-failed-lack-of-memory">
@@ -89,8 +97,12 @@ $ jar cf ../openam.war *</screen>
      <para>If you do not know the settings used when the web container was
      started, use the <command>ps</command> command to check. In the following
      example, the web container is <literal>tomcat</literal>.</para>
-     <screen>$ ps -ef | grep tomcat | grep Xm
-... -Xmx1024m -XX:MaxPermSize=256m ...</screen>
+
+     <screen>
+$ <userinput>ps -ef | grep tomcat | grep Xm</userinput>
+<computeroutput>... -Xmx1024m -XX:MaxPermSize=256m ...</computeroutput>
+     </screen>
+
      <para>Make sure you have at least 2 GB of RAM on the system where you
      run OpenAM to avoid running out of memory.</para>
 
@@ -108,19 +120,26 @@ $ jar cf ../openam.war *</screen>
     <answer>
      <para>OpenAM requires that you use a fully qualified domain name (FQDN)
      that the host can resolve.</para>
-     <screen>$ ping openam-ter.example.com
-PING openam-ter (192.168.56.2) 56(84) bytes of data.
+
+     <screen>
+$ <userinput>ping openam-ter.example.com</userinput>
+<computeroutput>PING openam-ter (192.168.56.2) 56(84) bytes of data.
 64 bytes from openam (192.168.56.2): icmp_seq=1 ttl=64 time=0.025 ms
 64 bytes from openam (192.168.56.2): icmp_seq=2 ttl=64 time=0.032 ms
-64 bytes from openam (192.168.56.2): icmp_seq=3 ttl=64 time=0.030 ms</screen>
+64 bytes from openam (192.168.56.2): icmp_seq=3 ttl=64 time=0.030 ms</computeroutput>
+     </screen>
+
      <para>For a test deployment (at home, on a laptop), you can use fake FQDNs
      in <filename>/etc/hosts</filename> (<filename
      >%SystemRoot%\system32\drivers\etc\hosts</filename> on Windows), depending
      on how your network is configured.</para>
-     <screen>$ cat /etc/hosts | grep openam
-192.168.56.2 openam openam.example.com
+
+     <screen>
+$ <userinput>cat /etc/hosts | grep openam</userinput>
+<computeroutput>192.168.56.2 openam openam.example.com
 192.168.56.3 openam-bis openam-bis.example.com
-192.168.56.5 openam-ter openam-ter.example.com</screen>
+192.168.56.5 openam-ter openam-ter.example.com</computeroutput>
+     </screen>
     </answer>
    </qandaentry>
    <qandaentry xml:id="who-deleted-my-config">
@@ -136,8 +155,12 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      Tomcat under <filename>/path/to/tomcat/webapps/openam</filename>, and
      running as user <literal>amuser</literal> with <literal>$HOME</literal>
      <filename>/home/amuser</filename>.</para>
-     <screen>$ cat .openamcfg/AMConfig_path_to_tomcat_webapps_openam_ 
-/home/amuser/openam</screen>
+
+     <screen>
+$ <userinput>cat ~/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_</userinput>
+<computeroutput>/home/amuser/openam</computeroutput>
+     </screen>
+
      <para>If OpenAM cannot find its configuration, then it displays the
      configuration screen.</para>
     </answer>
@@ -236,13 +259,16 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      <para>The full version of OpenAM includes directory server schema in the
      <filename>~/Downloads/openam/ldif/</filename> directory. To add the schema
      to OpenDJ afterwards, you can try the following command.</para>
-     <screen>$ /path/to/OpenDJ/bin/ldapmodify
- --port 1389
- --bindDN "cn=Directory Manager"
- --bindPassword password
- --filename ~/Downloads/openam/ldif/fam_sds_schema.ldif
-Processing MODIFY request for CN=schema
-MODIFY operation successful for DN CN=schema</screen>
+
+     <screen>
+$ <userinput>/path/to/opendj/bin/ldapmodify \
+ --port 1389 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --filename ~/Downloads/openam/ldif/fam_sds_schema.ldif</userinput>
+<computeroutput>Processing MODIFY request for CN=schema
+MODIFY operation successful for DN CN=schema</computeroutput>
+     </screen>
     </answer>
    </qandaentry>
 
@@ -407,7 +433,9 @@ MODIFY operation successful for DN CN=schema</screen>
         Stop Tomcat.
        </para>
 
-       <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
+       <screen>
+$ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
+       </screen>
       </listitem>
 
       <listitem>
@@ -432,8 +460,9 @@ MODIFY operation successful for DN CN=schema</screen>
         add the following line, and then save your work:
        </para>
 
-       <programlisting language="ini"
->org.restlet.level=OFF</programlisting>
+       <programlisting language="ini">
+org.restlet.level=OFF
+       </programlisting>
       </listitem>
 
       <listitem>
@@ -441,7 +470,9 @@ MODIFY operation successful for DN CN=schema</screen>
         Start Tomcat.
        </para>
 
-       <screen>$ /path/to/tomcat/bin/startup.sh</screen>
+       <screen>
+$ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
+       </screen>
       </listitem>
      </orderedlist>
     </answer>
@@ -488,8 +519,16 @@ MODIFY operation successful for DN CN=schema</screen>
      Advanced, or set the properties using the
      <command>ssoadm update-server-cfg</command> command as in the following
      example, which updates the default server configuration:</para>
-     <screen>$ ./ssoadm update-server-cfg -s default -u amadmin -f /tmp/pwd.txt
- -a com.iplanet.am.session.failover.cluster.stateCheck.timeout=2000</screen>
+
+     <screen width="82">
+$ <userinput>./ssoadm \
+ update-server-cfg \
+ --servername default \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues com.iplanet.am.session.failover.cluster.stateCheck.timeout=2000</userinput>
+     </screen>
+
     </answer>
    </qandaentry>
    <qandaentry xml:id="change-app-password">
@@ -506,10 +545,22 @@ MODIFY operation successful for DN CN=schema</screen>
      </para>
      <para>You can then change the password for the <literal>UrlAccessAgent</literal> for
      the root realm (/) with the following commands:</para>
-     <screen># cd /path/to/SSOAdminTools/bin
-# ./ssoadm set-identity-attrs -e / -i amService-UrlAccessAgent -t user -u amadmin -f /tmp/passwd -a userpassword=changeit</screen>
-     <para>If the command works, you will see the following response:</para>
-     <screen>Attribute values of identity, amService-UrlAccessAgent of type, user in realm, / was modified.</screen>
+
+     <screen>
+$ <userinput>cd /path/to/SSOAdminTools/bin</userinput>
+$ <userinput>./ssoadm \
+ set-identity-attrs \
+ --realm / \
+ --idname amService-UrlAccessAgent \
+ --idtype user \
+ --adminid amadmin \
+ --password-file /tmp/passwd \
+ --attributevalues userpassword=changeit</userinput>
+
+<computeroutput>Attribute values of identity, amService-UrlAccessAgent of type, user
+ in realm, / was modified.</computeroutput>
+     </screen>
+
      <para>The new password will take effect the next time you start OpenAM.</para>
     </answer>
    </qandaentry>

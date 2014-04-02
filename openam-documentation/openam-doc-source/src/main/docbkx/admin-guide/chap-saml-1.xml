@@ -504,12 +504,13 @@
      shown with lines folded to fit on the printed page.
     </para>
 
-    <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/lib/
-$ java -cp ${forgerockUtilLibrary}:\
- ${sharedLibrary}:\
- ${federationLibrary} \
- com.sun.identity.saml.common.SAMLSiteID https://ap.example.net/openam
-9BAg4UmVS6IbjccsSj9gAFYGO9Y=</screen>
+    <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+$ <userinput>java \
+ -cp ${forgerockUtilLibrary}:${sharedLibrary}:${federationLibrary} \
+ com.sun.identity.saml.common.SAMLSiteID https://ap.example.net/openam</userinput>
+<computeroutput>9BAg4UmVS6IbjccsSj9gAFYGO9Y=</computeroutput>
+    </screen>
    </step>
   </procedure>
  </section>

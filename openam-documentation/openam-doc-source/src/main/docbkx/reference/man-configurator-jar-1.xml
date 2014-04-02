@@ -27,10 +27,9 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <info><copyright><year>2011-2013</year><holder>ForgeRock AS</holder></copyright></info>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <info><copyright><year>2011-2014</year><holder>ForgeRock AS</holder></copyright></info>
  <refmeta>
   <refentrytitle>configurator.jar</refentrytitle><manvolnum>1</manvolnum>
   <refmiscinfo class="software">OpenAM</refmiscinfo>
@@ -549,8 +548,13 @@ DEPLOYMENT_URI=/openam
 ACCEPT_LICENSES=true</programlisting>
 
   <para>The following example uses a configuration file and then uses the
-   <sbr/><option>--acceptLicense</option> option on the command line.</para>
-    <screen>$ java -jar ${ssoconfigJarFile} -f <replaceable>config.file \
-  --acceptLicense</replaceable></screen>
+   <option>--acceptLicense</option> option on the command line.</para>
+
+    <screen>
+$ <userinput>java \
+ -jar ${ssoconfigJarFile} \
+ -f <replaceable>config.file</replaceable> \
+ --acceptLicense</userinput>
+    </screen>
  </refsect1>
 </refentry>

@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Monitoring OpenAM Services</title>
 
@@ -47,13 +48,15 @@
   Alternatively you can use the <command>ssoadm set-attr-defs</command>
   command.</para>
 
-  <screen>$ ssoadm
- set-attr-defs
- --servicename iPlanetAMMonitoringService
- --schematype Global
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --attributevalues iplanet-am-monitoring-enabled=true</screen>
+  <screen>
+$ <userinput>ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-enabled=true</userinput>
+  </screen>
 
   <para>Restart OpenAM for the changes to take effect. You must also restart
   OpenAM if you disable monitoring.</para>
@@ -66,26 +69,32 @@
    <literal>http://openam-ter.example.com:8082/</literal>. Either use the
    console, or use the <command>ssoadm</command> command.</para>
 
-   <screen>$ ssoadm
- set-attr-defs
- --servicename iPlanetAMMonitoringService
- --schematype Global
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --attributevalues iplanet-am-monitoring-http-enabled=true</screen>
+   <screen>
+$ <userinput>ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-http-enabled=true</userinput>
+   </screen>
 
    <para>The default authentication file allows you to authenticate over HTTP
    as user <literal>demo</literal>, password <literal>changeit</literal>. The
    user name and password are kept in the file specified, with the password
    encrypted.</para>
    
-   <screen>$ cat openam/openam/openam_mon_auth
-demo AQICMBCKlwx6G3vzK3TYYRbtTpNYAagVIPNP</screen>
+   <screen>
+$ <userinput>cat openam/openam/openam_mon_auth</userinput>
+<computeroutput>demo AQICMBCKlwx6G3vzK3TYYRbtTpNYAagVIPNP</computeroutput>
+   </screen>
 
-   <para>Or </para>
+   <para>Or:</para>
    
-   <screen>$ cat openam/openam/opensso_mon_auth
-demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
+   <screen>
+$ <userinput>cat openam/openam/opensso_mon_auth</userinput>
+<computeroutput>demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</computeroutput>
+   </screen>
    
    <para>You can encrypt a new password using the <command>ampassword</command>
    command. After changing the authentication file, you must restart OpenAM
@@ -112,14 +121,16 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    both Monitoring Status and Monitoring RMI interface status are both set to
    Enabled, or use the <command>ssoadm</command> command.</para>
 
-   <screen>$ ssoadm
- set-attr-defs
- --servicename iPlanetAMMonitoringService
- --schematype Global
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --attributevalues iplanet-am-monitoring-enabled=true
- iplanet-am-monitoring-rmi-enabled=true</screen>
+   <screen>
+$ <userinput>ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-enabled=true \
+  iplanet-am-monitoring-rmi-enabled=true</userinput>
+   </screen>
 
    <para>A number of tools support JMX, including <command>jvisualvm</command>
    and <command>jconsole</command>. When you use <command>jconsole</command>
@@ -127,7 +138,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    on the local system is
    <literal>service:jmx:rmi:///jndi/rmi://localhost:9999/server</literal>.</para>
 
-   <screen>$ jconsole service:jmx:rmi:///jndi/rmi://localhost:9999/server &amp;</screen>
+   <screen>
+$ <userinput>jconsole service:jmx:rmi:///jndi/rmi://localhost:9999/server &amp;</userinput>
+   </screen>
 
    <para>You can also browse the MBeans by connecting to your web application
    container, and browsing to the OpenAM MBeans. By default, JMX monitoring for
@@ -167,13 +180,15 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    monitoring. Either use the console, or use the <command>ssoadm</command>
    command.</para>
 
-   <screen>$ ssoadm
- set-attr-defs
- --servicename iPlanetAMMonitoringService
- --schematype Global
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --attributevalues iplanet-am-monitoring-snmp-enabled=true</screen>
+   <screen>
+$ <userinput>ssoadm \
+ set-attr-defs \
+ --servicename iPlanetAMMonitoringService \
+ --schematype Global \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --attributevalues iplanet-am-monitoring-snmp-enabled=true</userinput>
+   </screen>
   </section>
  </section>
 
@@ -255,7 +270,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
     the operation of SNMP on a GNU/Linux system, over port 8085,
     using SNMP version 2c, run the following command:</para>
 
-   <screen># snmpstatus -c public -v 2c localhost</screen>
+   <screen>
+# <userinput>snmpstatus -c public -v 2c localhost</userinput>
+   </screen>
 
    <para>The output should normally specify communications over UDP. If you
    get a <literal>timeout</literal> message, the SNMP service may not be
@@ -267,7 +284,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
 
    <!-- Replace 999 with the actual OID label for CTS when AME-2750 is complete -->
 
-   <screen># snmpget -c public -v 2c :8085 enterprises.36733.1.2.999.3.1.1.1</screen>
+   <screen>
+# <userinput>snmpget -c public -v 2c :8085 enterprises.36733.1.2.999.3.1.1.1</userinput>
+   </screen>
 
    <para>
     For one view of the tree of OIDs, you can use the
@@ -275,7 +294,9 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
     lists all OIDs related to CTS:
    </para>
 
-   <screen># snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.999</screen>
+   <screen>
+# <userinput>snmpwalk -c public -v 2c :8085 enterprises.36733.1.2.999</userinput>
+   </screen>
 
    <para>
     A number of CTS OIDs are listed with a <literal>Counter64</literal> value.

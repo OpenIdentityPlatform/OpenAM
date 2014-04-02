@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
@@ -63,10 +64,10 @@
           of Java, and set the <literal>JAVA_HOME</literal> environment
           variable accordingly.</para>
 
-      <screen>$ echo $JAVA_HOME
-/path/to/java
-$ which java
-/usr/bin/java</screen>
+      <screen>
+$ <userinput>echo $JAVA_HOME</userinput>
+<computeroutput>/path/to/java</computeroutput>
+      </screen>
 
   <para>If you are using IBM Java, see <xref linkend="install-with-ibm-jvm" />.</para>
 
@@ -155,9 +156,10 @@ $ which java
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
 
-    <screen>$ /path/to/j2ee_agents/websphere_v61_agent/bin/agentadmin --install \
-  --acceptLicense
-...
+    <screen>
+$ <userinput>/path/to/j2ee_agents/websphere_v61_agent/bin/agentadmin --install \
+  --acceptLicense</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -190,13 +192,16 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/j2ee_agents/websphere_v61_agent/installer-logs/audit/install.log
-...</screen>
+...</computeroutput>
+    </screen>
+
     <para>Upon successful completion, the installer has updated the WebSphere
     configuration, copied the agent libraries to WebSphere's external library
     directory, and also set up configuration and log directories for the
     agent.</para>
     <note>
-     <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
+     <para>If the agent is in a different domain than the server, refer to
+      the <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
    Single Sign On</citetitle></link>.</para>

@@ -732,12 +732,14 @@
    
    <step>
     <para>Use the <command>ssoadm list-policies</command> command.</para>
-    <screen>$ ssoadm
- list-policies
- --realm "/"
- --adminid amadmin
- --password-file /tmp/pwd.txt 
 
+    <screen>
+$ <userinput>ssoadm \
+ list-policies \
+ --realm "/" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt</userinput>
+<computeroutput>
 Policy definitions were returned under realm, /.
 &lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;!DOCTYPE Policies 
@@ -775,7 +777,8 @@ PUBLIC "-//OpenSSO Policy Administration DTD//EN"
 &lt;/Subject&gt;
 &lt;/Subjects&gt;
 &lt;/Policy&gt;
-&lt;/Policies&gt;</screen>
+&lt;/Policies&gt;</computeroutput>
+    </screen>
    </step>
   </procedure>
   
@@ -788,8 +791,10 @@ PUBLIC "-//OpenSSO Policy Administration DTD//EN"
    
    <step>
     <para>Create your XML policy file.</para>
-    <screen>$ cat policy.xml
-&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+
+    <screen>
+$ <userinput>cat policy.xml</userinput>
+<computeroutput>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;!DOCTYPE Policies 
 PUBLIC "-//OpenSSO Policy Administration DTD//EN"
 "jar://com/sun/identity/policy/policyAdmin.dtd"&gt;
@@ -822,18 +827,22 @@ PUBLIC "-//OpenSSO Policy Administration DTD//EN"
 &lt;/Subject&gt;
 &lt;/Subjects&gt;
 &lt;/Policy&gt;
-&lt;/Policies&gt;</screen>
+&lt;/Policies&gt;</computeroutput>
+    </screen>
    </step>
    <step>
     <para>Use the <command>ssoadm create-policies</command> command.</para>
-    <screen>$ ssoadm
- create-policies
- --realm "/"
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --xmlfile policy.xml
 
-Policies were created under realm, /.</screen>
+    <screen>
+$ <userinput>ssoadm \
+ create-policies \
+ --realm "/" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --xmlfile policy.xml</userinput>
+
+<computeroutput>Policies were created under realm, /.</computeroutput>
+    </screen>
    </step>
   </procedure>
  </section>

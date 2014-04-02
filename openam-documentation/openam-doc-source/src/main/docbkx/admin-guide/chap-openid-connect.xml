@@ -236,10 +236,12 @@
   <para>Ignoring the question of redirection, you can test the endpoint for the
   demo user account (output lines folded to make them easier to read).</para>
 
-  <screen>$ curl "https://openam.example.com:8443/openam/.well-known/webfinger
- ?resource=acct%3Ademo%40example.com
- &amp;rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer"
-{
+  <screen>
+$ <userinput>curl \
+ "https://openam.example.com:8443/openam/.well-known/webfinger\
+?resource=acct%3Ademo%40example.com\
+&amp;rel=http%3A%2F%2Fopenid.net%2Fspecs%2Fconnect%2F1.0%2Fissuer"</userinput>
+<computeroutput>{
   "subject": "acct:demo@example.com",
   "links": [
     {
@@ -247,7 +249,8 @@
       "href": "https://openam.example.com:8443/openam"
     }
   ]
-}</screen>
+}</computeroutput>
+  </screen>
 
   <para>This shows that the OpenID Connect Provider for the OpenAM demo user is
   indeed the OpenAM server.</para>
@@ -257,8 +260,10 @@
   easier to read).</para>
 
   <informalexample><?dbfo pgwide="1"?>
-  <screen>$ curl https://openam.example.com:8443/openam/.well-known/openid-configuration
-{
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-configuration</userinput>
+<computeroutput>{
     "response_types_supported": [
         "id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType",
         "token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType",
@@ -288,7 +293,8 @@
         "profile"
     ],
     "authorization_endpoint": "https://openam.example.com:8443/openam/oauth2/authorize"
-}</screen>
+}</computeroutput>
+  </screen>
   </informalexample>
  </section>
 
@@ -355,17 +361,19 @@
     <literal>password</literal>, you can use the OAuth 2.0 resource owner
     password grant as in the following example.</para>
 
-    <screen>$ curl
- --request POST
- --user "masterClient:password"
- --data "grant_type=password&amp;username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/oauth2/access_token
-{
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --user "masterClient:password" \
+ --data "grant_type=password&amp;username=amadmin&amp;password=password" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
     "expires_in": 59,
     "token_type": "Bearer",
     "refresh_token": "26938cd0-6870-4e31-ade9-df31afc37ee1",
     "access_token": "515d6551-4512-4279-98b6-c0ef3f03a722"
-}</screen>
+}</computeroutput>
+    </screen>
    </step>
 
    <step>
@@ -379,7 +387,8 @@
     Successful registration shows a response that includes the client ID and
     client secret. Lines are folded in the following example.</para>
 
-    <programlisting language="javascript">{
+    <programlisting language="javascript">
+{
   "issued_at": 1392364349,
   "expires_at": 0,
   "client_secret": "7f446ca9-3f1f-48fb-bf8c-150b9e643f29",
@@ -392,7 +401,8 @@
   "registration_client_uri":
      "https://openam.example.com:8443/openam/oauth2/connect/register
      ?client_id=6e4abd50-3f03-41dc-b807-c6705c3e45d7"
-}</programlisting>
+}
+    </programlisting>
    </step>
   </procedure>
  </section>

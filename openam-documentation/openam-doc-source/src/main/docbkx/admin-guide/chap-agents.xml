@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock Inc
+  !      Copyright 2011-2014 ForgeRock Inc
   !    
 -->
 <chapter xml:id='chap-agents'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Policy Agent Profiles</title>
@@ -247,8 +248,10 @@
     web policy agent profile.</para>
 
     <informalexample><?dbfo pgwide="1"?>
-    <screen>$ cat myWebAgent.properties
-com.sun.identity.agents.config.agenturi.prefix=http://www.example.com:80/amagent
+
+    <screen>
+$ <userinput>cat myWebAgent.properties</userinput>
+<computeroutput>com.sun.identity.agents.config.agenturi.prefix=http://www.example.com:80/amagent
 com.sun.identity.agents.config.cdsso.cdcservlet.url[0]=https://openam.example.com:8443/openam/cdcservlet
 com.sun.identity.agents.config.fqdn.default=www.example.com
 com.sun.identity.agents.config.login.url[0]=http://openam.example.com:8443/openam/UI/Login
@@ -259,27 +262,35 @@ com.sun.identity.client.notification.url=http://www.example.com:80/UpdateAgentCa
 com.sun.identity.client.notification.url=http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false
 sunIdentityServerDeviceKeyValue[0]=agentRootURL=http://www.example.com:80/
 sunIdentityServerDeviceStatus=Active
-userpassword=password
-
-</screen>
+userpassword=password</computeroutput>
+     </screen>
     </informalexample>
    </step>
 
    <step>
     <para>Set up a password file used when authenticating to OpenAM.</para>
 
-    <screen>$ echo password > /tmp/pwd.txt
-$ chmod 400 /tmp/pwd.txt</screen>
+    <screen>
+$ <userinput>echo password > /tmp/pwd.txt</userinput>
+$ <userinput>chmod 400 /tmp/pwd.txt</userinput>
+    </screen>
    </step>
 
    <step>
     <para>Create the profile in OpenAM.</para>
 
-    <screen>$ ssoadm create-agent --realm /
- --agentname myWebAgent --agenttype WebAgent --adminid amadmin
- --password-file /tmp/pwd.txt --datafile myWebAgent.properties
+    <screen>
+$ <userinput>ssoadm \
+ create-agent \
+ --realm / \
+ --agentname myWebAgent \
+ --agenttype WebAgent \
+ --adminid amadmin
+ --password-file /tmp/pwd.txt \
+ --datafile myWebAgent.properties</userinput>
 
-Agent configuration was created.</screen>
+<computeroutput>Agent configuration was created.</computeroutput>
+    </screen>
 
     <para>At this point you can view the profile in OpenAM Console under
     Access Control > <replaceable>Realm Name</replaceable> > Agents to make

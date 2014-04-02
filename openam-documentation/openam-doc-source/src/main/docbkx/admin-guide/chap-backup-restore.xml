@@ -20,15 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-backup-restore'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Backing Up and Restoring OpenAM Configurations</title>
  
  <para>This chapter shows how to backup and restore OpenAM configuration
@@ -48,12 +48,20 @@
   <step>
    <para>Backup OpenAM service configuration using the
    <command>ssoadm</command> command.</para>
-   <screen>$ ssoadm export-svc-cfg -u amadmin -e fZatIu68OiqccJMXosSRyVjMsWJIx+SA
- -f /tmp/pwd.txt -o ~/backup-`date -u +%F-%m-%S`.xml
 
-Service Configuration was exported.</screen>
+   <screen>
+$ <userinput>ssoadm \
+ export-svc-cfg \
+ --adminid amadmin \
+ --encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA \
+ --password-file /tmp/pwd.txt \
+ --outfile ~/backup-`date -u +%F-%m-%S`.xml</userinput>
+
+<computeroutput>Service Configuration was exported.</computeroutput>
+   </screen>
+
    <para>In this example, the secret key for encrypting the password in
-   <option>-e fZatIu68OiqccJMXosSRyVjMsWJIx+SA</option> was taken from the
+   <option>--encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA</option> was taken from the
    Password Encryption Key field in the OpenAM console under Configuration &gt;
    Servers and Sites &gt; <replaceable>Server Name</replaceable> &gt;
    Security.</para>
@@ -114,12 +122,20 @@ Service Configuration was exported.</screen>
   <step>
    <para>Restore OpenAM service configuration using the
    <command>ssoadm</command> command.</para>
-   <screen>$ ssoadm import-svc-cfg -u amadmin -e fZatIu68OiqccJMXosSRyVjMsWJIx+SA
- -f /tmp/pwd.txt -X ~/backup-2011-09-13-09-00.xml 
 
-Directory Service contains existing data. Do you want to delete it? [y|N] y
-Please wait while we import the service configuration...
-Service Configuration was imported.</screen>
+   <screen>
+$ <userinput>ssoadm \
+ import-svc-cfg \
+ --adminid amadmin \
+ --encryptsecret fZatIu68OiqccJMXosSRyVjMsWJIx+SA \
+ --password-file /tmp/pwd.txt
+ --xmlfile ~/backup-2011-09-13-09-00.xml</userinput>
+
+<computeroutput>Directory Service contains existing data. Do you want to delete it? [y|N]</computeroutput> <userinput>y</userinput>
+<computeroutput>Please wait while we import the service configuration...
+Service Configuration was imported.</computeroutput>
+   </screen>
+
    <para>In a site configuration, you perform this step only once.</para>
    <para>If the password for <literal>amadmin</literal> has been changed
    through the OpenAM console, then use the bind password for the root DN of

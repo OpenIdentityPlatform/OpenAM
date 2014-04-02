@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-custom-ui'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing the OpenAM End User Pages</title>
  
@@ -103,7 +104,11 @@
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
    you deployed OpenAM.</para>
-   <screen>$ cd /path/to/tomcat/webapps/openam/config/auth</screen>
+
+   <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/config/auth</userinput>
+   </screen>
+
   </step>
   <step>
    <para>Copy the default files and optionally the localized files to
@@ -117,12 +122,17 @@
    Simplified Chinese.</para>
    <para>The following example copies the files for the Top-Level Realm
    (<literal>/</literal>) for a custom French locale.</para>
-   <screen>$ mkdir -p openam/html
-$ cp -r default/* openam/html
-$ mkdir -p openam_fr/html
-$ cp -r default_fr/* openam_fr/html</screen>
-   <para>See <link linkend="lookup-for-ui-files"><citetitle>How OpenAM Looks Up
-   UI files</citetitle></link> for details.</para>
+
+   <screen>
+$ <userinput>mkdir -p openam/html</userinput>
+$ <userinput>cp -r default/* openam/html</userinput>
+$ <userinput>mkdir -p openam_fr/html</userinput>
+$ <userinput>cp -r default_fr/* openam_fr/html</userinput>
+   </screen>
+
+   <para>
+    See <xref linkend="lookup-for-ui-files" /> for details.
+   </para>
   </step>
  </procedure>
 
@@ -135,7 +145,11 @@ $ cp -r default_fr/* openam_fr/html</screen>
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
    you deployed OpenAM.</para>
-   <screen>$ cd /path/to/tomcat/webapps/openam/config/auth</screen>
+
+   <screen>
+$ <userinput>cd /path/to/tomcat/webapps/openam/config/auth</userinput>
+   </screen>
+
   </step>
   <step>
    <para>Depending on which locale you want to customize, copy the default
@@ -148,10 +162,12 @@ $ cp -r default_fr/* openam_fr/html</screen>
    <para>The following example copies the files for a custom French locale and
    a realm named <literal>ventes</literal>.</para>
 
-   <screen>$ mkdir -p openam/html/ventes/html
-$ cp -r default/* openam/services/ventes/html
-$ mkdir -p openam_fr/services/ventes/html
-$ cp -r default_fr/* openam_fr/services/ventes/html</screen>
+   <screen>
+$ <userinput>mkdir -p openam/html/ventes/html</userinput>
+$ <userinput>cp -r default/* openam/services/ventes/html</userinput>
+$ <userinput>mkdir -p openam_fr/services/ventes/html</userinput>
+$ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
+   </screen>
   </step>
  </procedure>
  
@@ -294,7 +310,8 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
    <literal>o=openam</literal>. The client name used in this example is the
    generic client name <literal>html</literal>.</para>
 
-   <programlisting language="shell">openam_en_GB/services/realm/html/Login.jsp
+   <programlisting language="none">
+openam_en_GB/services/realm/html/Login.jsp
 openam_en_GB/services/realm/Login.jsp
 openam_en_GB/services/html/Login.jsp
 openam_en_GB/services/Login.jsp
@@ -353,7 +370,8 @@ default/services/realm/Login.jsp
 default/services/html/Login.jsp
 default/services/Login.jsp
 default/html/Login.jsp
-default/Login.jsp</programlisting>
+default/Login.jsp
+   </programlisting>
   </example>
  </section>
 
@@ -414,7 +432,8 @@ default/Login.jsp</programlisting>
      left curly bracket <literal>{</literal> after the <literal>themes</literal> parameter, and the corresponding
      right curly bracket <literal>}</literal> towards the end of the file.</para>
 
-     <screen>{
+     <programlisting language="javascript">
+{
      "themes": [
         {
             "name": "default",
@@ -431,12 +450,13 @@ default/Login.jsp</programlisting>
             }
         }
      ]
-}</screen>
+}</programlisting>
 
      <para>For a new realm named <literal>realm1</literal>, the revised <filename>themeConfig.json</filename> file
      should look similar to:</para>
 
-     <screen>{
+     <programlisting language="javascript">
+{
      "themes": [
          {
             "name": "default",
@@ -467,7 +487,7 @@ default/Login.jsp</programlisting>
             }
          }
      ]
-}</screen>
+}</programlisting>
 
      <para>Be careful with the syntax. Do not forget the comma between realms. If in doubt about your JSON syntax,
      refer to a validation tool such as <link xlink:show="new" xlink:href="http://jsonlint.com"><citetitle>The

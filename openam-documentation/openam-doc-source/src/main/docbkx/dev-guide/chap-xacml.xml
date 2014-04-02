@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-xacml'
@@ -342,55 +342,57 @@ action.name=GET</programlisting>
       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM
       ssoadm.jsp</citetitle></link>.</para>
 
-      <screen>$ ssoadm
- create-cot
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot cot
+      <screen>
+$ <userinput>ssoadm \
+ create-cot \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --cot cot</userinput>
 
-Circle of trust, cot was created.
-$ ssoadm
- create-metadata-templ
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --entityid xacmlPepEntity
- --xacmlpep /xacmlPepEntity
- --meta-data-file xacmlPep.xml
- --extended-data-file xacmlPep-extended.xml
+<computeroutput>Circle of trust, cot was created.</computeroutput>
+$ <userinput>ssoadm \
+ create-metadata-templ \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --entityid xacmlPepEntity \
+ --xacmlpep /xacmlPepEntity \
+ --meta-data-file xacmlPep.xml \
+ --extended-data-file xacmlPep-extended.xml</userinput>
 
-Hosted entity configuration was written to xacmlPep-extended.xml.
-Hosted entity descriptor was written to xacmlPep.xml.
-$ ssoadm
- import-entity
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot cot
- --meta-data-file xacmlPep.xml
- --extended-data-file xacmlPep-extended.xml
+<computeroutput>Hosted entity configuration was written to xacmlPep-extended.xml.
+Hosted entity descriptor was written to xacmlPep.xml.</computeroutput>
+$ <userinput>ssoadm \
+ import-entity \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --cot cot \
+ --meta-data-file xacmlPep.xml \
+ --extended-data-file xacmlPep-extended.xml</userinput>
 
-Import file, xacmlPep.xml.
-Import file, xacmlPep-extended.xml.
-$ ssoadm
- create-metadata-templ
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --entityid xacmlPdpEntity
- --xacmlpdp /xacmlPdpEntity
- --meta-data-file xacmlPdp.xml
- --extended-data-file xacmlPdp-extended.xml
+<computeroutput>Import file, xacmlPep.xml.
+Import file, xacmlPep-extended.xml.</computeroutput>
+$ <userinput>ssoadm \
+ create-metadata-templ \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --entityid xacmlPdpEntity \
+ --xacmlpdp /xacmlPdpEntity \
+ --meta-data-file xacmlPdp.xml \
+ --extended-data-file xacmlPdp-extended.xml</userinput>
 
-Hosted entity configuration was written to xacmlPdp-extended.xml.
-Hosted entity descriptor was written to xacmlPdp.xml.
-$ ssoadm
- import-entity
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot cot
- --meta-data-file xacmlPdp.xml
- --extended-data-file xacmlPdp-extended.xml
+<computeroutput>Hosted entity configuration was written to xacmlPdp-extended.xml.
+Hosted entity descriptor was written to xacmlPdp.xml.</computeroutput>
+$ <userinput>ssoadm \
+ import-entity \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --cot cot \
+ --meta-data-file xacmlPdp.xml \
+ --extended-data-file xacmlPdp-extended.xml</userinput>
 
-Import file, xacmlPdp.xml.
-Import file, xacmlPdp-extended.xml.</screen>
+<computeroutput>Import file, xacmlPdp.xml.
+Import file, xacmlPdp-extended.xml.</computeroutput>
+      </screen>
      </listitem>
     </orderedlist>
   </listitem>
@@ -410,8 +412,9 @@ Import file, xacmlPdp-extended.xml.</screen>
  <para>After you have configured OpenAM and the properties files, run the
  sample client script, and observe the XACML request and response.</para>
 
- <screen width="83">$ sh scripts/run-xacml-client-sample.sh
-Using properties file:xacmlClientSample
+ <screen width="83">
+$ <userinput>sh scripts/run-xacml-client-sample.sh</userinput>
+<computeroutput>Using properties file:xacmlClientSample
 sample properties:
 subject.id.datatype:urn:oasis:names:tc:xacml:1.0:data-type:x500Name
 pdp.entityId:xacmlPdpEntity
@@ -478,5 +481,6 @@ testProcessRequest():xacmlResponse:
 &lt;xacml-context:StatusDetail/&gt;&lt;/xacml-context:StatusDetail&gt;
 &lt;/xacml-context:Status&gt;
 &lt;/xacml-context:Result&gt;
-&lt;/xacml-context:Response&gt;</screen>
+&lt;/xacml-context:Response&gt;</computeroutput>
+ </screen>
 </chapter>

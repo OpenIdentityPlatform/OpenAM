@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-troubleshooting'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Troubleshooting</title>
  <indexterm><primary>Troubleshooting</primary></indexterm>
  <para>This chapter offers solutions to issues during installation of OpenAM
@@ -46,7 +46,8 @@
     <para>I am trying to install a policy agent, connecting to OpenAM over
     HTTPS, and seeing the following error.</para>
 
-    <screen>OpenAM server URL: https://openam.example.com:8443/openam
+    <screen>
+<computeroutput>OpenAM server URL: https://openam.example.com:8443/openam
 
 WARNING: Unable to connect to OpenAM server URL. Please specify the
 correct OpenAM server URL by hitting the Back button (&lt;) or if the OpenAM
@@ -56,7 +57,8 @@ If OpenAM server is SSL enabled and the root CA certificate for the OpenAM
 server certificate has been not imported into installer JVMs key store (see
 installer-logs/debug/Agent.log for detailed exception), import the root
 CA certificate and restart the installer; or continue installation without
-verifying OpenAM server URL.</screen>
+verifying OpenAM server URL.</computeroutput>
+    </screen>
 
     <para>What should I do?</para>
    </question>
@@ -157,7 +159,7 @@ ServerName www.localhost.example:8080</programlisting>
        directory, and then open the <filename>OpenSSOAgentBootstrap.properties</filename> file. Near the
        end of the file, you should see the following attribute:</para>
 
-       <screen>com.forgerock.agents.instance.id=</screen>
+       <literallayout class="monospaced">com.forgerock.agents.instance.id=</literallayout>
 
        <para>Set that attribute to an appropriate unique value such as <literal>1</literal> or
        <literal>2</literal>. Restart the web service that is being protected by the agent.

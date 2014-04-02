@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
@@ -101,7 +102,11 @@
    <step>
     <para>Shut down the Apache 2.4 server where you plan to install the
     agent.</para>
-    <screen>$ /path/to/apache24/bin/apachectl -k stop</screen>
+
+    <screen>
+$ <userinput>/path/to/apache24/bin/apachectl -k stop</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
@@ -114,14 +119,15 @@
      enter <literal>yes</literal> to continue.</para>
 
     <para>You can suppress the license agreement prompt by including the
-     <sbr/><option>--acceptLicense</option> option on the command line.
+     <option>--acceptLicense</option> option on the command line.
      The inclusion of the option indicates that you have read and accepted
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
 
-    <screen>$ cd /path/to/web_agents/apache24_agent/bin/
-$ ./agentadmin --install --acceptLicense
-...
+    <screen>
+$ <userinput>cd /path/to/web_agents/apache24_agent/bin/</userinput>
+$ <userinput>./agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -149,7 +155,9 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/web_agents/apache24_agent/installer-logs/audit/install.log
-...</screen>
+...</computeroutput>
+    </screen>
+
     <para>Upon successful completion, the installer has added the agent as
     a module to the Apache 2.4 configuration, and also set up configuration
     and log directories for the agent. You can find a backup Apache HTTPD
@@ -211,7 +219,11 @@ Install log file location:
     </step>
    <step>
     <para>Start the Apache 2.4 server where you installed the agent.</para>
-    <screen>$ /path/to/apache24/bin/apachectl -k start</screen>
+
+    <screen>
+$ <userinput>/path/to/apache24/bin/apachectl -k start</userinput>
+    </screen>
+
    </step>
   </procedure>
 
@@ -221,24 +233,32 @@ Install log file location:
    <step>
     <para>Check the Apache 2.4 error log after you start the server to make
     sure startup completed successfully.</para>
-    <screen>$ tail -n 2 /path/to/apache24/logs/error_log
-[Fri Sep 14 12:48:55.765192 2012] [dsame:notice] [pid 18991:tid 3075335872]
+
+    <screen>
+$ <userinput>tail -n 2 /path/to/apache24/logs/error_log</userinput>
+<computeroutput>[Fri Sep 14 12:48:55.765192 2012] [dsame:notice] [pid 18991:tid 3075335872]
  Policy web agent shared memory configuration: notif_shm_size[2099200],
  pdp_shm_size[3213312], max_pid_count[256], max_pdp_count[256]
 [Fri Sep 14 12:48:55.774790 2012] [mpm_event:notice] [pid 18991:tid 3075335872]
  AH00489: Apache/2.4.3 (Unix) DSAME/3.0 configured
- -- resuming normal operations</screen>
+ -- resuming normal operations</computeroutput>
+    </screen>
+
    </step>
    <step>
     <para>Check the <filename>amAgent</filename> debug log to verify that
     no errors occurred on startup.</para>
-    <screen>$ tail /path/to/web_agents/apache24_agent/Agent_001/logs/debug/amAgent
-2012-09-14 12:48:55.613      -1 18991:85fdd48 all: ==============...=====
+
+    <screen>
+$ <userinput>tail /path/to/web_agents/apache24_agent/Agent_001/logs/debug/amAgent</userinput>
+<computeroutput>2012-09-14 12:48:55.613      -1 18991:85fdd48 all: ==============...=====
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Version: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Revision: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Build Date: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Build Machine: ...
-2012-09-14 12:48:55.614      -1 18991:85fdd48 all: ==============...=====</screen>
+2012-09-14 12:48:55.614      -1 18991:85fdd48 all: ==============...=====</computeroutput>
+    </screen>
+
    </step>
    <step performance="optional">
     <para>If you have a policy configured, you can test your policy agent.
@@ -260,7 +280,7 @@ Install log file location:
    option to the command.</para>
 
   <para>When performing a scripted, silent installation, use
-  <sbr/><command>./agentadmin --install --saveResponse
+  <command>./agentadmin --install --saveResponse
   <replaceable>response-file</replaceable></command>
   to create a response file for scripted installation. Then install silently
   using <command>./agentadmin --install --acceptLicense --useResponse
@@ -287,13 +307,16 @@ Install log file location:
   <para>Shut down the Apache 2.4 server before you uninstall the
     policy agent.</para>
 
-  <screen>$ /path/to/apache24/bin/apachectl -k stop</screen>
+  <screen>
+$ <userinput>/path/to/apache24/bin/apachectl -k stop</userinput>
+  </screen>
 
   <para>To remove the web policy agent, use <command>./agentadmin
   --uninstall</command>.</para>
 
-  <screen>$ ./agentadmin --uninstall
-...
+  <screen>
+$ <userinput>./agentadmin --uninstall</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -310,6 +333,8 @@ Removing Agent parameters from /path/to/apache24/conf/httpd.conf file
 
 Uninstall log file location:
 /path/to/web_agents/apache24_agent/installer-logs/audit/uninstall.log
-...</screen>
+...</computeroutput>
+  </screen>
+
  </section>
 </chapter>

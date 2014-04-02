@@ -28,8 +28,7 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Web Policy Agents <?eval ${agentsDocTargetVersion}?></title>
 
  <para>This chapter concerns OpenAM web policy agents. Web policy agents
@@ -46,15 +45,18 @@
      scroll through the license by pressing &lt;Enter&gt;.
      At the prompt, enter <literal>yes</literal> to accept the license and
      continue the installation.</para>
-     <screen>$ bin/agentadmin --install
 
+     <screen>
+$ <userinput>bin/agentadmin --install</userinput>
+<computeroutput>
 Please read the following License Agreement carefully:
 
 [Press &lt;Enter> to continue...] or [Enter n To Finish]
 
 Do you completely agree with all the terms and conditions of this License
-Agreement (yes/no): [no]:
-          </screen>
+Agreement (yes/no): [no]:</computeroutput>
+     </screen>
+
      <para>For scripted or silent installs, you can include the
       <option>--acceptLicense</option> option on the command line to suppress the
       license acceptance prompt. Using the option indicates that you have read and

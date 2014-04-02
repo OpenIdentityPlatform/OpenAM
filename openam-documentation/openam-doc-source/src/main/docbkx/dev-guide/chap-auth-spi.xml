@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-auth-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing Authentication Modules</title>
  <indexterm>
@@ -722,9 +723,10 @@ public class SampleAuthPrincipal implements Principal, Serializable
 
    <para>Build the module using Apache Maven.</para>
 
-   <screen>$ cd /path/to/openam-auth-sample
-$ mvn install
-[INFO] Scanning for projects...
+   <screen>
+$ <userinput>cd /path/to/openam-auth-sample</userinput>
+$ <userinput>mvn install</userinput>
+<computeroutput>[INFO] Scanning for projects...
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] Building openam-auth-sample 1.0.0-SNAPSHOT
@@ -741,7 +743,8 @@ $ mvn install
 [INFO] Total time: 3.651s
 [INFO] Finished at: Thu Oct 03 11:19:07 CEST 2013
 [INFO] Final Memory: 20M/226M
-[INFO] ------------------------------------------------------------------------</screen>
+[INFO] ------------------------------------------------------------------------</computeroutput>
+   </screen>
 
    <para>After you successfully build the module, you find the .jar in
    the <filename>target/</filename> directory of the project.</para>
@@ -760,27 +763,31 @@ $ mvn install
      <para>Copy the sample authentication module .jar file to
      <filename>WEB-INF/lib/</filename> where OpenAM is deployed.</para>
 
-     <screen>$ cp target/openam-auth-sample*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+     <screen>
+$ <userinput>cp target/openam-auth-sample*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
+     </screen>
     </listitem>
 
     <listitem>
      <para>Register the module with OpenAM using the <command>ssoadm</command>
      command.</para>
 
-     <screen>$ ssoadm
- create-svc
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --xmlfile amAuthSampleAuth.xml
+     <screen>
+$ <userinput>ssoadm \
+ create-svc \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --xmlfile amAuthSampleAuth.xml</userinput>
 
-Service was added.
-$ ssoadm
- register-auth-module
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --authmodule org.forgerock.openam.examples.SampleAuth
+<computeroutput>Service was added.</computeroutput>
+$ <userinput>ssoadm \
+ register-auth-module \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --authmodule org.forgerock.openam.examples.SampleAuth</userinput>
 
-Authentication module was registered.</screen>
+<computeroutput>Authentication module was registered.</computeroutput>
+     </screen>
 
      <para>See the <link xlink:href="reference#ssoadm-1" xlink:show="new"
      xlink:role="http://docbook.org/xlink/role/olink"><command>ssoadm</command>
@@ -794,10 +801,12 @@ Authentication module was registered.</screen>
      <para>For example if you deployed OpenAM in Apache Tomcat, then you shut
      down Tomcat and start it again.</para>
 
-     <screen>$ /path/to/tomcat/bin/shutdown.sh
-$ /path/to/tomcat/bin/startup.sh
-$ tail -1 /path/to/tomcat/logs/catalina.out
-INFO: Server startup in 14736 ms</screen>
+     <screen>
+$ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
+$ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
+$ <userinput>tail -1 /path/to/tomcat/logs/catalina.out</userinput>
+<computeroutput>INFO: Server startup in 14736 ms</computeroutput>
+     </screen>
     </listitem>
    </orderedlist>
   </section>

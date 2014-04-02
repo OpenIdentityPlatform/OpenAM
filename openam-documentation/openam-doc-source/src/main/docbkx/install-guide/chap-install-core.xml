@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-core'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing OpenAM Core Services</title>
 
@@ -698,8 +699,11 @@ Using CLASSPATH:
    <para>Deploy the <filename><?eval ${serveronlyWarFile}?></filename> file 
     in your container.</para>
 
-   <para>For example, copy the file to deploy on Apache Tomcat.</para>
-   <screen>$ cp <?eval ${serveronlyWarFile}?> /path/to/tomcat/webapps/coreonly.war</screen>
+   <para>For example, copy the file to deploy on Apache Tomcat:</para>
+
+   <screen>
+$ <userinput>cp ${serveronlyWarFile} /path/to/tomcat/webapps/coreonly.war</userinput>
+   </screen>
   </step>
 
   <step>

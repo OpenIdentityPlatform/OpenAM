@@ -20,24 +20,25 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !
 -->
  <section xml:id="formatting-conventions"
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Formatting Conventions</title>
 
  <para>Some items are formatted differently from other text, like
  <filename>filenames</filename>, <command>commands</command>, and
  <literal>literal values</literal>.</para>
 
- <screen>$ echo Command line sessions are formatted with lines folded for easier reading.
- In HTML documents click the [-] image for a flat, copy-paste version. Click
- the [+] image for an expanded, line-wrapped version. &gt; /dev/null</screen>
+ <screen>
+$ <userinput>echo Command line sessions are formatted with lines folded for easy reading. \
+ In HTML documents click the [-] image for a flat, copy-paste version. Click \
+ the [+] image for an expanded, line-wrapped version. &gt; /dev/null</userinput>
+ </screen>
 
  <para>In many cases, sections pertaining to UNIX, GNU/Linux, Mac OS X, BSD,
  and so forth are marked (UNIX). Sections pertaining to Microsoft Windows

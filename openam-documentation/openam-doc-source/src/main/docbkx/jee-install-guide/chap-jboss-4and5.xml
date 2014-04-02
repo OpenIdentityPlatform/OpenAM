@@ -62,10 +62,10 @@
   <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
   of Java, and set the <literal>JAVA_HOME</literal> environment variable accordingly.</para>
 
-      <screen>$ echo $JAVA_HOME
-/path/to/java
-$ which java
-/usr/bin/java</screen>
+      <screen>
+$ <userinput>echo $JAVA_HOME</userinput>
+<computeroutput>/path/to/java</computeroutput>
+      </screen>
 
   <para>Go to <link xlink:href="install-guide#download-openam-software"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
@@ -118,8 +118,9 @@ $ which java
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
 
-    <screen>$ /path/to/j2ee_agents/jboss_v42_agent/bin/agentadmin --install --acceptLicense
-...
+    <screen>
+$ <userinput>/path/to/j2ee_agents/jboss_v42_agent/bin/agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -149,7 +150,9 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/j2ee_agents/jboss_v42_agent/installer-logs/audit/install.log
-...</screen>
+...</computeroutput>
+    </screen>
+
     <para>Upon successful completion, the installer has updated the JBoss
     configuration, created a
     <filename>JBOSS_HOME/bin/setAgentClasspathdefault.sh</filename> script,
@@ -242,7 +245,11 @@ Install log file location:
    
    <step>
     <para>Adjust the script to set the agent classpath executable.</para>
-    <screen>$ chmod +x $JBOSS_HOME/bin/setAgentClasspathdefault.sh</screen>
+
+    <screen>
+$ <userinput>chmod +x $JBOSS_HOME/bin/setAgentClasspathdefault.sh</userinput>
+    </screen>
+
    </step>
    <step>
     <para>Open the <filename>JBOSS_HOME/bin/run.sh</filename> script for
@@ -269,9 +276,13 @@ fi</programlisting>
    </step>
    <step>
     <para>Start the JBoss server where you installed the agent.</para>
-    <screen>$ cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0
-...
-16:30:31,172 INFO  [ServerImpl] JBoss ... Started in 1m:44s:759ms</screen>
+
+    <screen>
+$ <userinput>cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0</userinput>
+<computeroutput>...
+16:30:31,172 INFO  [ServerImpl] JBoss ... Started in 1m:44s:759ms</computeroutput>
+    </screen>
+
    </step>
    <step performance="optional">
     <para>If you have a policy configured, you can test your policy agent.

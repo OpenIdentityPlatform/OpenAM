@@ -216,9 +216,14 @@
    <step>
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
-    <screen>$ curl -o metadata.xml
- http://www.idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://www.idp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+
+    <screen>
+$ <userinput>curl \
+ --output metadata.xml \
+ "http://www.idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=\
+http://www.idp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable>"</userinput>
+    </screen>
+
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -258,9 +263,14 @@
    <step>
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
-    <screen>$ curl -o metadata.xml
- http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+
+    <screen>
+$ <userinput>curl \
+ --output metadata.xml \
+ "http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=\
+http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable>"</userinput>
+    </screen>
+
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -506,7 +516,11 @@
     <step>
      <para>Copy the <filename><?eval ${ipdiscoWarFile}?></filename> file to
      the <filename>webapps/</filename> directory.</para>
-     <screen>$ cp ~/Downloads/openam/<?eval ${ipdiscoWarFile}?> /path/to/tomcat/webapps/disco.war</screen>
+
+     <screen>
+$ <userinput>cp ~/Downloads/openam/${ipdiscoWarFile} \
+ /path/to/tomcat/webapps/disco.war</userinput>
+     </screen>
     </step>
     <step>
      <para>Access the configuration screen through your browser.</para>
@@ -656,20 +670,34 @@
     <step>
      <para>Obtain metadata for each identity provider.</para>
 
-     <screen>$ ssh www.this-idp.example
-$ cd /path/to/openam-tools/admin/openam/bin
-$ ./ssoadm create-metadata-templ -y "http://www.this-idp.example:8080/openam"
- -u amadmin -f /tmp/pwd.txt -i /idp -m this-standard.xml -x this-extended.xml
-Hosted entity configuration was written to this-extended.xml.
-Hosted entity descriptor was written to this-standard.xml.
+     <screen>
+$ <userinput>ssh www.this-idp.example</userinput>
+$ <userinput>cd /path/to/openam-tools/admin/openam/bin</userinput>
+$ <userinput>./ssoadm \
+ create-metadata-templ \
+ --entityid "http://www.this-idp.example:8080/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --identityprovider /idp \
+ --meta-data-file this-standard.xml \
+ --extended-data-file this-extended.xml</userinput>
+<computeroutput>Hosted entity configuration was written to this-extended.xml.
+Hosted entity descriptor was written to this-standard.xml.</computeroutput>
 
-$ ssh www.that-idp.example
-$ cd /path/to/openam-tools/admin/openam/bin
-$ ./ssoadm create-metadata-templ -y "http://www.that-idp.example:8080/openam"
- -u amadmin -f /tmp/pwd.txt -i /idp -m that-standard.xml -x that-extended.xml
+$ <userinput>ssh www.that-idp.example</userinput>
+$ <userinput>cd /path/to/openam-tools/admin/openam/bin</userinput>
+$ <userinput>./ssoadm \
+ create-metadata-templ \
+ --entityid "http://www.that-idp.example:8080/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --identityprovider /idp \
+ --meta-data-file that-standard.xml \
+ --extended-data-file that-extended.xml</userinput>
 
-Hosted entity configuration was written to that-extended.xml.
-Hosted entity descriptor was written to that-standard.xml.</screen>
+<computeroutput>Hosted entity configuration was written to that-extended.xml.
+Hosted entity descriptor was written to that-standard.xml.</computeroutput>
+     </screen>
     </step>
     <step>
      <para>For each identity provider extended metadata file, change the value
@@ -680,18 +708,30 @@ Hosted entity descriptor was written to that-standard.xml.</screen>
      <para>On the service provider, add the identity providers to the circle of
      trust using the identity provider metadata.</para>
 
-     <screen>$ ssh www.sp.example
-$ cd /path/to/openam-tools/admin/openam/bin
-$ ./ssoadm import-entity -t discocot -m ~/Downloads/this-standard.xml
- -x ~/Downloads/this-extended.xml -u amadmin -f /tmp/pwd.txt
+     <screen>
+$ <userinput>ssh www.sp.example</userinput>
+$ <userinput>cd /path/to/openam-tools/admin/openam/bin</userinput>
+$ <userinput>./ssoadm \
+ import-entity \
+ --cot discocot \
+ --meta-data-file ~/Downloads/this-standard.xml \
+ --extended-data-file ~/Downloads/this-extended.xml \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt</userinput>
 
-Import file, /Users/mark/Downloads/this-standard.xml.
-Import file, /Users/mark/Downloads/this-extended.xml.
-$ ./ssoadm import-entity -t discocot -m ~/Downloads/that-standard.xml
- -x ~/Downloads/that-extended.xml -u amadmin -f /tmp/pwd.txt
+<computeroutput>Import file, /Users/mark/Downloads/this-standard.xml.
+Import file, /Users/mark/Downloads/this-extended.xml.</computeroutput>
+$ <userinput>./ssoadm \
+ import-entity \
+ --cot discocot \
+ --meta-data-file ~/Downloads/that-standard.xml \
+ --extended-data-file ~/Downloads/that-extended.xml \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt</userinput>
 
-Import file, /Users/mark/Downloads/that-standard.xml.
-Import file, /Users/mark/Downloads/that-extended.xml.</screen>
+<computeroutput>Import file, /Users/mark/Downloads/that-standard.xml.
+Import file, /Users/mark/Downloads/that-extended.xml.</computeroutput>
+     </screen>
     </step>
 
     <step>
@@ -707,7 +747,8 @@ Import file, /Users/mark/Downloads/that-extended.xml.</screen>
      Output generated during a test follows, with some lines folded to fit
      on the printed page.</para>
 
-     <screen>08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
+     <programlisting language="none">
+08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieUtils.init : idpDiscoveryOnlyWar=true
 08/08/2012 11:43:38:341 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieWriterServlet Initializing...
@@ -743,7 +784,8 @@ CookieWriterServlet.doGetPost: Preferred Cookie Name _saml_idp
 08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieWriterServlet.doGetPost: Redirect to
  http://www.that-idp.example:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
- s2ce9c465cf39c96f31e1dcf009cf9943695d82901</screen>
+ s2ce9c465cf39c96f31e1dcf009cf9943695d82901
+     </programlisting>
     </step>
    </procedure>
   </section>
@@ -1686,13 +1728,15 @@ CookieWriterServlet.doGetPost: Redirect to
      where the entity ID is <literal>http://lb.example.com:80/openam</literal>.
     </para>
 
-    <screen>$ ssoadm
- export-entity
- --entityid "http://lb.example.com:80/openam"
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --meta-data-file idp.xml
- --extended-data-file idp-extended.xml</screen>
+    <screen>
+$ <userinput>ssoadm \
+ export-entity \
+ --entityid "http://lb.example.com:80/openam" \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --meta-data-file idp.xml \
+ --extended-data-file idp-extended.xml</userinput>
+    </screen>
    </listitem>
 
    <listitem>
@@ -3296,26 +3340,33 @@ CookieWriterServlet.doGetPost: Redirect to
 
      <para>The following example starts on the service provider side.</para>
 
-     <screen>$ cat /tmp/user-map.txt
-id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org
-$ ssoadm do-bulk-federation --metaalias /sp
- --remoteentityid http://idp.example.org:8080/openam
- --useridmapping /tmp/user-map.txt
- --nameidmapping /tmp/name-map.txt
- --adminid amadmin --password-file /tmp/pwd.txt
- --spec saml2
+     <screen>
+$ <userinput>cat /tmp/user-map.txt</userinput>
+<computeroutput>id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org</computeroutput>
+$ <userinput>ssoadm  \
+ do-bulk-federation \
+ --metaalias /sp \
+ --remoteentityid http://idp.example.org:8080/openam \
+ --useridmapping /tmp/user-map.txt \
+ --nameidmapping /tmp/name-map.txt \
+ --adminid amadmin  \
+ --password-file /tmp/pwd.txt \
+ --spec saml2</userinput>
 
-Bulk Federation for this host was completed. To complete the
+<computeroutput>Bulk Federation for this host was completed. To complete the
 federation, name Id mapping file should be loaded to remote
-provider.</screen>
+provider.</computeroutput>
+     </screen>
     </listitem>
 
     <listitem>
      <para>Copy the name ID mapping output file to the other provider.</para>
 
-     <screen>$ scp /tmp/name-map.txt openam@idp.example.org:/tmp/name-map.txt
-openam@idp.example.org's password:
-name-map.txt                     100%  177     0.2KB/s   00:00</screen>
+     <screen>
+$ <userinput>scp /tmp/name-map.txt openam@idp.example.org:/tmp/name-map.txt</userinput>
+<computeroutput>openam@idp.example.org's password:
+name-map.txt                     100%  177     0.2KB/s   00:00</computeroutput>
+     </screen>
     </listitem>
 
     <listitem>
@@ -3325,11 +3376,16 @@ name-map.txt                     100%  177     0.2KB/s   00:00</screen>
      <para>The following example is performed on the identity provider
      side.</para>
 
-     <screen>$ ssoadm import-bulk-fed-data
- --adminid amadmin --password-file /tmp/pwd.txt
- --metaalias /idp --bulk-data-file /tmp/name-map.txt
+     <screen>
+$ <userinput>ssoadm \
+ import-bulk-fed-data \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --metaalias /idp \
+ --bulk-data-file /tmp/name-map.txt</userinput>
 
-Bulk Federation for this host was completed.</screen>
+<computeroutput>Bulk Federation for this host was completed.</computeroutput>
+     </screen>
     </listitem>
    </orderedlist>
 

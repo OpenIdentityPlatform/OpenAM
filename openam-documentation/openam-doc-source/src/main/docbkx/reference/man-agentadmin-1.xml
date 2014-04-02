@@ -20,17 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <refentry xml:id='agentadmin-1'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <info><copyright><year>2011-2012</year><holder>ForgeRock AS</holder></copyright></info>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ <info><copyright><year>2011-2014</year><holder>ForgeRock AS</holder></copyright></info>
  <refmeta>
   <refentrytitle>agentadmin</refentrytitle><manvolnum>1</manvolnum>
   <refmiscinfo class="software">OpenAM</refmiscinfo>
@@ -222,8 +221,10 @@
   <para>The following example installs an Apache HTTP Server 2.2 interactively,
   where Apache HTTP Server has been installed under
   <filename>/path/to/apache22</filename>.</para>
-  <screen>$ ./agentadmin --install --acceptLicense
-...
+
+  <screen>
+$ <userinput>./agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
@@ -251,6 +252,8 @@ Agent Debug directory location:
 
 Install log file location:
 /path/to/web_agents/apache22_agent/installer-logs/audit/install.log
-...</screen>
+...</computeroutput>
+  </screen>
+
  </refsect1>
 </refentry>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-first-steps'
@@ -29,7 +29,7 @@
          xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
-          http://docbook.org/xml/5.0/xsd/docbook.xsd'
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Protecting a Web Site With OpenAM</title>
 
@@ -195,13 +195,15 @@
     <para>Add the aliases to your hosts file using your preferred text
     editor.</para>
 
-    <screen>$ sudo vi /etc/hosts
-Password:
+    <screen>
+$ <userinput>sudo vi /etc/hosts</userinput>
+<computeroutput>Password:</computeroutput>
 
 ### Edit /etc/hosts ###
 
-$ cat /etc/hosts | grep openam
-127.0.0.1    localhost openam.example.com www.example.com</screen>
+$ <userinput>cat /etc/hosts | grep openam</userinput>
+<computeroutput>127.0.0.1    localhost openam.example.com www.example.com</computeroutput>
+    </screen>
    </step>
   </procedure>
 
@@ -228,10 +230,16 @@ $ cat /etc/hosts | grep openam
     compiler. How you install these depends on your distribution.</para>
 
     <para>This might work for Red Hat and CentOS distributions:</para>
-    <screen># yum groupinstall 'Development Tools'</screen>
+
+    <screen>
+# <userinput>yum groupinstall 'Development Tools'</userinput>
+    </screen>
 
     <para>This might work for Ubuntu distributions:</para>
-    <screen>$ sudo apt-get install build-essential checkinstall</screen>
+
+    <screen>
+$ <userinput>sudo apt-get install build-essential checkinstall</userinput>
+    </screen>
    </step>
 
    <step>
@@ -253,20 +261,26 @@ $ cat /etc/hosts | grep openam
     <para>The <option>--prefix</option> option can be used so that the
     web server is installed in a location where you can write files.</para>
 
-    <screen>$ cd ~/Downloads/httpd-2.2.25
-$ ./configure --prefix=/path/to/apache</screen>
+    <screen>
+$ <userinput>cd ~/Downloads/httpd-2.2.25</userinput>
+$ <userinput>./configure --prefix=/path/to/apache</userinput>
+    </screen>
    </step>
 
    <step>
     <para>Compile Apache HTTP Server.</para>
 
-    <screen>$ make</screen>
+    <screen>
+$ <userinput>make</userinput>
+    </screen>
    </step>
 
    <step>
     <para>Install Apache HTTP Server.</para>
 
-    <screen>$ make install</screen>
+    <screen>
+$ <userinput>make install</userinput>
+    </screen>
    </step>
 
    <step>
@@ -274,10 +288,12 @@ $ ./configure --prefix=/path/to/apache</screen>
     <literal>www.example.com</literal> and the port to one such as 8000 that
     the web server process can use when starting with your user ID.</para>
 
-    <screen>$ vi /path/to/apache/conf/httpd.conf
-$ grep 8000 /path/to/apache/conf/httpd.conf
-Listen 8000
-ServerName www.example.com:8000</screen>
+    <screen>
+$ <userinput>vi /path/to/apache/conf/httpd.conf</userinput>
+$ <userinput>grep 8000 /path/to/apache/conf/httpd.conf</userinput>
+<computeroutput>Listen 8000
+ServerName www.example.com:8000</computeroutput>
+    </screen>
    </step>
 
    <step>
@@ -287,7 +303,9 @@ ServerName www.example.com:8000</screen>
      <step>
       <para>Start the web server.</para>
       
-      <screen>$ /path/to/apache/bin/apachectl -k start</screen>
+      <screen>
+$ <userinput>/path/to/apache/bin/apachectl -k start</userinput>
+      </screen>
      </step>
      
      <step>
@@ -326,7 +344,9 @@ ServerName www.example.com:8000</screen>
     <para>One way of checking the version of the Java Development Kit is to
     list the version of the <command>javac</command> compiler.</para>
 
-    <screen>$ javac -version</screen>
+    <screen>
+$ <userinput>javac -version</userinput>
+    </screen>
 
     <para>If the <command>javac</command> compiler is not found, then either
     you do not have a Java Development Kit installed, or it is installed but
@@ -347,16 +367,19 @@ ServerName www.example.com:8000</screen>
    <step>
     <para>Extract the download.</para>
 
-    <screen>$ cd /path/to
-$ unzip ~/Downloads/apache-tomcat-7.0.42.zip
-$ mv apache-tomcat-7.0.42 tomcat</screen>
+    <screen>
+$ <userinput>cd /path/to</userinput>
+$ <userinput>unzip ~/Downloads/apache-tomcat-7.0.42.zip</userinput>
+$ <userinput>mv apache-tomcat-7.0.42 tomcat</userinput></screen>
    </step>
 
    <step>
     <para>On UNIX-like systems, make the scripts in Tomcat's
     <filename>bin/</filename> directory executable.</para>
 
-    <screen>$ chmod +x /path/to/tomcat/bin/*.sh</screen>
+    <screen>
+$ <userinput>chmod +x /path/to/tomcat/bin/*.sh</userinput>
+    </screen>
    </step>
 
    <step>
@@ -373,17 +396,21 @@ $ mv apache-tomcat-7.0.42 tomcat</screen>
     location of the Java Development Kit, and to set the heap and permanent
     generation size appropriately.</para>
 
-    <screen>$ vi /path/to/tomcat/bin/catalina.sh
-$ grep ^JAVA_HOME /path/to/tomcat/bin/catalina.sh
-JAVA_HOME=/path/to/jdk
-$ grep ^CATALINA /path/to/tomcat/bin/catalina.sh
-CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
+    <screen>
+$ <userinput>vi /path/to/tomcat/bin/catalina.sh</userinput>
+$ <userinput>grep ^JAVA_HOME /path/to/tomcat/bin/catalina.sh</userinput>
+<computeroutput>JAVA_HOME=/path/to/jdk</computeroutput>
+$ <userinput>grep ^CATALINA /path/to/tomcat/bin/catalina.sh</userinput>
+<computeroutput>CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</computeroutput>
+    </screen>
    </step>
 
    <step>
     <para>Start Tomcat.</para>
 
-    <screen>$ /path/to/tomcat/bin/startup.sh</screen>
+    <screen>
+$ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
+    </screen>
 
     <para>It might take Tomcat several seconds to start. When Tomcat has
     successfully started, you should see an informational message indicating
@@ -437,7 +464,9 @@ CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
    <step>
     <para>Deploy the .war file in Tomcat as <filename>openam.war</filename>.</para>
 
-    <screen>$ mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</screen>
+    <screen>
+$ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</userinput>
+    </screen>
 
     <para>Tomcat deploys OpenAM under the
     <filename>/path/to/tomcat/webapps/openam/</filename> directory, and you can
@@ -725,8 +754,10 @@ CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
     <para>The password file should be read-only by the user who installs
     the policy agent.</para>
 
-    <screen>$ echo password > /tmp/pwd.txt
-$ chmod 400 /tmp/pwd.txt</screen>
+    <screen>
+$ <userinput>echo password > /tmp/pwd.txt</userinput>
+$ <userinput>chmod 400 /tmp/pwd.txt</userinput>
+    </screen>
 
     <para>The password is stored encrypted after installation.</para>
    </step>
@@ -740,14 +771,18 @@ $ chmod 400 /tmp/pwd.txt</screen>
    <step>
     <para>Stop Apache HTTP Server while you install the policy agent.</para>
 
-    <screen>$ /path/to/apache/bin/apachectl stop</screen>
+    <screen>
+$ <userinput>/path/to/apache/bin/apachectl stop</userinput>
+    </screen>
    </step>
 
    <step>
     <para>Extract the download.</para>
 
-    <screen>$ cd /path/to
-$ unzip ~/Downloads/apache_v22_Linux_agent*.zip</screen>
+    <screen>
+$ <userinput>cd /path/to</userinput>
+$ <userinput>unzip ~/Downloads/apache_v22_Linux_agent*.zip</userinput>
+    </screen>
    </step>
 
    <step>
@@ -765,9 +800,10 @@ $ unzip ~/Downloads/apache_v22_Linux_agent*.zip</screen>
      the terms stated in the license.
      To view the license agreement, open <filename>license.txt</filename>.</para>
 
-       <screen>$ cd /path/to/web_agents/apache22_agent/bin
-$ ./agentadmin --install --acceptLicense
-...
+       <screen>
+$ <userinput>cd /path/to/web_agents/apache22_agent/bin</userinput>
+$ <userinput>./agentadmin --install --acceptLicense</userinput>
+<computeroutput>...
 
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
@@ -778,17 +814,20 @@ Agent URL : http://www.example.com:8000
 Agent Profile name : WebAgent
 Agent Profile Password file name : /tmp/pwd.txt
 
-...</screen>
+...</computeroutput>
+       </screen>
    </step>
 
    <step>
     <para>Start Apache HTTP Server, and check that the web policy agent seems
     to be correctly configured.</para>
 
-    <screen>$ /path/to/apache/bin/apachectl -k start
-$ tail /path/to/apache/logs/error_log
-...[notice] Apache/2.2.25 (Unix) Web Policy Agent/3.0 configured -- resuming
- normal operations</screen>
+    <screen>
+$ <userinput>/path/to/apache/bin/apachectl -k start</userinput>
+$ <userinput>tail /path/to/apache/logs/error_log</userinput>
+<computeroutput>...[notice] Apache/2.2.25 (Unix) Web Policy Agent/3.0 configured -- resuming
+ normal operations</computeroutput>
+    </screen>
 
     <para>Assuming everything up to now has worked correctly, you can now try
     your installation to see OpenAM in action.</para>

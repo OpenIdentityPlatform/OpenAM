@@ -20,15 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-entitlements'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Defining Entitlements</title>
  
  <para>This chapter covers how to define entitlements for fine-grained
@@ -110,8 +110,10 @@
    <step>
     <para>Use the <command>ssoadm list-xacml</command> command to list current
     policies, ready for export.</para>
-    <screen>$ ssoadm list-xacml --realm / --adminid amadmin --password-file /tmp/pwd.txt
 
+    <screen>
+$ <userinput>ssoadm list-xacml --realm / --adminid amadmin --password-file /tmp/pwd.txt</userinput>
+<computeroutput>
 &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
 &lt;PolicySet PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:
  rule-combining-algorithm:deny-overrides" Version="2011.10.07.12.22.04.705"
@@ -124,7 +126,8 @@
  PolicyId="New Policy"&gt;
 ... policy content here ...
     &lt;/Policy&gt;
-&lt;/PolicySet&gt;</screen>
+&lt;/PolicySet&gt;</computeroutput>
+    </screen>
    </step>
   </procedure>
   
@@ -134,12 +137,15 @@
    <step>
     <para>Use the <command>ssoadm create-xacml</command> command to import
     a policy.</para>
-    <screen>$ ssoadm
- create-xacml
- --realm /
- --xmlfile policy.xml
- --adminid amadmin
- --password-file /tmp/pwd.txt</screen>
+
+    <screen>
+$ <userinput>ssoadm \
+ create-xacml \
+ --realm / \
+ --xmlfile policy.xml \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt</userinput>
+    </screen>
    </step>
   </procedure>
   
@@ -149,8 +155,9 @@
    <step>
     <para>Use the <command>ssoadm create-appl</command> command to create an
     application type.</para>
-    <screen>$ cat application.txt
-resources=http://myapp.example.com:80/*
+    <screen>
+$ <userinput>cat application.txt</userinput>
+<computeroutput>resources=http://myapp.example.com:80/*
 subjects=com.sun.identity.admin.model.IdRepoUserViewSubject
 subjects=com.sun.identity.admin.model.VirtualViewSubject
 subjects=com.sun.identity.admin.model.OrViewSubject
@@ -164,17 +171,19 @@ conditions=com.sun.identity.admin.model.TimezoneCondition
 conditions=com.sun.identity.admin.model.OrViewCondition
 conditions=com.sun.identity.admin.model.AndViewCondition
 conditions=com.sun.identity.admin.model.NotViewCondition
-entitlementCombiner=com.sun.identity.entitlement.DenyOverride
-$ ssoadm
- create-appl
- --realm /
- --applicationtype iPlanetAMWebAgentService
- --name myApp
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --datafile application.txt
+entitlementCombiner=com.sun.identity.entitlement.DenyOverride</computeroutput>
 
-myApp was created.</screen>
+$ <userinput>ssoadm \
+ create-appl \
+ --realm / \
+ --applicationtype iPlanetAMWebAgentService \
+ --name myApp \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --datafile application.txt</userinput>
+
+<computeroutput>myApp was created.</computeroutput>
+    </screen>
    </step>
   </procedure>
  </section>
