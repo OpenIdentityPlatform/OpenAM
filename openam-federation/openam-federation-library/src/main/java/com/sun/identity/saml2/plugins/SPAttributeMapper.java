@@ -26,10 +26,16 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.saml2.plugins;
 
+import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.common.SAML2Exception;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -55,22 +61,23 @@ public interface SPAttributeMapper {
      * Returns the map of user attribute values for the corresponding
      * SAML <code>Attribute</code>s. This attribute value pair map will be
      * expose by the <code>SAML</code> framework via the Single Sign On
-     * Token. 
+     * Token.
      * @param attributes list of SAML <code>Attribute</code>s.
-     * @param userID universal identifier or the distinguished name (DN) 
-     *        of the user. 
-     * @param hostEntityID <code>EntityID</code> of the hosted provider.  
-     * @param remoteEntityID <code>EntityID</code> of the remote provider.  
+     * @param userID universal identifier or the distinguished name (DN)
+     *        of the user.
+     * @param hostEntityID <code>EntityID</code> of the hosted provider.
+     * @param remoteEntityID <code>EntityID</code> of the remote provider.
+     * @param realm The realm where the hosted provider belongs to.
      * @return map of <code>AttributeValuePair</code>s for the given
      *        SAML <code>Attribute</code> list. 
      * @exception SAML2Exception if any failure.
      */
-    public java.util.Map getAttributes(
-        java.util.List attributes,
-        java.lang.String userID,
-        java.lang.String hostEntityID,
-        java.lang.String remoteEntityID,
-        java.lang.String realm 
+    public Map<String, Set<String>> getAttributes(
+        List<Attribute> attributes,
+        String userID,
+        String hostEntityID,
+        String remoteEntityID,
+        String realm
     ) throws SAML2Exception;
 
 

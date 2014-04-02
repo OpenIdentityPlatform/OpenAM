@@ -1081,12 +1081,9 @@ public class SPACSUtils {
         SPSSOConfigElement spssoconfig =
             metaManager.getSPSSOConfig(realm, hostEntityId);
 
-        Map attributes = SAML2MetaUtils.getAttributes(spssoconfig);
-
         // get mappers
-        SPAccountMapper acctMapper = getSPAccountMapper(attributes);
-        SPAttributeMapper attrMapper =
-            getSPAttributeMapper(attributes);
+        SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, hostEntityId);
+        SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, hostEntityId);
         
         boolean needAttributeEncrypted = false;
         boolean needNameIDEncrypted = false;
@@ -1494,77 +1491,6 @@ public class SPACSUtils {
                 errorCode);
             se.setRedirectionDone(redirected);
         }
-    }
-
-    /**
-     * Gets the <code>SPAccountMapper</code>
-     *
-     * @param attributes the Attribute Map
-     * @return the <code>SPAccountMapper
-     * @throws SAML2Exception if the processing failed. 
-     */
-    private static SPAccountMapper getSPAccountMapper(
-        Map attributes) throws SAML2Exception {
-            
-        SPAccountMapper acctMapper = null;
-        List acctMapperList = (List)attributes.get(
-            SAML2Constants.SP_ACCOUNT_MAPPER);
-        if (acctMapperList != null) {
-            try {
-                acctMapper = (SPAccountMapper)
-                    (Class.forName((String)acctMapperList.get(0)).
-                     newInstance());
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message(
-                        "SPACSUtils.getSPAccountMapper: mapper = " +
-                        (String)acctMapperList.get(0));
-                }
-            } catch (ClassNotFoundException cfe) {
-                throw new SAML2Exception(cfe);
-            } catch (InstantiationException ie) {
-                throw new SAML2Exception(ie);
-            } catch (IllegalAccessException iae) {
-                throw new SAML2Exception(iae);
-            }
-        }
-        if (acctMapper == null) {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("failedAcctMapper"));
-        }
-        return acctMapper;
-    }
-
-    /**
-     * Gets the <code>SPAttributeMapper</code>
-     *
-     * @param attributes the Attribute Map
-     * @return the <code>SPAttributeMapper
-     * @throws SAML2Exception if the processing failed. 
-     */
-    private static SPAttributeMapper getSPAttributeMapper(
-        Map attributes) throws SAML2Exception {
-            
-        SPAttributeMapper attrMapper = null;
-        List attrMapperList = (List)attributes.get(
-            SAML2Constants.SP_ATTRIBUTE_MAPPER);
-        if (attrMapperList != null) {
-            try {
-                attrMapper = (SPAttributeMapper)
-                    (Class.forName((String)attrMapperList.get(0)).
-                     newInstance());
-            } catch (ClassNotFoundException cfe) {
-                throw new SAML2Exception(cfe);
-            } catch (InstantiationException ie) {
-                throw new SAML2Exception(ie);
-            } catch (IllegalAccessException iae) {
-                    throw new SAML2Exception(iae);
-            }
-        }
-        if (attrMapper == null) {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("failedAttrMapper"));
-        }
-        return attrMapper;
     }
 
     private static void saveInfoInMemory(SessionProvider sessionProvider,

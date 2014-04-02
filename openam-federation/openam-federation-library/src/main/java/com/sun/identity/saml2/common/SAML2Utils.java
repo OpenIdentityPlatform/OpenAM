@@ -76,6 +76,7 @@ import com.sun.identity.saml2.plugins.SAML2IDPFinder;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.plugins.SPAccountMapper;
+import com.sun.identity.saml2.plugins.SPAttributeMapper;
 import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
 import com.sun.identity.saml2.profile.AuthnRequestInfo;
 import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
@@ -3826,6 +3827,33 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
 
         return certgood;
+    }
+
+    /**
+     * Gets the <code>SPAttributeMapper</code>.
+     *
+     * @param realm The realm the SP belongs to.
+     * @param spEntityID The entity ID of the SP.
+     * @return The {@link SPAttributeMapper} defined in the configuration.
+     * @throws SAML2Exception if the processing failed.
+     */
+    public static SPAttributeMapper getSPAttributeMapper(String realm, String spEntityID) throws SAML2Exception {
+        String classMethod = "SAML2Utils.getSPAttributeMapper: ";
+        String spAttributeMapperName;
+        try {
+            spAttributeMapperName = getAttributeValueFromSSOConfig(realm, spEntityID, SAML2Constants.SP_ROLE,
+                    SAML2Constants.SP_ATTRIBUTE_MAPPER);
+            if (spAttributeMapperName == null) {
+                spAttributeMapperName = SAML2Constants.DEFAULT_SP_ATTRIBUTE_MAPPER_CLASS;
+            }
+            if (SAML2Utils.debug.messageEnabled()) {
+                SAML2Utils.debug.message(classMethod + "using " + spAttributeMapperName);
+            }
+            return Class.forName(spAttributeMapperName).asSubclass(SPAttributeMapper.class).newInstance();
+        } catch (Exception ex) {
+            SAML2Utils.debug.error(classMethod + "Unable to get SP Attribute Mapper.", ex);
+            throw new SAML2Exception(ex);
+        }
     }
 
     /**

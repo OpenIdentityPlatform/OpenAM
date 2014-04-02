@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.common;
@@ -1147,6 +1147,11 @@ public interface SAML2Constants {
     // Default SP account mapper class name
     public String DEFAULT_SP_ACCOUNT_MAPPER_CLASS =
         "com.sun.identity.saml2.plugins.DefaultSPAccountMapper";
+
+    /**
+     * Default SP attribute mapper class name
+     */
+    public String DEFAULT_SP_ATTRIBUTE_MAPPER_CLASS = "com.sun.identity.saml2.plugins.DefaultSPAttributeMapper";
 
     // Default IDP attribute mapper class name
     public String DEFAULT_IDP_ATTRIBUTE_MAPPER_CLASS =

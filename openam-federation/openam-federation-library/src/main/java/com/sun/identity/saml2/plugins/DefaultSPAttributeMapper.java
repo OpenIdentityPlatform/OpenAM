@@ -26,17 +26,14 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.shared.xml.XMLUtils;
 
 import java.util.List;
@@ -44,9 +41,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-import java.util.Iterator;
 
 
 /**
@@ -76,57 +70,48 @@ public class DefaultSPAttributeMapper extends DefaultAttributeMapper
      *         key as the attribute name and the value as the attribute value
      * @exception SAML2Exception if any failure.
      */ 
-    public Map getAttributes(
-        List attributes,
+    @Override
+    public Map<String, Set<String>> getAttributes(
+        List<Attribute> attributes,
         String userID,
         String hostEntityID,
         String remoteEntityID, 
         String realm
     ) throws SAML2Exception {
 
-        if(attributes == null || attributes.size() == 0) {
-           throw new SAML2Exception(bundle.getString(
-                 "nullAttributes")); 
+        if (attributes == null || attributes.isEmpty()) {
+           throw new SAML2Exception(bundle.getString("nullAttributes"));
         }
 
-        if(hostEntityID == null) {
-           throw new SAML2Exception(bundle.getString(
-                 "nullHostEntityID"));
+        if (hostEntityID == null) {
+           throw new SAML2Exception(bundle.getString("nullHostEntityID"));
         }
 
-        if(realm == null) {
-           throw new SAML2Exception(bundle.getString(
-                 "nullRealm"));
+        if (realm == null) {
+           throw new SAML2Exception(bundle.getString("nullRealm"));
         }
- 
+
         try {
-            Map configMap = getConfigAttributeMap(realm, hostEntityID, SP);
+            Map<String, String> configMap = getConfigAttributeMap(realm, hostEntityID, SP);
             if (configMap == null || configMap.isEmpty()) {
                 if (debug.messageEnabled()) {
-                    debug.message("DefaultSPAttributeMapper.getAttr:" +
-                        "Configuration map is not defined.");
+                    debug.message("DefaultSPAttributeMapper.getAttr: Configuration map is not defined.");
                 }
                 return null;
             }
             if (debug.messageEnabled()) {
-                debug.message("DefaultSPAttributeMapper.getAttr:" +
-                    "hosted SP attribute map = " + configMap);
+                debug.message("DefaultSPAttributeMapper.getAttr: hosted SP attribute map = " + configMap);
             }
 
-            Map map = new HashMap();
-            boolean toUnescape = needToUnescapeXMLSpecialCharacters(
-                hostEntityID, remoteEntityID, realm);
-            for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-
-                Attribute attribute = (Attribute)iter.next();
-                Set values = new HashSet(); 
-                List attrValues = attribute.getAttributeValueString();
+            Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+            boolean toUnescape = needToUnescapeXMLSpecialCharacters(hostEntityID, remoteEntityID, realm);
+            for (Attribute attribute : attributes) {
+                Set<String> values = new HashSet<String>();
+                List<String> attrValues = attribute.getAttributeValueString();
                 if (attrValues != null) {
                     if (toUnescape) {
-                        Iterator iter1 = attrValues.iterator();
-                        while (iter1.hasNext()) {
-                           values.add(XMLUtils.unescapeSpecialCharacters(
-                               (String)iter1.next()));
+                        for (String attrValue : attrValues) {
+                            values.add(XMLUtils.unescapeSpecialCharacters(attrValue));
                         }
                     } else {
                         values.addAll(attrValues);
@@ -134,25 +119,21 @@ public class DefaultSPAttributeMapper extends DefaultAttributeMapper
                 }
                 String attributeName = attribute.getName();
 
-                if (SAML2Constants.ATTR_WILD_CARD.equals((String)
-                    configMap.get(SAML2Constants.ATTR_WILD_CARD))) {
+                if (SAML2Constants.ATTR_WILD_CARD.equals(configMap.get(SAML2Constants.ATTR_WILD_CARD))) {
                     // this is the including all attributes as it is case
                     map.put(attributeName, values);
                 } else {
-                    String localAttribute = (String)configMap.get(attributeName);
-                    if (localAttribute != null && localAttribute.length() > 0) {
-                        map.put(localAttribute, values);  
+                    String localAttribute = configMap.get(attributeName);
+                    if (localAttribute != null && !localAttribute.isEmpty()) {
+                        map.put(localAttribute, values);
                     }
                 }
-             }
-             return map;
-
+            }
+            return map;
         } catch(SAML2Exception se) {
-            debug.error("DefaultSPAccountMapper.getAttributes:MetaException",
-                       se);  
+            debug.error("DefaultSPAccountMapper.getAttributes:MetaException", se);
             throw new SAML2Exception(se.getMessage());
         }
-
     }
 
     /**

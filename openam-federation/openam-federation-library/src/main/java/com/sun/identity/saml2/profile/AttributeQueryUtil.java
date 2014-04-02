@@ -24,7 +24,7 @@
  *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
- * Portions copyright 2010-2013 ForgeRock AS
+ * Portions copyright 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -77,14 +77,13 @@ import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.plugins.AttributeAuthorityMapper;
+import com.sun.identity.saml2.plugins.SPAttributeMapper;
 import com.sun.identity.saml2.protocol.AttributeQuery;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.saml2.xmlenc.EncManager;
-import java.io.IOException;
-
 
 /**
  * This class provides methods to send or process <code>AttributeQuery</code>.
@@ -1309,40 +1308,31 @@ public class AttributeQueryUtil {
      * @return the <code>Map</code> object
      * @exception SAML2Exception if the operation is not successful
      *
-     * @deprecated Use #getAttributesForFedlet(String, String, String, List, String, String)
+     * @deprecated Use {@link #getAttributesForFedlet(String, String, String, List, String, String)}
      */
-    public static Map<String, String> getAttributeMapForFedlet(String spEntityID,
-                                               String idpEntityID,
-                                               String nameIDValue,
-                                               List attrsList,
-                                               String attrQueryProfileAlias,
-                                               String subjectDN)
-                                               throws SAML2Exception {
-    	Map<String, Set<String>> attrMap = getAttributesForFedlet(spEntityID,
-    			idpEntityID,
-    			nameIDValue,
-    			attrsList,
-    			attrQueryProfileAlias,
-    			subjectDN);
-    	
-    	Map<String, String> newAttrMap = new HashMap<String, String>(); 
-    	for (Map.Entry<String, Set<String>> entry : attrMap.entrySet()) {
-    		String attrName = entry.getKey();
-    		Set<String> attrValue = entry.getValue();
-    		StringBuilder pipedValue = new StringBuilder();
-    		for(String value : attrValue) {
-    			// Multiple attribute values
-    			// are seperated with "|"
-    			if (pipedValue.length() > 0 ) {
-    				pipedValue.append('|');
-    			}
-    			pipedValue.append(value);
-    		}
-    		newAttrMap.put(attrName, pipedValue.toString());
-    		
-    	}
-    	
-    	return newAttrMap;
+    public static Map<String, String> getAttributeMapForFedlet(String spEntityID, String idpEntityID,
+            String nameIDValue, List<String> attrsList, String attrQueryProfileAlias, String subjectDN)
+            throws SAML2Exception {
+        Map<String, Set<String>> attrMap = getAttributesForFedlet(spEntityID, idpEntityID, nameIDValue, attrsList,
+                attrQueryProfileAlias, subjectDN);
+
+        Map<String, String> newAttrMap = new HashMap<String, String>();
+        for (Map.Entry<String, Set<String>> entry : attrMap.entrySet()) {
+            String attrName = entry.getKey();
+            Set<String> attrValue = entry.getValue();
+            StringBuilder pipedValue = new StringBuilder();
+            for (String value : attrValue) {
+                // Multiple attribute values
+                // are seperated with "|"
+                if (pipedValue.length() > 0) {
+                    pipedValue.append('|');
+                }
+                pipedValue.append(value);
+            }
+            newAttrMap.put(attrName, pipedValue.toString());
+        }
+
+        return newAttrMap;
     }
     
     /**
@@ -1363,149 +1353,99 @@ public class AttributeQueryUtil {
      *
      * @supported.api
      */
-    public static Map<String, Set<String>> getAttributesForFedlet(String spEntityID,
-                                               String idpEntityID,
-                                               String nameIDValue,
-                                               List attrsList,
-                                               String attrQueryProfileAlias,
-                                               String subjectDN)
-                                               throws SAML2Exception {
+    public static Map<String, Set<String>> getAttributesForFedlet(String spEntityID, String idpEntityID,
+            String nameIDValue, List<String> attrsList, String attrQueryProfileAlias, String subjectDN)
+            throws SAML2Exception {
+        final String classMethod = "AttributeQueryUtil.getAttributesForFedlet: ";
 
-        AttributeQueryConfigElement attrQueryConfig =
-                metaManager.getAttributeQueryConfig("/", spEntityID);
+        AttributeQueryConfigElement attrQueryConfig = metaManager.getAttributeQueryConfig("/", spEntityID);
         if (attrQueryConfig == null) {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("AttributeQueryUtil." +
-                                          "getAttributeMapForFedlet: " +
-                                          "Attribute Query Config is null");
-             }
+                SAML2Utils.debug.message(classMethod + "Attribute Query Config is null");
+            }
             return null;
         }
 
         String attrqMetaAlias = attrQueryConfig.getMetaAlias();
         if (attrqMetaAlias == null) {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("AttributeQueryUtil." +
-                                       "getAttributeMapForFedlet: " +
-                                       "Attribute Query MetaAlias is null");
-             }
+                SAML2Utils.debug.message(classMethod + "Attribute Query MetaAlias is null");
+            }
             return null;
         }
+
+        boolean wantNameIDEncrypted = SAML2Utils.getWantNameIDEncrypted("/", spEntityID,
+                SAML2Constants.ATTR_QUERY_ROLE);
         
-        boolean wantNameIDEncrypted = SAML2Utils.getWantNameIDEncrypted("/",
-                                              spEntityID,
-                                              SAML2Constants.ATTR_QUERY_ROLE);
-        
-        AttributeQuery attrQuery = constructAttrQueryForFedlet(spEntityID,
-                                                          idpEntityID,
-                                                          nameIDValue,
-                                                          attrsList,
-                                                          attrqMetaAlias,
-                                                          attrQueryProfileAlias,
-                                                          subjectDN,
-                                                          wantNameIDEncrypted);
-        
+        AttributeQuery attrQuery = constructAttrQueryForFedlet(spEntityID, idpEntityID, nameIDValue, attrsList,
+                attrqMetaAlias, attrQueryProfileAlias, subjectDN, wantNameIDEncrypted);
+
         String attrQueryProfile = null;
-        if (attrQueryProfileAlias.equals(
-                SAML2Constants.DEFAULT_ATTR_QUERY_PROFILE_ALIAS)) {
+        if (attrQueryProfileAlias.equals(SAML2Constants.DEFAULT_ATTR_QUERY_PROFILE_ALIAS)) {
             attrQueryProfile = SAML2Constants.DEFAULT_ATTR_QUERY_PROFILE;
-        } else if (attrQueryProfileAlias.equals(
-                SAML2Constants.X509_SUBJECT_ATTR_QUERY_PROFILE_ALIAS)) {
+        } else if (attrQueryProfileAlias.equals(SAML2Constants.X509_SUBJECT_ATTR_QUERY_PROFILE_ALIAS)) {
             attrQueryProfile = SAML2Constants.X509_SUBJECT_ATTR_QUERY_PROFILE;
         }
 
-        Response samlResp = sendAttributeQuery(attrQuery, idpEntityID,
-                                  "/",
-                                  attrQueryProfile,
-                                  SAML2Constants.BASIC_ATTRIBUTE_PROFILE,
-                                  SAML2Constants.SOAP);
+        Response samlResp = sendAttributeQuery(attrQuery, idpEntityID, "/", attrQueryProfile,
+                SAML2Constants.BASIC_ATTRIBUTE_PROFILE, SAML2Constants.SOAP);
 
         // Validate the response
-        boolean validResp = validateSAMLResponseForFedlet(samlResp, 
-                                                          spEntityID,
-                                                          wantNameIDEncrypted);
-        Map<String, Set<String>> attrMap = new HashMap();
+        boolean validResp = validateSAMLResponseForFedlet(samlResp, spEntityID, wantNameIDEncrypted);
+
+        Map<String, Set<String>> attrMap = new HashMap<String, Set<String>>();
         if (validResp) {
             // Return back the AttributeMap
             if (samlResp != null) {
-                List assertions = null;
+                List<Object> assertions;
                 if (wantNameIDEncrypted) {
                     assertions = samlResp.getEncryptedAssertion();
                 } else {
                     assertions = samlResp.getAssertion();
                 }
-                for (Iterator asserIter = assertions.iterator();
-                    asserIter.hasNext();) {
-                    Assertion assertion = null;
+
+                for (Object currentAssertion : assertions) {
+                    Assertion assertion;
                     if (wantNameIDEncrypted) {
-                        assertion = getDecryptedAssertion(
-                                           (EncryptedAssertion)asserIter.next(),
-                                            spEntityID);
+                        assertion = getDecryptedAssertion((EncryptedAssertion) currentAssertion, spEntityID);
                     } else {
-                        assertion = (Assertion)asserIter.next();
+                        assertion = (Assertion) currentAssertion;
                     }
                     if (assertion != null) {
-                        List statements = assertion.getAttributeStatements();
-                        if (statements != null && statements.size() > 0 ) {
-                            for (Iterator stmtIter = statements.iterator();
-                                stmtIter.hasNext();) {
-                                AttributeStatement statement =
-                                    (AttributeStatement)stmtIter.next();
-                                List attributes = statement.getAttribute();
-                                if (attributes != null) {
-                                    for (Iterator attribIter =
-                                        attributes.iterator();
-                                        attribIter.hasNext(); ) {
-                                        Attribute attr =
-                                            (Attribute)attribIter.next();
-                                        String attrName = attr.getName();
-                                        List attrValueList =
-                                            attr.getAttributeValueString();
-                                        Set<String> attrValue = new HashSet(); 
-                                        for (Iterator attrValueIter =
-                                             attrValueList.iterator();
-                                             attrValueIter.hasNext(); ) {
-                                            String value =
-                                                (String)attrValueIter.next();
-                                            attrValue.add(value);
-                                        }
-                                        attrMap.put(attrName,attrValue);
-                                    }
-                                } else {
-                                    if (SAML2Utils.debug.messageEnabled()) {
-                                        SAML2Utils.debug.message(
-                                            "AttributeQueryUtil." +
-                                            "getAttributeMapForFedlet: " +
-                                            "No Attributes present in " +
-                                            "SAML response");
-                                    }
-                                }
+                        List<AttributeStatement> statements = assertion.getAttributeStatements();
+                        if (statements != null && statements.size() > 0) {
+                            for (AttributeStatement statement : statements) {
+                                List<Attribute> attributes = statement.getAttribute();
+                                attrMap.putAll(mapAttributes("/", spEntityID, idpEntityID, nameIDValue, attributes));
                             }
                         } else {
                             if (SAML2Utils.debug.messageEnabled()) {
-                                SAML2Utils.debug.message("AttributeQueryUtil." +
-                                "getAttributeMapForFedlet: " +
-                                "Empty Statement present in SAML response");
+                                SAML2Utils.debug.message(classMethod + "Empty Statement present in SAML response");
                             }
                         }
                     } else {
                         if (SAML2Utils.debug.messageEnabled()) {
-                            SAML2Utils.debug.message("AttributeQueryUtil." +
-                            "getAttributeMapForFedlet: " +
-                            "Empty Assertion present in SAML response");
+                            SAML2Utils.debug.message(classMethod + "Empty Assertion present in SAML response");
                         }
                     }
+                }
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + "attributes received from Attribute Query: " + attrMap);
                 }
             }
         } else {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("AttributeQueryUtil." +
-                   "getAttributeMapForFedlet: " +
-                   "Invalid response obtained from Attribute Authority");
+                SAML2Utils.debug.message(classMethod + "Invalid response obtained from Attribute Authority");
             }
         }
         // Return the attribute map and to the fedlet
         return attrMap;
+    }
+
+    private static Map<String, Set<String>> mapAttributes(String realm, String spEntityID, String idpEntityID,
+            String userID, List<Attribute> attributes) throws SAML2Exception {
+        SPAttributeMapper spAttributeMapper = SAML2Utils.getSPAttributeMapper(realm, spEntityID);
+        return spAttributeMapper.getAttributes(attributes, userID, spEntityID, idpEntityID, realm);
     }
 
     /**
@@ -1522,7 +1462,7 @@ public class AttributeQueryUtil {
                              String spEntityID,
                              String idpEntityID,
                              String nameIDValue,
-                             List attrsList,
+                             List<String> attrsList,
                              String attrqMetaAlias,
                              String attrProfileNameAlias,
                              String subjectDN,
@@ -1545,10 +1485,8 @@ public class AttributeQueryUtil {
         attrQuery.setIssueInstant(new Date());
 
         List attrs = new ArrayList();
-        for (Iterator attrIter = attrsList.iterator();
-                                attrIter.hasNext();) {
+        for (String attributeName : attrsList) {
             Attribute attr = assertionFactory.createAttribute();
-            String attributeName = (String)attrIter.next();
             attr.setName(attributeName);
             attr.setNameFormat(SAML2Constants.BASIC_NAME_FORMAT);
             attrs.add(attr);
