@@ -191,6 +191,29 @@
     </para>
    </listitem>
 
+   <listitem>
+    <para>
+     The fix for
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2327"
+      xlink:show="new">OPENAM-2327</link>
+     adds a new <literal>PrintWriter</literal> argument
+     to the <literal>postSingleSignOnSuccess</literal> method of the
+     <link
+      xlink:href="http://docs.forgerock.org/en/openam/11.0.0/apidocs/index.html?com/sun/identity/saml2/plugins/SAML2ServiceProviderAdapter.html"
+      xlink:show="new"><literal>SAML2ServiceProviderAdapter</literal></link> class.
+     If you use a custom Service Provider adapter,
+     then you must update its implementation.
+    </para>
+
+    <para>
+     The new <literal>PrintWriter</literal> argument takes
+     the <literal>PrintWriter</literal> for presenting output.
+     It fits between the <literal>HttpServletResponse response</literal> argument
+     and the <literal>Object session</literal> argument.
+    </para>
+   </listitem>
+
   </itemizedlist>
 
   <itemizedlist>
