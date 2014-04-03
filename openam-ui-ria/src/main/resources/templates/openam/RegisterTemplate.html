@@ -19,11 +19,11 @@
                 </fieldset>
             </div>
             <div id="emailSent" style="display:none">
-                {{t "templates.user.UserRegistrationTemplate.emailSent"}}
+                <p>{{t "templates.user.UserRegistrationTemplate.emailSent"}}</p>
             </div>
         </form>
     {{else}}
-        <form id="registration" action="" class="form" method="post" onsubmit="return false">
+        <form id="registration" action="" class="form" method="post" onsubmit="return false" autocomplete="off">
             <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1>
          
             <fieldset id="step2">
@@ -89,7 +89,7 @@
             </fieldset>
 
             <div id="registerSuccess" style="display:none">
-                {{t "config.messages.UserMessages.afterRegistration"}} <a href="#" class="cancelButton">{{t "templates.user.ForgottenPasswordTemplate.proceedToLogin"}}</a>
+                <p>{{t "config.messages.UserMessages.afterRegistration"}} <a href="#" class="cancelButton">{{t "templates.user.ForgottenPasswordTemplate.proceedToLogin"}}</a></p>
             </div>
 
         </form>
