@@ -24,10 +24,7 @@
  *
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock Inc
  */
 package com.sun.identity.policy;
 
@@ -76,6 +73,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 
@@ -184,6 +182,7 @@ public final class PolicyManager {
     private ReferralTypeManager rtm;
     private PolicyCache policyCache;
     private ResourceIndexManager rim;
+    private final LockFactory<String> lockFactory;
 
     private static ServiceSchemaManager ssm;
     private static javax.security.auth.Subject adminSubject;
@@ -260,7 +259,7 @@ public final class PolicyManager {
                 "Unable to get service config manager", se);
             throw (new PolicyException(se));
         }
-            
+
         if (debug.messageEnabled()) {
             debug.message("Policy Manager constructed with SSO token " +
                 " for organization: " + org);
@@ -274,6 +273,8 @@ public final class PolicyManager {
         }
         rim = new ResourceIndexManager(rm);
 
+        // Retrieves a singleton instance of LockFactory shared across policy.
+        lockFactory = PolicyLockFactory.INSTANCE.getFactory();
     }
 
     /**
@@ -761,17 +762,21 @@ public final class PolicyManager {
                 validateReferrals(policy);
                 policyEntry.setAttributes(attrs);
                 if (oldPolicy != null) {
-                    if (isMigratedToEntitlementService()) {
-                        PrivilegeIndexStore pis = PrivilegeIndexStore.
-                            getInstance(SubjectUtils.createSubject(token),
-                            realm);
-                        pis.delete(PrivilegeUtils.policyToPrivileges(
-                            oldPolicy));
-                        pis.add(PrivilegeUtils.policyToPrivileges(policy));
-                    } else {
-                        //rm.replacePolicyInResourceTree(oldPolicy, policy);
-                        rim.replacePolicyInResourceTree(svtm, token, oldPolicy,
-                            policy);
+                    // Acquire lock to ensure atomicity when updating policy.
+                    Lock lock = lockFactory.acquireLock(policyName);
+
+                    try {
+                        lock.lock();
+                        if (isMigratedToEntitlementService()) {
+                            PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
+                                    SubjectUtils.createSubject(token), realm);
+                            pis.delete(PrivilegeUtils.policyToPrivileges(oldPolicy));
+                            pis.add(PrivilegeUtils.policyToPrivileges(policy));
+                        } else {
+                            rim.replacePolicyInResourceTree(svtm, token, oldPolicy, policy);
+                        }
+                    } finally {
+                        lock.unlock();
                     }
 
                     policyCache.sendPolicyChangeNotification(oldPolicy, policy, ServiceListener.MODIFIED);
