@@ -24,44 +24,46 @@
  *
  * $Id: TokenRestriction.java,v 1.2 2008/06/25 05:41:29 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.iplanet.dpro.session;
 
 import java.io.Serializable;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 /**
- * Interface to handle the different token restriction(s)
- * <p>
+ * Interface to handle the different token restriction(s).
+ * TokenRestrictions are serialized and deserialized during session failover and recovery as they are stored within
+ * {@link com.iplanet.dpro.session.service.InternalSession} objcets. The {@link JsonTypeInfo} annotation makes sure of
+ * saving type information as part of the serialized JSON, and provides a default implementation in case the type
+ * information is missing (e.g. with old tokens that were generated without type info).
  */
+@JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS,
+        defaultImpl = DNOrIPAddressListTokenRestriction.class)
 public interface TokenRestriction extends Serializable {
 
     /**
-     * Implements standard equals() semantics as mandated by Object
-     * 
-     * @param other
-     *            the object to be used for comparison
-     * @return true if this object is the same as the other argument; false
-     *         otherwise.
+     * Implements standard equals() semantics as mandated by Object.
+     *
+     * @param other The object to be used for comparison.
+     * @return <code>true</code> if this object is the same as the other argument; <code>false</code> otherwise.
      */
     public boolean equals(Object other);
 
     /**
      * Returns a hash code for this object.
-     * 
-     * @return a hash code value for this object.
+     *
+     * @return A hash code value for this object.
      */
     public int hashCode();
 
     /**
-     * Returns a true if the restriction matches the context for which it was
-     * set, otherwise it returns false.
-     * 
-     * @param context
-     *            The context from which the restriction needs to be checked
-     * @return boolean True if the restriction is satisfied, false otherwise
-     * @throws A
-     *             Exception is thrown if the there was an error
+     * Returns a true if the restriction matches the context for which it was set, otherwise it returns false.
+     *
+     * @param context The context from which the restriction needs to be checked.
+     * @return boolean <code>true</code> if the restriction is satisfied, <code>false</code> otherwise.
+     * @throws Exception If the there was an error.
      */
     public boolean isSatisfied(Object context) throws Exception;
 }

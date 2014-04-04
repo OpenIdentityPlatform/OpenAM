@@ -27,9 +27,8 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
-
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -63,6 +62,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import org.codehaus.jackson.annotate.JsonSetter;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal
@@ -147,11 +149,11 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     private String cookieStr;
 
-    private Map restrictedTokensBySid = Collections
-            .synchronizedMap(new HashMap());
+    private final ConcurrentMap<SessionID, TokenRestriction> restrictedTokensBySid =
+            new ConcurrentHashMap<SessionID, TokenRestriction>();
 
-    private Map restrictedTokensByRestriction = Collections
-            .synchronizedMap(new HashMap());
+    private transient final ConcurrentMap<TokenRestriction, SessionID> restrictedTokensByRestriction =
+            new ConcurrentHashMap<TokenRestriction, SessionID>();
 
     private static String superUserDN;
 
@@ -277,10 +279,10 @@ public class InternalSession implements TaskRunnable, Serializable {
      * 
      * out out sets value and sets value adds to protectedProperty
      */
-    protected static Set protectedProperties;
+    protected static final Set<String> protectedProperties;
 
     static {
-        protectedProperties = new HashSet();
+        protectedProperties = new HashSet<String>();
         protectedProperties.add(HOST);
         protectedProperties.add(HOST_NAME);
         protectedProperties.add("AuthLevel");
@@ -329,8 +331,8 @@ public class InternalSession implements TaskRunnable, Serializable {
      * the restricted token ids associated with the master) that will be used in
      * notification
      */
-    private Map<String, Set<SessionID>> sessionEventURLs =
-        Collections.synchronizedMap(new HashMap<String, Set<SessionID>>());
+    private final ConcurrentMap<String, Set<SessionID>> sessionEventURLs =
+            new ConcurrentHashMap<String, Set<SessionID>>();
 
     /**
      * Creates an instance of the Internal Session with its key dependences exposed.
@@ -1288,8 +1290,38 @@ public class InternalSession implements TaskRunnable, Serializable {
      * restricted token ids
      * @return Map of session event URLs
      */
-    Map<String, Set<SessionID>> getSessionEventURLs() {
+    ConcurrentMap<String, Set<SessionID>> getSessionEventURLs() {
         return sessionEventURLs;
+    }
+
+    /**
+     * This setter method is used by the JSON serialization mechanism and should not be used for other purposes.
+     *
+     * @param restrictedTokensBySid The deserialized map of sid&lt;->restricted tokens that should be stored in a
+     * ConcurrentHashMap.
+     */
+    @JsonSetter
+    private void setRestrictedTokensBySid(ConcurrentMap<SessionID, TokenRestriction> restrictedTokensBySid) {
+        for (Map.Entry<SessionID, TokenRestriction> entry : restrictedTokensBySid.entrySet()) {
+            SessionID sid = entry.getKey();
+            TokenRestriction restriction = entry.getValue();
+            this.restrictedTokensBySid.put(sid, restriction);
+            this.restrictedTokensByRestriction.put(restriction, sid);
+        }
+    }
+
+    /**
+     * This setter method is used by the JSON serialization mechanism and should not be used for other purposes.
+     *
+     * @param sessionEventURLs The deserialized map of sessionEventURLs that should be stored in a ConcurrentHashMap.
+     */
+    @JsonSetter
+    private void setSessionEventURLs(ConcurrentMap<String, Set<SessionID>> sessionEventURLs) {
+        for (Map.Entry<String, Set<SessionID>> entry : sessionEventURLs.entrySet()) {
+            Set<SessionID> values = Collections.newSetFromMap(new ConcurrentHashMap<SessionID, Boolean>());
+            values.addAll(entry.getValue());
+            this.sessionEventURLs.put(entry.getKey(), values);
+        }
     }
 
     /**
@@ -1320,12 +1352,21 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * add new restricted token pointing at the same session to the list
+     * Add new restricted token pointing at the same session to the list.
+     *
+     * @param sid The session ID.
+     * @param restriction The token restriction.
+     * @return The existing session ID instance if this TokenRestriction was already mapped to a session ID,
+     * <code>null</code> otherwise.
      */
-    void addRestrictedToken(SessionID sid, TokenRestriction restriction) {
-        restrictedTokensBySid.put(sid, restriction);
-        restrictedTokensByRestriction.put(restriction, sid);
-        updateForFailover();
+    SessionID addRestrictedToken(SessionID sid, TokenRestriction restriction) {
+        SessionID previousValue = restrictedTokensByRestriction.putIfAbsent(restriction, sid);
+        if (previousValue == null) {
+            restrictedTokensBySid.put(sid, restriction);
+            updateForFailover();
+            return null;
+        }
+        return previousValue;
     }
 
     /**
@@ -1335,15 +1376,15 @@ public class InternalSession implements TaskRunnable, Serializable {
      * @return Null indicates there is no restriction on the Session.
      */
     public TokenRestriction getRestrictionForToken(SessionID sid) {
-        return (TokenRestriction) restrictedTokensBySid.get(sid);
+        return restrictedTokensBySid.get(sid);
     }
 
     SessionID getRestrictedTokenForRestriction(TokenRestriction restriction) {
-        return (SessionID) restrictedTokensByRestriction.get(restriction);
+        return restrictedTokensByRestriction.get(restriction);
     }
 
-    Object[] getRestrictedTokens() {
-        return restrictedTokensBySid.keySet().toArray();
+    Set<SessionID> getRestrictedTokens() {
+        return new HashSet<SessionID>(restrictedTokensBySid.keySet());
     }
 
     /**
