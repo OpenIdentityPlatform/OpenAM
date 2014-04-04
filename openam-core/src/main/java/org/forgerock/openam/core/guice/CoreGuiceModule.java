@@ -13,12 +13,13 @@
  *
  * Copyright 2013 ForgeRock Inc.
  */
-
 package org.forgerock.openam.core.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
@@ -53,6 +54,7 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
+import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
@@ -64,11 +66,8 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
- *
- * @author apforrest
- * @author robert.wapshott@forgerock.com
  */
-@AMGuiceModule
+ @AMGuiceModule
 public class CoreGuiceModule extends AbstractModule {
 
     @Override
@@ -140,6 +139,11 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
     }
 
+    @Provides @Singleton @Named(CoreTokenConstants.CTS_LOCK_FACTORY)
+    LockFactory<String> getCTSLockFactory() {
+        return new LockFactory<String>();
+    }
+
     // Implementation exists to capture the generic type of the PrivilegedAction.
     private static class AdminTokenType extends TypeLiteral<PrivilegedAction<SSOToken>> {
     }
@@ -199,5 +203,4 @@ public class CoreGuiceModule extends AbstractModule {
         }
 
     }
-
 }

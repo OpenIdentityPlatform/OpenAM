@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock, Inc. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -38,6 +38,7 @@ import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
+import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
@@ -48,6 +49,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -65,20 +67,16 @@ import java.util.concurrent.ScheduledExecutorService;
  *
  * @see org.forgerock.openam.cts.adapters.TokenAdapter
  * @see Token
- *
- * @author steve
- * @author jeff.schenk@forgerock.com
- * @author jason.lemay@forgerock.com
- * @author robert.wapshott@forgerock.com
  */
 public class CTSPersistentStore {
 
-    private Debug debug;
+    private final Debug debug;
 
     // Injected
     private final LDAPDataConversion dataConversion;
     private final TokenBlobStrategy strategy;
     private final CoreTokenAdapter adapter;
+    private final LockFactory<String> lockFactory;
 
     /**
      * Private restricted to preserve Singleton Instantiation.
@@ -88,11 +86,13 @@ public class CTSPersistentStore {
                               CoreTokenAdapter adapter, final CTSReaper reaper,
                               final @Named(CTSReaper.CTS_SCHEDULED_SERVICE) ScheduledExecutorService executorService,
                               CoreGuiceModule.ShutdownManagerWrapper wrapper,
+                              @Named(CoreTokenConstants.CTS_LOCK_FACTORY) LockFactory<String> lockFactory,
                               @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
 
         this.dataConversion = dataConversion;
         this.strategy = strategy;
         this.adapter = adapter;
+        this.lockFactory = lockFactory;
         this.debug = debug;
 
         // Start the CTS Reaper and schedule shutdown for when system shutdown is signalled.
@@ -160,13 +160,16 @@ public class CTSPersistentStore {
             throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
 
-        adapter.updateOrCreate(token);
-
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Update: {0} updated",
-                    token.getTokenId()));
+        Lock lock = lockFactory.acquireLock(token.getTokenId());
+        try {
+            lock.lock();
+            adapter.updateOrCreate(token);
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_HEADER + "Update: {0} updated",
+                        token.getTokenId()));
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -187,7 +190,7 @@ public class CTSPersistentStore {
      * have this information, rather than reading the Token first before removing it.
      *
      * @param tokenId The non null Token Id of the token to remove.
-     * @throws CoreTokenException If there was a non-recoverable error during the operation.
+     * @throws DeleteFailedException If there was an error while trying to remove the token with the given Id.
      */
     public void delete(String tokenId) throws DeleteFailedException {
         adapter.delete(tokenId);
@@ -320,8 +323,7 @@ public class CTSPersistentStore {
      *
      * @param uuid User's universal unique ID.
      * @return Map of all Session for the user
-     * @throws Exception if there is any problem with accessing the session
-     *                   repository.
+     * @throws CoreTokenException If there is any problem with accessing the session repository.
      */
     public Map<String, Long> getTokensByUUID(String uuid) throws CoreTokenException {
         Collection<Entry> entries;

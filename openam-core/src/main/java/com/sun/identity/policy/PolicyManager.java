@@ -24,7 +24,7 @@
  *
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions Copyrighted 2011-2014 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.policy;
 
@@ -74,6 +74,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 
