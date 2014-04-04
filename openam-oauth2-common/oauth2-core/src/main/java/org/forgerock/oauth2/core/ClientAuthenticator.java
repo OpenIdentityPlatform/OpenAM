@@ -16,12 +16,32 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+
+import java.util.Map;
+
 /**
- * Responsible for performing the authentication of the Client based from the Client Authentication object.
+ * Handles the authentication of the OAuth2 Client.
+ * <br/>
+ * Root interface to be implemented to provide client authentication based on the client registration.
  *
  * @since 12.0.0
  */
-public interface ClientAuthenticator<T extends ClientAuthentication> {
+public interface ClientAuthenticator {
 
-    ClientRegistration authenticate(final T clientAuthentication) throws InvalidClientException;
+    /**
+     * Authenticates the OAuth2 Client.
+     * <br/>
+     * If authentication succeeds, then the authenticated client is returned, else if authentication fails
+     * a InvalidClientException will be thrown.
+     *
+     * @param clientCredentials An instance of the ClientCredentials which contain the clients credentials.
+     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
+     *                information.
+     * @return The authenticated Client.
+     * @throws InvalidClientException org.forgerock.oauth2.core.exceptions.InvalidClientException authenticating the
+     * Client fails.
+     */
+    ClientRegistration authenticate(final ClientCredentials clientCredentials, final Map<String, Object> context)
+            throws InvalidClientException;
 }

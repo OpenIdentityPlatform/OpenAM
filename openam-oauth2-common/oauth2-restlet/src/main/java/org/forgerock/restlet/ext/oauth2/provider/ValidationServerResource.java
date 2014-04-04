@@ -16,13 +16,14 @@
 
 package org.forgerock.restlet.ext.oauth2.provider;
 
-import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.Scope;
+import org.forgerock.oauth2.core.ScopeFactory;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.BearerToken;
-import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenExtractor;
 import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
@@ -30,7 +31,10 @@ import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenExtractor;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.Response;
-import org.restlet.data.*;
+import org.restlet.data.CacheDirective;
+import org.restlet.data.Form;
+import org.restlet.data.Reference;
+import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -38,6 +42,7 @@ import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,9 +119,14 @@ public class ValidationServerResource extends ServerResource implements
                     OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to read token from token store for id: " + token);
                     error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                 } else {
-                    Class<? extends Scope> pluginClass = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getScopePluginClass(t.getRealm());
+
+                    final ScopeFactory scopeFactory = InjectorHolder.getInstance(ScopeFactory.class);
+
+                    scopeClass = scopeFactory.create(Collections.<String, Object>singletonMap("realm", t.getRealm()));
+
+//                    Class<? extends Scope> pluginClass = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getScopePluginClass(t.getRealm());
                     //instantiate plugin class
-                    scopeClass = pluginClass.newInstance();
+//                    scopeClass = pluginClass.newInstance();
 
                     //call plugin class init
                     OAuth2Utils.DEBUG.trace("ValidationServerResource::In Validator resource - got token = " + t);

@@ -18,32 +18,33 @@ package org.forgerock.openam.noauth2.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
-import com.sun.identity.idm.AMIdentity;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.oauth2.core.AuthorizationCodeGrantTypeHandler;
 import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientCredentialsGrantTypeHandler;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.ContextHandler;
 import org.forgerock.oauth2.core.GrantType;
 import org.forgerock.oauth2.core.GrantTypeHandler;
-import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.PasswordGrantTypeHandler;
-import org.forgerock.oauth2.core.ResourceOwnerAuthenticator;
+import org.forgerock.oauth2.core.Scope;
+import org.forgerock.oauth2.core.ScopeFactory;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
-import org.forgerock.oauth2.reslet.ResourceOwnerCredentialsExtractor;
+import org.forgerock.oauth2.reslet.ResourceOwnerAuthorizationCodeCredentialsExtractor;
+import org.forgerock.oauth2.reslet.ResourceOwnerPasswordCredentialsExtractor;
 import org.forgerock.openam.noauth2.wrappers.ClientAuthenticatorImpl;
 import org.forgerock.openam.noauth2.wrappers.OpenAMClientRegistrationStore;
-import org.forgerock.openam.noauth2.wrappers.ResourceOwnerAuthenticatorImpl;
+import org.forgerock.openam.noauth2.wrappers.OpenAMOAuth2ContextHandler;
+import org.forgerock.openam.noauth2.wrappers.OpenAMOAuth2ProviderSettingsFactory;
+import org.forgerock.openam.noauth2.wrappers.OpenAMResourceOwnerAuthorizationCodeCredentialsExtractor;
+import org.forgerock.openam.noauth2.wrappers.OpenAMResourceOwnerPasswordCredentialsExtractor;
 import org.forgerock.openam.noauth2.wrappers.ScopeValidatorImpl;
 import org.forgerock.openam.noauth2.wrappers.TokenStoreImpl;
-import org.forgerock.openam.noauth2.wrappers.restlet.OpenAMClientCredentialsExtractor;
-import org.forgerock.openam.noauth2.wrappers.restlet.OpenAMResourceOwnerCredentialsExtractor;
 import org.forgerock.openam.oauth2.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
-import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.forgerock.openam.oauth2.provider.impl.ScopeImpl;
 
 import javax.inject.Inject;
@@ -65,18 +66,18 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ClientAuthenticator.class).to(ClientAuthenticatorImpl.class).in(Singleton.class);
-        bind(ResourceOwnerAuthenticator.class).to(ResourceOwnerAuthenticatorImpl.class).in(Singleton.class);
-        bind(ScopeValidator.class).to(ScopeValidatorImpl.class).in(Singleton.class);
+        bind(ScopeValidator.class).to(ScopeValidatorImpl.class);
         bind(TokenStore.class).to(TokenStoreImpl.class).in(Singleton.class);
-        bind(ClientCredentialsExtractor.class).to(OpenAMClientCredentialsExtractor.class).in(Singleton.class);
-        bind(ResourceOwnerCredentialsExtractor.class).to(OpenAMResourceOwnerCredentialsExtractor.class).
+        bind(ContextHandler.class).to(OpenAMOAuth2ContextHandler.class).in(Singleton.class);
+        bind(ResourceOwnerPasswordCredentialsExtractor.class).to(OpenAMResourceOwnerPasswordCredentialsExtractor.class).
                 in(Singleton.class);
-        bind(new TypeLiteral<ClientRegistrationStore<AMIdentity>>() {
-        }).to(OpenAMClientRegistrationStore.class)
-                .in(Singleton.class);
+        bind(ResourceOwnerAuthorizationCodeCredentialsExtractor.class)
+                .to(OpenAMResourceOwnerAuthorizationCodeCredentialsExtractor.class).in(Singleton.class);
+        bind(ClientRegistrationStore.class).to(OpenAMClientRegistrationStore.class).in(Singleton.class);
         bind(OAuth2TokenStore.class).to(DefaultOAuthTokenStoreImpl.class).in(Singleton.class);
-        bind(Scope.class).to(ScopeImpl.class).in(Singleton.class); //TODO this should be behind a provider as can be configured at runtime!
-        bind(OAuth2ProviderSettings.class).to(OAuth2ProviderSettingsImpl.class).in(Singleton.class);
+        bind(OAuth2ProviderSettingsFactory.class).to(OpenAMOAuth2ProviderSettingsFactory.class).in(Singleton.class);
+
+        install(new FactoryModuleBuilder().implement(Scope.class, ScopeImpl.class).build(ScopeFactory.class));
     }
 
     @Inject
@@ -85,11 +86,13 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Named(GRANT_TYPE_HANDLERS_INJECT_KEY)
     Map<? extends GrantType, ? extends GrantTypeHandler> getGrantTypeHandlers(
             final ClientCredentialsGrantTypeHandler clientCredentialsGrantTypeHandler,
-            final PasswordGrantTypeHandler passwordGrantTypeHandler) {
-        final Map<GrantType, GrantTypeHandler> grantTypeHandlers = new HashMap<GrantType, GrantTypeHandler>();
+            final PasswordGrantTypeHandler passwordGrantTypeHandler,
+            final AuthorizationCodeGrantTypeHandler authorizationCodeGrantTypeHandler) {
+        final Map<GrantType, GrantTypeHandler> grantTypeHandlers = new HashMap<GrantType, GrantTypeHandler>();  //TODO need to use Map Binder so can be extended?...
 
         grantTypeHandlers.put(GrantType.DefaultGrantType.CLIENT_CREDENTIALS, clientCredentialsGrantTypeHandler);
         grantTypeHandlers.put(GrantType.DefaultGrantType.PASSWORD, passwordGrantTypeHandler);
+        grantTypeHandlers.put(GrantType.DefaultGrantType.AUTHORIZATION_CODE, authorizationCodeGrantTypeHandler);
 
         return grantTypeHandlers;
     }

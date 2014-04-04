@@ -25,25 +25,28 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.util.Collections;
-
+import com.sun.identity.sm.ServiceListener;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.UserConsentResponse;
+import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
-import org.forgerock.openam.oauth2.OAuth2Utils;
-import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
   An instance of this class is consulted for OAuth2 provider configuration settings (e.g. token lifetimes) when tokens
@@ -57,13 +60,107 @@ import java.util.Set;
  */
 public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings, org.forgerock.oauth2.core.OAuth2ProviderSettings {
 
-    @Inject
-    public OAuth2ProviderSettingsImpl() {
-        initializeSettings(true);
-    }
-
     public boolean issueRefreshTokens() {
         return getRefreshTokensEnabledState();
+    }
+
+    public Map<String, String> getAllowedResponseTypes() throws InvalidRequestException {
+        Set<String> responseTypeSet = getResponseTypes();
+        if (responseTypeSet == null || responseTypeSet.isEmpty()) {
+            //TODO log
+            throw new InvalidRequestException("Invalid Response Type.");
+        }
+        Map<String, String> responseTypes = new HashMap<String, String>();
+        for (String responseType : responseTypeSet){
+            String[] parts = responseType.split("\\|");
+            if (parts.length != 2){
+                org.forgerock.openam.oauth2.utils.OAuth2Utils.DEBUG.error("OAuth2ProviderSettingsImpl.getAllowedResponseTypes(): Response type wrong format for realm: " + realm);
+                continue;
+            }
+            responseTypes.put(parts[0], parts[1]);
+        }
+        return responseTypes;
+    }
+
+    public boolean isConsentSaved(String resourceOwnerId, String clientId, Set<String> scope,
+            final Map<String, Object> context) {
+
+        String attribute = getSavedConsentAttributeName();
+
+        final String realm = (String) context.get("realm");
+
+        AMIdentity id = OAuth2Utils.getIdentity(resourceOwnerId, realm);
+        Set<String> attributeSet = null;
+
+        if (id != null) {
+            try {
+                attributeSet = id.getAttribute(attribute);
+            } catch (Exception e) {
+                OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to get profile attribute", e);
+                return false;
+            }
+        }
+
+        //check the values of the attribute set vs the scope and client requested
+        //attribute set is in the form of client_id|scope1 scope2 scope3
+        for (String consent : attributeSet) {
+            int loc = consent.indexOf(" ");
+            String consentClientId = consent.substring(0, loc);
+            String[] scopesArray = null;
+            if (loc + 1 < consent.length()) {
+                scopesArray = consent.substring(loc + 1, consent.length()).split(" ");
+            }
+            Set<String> consentScopes = null;
+            if (scopesArray != null && scopesArray.length > 0) {
+                consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
+            } else {
+                consentScopes = new HashSet<String>();
+            }
+
+            //if both the client and the scopes are identical to the saved consent then approve
+            if (clientId.equals(consentClientId) && scope.equals(consentScopes)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void saveConsent(String resourceOwnerId, String clientId, Set<String> scope, Map<String, Object> context) {
+
+        final String realm = (String) context.get("realm");
+        AMIdentity id = OAuth2Utils.getIdentity(resourceOwnerId, realm);
+        String consentAttribute = getSavedConsentAttributeName();
+        try {
+
+            //get the current set of consents and add our new consent to it.
+            Set<String> consents = new HashSet<String>(id.getAttribute(consentAttribute));
+            StringBuilder sb = new StringBuilder();
+            if (scope == null || scope.isEmpty()) {
+                sb.append(clientId.trim()).append(" ");
+            } else {
+                sb.append(clientId.trim()).append(" ").append(joinScope(scope));
+            }
+            consents.add(sb.toString());
+
+            //update the user profile with our new consent settings
+            Map<String, Set<String>> attrs = new HashMap<String, Set<String>>();
+            attrs.put(consentAttribute, consents);
+            id.setAttributes(attrs);
+            id.store();
+        } catch (Exception e) {
+            OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to save consent ", e);
+        }
+
+    }
+
+    public Map<String, Object> addAdditionalTokenData(UserConsentResponse userConsentResponse) {
+
+        final Map<String, Object> data = new HashMap<String, Object>();
+        data.put(OAuth2Constants.CoreTokenParams.REALM, userConsentResponse.getContext().get("realm"));
+        data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, userConsentResponse.getContext().get("ssoTokenId"));
+
+        return data;
     }
 
     private class OAuth2ProviderSettingsChangeListener implements ServiceListener {
@@ -190,12 +287,6 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings, org.f
     to propagate exceptions to service notifier thread.
      */
     private static final boolean PROPAGATE_EXCEPTIONS = false;
-
-    public OAuth2ProviderSettingsImpl(final HttpServletRequest request) {
-        final String deploymentUrl = OAuth2Utils.getDeploymentURL(request);
-        final String realm = OAuth2Utils.getRealm(request);
-        initializeClass(deploymentUrl, realm);
-    }
 
     public OAuth2ProviderSettingsImpl(final String deploymentUrl, final String realm) {
         initializeClass(deploymentUrl, realm);

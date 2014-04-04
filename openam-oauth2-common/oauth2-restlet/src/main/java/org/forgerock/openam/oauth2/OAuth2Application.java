@@ -24,7 +24,9 @@
 
 package org.forgerock.openam.oauth2;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.reslet.GuicedRestlet;
 import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
@@ -33,6 +35,7 @@ import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenVerifier;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Authenticator;
 import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
+import org.forgerock.restlet.ext.oauth2.flow.AuthorizeServerResource;
 import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
 import org.forgerock.restlet.ext.oauth2.provider.ValidationServerResource;
@@ -55,7 +58,7 @@ public class OAuth2Application extends Application {
 
     private URI redirectURI = null;
 
-    public OAuth2Application(){
+    public OAuth2Application() {
         getMetadataService().setEnabled(true);
         getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
         setStatusService(new OAuth2StatusService());
@@ -96,7 +99,7 @@ public class OAuth2Application extends Application {
         authenticator =
                 new OAuth2Authenticator(getContext(), null,
                         OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
-        authenticator.setNext(UserInfo.class);
+        authenticator.setNext(new GuicedRestlet(UserInfo.class));
         root.attach("/userinfo", authenticator);
 
         //connect session management
@@ -112,20 +115,20 @@ public class OAuth2Application extends Application {
      */
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
-        Router root = new Router(childContext);
+        Router router = new Router(childContext);
 
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
                 new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
                         .supportPassword();
-        root.attach(OAuth2Utils.getAuthorizePath(childContext), finder);
+        router.attach("/authorize", finder);
 
         //TODO client authentication needs to be done in the grant code
         ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
         filter.setVerifier(getClientVerifier());
-        root.attach(OAuth2Utils.getAccessTokenPath(childContext), filter);
+        router.attach("/access_token", filter);
 
         // Define Token Endpoint
         finder =
@@ -134,13 +137,7 @@ public class OAuth2Application extends Application {
                         .supportPassword().supportSAML20();
         filter.setNext(finder);
 
-        // Configure context
-        childContext.setDefaultVerifier(getUserVerifier());
-        OAuth2Utils.setClientVerifier(getClientVerifier(), childContext);
-        OAuth2Utils.setTokenStore(getTokenStore(), childContext);
-        OAuth2Utils.setContextRealm("/", childContext);
-
-        return root;
+        return router;
     }
 
     /**
@@ -151,16 +148,6 @@ public class OAuth2Application extends Application {
      */
     public org.forgerock.openam.oauth2.provider.ClientVerifier getClientVerifier() {
         return OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getClientVerifier();
-    }
-
-    /**
-     * Creates a new user verifier
-     * 
-     * @return UserIdentityVerifier
-     *              A new UserVerifier
-     */
-    public Verifier getUserVerifier() {
-        return OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getUserVerifier();
     }
 
     /**

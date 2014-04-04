@@ -18,17 +18,12 @@ package org.forgerock.openam.oauth2;
 
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.model.JWTToken;
-import org.forgerock.openam.oauth2.model.TokenManager;
 import org.forgerock.openam.oauth2.provider.ClientDAO;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
-import org.forgerock.openam.oauth2.provider.ServerAuthorizer;
 import org.restlet.Request;
-import org.restlet.resource.Resource;
 import org.restlet.resource.ServerResource;
-import org.restlet.security.SecretVerifier;
 import org.restlet.security.Verifier;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,13 +50,9 @@ public interface OAuth2ConfigurationFactory {
 
     ClientApplication createClientApplication(final Object o);
 
-    TokenManager getTokenManager();
-
     OAuth2ProviderSettings getOAuth2ProviderSettings(final Request request);
 
-    ServerAuthorizer getServerAuthorizer();
-
-    SecretVerifier getSecretVerifier();
+    OAuth2ProviderSettings getOAuth2ProviderSettings(final String deploymentUrl, final String realm);
 
     KeyPair getServerKeyPair(final Request request);
 
@@ -70,8 +61,6 @@ public interface OAuth2ConfigurationFactory {
     OAuth2TokenStore getTokenStore();
 
     String getSSOCookieName();
-
-    Class<? extends Scope> getScopePluginClass(final String realm);
 
     boolean savedConsent(final String userid, final String clientId, final Set<String> scopes, final Request request);
 

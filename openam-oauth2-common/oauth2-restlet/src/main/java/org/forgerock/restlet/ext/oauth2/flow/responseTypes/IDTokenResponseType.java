@@ -28,7 +28,7 @@ import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.ResponseType;
+import org.forgerock.oauth2.core.ResponseType;
 
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public class IDTokenResponseType implements ResponseType {
         return "FRAGMENT";
     }
 
-    public String URIParamValue(){
+    public String getURIParamValue(){
         return "id_token";
     }
 }

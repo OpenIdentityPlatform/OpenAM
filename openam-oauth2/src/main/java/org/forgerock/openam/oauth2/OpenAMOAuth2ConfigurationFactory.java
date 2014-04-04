@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.oauth2;
 
+import com.google.inject.Injector;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.guice.core.InjectorHolder;
@@ -39,7 +42,7 @@ import org.forgerock.openam.oauth2.provider.ClientDAO;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.oauth2.core.Scope;
 import org.forgerock.openam.oauth2.provider.ServerAuthorizer;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
@@ -52,6 +55,8 @@ import org.restlet.resource.ServerResource;
 import org.restlet.security.SecretVerifier;
 import org.restlet.security.Verifier;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
 import java.security.KeyPair;
@@ -100,6 +105,10 @@ public class OpenAMOAuth2ConfigurationFactory implements OAuth2ConfigurationFact
     public OAuth2ProviderSettings getOAuth2ProviderSettings(final Request request) {
         final String deploymentUrl = OAuth2Utils.getDeploymentURL(request);
         final String realm = OAuth2Utils.getRealm(request);
+        return OAuth2ProviderSettingsHolder.getInstance(deploymentUrl, realm);
+    }
+
+    public OAuth2ProviderSettings getOAuth2ProviderSettings(final String deploymentUrl, final String realm) {
         return OAuth2ProviderSettingsHolder.getInstance(deploymentUrl, realm);
     }
 

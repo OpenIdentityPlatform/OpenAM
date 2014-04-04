@@ -16,62 +16,50 @@
 
 package org.forgerock.openam.noauth2.wrappers;
 
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdSearchControl;
-import com.sun.identity.idm.IdSearchResults;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.oauth2.core.ClientAuthenticator;
+import org.forgerock.oauth2.core.ClientCredentials;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.openam.oauth2.OAuth2Utils;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * @since 12.0.0
  */
-public class ClientAuthenticatorImpl implements ClientAuthenticator<OpenAMClientAuthentication> {
+public class ClientAuthenticatorImpl implements ClientAuthenticator {
 
-    private final ClientRegistrationStore<AMIdentity> clientRegistrationStore;
+    private final ClientRegistrationStore clientRegistrationStore;
 
     @Inject
-    public ClientAuthenticatorImpl(final ClientRegistrationStore<AMIdentity> clientRegistrationStore) {
+    public ClientAuthenticatorImpl(final ClientRegistrationStore clientRegistrationStore) {
         this.clientRegistrationStore = clientRegistrationStore;
     }
 
-    public ClientRegistration authenticate(final OpenAMClientAuthentication clientAuthentication) throws InvalidClientException {
+    @Override
+    public ClientRegistration authenticate(final ClientCredentials clientCredentials, final Map<String, Object> context)
+            throws InvalidClientException {
 
-        final String clientId = clientAuthentication.getClientId();
-        String clientSecret = clientAuthentication.getClientSecret();
-        if (clientSecret == null) {
-            clientSecret = "";
-        }
-        final String realm = clientAuthentication.getRealm();
+        final String realm = (String) context.get("realm");
 
-        AMIdentity client = getIdentity(clientId, realm);
-        final ClientRegistration clientRegistration = clientRegistrationStore.get(client);
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(clientCredentials.getClientId(),
+                context);
 
         if (!clientRegistration.isConfidential()) {
             return clientRegistration;
         }
 
-        if (!authenticate(clientId, clientSecret.toCharArray(), realm)) {
-            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify password for: " + clientId);
+        if (!authenticate(clientCredentials.getClientId(), clientCredentials.getClientSecret(), realm)) {
+            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify password for: " + clientCredentials.getClientId());
             throw new InvalidClientException("Client authentication failed");
         }
 
@@ -118,45 +106,6 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator<OpenAMClient
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);
             throw new InvalidClientException(le);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
-        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
-        final AMIdentity theID;
-
-        try {
-            final AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
-
-            final IdSearchControl idsc = new IdSearchControl();
-            idsc.setRecursive(true);
-            idsc.setAllReturnAttributes(true);
-            // search for the identity
-            Set<AMIdentity> results = Collections.emptySet();
-            idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.AGENT, uName, idsc);
-            if (searchResults != null) {
-                results = searchResults.getSearchResults();
-            }
-
-            if (results == null || results.size() != 1) {
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
-
-            }
-
-            theID = results.iterator().next();
-
-            //if the client is deactivated return null
-            if (theID.isActive()){
-                return theID;
-            } else {
-                return null;
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
     }
 }

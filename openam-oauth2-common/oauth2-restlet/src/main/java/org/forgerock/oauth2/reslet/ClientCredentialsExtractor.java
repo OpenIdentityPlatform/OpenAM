@@ -16,20 +16,23 @@
 
 package org.forgerock.oauth2.reslet;
 
-import org.forgerock.oauth2.core.ClientAuthentication;
-import org.forgerock.oauth2.core.InvalidClientException;
-import org.forgerock.oauth2.core.InvalidRequestException;
+import org.forgerock.oauth2.core.ClientCredentials;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
+
+import javax.inject.Singleton;
 
 import static org.forgerock.oauth2.reslet.RestletUtils.getAttribute;
 
 /**
  * @since 12.0.0
  */
-public abstract class ClientCredentialsExtractor {
+@Singleton
+public final class ClientCredentialsExtractor {
 
-    public ClientAuthentication extract(final Request request) throws InvalidClientException, InvalidRequestException {
+    public ClientCredentials extract(final Request request) throws InvalidClientException, InvalidRequestException {
 
         String clientId = getAttribute(request, "client_id");
         String clientSecret = getAttribute(request, "client_secret");
@@ -47,7 +50,6 @@ public abstract class ClientCredentialsExtractor {
             if (challengeResponse.getSecret() != null && challengeResponse.getSecret().length > 0) {
                 clientSecret = String.valueOf(request.getChallengeResponse().getSecret());
             }
-
         }
 
         if (clientId == null || clientId.isEmpty()) {
@@ -55,9 +57,6 @@ public abstract class ClientCredentialsExtractor {
             throw new InvalidClientException("Client authentication failed");
         }
 
-        return createClientAuthentication(request, clientId, clientSecret);
+        return new ClientCredentials(clientId, clientSecret == null ? null : clientSecret.toCharArray());
     }
-
-    protected abstract ClientAuthentication createClientAuthentication(final Request request, final String clientId,
-            final String clientSecret);
 }

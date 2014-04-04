@@ -23,9 +23,27 @@ package org.forgerock.oauth2.core;
  */
 public interface GrantType {
 
+    /**
+     * Enum for all of the Grant Types specified in the core OAuth2 specification.
+     *
+     * @since 12.0.0
+     */
     enum DefaultGrantType implements GrantType {
+        /**
+         * OAuth2 Authorization Code Grant Type.
+         */
         AUTHORIZATION_CODE,
+        /**
+         * OAuth2 Password Credentials Grant Type.
+         */
         PASSWORD,
-        CLIENT_CREDENTIALS;
+        /**
+         * OAuth2 Client Credentials Grant Type.
+         */
+        CLIENT_CREDENTIALS,
+        /**
+         * OAuth2 Refresh Token.
+         */
+        REFRESH_TOKEN;
     }
 }

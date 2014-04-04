@@ -20,91 +20,86 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Implements the common methods and attributes of all standard OAuth 2 tokens
+ * Implements the common methods and attributes of all standard OAuth 2 tokens.
  *
  * @since 11.0.0
  */
 public interface Token {
+
     /**
-     * Get the string representation of the identifier of this token
-     * <p/>
+     * Get the string representation of the identifier of this token.
      *
-     * 
-     * @return unique identifier of the represented token
+     * @return The unique identifier of the represented token.
      */
     public String getTokenID();
 
     /**
-     * Get tokens UserID
-     * 
-     * @return
-     *          ID of user
+     * Get tokens UserID.
+     *
+     * @return The ID of user.
      */
     public String getUserID();
 
     /**
-     * Get Tokens Realm
-     * 
-     * @return
-     *          the realm
+     * Get Tokens Realm.
+     *
+     * @return The realm.
      */
     public String getRealm();
 
     /**
-     * Gets the tokens scope
-     * 
-     * @return
-     *          Set of strings that are the tokens scope
+     * Gets the tokens scope.
+     *
+     * @return Set of strings that are the tokens scope.
      */
     public Set<String> getScope();
 
     /**
      * Get the exact expiration time in POSIX format.
-     * 
+     *
      * @return long representation of the maximum valid date.
      */
     public long getExpireTime();
 
     /**
-     * Checks if token is expired
-     * 
-     * @return
-     *          true if expired
-     *          false if not expired
+     * Checks if token is expired.
+     *
+     * @return true if expired, false if not expired.
      */
     public boolean isExpired();
 
     /**
-     * Returns the token type
+     * Returns the token type.
      *
-     * @return The type of token. For example {@link BearerToken}
+     * @return The type of token. For example "BearerToken".
      */
     public String getTokenType();
 
     /**
-     * Returns the name of the token
+     * Returns the name of the token.
      *
-     * @return The name of token. Will be either access_token, code, refresh_token
+     * @return The name of token. Will be either access_token, code, refresh_token.
      */
     public String getTokenName();
 
     /**
-     * Returns the client_id associated token
+     * Returns the client_id associated token.
      *
-     * @return The client_id associated with token
+     * @return The client_id associated with token.
      */
     public String getClientID();
 
     /**
-     * Converts the token to Map
+     * Converts the token to Map.
      *
-     * @return new Map representation of this AccessToken
+     * @return new Map representation of this AccessToken.
      */
     public Map<String, Object> convertToMap();
 
     /**
-     * Gets information about the token for the tokeninfo end point
-     * @return
+     * Gets information about the token for the tokeninfo end point.
+     *
+     * @return The token info.
      */
     public Map<String, Object> getTokenInfo();
 }

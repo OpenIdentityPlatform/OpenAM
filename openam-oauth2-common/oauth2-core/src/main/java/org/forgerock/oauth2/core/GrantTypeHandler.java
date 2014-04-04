@@ -16,12 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+
 /**
- * Handler for the OAuth2 grant types that the OAuth2 Token endpoint.
+ * Implementations of this interface will implement the logic for a specific OAuth2 Grant Type, to gain an Access Token.
  *
  * @since 12.0.0
  */
 public interface GrantTypeHandler {
 
-    AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException, UnauthorizedClientException, InvalidGrantException;
+    /**
+     * Handles the OAuth2 request for the implemented grant type.
+     *
+     * @param accessTokenRequest The AccessTokenRequest instance.
+     * @return An AccessToken.
+     * @throws OAuth2Exception If a problem occurs when processing the OAuth2 request.
+     */
+    AccessToken handle(final AccessTokenRequest accessTokenRequest) throws OAuth2Exception;
 }

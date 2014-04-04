@@ -24,15 +24,35 @@ import java.util.Set;
 
 /**
  * Utils class containing common utility methods used by various OAuth2 response and grant type handlers.
- * <br/>
- * TODO Ensure that this class does not become a dumping ground for "utility methods"
  *
  * @since 12.0.0
  */
 public final class Utils {
 
-    private Utils() {}
+    /**
+     * Private constructor.
+     */
+    private Utils() { }
 
+    /**
+     * Splits the response type string on ' ' character and returns a {@code Set<String>} of the contents.
+     *
+     * @param responseType The response type string.
+     * @return A {@code Set<String>} of the response types.
+     */
+    static Set<String> splitResponseType(final String responseType) {
+        if (responseType == null) {
+            return new HashSet<String>();
+        }
+        return new HashSet<String>(Arrays.asList(responseType.split(" ")));
+    }
+
+    /**
+     * Splits the scope string on ' ' character and returns a {@code Set<String>} of the contents.
+     *
+     * @param scope The response type string.
+     * @return A {@code Set<String>} of the scope.
+     */
     static Set<String> splitScope(final String scope) {
         if (scope == null) {
             return new HashSet<String>();
@@ -40,8 +60,14 @@ public final class Utils {
         return new HashSet<String>(Arrays.asList(scope.split(" ")));
     }
 
-    static Set<String> stringToSet(String string){
-        if (string == null || string.isEmpty()){
+    /**
+     * Splits the string on ' ' character and returns a {@code Set<String>} of the contents.
+     *
+     * @param string The string.
+     * @return A {@code Set<String>}.
+     */
+    static Set<String> stringToSet(String string) {
+        if (string == null || string.isEmpty()) {
             return Collections.emptySet();
         }
         String[] values = string.split(" ");
@@ -49,7 +75,14 @@ public final class Utils {
         return set;
     }
 
-    public static String join(final Set<String> scope) {
+    /**
+     * Joins together a {@code Set<String>} of scope into a String using the ' ' character to separate the individual
+     * scopes.
+     *
+     * @param scope The scope.
+     * @return A concatenated String of the scope.
+     */
+    public static String joinScope(final Set<String> scope) {
 
         if (scope == null) {
             return "";
@@ -65,5 +98,15 @@ public final class Utils {
             sb.append(" ").append(iterator.next());
         }
         return sb.toString();
+    }
+
+    /**
+     * Determines if the specified String is {@code null} or empty.
+     *
+     * @param s The String.
+     * @return {@code true} if the String is {@code null} or empty.
+     */
+    static boolean isEmpty(final String s) {
+        return s == null ? true : s.trim().isEmpty();
     }
 }

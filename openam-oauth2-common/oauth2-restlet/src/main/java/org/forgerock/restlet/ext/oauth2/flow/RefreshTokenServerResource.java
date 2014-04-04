@@ -24,17 +24,26 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.*;
-
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
-import org.forgerock.openam.oauth2.model.SessionClientImpl;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AccessTokenService;
+import org.forgerock.oauth2.core.ClientCredentials;
+import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.RefreshTokenRequest;
+import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+
+import javax.inject.Inject;
+import java.util.Map;
+
+import static org.forgerock.oauth2.core.RefreshTokenRequest.createRefreshTokenRequest;
+import static org.forgerock.oauth2.reslet.RestletUtils.getParameter;
 
 /**
  * Implements the Refresh Token Flow
@@ -43,90 +52,55 @@ import org.restlet.resource.Post;
  */
 public class RefreshTokenServerResource extends AbstractFlow {
 
-    @Post("form:json")
+    private final ClientCredentialsExtractor clientCredentialsExtractor;
+    private final AccessTokenService accessTokenService;
+    private final ContextHandler contextHandler;
+
+    @Inject
+    public RefreshTokenServerResource(final ClientCredentialsExtractor clientCredentialsExtractor,
+            final AccessTokenService accessTokenService, final ContextHandler contextHandler) {
+        this.clientCredentialsExtractor = clientCredentialsExtractor;
+        this.accessTokenService = accessTokenService;
+        this.contextHandler = contextHandler;
+    }
+
+    @Post()
     public Representation represent(Representation entity) {
-        /*
-         * o require client authentication for confidential clients or for any
-         * client that was issued client credentials (or with other
-         * authentication requirements), o authenticate the client if client
-         * authentication is included and ensure the refresh token was issued to
-         * the authenticated client, and o validate the refresh token.
-         */
 
-        client = getAuthenticatedClient();
-        String refresh_token =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.REFRESH_TOKEN,
-                        String.class);
-        // Find Token
-        CoreToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
+        final String refreshToken = getParameter(getRequest(), "refresh_token");
+        final String scope = getParameter(getRequest(), "scope");
 
-        SessionClient refreshTokenClient = new SessionClientImpl(refreshToken.getClientID(),
-                refreshToken.getRedirectURI());
+        final ClientCredentials clientCredentials;
+        try {
+            clientCredentials = clientCredentialsExtractor.extract(getRequest());
+        } catch (InvalidClientException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+        }
 
-        if (null == refreshToken) {
-            OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token);
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "RefreshToken does not exist");
-        } else if (!refreshTokenClient.getClientId().equals(client.getClient().getClientId())) {
-            OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshTokenClient.getClientId());
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "Token was issued to a different client");
-        } else {
-            if (refreshToken.isExpired()) {
-                OAuth2Utils.DEBUG.warn("Refresh Token is expired for id: " + refresh_token);
-                throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest());
-            }
+        try {
+            final RefreshTokenRequest refreshTokenRequest = createRefreshTokenRequest()
+                    .refreshToken(refreshToken)
+                    .scope(scope)
+                    .clientCredentials(clientCredentials)
+                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
+                    .build();
 
-            // Get the requested scope
-            String scope_before =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+            final AccessToken accessToken = accessTokenService.refreshToken(refreshTokenRequest);
 
-            Set<String> granted_after = null;
-            // Get the granted scope
-            if (null != refreshToken.getScope()) {
-                granted_after = new TreeSet<String>(refreshToken.getScope());
-            } else {
-                granted_after = new TreeSet<String>();
-            }
+            return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
 
-            // Validate the granted scope
-            Set<String> checkedScope = executeRefreshTokenScopePlugin(scope_before, granted_after);
-
-            // Generate Token
-            CoreToken token = createAccessToken(refreshToken, checkedScope);
-            Map<String, Object> response = token.convertToMap();
-
-            //execute post token creation pre return scope plugin for extra return data.
-            Map<String, String> data = new HashMap<String, String>();
-            response.putAll(executeExtraDataScopePlugin(data, token));
-
-            if (checkedScope != null && !checkedScope.isEmpty()) {
-                response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
-                        OAuth2Utils.getScopeDelimiter(getContext())));
-            }
-
-            return new JacksonRepresentation<Map>(response);
+        } catch (IllegalArgumentException e) {
+            //TODO log
+//            OAuth2Utils.DEBUG.error("AbstractFlow::Invalid parameters in request: " + sb.toString());
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidClientException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (ExpiredTokenException e) {
+            throw OAuthProblemException.OAuthError.EXPIRED_TOKEN.handle(getRequest(), e.getMessage());
         }
     }
-
-    @Override
-    protected String[] getRequiredParameters() {
-        return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN};
-    }
-
-    /**
-     * This method is intended to be overridden by subclasses.
-     *
-     * @param checkedScope
-     * @return
-     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     *
-     */
-    protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
-                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID(), getGrantType());
-    }
-
 }

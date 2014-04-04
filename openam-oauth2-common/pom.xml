@@ -37,7 +37,7 @@
     <packaging>pom</packaging>
 
     <name>OpenAM OAuth2 Common</name>
-    <description></description><!-- TODO -->
+    <description>OAuth2 Commons library</description>
 
     <modules>
         <module>oauth2-core</module>

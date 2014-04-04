@@ -11,20 +11,40 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2014 ForgeRock AS.
+ * Copyright 2012-2014 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import java.util.Map;
+
 /**
- * Represents an OAuth2 Response Type, used by the OAuth2 authorize endpoint.
+ * This interface provides the functions that need to be implemented to create a response type for the authorize
+ * endpoint.
  *
- * @since 12.0.0
+ * @supported.all.api //TODO what state is the api in? (final/evolving?)
  */
 public interface ResponseType {
 
-    enum DefaultResponseType implements ResponseType {
-        CODE,
-        TOKEN;
-    }
+    /**
+     * Creates a token for a response type.
+     *
+     * @param data The data needed to create the token.
+     * @return The created token.
+     */
+    public CoreToken createToken(Map<String, Object> data);
+
+    /**
+     * Returns the location in the HTTP response the token should be returned.
+     *
+     * @return A string of either FRAGMENT or QUERY.
+     */
+    public String getReturnLocation();
+
+    /**
+     * The parameter in the URI to return the token as.
+     *
+     * @return The URI to return the token as.
+     */
+    public String getURIParamValue();
 }

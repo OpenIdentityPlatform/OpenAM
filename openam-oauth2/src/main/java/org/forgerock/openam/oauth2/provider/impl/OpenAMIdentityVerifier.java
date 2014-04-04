@@ -28,7 +28,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.openid.OpenIDPromptParameter;
+import org.forgerock.oauth2.core.OpenIDPromptParameter;
 import org.forgerock.openam.oauth2.OAuth2Utils;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;

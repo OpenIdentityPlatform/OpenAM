@@ -29,7 +29,7 @@ import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.model.SessionClientImpl;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.ResponseType;
+import org.forgerock.oauth2.core.ResponseType;
 
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class CodeResponseType implements ResponseType {
         return "QUERY";
     }
 
-    public String URIParamValue(){
+    public String getURIParamValue(){
         return "code";
     }
 }

@@ -24,28 +24,23 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.Scope;
+import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
-import org.forgerock.openam.oauth2.provider.ServerAuthorizer;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
-import org.owasp.esapi.ESAPI;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.CacheDirective;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
@@ -56,16 +51,9 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Redirector;
-import org.restlet.security.SecretVerifier;
-import org.restlet.security.User;
 import org.restlet.util.Series;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -77,30 +65,12 @@ public abstract class AbstractFlow extends ServerResource {
 
     protected OAuth2Constants.EndpointType endpointType;
     protected OAuth2Client client = null;
-    protected User resourceOwner = null;
-    protected SessionClient sessionClient = null;
-    protected boolean issueRefreshToken = false;
     protected boolean fragment = false;
-
-    protected static final int RESULT_VALID = 4;
-
-    /**
-     * If the {@link AbstractFlow#getCheckedScope} change the requested scope
-     * then this value is true.
-     */
-    private boolean scopeChanged = false;
 
     private ClientVerifier clientVerifier = null;
 
     private OAuth2TokenStore tokenStore = null;
 
-    public AbstractFlow(){
-    }
-    protected boolean checkIfRefreshTokenIsRequired(Request request){
-        OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-        issueRefreshToken = settings.getRefreshTokensEnabledState();
-        return issueRefreshToken;
-    }
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {
             OAuth2Utils.DEBUG.error("AbstractFlow::ClientVerifier is not initialised");
@@ -117,16 +87,6 @@ public abstract class AbstractFlow extends ServerResource {
                     "Token store is not initialised");
         }
         return tokenStore;
-    }
-
-    /**
-     * After the call of {@link AbstractFlow#getCheckedScope} it return true if
-     * the requested scope was changed.
-     * 
-     * @return
-     */
-    public boolean isScopeChanged() {
-        return scopeChanged;
     }
 
     /**
@@ -154,8 +114,6 @@ public abstract class AbstractFlow extends ServerResource {
         validateMethod();
         validateContentType();
         validateRequiredParameters();
-        validateOptionalParameters();
-        validateNotAllowedParameters();
         fragment = false;
         // -------------------------------------
         // Add Cache-Control: no-store
@@ -188,8 +146,6 @@ public abstract class AbstractFlow extends ServerResource {
         validateMethod();
         validateContentType();
         validateRequiredParameters();
-        validateOptionalParameters();
-        validateNotAllowedParameters();
         return super.doHandle();
     }
 
@@ -266,41 +222,6 @@ public abstract class AbstractFlow extends ServerResource {
         Representation result = getPage("error.ftl", exception.getErrorMessage());
         if (null != result) {
             getResponse().setEntity(result);
-        }
-    }
-
-    /**
-     * @see <a
-     *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-5.2">5.2.
-     *      Error Response</a>
-     */
-    public Representation doError(OAuthProblemException exception) {
-        doError(Status.CLIENT_ERROR_BAD_REQUEST);
-        return new JacksonRepresentation<Map>(exception.getErrorMessage());
-    }
-
-    /**
-     * Error Response
-     * <p/>
-     * If the request fails due to a missing, invalid, or mismatching
-     * redirection URI, or if the client identifier is missing or invalid, the
-     * authorization server SHOULD inform the resource owner of the error, and
-     * MUST NOT automatically redirect the user-agent to the invalid redirection
-     * URI.
-     * 
-     * @see <a
-     *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.2.1">4.1.2.1.
-     *      Error Response</a>
-     * @see <a
-     *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.2.1">4.2.2.1.
-     *      Error Response</a>
-     */
-    public Representation doError(OAuthProblemException exception, Reference redirect) {
-        if (null != redirect) {
-            return null;
-        } else {
-            // TODO make null safe and configure the error page
-            return getPage("error.ftl", exception.getErrorMessage());
         }
     }
 
@@ -395,30 +316,6 @@ public abstract class AbstractFlow extends ServerResource {
         }
     }
 
-    protected User getAuthenticatedResourceOwner() throws OAuthProblemException {
-        //authenticate the resource owner
-        SecretVerifier secretVerifier = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getSecretVerifier();
-        int verified = secretVerifier.verify(getRequest(), getResponse());
-        if (verified != RESULT_VALID){
-            OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Unable to login resource owner.");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Resource Owner unable to login");
-        }
-        if (endpointType.equals(OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)){
-            ServerAuthorizer authorizer = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getServerAuthorizer();
-            if (authorizer.authorize(getRequest(), getResponse()) == false){
-                OAuth2Utils.DEBUG.error("The authorization server can not authorize the resource owner.");
-                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
-                        "The authorization server can not authorize the resource owner.");
-            }
-        }
-        if (getRequest().getClientInfo().getUser() != null) {
-            return getRequest().getClientInfo().getUser();
-        }
-        OAuth2Utils.DEBUG.error("The authorization server can not authenticate the resource owner.");
-        throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
-                "The authorization server can not authenticate the resource owner.");
-    }
-
     protected OAuth2Client getAuthenticatedClient() throws OAuthProblemException {
         if (getRequest().getClientInfo().getUser() != null
                 && getRequest().getClientInfo().isAuthenticated()) {
@@ -429,95 +326,6 @@ public abstract class AbstractFlow extends ServerResource {
         OAuth2Utils.DEBUG.error("The authorization server can not authenticate the client.");
         throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
                 "The authorization server can not authenticate the client.");
-    }
-
-    protected Map<String, Object> getDataModel(Set<String> scopes) {
-        Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
-        data.put("target", getRequest().getResourceRef().toString());
-        Set<String> displayNames = client.getClient().getDisplayName();
-        Set<String> displayDescriptions = client.getClient().getDisplayDescription();
-        Set<String> allScopes = client.getClient().getAllowedGrantScopes();
-        String locale = OAuth2Utils.getLocale(getRequest());
-        String displayName = "";
-        String displayDescription = "";
-        List<String> displayScope = null;
-
-        //get the localized display name
-        displayName = getDisplayParameter(locale, displayNames);
-        displayDescription = getDisplayParameter(locale, displayDescriptions);
-
-        //get the scope descriptions
-        displayScope = getScopeDescriptionsForLocale(scopes, allScopes, locale);
-
-        data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
-        data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
-        data.put("display_scope", encodeListForHTML(displayScope));
-        return data;
-    }
-
-    private List<String> encodeListForHTML(final List<String> dirtyList){
-        List<String> htmlEncodedList = new ArrayList<String>();
-
-        for (String scope : dirtyList){
-            htmlEncodedList.add(ESAPI.encoder().encodeForHTML(scope));
-        }
-
-        return htmlEncodedList;
-    }
-
-    private String getDisplayParameter(String locale, Set<String> displayNames){
-        Set<String> names = new HashSet<String>();
-        String defaultName = null;
-        final String DELIMITER = "|";
-        for (String name : displayNames){
-            if (name.contains(DELIMITER)){
-                int locationOfDelimiter = name.indexOf(DELIMITER);
-                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale)){
-                    return name.substring(locationOfDelimiter+1, name.length());
-                }
-            } else {
-                defaultName = name;
-            }
-        }
-
-        return defaultName;
-    }
-
-    private List<String> getScopeDescriptionsForLocale(Set<String> scopes,
-                                                       Set<String>scopesWithDescriptions,
-                                                       String locale){
-        final String DELIMITER = "\\|";
-        List<String> list = new LinkedList<String>();
-        for (String scope: scopes){
-            for (String scopeDescription : scopesWithDescriptions){
-                String[] parts = scopeDescription.split(DELIMITER);
-                if (parts != null && parts[0].equalsIgnoreCase(scope)){
-                    //no description or locale
-                    if (parts.length == 1){
-                        continue;
-                    } else if (parts.length == 2){
-                        //no locale add description
-                        list.add(parts[1]);
-                    } else if (parts.length == 3){
-                        //locale and description
-                        if (parts[1].equalsIgnoreCase(locale)){
-                            list.add(parts[2]);
-                        } else {
-                            //not the right locale
-                            continue;
-                        }
-
-                    } else {
-                        OAuth2Utils.DEBUG.warn("Scope was input into the client settings in the wrong format for scope: " + scopeDescription);
-                        continue;
-                    }
-
-                }
-
-            }
-
-        }
-        return list;
     }
 
     protected void validateMethod() throws OAuthProblemException {
@@ -600,35 +408,8 @@ public abstract class AbstractFlow extends ServerResource {
         }
     }
 
-    public Set<String> getCheckedScope(String requestedScope, Set<String> maximumScope,
-            Set<String> defaultScope) {
-        if (null == requestedScope) {
-            return defaultScope;
-        } else {
-            Set<String> intersect =
-                    new TreeSet<String>(OAuth2Utils.split(requestedScope, OAuth2Utils
-                            .getScopeDelimiter(getContext())));
-            Set<String> scopes = null;
-            scopes = OAuth2Utils.parseScope(maximumScope);
-            if (intersect.retainAll(scopes)) {
-                OAuth2Utils.DEBUG.warn("AbstractFlow::Scope is different then requested");
-                scopeChanged = true;
-                return intersect;
-            } else {
-                scopeChanged = false;
-                return intersect;
-            }
-        }
-    }
-
     protected String[] getRequiredParameters() {
         return null;
-    }
-
-    protected void validateOptionalParameters() throws OAuthProblemException {
-    }
-
-    protected void validateNotAllowedParameters() throws OAuthProblemException {
     }
 
     protected Set<String> executeAccessTokenScopePlugin(String scopeRequest){
@@ -662,145 +443,6 @@ public abstract class AbstractFlow extends ServerResource {
         }
 
         return checkedScope;
-    }
-
-    protected Set<String> executeRefreshTokenScopePlugin(String scopeRequest, Set<String> maxScope){
-        Set<String> checkedScope = null;
-        Set<String> requestedScopeSet = null;
-        String pluginClass = null;
-        Scope scopeClass = null;
-        try {
-            requestedScopeSet =
-                    new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
-                            .getScopeDelimiter(getContext())));
-            OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-            pluginClass = settings.getScopeImplementationClass();
-            if (pluginClass != null && !pluginClass.isEmpty()){
-                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
-            checkedScope = null;
-            scopeClass = null;
-        }
-        // Validate the granted scope
-        if (scopeClass != null && pluginClass != null){
-            checkedScope = scopeClass.scopeRequestedForRefreshToken(requestedScopeSet,
-                    maxScope,
-                    OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
-                    OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
-        } else {
-            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
-        }
-
-        return checkedScope;
-    }
-
-    protected Set<String> executeAuthorizationPageScopePlugin(String scopeRequest){
-        Set<String> checkedScope = null;
-        Set<String> requestedScopeSet = null;
-        String pluginClass = null;
-        Scope scopeClass = null;
-        try {
-            requestedScopeSet =
-                    new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
-                            .getScopeDelimiter(getContext())));
-            OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-            pluginClass = settings.getScopeImplementationClass();
-            if (pluginClass != null && !pluginClass.isEmpty()){
-                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
-            checkedScope = null;
-            scopeClass = null;
-        }
-
-        // Validate the granted scope
-        if (scopeClass != null && pluginClass != null){
-            checkedScope = scopeClass.scopeToPresentOnAuthorizationPage(requestedScopeSet,
-                    OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
-                    OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
-        } else {
-            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
-        }
-
-        return checkedScope;
-    }
-
-    protected Map<String, Object> executeExtraDataScopePlugin(Map<String, String> data, CoreToken token){
-        Map<String, Object> jsonData = null;
-        String pluginClass = null;
-        Scope scopeClass = null;
-        try {
-            OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-            pluginClass = settings.getScopeImplementationClass();
-            if (pluginClass != null && !pluginClass.isEmpty()){
-                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
-            jsonData = null;
-            scopeClass = null;
-        }
-
-        // Validate the granted scope
-        if (scopeClass != null && pluginClass != null){
-            jsonData = scopeClass.extraDataToReturnForTokenEndpoint(data, token);
-        } else {
-            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
-        }
-
-        return jsonData;
-    }
-
-    protected Map<String, String> executeAuthorizationExtraDataScopePlugin(Map<String, String> data, Map<String, CoreToken> token){
-        Map<String, String> jsonData = null;
-        String pluginClass = null;
-        Scope scopeClass = null;
-        try {
-            OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-            pluginClass = settings.getScopeImplementationClass();
-            if (pluginClass != null && !pluginClass.isEmpty()){
-                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
-            jsonData = null;
-            scopeClass = null;
-        }
-
-        // Validate the granted scope
-        if (scopeClass != null && pluginClass != null){
-            jsonData = scopeClass.extraDataToReturnForAuthorizeEndpoint(data, token);
-        } else {
-            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
-        }
-
-        return jsonData;
-    }
-
-    protected Map<String,String> getResponseTypes(String realm){
-        OAuth2ProviderSettings settings = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
-        Set<String> responseTypeSet = settings.getResponseTypes();
-        if (responseTypeSet == null || responseTypeSet.isEmpty()){
-            OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): No response types for realm: " + realm);
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invlaid Response Type");
-        }
-        Map<String, String> responseTypes = new HashMap<String, String>();
-        for (String responseType : responseTypeSet){
-            String[] parts = responseType.split("\\|");
-            if (parts.length != 2){
-                OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): Response type wrong format for realm: " + realm);
-                continue;
-            }
-            responseTypes.put(parts[0], parts[1]);
-        }
-        return responseTypes;
     }
     
     protected String getGrantType() {

@@ -19,16 +19,20 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenRequest;
 import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.ClientAuthentication;
-import org.forgerock.oauth2.core.InvalidClientException;
-import org.forgerock.oauth2.core.InvalidGrantException;
-import org.forgerock.oauth2.core.InvalidRequestException;
-import org.forgerock.oauth2.core.ResourceOwnerAuthentication;
-import org.forgerock.oauth2.core.UnauthorizedClientException;
+import org.forgerock.oauth2.core.ClientCredentials;
+import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.ResourceOwnerPasswordAuthenticationHandler;
+import org.forgerock.oauth2.reslet.ResourceOwnerPasswordCredentialsExtractor;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
-import org.forgerock.oauth2.reslet.ResourceOwnerCredentialsExtractor;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 
@@ -47,16 +51,18 @@ import static org.forgerock.oauth2.core.AccessTokenRequest.createPasswordAccessT
 public class PasswordServerResource extends AbstractFlow {
 
     private final ClientCredentialsExtractor clientCredentialsExtractor;
-    private final ResourceOwnerCredentialsExtractor resourceOwnerCredentialsExtractor;
+    private final ResourceOwnerPasswordCredentialsExtractor resourceOwnerCredentialsExtractor;
     private final AccessTokenService accessTokenService;
+    private final ContextHandler contextHandler;
 
     @Inject
     public PasswordServerResource(final ClientCredentialsExtractor clientCredentialsExtractor,
-            final ResourceOwnerCredentialsExtractor resourceOwnerCredentialsExtractor,
-            final AccessTokenService accessTokenService) {
+            final ResourceOwnerPasswordCredentialsExtractor resourceOwnerCredentialsExtractor,
+            final AccessTokenService accessTokenService, final ContextHandler contextHandler) {
         this.clientCredentialsExtractor = clientCredentialsExtractor;
         this.resourceOwnerCredentialsExtractor = resourceOwnerCredentialsExtractor;
         this.accessTokenService = accessTokenService;
+        this.contextHandler = contextHandler;
     }
 
     @Post                             //TODO document that this param is required even though not used as otherwise Restlet complains about incorrect content-type
@@ -64,29 +70,30 @@ public class PasswordServerResource extends AbstractFlow {
 
         final String scope = getAttribute("scope");
 
-        final ClientAuthentication clientAuthentication;
+        final ClientCredentials clientCredentials;
         try {
-            clientAuthentication = clientCredentialsExtractor.extract(getRequest());
+            clientCredentials = clientCredentialsExtractor.extract(getRequest());
         } catch (InvalidRequestException e) {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "Client authentication failed");
         } catch (InvalidClientException e) {
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
 
-        final ResourceOwnerAuthentication resourceOwnerAuthentication;
-        try {
-            resourceOwnerAuthentication = resourceOwnerCredentialsExtractor.extract(getRequest());
-        } catch (InvalidClientException e) {
-                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        } catch (InvalidRequestException e) {
-                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        }
+        final ResourceOwnerPasswordAuthenticationHandler authenticationHandler;
+//        try {
+            authenticationHandler = resourceOwnerCredentialsExtractor.extract(getRequest());
+//        } catch (InvalidClientException e) {
+//                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
+//        } catch (InvalidRequestException e) {
+//                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
+//        }
 
         try {
             final AccessTokenRequest accessTokenRequest = createPasswordAccessTokenRequest()
-                    .clientAuthentication(clientAuthentication)
-                    .resourceOwnerAuthentication(resourceOwnerAuthentication)
+                    .clientCredentials(clientCredentials)
+                    .authenticationHandler(authenticationHandler)
                     .scope(scope)
+                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
                     .build();
 
             final AccessToken accessToken = accessTokenService.requestAccessToken(accessTokenRequest);
@@ -103,6 +110,13 @@ public class PasswordServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(getRequest(), e.getMessage());
         } catch (InvalidGrantException e) {
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidCodeException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(), e.getMessage());
+        } catch (OAuth2Exception e) {
+            //CATCH ALL
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
         }
     }
 }

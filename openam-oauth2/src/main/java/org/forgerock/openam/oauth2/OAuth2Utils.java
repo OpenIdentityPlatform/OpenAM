@@ -53,6 +53,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
@@ -477,7 +478,8 @@ public class OAuth2Utils {
             if (setting != null){
                 return setting;
             } else {
-                setting = new OAuth2ProviderSettingsImpl(request);
+                final String deploymentUrl = getDeploymentURL(request);
+                setting = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(deploymentUrl, realm);
                 settingsProviderMap.put(realm, setting);
                 return setting;
             }

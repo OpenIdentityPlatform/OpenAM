@@ -17,17 +17,36 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 
-import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import com.google.inject.Inject;
+import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
+import org.forgerock.oauth2.core.exceptions.AuthenticationRedirectRequiredException;
+import org.forgerock.oauth2.core.Authorization;
+import org.forgerock.oauth2.core.AuthorizationRequest;
+import org.forgerock.oauth2.core.AuthorizationService;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.ConsentRequiredException;
+import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.ResourceOwnerAuthorizationCodeAuthenticationHandler;
+import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.core.UserConsentRequest;
+import org.forgerock.oauth2.core.UserConsentResponse;
+import org.forgerock.oauth2.reslet.ResourceOwnerAuthorizationCodeCredentialsExtractor;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.openid.OpenIDPromptParameter;
-import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.owasp.esapi.ESAPI;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -35,10 +54,28 @@ import org.restlet.routing.Redirector;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.AuthorizationRequest.createCodeAuthorizationRequest;
+import static org.forgerock.oauth2.core.UserConsentResponse.createUserConsentResponse;
+import static org.forgerock.oauth2.reslet.RestletUtils.getParameter;
+
 public class AuthorizeServerResource extends AbstractFlow {
+
+    private final ResourceOwnerAuthorizationCodeCredentialsExtractor resourceOwnerCredentialsExtractor;
+    private final AuthorizationService authorizationService;
+    private final ContextHandler contextHandler;
+
+    @Inject
+    public AuthorizeServerResource(
+            final ResourceOwnerAuthorizationCodeCredentialsExtractor resourceOwnerCredentialsExtractor,
+            final AuthorizationService authorizationService, final ContextHandler contextHandler) {
+        this.resourceOwnerCredentialsExtractor = resourceOwnerCredentialsExtractor;
+        this.authorizationService = authorizationService;
+        this.contextHandler = contextHandler;
+    }
 
     /**
      * Developers should note that some user-agents do not support the inclusion
@@ -53,275 +90,195 @@ public class AuthorizeServerResource extends AbstractFlow {
      *
      * @return
      */
-    @Get("html")
+    @Get()
     public Representation represent() {
 
-        // Validate the client
-        client = validateRemoteClient();
-        // Validate Redirect URI throw exception
-        sessionClient =
-                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2Constants.Params.REDIRECT_URI, String.class));
-
-        // The target contains the state
-        String state =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
-
-        // Get the requested scope
-        String scope_before =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
-
-        // Validate the granted scope
-        Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
-
-        String prompt =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.PROMPT, String.class);
+        final String clientId = getQueryValue("client_id");
+        final String redirectUri = getQueryValue("redirect_uri");
+        final String scope = getQueryValue("scope");
+        final String state = getQueryValue("state");
+        final String responseType = getQueryValue("response_type");
+        String prompt = getQueryValue("prompt");
 
         if (prompt == null || prompt.isEmpty()) {
-            prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom._PROMPT, String.class);
+            prompt = getQueryValue("_prompt");
         }
 
-        OpenIDPromptParameter openIDPromptParameter = new OpenIDPromptParameter(prompt);
-        if (!openIDPromptParameter.isValid()){
-            throw OAuthProblemException.OAuthError.BAD_REQUEST.handle(getRequest(), "Prompt parameter is invalid");
-        }
+        final ResourceOwnerAuthorizationCodeAuthenticationHandler authenticationHandler;
+//        try {
+            authenticationHandler = resourceOwnerCredentialsExtractor.extract(getRequest());
+//        }
 
-        //check if there is an invalid response type
-        String responseType =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class);
-        if (responseType != null && !responseType.isEmpty()) {
-            if (!validResponseTypes(OAuth2Utils.stringToSet(responseType))) {
-                OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
-                throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
+        try {
+            final AuthorizationRequest authorizationRequest = createCodeAuthorizationRequest()
+                    .clientId(clientId)
+                    .redirectUri(redirectUri)
+                    .scope(scope)
+                    .state(state)
+                    .responseType(responseType)
+                    .prompt(prompt)
+                    .authenticationHandler(authenticationHandler)
+                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
+                    .locale(OAuth2Utils.getLocale(getRequest()))
+                    .build();
+
+            final UserConsentRequest userConsentRequest = authorizationService.requestAuthorization(authorizationRequest);
+
+            if (!userConsentRequest.isConsentRequired()) {
+                Map<String, Object> attrs = getRequest().getAttributes();
+                attrs.put(OAuth2Constants.Custom.DECISION, OAuth2Constants.Custom.ALLOW);
+                getRequest().setAttributes(attrs);
+                Representation rep = new JsonRepresentation(new HashMap<String, Object>());
+                return represent(rep);
             }
-        } else {
-            OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
-            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
+
+            return getPage("authorize.ftl", getDataModel(userConsentRequest.getDisplayName(),
+                    userConsentRequest.getDisplayDescription(), userConsentRequest.getScopeDescription()));
+
+        } catch (IllegalArgumentException e) {
+            //TODO log
+//            OAuth2Utils.DEBUG.error("AbstractFlow::Invalid parameters in request: " + sb.toString());
+            if (e.getMessage().contains("client_id")) {
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, e.getMessage());
+            }
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (ConsentRequiredException e) {
+            throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest(), e.getMessage());
+        } catch (InvalidClientException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+        } catch (InvalidGrantException e) {
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), e.getMessage());
+        } catch (UnsupportedResponseTypeException e) {
+            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, e.getMessage());
+        } catch (RedirectUriMismatchException e) {
+            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null, e.getMessage());
+        } catch (AuthenticationRedirectRequiredException e) {
+            throw OAuthProblemException.OAuthError.REDIRECT_TEMPORARY.handle(getRequest())
+                    .redirectUri(e.getRedirectUri());
+        } catch (BadRequestException e) {
+            throw OAuthProblemException.OAuthError.BAD_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InteractionRequiredException e) {
+            throw OAuthProblemException.OAuthError.INTERACTION_REQUIRED.handle(getRequest(), e.getMessage());
+        } catch (LoginRequiredException e) {
+            throw OAuthProblemException.OAuthError.LOGIN_REQUIRED.handle(getRequest(), e.getMessage());
+        } catch (AccessDeniedException e) {
+            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), e.getMessage());
+        } catch (OAuth2Exception e) {
+            //CATCH ALL
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
         }
-
-        //check if client has access to this response type
-        Set<String> clientResponseTypesAllowed = client.getClient().getResponseTypes();
-        if (!clientResponseTypesAllowed.containsAll(OAuth2Utils.stringToSet(responseType))) {
-            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Client does not support " +
-                    "this response type");
-        }
-
-        //authenticate the resource owner
-        resourceOwner = getAuthenticatedResourceOwner();
-
-        //check for saved consent
-        boolean savedConsent = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope, getRequest());
-
-        if (openIDPromptParameter.noPrompts() && !savedConsent){
-            throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest());
-        } else if (!openIDPromptParameter.promptConsent() && openIDPromptParameter.promptLogin() && !savedConsent) {
-            throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest());
-        } else if (savedConsent && !openIDPromptParameter.promptConsent()) {
-            Map<String, Object> attrs = getRequest().getAttributes();
-            attrs.put(OAuth2Constants.Custom.DECISION, OAuth2Constants.Custom.ALLOW);
-            getRequest().setAttributes(attrs);
-            Representation rep = new JsonRepresentation(new HashMap());
-            return represent(rep);
-        } else if (!savedConsent || openIDPromptParameter.promptConsent()) {
-            return getPage("authorize.ftl", getDataModel(checkedScope));
-        }
-        return getPage("authorize.ftl", getDataModel(checkedScope));
     }
 
-    @Post("form:json")
+    protected Map<String, Object> getDataModel(final String displayName, final String displayDescription,
+            final Set<String> displayScope) {
+        Map<String, Object> data = new HashMap<String, Object>(getRequest().getAttributes());
+        data.put("target", getRequest().getResourceRef().toString());
+
+        data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
+        data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
+        data.put("display_scope", encodeListForHTML(displayScope));
+        return data;
+    }
+
+    private Set<String> encodeListForHTML(final Set<String> dirtyList) {
+        final Set<String> htmlEncodedList = new LinkedHashSet<String>();
+
+        for (String scope : dirtyList){
+            htmlEncodedList.add(ESAPI.encoder().encodeForHTML(scope));
+        }
+
+        return htmlEncodedList;
+    }
+
+    @Post()
     public Representation represent(Representation entity) {
-        resourceOwner = getAuthenticatedResourceOwner();
-        client = validateRemoteClient();
-        sessionClient =
-                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2Constants.Params.REDIRECT_URI, String.class));
 
-        String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
-                String.class);
+        final boolean consentGiven = "allow".equalsIgnoreCase(getParameter(getRequest(), "decision"));
 
-        if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
-            String save_consent =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.SAVE_CONSENT, String.class);
+        final boolean saveConsent = "on".equalsIgnoreCase(getParameter(getRequest(), "save_consent"));
 
-            String scope_after =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+        final String scope = getParameter(getRequest(), "scope");
 
-            if (save_consent != null && save_consent.equalsIgnoreCase("on")) {
-                OAuth2ConfigurationFactory.Holder.getConfigurationFactory().saveConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), scope_after, getRequest());
-            }
+        final String state = getParameter(getRequest(), "state");
 
-            String state =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
-            String nonce =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
+        final String nonce = getParameter(getRequest(), "nonce");
 
-            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
+        final String responseType = getParameter(getRequest(), "response_type");
 
+        final String redirectUri = getParameter(getRequest(), "redirect_uri");
+        final String clientId = getParameter(getRequest(), "client_id");
 
-            Map<String, String> responseTypes = null;
-            responseTypes = getResponseTypes(OAuth2Utils.getRealm(getRequest()));
+        final ResourceOwnerAuthorizationCodeAuthenticationHandler authenticationHandler;
+//        try {
+        authenticationHandler = resourceOwnerCredentialsExtractor.extract(getRequest());
+//        }
 
-            Set<String> requestedResponseTypes = OAuth2Utils.stringToSet(OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class));
-            Map<String, CoreToken> listOfTokens = new HashMap<String, CoreToken>();
-            Map<String, Object> data = new HashMap<String, Object>();
-            data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, client.getClient().getAccessTokenType());
-            data.put(OAuth2Constants.CoreTokenParams.SCOPE, checkedScope);
-            data.put(OAuth2Constants.CoreTokenParams.REALM, OAuth2Utils.getRealm(getRequest()));
-            data.put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwner.getIdentifier());
-            data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, sessionClient.getClientId());
-            data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, sessionClient.getRedirectUri());
-            data.put(OAuth2Constants.Custom.NONCE, nonce);
-            data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
-                    OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getSSOCookieName()));
+        try {
+            final UserConsentResponse userConsentResponse = createUserConsentResponse()
+                    .consentGiven(consentGiven)
+                    .saveConsent(saveConsent)
+                    .scope(scope)
+                    .state(state)
+                    .nonce(nonce)
+                    .responseType(responseType)
+                    .redirectUri(redirectUri)
+                    .clientId(clientId)
+                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
+                    .authenticationHandler(authenticationHandler)
+                    .build();
 
+            final Authorization authorization = authorizationService.authorize(userConsentResponse);
 
-            if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()) {
-                OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Error response_type not set");
-                throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                        "Response type is not supported");
-            } else {
-                try {
-                    for (String request : requestedResponseTypes) {
-                        if (request.isEmpty()) {
-                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                                    "Response type is not supported");
-                        }
-                        String responseClass = responseTypes.get(request);
-                        if (responseClass == null || responseClass.isEmpty()) {
-                            OAuth2Utils.DEBUG.warn("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
-                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                                    "Response type is not supported");
-                        } else if (responseClass.equalsIgnoreCase("none")) {
-                            continue;
-                        }
-                        //execute response type class
-                        Class clazz = Class.forName(responseClass);
-                        ResponseType classObj = (ResponseType) clazz.newInstance();
+            final Form tokenForm = toForm(authorization);
 
-                        //create the response type token
-                        CoreToken token = classObj.createToken(data);
+            final Reference redirectReference = new Reference(redirectUri);
 
-                        //get the response type return location
-                        String paramName = classObj.URIParamValue();
-                        if (listOfTokens.containsKey(paramName)) {
-                            OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Returning multiple response types with the same url value");
-                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                                    "Returning multiple response types with the same url value");
-                        }
-                        listOfTokens.put(classObj.URIParamValue(), token);
-
-                        //if return location is fragment all tokens need to be returned as a fragment
-                        if (fragment == false) {
-                            String location = classObj.getReturnLocation();
-                            if (location.equalsIgnoreCase("FRAGMENT")) {
-                                fragment = true;
-                            }
-                        }
-
-                    }
-                } catch (Exception e) {
-                    OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Error invoking classes for response_type", e);
-                    throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                            "Response type is not supported");
-                }
-            }
-
-            Form tokenForm = tokensToForm(listOfTokens);
-
-            //execute post token creation pre return scope plugin for extra return data.
-            Map<String, String> extraData = new HashMap<String, String>();
-
-            Map<String, String> valuesToAdd = executeAuthorizationExtraDataScopePlugin(extraData, listOfTokens);
-
-            if (valuesToAdd != null && !valuesToAdd.isEmpty()) {
-                String returnType = valuesToAdd.remove("returnType");
-                if (returnType != null && !returnType.isEmpty()) {
-                    if (returnType.equalsIgnoreCase("FRAGMENT")) {
-                        fragment = true;
-                    }
-                }
-            }
-            for (Map.Entry<String, String> entry : valuesToAdd.entrySet()) {
-                tokenForm.add(entry.getKey(), entry.getValue().toString());
-            }
-
-            /*
-             * scope OPTIONAL, if identical to the scope requested by the
-             * client, otherwise REQUIRED. The scope of the access token as
-             * described by Section 3.3.
-             */
-            if (isScopeChanged()) {
-                String scope_before =
-                        OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
-
-                checkedScope = executeAccessTokenScopePlugin(scope_before);
-                if (checkedScope != null && !checkedScope.isEmpty()) {
-                    tokenForm.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
-                            .getScopeDelimiter(getContext())));
-                }
-
-            }
-            if (null != state) {
-                tokenForm.add(OAuth2Constants.Params.STATE, state);
-            }
-
-            Reference redirectReference = new Reference(sessionClient.getRedirectUri());
-
-            if (fragment) {
+            if (authorization.isFragment()) {
                 redirectReference.setFragment(tokenForm.getQueryString());
             } else {
-                Iterator<Parameter> iter = tokenForm.iterator();
+                final Iterator<Parameter> iter = tokenForm.iterator();
                 while (iter.hasNext()) {
                     redirectReference.addQueryParameter(iter.next());
                 }
             }
 
-            Redirector dispatcher =
-                    new Redirector(getContext(), redirectReference.toString(),
-                            Redirector.MODE_CLIENT_FOUND);
+            final Redirector dispatcher = new Redirector(getContext(), redirectReference.toString(),
+                    Redirector.MODE_CLIENT_FOUND);
             dispatcher.handle(getRequest(), getResponse());
-        } else {
-            OAuth2Utils.DEBUG.warn("AuthorizeServerResource::Resource Owner did not authorize the request");
-            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
-                    "Resource Owner did not authorize the request");
+
+            return getResponseEntity();
+
+        } catch (IllegalArgumentException e) {
+            //TODO log
+//            OAuth2Utils.DEBUG.error("AbstractFlow::Invalid parameters in request: " + sb.toString());
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (AccessDeniedException e) {
+            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(), e.getMessage());
+        } catch (InvalidGrantException e) {
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, e.getMessage());
+        } catch (RedirectUriMismatchException e) {
+            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null, e.getMessage());
+        } catch (UnsupportedResponseTypeException e) {
+            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), e.getMessage());
+        } catch (OAuth2Exception e) {
+            //CATCH ALL
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
         }
-        return getResponseEntity();
     }
 
-    @Override
-    protected String[] getRequiredParameters() {
-        return new String[]{OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID};
-    }
+    protected Form toForm(final Authorization authorization) {
 
-    protected Form tokensToForm(Map<String, CoreToken> tokens) {
-
-        Form result = new Form();
-        for (Map.Entry<String, CoreToken> entry : tokens.entrySet()) {
-            Map<String, Object> token = entry.getValue().convertToMap();
-            Parameter p = new Parameter(entry.getKey(), entry.getValue().getTokenID());
+        final Form result = new Form();
+        for (final Map.Entry<String, String> entry : authorization.getTokens().entrySet()) {
+            final Parameter p = new Parameter(entry.getKey(), entry.getValue());
             if (!result.contains(p)) {
                 result.add(p);
             }
-            //if access token add extra fields
-            if (entry.getValue().getTokenName().equalsIgnoreCase(OAuth2Constants.Params.ACCESS_TOKEN)) {
-                for (Map.Entry<String, Object> entryInMap : token.entrySet()) {
-                    p = new Parameter(entryInMap.getKey(), entryInMap.getValue().toString());
-                    if (!result.contains(p)) {
-                        result.add(p);
-                    }
-                }
-            }
-
         }
         return result;
     }
-
-    private boolean validResponseTypes(Set<String> responseTypesRequested) {
-
-        Map<String, String> allResponseTypes = getResponseTypes(OAuth2Utils.getRealm(getRequest()));
-        return allResponseTypes.keySet().containsAll(responseTypesRequested);
-    }
-
 }

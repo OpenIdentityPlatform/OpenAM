@@ -16,12 +16,22 @@
 
 package org.forgerock.oauth2.core;
 
+import java.util.Map;
+
 /**
- * Represents the store in which all Client registrations are kept.
+ * Represents the store in which all clients registrations are kept on the OAuth2 Provider.
  *
  * @since 12.0.0
  */
-public interface ClientRegistrationStore<T> {
+public interface ClientRegistrationStore {
 
-    ClientRegistration get(final T id);
+    /**
+     * Gets the Client Registration from the store.
+     *
+     * @param clientId The identifier of the client.
+     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
+     *                information.
+     * @return The Client Registration.
+     */
+    ClientRegistration get(final String clientId, final Map<String, Object> context);
 }

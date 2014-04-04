@@ -19,7 +19,7 @@ package org.forgerock.openam.authz.modules;
 import org.forgerock.authz.modules.oauth2.OAuth2Exception;
 import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.oauth2.core.Scope;
 import org.forgerock.openam.oauth2.OAuth2Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

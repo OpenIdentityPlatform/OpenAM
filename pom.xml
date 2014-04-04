@@ -1569,6 +1569,18 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>com.google.inject.extensions</groupId>
+                <artifactId>guice-assistedinject</artifactId>
+                <version>${guice.version}</version>
+                <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-guice-core</artifactId>
                 <version>${forgerock.guice.version}</version>

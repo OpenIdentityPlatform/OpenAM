@@ -24,12 +24,15 @@
 
 package org.forgerock.openam.oauth2.openid;
 
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.ScopeValidator;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.oauth2.core.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
@@ -37,9 +40,20 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
+import javax.inject.Inject;
+import java.util.Collections;
 import java.util.Map;
 
 public class UserInfo extends ServerResource {
+
+    private final TokenStore tokenStore;
+    private final ScopeValidator scopeValidator;
+
+    @Inject
+    public UserInfo(final TokenStore tokenStore, final ScopeValidator scopeValidator) {
+        this.tokenStore = tokenStore;
+        this.scopeValidator = scopeValidator;
+    }
 
     @Get
     @Post
@@ -48,34 +62,15 @@ public class UserInfo extends ServerResource {
     }
 
     private Map<String,Object> executeScopePlugin(){
-            Map<String, Object> userinfo = null;
-            String pluginClass = null;
-            Scope scopeClass = null;
-            String tokenid = getRequest().getChallengeResponse().getRawValue();
-            OAuth2TokenStore store = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getTokenStore();
-            CoreToken token = store.readAccessToken(tokenid);
-            try {
-                OAuth2ProviderSettings settings =
-                        OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getOAuth2ProviderSettings(getRequest());
 
-                pluginClass = settings.getScopeImplementationClass();
-                if (pluginClass != null && !pluginClass.isEmpty()){
-                    scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-                }
-            } catch (Exception e){
-                OAuth2Utils.DEBUG.error("AbstractFlow::Exception during userinfo scope execution", e);
-                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-            }
+        final String tokenid = getRequest().getChallengeResponse().getRawValue();
+        final AccessToken token = tokenStore.readAccessToken(tokenid);
 
-            // Validate the granted scope
-            if (scopeClass != null && pluginClass != null){
-                userinfo = scopeClass.getUserInfo(token);
-            } else {
-                OAuth2Utils.DEBUG.error("AbstractFlow::Exception during userinfo scope execution");
-                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-            }
-
-            return userinfo;
+        if (scopeValidator != null) {
+            return scopeValidator.getUserInfo(token);
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::Exception during userinfo scope execution");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
         }
-
+    }
 }

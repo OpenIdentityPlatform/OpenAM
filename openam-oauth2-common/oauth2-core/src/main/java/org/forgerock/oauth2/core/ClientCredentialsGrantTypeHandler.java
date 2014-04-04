@@ -16,20 +16,33 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.inject.Inject;
 import java.util.Set;
 
 /**
- * Handles the OAuth2 Client Credential Grant flow for the OAuth2 Token endpoint.
+ * Handles the OAuth2 Client Credentials grant type for the 'token' endpoint.
  *
  * @since 12.0.0
  */
 public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
 
-    private final ClientAuthenticator clientAuthenticator; //TODO add type generics
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+    private final ClientAuthenticator clientAuthenticator;
     private final ScopeValidator scopeValidator;
     private final TokenStore tokenStore;
 
+    /**
+     * Constructs a new ClientCredentialsGrantTypeHandler.
+     *
+     * @param clientAuthenticator An instance of the ClientAuthenticator.
+     * @param scopeValidator An instance of the ScopeValidator.
+     * @param tokenStore An instance of the TokenStore.
+     */
     @Inject
     public ClientCredentialsGrantTypeHandler(final ClientAuthenticator clientAuthenticator,
             final ScopeValidator scopeValidator, final TokenStore tokenStore) {
@@ -38,28 +51,40 @@ public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
         this.tokenStore = tokenStore;
     }
 
-    public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException, UnauthorizedClientException {
+    /**
+     * Handles the OAuth2 request for the Client Credentials grant type.
+     *
+     * @param accessTokenRequest {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws InvalidClientException If the client's registration could not be found.
+     * @throws UnauthorizedClientException If the client is not confidential.
+     */
+    public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException,
+            UnauthorizedClientException {
 
-        final ClientAuthentication clientAuthentication = accessTokenRequest.getClientAuthentication();
+        final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientAuthentication);
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientCredentials,
+                accessTokenRequest.getContext());
 
         if (!clientRegistration.isConfidential()) {
-            //TODO log
+            logger.error("Client is not confidential. Public clients cannot use the client credentials grant.");
             throw new UnauthorizedClientException("Public clients can't use client credentials grant.");
         }
 
         final Set<String> scope = accessTokenRequest.getScope();
 
-        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope);
+        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope,
+                accessTokenRequest.getContext());
 
         final AccessToken accessToken = tokenStore.createAccessToken(accessTokenRequest.getGrantType(),
-                clientRegistration.getClientId(), clientRegistration, clientAuthentication, validatedScope, null);
+                clientRegistration.getClientId(), clientRegistration, validatedScope, null,
+                accessTokenRequest.getContext());
 
-        scopeValidator.addAdditionDataToReturnFromTokenEndpoint(accessToken);
+        scopeValidator.addAdditionalDataToReturnFromTokenEndpoint(accessToken, accessTokenRequest.getContext());
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", Utils.join(validatedScope));
+            accessToken.add("scope", Utils.joinScope(validatedScope));
         }
 
         return accessToken;

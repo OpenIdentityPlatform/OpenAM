@@ -50,7 +50,7 @@ public class ScopeImplTest extends PowerMockTestCase {
         suppress(constructor(DefaultOAuthTokenStoreImpl.class));
         OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
-        scopeImpl = new ScopeImpl(store, id);
+        scopeImpl = new ScopeImpl(store, id, "");
 
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
@@ -74,7 +74,7 @@ public class ScopeImplTest extends PowerMockTestCase {
         suppress(constructor(DefaultOAuthTokenStoreImpl.class));
         OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
-        scopeImpl = new ScopeImpl(store, id);
+        scopeImpl = new ScopeImpl(store, id, "");
 
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
@@ -106,7 +106,7 @@ public class ScopeImplTest extends PowerMockTestCase {
         suppress(constructor(DefaultOAuthTokenStoreImpl.class));
         OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
-        scopeImpl = new ScopeImpl(store, id);
+        scopeImpl = new ScopeImpl(store, id, "");
 
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
@@ -143,7 +143,7 @@ public class ScopeImplTest extends PowerMockTestCase {
         OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
         CoreToken token = mock(CoreToken.class);
-        scopeImpl = new ScopeImpl(store, id);
+        scopeImpl = new ScopeImpl(store, id, "");
 
         //setup AMIdentity attribute return values
         Set idAttribute = new HashSet<String>();

@@ -34,7 +34,13 @@ import org.restlet.Request;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Implementation of a {@link ClientApplication}
@@ -718,10 +724,95 @@ public class ClientApplicationImpl implements ClientApplication, ClientRegistrat
     }
 
     public Set<String> getAllowedScopes() {
-        return getAllowedGrantScopes();
+        return parseScope(getAllowedGrantScopes());
+    }
+
+    public static final String SCOPE_LOCALE_DELIMITER = "|";
+    /**
+     * Scopes retrieved from the stored client can be in the form <scope>|<locale>|<description>. This method
+     * parses out the actual scope value
+     * @param maximumScope The allowed scopes for the client
+     * @return A set of strings containing the scope value only
+     */
+    private Set<String> parseScope(Set<String> maximumScope){
+        Set<String> cleanScopes = new TreeSet<String>();
+        for (String s : maximumScope){
+            int index = s.indexOf(SCOPE_LOCALE_DELIMITER);
+            if (index == -1){
+                cleanScopes.add(s);
+                continue;
+            }
+            cleanScopes.add(s.substring(0,index));
+        }
+
+        return cleanScopes;
     }
 
     public Set<String> getDefaultScopes() {
-        return getDefaultGrantScopes();
+        return parseScope(getDefaultGrantScopes());
+    }
+
+    @Override
+    public Map<String, String> getAllowedScopeDescriptions(final String locale) {
+        final String DELIMITER = "\\|";
+        final Map<String, String> scopeDescriptions = new LinkedHashMap<String, String>();
+        for (final String scopeDescription : getAllowedGrantScopes()) {
+            final String[] parts = scopeDescription.split(DELIMITER);
+            if (parts != null) {
+                //no description or locale
+                if (parts.length == 1){
+                    continue;
+                } else if (parts.length == 2){
+                    //no locale add description
+                    scopeDescriptions.put(parts[0], parts[1]);
+                } else if (parts.length == 3){
+                    //locale and description
+                    if (parts[1].equalsIgnoreCase(locale)){
+                        scopeDescriptions.put(parts[0], parts[2]);
+                    } else {
+                        //not the right locale
+                        continue;
+                    }
+                } else {
+//                        OAuth2Utils.DEBUG.warn("Scope was input into the client settings in the wrong format for scope: " + scopeDescription);
+                    continue;
+                }
+            }
+        }
+        return scopeDescriptions;
+    }
+
+    public Set<URI> getRedirectUris() {
+        return getRedirectionURIs();
+    }
+
+    public Set<String> getAllowedResponseTypes() {
+        return getResponseTypes();
+    }
+
+    public String getDisplayName(String locale) {
+        return getDisplayParameter(locale, getDisplayName());
+    }
+
+    private String getDisplayParameter(String locale, Set<String> displayNames) {
+        Set<String> names = new HashSet<String>();
+        String defaultName = null;
+        final String DELIMITER = "|";
+        for (String name : displayNames) {
+            if (name.contains(DELIMITER)) {
+                int locationOfDelimiter = name.indexOf(DELIMITER);
+                if (name.substring(0, locationOfDelimiter).equalsIgnoreCase(locale)) {
+                    return name.substring(locationOfDelimiter+1, name.length());
+                }
+            } else {
+                defaultName = name;
+            }
+        }
+
+        return defaultName;
+    }
+
+    public String getDisplayDescription(String locale) {
+        return getDisplayParameter(locale, getDisplayDescription());
     }
 }

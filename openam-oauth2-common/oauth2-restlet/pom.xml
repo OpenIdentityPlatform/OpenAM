@@ -36,7 +36,7 @@
     <artifactId>oauth2-restlet</artifactId>
 
     <name>OAuth2 Restlet Integration</name>
-    <description></description><!-- TODO -->
+    <description>OAuth2 Restlet library to provide HTTP integration</description>
 
     <properties>
         <skipTests>true</skipTests>

@@ -49,19 +49,10 @@ public abstract class AccessTokenExtractor<T extends CoreToken> {
     }
 
     /**
-     * Extracts the access token from the contents of an {@link Response}
-     * 
-     * @param response
-     *            the contents of the response
-     * @return OAuth2 access token
-     */
-    // public abstract T extract(Response response);
-
-    /**
      * Extracts the access token from the contents of an {@link Request}
      * <p/>
      * This method used to get the token from the redirect GET
-     * 
+     *
      * @return OAuth2 access token @ param request the contents of the request
      */
     // public abstract T extract(OAuth2Utils.ParameterLocation tokenLocation,

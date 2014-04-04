@@ -17,11 +17,16 @@
 package org.forgerock.oauth2.core;
 
 /**
- * Represents a Resource Owner.
+ * Interface representing a Resource Owner.
  *
  * @since 12.0.0
  */
 public interface ResourceOwner {
 
+    /**
+     * Gets the resource owner's identifier.
+     *
+     * @return The identifier.
+     */
     String getId();
 }

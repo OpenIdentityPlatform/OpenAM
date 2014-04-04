@@ -36,7 +36,7 @@
     <artifactId>openam-oauth2</artifactId>
 
     <name>OpenAM OAuth2</name>
-    <description></description><!-- TODO -->
+    <description>OpenAM OAuth2 integration</description>
 
     <properties>
         <skipTests>true</skipTests>
@@ -57,7 +57,6 @@
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
-
 
         <!-- Test Dependencies -->
         <dependency>

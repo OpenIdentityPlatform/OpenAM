@@ -27,14 +27,18 @@ package org.forgerock.restlet.ext.oauth2.flow;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenRequest;
 import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.ClientAuthentication;
-import org.forgerock.oauth2.core.InvalidClientException;
-import org.forgerock.oauth2.core.InvalidGrantException;
-import org.forgerock.oauth2.core.InvalidRequestException;
-import org.forgerock.oauth2.core.UnauthorizedClientException;
+import org.forgerock.oauth2.core.ClientCredentials;
+import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
 
@@ -54,12 +58,14 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
     private final ClientCredentialsExtractor credentialsExtractor;
     private final AccessTokenService accessTokenService;
+    private final ContextHandler contextHandler;
 
     @Inject
     public ClientCredentialsServerResource(final ClientCredentialsExtractor credentialsExtractor,
-            final AccessTokenService accessTokenService) {
+            final AccessTokenService accessTokenService, final ContextHandler contextHandler) {
         this.credentialsExtractor = credentialsExtractor;
         this.accessTokenService = accessTokenService;
+        this.contextHandler = contextHandler;
     }
 
     @Post                                            //TODO document that this param is required even though not used as otherwise Restlet complains about incorrect content-type
@@ -67,9 +73,9 @@ public class ClientCredentialsServerResource extends AbstractFlow {
 
         final String scope = getAttribute("scope");
 
-        final ClientAuthentication clientAuthentication;
+        final ClientCredentials clientCredentials;
         try {
-            clientAuthentication = credentialsExtractor.extract(getRequest());
+            clientCredentials = credentialsExtractor.extract(getRequest());
         } catch (InvalidRequestException e) {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "Client authentication failed");
         } catch (InvalidClientException e) {
@@ -77,8 +83,9 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         }
 
         final AccessTokenRequest accessTokenRequest = createClientCredentialsAccessTokenRequest()
-                .clientAuthentication(clientAuthentication)
+                .clientCredentials(clientCredentials)
                 .scope(scope)
+                .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
                 .build();
 
         try {
@@ -91,6 +98,13 @@ public class ClientCredentialsServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(getRequest(), e.getMessage());
         } catch (InvalidGrantException e) {
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidCodeException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(), e.getMessage());
+        } catch (OAuth2Exception e) {
+            //CATCH ALL
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
         }
     }
 }

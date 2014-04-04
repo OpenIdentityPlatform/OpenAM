@@ -24,6 +24,7 @@
 
 package org.forgerock.openam.oauth2.provider.impl;
 
+import com.google.inject.assistedinject.Assisted;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -35,9 +36,10 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.oauth2.core.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.oauth2.core.Scope;
 import org.restlet.Request;
 
+import javax.inject.Inject;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,15 +77,17 @@ public class ScopeImpl implements Scope {
 
     private OAuth2TokenStore store = null;
     private AMIdentity id = null;
+    private String realm;
 
-    public ScopeImpl(){
-        this.store = OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getTokenStore();
-        this.id = null;
+    @Inject
+    public ScopeImpl(final OAuth2TokenStore store, @Assisted("context") final Map<String, Object> context) {
+        this(store, null, (String) context.get("realm"));
     }
 
-    public ScopeImpl(OAuth2TokenStore store, AMIdentity id){
+    public ScopeImpl(OAuth2TokenStore store, AMIdentity id, final String realm) {
         this.store = store;
         this.id = id;
+        this.realm = realm;
     }
 
     /**

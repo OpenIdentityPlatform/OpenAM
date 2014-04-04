@@ -26,23 +26,48 @@ import java.util.Set;
 
 import static org.forgerock.oauth2.core.Utils.stringToSet;
 
+/**
+ * Encapsulates the data of a OAuth2 token.
+ *
+ * @since 11.0.0
+ */
 public class CoreToken extends JsonValue implements Token {
 
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("OAuth2CoreToken");
     private String id;
-    private static ResourceBundle rb = ResourceBundle.getBundle("OAuth2CoreToken");
 
-    public CoreToken(){
+    /**
+     * Constructs a new, empty, CoreToken.
+     */
+    public CoreToken() {
         super(new HashMap<String, Object>());
     }
 
-    public CoreToken(String id, JsonValue value){
+    /**
+     * Constructs a new CoreToken with the specified identifier and content.
+     *
+     * @param id The identifier.
+     * @param value The context of the token.
+     */
+    public CoreToken(final String id, final JsonValue value) {
         super(value);
         this.id = id;
-
     }
 
-    public CoreToken(String id, String userName, String realm, long expireTime, String tokenType, String tokenName,
-                     String nonce, String grantType){
+    /**
+     * Constructs a new CoreToken with the specified identifier and content.
+     *
+     * @param id The identifier.
+     * @param userName The username.
+     * @param realm The realm.
+     * @param expireTime The expire time.
+     * @param tokenType The token type.
+     * @param tokenName The token name.
+     * @param nonce The nonce.
+     * @param grantType The grant type.
+     */
+    public CoreToken(final String id, final String userName, final String realm, final long expireTime,
+            final String tokenType, final String tokenName, final String nonce, final String grantType) {
         super(new HashMap<String, Object>());
         setTokenID(id);
         setUserName(userName);
@@ -57,71 +82,118 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
-    public Map<String, Object> convertToMap(){
-        Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE));
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (System.currentTimeMillis() - getExpireTime())/1000);
+    @Override
+    public Map<String, Object> convertToMap() {
+        final Map<String, Object> tokenMap = new HashMap<String, Object>();
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE),
+                getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE));
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
+                (System.currentTimeMillis() - getExpireTime()) / 1000);
         return tokenMap;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Map<String, Object> getTokenInfo() {
-        Map<String, Object> tokenMap = new HashMap<String, Object>();
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME), (System.currentTimeMillis() - getExpireTime())/1000);
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
-        tokenMap.put(rb.getString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
+        final Map<String, Object> tokenMap = new HashMap<String, Object>();
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.TOKEN_TYPE), getTokenType());
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.EXPIRE_TIME),
+                (System.currentTimeMillis() - getExpireTime()) / 1000);
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.REALM), getRealm());
+        tokenMap.put(RESOURCE_BUNDLE.getString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenMap;
     }
 
-    protected void setTokenID(String id){
+    /**
+     * Sets the tokens identifier.
+     *
+     * @param id The identifier.
+     */
+    protected void setTokenID(final String id) {
         this.id = id;
         this.put(OAuth2Constants.CoreTokenParams.ID, stringToSet(id));
     }
 
-    protected void setUserName(String userName) {
+    /**
+     * Sets the user name.
+     *
+     * @param userName The username.
+     */
+    protected void setUserName(final String userName) {
         this.put(OAuth2Constants.CoreTokenParams.USERNAME, stringToSet(userName));
     }
 
-    protected void setRealm(String realm) {
-        if (realm == null || realm.isEmpty()){
+    /**
+     * Sets the realm.
+     *
+     * @param realm The realm.
+     */
+    protected void setRealm(final String realm) {
+        if (realm == null || realm.isEmpty()) {
             this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet("/"));
         } else {
             this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet(realm));
         }
     }
 
-    protected void setExpireTime(long expireTime) {
-        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf((expireTime * 1000) + System.currentTimeMillis())));
+    /**
+     * Sets the expire time.
+     *
+     * @param expireTime The expire time.
+     */
+    protected void setExpireTime(final long expireTime) {
+        this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME,
+                stringToSet(String.valueOf((expireTime * 1000) + System.currentTimeMillis())));
     }
 
-    protected void setNonce(String nonce){
+    /**
+     * Sets the nonce.
+     *
+     * @param nonce The nonce.
+     */
+    protected void setNonce(final String nonce) {
         this.put(OAuth2Constants.Custom.NONCE, stringToSet(nonce));
     }
 
-    protected void setTokenType(String tokenType) {
+    /**
+     * Sets the token type.
+     *
+     * @param tokenType The token type.
+     */
+    protected void setTokenType(final String tokenType) {
         this.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, stringToSet(tokenType));
     }
 
-    protected void setTokenName(String tokenName) {
+    /**
+     * Sets the token name.
+     *
+     * @param tokenName The token name.
+     */
+    protected void setTokenName(final String tokenName) {
         this.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, stringToSet(tokenName));
     }
 
-    protected void setGrantType(String grantType) {
+    /**
+     * Sets the grant type.
+     *
+     * @param grantType The grant type.
+     */
+    protected void setGrantType(final String grantType) {
         this.put(OAuth2Constants.Params.GRANT_TYPE, stringToSet(grantType));
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getTokenID(){
-        if (id != null){
+    @Override
+    public String getTokenID() {
+        if (id != null) {
             return id;
         } else {
-            JsonValue val = this.get(OAuth2Constants.CoreTokenParams.ID);
-            if (val != null){
+            final JsonValue val = this.get(OAuth2Constants.CoreTokenParams.ID);
+            if (val != null) {
                 id = val.asString();
                 return val.asString();
             }
@@ -129,32 +201,39 @@ public class CoreToken extends JsonValue implements Token {
         return null;
     }
 
-    public String getNonce(){
-        Set<String> value = this.getParameter(OAuth2Constants.Custom.NONCE);
-        if (value != null && !value.isEmpty()){
+    /**
+     * Sets the nonce.
+     *
+     * @return The nonce.
+     */
+    public String getNonce() {
+        final Set<String> value = this.getParameter(OAuth2Constants.Custom.NONCE);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
 
     /**
-     * Gets the parent token
-     * @return the id of the parent token
+     * Gets the parent token.
+     *
+     * @return The id of the parent token.
      */
-    public String getParent(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.PARENT);
-        if (value != null && !value.isEmpty()){
+    public String getParent() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.PARENT);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
 
     /**
-     * Gets the issued state for code type
-     * @return true or false if issued or not
+     * Gets the issued state for code type.
+     *
+     * @return true or false if issued or not.
      */
-    public boolean isIssued(){
-        if (this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null){
+    public boolean isIssued() {
+        if (this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null) {
             return Boolean.parseBoolean(this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next());
         } else {
             return false;
@@ -162,12 +241,13 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Gets the refresh token id
-     * @return id of refresh token
+     * Gets the refresh token id.
+     *
+     * @return The id of refresh token.
      */
-    public String getRefreshToken(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
-        if (value != null && !value.isEmpty()){
+    public String getRefreshToken() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
@@ -176,9 +256,10 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getUserID() {
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
-        if (value != null && !value.isEmpty()){
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
@@ -187,9 +268,10 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getRealm() {
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REALM);
-        if (value != null && !value.isEmpty()){
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REALM);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
@@ -198,9 +280,10 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getExpireTime() {
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
-        if (value != null && !value.isEmpty()){
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
+        if (value != null && !value.isEmpty()) {
             return Long.parseLong(value.iterator().next());
         }
         return 0;
@@ -209,17 +292,19 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
-    public Set<String> getScope(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
-        if (value != null && !value.isEmpty()){
+    @Override
+    public Set<String> getScope() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
+        if (value != null && !value.isEmpty()) {
             return value;
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isExpired() {
         return (System.currentTimeMillis() > getExpireTime());
     }
@@ -227,9 +312,10 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
-    public String getTokenType(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
-        if (value != null && !value.isEmpty()){
+    @Override
+    public String getTokenType() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
@@ -238,9 +324,10 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
-    public String getTokenName(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
-        if (value != null && !value.isEmpty()){
+    @Override
+    public String getTokenName() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
@@ -249,56 +336,70 @@ public class CoreToken extends JsonValue implements Token {
     /**
      * {@inheritDoc}
      */
-    public String getClientID(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
-        if (value != null && !value.isEmpty()){
+    @Override
+    public String getClientID() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
 
     /**
-     * Returns the redirect_uri associated token
+     * Returns the redirect_uri associated token.
      *
-     * @return The  redirect_uri associated with token
+     * @return The redirect_uri associated with token.
      */
-    public String getRedirectURI(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
-        if (value != null && !value.isEmpty()){
+    public String getRedirectURI() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
     /**
-     * Gets any parameter stored in the token
-     * @return
+     * Gets any parameter stored in the token.
+     *
+     * @param paramName The parameter name.
+     * @return The parameter stored in the token.
      */
-    public Set<String> getParameter(String paramName){
-        JsonValue param = get(paramName);
-        if (param != null){
-            return (Set<String>)param.getObject();
+    @SuppressWarnings("unchecked")
+    public Set<String> getParameter(String paramName) {
+        final JsonValue param = get(paramName);
+        if (param != null) {
+            return (Set<String>) param.getObject();
         }
         return null;
     }
 
-    public String getIssued(){
-        Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED);
-        if (value != null && !value.isEmpty()){
+    /**
+     * Whether the token has been issued.
+     *
+     * @return {@code true} if the token has been issued.
+     */
+    public String getIssued() {
+        final Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
 
-    public void setIssued(){
+    /**
+     * Sets the token as have being issued.
+     */
+    public void setIssued() {
         this.put(OAuth2Constants.CoreTokenParams.ISSUED, stringToSet("true"));
     }
 
     /**
-     * {@inheritDoc}
+     * Gets the grant type.
+     *
+     * @return The grant type.
      */
     public String getGrantType() {
-        Set<String> value = this.getParameter(OAuth2Constants.Params.GRANT_TYPE);
-        if (value != null && !value.isEmpty()){
+        final Set<String> value = this.getParameter(OAuth2Constants.Params.GRANT_TYPE);
+        if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;

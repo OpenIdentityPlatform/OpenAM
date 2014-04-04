@@ -16,20 +16,30 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.forgerock.json.fluent.JsonValue;
+import com.google.inject.Inject;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AccessTokenRequest;
+import org.forgerock.oauth2.core.AccessTokenService;
+import org.forgerock.oauth2.core.ClientCredentials;
+import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
 import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.restlet.data.Form;
 import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+
+import java.util.Map;
+
+import static org.forgerock.oauth2.core.AccessTokenRequest.createAuthorizationCodeAccessTokenRequest;
 
 /**
  * Implements the Authorization Code Flow
@@ -38,211 +48,66 @@ import org.restlet.resource.Post;
  */
 public class AuthorizationCodeServerResource extends AbstractFlow {
 
-    protected boolean decisionIsAllow = false;
-    protected Form formPost = null;
+    private final ClientCredentialsExtractor clientCredentialsExtractor;
+    private final AccessTokenService accessTokenService;
+    private final ContextHandler contextHandler;
 
-    @Post("form:json")
-    public Representation represent(Representation entity) {
-        // Validate the client
-        client = validateRemoteClient();
-        // Validate Redirect URI throw exception
-        sessionClient =
-                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2Constants.Params.REDIRECT_URI, String.class));
-        return token(entity);
+    @Inject
+    public AuthorizationCodeServerResource(final ClientCredentialsExtractor clientCredentialsExtractor,
+            final AccessTokenService accessTokenService, final ContextHandler contextHandler) {
+        this.clientCredentialsExtractor = clientCredentialsExtractor;
+        this.accessTokenService = accessTokenService;
+        this.contextHandler = contextHandler;
     }
 
+    @Post()
     public Representation token(Representation entity) {
-        /*
-         * The authorization server MUST:
-         * 
-         * o require client authentication for confidential clients or for any
-         * client that was issued client credentials (or with other
-         * authentication requirements), o authenticate the client if client
-         * authentication is included and ensure the authorization code was
-         * issued to the authenticated client, o verify that the authorization
-         * code is valid, and o ensure that the "redirect_uri" parameter is
-         * present if the "redirect_uri" parameter was included in the initial
-         * authorization request as described in Section 4.1.1, and if included
-         * ensure their values are identical.
-         */
 
-        // Find code
-        String code_p =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CODE, String.class);
-        CoreToken code = null;
+        final String code = getAttribute("code");
+        final String clientId = getAttribute("client_id");
+        final String redirectUri = getAttribute("redirect_uri");
+
+        final ClientCredentials clientCredentials;
+        try {
+            clientCredentials = clientCredentialsExtractor.extract(getRequest());
+        } catch (InvalidClientException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+        }
 
         try {
-            code = getTokenStore().readAuthorizationCode(code_p);
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
-            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        }
+            final AccessTokenRequest accessTokenRequest = createAuthorizationCodeAccessTokenRequest()
+                    .clientCredentials(clientCredentials)
+                    .code(code)
+                    .clientId(clientId)
+                    .redirectUri(redirectUri)
+                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
+                    .build();
 
-        String redirect_uri =
-                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.REDIRECT_URI, String.class);
+            final AccessToken accessToken = accessTokenService.requestAccessToken(accessTokenRequest);
 
-        if (null == code) {
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                    "Authorization code doesn't exist.");
-        } else if (code.isIssued()) {
-            invalidateTokens(code_p);
-            getTokenStore().deleteAuthorizationCode(code_p);
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
-            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        } else if (!code.getRedirectURI().equalsIgnoreCase(redirect_uri)) {
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code redirect URI doesn't match redirect_uri supplied");
-            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        } else if (!code.getClientID().equalsIgnoreCase(client.getClient().getClientId())) {
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code client_id doesn't match authorized client_id");
-            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-        } else {
-            if (code.isExpired()) {
-                OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code expired.");
-                throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
-                        "Authorization code expired.");
-            }
+            return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
 
-            // Generate Token
-            CoreToken token = createAccessToken(code);
-
-            //set access token issued
-            code.setIssued();
-            getTokenStore().updateAuthorizationCode(code_p, code);
-            Map<String, Object> response = token.convertToMap();
-
-            if (token != null && token.getRefreshToken() != null && !token.getRefreshToken().isEmpty()) {
-                response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
-            }
-
-            //execute post token creation pre return scope plugin for extra return data.
-            Map<String, String> data = new HashMap<String, String>();
-            String nonce = code.getNonce();
-            data.put(OAuth2Constants.Custom.NONCE, nonce);
-            data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
-                    OAuth2ConfigurationFactory.Holder.getConfigurationFactory().getSSOCookieName()));
-            response.putAll(executeExtraDataScopePlugin(data, token));
-
-            String scope_before =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
-
-            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
-
-            if (checkedScope != null && !checkedScope.isEmpty()) {
-                response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
-                        OAuth2Utils.getScopeDelimiter(getContext())));
-            }
-
-            return new JacksonRepresentation<Map>(response);
-        }
-    }
-
-    // Get the decision [allow,deny]
-    protected boolean getDecision(Representation entity) {
-        if (!decisionIsAllow) {
-            String decision =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
-                            String.class);
-            if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
-                decisionIsAllow = true;
-            } else {
-                OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Resource Owner did not authorize the request");
-                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
-                        "Resource Owner did not authorize the request");
-            }
-        }
-        return decisionIsAllow;
-    }
-
-    @Override
-    protected String[] getRequiredParameters() {
-        Set<String> required = null;
-        switch (endpointType) {
-            case AUTHORIZATION_ENDPOINT: {
-                return new String[]{OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID};
-            }
-            case TOKEN_ENDPOINT: {
-                return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.CODE,
-                        OAuth2Constants.Params.REDIRECT_URI};
-            }
-            default: {
-                return null;
-            }
-        }
-    }
-
-    protected CoreToken createRefreshToken(CoreToken code) {
-        return getTokenStore().createRefreshToken(code.getScope(),
-                OAuth2Utils.getRealm(getRequest()),
-                code.getUserID(),
-                sessionClient.getClientId(),
-                sessionClient.getRedirectUri(),
-                OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE);
-    }
-
-    /**
-     * This method is intended to be overridden by subclasses.
-     *
-     * @param code
-     * @return
-     * @throws OAuthProblemException
-     */
-    protected CoreToken createAccessToken(CoreToken code) {
-        if (checkIfRefreshTokenIsRequired(getRequest())) {
-            //create refresh token
-            CoreToken token = createRefreshToken(code);
-
-
-            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    code.getScope(), OAuth2Utils.getRealm(getRequest()), token.getUserID(),
-                    token.getClientID(), token.getRedirectURI(), code.getTokenID(), token.getTokenID(), getGrantType());
-        } else {
-            return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                    code.getScope(), OAuth2Utils.getRealm(getRequest()), code.getUserID(),
-                    code.getClientID(), code.getRedirectURI(), code.getTokenID(), null, getGrantType());
-        }
-    }
-
-    private void invalidateTokens(String id) {
-
-        JsonValue token = getTokenStore().queryForToken(id);
-
-        Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) token.getObject();
-
-        if (list != null && !list.isEmpty()) {
-            for (HashMap<String, Set<String>> entry : list) {
-                Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
-                Set<String> tokenNameSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
-                Set<String> refreshTokenSet = entry.get(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
-                String refreshTokenID = null;
-                if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()) {
-                    String entryID = idSet.iterator().next();
-                    String type = tokenNameSet.iterator().next();
-
-                    //if access_token delete the refresh token if it exists
-                    if (tokenNameSet.iterator().next().equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN) &&
-                            refreshTokenSet != null && !refreshTokenSet.isEmpty()) {
-                        refreshTokenID = refreshTokenSet.iterator().next();
-                        deleteToken(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
-                    }
-                    //delete the access_token
-                    invalidateTokens(entryID);
-                    deleteToken(type, entryID);
-                }
-            }
-        }
-    }
-
-    private void deleteToken(String type, String id) {
-        if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
-            getTokenStore().deleteAccessToken(id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)) {
-            getTokenStore().deleteRefreshToken(id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)) {
-            getTokenStore().deleteAuthorizationCode(id);
-        } else {
-            //shouldnt ever happen
+        } catch (IllegalArgumentException e) {
+            //TODO log
+//            OAuth2Utils.DEBUG.error("AbstractFlow::Invalid parameters in request: " + sb.toString());
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (InvalidClientException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+        } catch (InvalidGrantException e) {
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), e.getMessage());
+        } catch (InvalidCodeException e) {
+            throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(), e.getMessage());
+        } catch (InvalidRequestException e) {
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
+        } catch (UnauthorizedClientException e) {
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(getRequest(), e.getMessage());
+        } catch (RedirectUriMismatchException e) {
+            throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null, e.getMessage());
+        } catch (OAuth2Exception e) {
+            //CATCH ALL
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
         }
     }
 }

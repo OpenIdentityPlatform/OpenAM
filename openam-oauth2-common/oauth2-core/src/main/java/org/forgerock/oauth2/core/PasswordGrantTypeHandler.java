@@ -16,71 +16,91 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.inject.Inject;
 import java.util.Set;
 
 /**
- * Handles the OAuth2 Password Credential Grant flow for the OAuth2 Token endpoint.
+ * Handles the OAuth2 Password Credentials grant type for the 'token' endpoint.
  *
  * @since 12.0.0
  */
 public class PasswordGrantTypeHandler implements GrantTypeHandler {
 
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientAuthenticator clientAuthenticator;
-    private final ResourceOwnerAuthenticator resourceOwnerAuthenticator;
     private final ScopeValidator scopeValidator;
     private final TokenStore tokenStore;
-    private final OAuth2ProviderSettings providerSettings;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
+    /**
+     * Constructs a new PasswordGrantTypeHandler.
+     *
+     * @param clientAuthenticator An instance of the ClientAuthenticator.
+     * @param scopeValidator An instance of the ScopeValidator.
+     * @param tokenStore An instance of the TokenStore.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
+     */
     @Inject
-    public PasswordGrantTypeHandler(final ClientAuthenticator clientAuthenticator,
-            final ResourceOwnerAuthenticator resourceOwnerAuthenticator, final ScopeValidator scopeValidator,
-            final TokenStore tokenStore, final OAuth2ProviderSettings providerSettings) {
+    public PasswordGrantTypeHandler(final ClientAuthenticator clientAuthenticator, final ScopeValidator scopeValidator,
+            final TokenStore tokenStore, final OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.clientAuthenticator = clientAuthenticator;
-        this.resourceOwnerAuthenticator = resourceOwnerAuthenticator;
         this.scopeValidator = scopeValidator;
         this.tokenStore = tokenStore;
-        this.providerSettings = providerSettings;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
+    /**
+     * Handles the OAuth2 request for the Password Credentials grant type.
+     *
+     * @param accessTokenRequest {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws InvalidClientException If the client's registration could not be found.
+     * @throws InvalidGrantException If the resource owner could not be verified.
+     * @throws OAuth2Exception If the resource owner could not be authenticated.
+     */
     public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException,
-            UnauthorizedClientException, InvalidGrantException {
+            InvalidGrantException, OAuth2Exception {
 
-        final ClientAuthentication clientAuthentication = accessTokenRequest.getClientAuthentication();
+        final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientAuthentication);
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientCredentials,
+                accessTokenRequest.getContext());
 
-        final ResourceOwnerAuthentication resourceOwnerAuthentication =
-                accessTokenRequest.getResourceOwnerAuthentication();
-
-        final ResourceOwner resourceOwner = resourceOwnerAuthenticator.authenticate(resourceOwnerAuthentication);
+        final ResourceOwner resourceOwner = accessTokenRequest.getAuthenticationHandler().authenticate();
         if (resourceOwner == null) {
-            //TODO log
-//            OAuth2Utils.DEBUG.error("Unable to verify user: " + username);
+            logger.error("Unable to verify user");
             throw new InvalidGrantException();
         }
 
         final Set<String> scope = accessTokenRequest.getScope();
 
-        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope);
+        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope,
+                accessTokenRequest.getContext());
 
         RefreshToken refreshToken = null;
-        if (providerSettings.issueRefreshTokens()) {
+        if (providerSettingsFactory.getProviderSettings(accessTokenRequest.getContext()).issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(accessTokenRequest.getGrantType(), clientRegistration,
-                    clientAuthentication, resourceOwner, validatedScope);
+                    resourceOwner.getId(), null, validatedScope, accessTokenRequest.getContext());
         }
 
         final AccessToken accessToken = tokenStore.createAccessToken(accessTokenRequest.getGrantType(),
-                resourceOwner.getId(), clientRegistration, clientAuthentication, validatedScope, refreshToken);
+                resourceOwner.getId(), clientRegistration, validatedScope, refreshToken,
+                accessTokenRequest.getContext());
 
         if (refreshToken != null) {
             accessToken.add(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
         }
 
-        scopeValidator.addAdditionDataToReturnFromTokenEndpoint(accessToken);
+        scopeValidator.addAdditionalDataToReturnFromTokenEndpoint(accessToken, accessTokenRequest.getContext());
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", Utils.join(validatedScope));
+            accessToken.add("scope", Utils.joinScope(validatedScope));
         }
 
         return accessToken;

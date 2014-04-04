@@ -64,7 +64,7 @@
 
   <para>
    A scopes plugin implements the
-   <literal>org.forgerock.openam.oauth2.provider.Scope</literal> interface.
+   <literal>org.forgerock.oauth2.core.Scope</literal> interface.
    As described in the API specification, the
    <link xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
    xlink:show="new"><literal>Scope</literal> interface</link> has seven methods
@@ -122,11 +122,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.oauth2.core.Scope;
 
 /**
  * Custom scope providers implement the
- * {@link org.forgerock.openam.oauth2.provider.Scope} interface.
+ * {@link org.forgerock.oauth2.core.Scope} interface.
  *
  * This custom scope implementation does not support OpenID Connect 1.0,
  * and implements the default mechanisms for the three {@code scope*} methods.
