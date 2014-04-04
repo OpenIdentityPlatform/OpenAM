@@ -13,7 +13,6 @@
  *
  * Copyright 2013-2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.core.guice;
 
 import com.google.inject.AbstractModule;
@@ -32,7 +31,6 @@ import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.entitlement.EntitlementConfiguration;
-import com.sun.identity.entitlement.opensso.EntitlementService;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -67,6 +65,7 @@ import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
+import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
@@ -82,9 +81,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
- *
- * @author apforrest
- * @author robert.wapshott@forgerock.com
  */
 @GuiceModule
 public class CoreGuiceModule extends AbstractModule {
@@ -206,6 +202,11 @@ public class CoreGuiceModule extends AbstractModule {
         return esf.createScheduledService(1);
     }
 
+    @Provides @Singleton @Named(CoreTokenConstants.CTS_LOCK_FACTORY)
+    LockFactory<String> getCTSLockFactory() {
+        return new LockFactory<String>();
+    }
+
     // Implementation exists to capture the generic type of the PrivilegedAction.
     private static class AdminTokenType extends TypeLiteral<PrivilegedAction<SSOToken>> {
     }
@@ -280,5 +281,4 @@ public class CoreGuiceModule extends AbstractModule {
             }
         }
     }
-
 }

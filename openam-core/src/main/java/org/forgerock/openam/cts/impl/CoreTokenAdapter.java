@@ -1,6 +1,4 @@
-/**
- * Copyright 2013-2014 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS
  */
 package org.forgerock.openam.cts.impl;
 
@@ -43,8 +43,6 @@ import java.text.MessageFormat;
  *
  * Note: This class uses Token as its main means of adding data to and from LDAP and therefore is intended
  * for use by the Core Token Service.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenAdapter {
     // Injected
@@ -58,6 +56,9 @@ public class CoreTokenAdapter {
      * @param connectionFactory Required for connections to LDAP.
      * @param queryFactory Required for query instances.
      * @param ldapAdapter Required for all LDAP operations.
+     * @param observer Required for configuration change notifications.
+     * @param listener Required for configuration change notifications.
+     * @param debug Required for debug logging
      */
     @Inject
     public CoreTokenAdapter(ConnectionFactory connectionFactory, QueryFactory queryFactory,
@@ -254,7 +255,7 @@ public class CoreTokenAdapter {
     /**
      * Deletes a token from the store based on its token id.
      * @param tokenId Non null token id.
-     * @throws CoreTokenException If there was an unexpected error during deletion.
+     * @throws DeleteFailedException If there was an error while trying to remove the token with the given Id.
      */
     public void delete(String tokenId) throws DeleteFailedException {
         Connection connection = null;

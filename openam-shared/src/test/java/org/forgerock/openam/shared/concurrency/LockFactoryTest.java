@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,12 +10,13 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
-package com.sun.identity.policy;
-
-import org.testng.annotations.Test;
+package org.forgerock.openam.shared.concurrency;
 
 import java.util.concurrent.locks.Lock;
+import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -48,8 +47,8 @@ public class LockFactoryTest {
         LockFactory<String> stringLockFactory = new LockFactory<String>();
 
         // New string to force new string instances.
-        Lock lockA = stringLockFactory.acquireLock(new String("xyz"));
-        Lock lockB = stringLockFactory.acquireLock(new String("xyz"));
+        Lock lockA = stringLockFactory.acquireLock("xyz");
+        Lock lockB = stringLockFactory.acquireLock("xyz");
 
         assertThat(lockA).isEqualTo(lockB);
 
@@ -99,5 +98,4 @@ public class LockFactoryTest {
         LockFactory<String> lockFactory = new LockFactory<String>();
         lockFactory.acquireLock(null);
     }
-
 }
