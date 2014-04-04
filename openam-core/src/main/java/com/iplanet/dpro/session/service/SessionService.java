@@ -134,6 +134,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -560,13 +562,15 @@ public class SessionService {
         }
         checkSession(session, masterSid);
         // attempt to reuse the token if restriction is the same
-        SessionID restrictedSid = session
-                .getRestrictedTokenForRestriction(restriction);
+        SessionID restrictedSid = session.getRestrictedTokenForRestriction(restriction);
         if (restrictedSid == null) {
-            restrictedSid = new SessionID(SessionID.makeRelatedSessionID(
-                    generateEncryptedID(), session.getID()));
-            session.addRestrictedToken(restrictedSid, restriction);
-            restrictedTokenMap.put(restrictedSid, session.getID());
+            restrictedSid = new SessionID(SessionID.makeRelatedSessionID(generateEncryptedID(), session.getID()));
+            SessionID previousValue = session.addRestrictedToken(restrictedSid, restriction);
+            if (previousValue == null) {
+                restrictedTokenMap.put(restrictedSid, session.getID());
+            } else {
+                restrictedSid = previousValue;
+            }
         }
         return restrictedSid.toString();
     }
@@ -795,11 +799,11 @@ public class SessionService {
     }
 
     private void removeRestrictedTokens(InternalSession session) {
-        if (session == null)
+        if (session == null) {
             return;
-        Object[] tokens = session.getRestrictedTokens();
-        for (int i = 0; i < tokens.length; ++i) {
-            restrictedTokenMap.remove(tokens[i]);
+        }
+        for (SessionID restrictedSessionID : session.getRestrictedTokens()) {
+            restrictedTokenMap.remove(restrictedSessionID);
         }
     }
 
@@ -999,13 +1003,9 @@ public class SessionService {
         }
         if (checkRestriction) {
             try {
-                TokenRestriction restriction = session
-                        .getRestrictionForToken(token);
-                if (restriction != null
-                        && !restriction.isSatisfied(RestrictedTokenContext
-                        .getCurrent())) {
-                    throw new SessionException(SessionBundle.rbName,
-                            "restrictionViolation", null);
+                TokenRestriction restriction = session.getRestrictionForToken(token);
+                if (restriction != null && !restriction.isSatisfied(RestrictedTokenContext.getCurrent())) {
+                    throw new SessionException(SessionBundle.rbName, "restrictionViolation", null);
                 }
             } catch (SessionException se) {
                 throw se;
@@ -1180,23 +1180,24 @@ public class SessionService {
      * @param url
      * @param sid     sid to be used with notification (master or restricted)
      */
-    private void addInternalSessionListener(InternalSession session, String url,
-                                            SessionID sid) {
+    private void addInternalSessionListener(InternalSession session, String url, SessionID sid) {
         if (session != null) {
-            if (!sid.equals(session.getID())
-                    && session.getRestrictionForToken(sid) == null) {
+            if (!sid.equals(session.getID()) && session.getRestrictionForToken(sid) == null) {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
-            Set<SessionID> sids = urls.get(url);
+            ConcurrentMap<String, Set<SessionID>> urls = session.getSessionEventURLs();
 
+            Set<SessionID> sids = urls.get(url);
             if (sids == null) {
-                sids = new HashSet<SessionID>();
+                sids = Collections.newSetFromMap(new ConcurrentHashMap<SessionID, Boolean>());
+                Set<SessionID> previousValue = urls.putIfAbsent(url, sids);
+                if (previousValue != null) {
+                    sids = previousValue;
+                }
             }
 
             sids.add(sid);
-            urls.put(url, sids);
             session.updateForFailover();
         }
     }
@@ -2423,28 +2424,26 @@ public class SessionService {
 
             // CHECK THE INDVIDUAL URL LIST
             if (!urls.isEmpty()) {
-                synchronized (urls) {
-                    for (Map.Entry<String, Set<SessionID>> entry : urls.entrySet()) {
-                        // ONLY SEND ONCE TO ONE LOCATION
-                        String url = entry.getKey();
+                for (Map.Entry<String, Set<SessionID>> entry : urls.entrySet()) {
+                    // ONLY SEND ONCE TO ONE LOCATION
+                    String url = entry.getKey();
 
-                        try {
-                            URL parsedUrl = new URL(url);
+                    try {
+                        URL parsedUrl = new URL(url);
 
-                            if (sessionService.isLocalSessionService(parsedUrl)) {
-                                for (SessionID sid : entry.getValue()) {
-                                    SessionInfo info = makeSessionInfo(session, sid);
-                                    SessionNotification sn = new SessionNotification(
-                                            info, eventType, System.currentTimeMillis());
-                                    SessionNotificationHandler.handler.processNotification(sn);
-                                }
-                            } else {
-                                remoteURLExists = true;
+                        if (sessionService.isLocalSessionService(parsedUrl)) {
+                            for (SessionID sid : entry.getValue()) {
+                                SessionInfo info = makeSessionInfo(session, sid);
+                                SessionNotification sn = new SessionNotification(
+                                        info, eventType, System.currentTimeMillis());
+                                SessionNotificationHandler.handler.processNotification(sn);
                             }
-                        } catch (Exception e) {
-                            sessionService.sessionDebug.error(
-                                "Local Individual notification to " + url, e);
+                        } else {
+                            remoteURLExists = true;
                         }
+                    } catch (Exception e) {
+                        sessionService.sessionDebug.error(
+                            "Local Individual notification to " + url, e);
                     }
                 }
             }
@@ -2486,29 +2485,27 @@ public class SessionService {
             }
             // CHECK THE INDIVIDUAL URLS LIST
             if (!urls.isEmpty()) {
-                synchronized (urls) {
-                    for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
-                        String url = (String) entry.getKey();
-                        // ONLY SEND ONCE TO ONE LOCATION
+                for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
+                    String url = entry.getKey();
+                    // ONLY SEND ONCE TO ONE LOCATION
 
-                        try {
-                            URL parsedUrl = new URL(url);
+                    try {
+                        URL parsedUrl = new URL(url);
 
-                            if (!sessionService.isLocalSessionService(parsedUrl)) {
-                                for (SessionID sid : entry.getValue()) {
-                                    SessionInfo info = makeSessionInfo(session, sid);
-                                    SessionNotification sn = new SessionNotification(
-                                        info, eventType, System.currentTimeMillis());
-                                    Notification not = new Notification(sn.toXMLString());
-                                    NotificationSet set = new NotificationSet(SESSION_SERVICE);
-                                    set.addNotification(not);
-                                    PLLServer.send(parsedUrl, set);
-                                }
+                        if (!sessionService.isLocalSessionService(parsedUrl)) {
+                            for (SessionID sid : entry.getValue()) {
+                                SessionInfo info = makeSessionInfo(session, sid);
+                                SessionNotification sn = new SessionNotification(
+                                    info, eventType, System.currentTimeMillis());
+                                Notification not = new Notification(sn.toXMLString());
+                                NotificationSet set = new NotificationSet(SESSION_SERVICE);
+                                set.addNotification(not);
+                                PLLServer.send(parsedUrl, set);
                             }
-                        } catch (Exception e) {
-                            sessionService.sessionDebug.error(
-                                "Remote Individual notification to " + url, e);
                         }
+                    } catch (Exception e) {
+                        sessionService.sessionDebug.error(
+                            "Remote Individual notification to " + url, e);
                     }
                 }
             }
@@ -2921,9 +2918,7 @@ public class SessionService {
             } else {
                 InternalSession sess = decrypt(sessionState);
 
-                if (sess == null
-                        || (sess.getRestrictionForToken(sid) == null && !sess
-                        .getID().equals(sid))) {
+                if (sess == null || (sess.getRestrictionForToken(sid) == null && !sess.getID().equals(sid))) {
                     return null;
                 }
 
@@ -2991,9 +2986,9 @@ public class SessionService {
         if (sessionHandle != null) {
             sessionHandleTable.put(sessionHandle, sess);
         }
-        Object[] tokens = sess.getRestrictedTokens();
-        for (int i = 0; i < tokens.length; ++i) {
-            restrictedTokenMap.put(tokens[i], sess.getID());
+
+        for (SessionID restrictedSessionID : sess.getRestrictedTokens()) {
+            restrictedTokenMap.put(restrictedSessionID, sess.getID());
         }
     }
 
@@ -3613,7 +3608,4 @@ public class SessionService {
         }
 
     }
-
-
-
 }

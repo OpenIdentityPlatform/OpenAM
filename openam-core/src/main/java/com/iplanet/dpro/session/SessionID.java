@@ -298,9 +298,11 @@ public class SessionID implements Serializable {
     }
 
     /**
-     * Returns the encrypted session string.
+     * Returns the encrypted session string. By doing so it also makes it possible to use this string representation
+     * for serializing/deserializing SessionID objects for session failover.
      * 
      * @return An encrypted session string.
+     * @see org.forgerock.openam.cts.utils.JSONSerialisation
      */
     public String toString() {
         return encryptedString;

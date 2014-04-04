@@ -27,12 +27,11 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.Misc;
-import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -56,12 +55,11 @@ import java.util.StringTokenizer;
  * {@link TokenRestriction} interface and handles the restriction of
  * the <code>DN</code> or <code>IPAddress</code>
  */
-
 public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
 
     static final long serialVersionUID = 8352965917649287133L;
     private String dn;
-    private static Debug debug;
+    private static final Debug DEBUG = Debug.getInstance("amSession");
 
     private Set<InetAddress> addressList = new HashSet<InetAddress>();
 
@@ -77,22 +75,18 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
       * with value "true"
       */
     private static boolean dnRestrictionOnly;
+    private static volatile boolean isInitialized = false;
 
     private static final String SESSION_DNRESTRICTIONONLY_ATTR_NAME =
         "iplanet-am-session-dnrestrictiononly";
 
     private static final String AM_SESSION_SERVICE = "iPlanetAMSessionService";
 
-   static {
-       debug = Debug.getInstance("amSession");
-       dnRestrictionOnly = getDNRestrictionOnly();
-       if (debug.messageEnabled()) {
-           debug.message(
-               "DNOrIPAddressListTokenRestriction"
-             +": fetching value for dnRestrictionOnly:"+
-              dnRestrictionOnly);
-       }
-   }
+    /**
+     * Default constructor for InternalSession deserialization.
+     */
+    public DNOrIPAddressListTokenRestriction() {
+    }
 
    /**
     * Constructs <code>DNOrIPAddressListTokenRestriction</code> object based on
@@ -118,7 +112,7 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         }
         this.dn = buf.toString();
 
-        if (!dnRestrictionOnly) {
+        if (!isDNRestrictionOnly()) {
             boolean hostmatch = false;
             Iterator<String> it = hostNames.iterator();
             while (it.hasNext()) {
@@ -127,10 +121,8 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
                     addressList.add(InetAddress.getByName(val));
                     hostmatch = true;
                 } catch (UnknownHostException e) {
-                    if (SessionService.sessionDebug.warningEnabled()) {
-                        SessionService.sessionDebug.warning(
-                                "DNOrIPAddressListTokenRestriction.constructor: "
-                                + "failure resolving host " + val);
+                    if (DEBUG.warningEnabled()) {
+                        DEBUG.warning("DNOrIPAddressListTokenRestriction.constructor: failure resolving host " + val);
                     }
                     if (!it.hasNext() && !hostmatch) {
                         throw new UnknownHostException(val);
@@ -144,15 +136,15 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
             buf.append(hostName).append('\n');
         }
         asString = buf.toString();
-        if (debug.messageEnabled()) {
-            debug.message("DNOrIPAddressListTokenRestriction.new " + asString);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("DNOrIPAddressListTokenRestriction.new " + asString);
         }
         asString = Hash.hash(asString);
         if (asString == null){
             throw new IllegalStateException("DNOrIPAddressListTokenRestriction.hashcode error creating SHA-1 hash, hash was null");
         }
-        if (debug.messageEnabled()) {
-            debug.message("DNOrIPAddressListTokenRestriction.hashCode " + asString);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("DNOrIPAddressListTokenRestriction.hashCode " + asString);
         }
     }
 
@@ -192,10 +184,8 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
         if (context == null) {
             return false;
         } else if (context instanceof SSOToken) {
-            if (SessionService.sessionDebug.messageEnabled()) {
-                SessionService.sessionDebug.message(
-                   "DNOrIPAddressListTokenRestriction"
-                   +".isSatisfied(): context is instance of SSOToken");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("DNOrIPAddressListTokenRestriction.isSatisfied(): context is instance of SSOToken");
             }
             SSOToken usedBy = (SSOToken) context;
             String udn = Misc.canonicalize(usedBy.getPrincipal().getName());
@@ -206,39 +196,32 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
                 }
             }
 
-            if (debug.messageEnabled()) {
-                debug.message("DNOrIPAddressListTokenRestriction:isSatisfied SSOToken of " + udn + " does not match with restriction " + dn);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("DNOrIPAddressListTokenRestriction:isSatisfied SSOToken of " + udn
+                        + " does not match with restriction " + dn);
             }
             return false;
         } else if (context instanceof InetAddress) {
-            if (dnRestrictionOnly) {
+            if (isDNRestrictionOnly()) {
                 //returning true here lessens the security, but truth to be told
                 //sessionservice endpoint should not be accessible externally
-                if (SessionService.sessionDebug.warningEnabled()) {
-                    SessionService.sessionDebug.warning(
-                            "DNOrIPAddressListTokenRestriction.isSatisfied():"
-                            + "dnRestrictionOnly is true, but IP has been received "
-                            + "as the restriction context, this could be a "
-                            + "suspicious activity. Received InetAddress is: "
-                            + ((InetAddress) context).toString());
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("DNOrIPAddressListTokenRestriction.isSatisfied():dnRestrictionOnly is true, but IP "
+                            + "has been received as the restriction context, this could be a suspicious activity. "
+                            + "Received InetAddress is: " + ((InetAddress) context).toString());
                 }
                 return true;
             } else {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message(
-                         "DNOrIPAddressListTokenRestriction"
-                        +".isSatisfied(): dnRestrictionOnly is false");
-                    SessionService.sessionDebug.message(
-                         "DNOrIPAddressListTokenRestriction"
-                        +".isSatisfied(): IP based"
-                        +" restriction received and accepted");
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("DNOrIPAddressListTokenRestriction.isSatisfied(): dnRestrictionOnly is false");
+                    DEBUG.message("DNOrIPAddressListTokenRestriction.isSatisfied(): IP based restriction received and "
+                            + "accepted");
                 }
                 return addressList.contains((InetAddress) context);
             }
         } else {
-            if (SessionService.sessionDebug.warningEnabled()) {
-                SessionService.sessionDebug.warning("Unknown context type:"
-                        + context);
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("Unknown context type:" + context);
             }
             return false;
         }
@@ -267,50 +250,38 @@ public class DNOrIPAddressListTokenRestriction implements TokenRestriction {
     * Gets the admin token for checking the dn restriciton property
     * @return admin the admin {@link SSOToken}
     */
-    static SSOToken getAdminToken() {
+    private static SSOToken getAdminToken() {
         try {
-            return (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+            return AccessController.doPrivileged(AdminTokenAction.getInstance());
         } catch (Exception e) {
-            SessionService.sessionDebug.error(
-                    "Failed to get the admin token for "
-                    + "dnRestrictionOnly property checking.", e);
+            DEBUG.error("Failed to get the admin token for dnRestrictionOnly property checking.", e);
         }
         return null;
     }
 
-    static SessionService getSS() {
-        SessionService ss = SessionService.getSessionService();
-        if (ss == null) {
-            SessionService.sessionDebug.error(
-                "DNOrIPAddressListTokenRestriction: "
-                    + " Failed to get the session service instance");
-        }
-        return ss;
-    }
-
     /**
-     * Gets the  value of the "iplanet-am-session-dnrestrictiononly"
-     * session global attribute.
+     * Gets the  value of the "iplanet-am-session-dnrestrictiononly" session global attribute.
+     * NOTE: It may be possible that this setting gets initialized more than once, but that should be fine as it
+     * shouldn't be a too expensive operation.
      *
-     * @return whether the DN restriction only is enabled
+     * @return Whether the DN restriction only is enabled.
      */
-    private static boolean getDNRestrictionOnly() {
-        boolean dnRestrictionOnly = false;
-        try {
-            ServiceSchemaManager ssm = new ServiceSchemaManager(
-                    AM_SESSION_SERVICE, getAdminToken());
-            ServiceSchema schema = ssm.getGlobalSchema();
-            Map attrs = schema.getAttributeDefaults();
-            dnRestrictionOnly = Boolean.valueOf(
-                    CollectionHelper.getMapAttr(
-                    attrs, SESSION_DNRESTRICTIONONLY_ATTR_NAME, "false")).booleanValue();
-        } catch (Exception e) {
-            if (SessionService.sessionDebug.messageEnabled()) {
-                SessionService.sessionDebug.message(
-                        "Failed to get the default dnRestrictionOnly"
-                        + "setting. => Set  dnRestrictionOnly to "
-                        + "false", e);
+    private static boolean isDNRestrictionOnly() {
+        if (!isInitialized) {
+            try {
+                ServiceSchemaManager ssm = new ServiceSchemaManager(AM_SESSION_SERVICE, getAdminToken());
+                ServiceSchema schema = ssm.getGlobalSchema();
+                Map attrs = schema.getAttributeDefaults();
+                dnRestrictionOnly = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs,
+                        SESSION_DNRESTRICTIONONLY_ATTR_NAME, "false"));
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("DN restriction enabled: " + dnRestrictionOnly);
+                }
+                isInitialized = true;
+            } catch (Exception e) {
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Failed to get the default dnRestrictionOnly setting. => Setting to false", e);
+                }
             }
         }
         return dnRestrictionOnly;
