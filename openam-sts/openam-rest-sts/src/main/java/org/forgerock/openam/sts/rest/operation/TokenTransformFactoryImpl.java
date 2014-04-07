@@ -73,6 +73,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler;
+    private final UrlConstituentCatenator urlConstituentCatenator;
     private final Logger logger;
 
     @Inject
@@ -87,6 +88,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
             AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler,
+            UrlConstituentCatenator urlConstituentCatenator,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -99,6 +101,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.openIdConnectIdTokenAuthenticationHandler = openIdConnectIdTokenAuthenticationHandler;
+        this.urlConstituentCatenator = urlConstituentCatenator;
         this.logger = logger;
     }
 
@@ -161,8 +164,9 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         if (invalidateInterimAMSession) {
             try {
                 return new AMSAMLTokenProvider(new SAMLTokenProvider(),
-                        new AMSessionInvalidatorImpl(amDeploymentUrl,
-                                jsonRestRoot, realm, restLogoutUriElement, amSessionCookieName, logger), threadLocalAMTokenCache, logger);
+                        new AMSessionInvalidatorImpl(amDeploymentUrl,jsonRestRoot, realm, restLogoutUriElement,
+                                amSessionCookieName, urlConstituentCatenator, logger),
+                        threadLocalAMTokenCache, logger);
             } catch (URISyntaxException e) {
                 throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
             }

@@ -1,3 +1,18 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
+ */
 package org.forgerock.openam.authentication.modules.oidc;
 
 import com.google.inject.AbstractModule;
@@ -69,7 +84,7 @@ public class OpenIdResolverCacheImplTest {
 
     @Test(expectedExceptions = IllegalStateException.class)
     public void createInvalidResolver() throws MalformedURLException, FailedToLoadJWKException {
-        cache.createResolver("issuer_string_that_does_not_match_resolver", OpenIdConnect.CRYPTO_CONTEXT_TYPE_CONFIG_URL,
+        cache.createResolver("issuer_string_that_does_not_match_resolver", OpenIdConnectConfig.CRYPTO_CONTEXT_TYPE_CONFIG_URL,
                 FAUX_CONIFIG_URL_STRING, new URL(FAUX_CONIFIG_URL_STRING));
 
     }
@@ -94,17 +109,17 @@ public class OpenIdResolverCacheImplTest {
     }
 
     private OpenIdResolver createConfigResolver() throws MalformedURLException, FailedToLoadJWKException {
-        return cache.createResolver(FAUX_ISSUER, OpenIdConnect.CRYPTO_CONTEXT_TYPE_CONFIG_URL, FAUX_CONIFIG_URL_STRING,
+        return cache.createResolver(FAUX_ISSUER, OpenIdConnectConfig.CRYPTO_CONTEXT_TYPE_CONFIG_URL, FAUX_CONIFIG_URL_STRING,
                 new URL(FAUX_CONIFIG_URL_STRING));
     }
 
     private OpenIdResolver createJwtResolver() throws MalformedURLException, FailedToLoadJWKException {
-        return cache.createResolver(FAUX_ISSUER, OpenIdConnect.CRYPTO_CONTEXT_TYPE_JWK_URL, FAUX_JWK_URL_STRING,
+        return cache.createResolver(FAUX_ISSUER, OpenIdConnectConfig.CRYPTO_CONTEXT_TYPE_JWK_URL, FAUX_JWK_URL_STRING,
                 new URL(FAUX_JWK_URL_STRING));
 
     }
     private OpenIdResolver createSecretResolver() throws FailedToLoadJWKException {
-        return cache.createResolver(FAUX_ISSUER, OpenIdConnect.CRYPTO_CONTEXT_TYPE_CLIENT_SECRET, FAUX_CLIENT_SECRET,
+        return cache.createResolver(FAUX_ISSUER, OpenIdConnectConfig.CRYPTO_CONTEXT_TYPE_CLIENT_SECRET, FAUX_CLIENT_SECRET,
                 null);
     }
 

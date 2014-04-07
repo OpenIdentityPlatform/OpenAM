@@ -117,4 +117,12 @@ public class HttpURLConnectionManager {
         conn.setConnectTimeout(CONNECT_TIMEOUT);
         return conn;
     }
+
+    public static int getReadTimeout() {
+        return READ_TIMEOUT;
+    }
+
+    public static int getConnectTimeout() {
+        return CONNECT_TIMEOUT;
+    }
 }

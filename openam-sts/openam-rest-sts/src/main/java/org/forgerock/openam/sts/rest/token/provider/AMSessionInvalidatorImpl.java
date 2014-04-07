@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.rest.token.provider;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.restlet.engine.header.Header;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
@@ -41,30 +42,25 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                                     String realm,
                                     String restLogoutUriElement,
                                     String amSessionCookieName,
+                                    UrlConstituentCatenator urlConstituentCatenator,
                                     Logger logger) throws URISyntaxException {
-        this.logoutUri = constituteLogoutUri(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement);
+        this.logoutUri = constituteLogoutUri(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement, urlConstituentCatenator);
         this.amSessionCookieName = amSessionCookieName;
         this.logger = logger;
     }
 
-    /*
-    As in the AMTokenValidator, the constitution of a proper URL on the basis of constituents should be a first class concern,
-    represented by an interface, and injected by Guice. Then the logic to insure proper trailing '/' values, etc, can
-    be centralized in a single place.
-     */
     private URI constituteLogoutUri(String amDeploymentUrl,
                                     String jsonRestRoot,
                                     String realm,
-                                    String restLogoutUriElement) throws URISyntaxException {
-        StringBuilder sb = new StringBuilder(amDeploymentUrl);
-        sb.append(jsonRestRoot);
+                                    String restLogoutUriElement,
+                                    UrlConstituentCatenator urlConstituentCatenator) throws URISyntaxException {
+        StringBuilder sb = new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRestRoot));
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
-            sb.append(realm);
+            sb = urlConstituentCatenator.catentateUrlConstituent(sb, realm);
         }
-        sb.append(restLogoutUriElement);
+        sb = urlConstituentCatenator.catentateUrlConstituent(sb, restLogoutUriElement);
         return new URI(sb.toString());
     }
-
 
     @Override
     public void invalidateAMSession(String sessionId) throws TokenCreationException {
@@ -76,11 +72,13 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
             resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
         }
         headers.set(amSessionCookieName, sessionId);
+        headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         try {
             resource.post(null);
         } catch (ResourceException e) {
             throw new TokenCreationException(e.getStatus().getCode(),
-                    "Exception caught in AM Session invalidation invocation: " + e.getMessage(), e);
+                    "Exception caught in AM Session invalidation invocation against url: " + logoutUri +
+                            ". Exception: " + e.getMessage(), e);
         }
     }
 }

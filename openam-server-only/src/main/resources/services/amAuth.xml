@@ -69,6 +69,7 @@
                         <Value>org.forgerock.openam.authentication.modules.adaptive.Adaptive</Value>
                         <Value>org.forgerock.openam.authentication.modules.oauth2.OAuth</Value>
                         <Value>org.forgerock.openam.authentication.modules.oath.OATH</Value>
+                        <Value>org.forgerock.openam.authentication.modules.oidc.OpenIdConnect</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-ldap-connection-pool-size"

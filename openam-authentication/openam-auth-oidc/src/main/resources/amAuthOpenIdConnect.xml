@@ -66,6 +66,24 @@
                         <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
+                                 type="single" syntax="string" i18nKey="princial_mapper_class"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="local_to_jwt_attr_mappings">
+                    <DefaultValues>
+                        <Value>uid=sub</Value>
+                        <Value>mail=email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="RequiredValueValidator"
@@ -106,6 +124,24 @@
                                      validator="RequiredValueValidator">
                         <DefaultValues>
                             <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
+                                     type="single" syntax="string" i18nKey="princial_mapper_class"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-local-to-jwt-attribute-mappings"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="local_to_jwt_attr_mappings">
+                        <DefaultValues>
+                            <Value>uid=sub</Value>
+                            <Value>mail=email</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

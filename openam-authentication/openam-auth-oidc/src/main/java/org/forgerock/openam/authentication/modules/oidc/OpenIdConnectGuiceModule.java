@@ -19,6 +19,7 @@ package org.forgerock.openam.authentication.modules.oidc;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.sun.identity.common.HttpURLConnectionManager;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolverFactory;
 
@@ -26,15 +27,6 @@ import javax.inject.Singleton;
 
 @GuiceModule
 public class OpenIdConnectGuiceModule extends AbstractModule {
-    /*
-    TODO: this information can't come from a AMLoginModule configuration, as it is global to all LoginModules, and this
-     module will be initialized upon startup, when @GuiceModule instances are processed, but is there a generic OpenAM
-     property relating to http connect/read timeouts, available during OpenAM startup, which could be leveraged to
-     configure these values?
-     */
-    static final int RESOLVER_FACTORY_CONNECT_TIMEOUT_MILLIS = 5000;
-    static final int RESOLVER_FACTORY_READ_TIMEOUT_MILLIS = 5000;
-
     @Override
     protected void configure() {
         bind(OpenIdResolverCache.class).to(OpenIdResolverCacheImpl.class).in(Scopes.SINGLETON);
@@ -48,6 +40,6 @@ public class OpenIdConnectGuiceModule extends AbstractModule {
     @Provides
     @Singleton
     OpenIdResolverFactory getResolverFactory() {
-        return new OpenIdResolverFactory(RESOLVER_FACTORY_READ_TIMEOUT_MILLIS, RESOLVER_FACTORY_CONNECT_TIMEOUT_MILLIS);
+        return new OpenIdResolverFactory(HttpURLConnectionManager.getReadTimeout(), HttpURLConnectionManager.getConnectTimeout());
     }
 }
