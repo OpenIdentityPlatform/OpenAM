@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -99,7 +99,7 @@ public class IdentityServicesHandler extends HttpServlet {
         super.init();
         // determine if the provider is correct..
         try {
-            // get the security provider from the params..
+            // get the security provider from the params.
             String def = PROVIDER_DEFAULT.toString();
             String provider = getInitParameter(PARAM_PROVIDER, def);
             this.factory = IdentityServicesFactory.getInstance(provider);
@@ -108,8 +108,7 @@ public class IdentityServicesHandler extends HttpServlet {
             throw new ServletException(e);
         }
         
-        lbCookieName = AuthClientUtils.getlbCookieName();
-        lbCookieValue = AuthClientUtils.getlbCookieValue();
+
     }
 
     // =======================================================================
@@ -123,7 +122,11 @@ public class IdentityServicesHandler extends HttpServlet {
      *      HttpServletResponse response)
      */
     protected void service(HttpServletRequest request,
-        HttpServletResponse response) throws ServletException, IOException {
+        HttpServletResponse response) throws ServletException, IOException {    
+        // check/init LB cookie names
+        if (lbCookieName == null || lbCookieValue == null) {
+            initLbCookieSettings();
+        }
         //set headers before executing the method, so they are set even if exception is being thrown
         response.addHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
         response.addHeader("Pragma", "no-cache");
@@ -152,6 +155,11 @@ public class IdentityServicesHandler extends HttpServlet {
     {
         return (val == null) ? true :
             ((val.trim().length() == 0) ? true : false);
+    }
+    
+    private void initLbCookieSettings() {
+        lbCookieName = AuthClientUtils.getlbCookieName();
+        lbCookieValue = AuthClientUtils.getlbCookieValue();
     }
     
     private void setLbCookie(HttpServletRequest request, HttpServletResponse response) {
