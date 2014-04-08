@@ -104,7 +104,7 @@ public class RealmRouterConnectionFactory {
              */
             public void actionCollection(ServerContext context, ActionRequest request,
                     ResultHandler<JsonValue> handler) {
-                provider.actionCollection(new RealmContext(context, realm), request, handler);
+                provider.actionCollection(realmContext(context, realm), request, handler);
             }
 
             /**
@@ -112,14 +112,14 @@ public class RealmRouterConnectionFactory {
              */
             public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
                     ResultHandler<JsonValue> handler) {
-                provider.actionInstance(new RealmContext(context, realm), resourceId, request, handler);
+                provider.actionInstance(realmContext(context, realm), resourceId, request, handler);
             }
 
             /**
              * {@inheritDoc}
              */
             public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-                provider.createInstance(new RealmContext(context, realm), request, handler);
+                provider.createInstance(realmContext(context, realm), request, handler);
             }
 
             /**
@@ -127,7 +127,7 @@ public class RealmRouterConnectionFactory {
              */
             public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                     ResultHandler<Resource> handler) {
-                provider.deleteInstance(new RealmContext(context, realm), resourceId, request, handler);
+                provider.deleteInstance(realmContext(context, realm), resourceId, request, handler);
             }
 
             /**
@@ -135,14 +135,14 @@ public class RealmRouterConnectionFactory {
              */
             public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                     ResultHandler<Resource> handler) {
-                provider.patchInstance(new RealmContext(context, realm), resourceId, request, handler);
+                provider.patchInstance(realmContext(context, realm), resourceId, request, handler);
             }
 
             /**
              * {@inheritDoc}
              */
             public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-                provider.queryCollection(new RealmContext(context, realm), request, handler);
+                provider.queryCollection(realmContext(context, realm), request, handler);
             }
 
             /**
@@ -150,7 +150,7 @@ public class RealmRouterConnectionFactory {
              */
             public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                     ResultHandler<Resource> handler) {
-                provider.readInstance(new RealmContext(context, realm), resourceId, request, handler);
+                provider.readInstance(realmContext(context, realm), resourceId, request, handler);
             }
 
             /**
@@ -158,9 +158,21 @@ public class RealmRouterConnectionFactory {
              */
             public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                     ResultHandler<Resource> handler) {
-                provider.updateInstance(new RealmContext(context, realm), resourceId, request, handler);
+                provider.updateInstance(realmContext(context, realm), resourceId, request, handler);
             }
         };
+    }
+
+    /**
+     * Creates a {@link RealmContext} wrapper around the given parent context and realm name. Also wraps the parent
+     * context in an {@link SSOTokenContext} to provide convenient access to the caller subject if required.
+     *
+     * @param parent the parent realm.
+     * @param realm the realm name.
+     * @return an appropriate realm context.
+     */
+    private RealmContext realmContext(ServerContext parent, String realm) {
+        return new RealmContext(new SSOTokenContext(parent), realm);
     }
 
     /**
@@ -177,28 +189,28 @@ public class RealmRouterConnectionFactory {
              * {@inheritDoc}
              */
             public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-                provider.actionInstance(new RealmContext(context, realm), request, handler);
+                provider.actionInstance(realmContext(context, realm), request, handler);
             }
 
             /**
              * {@inheritDoc}
              */
             public void patchInstance(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-                provider.patchInstance(new RealmContext(context, realm), request, handler);
+                provider.patchInstance(realmContext(context, realm), request, handler);
             }
 
             /**
              * {@inheritDoc}
              */
             public void readInstance(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
-                provider.readInstance(new RealmContext(context, realm), request, handler);
+                provider.readInstance(realmContext(context, realm), request, handler);
             }
 
             /**
              * {@inheritDoc}
              */
             public void updateInstance(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-                provider.updateInstance(new RealmContext(context, realm), request, handler);
+                provider.updateInstance(realmContext(context, realm), request, handler);
             }
         };
     }
