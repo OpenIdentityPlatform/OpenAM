@@ -24,12 +24,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest;
+
 /**
  * Handles the OAuth2 Client Credentials grant type for the 'token' endpoint.
  *
  * @since 12.0.0
  */
-public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
+public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler<ClientCredentialsAccessTokenRequest> {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientAuthenticator clientAuthenticator;
@@ -59,8 +61,8 @@ public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
      * @throws InvalidClientException If the client's registration could not be found.
      * @throws UnauthorizedClientException If the client is not confidential.
      */
-    public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException,
-            UnauthorizedClientException {
+    public AccessToken handle(final ClientCredentialsAccessTokenRequest accessTokenRequest)
+            throws InvalidClientException, UnauthorizedClientException {
 
         final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
 

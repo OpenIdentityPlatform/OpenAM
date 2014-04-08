@@ -24,6 +24,9 @@
 
 package org.forgerock.openam.oauth2;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.reslet.GuicedRestlet;
@@ -35,7 +38,7 @@ import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenVerifier;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Authenticator;
 import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
-import org.forgerock.restlet.ext.oauth2.flow.AuthorizeServerResource;
+import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
 import org.forgerock.restlet.ext.oauth2.provider.ClientAuthenticationFilter;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2FlowFinder;
 import org.forgerock.restlet.ext.oauth2.provider.ValidationServerResource;
@@ -46,10 +49,10 @@ import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.routing.Router;
-import org.restlet.security.Verifier;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.Map;
 
 /**
  * Sets up the OAuth 2 provider end points and their handlers
@@ -108,6 +111,7 @@ public class OAuth2Application extends Application {
         return root;
     }
 
+    public static final String OAUTH2_RESTLET_ENDPOINTS_INJECT_KEY = "OAUTH2_RESTLET_ENDPOINTS";
     /**
      * Setups OAuth2 paths and handlers
      * 
@@ -117,11 +121,14 @@ public class OAuth2Application extends Application {
         Context childContext = getContext().createChildContext();
         Router router = new Router(childContext);
 
+        final Map<String, Class<? extends AbstractFlow>> endpointClasses =
+                InjectorHolder.getInstance(Key.get(new TypeLiteral<Map<String, Class<? extends AbstractFlow>>>() {},
+                Names.named(OAUTH2_RESTLET_ENDPOINTS_INJECT_KEY)));
+
         // Define Authorization Endpoint
         OAuth2FlowFinder finder =
-                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT)
-                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
-                        .supportPassword();
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT,
+                        endpointClasses);
         router.attach("/authorize", finder);
 
         //TODO client authentication needs to be done in the grant code
@@ -132,9 +139,7 @@ public class OAuth2Application extends Application {
 
         // Define Token Endpoint
         finder =
-                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.TOKEN_ENDPOINT)
-                        .supportAuthorizationCode().supportClientCredentials().supportImplicit()
-                        .supportPassword().supportSAML20();
+                new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.TOKEN_ENDPOINT, endpointClasses);
         filter.setNext(finder);
 
         return router;

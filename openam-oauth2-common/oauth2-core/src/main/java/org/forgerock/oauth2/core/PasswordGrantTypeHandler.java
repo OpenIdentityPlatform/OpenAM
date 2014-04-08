@@ -25,12 +25,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest;
+
 /**
  * Handles the OAuth2 Password Credentials grant type for the 'token' endpoint.
  *
  * @since 12.0.0
  */
-public class PasswordGrantTypeHandler implements GrantTypeHandler {
+public class PasswordGrantTypeHandler implements GrantTypeHandler<PasswordCredentialsAccessTokenRequest> {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientAuthenticator clientAuthenticator;
@@ -64,8 +66,8 @@ public class PasswordGrantTypeHandler implements GrantTypeHandler {
      * @throws InvalidGrantException If the resource owner could not be verified.
      * @throws OAuth2Exception If the resource owner could not be authenticated.
      */
-    public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException,
-            InvalidGrantException, OAuth2Exception {
+    public AccessToken handle(final PasswordCredentialsAccessTokenRequest accessTokenRequest)
+            throws InvalidClientException, InvalidGrantException, OAuth2Exception {
 
         final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
 

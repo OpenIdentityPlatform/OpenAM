@@ -14,23 +14,13 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.oauth2.core;
+package org.forgerock.openam.oauth2.saml2.core;
 
-import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
+import org.forgerock.oauth2.core.GrantType;
 
 /**
- * Implementations of this interface will implement the logic for a specific OAuth2 Grant Type, to gain an Access Token.
- *
  * @since 12.0.0
  */
-public interface GrantTypeHandler<T extends AccessTokenRequest> {
-
-    /**
-     * Handles the OAuth2 request for the implemented grant type.
-     *
-     * @param accessTokenRequest The AccessTokenRequest instance.
-     * @return An AccessToken.
-     * @throws OAuth2Exception If a problem occurs when processing the OAuth2 request.
-     */
-    AccessToken handle(final T accessTokenRequest) throws OAuth2Exception;
+public enum Saml2GrantType implements GrantType {
+    SAML2;
 }

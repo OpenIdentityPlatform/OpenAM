@@ -20,12 +20,15 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequestBuilder;
-import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequestBuilder;
-import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequestBuilder;
-import static org.forgerock.oauth2.core.AccessTokenRequest.createAuthorizationCodeAccessTokenRequest;
-import static org.forgerock.oauth2.core.AccessTokenRequest.createClientCredentialsAccessTokenRequest;
-import static org.forgerock.oauth2.core.AccessTokenRequest.createPasswordAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest.AuthorizationCodeAccessTokenRequestBuilder;
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest.ClientCredentialsAccessTokenRequestBuilder;
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest.PasswordCredentialsAccessTokenRequestBuilder;
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest.createAuthorizationCodeAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest.createClientCredentialsAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest.createPasswordAccessTokenRequest;
 import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.AUTHORIZATION_CODE;
 import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.CLIENT_CREDENTIALS;
 import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.PASSWORD;
@@ -232,7 +235,7 @@ public class AccessTokenRequestTest {
         builder.context(Collections.<String, Object>emptyMap());
 
         //When
-        final AccessTokenRequest accessTokenRequest = builder.build();
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = builder.build();
 
         //Then
         assertEquals(accessTokenRequest.getGrantType(), AUTHORIZATION_CODE);
@@ -485,7 +488,7 @@ public class AccessTokenRequestTest {
         builder.context(Collections.<String, Object>emptyMap());
 
         //When
-        final AccessTokenRequest accessTokenRequest = builder.build();
+        final PasswordCredentialsAccessTokenRequest accessTokenRequest = builder.build();
 
         //Then
         assertEquals(accessTokenRequest.getGrantType(), PASSWORD);
@@ -600,7 +603,7 @@ public class AccessTokenRequestTest {
         builder.context(Collections.<String, Object>emptyMap());
 
         //When
-        final AccessTokenRequest accessTokenRequest = builder.build();
+        final ClientCredentialsAccessTokenRequest accessTokenRequest = builder.build();
 
         //Then
         assertEquals(accessTokenRequest.getGrantType(), CLIENT_CREDENTIALS);

@@ -27,6 +27,7 @@ import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.ContextHandler;
 import org.forgerock.oauth2.core.GrantType;
 import org.forgerock.oauth2.core.GrantTypeHandler;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.PasswordGrantTypeHandler;
 import org.forgerock.oauth2.core.Scope;
@@ -43,9 +44,16 @@ import org.forgerock.openam.noauth2.wrappers.OpenAMResourceOwnerAuthorizationCod
 import org.forgerock.openam.noauth2.wrappers.OpenAMResourceOwnerPasswordCredentialsExtractor;
 import org.forgerock.openam.noauth2.wrappers.ScopeValidatorImpl;
 import org.forgerock.openam.noauth2.wrappers.TokenStoreImpl;
+import org.forgerock.openam.oauth2.OAuth2Application;
 import org.forgerock.openam.oauth2.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.impl.ScopeImpl;
+import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
+import org.forgerock.restlet.ext.oauth2.flow.AuthorizationCodeServerResource;
+import org.forgerock.restlet.ext.oauth2.flow.ClientCredentialsServerResource;
+import org.forgerock.restlet.ext.oauth2.flow.PasswordServerResource;
+import org.forgerock.restlet.ext.oauth2.flow.RefreshTokenServerResource;
+import org.forgerock.openam.oauth2.saml2.restlet.Saml2BearerServerResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,6 +62,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.forgerock.oauth2.core.AccessTokenService.GRANT_TYPE_HANDLERS_INJECT_KEY;
+import static org.forgerock.openam.oauth2.OAuth2Application.OAUTH2_RESTLET_ENDPOINTS_INJECT_KEY;
 
 /**
  * Guice Module that defines the bindings for the OAuth2 implementation.
@@ -95,5 +104,21 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.put(GrantType.DefaultGrantType.AUTHORIZATION_CODE, authorizationCodeGrantTypeHandler);
 
         return grantTypeHandlers;
+    }
+
+    @Provides
+    @Singleton
+    @Named(OAUTH2_RESTLET_ENDPOINTS_INJECT_KEY)
+    Map<String, Class<? extends AbstractFlow>> getOAuth2EndpointClasses() {
+        final Map<String, Class<? extends AbstractFlow>> endpointClasses =
+                new HashMap<String, Class<? extends AbstractFlow>>();  //TODO need to use Map Binder so can be extended?...
+
+        endpointClasses.put(OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE, AuthorizationCodeServerResource.class);
+        endpointClasses.put(OAuth2Constants.TokeEndpoint.REFRESH_TOKEN, RefreshTokenServerResource.class);
+        endpointClasses.put(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS, ClientCredentialsServerResource.class);
+        endpointClasses.put(OAuth2Constants.TokeEndpoint.PASSWORD, PasswordServerResource.class);
+        endpointClasses.put(OAuth2Constants.TokeEndpoint.SAML2_BEARER, Saml2BearerServerResource.class);                   //TODO does the contents of this map need to be configurable?...
+
+        return endpointClasses;
     }
 }

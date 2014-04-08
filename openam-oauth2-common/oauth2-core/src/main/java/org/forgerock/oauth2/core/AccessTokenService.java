@@ -83,6 +83,7 @@ public class AccessTokenService {
      * @throws OAuth2Exception If a problem occurs during the handling of the Access Token request. See specific
      * GrantTypeHandler for the more detailed exceptions they throw.
      */
+    @SuppressWarnings("unchecked")
     public AccessToken requestAccessToken(final AccessTokenRequest accessTokenRequest) throws OAuth2Exception {
         final GrantTypeHandler grantTypeHandler = grantTypeHandlers.get(accessTokenRequest.getGrantType());
         if (grantTypeHandler == null) {

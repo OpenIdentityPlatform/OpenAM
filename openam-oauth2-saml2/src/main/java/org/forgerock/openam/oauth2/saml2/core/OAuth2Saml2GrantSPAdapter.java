@@ -1,41 +1,39 @@
 /*
- * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
  *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions copyright [year] [name of copyright owner]"
- *
- * Portions copyright 2012-2013 ForgeRock AC
+ * Copyright 2012-2014 ForgeRock AS.
  */
-package org.forgerock.restlet.ext.oauth2.flow;
+
+package org.forgerock.openam.oauth2.saml2.core;
 
 import com.sun.identity.saml2.assertion.impl.AssertionImpl;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.protocol.*;
+import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.LogoutRequest;
+import com.sun.identity.saml2.protocol.LogoutResponse;
+import com.sun.identity.saml2.protocol.ManageNameIDRequest;
+import com.sun.identity.saml2.protocol.ManageNameIDResponse;
+import com.sun.identity.saml2.protocol.Response;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.util.encode.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {

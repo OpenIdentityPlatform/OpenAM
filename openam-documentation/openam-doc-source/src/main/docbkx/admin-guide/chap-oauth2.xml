@@ -1283,7 +1283,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      <para>OpenAM as relying party must request that assertions are signed, must
      verify the signatures on assertions, must correctly handle name IDs
      from the issuer, and must use the built-in
-     <literal>org.forgerock.restlet.ext.oauth2.flow.OAuth2Saml2GrantSPAdapter</literal>
+     <literal>org.forgerock.openam.oauth2.saml2.core.OAuth2Saml2GrantSPAdapter</literal>
      adapter class in the service provider configuration to POST assertions
      to the OAuth 2.0 authorization service.</para>
     </listitem>
@@ -1374,7 +1374,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      <step>
       <para>In Federation &gt; Entity Providers &gt; <replaceable>SP
       name</replaceable> &gt; Assertion Processing &gt; Adapter, add
-      <literal>org.forgerock.restlet.ext.oauth2.flow.OAuth2Saml2GrantSPAdapter</literal>,
+      <literal>org.forgerock.openam.oauth2.saml2.core.OAuth2Saml2GrantSPAdapter</literal>,
       and then Save your work.</para>
 
       <para>This is the adapter class that POSTs the SAML 2.0 assertion to

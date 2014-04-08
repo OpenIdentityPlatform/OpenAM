@@ -53,7 +53,7 @@ public final class Utils {
      * @param scope The response type string.
      * @return A {@code Set<String>} of the scope.
      */
-    static Set<String> splitScope(final String scope) {
+    public static Set<String> splitScope(final String scope) {
         if (scope == null) {
             return new HashSet<String>();
         }

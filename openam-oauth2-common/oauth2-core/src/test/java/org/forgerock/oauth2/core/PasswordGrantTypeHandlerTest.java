@@ -25,9 +25,15 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
 import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.AUTHORIZATION_CODE;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.anyMapOf;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest;
 
 /**
  * @since 12.0.0
@@ -57,7 +63,8 @@ public class PasswordGrantTypeHandlerTest {
     public void shouldFailToCreateAccessTokenWhenResourceOwnerCannotBeFound() throws OAuth2Exception {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final PasswordCredentialsAccessTokenRequest accessTokenRequest =
+                mock(PasswordCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthenticationHandler authenticationHandler = mock(AuthenticationHandler.class);
@@ -78,7 +85,8 @@ public class PasswordGrantTypeHandlerTest {
     public void shouldCreateAccessTokenWithoutRefreshToken() throws OAuth2Exception {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final PasswordCredentialsAccessTokenRequest accessTokenRequest =
+                mock(PasswordCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthenticationHandler authenticationHandler = mock(AuthenticationHandler.class);
@@ -119,7 +127,8 @@ public class PasswordGrantTypeHandlerTest {
     public void shouldCreateAccessTokenWithoutRefreshTokenAndScope() throws OAuth2Exception {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final PasswordCredentialsAccessTokenRequest accessTokenRequest =
+                mock(PasswordCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthenticationHandler authenticationHandler = mock(AuthenticationHandler.class);
@@ -160,7 +169,8 @@ public class PasswordGrantTypeHandlerTest {
     public void shouldCreateAccessTokenWithRefreshTokenAndScope() throws OAuth2Exception {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final PasswordCredentialsAccessTokenRequest accessTokenRequest =
+                mock(PasswordCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthenticationHandler authenticationHandler = mock(AuthenticationHandler.class);

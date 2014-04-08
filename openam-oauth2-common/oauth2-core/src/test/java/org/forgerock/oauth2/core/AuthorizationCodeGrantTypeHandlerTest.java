@@ -40,6 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest;
 
 /**
  * @since 12.0.0
@@ -75,7 +76,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
 
@@ -101,7 +102,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -113,7 +114,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(accessTokenRequest.getCode()).willReturn("CODE");
         given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
         given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(accessTokenRequest.getScope()).willReturn(scope);
+        given(authorizationCode.getScope()).willReturn(scope);
         given(authorizationCode.isIssued()).willReturn(true);
 
         //When
@@ -134,7 +135,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -146,7 +147,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(accessTokenRequest.getCode()).willReturn("CODE");
         given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
         given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(accessTokenRequest.getScope()).willReturn(scope);
+        given(authorizationCode.getScope()).willReturn(scope);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("OTHER_REDIRECT_URI");
 
@@ -162,7 +163,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -174,7 +175,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(accessTokenRequest.getCode()).willReturn("CODE");
         given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
         given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(accessTokenRequest.getScope()).willReturn(scope);
+        given(authorizationCode.getScope()).willReturn(scope);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("OTHER_CLIENT_ID");
@@ -192,7 +193,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -204,7 +205,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(accessTokenRequest.getCode()).willReturn("CODE");
         given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
         given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(accessTokenRequest.getScope()).willReturn(scope);
+        given(authorizationCode.getScope()).willReturn(scope);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -228,7 +229,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -284,7 +285,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException, InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
@@ -340,7 +341,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
             UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException, InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);

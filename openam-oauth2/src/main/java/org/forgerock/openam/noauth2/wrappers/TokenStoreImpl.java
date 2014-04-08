@@ -45,8 +45,8 @@ public class TokenStoreImpl implements TokenStore {
     }
 
     public AccessToken createAccessToken(final GrantType grantType, final String resourceOwnerId,
-            final ClientRegistration clientRegistration,
-            final Set<String> scope, final RefreshToken refreshToken, final Map<String, Object> context) {
+            final ClientRegistration clientRegistration, final Set<String> scope, final RefreshToken refreshToken,
+            final Map<String, Object> context) {
 
         final String clientId = clientRegistration.getClientId();
         final String realm = (String) context.get("realm");

@@ -287,6 +287,7 @@
         <module>openam-annotations</module>
         <module>openam-sts</module>
         <module>openam-slf4j</module>
+        <module>openam-oauth2-saml2</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -626,6 +627,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-oauth2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-oauth2-saml2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

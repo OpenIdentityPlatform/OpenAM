@@ -45,7 +45,7 @@ import org.restlet.resource.Post;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.createClientCredentialsAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest.createClientCredentialsAccessTokenRequest;
 
 /**
  * Implements the Client Credentials Flow

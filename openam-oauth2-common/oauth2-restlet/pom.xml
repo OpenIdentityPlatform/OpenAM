@@ -48,16 +48,19 @@
             <artifactId>oauth2-core</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-guice-core</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
         </dependency>
 
         <dependency>

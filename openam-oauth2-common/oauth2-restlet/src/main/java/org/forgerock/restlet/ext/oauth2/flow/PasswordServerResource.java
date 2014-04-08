@@ -21,15 +21,15 @@ import org.forgerock.oauth2.core.AccessTokenRequest;
 import org.forgerock.oauth2.core.AccessTokenService;
 import org.forgerock.oauth2.core.ClientCredentials;
 import org.forgerock.oauth2.core.ContextHandler;
+import org.forgerock.oauth2.core.ResourceOwnerPasswordAuthenticationHandler;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
-import org.forgerock.oauth2.core.ResourceOwnerPasswordAuthenticationHandler;
-import org.forgerock.oauth2.reslet.ResourceOwnerPasswordCredentialsExtractor;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
+import org.forgerock.oauth2.reslet.ResourceOwnerPasswordCredentialsExtractor;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
@@ -39,7 +39,7 @@ import org.restlet.resource.Post;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.createPasswordAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.PasswordCredentialsAccessTokenRequest.createPasswordAccessTokenRequest;
 
 /**
  * Implements the Resource Owner Password Credentials Flow
@@ -79,14 +79,8 @@ public class PasswordServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         }
 
-        final ResourceOwnerPasswordAuthenticationHandler authenticationHandler;
-//        try {
-            authenticationHandler = resourceOwnerCredentialsExtractor.extract(getRequest());
-//        } catch (InvalidClientException e) {
-//                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-//        } catch (InvalidRequestException e) {
-//                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
-//        }
+        final ResourceOwnerPasswordAuthenticationHandler authenticationHandler =
+                resourceOwnerCredentialsExtractor.extract(getRequest());
 
         try {
             final AccessTokenRequest accessTokenRequest = createPasswordAccessTokenRequest()

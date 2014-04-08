@@ -18,6 +18,7 @@ package org.forgerock.openam.noauth2.wrappers;
 
 import org.forgerock.oauth2.core.ContextHandler;
 import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
+import org.forgerock.openam.oauth2.OAuth2Utils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +50,24 @@ public class OpenAMOAuth2ContextHandler implements ContextHandler {
             }
         }
 
+        context.put("deploymentURL", getDeploymentURL(request)); //TODO constant up
+
         return context;
+    }
+
+    private String getDeploymentURL(final HttpServletRequest request) {
+        final String uri = request.getRequestURI();
+        String deploymentURI = uri;
+        final int firstSlashIndex = uri.indexOf("/");
+        final int secondSlashIndex = uri.indexOf("/", firstSlashIndex + 1);
+        if (secondSlashIndex != -1) {
+            deploymentURI = uri.substring(0, secondSlashIndex);
+        }
+        final StringBuffer sb = new StringBuffer(100);
+        sb.append(request.getScheme()).append("://")
+                .append(request.getServerName()).append(":")
+                .append(request.getServerPort())
+                .append(deploymentURI);
+        return sb.toString();
     }
 }

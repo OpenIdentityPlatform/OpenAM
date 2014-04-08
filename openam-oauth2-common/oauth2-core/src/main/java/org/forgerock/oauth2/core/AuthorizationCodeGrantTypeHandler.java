@@ -27,12 +27,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest;
+
 /**
  * Handles the OAuth2 Authorization Code grant type for the 'token' endpoint.
  *
  * @since 12.0.0
  */
-public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
+public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler<AuthorizationCodeAccessTokenRequest> {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
@@ -78,8 +80,8 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
      * @throws InvalidCodeException If the authorization code has expired.
      * @throws RedirectUriMismatchException If the redirect URI is not valid.
      */
-    public AccessToken handle(final AccessTokenRequest accessTokenRequest) throws InvalidClientException,
-            InvalidGrantException, InvalidRequestException, InvalidCodeException,
+    public AccessToken handle(final AuthorizationCodeAccessTokenRequest accessTokenRequest)
+            throws InvalidClientException, InvalidGrantException, InvalidRequestException, InvalidCodeException,
             RedirectUriMismatchException {
 
         final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();

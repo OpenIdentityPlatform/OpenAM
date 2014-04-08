@@ -30,16 +30,17 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
-import org.forgerock.openam.oauth2.OAuth2ConfigurationFactory;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.createAuthorizationCodeAccessTokenRequest;
+import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest.createAuthorizationCodeAccessTokenRequest;
 
 /**
  * Implements the Authorization Code Flow
@@ -48,6 +49,7 @@ import static org.forgerock.oauth2.core.AccessTokenRequest.createAuthorizationCo
  */
 public class AuthorizationCodeServerResource extends AbstractFlow {
 
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientCredentialsExtractor clientCredentialsExtractor;
     private final AccessTokenService accessTokenService;
     private final ContextHandler contextHandler;
@@ -60,7 +62,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         this.contextHandler = contextHandler;
     }
 
-    @Post()
+    @Post
     public Representation token(Representation entity) {
 
         final String code = getAttribute("code");
@@ -90,8 +92,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
 
         } catch (IllegalArgumentException e) {
-            //TODO log
-//            OAuth2Utils.DEBUG.error("AbstractFlow::Invalid parameters in request: " + sb.toString());
+            logger.error("Invalid parameters in request, " + e.getMessage());
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
         } catch (InvalidClientException e) {
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());

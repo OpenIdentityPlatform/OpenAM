@@ -51,19 +51,21 @@ public class OAuth2FlowFinder extends Finder {
 
     private final OAuth2Constants.EndpointType endpointType;
 
+    private final Map<String, Class<? extends AbstractFlow>> endpointClasses;
+
     /**
      * Constructor.
      * 
      * @param context
      *            The context.
      */
-    public OAuth2FlowFinder(Context context, OAuth2Constants.EndpointType endpointType) {
+    public OAuth2FlowFinder(Context context, OAuth2Constants.EndpointType endpointType,
+            final Map<String, Class<? extends AbstractFlow>> endpointClasses) {
         super(context, ErrorServerResource.class);
         this.endpointType = endpointType;
+        this.endpointClasses =
+                new ConcurrentHashMap<String, Class<? extends AbstractFlow>>(endpointClasses);
     }
-
-    private final Map<String, Class<? extends AbstractFlow>> flowServerResources =
-            new ConcurrentHashMap<String, Class<? extends AbstractFlow>>(6);
 
     /**
      * Creates a new instance of the {@link ServerResource} subclass designated
@@ -123,7 +125,7 @@ public class OAuth2FlowFinder extends Finder {
         if (propertyName != null) {
             String type = OAuth2Utils.getRequestParameter(request, propertyName, String.class);
             if (type instanceof String && !type.isEmpty()) {
-                targetClass = flowServerResources.get(type);
+                targetClass = endpointClasses.get(type);
                 if (targetClass == null) {
                     targetClass = ErrorServerResource.class;
 
@@ -149,35 +151,4 @@ public class OAuth2FlowFinder extends Finder {
         }
         return targetClass;
     }
-
-    public OAuth2FlowFinder supportAuthorizationCode() {
-        flowServerResources.put(OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE,
-                AuthorizationCodeServerResource.class);
-        flowServerResources
-                .put(OAuth2Constants.TokeEndpoint.REFRESH_TOKEN, RefreshTokenServerResource.class);
-        return this;
-    }
-
-    public OAuth2FlowFinder supportImplicit() {
-        return this;
-    }
-
-    public OAuth2FlowFinder supportClientCredentials() {
-        flowServerResources.put(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS,
-                ClientCredentialsServerResource.class);
-        return this;
-    }
-
-    public OAuth2FlowFinder supportPassword() {
-        flowServerResources.put(OAuth2Constants.TokeEndpoint.PASSWORD, PasswordServerResource.class);
-        flowServerResources
-                .put(OAuth2Constants.TokeEndpoint.REFRESH_TOKEN, RefreshTokenServerResource.class);
-        return this;
-    }
-
-    public OAuth2FlowFinder supportSAML20() {
-        flowServerResources.put(OAuth2Constants.TokeEndpoint.SAML2_BEARER, SAML20BearerServerResource.class);
-        return this;
-    }
-
 }

@@ -31,6 +31,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.AUTHORIZATION_CODE;
+import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest;
 
 /**
  * @since 12.0.0
@@ -58,7 +59,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
             InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
 
@@ -81,7 +82,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     public void shouldCreateAccessTokenIncludingScope() throws UnauthorizedClientException, InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final Set<String> scope = Collections.singleton("SCOPE");
@@ -115,7 +116,7 @@ public class ClientCredentialsGrantTypeHandlerTest {
     public void shouldCreateAccessToken() throws UnauthorizedClientException, InvalidClientException {
 
         //Given
-        final AccessTokenRequest accessTokenRequest = mock(AccessTokenRequest.class);
+        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
         final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
         final ClientRegistration clientRegistration = mock(ClientRegistration.class);
         final Set<String> scope = Collections.singleton("SCOPE");
