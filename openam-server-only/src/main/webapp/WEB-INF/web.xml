@@ -168,6 +168,10 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>AdminOnlyAuthorizationModule</filter-name>
+        <url-pattern>/json/applicationtypes/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminOnlyAuthorizationModule</filter-name>
         <url-pattern>/json/tokens/*</url-pattern>
     </filter-mapping>
     <filter-mapping>

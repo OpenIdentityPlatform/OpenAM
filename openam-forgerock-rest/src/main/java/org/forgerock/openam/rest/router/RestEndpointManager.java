@@ -64,6 +64,11 @@ public interface RestEndpointManager {
     String SERVER_INFO = "/serverinfo";
 
     /**
+     * The applicationtype resource endpoint.
+     */
+    String APPLICATIONTYPES = "/applicationtypes";
+
+    /**
      * The authenticate service endpoint.
      */
     String AUTHENTICATE = "/authenticate";

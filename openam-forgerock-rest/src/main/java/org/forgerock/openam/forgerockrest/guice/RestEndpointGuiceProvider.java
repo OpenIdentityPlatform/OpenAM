@@ -19,6 +19,9 @@ package org.forgerock.openam.forgerockrest.guice;
 import com.google.inject.Binder;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
+import java.util.Map;
+import javax.inject.Inject;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
@@ -28,10 +31,10 @@ import org.forgerock.openam.forgerockrest.IdentityResource;
 import org.forgerock.openam.forgerockrest.RealmResource;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
+import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
@@ -39,9 +42,6 @@ import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
-
-import javax.inject.Inject;
-import java.util.Map;
 
 /**
  * Contains all of Guice Providers for the Rest Endpoints.
@@ -192,6 +192,7 @@ public final class RestEndpointGuiceProvider {
                     .toProvider(CoreTokenResourceProvider.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.SERVER_INFO).to(ServerInfoResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.ENTITLEMENTS).to(EntitlementsResource.class);
+            collectionResourceEndpoints.addBinding(RestEndpointManager.APPLICATIONTYPES).to(ApplicationTypesResource.class);
 
             return collectionResourceEndpoints;
         }
