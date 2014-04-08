@@ -95,16 +95,89 @@
    <para>For the first server in the site, follow the instructions in the
    Upgrade Wizard.</para>
 
-   <para>Alternatively, you can use the
-   <filename><?eval ${ssoconfigUpgradeJarFile}?></filename> command-line tool
-   to upgrade the server configuration. The procedure, <link xlink:show="new"
-   xlink:href="install-guide#install-openam-config-tools"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
-   Configuration Tools</citetitle></link>, describes how to install the
-   tool.</para>
+   <para>
+    Alternatively for a silent, unattended upgrade,
+    you can use the <filename>${ssoconfigUpgradeJarFile}</filename> tool
+    to upgrade the server configuration in a command-line script.
+   </para>
 
    <para>
-    For examples showing how to use the command-line tool,
+    First you must install the tool.
+    The procedure,
+    <link
+     xlink:show="new"
+     xlink:href="install-guide#install-openam-config-tools"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>To Set Up Configuration Tools</citetitle></link>,
+    describes how to install the tool.
+   </para>
+
+   <para>
+    The upgraded server must be deployed and running when you use the tool.
+   </para>
+
+   <para>
+    The ${ssoconfigUpgradeJarFile} relies on a properties file
+    to upgrade OpenAM server.
+   </para>
+
+   <screen>
+$ <userinput>cp sampleupgrade upgrade.properties</userinput>
+$ <userinput>vi upgrade.properties</userinput>
+$ <userinput>grep -v "^#" upgrade.properties</userinput>
+<computeroutput>SERVER_URL=http://openam.example.com:8080
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true</computeroutput>
+   </screen>
+
+   <para>
+    When the new OpenAM server .war file is deployed and running,
+    you can upgrade by using the tool with the properties file.
+   </para>
+
+   <screen>
+$ <userinput>java -jar ${ssoconfigUpgradeJarFile} --file upgrade.properties</userinput>
+<computeroutput>
+Writing Backup; Done.
+Upgrading Services
+New service iPlanetAMAuthPersistentCookieService; Done.
+New service iPlanetAMAuthOpenIdConnectService; Done.
+New service OAuth2Provider; Done.
+New service iPlanetAMAuthDevicePrintModuleService; Done.
+New service crestPolicyService; Done.
+New service RestSecurity; Done.
+New service MailServer; Done.
+New service dashboardService; Done.
+New service iPlanetAMAuthOATHService; Done.
+Add Organization schema to sunFAMSAML2Configuration; Done.
+Upgrade sunAMAuthHOTPService; Done.
+Upgrade sunAMAuthADService; Done.
+Upgrade sunAMAuthOAuthService; Done.
+Upgrade iPlanetAMAuthCertService; Done.
+Upgrade sunIdentityRepositoryService; Done.
+Upgrade iPlanetAMPasswordResetService; Done.
+Upgrade iPlanetAMSessionService; Done.
+Upgrade iPlanetAMAuthService; Done.
+Upgrade iPlanetAMAuthLDAPService; Done.
+Upgrade sunAMAuthDataStoreService; Done.
+Upgrade AgentService; Done.
+New sub schema sunIdentityRepositoryService; Done.
+New sub schema AgentService; Done.
+Delete service sunFAMLibertyInteractionService; Done.
+Delete service sunFAMLibertySecurityService; Done.
+Creating entitlement application type crestPolicyService; Done.
+Creating entitlement application crestPolicyService; Done.
+Re-enabling Generic LDAPv3 Data Store; Done.
+Upgrading data store embedded; Done.
+Updating Platform Properties; Done.
+Writing Upgrade Log; Done.
+
+Upgrade Complete.
+</computeroutput>
+   </screen>
+
+   <para>
+    For additional information about the command-line tool,
     see the reference documentation for
     <link xlink:show="new"
           xlink:href="reference#man-upgrade-jar"
