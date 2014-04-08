@@ -3792,6 +3792,235 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
 -->
   </section>
 
+
+  <section xml:id="oidc-module-conf-hints">
+   <title>Hints for the OpenID Connect Token Authentication Module</title>
+
+   <para>
+    The OpenID Connect ID Token Authentication module lets OpenAM rely on
+    an <link xlink:show="new" xlink:href="http://openid.net/connect/"
+    >OpenID Connect 1.0</link> provider's ID Token to authenticate an end user.
+    The module expects an OpenID Connect ID Token in an HTTP request header.
+    It validates the ID Token, and if successful,
+    looks up the OpenAM user profile corresponding to the end user
+    for whom the ID Token was issued.
+    Assuming the ID Token is valid and the profile is found,
+    the module authenticates the OpenAM user.
+   </para>
+
+   <para>
+    You configure the OpenID Connect ID Token Authentication module
+    to specify how OpenAM gets the information needed to validate the ID Token,
+    which request header contains the ID Token,
+    the issuer identifier for the provider who issued the ID Token,
+    and how to map the ID Token claims to an OpenAM user profile.
+   </para>
+
+   <note>
+    <para>The default settings are for Google's provider.</para>
+   </note>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>OpenID Connect 1.0</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>OpenID Connect 1.0</primary>
+   </indexterm>
+
+   <para>
+    <command>ssoadm</command> service name:
+    <literal>amAuthOpenIdConnect</literal>
+   </para>
+
+   <variablelist>
+
+    <varlistentry>
+     <term>Configuration type</term>
+     <listitem>
+      <para>
+       In order to validate the ID Token from the OpenID Connect provider,
+       the module needs either a URL to get the public keys for the provider,
+       or the symmetric key for an ID Token signed with a HMAC-based algorithm.
+      </para>
+
+      <variablelist>
+       <para>
+        By default, the configuration type is
+        <literal>.well-known/openid-configuration_url</literal>.
+        This means the module should retrieve the keys based on
+        information in the OpenID Connect Provider Configuration Document.
+       </para>
+
+       <para>
+        You can instead configure the authentication module
+        to validate the ID Token signature
+        with the client secret key you provide,
+        or to validate the ID token with the keys retrieved
+        from the URL to the OpenID Connect provider's JSON Web Key Set.
+       </para>
+
+       <varlistentry>
+        <term><literal>.well-known/openid-configuration_url</literal> (Default)</term>
+        <listitem>
+         <para>
+          Retrieve the provider keys based on the information provided
+          in the OpenID Connect Provider Configuration Document.
+         </para>
+
+         <para>
+          Specify the URL to the document as the discovery URL.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term><literal>client_secret</literal></term>
+        <listitem>
+         <para>
+          Use the client secret that you specify as the key to validate
+          the ID Token signature according to the HMAC,
+          using the client secret to the decrypt the hash
+          and then checking that the hash matches the hash of the ID Token JWT.
+         </para>
+        </listitem>
+       </varlistentry>
+
+       <varlistentry>
+        <term><literal>jwk_url</literal></term>
+        <listitem>
+         <para>
+          Retrieve the provider's JSON Web Key Set at the URL that you specify.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-crypto-context-type</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Discovery url, jwk url, or client_secret</term>
+     <listitem>
+      <para>
+       Edit this field depending on the Configuration type you specified.
+      </para>
+
+      <para>
+       Default: <literal>https://accounts.google.com/.well-known/openid-configuration</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-crypto-context-value</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Name of header referencing the ID Token</term>
+     <listitem>
+      <para>
+       The module looks for the ID Token in this HTTP request header.
+      </para>
+
+      <para>
+       Default: <literal>oidc_id_token</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-header-name</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Name of OpenID Connect ID Token Issuer</term>
+     <listitem>
+      <para>
+       This corresponds to the expected issue identifier value
+       in the <literal>iss</literal> of the ID Token.
+      </para>
+
+      <para>
+       Default: <literal>accounts.google.com</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-issuer-name</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Mapping of local LDAP attributes to jwt attributes</term>
+     <listitem>
+      <para>
+       This setting maps local user profile attributes
+       to OpenID Connect ID Token claims,
+       allowing the module to retrieve the user profile based on the ID Token.
+      </para>
+
+      <para>
+       In OpenID Connect, an ID Token is represented as a JSON Web Token (JWT).
+       The
+       <link
+        xlink:show="new"
+        xlink:href="http://openid.net/specs/openid-connect-core-1_0.html#IDToken"
+       >ID Token</link> section of the OpenID Connect Core 1.0 specification
+       defines a number of claims included in the ID Token for all flows.
+       Additional claims depend on the scopes
+       requested of the OpenID Connect provider.
+      </para>
+
+      <para>
+       For each item in the map,
+       the key is the local user profile attribute name
+       and the value is the ID Token field name.
+      </para>
+
+      <para>
+       Default: <literal>mail=email</literal>, <literal>uid=sub</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-local-to-jwt-attribute-mappings</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Principal mapper class</term>
+     <listitem>
+      <para>
+       The principal mapper matches the OpenID Connect end user
+       with an OpenAM account.
+       The default principal mapper uses
+       the mapping of local attributes to ID Token attributes
+       to find a user profile.
+      </para>
+
+      <para>
+       Default: <literal>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-principal-mapper-class</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+   </variablelist>
+  </section>
+
   <section xml:id="persistent-cookie">
    <title>Hints for the Persistent Cookie Module</title>
    <para>The Persistent Cookie module supports the configuration of cookie lifetimes,

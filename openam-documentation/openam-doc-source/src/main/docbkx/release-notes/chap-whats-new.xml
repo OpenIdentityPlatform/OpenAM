@@ -166,6 +166,22 @@ Agreement (yes/no): [no]:</screen>
     </para>
    </listitem>
 
+  <listitem><!-- AME-3150 -->
+   <para>
+    <emphasis role="bold">OpenID Connect 1.0 Authentication Module</emphasis>.
+    OpenAM now provides an authentication module
+    that lets OpenAM rely on an OpenID Connect provider's ID Token
+    to authenticate an end user.
+    For details on configuring the module, see
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#oidc-module-conf-hints"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Hints for the OpenID Connect Token Authentication Module</citetitle></link>
+    in the <citetitle>Administration Guide</citetitle>.
+   </para>
+  </listitem>
+
   <listitem>
     <para>
      TODO: Update for next version
