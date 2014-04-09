@@ -730,6 +730,10 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
     </listitem>
     <listitem>
      <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
+     for a specified resource URL</para>
+    </listitem>
+    <listitem>
+     <para><literal>ws/1/entitlement/entitlements</literal>: request decisions
      for a specified resource URL and all resources underneath</para>
     </listitem>
    </itemizedlist>
@@ -779,11 +783,11 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
      <literal>env</literal> parameters thus express conditions.</para>
 
      <para>
-      In order to express a condition that specifies OAuth 2.0 scopes,
-      set the value of the parameter
-      to <literal>scope=<replaceable>scopes</replaceable></literal>.
-      To set scopes to <literal>openid</literal> and <literal>profile</literal>,
-      use <literal>env=scope%3Dopenid%20profile</literal> for example.
+      In order to express a condition that specifies OAuth 2.0 scopes,
+      set the value of the parameter
+      to <literal>scope=<replaceable>scopes</replaceable></literal>.
+      To set scopes to <literal>openid</literal> and <literal>profile</literal>,
+      use <literal>env=scope%3Dopenid%20profile</literal> for example.
      </para>
     </listitem>
    </itemizedlist>
@@ -848,9 +852,11 @@ $ <userinput>curl \
 }</computeroutput>
    </screen>
 
-   <para>To request decisions for all resource underneath a given resource, use
-   an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal> as in the
-   following example.</para>
+   <para>
+    To request decisions for a given resource,
+    use an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal>
+    as in the following example.
+   </para>
 
    <screen>
 $ <userinput>curl \
@@ -874,6 +880,52 @@ $ <userinput>curl \
     "statusMessage": "OK"
 }</computeroutput>
    </screen>
+
+   <para>
+    To request decisions for all resources underneath a given resource,
+    use an HTTP GET on <literal>/ws/1/entitlement/entitlements</literal>
+    as in the following example.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ "https://openam.example.com:8443/openam/ws/1/entitlement/entitlements\
+?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=\
+&amp;application=iPlanetAMWebAgentService\
+&amp;resource=http%3A%2F%2Fwww.example.com%2F"</userinput>
+<computeroutput>{
+    "statusCode": 200,
+    "body": {
+        "results": [
+            {
+                "actionsValues": {},
+                "resourceName": "http://www.example.com:80/"
+            },
+            {
+                "actionsValues": {
+                    "POST": true,
+                    "GET": true
+                },
+                "advices": {},
+                "resourceName": "http://www.example.com:80/*"
+            },
+            {
+                "actionsValues": {
+                    "POST": true,
+                    "GET": true
+                },
+                "attributes": {},
+                "advices": {},
+                "resourceName": "http://www.example.com:80/*?*"
+            }
+        ]
+    },
+    "statusMessage": "OK"
+}</computeroutput>
+   </screen>
+
   </section>
 
   <section xml:id="rest-api-policy-management">
