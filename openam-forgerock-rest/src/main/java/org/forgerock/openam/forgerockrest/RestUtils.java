@@ -34,6 +34,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.dashboard.ServerContextHelper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -76,11 +77,7 @@ final public class  RestUtils {
      * @return String with TokenID
      */
     static public String getCookieFromServerContext(ServerContext context) {
-        SecurityContext securityContext = context.asContext(SecurityContext.class);
-        if (securityContext.getAuthenticationId() != null) {
-            return (String) securityContext.getAuthorizationId().get("tokenId");
-        }
-        return null;
+        return ServerContextHelper.getCookieFromServerContext(context);
     }
 
     static public boolean isAdmin(final ServerContext context){

@@ -34,7 +34,7 @@ import javax.security.auth.Subject;
  *
  * @since 12.0.0
  */
-public final class SSOTokenContext extends ServerContext implements SubjectContext {
+public class SSOTokenContext extends ServerContext implements SubjectContext {
     public SSOTokenContext(Context parent) {
         super(parent);
         Reject.ifFalse(parent.containsContext(SecurityContext.class), "Parent context must contain a SecurityContext");
@@ -60,8 +60,18 @@ public final class SSOTokenContext extends ServerContext implements SubjectConte
      * @throws SSOException if there is no SSO token associated with this request.
      */
     public SSOToken getCallerSSOToken() throws SSOException {
+        return getCallerSSOToken(SSOTokenManager.getInstance());
+    }
+
+    /**
+     * Returns the SSO token associated with this request.
+     *
+     * @param tokenManager The SSOTokenManager instance that will get the SSOToken.
+     * @return the SSO token associated with this request.
+     * @throws SSOException if there is no SSO token associated with this request.
+     */
+    public SSOToken getCallerSSOToken(final SSOTokenManager tokenManager) throws SSOException {
         String tokenId = RestUtils.getCookieFromServerContext(this);
-        SSOTokenManager manager = SSOTokenManager.getInstance();
-        return manager.createSSOToken(tokenId);
+        return tokenManager.createSSOToken(tokenId);
     }
 }

@@ -80,6 +80,7 @@ public class AMAuthNFilter extends JaspiRuntimeFilter {
         endpointMatcher.endpoint(RestEndpointManager.USERS, HttpMethod.POST, "_action", "register", "confirm",
                 "forgotPassword", "forgotPasswordReset", "anonymousCreate");
         endpointMatcher.endpoint(RestEndpointManager.SERVER_INFO, HttpMethod.GET);
+        endpointMatcher.endpoint(RestEndpointManager.SESSIONS, HttpMethod.POST, "_action", "validate");
     }
 
     /**

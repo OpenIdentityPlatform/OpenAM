@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,11 +13,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.forgerockrest.session.query;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
 
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -42,8 +44,8 @@ public class SessionQueryManager {
      * Intialise the SessionQueryManager and provide the OpenAM server ids that it should apply to.
      *
      * @param queryFactory Non null instance.
-     *
      */
+    @Inject
     public SessionQueryManager(SessionQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }

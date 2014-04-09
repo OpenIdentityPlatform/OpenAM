@@ -32,7 +32,7 @@ public final class ServerContextHelper {
      */
     public static String getCookieFromServerContext(ServerContext context) {
         SecurityContext securityContext = context.asContext(SecurityContext.class);
-        if (securityContext.getAuthenticationId() != null) {
+        if (securityContext.getAuthorizationId() != null) {
             return (String) securityContext.getAuthorizationId().get("tokenId");
         }
         return null;

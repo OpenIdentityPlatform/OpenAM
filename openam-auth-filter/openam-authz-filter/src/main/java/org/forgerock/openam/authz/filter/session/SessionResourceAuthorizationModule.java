@@ -63,8 +63,13 @@ public class SessionResourceAuthorizationModule extends AdminAuthorizationModule
             Map<String, String[]> parameterMap = servletRequest.getParameterMap();
             if (parameterMap != null && parameterMap.containsKey("_action")) {
                 String[] values = parameterMap.get("_action");
-                if (values != null && values.length > 0 && "logout".equalsIgnoreCase(values[0])) {
-                    return true;
+                if (values != null && values.length > 0) {
+                    if ("logout".equalsIgnoreCase(values[0])) {
+                        return true;
+                    }
+                    if ("validate".equalsIgnoreCase(values[0])) {
+                        return true;
+                    }
                 }
             }
         }

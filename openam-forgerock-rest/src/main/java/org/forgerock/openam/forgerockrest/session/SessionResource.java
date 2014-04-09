@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,9 +13,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.forgerockrest.session;
 
-import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
@@ -37,19 +38,24 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * Represents Sessions that can queried via a REST interface.
@@ -69,7 +75,7 @@ import java.util.Map;
  */
 public class SessionResource implements CollectionResourceProvider {
 
-    private static final Debug DEBUG = SessionService.sessionDebug;
+    private static final Debug DEBUG = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
@@ -77,21 +83,20 @@ public class SessionResource implements CollectionResourceProvider {
     public static final String HEADER_USER_ID = "userid";
     public static final String HEADER_TIME_REMAINING = "timeleft";
 
+    private final SSOTokenManager ssoTokenManager;
+
     private SessionQueryManager queryManager;
 
     /**
-     * Default constructor instantiates the SessionResource.
-     */
-    public SessionResource() {
-        this(new SessionQueryManager(new SessionQueryFactory()));
-    }
-
-    /**
      * Dependency Injection constructor allowing the SessionResource dependency to be provided.
-     * @param sessionQueryManager No null.
+     *
+     * @param sessionQueryManager An instance of the SessionQueryManager. Must not null.
+     * @param ssoTokenManager An instance of the SSOTokenManager.
      */
-    public SessionResource(SessionQueryManager sessionQueryManager) {
+    @Inject
+    public SessionResource(final SessionQueryManager sessionQueryManager, final SSOTokenManager ssoTokenManager) {
         this.queryManager = sessionQueryManager;
+        this.ssoTokenManager = ssoTokenManager;
     }
 
     /**
@@ -108,7 +113,11 @@ public class SessionResource implements CollectionResourceProvider {
     }
 
     /**
-     * Currently unimplemented.
+     * Actions supported are:
+     * <ul>
+     * <li>logout - invalidates the token on the request</li>
+     * <li>validate - validate if the token on the request is still valid</li>
+     * </ul>
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -116,35 +125,58 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
 
-        String id = request.getAction();
+        final String action = request.getAction();
+        try {
+            final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken(ssoTokenManager);
 
-        if ("logout".equalsIgnoreCase(id)) {
+            if ("logout".equalsIgnoreCase(action)) {
 
-            String tokenId = ServerContextHelper.getCookieFromServerContext(context);
+                if (ssoToken == null) {
+                    final BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
+                    DEBUG.error("iPlanetDirectoryCookie not set on request", e);
+                    handler.handleError(e);
+                    return;
+                }
 
-            if (tokenId == null) {
-                BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
-                DEBUG.error("iPlanetDirectoryCookie not set on request", e);
-                handler.handleError(e);
+                try {
+                    final JsonValue jsonValue = logout(ssoToken.getTokenID().toString());
+                    handler.handleResult(jsonValue);
+                } catch (InternalServerErrorException e) {
+                    DEBUG.error("Exception handling logout", e);
+                    handler.handleError(e);
+                }
+                return;
             }
 
-            try {
-                JsonValue jsonValue = logout(tokenId);
-                handler.handleResult(jsonValue);
-            } catch (InternalServerErrorException e) {
-                DEBUG.error("Exception handling logout", e);
-                handler.handleError(e);
+            if ("validate".equalsIgnoreCase(action)) {
+
+                if (ssoToken == null) {
+                    final BadRequestException e = new BadRequestException("SSO Token Id Cookie not set on request");
+                    DEBUG.error("SSO Token Id Cookie not set on request", e);
+                    handler.handleError(e);
+                    return;
+                }
+
+                handler.handleResult(validateSession(ssoToken));
+                return;
             }
-            return;
+
+            final NotSupportedException e =
+                    new NotSupportedException("Action, " + action + ", Not implemented for this Resource");
+            DEBUG.error("Action, " + action + ", Not implemented for this Resource", e);
+            handler.handleError(e);
+        } catch (SSOException e) {
+            DEBUG.error(e.getMessage());
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage()));
         }
-
-        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
-        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
-        handler.handleError(e);
     }
 
     /**
-     * Logout action to handle the invalidating of Tokens.
+     * Actions supported are:
+     * <ul>
+     * <li>logout - invalidates the token</li>
+     * <li>validate - validate if the token is still valid</li>
+     * </ul>
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -153,9 +185,9 @@ public class SessionResource implements CollectionResourceProvider {
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
             ResultHandler<JsonValue> handler) {
 
-        String id = request.getAction();
+        final String action = request.getAction();
 
-        if ("logout".equalsIgnoreCase(id)) {
+        if ("logout".equalsIgnoreCase(action)) {
             try {
                 JsonValue jsonValue = logout(resourceId);
                 handler.handleResult(jsonValue);
@@ -166,9 +198,53 @@ public class SessionResource implements CollectionResourceProvider {
             return;
         }
 
-        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
-        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
+        if ("validate".equalsIgnoreCase(action)) {
+            handler.handleResult(validateSession(resourceId));
+            return;
+        }
+
+        NotSupportedException e = new NotSupportedException("Action, " + action + ", Not implemented for this Resource");
+        DEBUG.error("Action, " + action + ", Not implemented for this Resource", e);
         handler.handleError(e);
+    }
+
+    /**
+     * Will validate that the specified SSO Token Id is valid or not.
+     * <br/>
+     * Example response:
+     * { "valid": true }
+     * <br/>
+     * If there is any problem getting or validating the token which causes an exception the json response will be
+     * false. In addition if the token is expired then the json response will be set to true. Otherwise it will be
+     * set to true.
+     *
+     * @param tokenId The SSO Token Id.
+     * @return The json response of the validation.
+     */
+    private JsonValue validateSession(final String tokenId) {
+
+        try {
+            final SSOToken ssoToken = ssoTokenManager.createSSOToken(tokenId);
+            return validateSession(ssoToken);
+        } catch (SSOException e) {
+            DEBUG.error("Session validation for token, " + tokenId + ", failed.", e);
+            return json(object(field("valid", false)));
+        }
+    }
+
+    private JsonValue validateSession(final SSOToken ssoToken) {
+        try {
+            if (!ssoTokenManager.isValidToken(ssoToken)) {
+                DEBUG.message("Session validation for token, " + ssoToken.getTokenID() + ", returning false.");
+                return json(object(field("valid", false)));
+            }
+
+            DEBUG.message("Session validation for token, " + ssoToken.getTokenID() + ", returning true.");
+            return json(object(field("valid", true), field("prn", ssoToken.getPrincipal().getName())));
+        } catch (SSOException e) {
+            DEBUG.error("Session validation for token, " + ssoToken.getTokenID() + ", failed.", e);
+            return json(object(field("valid", false)));
+        }
     }
 
     /**

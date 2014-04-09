@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,24 +13,60 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.forgerockrest.session;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
+import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.RootContext;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.security.Principal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class SessionResourceTest {
+
+    private SessionResource sessionResource;
+
+    private SessionQueryManager sessionQueryManager;
+    private SSOTokenManager ssoTokenManager;
+
+    @BeforeMethod
+    public void setUp() {
+
+        sessionQueryManager = mock(SessionQueryManager.class);
+        ssoTokenManager = mock(SSOTokenManager.class);
+
+        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager);
+    }
+
     @Test
     public void shouldUseSessionQueryManagerForAllSessionsQuery() {
         // Given
@@ -42,7 +78,7 @@ public class SessionResourceTest {
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResultHandler handler = mock(QueryResultHandler.class);
 
-        SessionResource resource = spy(new SessionResource(mockManager));
+        SessionResource resource = spy(new SessionResource(mockManager, null));
         List<String> list = Arrays.asList(new String[]{badger, weasel});
         doReturn(list).when(resource).getAllServerIds();
 
@@ -64,7 +100,7 @@ public class SessionResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(badger);
 
-        SessionResource resource = spy(new SessionResource(mockManager));
+        SessionResource resource = spy(new SessionResource(mockManager, null));
 
         // When
         resource.queryCollection(null, request, mockHandler);
@@ -74,5 +110,106 @@ public class SessionResourceTest {
 
         List<String> result = Arrays.asList(new String[]{badger});
         verify(mockManager, times(1)).getAllSessions(result);
+    }
+
+    @Test
+    public void actionCollectionShouldFailToValidateSessionWhenSSOTokenIdNotSet() {
+
+        //Given
+        final Map<String, Object> authzContext = new HashMap<String, Object>();
+        authzContext.put("tokenId", null);
+        final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
+        final ServerContext context = new ServerContext(tokenContext);
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+
+        given(request.getAction()).willReturn("validate");
+
+        //When
+        sessionResource.actionCollection(context, request, handler);
+
+        //Then
+        verify(handler).handleError(Matchers.isA(BadRequestException.class));
+    }
+
+    @Test
+    public void actionCollectionShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+
+        //Given
+        final Map<String, Object> authzContext = new HashMap<String, Object>();
+        authzContext.put("tokenId", "SSO_TOKEN_ID");
+        final SSOTokenContext tokenContext = mock(SSOTokenContext.class);
+        final ServerContext context = new ServerContext(tokenContext);
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("validate");
+        given(tokenContext.getCallerSSOToken(ssoTokenManager)).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
+        given(ssoToken.getTokenID()).willReturn(ssoTokenId);
+        given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
+        given(ssoToken.getPrincipal()).willReturn(principal);
+        given(principal.getName()).willReturn("PRINCIPAL");
+
+        //When
+        sessionResource.actionCollection(context, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
+        assertThat(responseCaptor.getValue().get("prn").asString()).isEqualTo("PRINCIPAL");
+    }
+
+    @Test
+    public void actionInstanceShouldValidateSessionAndReturnFalseWhenSSOTokenCreationThrowsException()
+            throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+
+        given(request.getAction()).willReturn("validate");
+        doThrow(SSOException.class).when(ssoTokenManager).createSSOToken("SSO_TOKEN_ID");
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isFalse();
+    }
+
+    @Test
+    public void actionInstanceShouldValidateSessionAndReturnTrueWhenSSOTokenValid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("validate");
+        given(ssoTokenManager.createSSOToken("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
+        given(ssoToken.getPrincipal()).willReturn(principal);
+        given(principal.getName()).willReturn("PRINCIPAL");
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
+        assertThat(responseCaptor.getValue().get("prn").asString()).isEqualTo("PRINCIPAL");
     }
 }
