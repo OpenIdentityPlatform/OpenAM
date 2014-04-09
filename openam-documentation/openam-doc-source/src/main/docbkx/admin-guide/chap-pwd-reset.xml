@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-pwd-reset'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Password Reset</title>
  <indexterm><primary>Password reset</primary></indexterm>
  <para>This chapter focuses on how to enable users to reset their own
@@ -81,34 +81,29 @@
    each realm inherit the global settings. Alternatively, you can choose to
    configure the service only for an individual realm.</para>
 
-   <step performance="optional">
-    <para>When OpenAM is configured with default settings, it uses the
-    <literal>ldapService</literal> authentication chain, which relies on the
-    <literal>DataStore</literal> authentication module. The
-    <literal>DataStore</literal> authentication module provides a generic
-    authentication mechanism for OpenAM data stores, and therefore cannot
-    handle specific data store settings, such as the directory server password
-    policy setting to force password changes on reset. When you use settings
-    the module cannot handle, then authentication can fail.</para>
+   <tip>
+    <para>
+     Resetting a user password can have repercussions on the user profile.
+     For example, a user data store directory service
+     could enforce a policy to require password changes on reset.
+     OpenAM's LDAP authentication module can deal with policies
+     based on the Behera Internet-Draft,
+     <link
+      xlink:show="new"
+      xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+     >Password Policy for LDAP Directories</link>,
+     though its default DataStore authentication module cannot.
+    </para>
 
-    <para>If you must configure the directory server to force password changes
-    on reset, then also configure a separate authentication chain for users.
-    The separate authentication chain must require the <literal>LDAP</literal>
-    authentication module rather than the <literal>DataStore</literal>
-    authentication module.</para>
+    <para>
+     When the user data store directory service
+     enforces password reset policies,
+     then either use the LDAP authentication module
+     in the authentication chain,
+     or rely on some other means of resetting user passwords.
+    </para>
+   </tip>
 
-    <para>You can create and configure authentication chains, and assign them
-    in the OpenAM console under Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Authentication.</para>
-
-    <para>The OpenAM administrator, <literal>amadmin</literal>, uses the
-    <literal>DataStore</literal> authentication module. If you set Access
-    Control &gt; /(Top Level Realm) &gt; Authentication &gt;
-    Core &gt; Organization Authentication Configuration to use your
-    <literal>LDAP</literal> based authentication chain for users, let the
-    Administrator Authentication Configuration continue to use the
-    <literal>DataStore</literal> based authentication chain.</para>
-   </step>
    <step>
     <para>Configure the Password Reset service in one of the following ways.</para>
 
