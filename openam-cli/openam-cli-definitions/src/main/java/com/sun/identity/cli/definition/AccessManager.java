@@ -1942,11 +1942,11 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and"
-                + " WebAgent. This parameter is required if the agent is created without datafile/attributes.",
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid only for J2EEAgent and"
+                + " WebAgent agent types, and is required when the agent type is J2EEAgent or WebAgent.",
             "agenturl|g|s|Agent URL. e.g. http://www.agent.example:8080/agent. WebAgent does not take URL with path. "
-                + "e.g. http://www.agent.example:8080. This option is valid for J2EEAgent and WebAgent. This parameter "
-                + "is required if the agent is created without datafile/attributes.",
+                + "e.g. http://www.agent.example:8080. This option is valid only for J2EEAgent and WebAgent agent types, "
+                + "and is required when the agent type is J2EEAgent or WebAgent.",
             "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={

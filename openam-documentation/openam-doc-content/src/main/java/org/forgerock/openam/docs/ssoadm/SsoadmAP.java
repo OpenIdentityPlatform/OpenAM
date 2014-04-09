@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,8 +50,8 @@ import javax.lang.model.element.TypeElement;
  * for the ssoadm command.
  *
  * Annotations specifying ssoadm subcommand info are provided by two files:
- * openam-core/src/main/java/com/sun/identity/cli/definition/AccessManager.java
- * openam-federation/OpenFM/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
+ * openam/openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/cli/definition/AccessManager.java
+ * openam/openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
  *
  * The ssoadm &lt;refentry&gt; incorporates a sorted list of subcommands and
  * their options.
