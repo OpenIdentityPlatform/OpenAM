@@ -2824,15 +2824,15 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/users/demo</userinput>
 <computeroutput>{
     "username": "demo",
-    "realm": "/",
+    "realm": "dc=openam,dc=forgerock,dc=org",
     "uid": [
         "demo"
     ],
+    "userpassword": [
+        "{SSHA}BKPAKRS3QKkvQRw25MfXbVC4VEuVNUf+yCaejg=="
+    ],
     "sn": [
         "demo"
-    ],
-    "userpassword": [
-        "{SSHA}S14oR2gusLWtiDkAS4twj63slXNNaMKpwrOWdw=="
     ],
     "cn": [
         "demo"
@@ -2844,18 +2844,20 @@ $ <userinput>curl \
         "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
     ],
     "objectclass": [
+        "devicePrintProfilesContainer",
         "person",
         "sunIdentityServerLibertyPPService",
-        "sunFederationManagerDataStore",
         "inetorgperson",
+        "sunFederationManagerDataStore",
         "iPlanetPreferences",
         "iplanet-am-auth-configuration-service",
         "organizationalperson",
         "sunFMSAML2NameIdentifier",
         "inetuser",
+        "forgerock-am-dashboard-service",
         "iplanet-am-managed-person",
-        "sunAMAuthAccountLockout",
         "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
         "top"
     ],
     "universalid": [
@@ -2871,8 +2873,8 @@ $ <userinput>curl \
    <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
- https://openam.example.com:8443/openam/json/users/demo?_fields=name,uid</userinput>
-<computeroutput>{"name":"demo","uid":["demo"]}</computeroutput>
+ https://openam.example.com:8443/openam/json/users/demo?_fields=username,uid</userinput>
+<computeroutput>{"username":"demo","uid":["demo"]}</computeroutput>
    </screen>
 
    <para>As shown in the examples, OpenAM returns the JSON representation of the
@@ -2889,22 +2891,28 @@ $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  https://openam.example.com:8443/openam/json/agents/myClientID</userinput>
 <computeroutput>{
-    "name": "myClientID",
-    "realm": "/",
-    "com.forgerock.openam.oauth2provider.accessToken": [],
-    "com.forgerock.openam.oauth2provider.clientSessionURI": [],
-    "com.forgerock.openam.oauth2provider.subjectType": [
-        "Pairwise"
+    "username": "myClientID",
+    "realm": "dc=openam,dc=forgerock,dc=org",
+    "com.forgerock.openam.oauth2provider.accesstoken": [],
+    "com.forgerock.openam.oauth2provider.clientsessionuri": [],
+    "com.forgerock.openam.oauth2provider.defaultscopes": [
+        "[0]="
     ],
-    "com.forgerock.openam.oauth2provider.defaultScopes": [
-        "[1]=profile",
-        "[0]=openid"
-    ],
-    "com.forgerock.openam.oauth2provider.clientType": [
+    "com.forgerock.openam.oauth2provider.clientname": [],
+    "com.forgerock.openam.oauth2provider.clienttype": [
         "Confidential"
     ],
     "universalid": [
         "id=myClientID,ou=agent,dc=openam,dc=forgerock,dc=org"
+    ],
+    "com.forgerock.openam.oauth2provider.responsetypes": [
+        "[6]=code token id_token",
+        "[0]=code",
+        "[2]=id_token",
+        "[4]=token id_token",
+        "[3]=code token",
+        "[1]=token",
+        "[5]=code id_token"
     ],
     "userpassword": [
         "{SHA-1}W6ph5Mm5Pz8GgiULbPgzG37mj9g="
@@ -2912,22 +2920,20 @@ $ <userinput>curl \
     "com.forgerock.openam.oauth2provider.name": [
         "[0]="
     ],
-    "com.forgerock.openam.oauth2provider.redirectionURIs": [
-        "[1]=https://openam.example.com:8443/openid/cb-implicit.html",
-        "[0]=https://openam.example.com:8443/openid/cb-basic.html"
+    "com.forgerock.openam.oauth2provider.redirectionuris": [
+        "[0]="
+    ],
+    "com.forgerock.openam.oauth2provider.idtokensignedresponsealg": [
+        "HS256"
     ],
     "com.forgerock.openam.oauth2provider.scopes": [
-        "[1]=profile",
-        "[0]=openid"
+        "[0]="
     ],
-    "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg": [
-        "HmacSHA256"
-    ],
-    "com.forgerock.openam.oauth2provider.postLogoutRedirectURI": [],
-    "sunIdentityServerDeviceStatus": [
+    "com.forgerock.openam.oauth2provider.postlogoutredirecturi": [],
+    "sunidentityserverdevicestatus": [
         "Active"
     ],
-    "AgentType": [
+    "agenttype": [
         "OAuth2Client"
     ],
     "com.forgerock.openam.oauth2provider.description": [
@@ -2945,12 +2951,24 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  https://openam.example.com:8443/openam/json/groups/myGroup?_prettyPrint=true</userinput>
 <computeroutput>{
-  "name" : "myGroup",
-  "realm" : "/",
-  "uniquemember" : [ "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org" ],
-  "cn" : [ "myGroup" ],
-  "objectclass" : [ "groupofuniquenames", "top" ],
-  "universalid" : [ "id=myGroup,ou=group,dc=openam,dc=forgerock,dc=org" ]
+    "username": "myGroup",
+    "realm": "dc=openam,dc=forgerock,dc=org",
+    "uniquemember": [
+        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "cn": [
+        "myGroup"
+    ],
+    "dn": [
+        "cn=myGroup,ou=groups,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectclass": [
+        "groupofuniquenames",
+        "top"
+    ],
+    "universalid": [
+        "id=myGroup,ou=group,dc=openam,dc=forgerock,dc=org"
+    ]
 }</computeroutput>
    </screen>
   </section>
