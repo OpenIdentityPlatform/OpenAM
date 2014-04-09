@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using RESTful Web Services</title>
@@ -181,12 +182,16 @@
    Pass the user name in an <literal>X-OpenAM-Username</literal> header, and
    the password in an <literal>X-OpenAM-Password</literal> header.</para>
 
-   <screen>$ curl --request POST
- --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: changeit"
- --header "Content-Type: application/json" --data "{}"
- https://openam.example.com:8443/openam/json/authenticate
-
-{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</screen>
+   <screen>
+$ <userinput>curl \
+ --request POST
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Content-Type: application/json" \
+ --data "{}" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
 
    <para>This "zero page login" mechanism works only for name/password
    authentication. If you include a POST body with the request, it must
@@ -205,9 +210,12 @@
    and input which is what the client must complete and send back to
    OpenAM. The default is still user name/password authentication.</para>
 
-   <screen>$ curl --request POST --header "Content-Type: application/json"
- https://openam.example.com:8443/openam/json/authenticate
-
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>
 {
     "authId": "...jwt-value...",
     "template": "",
@@ -244,7 +252,8 @@
             ]
         }
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>The "authId" value is a JSON Web Token (JWT) that uniquely identifies
    the authentication context to OpenAM, and so must also be sent back with the
@@ -255,15 +264,19 @@
    and the password is <literal>changeit</literal>.</para>
 
    <informalexample><?dbfo pgwide="1"?>
-   <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
-   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
-   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
-   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
-   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
- https://openam.example.com:8443/openam/json/authenticate
-
-{ "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</screen>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1", \
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt", \
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] }, \
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ], \
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>
+{ "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
    </informalexample>
 
    <para>The response is a token ID holding the SSO Token value.</para>
@@ -272,15 +285,19 @@
    using the <literal>noSession</literal> query string parameter.</para>
 
    <informalexample><?dbfo pgwide="1"?>
-   <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
-   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
-   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
-   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
-   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
- https://openam.example.com:8443/openam/json/authenticate?noSession=true
-
-{ "message": "Authentication Successful", "successUrl": "/openam/console" }</screen>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1", \
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt", \
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] }, \
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ], \
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
+ https://openam.example.com:8443/openam/json/authenticate?noSession=true</userinput>
+<computeroutput>
+{ "message": "Authentication Successful", "successUrl": "/openam/console" }</computeroutput>
+   </screen>
    </informalexample>
 
    <para>OpenAM can be configured to return a failure URL value when
@@ -294,12 +311,17 @@
    code 401 Unauthorized, and the JSON in the reply indicates the failure
    URL.</para>
 
-   <screen>$ curl --request POST --header "Content-Type: application/json"
- --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: badpassword"
- https://openam.example.com:8443/openam/json/authenticate
-
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: badpassword" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>
 { "errorMessage": "Invalid Password!!",
-  "failureUrl": "http://www.example.com/401.html" }</screen>
+  "failureUrl": "http://www.example.com/401.html" }</computeroutput>
+   </screen>
 
    <para>To specify a realm in your request, first make sure that the name of your realm does not match
        an endpoint name to avoid any potential routing errors.
@@ -308,11 +330,13 @@
     <itemizedlist>
         <listitem>
             <para>Using the realm in the URI to the endpoint (preferred method):</para>
-            <literallayout class="monospaced">https://openam.example.com:8443/openam/json/<literal>myRealm</literal>/authenticate</literallayout>
+            <literallayout class="monospaced"
+            >https://openam.example.com:8443/openam/json/<literal>myRealm</literal>/authenticate</literallayout>
         </listitem>
         <listitem>
             <para>Using the realm query string parameter:</para>
-            <literallayout class="monospaced">https://openam.example.com:8443/openam/json/authenticate?realm=<literal>myRealm</literal></literallayout>
+            <literallayout class="monospaced"
+            >https://openam.example.com:8443/openam/json/authenticate?realm=<literal>myRealm</literal></literallayout>
         </listitem>
     </itemizedlist>
 
@@ -421,12 +445,14 @@
    <para>Authenticated users can log out with the token cookie value and an HTTP
    POST to <literal>/json/sessions/?_action=logout</literal>.</para>
 
-   <screen>$ curl
- --request POST
- --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*"
- "https://openam.example.com:8443/openam/json/sessions/?_action=logout"
-
-{"result":"Successfully logged out"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*" \
+ "https://openam.example.com:8443/openam/json/sessions/?_action=logout"</userinput>
+<computeroutput>
+{"result":"Successfully logged out"}</computeroutput>
+   </screen>
   </section>
 
   <section xml:id="rest-api-auth-legacy">
@@ -439,10 +465,14 @@
     <para>Simple authentication with a user name and password returns a
     token.</para>
 
-    <screen>$ curl --request POST --data "username=bjensen&amp;password=hifalutin"
- https://openam.example.com:8443/openam/identity/authenticate
-
-token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=bjensen&amp;password=hifalutin" \
+ https://openam.example.com:8443/openam/identity/authenticate</userinput>
+<computeroutput>
+token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</computeroutput>
+    </screen>
 
     <para>If you must specify parameters as when authenticating to
     <literal>/UI/Login</literal>, you provide a percent encoded string of the
@@ -453,18 +483,24 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
     token following successful authentication. The default for the <literal>client</literal>
     parameter is the IP of the machine making the REST request.</para>
 
-    <screen>$ curl --request POST --data "username=bjensen
- &amp;password=hifalutin
- &amp;uri=realm%3D%2F%26module%3DDataStore
- &amp;client=192.168.1.1"
- https://openam.example.com:8443/openam/identity/authenticate
-
-token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=bjensen&amp;password=hifalutin&amp;uri=realm%3D%2F%26module%3DDataStore\
+&amp;client=192.168.1.1" \
+ https://openam.example.com:8443/openam/identity/authenticate</userinput>
+<computeroutput>
+token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</computeroutput>
+    </screen>
 
     <para>You log out using the token to end the user session.</para>
 
-    <screen>$ curl --request POST --data "subjectid=AQIC5w...*AAJTSQACMDE.*"
-https://openam.example.com:8443/openam/identity/logout</screen>
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "subjectid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/logout</userinput>
+    </screen>
   </section>
  </section>
 
@@ -474,19 +510,27 @@ https://openam.example.com:8443/openam/identity/logout</screen>
   <para>You can retrieve the cookie domains that OpenAM supports by HTTP GET on
   <literal>/json/serverinfo/cookieDomains</literal>.</para>
 
-  <screen>$ curl https://openam.example.com:8443/openam/json/serverinfo/cookieDomains
-{"domains":[".example.com"]}</screen>
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/json/serverinfo/cookieDomains</userinput>
+<computeroutput>{"domains":[".example.com"]}</computeroutput>
+  </screen>
 
   <para>You can retrieve the name of the cookie used for storing the session
   token. By default it is <literal>iPlanetDirectoryPro</literal>.</para>
-  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNameForToken
-string=iPlanetDirectoryPro</screen>
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/identity/getCookieNameForToken</userinput>
+<computeroutput>string=iPlanetDirectoryPro</computeroutput>
+  </screen>
 
   <para>You can also retrieve the name of the cookie used for storing the session
   token and the names of the cookies to forward with requests.</para>
-  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNamesToForward
-string=iPlanetDirectoryPro
-string=amlbcookie</screen>
+
+  <screen>
+$ <userinput>curl https://openam.example.com:8443/openam/identity/getCookieNamesToForward</userinput>
+<computeroutput>string=iPlanetDirectoryPro
+string=amlbcookie</computeroutput>
+  </screen>
  </section>
 
  <section xml:id="rest-api-tokens">
@@ -499,15 +543,23 @@ string=amlbcookie</screen>
 
   <para>You check whether a token is valid as follows.</para>
 
-  <screen>$ curl --request POST --data "tokenid=AQIC5w...*AAJTSQACMDE.*" 
-  https://openam.example.com:8443/openam/identity/isTokenValid
-boolean=true</screen>
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "tokenid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
+<computeroutput>boolean=true</computeroutput>
+  </screen>
   
   <para>An invalid token returns <literal>boolean=false</literal>.</para>
   
-  <screen>$ curl --request POST --data "tokenid=INVALID" 
-  https://openam.example.com:8443/openam/identity/isTokenValid
-boolean=false</screen>
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "tokenid=INVALID" \
+ https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
+<computeroutput>boolean=false</computeroutput>
+  </screen>
   
   <para>With a valid token, you can retrieve attributes about the subject.
   OpenAM returns a series of <replaceable>name</replaceable>,
@@ -521,9 +573,13 @@ boolean=false</screen>
    <primary>User data</primary>
    <secondary>REST access</secondary>
   </indexterm>
-  <screen>$ curl --request POST --data "subjectid=AQIC5w...*AAJTSQACMDE.*" 
-  https://openam.example.com:8443/openam/identity/attributes
-userdetails.token.id=
+
+  <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "subjectid=AQIC5w...*AAJTSQACMDE.*" \
+ https://openam.example.com:8443/openam/identity/attributes</userinput>
+<computeroutput>userdetails.token.id=
  AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
 userdetails.attribute.name=uid
 userdetails.attribute.value=bjensen
@@ -549,34 +605,39 @@ userdetails.attribute.value=posixAccount
 userdetails.attribute.value=inetOrgPerson
 userdetails.attribute.value=krbprincipalaux
 userdetails.attribute.value=krbTicketPolicyAux
-userdetails.attribute.value=top</screen>
+userdetails.attribute.value=top</computeroutput>
+  </screen>
   
   <para>You can specify attributes to limit what you retrieve.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
- subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
- &amp;attributenames=mail
- &amp;attributenames=uid"
-userdetails.token.id=
+  <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
+subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;attributenames=mail\
+&amp;attributenames=uid"</userinput>
+<computeroutput>userdetails.token.id=
  AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
 userdetails.attribute.name=uid
 userdetails.attribute.value=bjensen
 userdetails.attribute.name=mail
-userdetails.attribute.value=bjensen@example.com</screen>
+userdetails.attribute.value=bjensen@example.com</computeroutput>
+  </screen>
 
   <para>When retrieving attributes, you can refresh the session thus setting
   the idle time to 0, by adding the boolean parameter
   <literal>refresh=true</literal> to the query string.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
- subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
- &amp;attributenames=cn
- &amp;refresh=true"
-userdetails.token.id=
+  <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
+subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;attributenames=cn\
+&amp;refresh=true"</userinput>
+<computeroutput>userdetails.token.id=
  AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
 userdetails.attribute.name=cn
 userdetails.attribute.value=Babs Jensen
-userdetails.attribute.value=Barbara Jensen</screen>
+userdetails.attribute.value=Barbara Jensen</computeroutput>
+  </screen>
 
   <para>
    You can specify the following attributes to retrieve information
@@ -603,7 +664,7 @@ $ <userinput>curl \
  &amp;attributenames=maxsessiontime\
  &amp;refresh=false" \
  https://openam.example.com:8443/openam/identity/attributes</userinput>
-
+<computeroutput>
 userdetails.token.id=AQIC5w....*AAJTSQACMDE.*
 userdetails.attribute.name=maxsessiontime
 userdetails.attribute.value=120
@@ -612,7 +673,7 @@ userdetails.attribute.value=30
 userdetails.attribute.name=idletime
 userdetails.attribute.value=664
 userdetails.attribute.name=timeleft
-userdetails.attribute.value=6319
+userdetails.attribute.value=6319</computeroutput>
    </screen>
 
  </section>
@@ -633,10 +694,12 @@ userdetails.attribute.value=6319
   xlink:href="admin-guide#interface-stability"
   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
 
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/authorize?
- uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html
- &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
-boolean=true</screen>
+  <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/authorize?\
+uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
+&amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"</userinput>
+<computeroutput>boolean=true</computeroutput>
+  </screen>
   
   <para>To indicate access denied, OpenAM returns
   <literal>boolean=false</literal>.</para>
@@ -732,29 +795,32 @@ boolean=true</screen>
    <para>To request a decision for a single resource, use an HTTP GET on
    <literal>/ws/1/entitlement/decision</literal> as in the following example.</para>
 
-   <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- "https://openam.example.com:8443/openam/ws/1/entitlement/decision
- ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
- &amp;application=iPlanetAMWebAgentService
- &amp;resource=http%3A%2F%2Fwww.example.com%2Findex.html"
-allow</screen>
+   <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ "https://openam.example.com:8443/openam/ws/1/entitlement/decision\
+?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET\
+&amp;application=iPlanetAMWebAgentService\
+&amp;resource=http%3A%2F%2Fwww.example.com%2Findex.html"</userinput>
+<computeroutput>allow</computeroutput>
+   </screen>
 
    <para>If access is denied, the result is <literal>deny</literal>.</para>
 
    <para>To request decisions for multiple resources, use an HTTP GET on
    <literal>/ws/1/entitlement/decisions</literal> as in the following example.</para>
 
-   <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- "https://openam.example.com:8443/openam/ws/1/entitlement/decisions
- ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
- &amp;application=iPlanetAMWebAgentService
- &amp;resources=http%3A%2F%2Fwww.example.com%2Findex.html
- &amp;resources=http%3A%2F%2Fwww.example.com%2Ffavicon.ico"
-{
+   <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ "https://openam.example.com:8443/openam/ws/1/entitlement/decisions\
+?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET\
+&amp;application=iPlanetAMWebAgentService\
+&amp;resources=http%3A%2F%2Fwww.example.com%2Findex.html\
+&amp;resources=http%3A%2F%2Fwww.example.com%2Ffavicon.ico"</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "results": [
@@ -779,20 +845,22 @@ allow</screen>
         ]
     },
     "statusMessage": "OK"
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>To request decisions for all resource underneath a given resource, use
    an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal> as in the
    following example.</para>
 
-   <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- "https://openam.example.com:8443/openam/ws/1/entitlement/entitlement
- ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=
- &amp;application=iPlanetAMWebAgentService
- &amp;resource=http%3A%2F%2Fwww.example.com%2F*"
-{
+   <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ "https://openam.example.com:8443/openam/ws/1/entitlement/entitlement\
+?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=\
+&amp;application=iPlanetAMWebAgentService\
+&amp;resource=http%3A%2F%2Fwww.example.com%2F*"</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "actionsValues": {
@@ -804,7 +872,8 @@ allow</screen>
         "resourceName": "http://www.example.com:80/*"
     },
     "statusMessage": "OK"
-}</screen>
+}</computeroutput>
+   </screen>
   </section>
 
   <section xml:id="rest-api-policy-management">
@@ -826,8 +895,9 @@ allow</screen>
     to the endpoint. You must URL encode the JSON before passing it to
     OpenAM.</para>
 
-    <screen>$ cat entitlement.json
-{
+    <screen>
+$ <userinput>cat entitlement.json</userinput>
+<computeroutput>{
     "name": "Example HTTP",
     "eSubject": {
         "state": {
@@ -849,15 +919,17 @@ allow</screen>
             "http://www.example.com:80/*"
         ]
     }
-}$ curl
- --request POST
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- --data-urlencode "privilege.json@entitlement.json"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege
-{"statusCode":201,"body":"Created","statusMessage":"Created"}
+}</computeroutput>
 
-$ cat entitlement2.json
-{
+$ <userinput>curl \
+ --request POST \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ --data-urlencode "privilege.json@entitlement.json" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege</userinput>
+<computeroutput>{"statusCode":201,"body":"Created","statusMessage":"Created"}</computeroutput>
+
+$ <userinput>cat entitlement2.json</userinput>
+<computeroutput>{
     "name": "Example HTTPS",
     "eSubject": {
         "state": {
@@ -879,12 +951,15 @@ $ cat entitlement2.json
             "https://www.example.com:443/*?*"
         ]
     }
-}$ curl
- --request POST
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- --data-urlencode "privilege.json@entitlement2.json"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege
-{"statusCode":201,"body":"Created","statusMessage":"Created"}</screen>
+}</computeroutput>
+
+$ <userinput>curl \
+ --request POST \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ --data-urlencode "privilege.json@entitlement2.json" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege</userinput>
+<computeroutput>{"statusCode":201,"body":"Created","statusMessage":"Created"}</computeroutput>
+    </screen>
    </section>
 
    <section xml:id="rest-api-policy-management-read">
@@ -896,11 +971,12 @@ $ cat entitlement2.json
     <para>Notice that the "state" is returned as a long string, and so is not
     shown here in full.</para>
 
-    <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP
-{
+    <screen width="81">
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "results": {
@@ -923,13 +999,13 @@ $ cat entitlement2.json
         }
     },
     "statusMessage": "OK"
-}
+}</computeroutput>
 
-$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS
-{
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "results": {
@@ -952,7 +1028,8 @@ $ curl
         }
     },
     "statusMessage": "OK"
-}</screen>
+}</computeroutput>
+    </screen>
    </section>
 
    <section xml:id="rest-api-policy-management-update">
@@ -961,7 +1038,9 @@ $ curl
     <para>To update a policy, use an HTTP PUT on the endpoint followed by the
     URL-encoded name of the policy.</para>
 
-    <screen>$ cat update.json {
+    <screen width="81">
+$ <userinput>cat update.json</userinput>
+<computeroutput>{
     "name": "Example HTTP",
     "eSubject": {
         "state": {
@@ -983,12 +1062,15 @@ $ curl
             "http://www.example.com:80/*?*"
         ]
     }
-}$ curl
- --request PUT
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- --data-urlencode "privilege.json@update.json"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP
-{"statusCode":200,"body":"OK","statusMessage":"OK"}</screen>
+}</computeroutput>
+
+$ <userinput>curl \
+ --request PUT \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ --data-urlencode "privilege.json@update.json" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP</userinput>
+<computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
+    </screen>
    </section>
 
    <section xml:id="rest-api-policy-management-delete">
@@ -997,11 +1079,13 @@ $ curl
     <para>To delete a policy, use an HTTP DELETE on the endpoint followed by
     the URL-encoded name of the policy.</para>
 
-    <screen>$ curl
- --request DELETE
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS
-{"statusCode":200,"body":"OK","statusMessage":"OK"}</screen>
+    <screen width="81">
+$ <userinput>curl \
+ --request DELETE \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS</userinput>
+<computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
+    </screen>
    </section>
 
    <section xml:id="rest-api-policy-management-query">
@@ -1009,11 +1093,12 @@ $ curl
 
     <para>To get the names of policies, use an HTTP GET on the endpoint.</para>
 
-    <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- https://openam.example.com:8443/openam/ws/1/entitlement/privilege
-{
+    <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ https://openam.example.com:8443/openam/ws/1/entitlement/privilege</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "results": [
@@ -1022,17 +1107,19 @@ $ curl
         ]
     },
     "statusMessage": "OK"
-}</screen>
+}</computeroutput>
+    </screen>
 
     <para>You can pass a filter query parameter to get only policies
     that match the filter. Make sure you URL encode the filter value.</para>
 
-    <screen>$ curl
- --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
- "https://openam.example.com:8443/openam/ws/1/entitlement/privilege
- ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;filter=name%3D*HTTP"
-{
+    <screen>
+$ <userinput>curl \
+ --request GET \
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
+ "https://openam.example.com:8443/openam/ws/1/entitlement/privilege\
+?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;filter=name%3D*HTTP"</userinput>
+<computeroutput>{
     "statusCode": 200,
     "body": {
         "results": [
@@ -1040,8 +1127,8 @@ $ curl
         ]
     },
     "statusMessage": "OK"
-}
-</screen>
+}</computeroutput>
+    </screen>
    </section>
   </section>
  </section>
@@ -1119,20 +1206,22 @@ $ curl
    <para>The following example shows OpenAM issuing an access token, and
    then returning token information.</para>
 
-   <screen>$ curl
- --request POST
- --user "myClientID:password"
- --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail"
- https://openam.example.com:8443/openam/oauth2/access_token
-{
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --user "myClientID:password" \
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
     "expires_in": 599,
     "token_type": "Bearer",
     "refresh_token": "f6dcf133-f00b-4943-a8d4-ee939fc1bf29",
     "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
-}
-$ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
- ?access_token=f9063e26-3a29-41ec-86de-1d0d68aa85e9
-{
+}</computeroutput>
+
+$ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
+?access_token=f9063e26-3a29-41ec-86de-1d0d68aa85e9</userinput>
+<computeroutput>{
     "mail": "demo@example.com",
     "scope": [
         "mail",
@@ -1143,7 +1232,8 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
     "token_type": "Bearer",
     "expires_in": 577,
     "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>The resource server making decisions about whether the token is valid
    can thus use the <literal>/oauth2/tokeninfo</literal> endpoint to retrieve
@@ -1208,21 +1298,23 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl
- --request POST
- --user "myClientID:password"
- --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail"
- https://openam.example.com:8443/openam/oauth2/access_token
-{
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --user "myClientID:password" \
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
     "expires_in": 599,
     "token_type": "Bearer",
     "refresh_token": "f838e7d4-7e84-4743-af7c-9a9c42c2969e",
     "access_token": "9c6a48fc-44b1-4a0c-b4f0-672fba468b0f"
-}
-$ curl
- --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
- https://openam.example.com:8443/openam/frrest/oauth2/token/9c6a48fc...fba468b0f
-{
+}</computeroutput>
+
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/9c6a48fc...fba468b0f</userinput>
+<computeroutput>{
     "scope": [
         "mail",
         "cn"
@@ -1248,7 +1340,8 @@ $ curl
     "client_id": [
         "myClientID"
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>To list tokens, perform an HTTP GET on
    <literal>/frrest/oauth2/token/?_query_id=<replaceable>conditions</replaceable></literal>,
@@ -1299,11 +1392,12 @@ $ curl
    <para>The following example shows a search for current access tokens that
    were issued to <literal>myClientID</literal>.</para>
 
-   <screen>$ curl
- --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
- https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryID
- =username%3DmyClientID%2Ctype%3Daccess_token
-{
+   <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryID\
+=username%3DmyClientID%2Ctype%3Daccess_token</userinput>
+<computeroutput>{
     "result": [
         {
             "scope": [
@@ -1350,29 +1444,33 @@ $ curl
     ],
     "pagedResultsCookie": null,
     "remainingPagedResults": -1
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>To delete a token, perform an HTTP DELETE on
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl
- --request POST
- --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit
- &amp;client_id=myClientID&amp;client_secret=password&amp;scope=cn%20mail"
- https://openam.example.com:8443/openam/oauth2/access_token
-{
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit\
+&amp;client_id=myClientID&amp;client_secret=password&amp;scope=cn%20mail" \
+ https://openam.example.com:8443/openam/oauth2/access_token</userinput>
+<computeroutput>{
     "expires_in": 599,
     "token_type": "Bearer",
     "access_token": "867aaab2-61d7-4b78-9b80-4f9098034540"
-}
-$ curl
- --request DELETE
- --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
- https://openam.example.com:8443/openam/frrest/oauth2/token/867aaab2..098034540
-{
+}</computeroutput>
+
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/token/867aaab2..098034540</userinput>
+<computeroutput>{
     "success": "true"
-}</screen>
+}</computeroutput>
+   </screen>
   </section>
 
   <section xml:id="rest-api-oauth2-client-admin-endpoint">
@@ -1395,21 +1493,26 @@ $ curl
    with a JSON object fully specifying the client, as in the following
    example.</para>
 
-   <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
- --header "Content-Type: application/json"
- --data '{"client_id":["testClient"],
-          "realm":["/"]
-          "userpassword":["secret12"],
-          "com.forgerock.openam.oauth2provider.clientType":["Confidential"],
-          "com.forgerock.openam.oauth2provider.redirectionURIs":
-            ["www.client.com","www.example.com"],
-          "com.forgerock.openam.oauth2provider.scopes":["cn","sn"],
-          "com.forgerock.openam.oauth2provider.defaultScopes":["cn"],
-          "com.forgerock.openam.oauth2provider.name":["My Test Client"],
-          "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"]
-         }'
- https://openam.example.com:8443/openam/frrest/oauth2/client/?_action=create
- {"success":"true"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
+ --header "Content-Type: application/json" \
+ --data \
+ '{"client_id":["testClient"], \
+   "realm":["/"], \
+   "userpassword":["secret12"], \
+   "com.forgerock.openam.oauth2provider.clientType":["Confidential"], \
+   "com.forgerock.openam.oauth2provider.redirectionURIs": \
+     ["www.client.com","www.example.com"], \
+   "com.forgerock.openam.oauth2provider.scopes":["cn","sn"], \
+   "com.forgerock.openam.oauth2provider.defaultScopes":["cn"], \
+   "com.forgerock.openam.oauth2provider.name":["My Test Client"], \
+   "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"] \
+  }' \
+ https://openam.example.com:8443/openam/frrest/oauth2/client/?_action=create</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
 
    <variablelist>
     <para>When creating an OAuth 2.0 client, use the following fields in your
@@ -1505,10 +1608,13 @@ $ curl
    <literal>/frrest/oauth2/client/<replaceable>client-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl --request DELETE
- --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
- https://openam.example.com:8443/openam/frrest/oauth2/client/testClient
-{"success":"true"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
+ https://openam.example.com:8443/openam/frrest/oauth2/client/testClient</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
   </section>
  </section>
 
@@ -1704,13 +1810,19 @@ $ curl
      Notice that authentication is not required.
     </para>
 
-    <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{
-    "email": "newuser@example.com",
-    "subject": "Confirm registration with OpenAM",
-    "message": "Follow this link to confirm your registration"
- }' https://openam.example.com:8443/openam/json/users/?_action=register
-{}</screen>
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{ \
+   "email": "newuser@example.com", \
+   "subject": "Confirm registration with OpenAM", \
+   "message": "Follow this link to confirm your registration" \
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=register</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
 
     <para>On success, the response is an empty JSON object <literal>{}</literal>
     as shown in the example.</para>
@@ -1737,16 +1849,23 @@ $ curl
     POST to <literal>/json/users?_action=confirm</literal> from the query string
     parameters as shown in the following example.</para>
 
-    <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{"email":"newuser@example.com",
-     "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
-     "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg="}'
- https://openam.example.com:8443/openam/json/users?_action=confirm
-{
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{ \
+   "email":"newuser@example.com", \
+   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=", \
+   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=" \
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=confirm</userinput>
+<computeroutput>{
     "email": "newuser@example.com",
     "tokenId": "+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
     "confirmationId": "P23PK5kyAgNdqeNJpAvq1ebcpcg="
-}</screen>
+}</computeroutput>
+    </screen>
 
     <para>The response is a further confirmation that the account can be
     created.</para>
@@ -1757,16 +1876,20 @@ $ curl
     HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
     create the user as shown in the following example.</para>
 
-    <screen>$ curl
- --request POST
- --header "Content-Type: application/json"
- --data '{"email":"newuser@example.com",
-     "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
-     "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=",
-     "username":"newuser",
-     "userpassword":"password"}'
- https://openam.example.com:8443/openam/json/users?_action=anonymousCreate
-{
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data \
+ '{ \
+   "email":"newuser@example.com", \
+   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=", \
+   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=", \
+   "username":"newuser", \
+   "userpassword":"password" \
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=anonymousCreate</userinput>
+<computeroutput>{
     "username": "newuser",
     "realm": "/",
     "uid": [
@@ -1810,7 +1933,8 @@ $ curl
     "universalid": [
         "id=newuser,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
    </listitem>
   </orderedlist>
 
@@ -1898,13 +2022,18 @@ $ curl
      Notice that authentication is not required.
     </para>
 
-    <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{
-    "username": "demo",
-    "subject": "Reset your forgotten password with OpenAM",
-    "message": "Follow this link to reset your password"
- }' https://openam.example.com:8443/openam/json/users/?_action=forgotPassword
-{}</screen>
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ \
+   "username": "demo", \
+   "subject": "Reset your forgotten password with OpenAM", \
+   "message": "Follow this link to reset your password" \
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
 
     <para>On success, the response is an empty JSON object <literal>{}</literal>
     as shown in the example.</para>
@@ -1933,13 +2062,18 @@ $ curl
     <para>Your POST includes the new password as the value of the "userpassword"
     field in the JSON payload.</para>
 
-    <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{"username":"demo",
-     "userpassword":"password",
-     "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=",
-     "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ="}'
- https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset
-{
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{ \
+ "username":"demo", \
+ "userpassword":"password", \
+ "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=", \
+ "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=" \
+ }' \
+ https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset</userinput>
+<computeroutput>{
     "name": "demo",
     "realm": "/",
     "uid": [
@@ -1980,7 +2114,8 @@ $ curl
     "universalid": [
         "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
 
     <para>On success, the response is the JSON representation of the user
     profile with the new password hashed according to the password storage
@@ -2002,19 +2137,22 @@ $ curl
   <para>You can send OpenAM messages to log, specifying the message content
   and the log file in which to write your message.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/log?
- appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
- &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
- &amp;logname=rest.access
- &amp;message=Hello%20World"</screen>
+  <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/log?\
+appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*\
+&amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
+&amp;logname=rest.access\
+&amp;message=Hello%20World"</userinput>
+  </screen>
   
   <para>Logging takes a valid <literal>appid</literal> token for the subject
   with access to log the message, and also a <literal>subjectid</literal> token
   for the user whom the message concerns. If the tokens are valid and the
   access rights correct, your message ends up in the log specified.</para>
   
-  <screen>$ cat openam/openam/log/rest.access 
-#Version: 1.0
+  <screen>
+$ <userinput>cat openam/openam/log/rest.access</userinput>
+<computeroutput>#Version: 1.0
 #Fields: time   Data    LoginID ContextID   IPAddr  LogLevel    Domain 
  LoggedBy    MessageID   ModuleName  NameID  HostName    
 "2011-09-14 16:38:17"   /home/user/openam/openam/log/
@@ -2024,7 +2162,8 @@ $ curl
 "2011-09-14 16:38:17"   "Hello World"   id=bjensen,ou=user,o=openam
    8a4025a2b3af291d01  "Not Available" INFO    o=openam
    id=amadmin,ou=user,o=openam "Not Available" rest.access "Not Available"
-   192.168.56.2</screen>
+   192.168.56.2</computeroutput>
+  </screen>
  </section>
  
  <section xml:id="rest-api-crud-identity">
@@ -2107,12 +2246,19 @@ $ curl
    you make for <literal>username</literal> defaults to both the user id and the
    user's last name.</para>
 
-   <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{ "username": "bjensen", "userpassword": "secret12",
-           "mail": "bjensen@example.com" }'
- https://openam.example.com:8443/openam/json/users/?_action=create
-{
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data \
+ '{ \
+   "username": "bjensen", \
+   "userpassword": "secret12", \
+   "mail": "bjensen@example.com" \
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=create</userinput>
+<computeroutput>{
     "username": "bjensen",
     "realm": "/",
     "uid": [
@@ -2154,18 +2300,28 @@ $ curl
     "universalid": [
         "id=bjensen,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
     <para>Alternatively, administrators can create user profiles with specific
     user IDs by doing an HTTP PUT of the JSON representation of the changes to
     <literal>/json/users/<replaceable>user-id</replaceable></literal>, as
     shown in the following example.</para>
 
-    <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json" --header "If-None-Match: *"
- --data '{ "username": "janedoe", "userpassword": "secret12", "mail": "janedoe@example.com" }'
- https://openam.example.com:8443/openam/json/users/janedoe
-{
+    <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --header "If-None-Match: *" \
+ --data \
+ '{ \
+   "username": "janedoe", \
+   "userpassword": "secret12", \
+   "mail": "janedoe@example.com" \
+ }' \
+ https://openam.example.com:8443/openam/json/users/janedoe</userinput>
+<computeroutput>{
     "username": "janedoe",
     "realm": "/",
     "uid": [
@@ -2209,7 +2365,8 @@ $ curl
     "universalid": [
         "id=janedoe,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
 
    <para>As shown in the examples, OpenAM returns the JSON representation of
    the profile on successful creation. On failure, OpenAM returns a JSON
@@ -2220,28 +2377,36 @@ $ curl
    <para>The same HTTP POST and PUT mechanisms also work for other objects
    such as policy agent profiles and groups.</para>
 
-   <screen>$ curl --request POST --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{"name":"myWebAgent","realm":"/",
-  "com.sun.identity.agents.config.fqdn.default":["www.example.com"],
-  "sunidentityserverdevicekeyvalue":["agentRootURL=http://www.example.com:80/"],
-  "com.sun.identity.agents.config.remote.logfile":["amAgent_www_example_com_80.log"],
-  "com.sun.identity.agents.config.repository.location":["centralized"],
-  "agenttype":["WebAgent"],
-  "com.sun.identity.agents.config.cdsso.cdcservlet.url":
-  ["[0]=https://openam.example.com:8443/openam/cdcservlet"],
-  "com.sun.identity.client.notification.url":
-  ["http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false"],
-  "com.sun.identity.agents.config.agenturi.prefix":
-  ["http://www.example.com:80/amagent"],
-  "userpassword":["password"],
-  "com.sun.identity.agents.config.login.url":
-  ["[0]=https://openam.example.com:8443/openam/UI/Login"],
-  "com.sun.identity.agents.config.logout.url":
-  ["[0]=https://openam.example.com:8443/openam/UI/Logout"],
-  "sunidentityserverdevicestatus":["Active"]}'
- https://openam.example.com:8443/openam/json/agents/?_action=create
-{
+   <screen width="82">
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data \
+ '{ \
+   "name":"myWebAgent","realm":"/", \
+   "com.sun.identity.agents.config.fqdn.default":["www.example.com"], \
+   "sunidentityserverdevicekeyvalue": \
+     ["agentRootURL=http://www.example.com:80/"], \
+   "com.sun.identity.agents.config.remote.logfile": \
+     ["amAgent_www_example_com_80.log"], \
+   "com.sun.identity.agents.config.repository.location":["centralized"], \
+   "agenttype":["WebAgent"],
+    "com.sun.identity.agents.config.cdsso.cdcservlet.url": \
+     ["[0]=https://openam.example.com:8443/openam/cdcservlet"], \
+   "com.sun.identity.client.notification.url": \
+     ["http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false"], \
+   "com.sun.identity.agents.config.agenturi.prefix": \
+     ["http://www.example.com:80/amagent"], \
+   "userpassword":["password"], \
+   "com.sun.identity.agents.config.login.url": \
+     ["[0]=https://openam.example.com:8443/openam/UI/Login"], \
+   "com.sun.identity.agents.config.logout.url": \
+     ["[0]=https://openam.example.com:8443/openam/UI/Logout"], \
+   "sunidentityserverdevicestatus":["Active"] \
+ }' \
+ https://openam.example.com:8443/openam/json/agents/?_action=create</userinput>
+<computeroutput>{
     "name": "myWebAgent",
     "realm": "/",
     "com.sun.identity.agents.config.cdsso.enable": [
@@ -2522,14 +2687,21 @@ $ curl
     "com.sun.identity.agents.config.postcache.entry.lifetime": [
         "10"
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
-   <screen>$ curl --request POST --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{"name":"newGroup","realm":"/",
-    "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]}'
- "https://openam.example.com:8443/openam/json/groups?_action=create"
-{
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data '{ \
+   "name":"newGroup", \
+   "realm":"/", \
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"] \
+ }' \
+ https://openam.example.com:8443/openam/json/groups?_action=create</userinput>
+<computeroutput>{
     "name": "newGroup",
     "realm": "/",
     "uniqueMember": [
@@ -2545,15 +2717,20 @@ $ curl
     "universalid": [
         "id=newGroup,ou=group,dc=openam,dc=forgerock,dc=org"
     ]
-}
+}</computeroutput>
 
-$ curl --request PUT --header "If-None-Match: *"
- --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{"name":"anotherGroup","realm":"/",
-    "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]}'
- https://openam.example.com:8443/openam/json/groups/anotherGroup
-{
+$ <userinput>curl \
+ --request PUT \
+ --header "If-None-Match: *" \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data '{ \
+   "name":"anotherGroup", \
+   "realm":"/", \
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"] \
+ }' \
+ https://openam.example.com:8443/openam/json/groups/anotherGroup</userinput>
+<computeroutput>{
     "name": "anotherGroup",
     "realm": "/",
     "uniqueMember": [
@@ -2569,7 +2746,8 @@ $ curl --request PUT --header "If-None-Match: *"
     "universalid": [
         "id=anotherGroup,ou=group,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+   </screen>
   </section>
    
   <section xml:id="rest-api-read-identity">
@@ -2588,9 +2766,11 @@ $ curl --request PUT --header "If-None-Match: *"
    accessing user data. Users can view their information by changing
    <literal>username=amadmin</literal> to <literal><replaceable>user-id</replaceable></literal>.</para>
 
-    <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/users/demo
-{
+    <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/users/demo</userinput>
+<computeroutput>{
     "username": "demo",
     "realm": "/",
     "uid": [
@@ -2629,15 +2809,19 @@ $ curl --request PUT --header "If-None-Match: *"
     "universalid": [
         "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
 
    <para>Use the <literal>_fields</literal> query string parameter to restrict
    the list of attributes returned. This parameter takes a comma-separated list
    of JSON object fields to include in the result.</para>
 
-   <screen>$ curl --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/users/demo?_fields=name,uid
-{"name":"demo","uid":["demo"]}</screen>
+   <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/users/demo?_fields=name,uid</userinput>
+<computeroutput>{"name":"demo","uid":["demo"]}</computeroutput>
+   </screen>
 
    <para>As shown in the examples, OpenAM returns the JSON representation of the
    profile on success. On failure, OpenAM returns a JSON representation of the
@@ -2648,9 +2832,11 @@ $ curl --request PUT --header "If-None-Match: *"
    <para>Using HTTP GET to read also works for other objects such as agent
    profiles and groups.</para>
 
-   <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/agents/myClientID
-{
+   <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/agents/myClientID</userinput>
+<computeroutput>{
     "name": "myClientID",
     "realm": "/",
     "com.forgerock.openam.oauth2provider.accessToken": [],
@@ -2695,22 +2881,26 @@ $ curl --request PUT --header "If-None-Match: *"
     "com.forgerock.openam.oauth2provider.description": [
         "[0]="
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>The <literal>_prettyPrint</literal> query string parameter can make
    the resulting JSON easier to read when you are viewing the resulting JSON
    directly.</para>
 
-   <screen>$ curl --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- "https://openam.example.com:8443/openam/json/groups/myGroup?_prettyPrint=true"
-{
+   <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/groups/myGroup?_prettyPrint=true</userinput>
+<computeroutput>{
   "name" : "myGroup",
   "realm" : "/",
   "uniquemember" : [ "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org" ],
   "cn" : [ "myGroup" ],
   "objectclass" : [ "groupofuniquenames", "top" ],
   "universalid" : [ "id=myGroup,ou=group,dc=openam,dc=forgerock,dc=org" ]
-}</screen>
+}</computeroutput>
+   </screen>
   </section>
 
   <section xml:id="rest-api-update-identity">
@@ -2725,11 +2915,14 @@ $ curl --request PUT --header "If-None-Match: *"
     <para>The following example shows how users can update their own
     profiles.</para>
 
-    <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
- --header "Content-Type: application/json"
- --data '{ "mail": "demo@example.com" }'
- https://openam.example.com:8443/openam/json/users/demo
-{
+    <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iplanetDirectoryPro: AQIC5...Y3MTAx*" \
+ --header "Content-Type: application/json" \
+ --data '{ "mail": "demo@example.com" }' \
+ https://openam.example.com:8443/openam/json/users/demo</userinput>
+<computeroutput>{
     "username": "demo",
     "realm": "/",
     "uid": [
@@ -2771,7 +2964,8 @@ $ curl --request PUT --header "If-None-Match: *"
     "universalid": [
         "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
 
    <para>As shown in the example, OpenAM returns the JSON representation of the
    profile on success. On failure, OpenAM returns a JSON representation of the
@@ -2782,18 +2976,32 @@ $ curl --request PUT --header "If-None-Match: *"
    <para>You can use HTTP PUT to update other objects as well, such as policy
    agent profiles groups.</para>
 
-   <screen>$ curl --request PUT --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*"
- --header "Content-Type: application/json"
- --data '{"name":"masterClient","realm":"/","accesstoken":[],
-    "clientsessionuri":[],"subjecttype":["Pairwise"],
-    "defaultscopes":["[0]=openid"],"clienttype":["Confidential"],
-    "universalid":["id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"],
-    "userpassword":"changeit","name":["[0]="],"redirectionuris":["[0]="],
-    "idtokensignedresponsealg":["HmacSHA512"],"scopes":["[0]=openid"],
-    "postlogoutredirecturi":[],"sunidentityserverdevicestatus":["Active"],
-    "agenttype":["OAuth2Client"],"description":["[0]="]}'
- https://openam.example.com:8443/openam/json/agents/masterClient
-{
+   <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*" \
+ --header "Content-Type: application/json" \
+ --data '{ \
+   "name":"masterClient", \
+   "realm":"/", \
+   "accesstoken":[], \
+   "clientsessionuri":[], \
+   "subjecttype":["Pairwise"], \
+   "defaultscopes":["[0]=openid"], \
+   "clienttype":["Confidential"], \
+   "universalid":["id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"], \
+   "userpassword":"changeit", \
+   "name":["[0]="], \
+   "redirectionuris":["[0]="], \
+   "idtokensignedresponsealg":["HmacSHA512"], \
+   "scopes":["[0]=openid"], \
+   "postlogoutredirecturi":[], \
+   "sunidentityserverdevicestatus":["Active"], \
+   "agenttype":["OAuth2Client"], \
+   "description":["[0]="] \
+ }' \
+ https://openam.example.com:8443/openam/json/agents/masterClient</userinput>
+<computeroutput>{
     "name": "masterClient",
     "realm": "/",
     "com.forgerock.openam.oauth2provider.accesstoken": [],
@@ -2835,18 +3043,26 @@ $ curl --request PUT --header "If-None-Match: *"
     "com.forgerock.openam.oauth2provider.description": [
         "[0]="
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>Notice in the following example that updates <literal>myGroup</literal>
    the object class value is not included in the JSON sent to OpenAM.</para>
 
-   <screen>$ curl --request PUT --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*"
- --header "Content-Type: application/json"
- --data '{"name":"myGroup","realm":"/",
-    "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"],
-    "cn":["myGroup"],"description":["Updated the group"]}'
-    https://openam.example.com:8443/openam/json/groups/myGroup
-{
+   <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*" \
+ --header "Content-Type: application/json" \
+ --data '{ \
+   "name":"myGroup", \
+   "realm":"/", \
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"], \
+   "cn":["myGroup"], \
+   "description":["Updated the group"] \
+ }' \
+ https://openam.example.com:8443/openam/json/groups/myGroup</userinput>
+<computeroutput>{
     "name": "myGroup",
     "realm": "/",
     "uniqueMember": [
@@ -2865,8 +3081,8 @@ $ curl --request PUT --header "If-None-Match: *"
     "universalid": [
         "id=myGroup,ou=group,dc=openam,dc=forgerock,dc=org"
     ]
-}
-</screen>
+}</computeroutput>
+   </screen>
   </section>
 
   <section xml:id="rest-api-delete-identity">
@@ -2881,9 +3097,13 @@ $ curl --request PUT --header "If-None-Match: *"
    realm. Only administrators should delete users. The user id is the only
    field required to delete a user.</para>
 
-   <screen>$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/users/bjensen
-{"success":"true"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/users/bjensen</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
 
    <para>On success, OpenAM returns a JSON object indicating success. On
    failure, OpenAM returns a JSON representation of the error including the
@@ -2893,13 +3113,21 @@ $ curl --request PUT --header "If-None-Match: *"
    <para>You can use this same logic for other resources such as performing an
    HTTP DELETE of an agent profile or of a group.</para>
 
-   <screen>$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/agents/myOAuth2ClientAgent
-{"success":"true"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/agents/myOAuth2ClientAgent</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
 
-   <screen>$ curl --request DELETE --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/groups/myGroup
-{"success":"true"}</screen>
+   <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/groups/myGroup</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+   </screen>
 
   <note>
     <para>Deleting a user does not automatically remove any of the user's sessions.
@@ -2916,35 +3144,44 @@ $ curl --request PUT --header "If-None-Match: *"
    >/users/?_queryId=*</literal>. To query the Top Level Realm, you do not need
    to specify the realm.</para>
 
-   <screen>$ curl --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- "https://openam.example.com:8443/openam/json/users?_queryID=*"
-{
+   <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ "https://openam.example.com:8443/openam/json/users?_queryID=*"</userinput>
+<computeroutput>{
   "result" : [ "amAdmin", "demo", "anonymous" ],
   "resultCount" : 3,
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>This also works for other types of objects, such as agent profiles and
    groups.</para>
 
-   <screen>$ curl --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- "https://openam.example.com:8443/openam/json/agents?_queryID=*"
-{
+   <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ "https://openam.example.com:8443/openam/json/agents?_queryID=*"</userinput>
+<computeroutput>{
   "result" : [ "wsp", "wsc", "agentAuth", "SecurityTokenService" ],
   "resultCount" : 4,
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
-}</screen>
+}</computeroutput>
+   </screen>
 
-   <screen>$ curl --header "iPlanetDirectoryPro: AQIC5w...2NzEz*"
- "https://openam.example.com:8443/openam/json/groups?_queryID=*"
-{
+   <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
+ "https://openam.example.com:8443/openam/json/groups?_queryID=*"</userinput>
+<computeroutput>{
   "result" : [ "myOtherGroup", "myGroup" ],
   "resultCount" : 2,
   "pagedResultsCookie" : null,
   "remainingPagedResults" : -1
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>As the result lists include all objects, this capability to list
    identity names is mainly useful in testing.</para>
@@ -2987,14 +3224,15 @@ $ curl --request PUT --header "If-None-Match: *"
     password to <literal>password</literal>.
    </para>
 
-   <screen>$ curl
- --request PUT
- --header "iPlanetDirectoryPro: AQIC5w...NTcy*"
- --header "Content-Type: application/json"
- --header "olduserpassword: changeit"
- --data '{"userpassword":"newpassword"}'
- http://openam.example.com:8080/openam/json/users/demo
-{
+   <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5w...NTcy*" \
+ --header "Content-Type: application/json" \
+ --header "olduserpassword: changeit" \
+ --data '{"userpassword":"newpassword"}' \
+ http://openam.example.com:8080/openam/json/users/demo</userinput>
+<computeroutput>{
     "username": "demo",
     "realm": "/",
     "uid": [
@@ -3038,7 +3276,8 @@ $ curl --request PUT --header "If-None-Match: *"
     "universalid": [
         "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
-}</screen>
+}</computeroutput>
+   </screen>
 
    <para>
     As shown in the examples, OpenAM returns
@@ -3102,17 +3341,19 @@ $ curl --request PUT --header "If-None-Match: *"
     </varlistentry>
    </variablelist>
    
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/create?
- admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
- &amp;identity_name=testuser
- &amp;identity_attribute_names=cn
- &amp;identity_attribute_values_cn=Test%20User
- &amp;identity_attribute_names=sn
- &amp;identity_attribute_values_sn=User
- &amp;identity_attribute_names=userpassword
- &amp;identity_attribute_values_userpassword=secret12
- &amp;identity_realm=%2F
- &amp;identity_type=user"</screen>
+    <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/create?\
+admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
+&amp;identity_name=testuser\
+&amp;identity_attribute_names=cn\
+&amp;identity_attribute_values_cn=Test%20User\
+&amp;identity_attribute_names=sn\
+&amp;identity_attribute_values_sn=User\
+&amp;identity_attribute_names=userpassword\
+&amp;identity_attribute_values_userpassword=secret12\
+&amp;identity_realm=%2F\
+&amp;identity_type=user"</userinput>
+    </screen>
   </section>
   
   <section xml:id="rest-api-read-legacy">
@@ -3127,12 +3368,13 @@ $ curl --request PUT --header "If-None-Match: *"
    a user with permissions to perform the search, as shown in the following
    example.</para>
    
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/read?
- admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
- &amp;name=testuser
- &amp;attributes_names=realm
- &amp;attributes_values_realm=%2F"
-identitydetails.name=testuser
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/read?\
+admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
+&amp;name=testuser\
+&amp;attributes_names=realm\
+&amp;attributes_values_realm=%2F"</userinput>
+<computeroutput>identitydetails.name=testuser
 identitydetails.type=user
 identitydetails.realm=o=openam
 identitydetails.attribute=
@@ -3170,7 +3412,8 @@ identitydetails.attribute.value=sunAMAuthAccountLockout
 identitydetails.attribute.value=top
 identitydetails.attribute=
 identitydetails.attribute.name=universalid
-identitydetails.attribute.value=id=testuser,ou=user,o=openam</screen>
+identitydetails.attribute.value=id=testuser,ou=user,o=openam</computeroutput>
+   </screen>
    
    <para>You can search for user IDs by providing the following
    parameters.</para>
@@ -3204,15 +3447,17 @@ identitydetails.attribute.value=id=testuser,ou=user,o=openam</screen>
     </varlistentry>
    </variablelist>
    
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/search?
- admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
- &amp;attributes_names=sn
- &amp;attributes_values_sn=Jensen
- &amp;attributes_names=mail
- &amp;attributes_values_mail=bjensen*
- &amp;attributes_names=realm
- &amp;attributes_values_realm=%2F"
-string=bjensen</screen>
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/search?\
+admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
+&amp;attributes_names=sn\
+&amp;attributes_values_sn=Jensen\
+&amp;attributes_names=mail\
+&amp;attributes_values_mail=bjensen*\
+&amp;attributes_names=realm\
+&amp;attributes_values_realm=%2F"</userinput>
+<computeroutput>string=bjensen</computeroutput>
+   </screen>
   </section>
   
   <section xml:id="rest-api-update-legacy">
@@ -3226,13 +3471,15 @@ string=bjensen</screen>
    identities, provided the token corresponds to a user with access to
    update the identity.</para>
    
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/update?
- admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
- &amp;identity_name=testuser
- &amp;identity_attribute_names=mail
- &amp;identity_attribute_values_mail=testuser%40example.com
- &amp;identity_realm=%2F
- &amp;identity_type=user"</screen>
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/update?\
+admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
+&amp;identity_name=testuser\
+&amp;identity_attribute_names=mail\
+&amp;identity_attribute_values_mail=testuser%40example.com\
+&amp;identity_realm=%2F\
+&amp;identity_type=user"</userinput>
+   </screen>
   </section>
   
   <section xml:id="rest-api-delete-legacy">
@@ -3245,11 +3492,13 @@ string=bjensen</screen>
 
    <para>You can also delete an identity.</para>
    
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/delete?
- admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
- &amp;identity_name=testuser
- &amp;identity_realm=%2F
- &amp;identity_type=user"</screen>
+   <screen>
+$ <userinput>curl "https://openam.example.com:8443/openam/identity/delete?\
+admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
+&amp;identity_name=testuser\
+&amp;identity_realm=%2F\
+&amp;identity_type=user"</userinput>
+   </screen>
   </section>
  </section>
  
@@ -3351,11 +3600,15 @@ string=bjensen</screen>
     the following example. The only required field is <literal>realm</literal>, 
     but the realm will not be active if the status is not set.</para>
    
-     <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{ "realm": "testRealm" }'
- https://openam.example.com:8443/openam/json/realms/?_action=create
-{"realmCreated":"/testRealm"}</screen>
+     <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data '{ "realm": "testRealm" }' \
+ https://openam.example.com:8443/openam/json/realms/?_action=create</userinput>
+<computeroutput>{"realmCreated":"/testRealm"}</computeroutput>
+     </screen>
 
     <para>You can also set the <literal>sunOrganizationAliases</literal> parameter,
     but it can only be assigned to one realm (usually the top level realm). Before
@@ -3367,17 +3620,23 @@ string=bjensen</screen>
     <literal>/json/realms/<replaceable>realm-id</replaceable></literal>, as
     shown in the following example.</para>
    
-     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- --header "Content-Type: application/json"
- --data '{ "sunOrganizationStatus": "Active" }'
- https://openam.example.com:8443/openam/json/realms/testRealm
-{</screen>
+     <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ --header "Content-Type: application/json" \
+ --data '{ "sunOrganizationStatus": "Active" }' \
+ https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+     </screen>
 
-    <para>As shown in the examples, OpenAM returns the JSON representation of
-    the profile on successful creation. On failure, OpenAM returns a JSON
-    representation of the error including the
-    <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-    xlink:show="new">HTTP status code</link>.</para>
+    <para>
+     OpenAM returns the JSON representation of the profile on success.
+     On failure, OpenAM returns a JSON representation of the error including the
+     <link
+      xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+      xlink:show="new"
+     >HTTP status code</link>.
+    </para>
    </section>
 
   <section xml:id="rest-api-read-realm">
@@ -3393,9 +3652,11 @@ string=bjensen</screen>
     <para>The following example shows an administrator receiving information about
     the <literal>testRealm</literal>.</para>
 
-    <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/realms/testRealm
-{
+    <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+<computeroutput>{
     "serviceNames":[
                   "sunAMAuthHOTPService",
                   "iPlanetAMAuthConfiguration",
@@ -3410,7 +3671,8 @@ string=bjensen</screen>
                   "sunAMAuthWSSAuthModuleService",
                   "iPlanetAMAuthOATHService"
     ]
-}</screen>
+}</computeroutput>
+    </screen>
 
     <para>As shown in the example, OpenAM returns the JSON representation of the
     profile on success. On failure, OpenAM returns a JSON representation of the
@@ -3428,12 +3690,16 @@ string=bjensen</screen>
 
     <para>The following example shows how to update a realm.</para>
    
-     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
- --header "Content-Type: application/json"
- --data '{ "sunOrganizationStatus": "Active" }'
- https://openam.example.com:8443/openam/json/realms/testRealm</screen>
+     <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iplanetDirectoryPro: AQIC5...Y3MTAx*" \
+ --header "Content-Type: application/json" \
+ --data '{ "sunOrganizationStatus": "Active" }' \
+ https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+     </screen>
 
-    <para>As shown in the example, OpenAM returns the JSON representation of the
+    <para>OpenAM returns the JSON representation of the
     profile on success. On failure, OpenAM returns a JSON representation of the
     error including the
     <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
@@ -3453,9 +3719,13 @@ string=bjensen</screen>
     before deleting it. Once a realm is deleted, the only way to restore it is 
     to return to a backed up deployment of OpenAM.</para>
 
-    <screen>$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/realms/testRealm
- {"success":"true"}</screen>
+    <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/realms/testRealm</userinput>
+<computeroutput>{"success":"true"}</computeroutput>
+    </screen>
 
     <para>On success, OpenAM returns a JSON object indicating success. On
     failure, OpenAM returns a JSON representation of the error including the
@@ -3480,9 +3750,12 @@ string=bjensen</screen>
       <listitem>
        <para>This endpoint retrieves the list of applications assigned to the 
        authenticated user.</para>
-      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/dashboard/assigned
-{
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/assigned</userinput>
+<computeroutput>{
   "google": {
       "dashboardIcon": [
           "Google.gif"
@@ -3503,7 +3776,8 @@ string=bjensen</screen>
           "SAML2ApplicationClass"
       ]
    }
-}</screen>
+}</computeroutput>
+      </screen>
       </listitem>
      </varlistentry>
 
@@ -3513,9 +3787,12 @@ string=bjensen</screen>
        <para>This endpoint retrieves the list of applications available in the
        authenticated user's realm. The example is based on two of the default 
        Dashboard applications: Google and Salesforce.</para>
-      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/dashboard/available
-{
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/available</userinput>
+<computeroutput>{
   "google": {
       "dashboardIcon": [
           "Google.gif"
@@ -3556,7 +3833,8 @@ string=bjensen</screen>
           "SAML2ApplicationClass"
       ]
   }
-}</screen>
+}</computeroutput>
+      </screen>
       </listitem>
      </varlistentry>
 
@@ -3566,9 +3844,12 @@ string=bjensen</screen>
        <para>This endpoint retrieves the list of all applications available defined
        for the OpenAM Dashboard service. The example is based on the three default 
        Dashboard applications: Google, Salesforce, and Zendesk.</para>
-      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/dashboard/defined
-{
+
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
+ https://openam.example.com:8443/openam/json/dashboard/defined</userinput>
+<computeroutput>{
     "google": {
         "dashboardIcon": [
             "Google.gif"
@@ -3629,7 +3910,8 @@ string=bjensen</screen>
             "SAML2ApplicationClass"
         ]
     }
-}</screen>
+}</computeroutput>
+      </screen>
       </listitem>
      </varlistentry>
 
@@ -3673,11 +3955,15 @@ string=bjensen</screen>
       <para>The request was malformed as in the following example, which is
       sending bad data in the payload for the action.</para>
 
-      <screen>$ curl --request POST --header "Content-Type: application/json"
- --data '{"bad":"data"}'
- https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+      <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{"bad":"data"}' \
+ https://openam.example.com:8443/openam/json/users?_action=forgotPassword</userinput>
 
-{"code":400,"reason":"Bad Request","message":"Username not provided"}</screen>
+<computeroutput>{"code":400,"reason":"Bad Request","message":"Username not provided"}</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
@@ -3687,10 +3973,13 @@ string=bjensen</screen>
       <para>The request requires user authentication as in the following
       example, which is missing an SSO Token value.</para>
 
-      <screen>$ curl --request POST
- https://openam.example.com:8443/openam/json/sessions?_action=logout
+      <screen>
+$ <userinput>curl \
+ --request POST \
+ https://openam.example.com:8443/openam/json/sessions?_action=logout</userinput>
 
-{ "code": 401, "reason": "Unauthorized", "message": "Access denied" }</screen>
+<computeroutput>{ "code": 401, "reason": "Unauthorized", "message": "Access denied" }</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
@@ -3701,20 +3990,25 @@ string=bjensen</screen>
       following example, which has a regular user trying to read the OpenAM
       administrator profile.</para>
 
-      <screen>$ curl --request POST
- --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: changeit"
- https://openam.example.com:8443/openam/json/authenticate
+      <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
 
-{ "tokenId": "AQIC5w...YyMA..*" }
+<computeroutput>{ "tokenId": "AQIC5w...YyMA..*" }</computeroutput>
 
-$ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
- https://openam.example.com:8443/openam/json/users/amadmin
-{
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...YyMA..*" \
+ https://openam.example.com:8443/openam/json/users/amadmin</userinput>
+<computeroutput>{
     "code": 403,
     "reason": "Forbidden",
     "message": "Permission to perform the read operation denied to
                 id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
-}</screen>
+}</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
@@ -3724,10 +4018,13 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
       <para>The specified resource could not be found as in the following
       example, which is attempting to read a nonexistent user's profile.</para>
 
-      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...NTcy*"
- https://openam.example.com:8443/openam/json/users/missing
+      <screen>
+$ <userinput>curl \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ https://openam.example.com:8443/openam/json/users/missing</userinput>
 
-  {"code":404,"reason":"Not Found","message":"Resource cannot be found."}</screen>
+<computeroutput>{"code":404,"reason":"Not Found","message":"Resource cannot be found."}</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
@@ -3764,14 +4061,18 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
       to pass basic authentication credentials as form-encoded data rather than
       query string parameters.</para>
 
-      <screen>$ curl --request POST --data "username=demo&amp;password=changeit"
- https://openam.example.com:8443/openam/json/authenticate
-...
+      <screen>
+$ <userinput>curl \
+ --request POST \
+ --data "username=demo&amp;password=changeit" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+<computeroutput>...
 HTTP Status 415
 ...
 The server refused this request because the request entity is in a
  format not supported by the requested resource for the requested method
-...</screen>
+...</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
@@ -3800,14 +4101,18 @@ The server refused this request because the request entity is in a
       the request as in the following example, which is attempting to delete
       an entry as a delete action instead of using an HTTP DELETE request.</para>
 
-      <screen>curl --request POST --header "iplanetDirectoryPro: AQIC5w...NTcy*"
- https://openam.example.com:8443/openam/json/users/demo?_action=delete
+      <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iplanetDirectoryPro: AQIC5w...NTcy*" \
+ https://openam.example.com:8443/openam/json/users/demo?_action=delete</userinput>
 
-{
+<computeroutput>{
     "code": 501,
     "reason": "Not Implemented",
     "message": "Actions are not supported for resource instances"
-}</screen>
+}</computeroutput>
+      </screen>
      </listitem>
     </varlistentry>
 
