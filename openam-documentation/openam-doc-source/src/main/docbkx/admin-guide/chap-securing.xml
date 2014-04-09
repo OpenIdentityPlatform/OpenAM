@@ -20,16 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-securing'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Securing OpenAM</title>
  <indexterm>
   <primary>Securing OpenAM</primary>
@@ -229,6 +229,33 @@
     <para>When using HTTPS, use <link xlink:show="new"
     xlink:href="http://en.wikipedia.org/wiki/HTTP_cookie#Secure_and_HttpOnly"
     >secure cookies</link>.</para>
+
+    <para>
+     Secure cookies are meant to be transmitted only over secured connections.
+    </para>
+
+    <para>
+     You can configure OpenAM server to use Secure cookies
+     by browsing in OpenAM console to
+     Configuration > Servers and Sites > Default Server Settings > Security > Cookie,
+     selecting Yes in the Secure Cookie field,
+     and then clicking Save to keep your work.
+    </para>
+
+    <para>
+     HttpOnly cookies are meant to be transmitted only over HTTP and HTTPS,
+     and not through non-HTTP methods such as JavaScript functions.
+    </para>
+
+    <para>
+     You can configure OpenAM server to use HttpOnly cookies
+     by browsing in OpenAM console to
+     Configuration > Servers and Sites > Default Server Settings > Advanced,
+     adding the advanced property
+     with name <literal>com.sun.identity.cookie.httponly</literal>
+     and value <literal>true</literal>,
+     and then clicking Save to keep your work.
+    </para>
    </listitem>
 
    <listitem>
