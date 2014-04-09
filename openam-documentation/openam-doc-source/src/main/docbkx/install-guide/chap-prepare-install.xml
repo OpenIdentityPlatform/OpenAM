@@ -1060,18 +1060,49 @@ $ <userinput>unzip ~/Downloads/${coreDirectoryFile}</userinput>
  <section xml:id="prepare-apache-tomcat">
   <title>Preparing Apache Tomcat</title>
 
-  <para>OpenAM examples often use Apache Tomcat as the deployment container.
-  Tomcat is installed on <literal>openam.example.com</literal>, and listens
-  on the default ports, with no Java Security Manager enabled. The script
-  <filename>/etc/init.d/tomcat</filename> manages the service at system
-  startup and shutdown. This script assumes you run OpenAM as the user
-  <literal>openam</literal>.</para>
+  <para>
+   OpenAM examples often use Apache Tomcat as the deployment container.
+   Tomcat is installed on <literal>openam.example.com</literal>,
+   and listens on the default ports,
+   with no Java Security Manager enabled.
+  </para>
 
-  <para>OpenAM core services require a minimum JVM heap size of 1 GB, and a
-  permanent generation size of 256 MB. If you are including the embedded
-  OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space
-  is allocated to OpenDJ. See <xref linkend="prepare-java" /> for
-  details.</para>
+  <para>
+   OpenAM core services require a minimum JVM heap size of 1 GB,
+   and a permanent generation size of 256 MB.
+   If you are including the embedded OpenDJ directory,
+   OpenAM requires at least a 2 GB heap,
+   as 50% of that space is allocated to OpenDJ.
+   See <xref linkend="prepare-java" /> for details.
+  </para>
+
+  <para>
+   ForgeRock recommends that you edit the Tomcat &lt;Connector> configuration
+   to set <literal>URIEncoding="UTF-8"</literal>.
+   UTF-8 URI encoding ensures that URL-encoded characters
+   in the paths of URIs are correctly decoded by the container.
+   This is particularly useful when applications use the OpenAM REST APIs,
+   and some identifiers such as user names can contain special characters.
+  </para>
+
+  <para>
+   &lt;Connector> configuration elements are found in the configuration file,
+   <filename>/path/to/tomcat/conf/server.xml</filename>.
+   The following excerpt shows an example &lt;Connector>
+   with the <literal>URIEncoding</literal> attribute set appropriately.
+  </para>
+
+  <programlisting language="xml">
+&lt;Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+              maxThreads="150" scheme="https" secure="true"
+              clientAuth="false" sslProtocol="TLS" URIEncoding="UTF-8" />
+  </programlisting>
+
+  <para>
+   The following example script, <filename>/etc/init.d/tomcat</filename>,
+   manages the service at system startup and shutdown.
+   This script assumes you run OpenAM as the user <literal>openam</literal>.
+  </para>
 
   <programlisting language="shell">
 #!/bin/sh
