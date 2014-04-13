@@ -26,7 +26,7 @@
 : $Id: ssoadm.bat,v 1.19 2010/01/28 00:49:05 bigfatrat Exp $
 :
 
-: Portions Copyrighted 2010-2013 ForgeRock AS.
+: Portions Copyrighted 2010-2014 ForgeRock AS.
 
 setlocal
 
@@ -42,20 +42,19 @@ set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/opendj-server-${opendj.server.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/mail-1.4.5.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/servlet-api-2.5.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-api-2009-14-01.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-rt-2009-29-07.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-tools-2.1-b16.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/json-20090211.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-2008-03-12.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-api-2003-09-04.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xalan-2.7.1.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xercesImpl-2.10.0.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-apis-1.4.01.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-serializer-2.11.0.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xmlsec-1.3.0.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/commons-lang-2.6.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/mail-${mail.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/servlet-api-${servlet-api.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-api-${webservices-api.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-rt-${webservices-rt.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/json-${json.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-${webservices-extra.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-api-${webservices-extra-api.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xalan-${xalan.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xercesImpl-${xercesj.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-apis-${xercesj.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-serializer-${xercesj.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xmlsec-${santuario.xmlsec.version}.jar"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/commons-lang-${commons-lang.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-cli-definitions-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-cli-impl-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-core-${project.version}.jar"

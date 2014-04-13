@@ -137,6 +137,56 @@
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
         <cxf-rt-ws-security.version>2.7.8</cxf-rt-ws-security.version>
+        <click.version>2.3.0</click.version>
+        <commons-beanutils.version>1.8.3</commons-beanutils.version>
+        <commons-codec.version>1.6</commons-codec.version>
+        <commons-collections.version>3.2.1</commons-collections.version>
+        <commons-digester.version>2.1</commons-digester.version>
+        <commons-fileupload.version>1.2.2</commons-fileupload.version>
+        <commons-io.version>2.3</commons-io.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <commons-logging.version>1.1.3</commons-logging.version>
+        <commons-logging-api.version>1.1</commons-logging-api.version>
+        <esapiport.version>2013-12-04</esapiport.version>
+        <geoip.version>1.2.8</geoip.version>
+        <jaxb.version>1.0.6</jaxb.version>
+        <jaxrpc-api.version>1.1</jaxrpc-api.version>
+        <jaxrpc-impl.version>1.1.3_01-041406</jaxrpc-impl.version>
+        <jaxrpc-spi.version>1.1.3_01</jaxrpc-spi.version>
+        <jdom.version>2.0.1</jdom.version>
+        <je.version>5.0.73</je.version>
+        <jersey-bundle.version>1.1.1-ea</jersey-bundle.version>
+        <jato.version>2005-05-04</jato.version>
+        <cc-ui.version>2008-08-08</cc-ui.version>
+        <jsr311-api.version>1.1.1</jsr311-api.version>
+        <jstl.version>1.1.2</jstl.version>
+        <log4j.version>1.2.16</log4j.version>
+        <mail.version>1.4.5</mail.version>
+        <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
+        <relaxngDatatype.version>20020414</relaxngDatatype.version>
+        <saaj-api.version>1.3.4</saaj-api.version>
+        <saaj-impl.version>1.3.19</saaj-impl.version>
+        <servlet-api.version>2.5</servlet-api.version>
+        <jsp-api.version>2.1</jsp-api.version>
+        <xalan.version>2.7.1</xalan.version>
+        <xsdlib.version>20060615</xsdlib.version>
+        <authapi.version>2005-08-12</authapi.version>
+        <FastInfoset.version>2006-26-09</FastInfoset.version>
+        <jdmk.version>2007-01-10</jdmk.version>
+        <jsr173_api.version>2004-30-01</jsr173_api.version>
+        <jss4.version>2007-08-11</jss4.version>
+        <publicsuffix.version>1.0.1</publicsuffix.version>
+        <webservices-extra.version>2008-03-12</webservices-extra.version>
+        <webservices-extra-api.version>2003-09-04</webservices-extra-api.version>
+        <webservices-rt.version>2009-29-07</webservices-rt.version>
+        <webservices-api.version>2009-14-01</webservices-api.version>
+        <jackson-asl.version>1.9.7</jackson-asl.version>
+        <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
+        <jquery-amd.version>1.7.1-alpha-1</jquery-amd.version>
+        <freemarker.version>2.3.19</freemarker.version>
+        <java-ipv6.version>0.14</java-ipv6.version>
+        <json.version>20090211</json.version>
+        <javax.inject.version>1</javax.inject.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -887,78 +937,73 @@
             <dependency>
                 <groupId>org.apache.click</groupId>
                 <artifactId>click-extras</artifactId>
-                <version>2.3.0</version>
+                <version>${click.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.click</groupId>
                 <artifactId>click-nodeps</artifactId>
-                <version>2.3.0</version>
+                <version>${click.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-beanutils</groupId>
                 <artifactId>commons-beanutils</artifactId>
-                <version>1.8.3</version>
-                <!-- Originally 1.6 -->
+                <version>${commons-beanutils.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.6</version>
-                <!-- Originally 1.4 -->
+                <version>${commons-codec.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
-                <version>3.2.1</version>
+                <version>${commons-collections.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-digester</groupId>
                 <artifactId>commons-digester</artifactId>
-                <version>2.1</version>
-                <!-- Originally 1.8.3 -->
+                <version>${commons-digester.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
-                <version>1.2.2</version>
-                <!-- Originally 1.8.3 -->
+                <version>${commons-fileupload.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.3</version>
-                <!-- Originally 2.0.1 -->
+                <version>${commons-io.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
+                <version>${commons-lang.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
-                <version>1.1.3</version>
+                <version>${commons-logging.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging-api</artifactId>
-                <version>1.1</version>
+                <version>${commons-logging-api.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>esapiport</artifactId>
-                <version>2013-12-04</version>
+                <version>${esapiport.version}</version>
             </dependency>
 
             <!--
@@ -972,7 +1017,7 @@
             <dependency>
                 <groupId>org.kohsuke</groupId>
                 <artifactId>geoip</artifactId>
-                <version>1.2.8</version>
+                <version>${geoip.version}</version>
             </dependency>
 
             <!-- TODO j2ee -->
@@ -980,49 +1025,43 @@
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
-                <version>1.0.6</version>
-                <!-- Originally ? -->
+                <version>${jaxb.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>1.0.6</version>
-                <!-- Originally ? -->
+                <version>${jaxb.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-libs</artifactId>
-                <version>1.0.6</version>
-                <!-- Originally ? -->
+                <version>${jaxb.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
-                <version>1.0.6</version>
-                <!-- Originally ? -->
+                <version>${jaxb.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>javax.xml</groupId>
                 <artifactId>jaxrpc-api</artifactId>
-                <version>1.1</version>
-                <!-- Originally ? -->
+                <version>${jaxrpc-api.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>jaxrpc-impl</artifactId>
-                <version>1.1.3_01-041406</version>
+                <version>${jaxrpc-impl.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.rpc</groupId>
                 <artifactId>jaxrpc-spi</artifactId>
-                <version>1.1.3_01</version>
-                <!-- Originally ? -->
+                <version>${jaxrpc-spi.version}</version>
             </dependency>
 
             <!-- TODO jmx -->
@@ -1030,117 +1069,115 @@
             <dependency>
                 <groupId>org.jdom</groupId>
                 <artifactId>jdom</artifactId>
-                <version>2.0.1</version>
-                <!-- Originally ? -->
+                <version>${jdom.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sleepycat</groupId>
                 <artifactId>je</artifactId>
-                <version>5.0.73</version>
+                <version>${je.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-bundle</artifactId>
-                <version>1.1.1-ea</version>
-                <!-- Originally 1.1.1-ea-SNAPSHOT -->
+                <version>${jersey-bundle.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.iplanet.jato</groupId>
                 <artifactId>jato</artifactId>
-                <version>2005-05-04</version>
+                <version>${jato.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_de</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_es</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_fr</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_it</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_ja</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_ko</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_sv</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_CN</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_HK</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.web.ui</groupId>
                 <artifactId>cc_zh_TW</artifactId>
-                <version>2008-08-08</version>
+                <version>${cc-ui.version}</version>
                 <scope>runtime</scope>
             </dependency>
 
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>jsr311-api</artifactId>
-                <version>1.1.1</version>
+                <version>${jsr311-api.version}</version>
             </dependency>
 
             <!-- TODO jss4 org/mozilla/jss -->
@@ -1148,7 +1185,7 @@
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>jstl</artifactId>
-                <version>1.1.2</version>
+                <version>${jstl.version}</version>
             </dependency>
 
             <dependency>
@@ -1167,72 +1204,68 @@
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.16</version>
-                <!-- Originally1.2.8 -->
+                <version>${log4j.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
-                <version>1.4.5</version>
-                <!-- Originally ? -->
+                <version>${mail.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
                 <artifactId>oauth-client</artifactId>
-                <version>1.1.5.2</version>
+                <version>${jersey-oauth.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
                 <artifactId>oauth-server</artifactId>
-                <version>1.1.5.2</version>
+                <version>${jersey-oauth.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
                 <artifactId>oauth-signature</artifactId>
-                <version>1.1.5.2</version>
+                <version>${jersey-oauth.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>relaxngDatatype</groupId>
                 <artifactId>relaxngDatatype</artifactId>
-                <version>20020414</version>
+                <version>${relaxngDatatype.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>javax.xml.soap</groupId>
                 <artifactId>saaj-api</artifactId>
-                <version>1.3.4</version>
-                <!-- Originally ? -->
+                <version>${saaj-api.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.sun.xml.messaging.saaj</groupId>
                 <artifactId>saaj-impl</artifactId>
-                <version>1.3.19</version>
-                <!-- Originally ? -->
+                <version>${saaj-impl.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
+                <version>${servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>
                 <artifactId>jsp-api</artifactId>
-                <version>2.1</version>
+                <version>${jsp-api.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
-                <version>2.7.1</version>
+                <version>${xalan.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>xml-apis</groupId>
@@ -1244,8 +1277,7 @@
             <dependency>
                 <groupId>com.sun.msv.datatype.xsd</groupId>
                 <artifactId>xsdlib</artifactId>
-                <version>20060615</version>
-                <!-- Originally ? -->
+                <version>${xsdlib.version}</version>
             </dependency>
 
             <!-- OpenDJ API -->
@@ -1279,58 +1311,58 @@
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>authapi</artifactId>
-                <version>2005-08-12</version>
+                <version>${authapi.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>FastInfoset</artifactId>
-                <version>2006-26-09</version>
+                <version>${FastInfoset.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>jdmkrt</artifactId>
-                <version>2007-01-10</version>
+                <version>${jdmk.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>jdmktk</artifactId>
-                <version>2007-01-10</version>
+                <version>${jdmk.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>jsr173_api</artifactId>
-                <version>2004-30-01</version>
+                <version>${jsr173_api.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>jss4</artifactId>
-                <version>2007-08-11</version>
+                <version>${jss4.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>publicsuffix</artifactId>
-                <version>1.0.1</version>
+                <version>${publicsuffix.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>webservices-extra</artifactId>
-                <version>2008-03-12</version>
+                <version>${webservices-extra.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>webservices-extra-api</artifactId>
-                <version>2003-09-04</version>
+                <version>${webservices-extra-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>webservices-rt</artifactId>
-                <version>2009-29-07</version>
+                <version>${webservices-rt.version}</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>webservices-api</artifactId>
-                <version>2009-14-01</version>
+                <version>${webservices-api.version}</version>
             </dependency>
 
             <!-- Preferred JSON Data Binding API -->
@@ -1359,12 +1391,12 @@
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-core-asl</artifactId>
-                <version>1.9.7</version>
+                <version>${jackson-asl.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
-                <version>1.9.7</version>
+                <version>${jackson-asl.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.restlet.jse</groupId>
@@ -1500,21 +1532,21 @@
             <dependency>
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.security.auth.message</artifactId>
-                <version>3.1</version>
+                <version>${javax.security.auth.message.version}</version>
             </dependency>
 
             <!-- DevicePrint -->
             <dependency>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jquery-amd</artifactId>
-                <version>1.7.1-alpha-1</version>
+                <version>${jquery-amd.version}</version>
                 <type>js</type>
             </dependency>
 
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
-                <version>2.3.19</version>
+                <version>${freemarker.version}</version>
             </dependency>
             <!-- Xerces-J Required for fedlet and XACML -->
             <dependency>
@@ -1541,13 +1573,13 @@
             <dependency>
                 <groupId>com.googlecode.java-ipv6</groupId>
                 <artifactId>java-ipv6</artifactId>
-                <version>0.14</version>
+                <version>${java-ipv6.version}</version>
             </dependency>
             <!-- Native Json Manipulation -->
             <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
-                <version>20090211</version>
+                <version>${json.version}</version>
             </dependency>
 
             <dependency>
@@ -1596,6 +1628,13 @@
                 <artifactId>forgerock-guice-servlet</artifactId>
                 <version>${forgerock.guice.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${javax.inject.version}</version>
+            </dependency>
+
             <!--
               required by the STS
               -->

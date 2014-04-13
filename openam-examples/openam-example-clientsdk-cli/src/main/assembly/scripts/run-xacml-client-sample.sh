@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #------------------------------------------------------------------------------
-#README file for OpenSSO stand alone client sdk samples
+#README file for OpenAM stand alone client sdk samples
 #------------------------------------------------------------------------------
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
@@ -28,7 +28,7 @@
 #
 #$Id: run-xacml-client-sample.sh,v 1.9 2008/08/19 19:11:25 veiming Exp $
 #
-# Portions Copyrighted 2013 ForgeRock, Inc.
+# Portions Copyrighted 2013-2014 ForgeRock AS
 #------------------------------------------------------------------------------
 #
 #Runs the xacml client sample program
@@ -52,44 +52,44 @@
 #see ../resources/xacmlClientSample.properties for more information
 #
 #Requires ../resources/AMConfig.properties 
-#Must run "setup.sh" once to configure the client to find the OpenSSO server, this
+#Must run "setup.sh" once to configure the client to find the OpenAM server, this
 #is referred as PEP host below. Modify AMConfig.properties, set value of
 #"com.sun.identity.agents.app.username" property to "amadmin", set value of 
 #"com.iplanet.am.service.password" property to the amadmin password if it is 
 #different from the password entered when running setup.sh command. 
 #
-#Setting up PDP OpenSSO and PEP OpenSSO
+#Setting up PDP OpenAM and PEP OpenAM
 #
-# At PDP host, that is the host that would run the OpenSSO acting as PDP.
-# We would call this PDP OpenSSO. At PDP host, do the following:
+# At PDP host, that is the host that would run the OpenAM acting as PDP.
+# We would call this PDP OpenAM. At PDP host, do the following:
 #
-# deploy opensso.war  and configure it on a supported java ee container
-# using OpenSSO console, Configuration > SAMLv2 SOAP Binding,set soap handler, 
+# deploy openam.war  and configure it on a supported java ee container
+# using OpenAM console, Configuration > SAMLv2 SOAP Binding,set soap handler,
 # key=/xacmlPdp|class=com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler
 #
-# unzip ssoAdminTools.zip and setup OpenSSO admin tools
-# opensso/bin/ssoadm create-cot -t xacml-pdp-cot -u amadmin -f <password_file>
-# opensso/bin/ssoadm create-metadata-templ -y xacmlPdpEntity -p /xacmlPdp -m xacmlPdp.xml -x xacmlPdp-x.xml -u amadmin -f <password_file>
-# opensso/bin/ssoadm import-entity -t xacml-pdp-cot -m xacmlPdp.xml -x xacmlPdp-x.xml -u amadmin -f <password_file>
+# unzip ssoAdminTools.zip and setup OpenAM admin tools
+# openam/bin/ssoadm create-cot -t xacml-pdp-cot -u amadmin -f <password_file>
+# openam/bin/ssoadm create-metadata-templ -y xacmlPdpEntity -p /xacmlPdp -m xacmlPdp.xml -x xacmlPdp-x.xml -u amadmin -f <password_file>
+# openam/bin/ssoadm import-entity -t xacml-pdp-cot -m xacmlPdp.xml -x xacmlPdp-x.xml -u amadmin -f <password_file>
 #
 #
-# At PEP host, that is the host that would run the OpenSSO acting as PEP metadata
+# At PEP host, that is the host that would run the OpenAM acting as PEP metadata
 # repository, do
 #
-# deploy opensso.war  and configure it on a supported java ee container
+# deploy openam.war  and configure it on a supported java ee container
 #
-# unzip ssoAdminTools.zip and setup OpenSSO admin tools 
-# opensso/bin/ssoadm create-cot -t xacml-pep-cot -u amadmin -f <password_file>
-# opensso/bin/ssoadm create-metadata-templ -y xacmlPepEntity -e /xacmlPep -m xacmlPep.xml -x xacmlPep-x.xml -u amadmin -f <password_file>
-# opensso/bin/ssoadm import-entity -t xacml-pep-cot -m xacmlPep.xml -x xacmlPep-x.xml -u amadmin -f <password_file>
+# unzip ssoAdminTools.zip and setup OpenAM admin tools
+# openam/bin/ssoadm create-cot -t xacml-pep-cot -u amadmin -f <password_file>
+# openam/bin/ssoadm create-metadata-templ -y xacmlPepEntity -e /xacmlPep -m xacmlPep.xml -x xacmlPep-x.xml -u amadmin -f <password_file>
+# openam/bin/ssoadm import-entity -t xacml-pep-cot -m xacmlPep.xml -x xacmlPep-x.xml -u amadmin -f <password_file>
 #
 # copy xacmlPdp.xml from PDP host as  xacmlPdp-r.xml to PEP host, do
-# opensso/bin/ssoadm import-entity -t xacml-pep-cot -m xacmlPdp-r.xml -u amadmin -f <password_file>
+# openam/bin/ssoadm import-entity -t xacml-pep-cot -m xacmlPdp-r.xml -u amadmin -f <password_file>
 #
 #
 # At PDP host, do the following:
 # copy xacmlPep.xml from PEP host as xacmlPep-r.xml to PDP host
-# opensso/bin/ssoadm import-entity -t xacml-pdp-cot -m xacmlPep-r.xml -u amadmin -f <password_file>
+# openam/bin/ssoadm import-entity -t xacml-pdp-cot -m xacmlPep-r.xml -u amadmin -f <password_file>
 #
 # Then, run this script
-java -classpath resources:lib/openam-clientsdk-${project.version}.jar:lib/servlet-api-2.5.jar:lib/openam-example-clientsdk-cli-${project.version}.jar:lib/jaxb-impl-1.0.6.jar:lib/jaxb-libs-1.0.6.jar samples.xacml.XACMLClientSample xacmlClientSample
+java -classpath resources:lib/openam-clientsdk-${project.version}.jar:lib/servlet-api-${servlet-api.version}.jar:lib/openam-example-clientsdk-cli-${project.version}.jar:lib/jaxb-impl-${jaxb.version}.jar:lib/jaxb-libs-${jaxb.version}.jar samples.xacml.XACMLClientSample xacmlClientSample

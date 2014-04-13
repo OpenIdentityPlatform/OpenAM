@@ -24,7 +24,7 @@
 :
 : $Id: Login.bat,v 1.5 2008/07/02 18:33:11 veiming Exp $
 :
-: Portions Copyrighted 2013 ForgeRock, Inc.
+: Portions Copyrighted 2013-2014 ForgeRock AS
 :
-java -cp resources;lib/openam-clientsdk-${project.version}.jar;openam-example-clientsdk-cli-${project.version}.jar;lib/servlet-api-2.5.jar com.sun.identity.samples.authentication.Login
+java -cp resources;lib/openam-clientsdk-${project.version}.jar;openam-example-clientsdk-cli-${project.version}.jar;lib/servlet-api-${servlet-api.version}.jar com.sun.identity.samples.authentication.Login
 

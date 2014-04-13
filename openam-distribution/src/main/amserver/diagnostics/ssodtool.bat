@@ -25,7 +25,7 @@
 :: $Id: ssodtool.bat,v 1.4 2009/08/18 01:03:25 ak138937 Exp $
 ::
 
-:: Portions Copyrighted 2011-2012 ForgeRock Inc
+:: Portions Copyrighted 2011-2014 ForgeRock AS
 
 set _JAVA_CMD=java
 set _TRIMMED_JAVA_HOME=%JAVA_HOME%
@@ -84,11 +84,11 @@ set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-base-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-schema-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/jaxb-api-1.0.6.jar"
-set CLASSPATH="%CLASSPATH%;lib/jaxb-impl-1.0.6.jar"
-set CLASSPATH="%CLASSPATH%;lib/OpenDJ-2012-20-02.jar"
-set CLASSPATH="%CLASSPATH%;lib/xsdlib-20060615.jar"
-set CLASSPATH="%CLASSPATH%;lib/webservices-rt-2009-29-07.jar"
+set CLASSPATH="%CLASSPATH%;lib/jaxb-api-${jaxb.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/jaxb-impl-${jaxb.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/xsdlib-${xsdlib.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-rt-${webservices-rt.version}.jar"
 
 IF DEFINED ORIG_CLASSPATH (
 	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%

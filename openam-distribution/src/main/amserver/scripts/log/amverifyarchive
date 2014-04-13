@@ -26,7 +26,7 @@
 # $Id: amverifyarchive,v 1.11 2009/07/06 22:00:08 hvijay Exp $
 #
 
-# Portions Copyrighted 2011-2013 ForgeRock AS.
+# Portions Copyrighted 2011-2014 ForgeRock AS.
 
 TOOLS_HOME="@TOOLS_HOME@"
 JAVA_HOME="\@JAVA_HOME@"
@@ -34,16 +34,15 @@ JAVA_HOME="\@JAVA_HOME@"
 TOOLS_CLASSPATH="@CONFIG_DIR@"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/forgerock-util-${commons.forgerock-util.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/opendj-server-${opendj.server.version}.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/mail-1.4.5.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/j2ee-2007-18-10.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/webservices-api-2009-14-01.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/webservices-rt-2009-29-07.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/wwebservices-tools-2.1-b16.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/json-20090211.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xalan-2.7.1.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xercesImpl-2.10.0.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xml-apis-1.4.01.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xmlsec-1.3.0.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/mail-${mail.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/servlet-api-${servlet-api.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/webservices-api-${webservices-api.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/webservices-rt-${webservices-rt.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/json-${json.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xalan-${xalan.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xercesImpl-${xercesj.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xml-apis-${xercesj.version}.jar"
+TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/xmlsec-${santuario.xmlsec.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/openam-core-${project.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/openam-shared-${project.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/openam-dtd-schema-${project.version}.jar"

@@ -26,7 +26,7 @@
 : $Id: ampassword.bat,v 1.18 2009/01/28 05:34:45 ww203982 Exp $
 :
 
-: Portions Copyrighted 2010-2013 ForgeRock AS.
+: Portions Copyrighted 2010-2014 ForgeRock AS.
 
 set TOOLS_HOME="@TOOLS_HOME@"
 
@@ -41,16 +41,15 @@ goto WHILE
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
-set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
-set CLASSPATH="%CLASSPATH%;lib/webservices-api-2009-14-01.jar"
-set CLASSPATH="%CLASSPATH%;lib/webservices-rt-2009-29-07.jar"
-set CLASSPATH="%CLASSPATH%;lib/wwebservices-tools-2.1-b16.jar"
-set CLASSPATH="%CLASSPATH%;lib/json-20090211.jar"
-set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
-set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
-set CLASSPATH="%CLASSPATH%;lib/xml-apis-1.4.01.jar"
-set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
+set CLASSPATH="%CLASSPATH%;lib/mail-${mail.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/servlet-api-${servlet-api.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-api-${webservices-api.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/webservices-rt-${webservices-rt.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/json-${json.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/xalan-${xalan.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/xercesImpl-${xercesj.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/xml-apis-${xercesj.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/xmlsec-${santuario.xmlsec.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"

@@ -25,7 +25,7 @@
 # $Id: ssodtool.sh,v 1.3 2009/08/18 01:02:53 ak138937 Exp $
 #
 
-# Portions Copyrighted 2011-2012 ForgeRock Inc
+# Portions Copyrighted 2011-2014 ForgeRock AS
 
 if [ -z "$JAVA_HOME" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
@@ -63,11 +63,11 @@ CLASSPATH="$CLASSPATH:lib/openam-diagnostics-base-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-diagnostics-schema-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-shared-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/jaxb-api-1.0.6.jar"
-CLASSPATH="$CLASSPATH:lib/jaxb-impl-1.0.6.jar"
+CLASSPATH="$CLASSPATH:lib/jaxb-api-${jaxb.version}.jar"
+CLASSPATH="$CLASSPATH:lib/jaxb-impl-${jaxb.version}.jar"
 CLASSPATH="$CLASSPATH:lib/opendj-server-${opendj.server.version}.jar"
-CLASSPATH="$CLASSPATH:lib/xsdlib-20060615.jar"
-CLASSPATH="$CLASSPATH:lib/webservices-rt-2009-29-07.jar"
+CLASSPATH="$CLASSPATH:lib/xsdlib-${xsdlib.version}.jar"
+CLASSPATH="$CLASSPATH:lib/webservices-rt-${webservices-rt.version}.jar"
 
 if [ -n "$EXT_CLASSPATH" ] ; then
         CLASSPATH=$EXT_CLASSPATH:$CLASSPATH

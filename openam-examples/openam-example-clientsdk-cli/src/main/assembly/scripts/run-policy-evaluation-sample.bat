@@ -25,10 +25,10 @@
 :
 : $Id: run-policy-evaluation-sample.bat,v 1.4 2008/08/19 19:11:24 veiming Exp $
 :
-: Portions Copyrighted 2013 ForgeRock, Inc.
+: Portions Copyrighted 2013-2014 ForgeRock AS
 :
 : ------------------------------------------------------------------------------
-: README file for OpenSSO stand alone client sdk 
+: README file for OpenAM stand alone client sdk
 : policy evaluation sample
 : ------------------------------------------------------------------------------
 : 
@@ -49,7 +49,7 @@
 : 
 : Requires ../resources/AMConfig.properties 
 : 
-: Must run "setup.sh" once to configure the client to find the OpenSSO server.
+: Must run "setup.sh" once to configure the client to find the OpenAM server.
 : 
 :  Then, run this script
-java -classpath resources;lib/openam-clientsdk-${project.version}.jar;lib/servlet-api-2.5.jar;lib/openam-example-clientsdk-cli-${project.version}.jar samples.policy.PolicyEvaluationSample policyEvaluationSample
+java -classpath resources;lib/openam-clientsdk-${project.version}.jar;lib/servlet-api-${servlet-api.version}.jar;lib/openam-example-clientsdk-cli-${project.version}.jar samples.policy.PolicyEvaluationSample policyEvaluationSample
