@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -29,7 +29,7 @@ import javax.security.auth.Subject;
  * times unnecessarily. In case a given condition check is time-consuming this could lead to performance problems.
  * The purpose of the {@link CachingEntitlementCondition} is to make sure that the exact same entitlement conditions
  * are only executed once per privilege evaluations. This is being implemented using the {@link
- * PrivilegeEvluatorContext} object, which is shared across privilege evaluator threads. It's worthwhile to note, that
+ * PrivilegeEvaluatorContext} object, which is shared across privilege evaluator threads. It's worthwhile to note, that
  * the context is only shared per a single privilege evaluation, hence different privilege evaluations have different
  * caches.
  *

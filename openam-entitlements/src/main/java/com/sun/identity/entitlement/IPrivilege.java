@@ -27,10 +27,10 @@
 
 package com.sun.identity.entitlement;
 
+import javax.security.auth.Subject;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * Class that implements this interface has a evaluate method.
@@ -42,6 +42,13 @@ public interface IPrivilege {
      * @return name.
      */
     String getName();
+
+    /**
+     * Returns the date (as milliseconds since the Java epoch) since this privilege was last modified.
+     *
+     * @return the last modified date.
+     */
+    long getLastModifiedDate();
 
     /**
      * Returns resource save indexes.

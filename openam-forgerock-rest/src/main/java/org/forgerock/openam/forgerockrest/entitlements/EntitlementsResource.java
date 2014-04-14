@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +10,14 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock, AS.
  */
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -30,6 +32,12 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.util.Reject;
+
+import javax.inject.Inject;
+
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * REST endpoint for policy/entitlements management and evaluation.
@@ -37,6 +45,29 @@ import org.forgerock.openam.forgerockrest.RestUtils;
  * @since 12.0.0
  */
 public final class EntitlementsResource implements CollectionResourceProvider {
+
+    /**
+     * Parser for converting between JSON and concrete entitlements policy instances.
+     */
+    private final PolicyParser policyParser;
+    /**
+     * Data store for entitlements policies.
+     */
+    private final PolicyStoreProvider policyStoreProvider;
+    /**
+     * Handler for converting entitlements exceptions into appropriate resource exceptions.
+     */
+    private final ResourceErrorHandler<EntitlementException> resourceErrorHandler;
+
+    @Inject
+    public EntitlementsResource(final PolicyParser parser,
+                                final PolicyStoreProvider provider,
+                                final ResourceErrorHandler<EntitlementException> handler) {
+        Reject.ifNull(parser, provider, handler);
+        this.policyParser = parser;
+        this.policyStoreProvider = provider;
+        this.resourceErrorHandler = handler;
+    }
 
     /**
      * {@inheritDoc}
@@ -60,7 +91,13 @@ public final class EntitlementsResource implements CollectionResourceProvider {
      */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        try {
+            Privilege policy = policyParser.parsePolicy(request.getNewResourceId(), request.getContent());
+            policyStoreProvider.getPolicyStore(context).create(policy);
+            handler.handleResult(policyResource(policy));
+        } catch (EntitlementException ex) {
+            handler.handleError(resourceErrorHandler.handleError(request, ex));
+        }
     }
 
     /**
@@ -69,7 +106,14 @@ public final class EntitlementsResource implements CollectionResourceProvider {
     @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        try {
+            PolicyStore store = policyStoreProvider.getPolicyStore(context);
+            store.delete(resourceId);
+            // Return an empty resource to indicate success?
+            handler.handleResult(new Resource(resourceId, null, json(object())));
+        } catch (EntitlementException ex) {
+            handler.handleError(resourceErrorHandler.handleError(request, ex));
+        }
     }
 
     /**
@@ -95,7 +139,12 @@ public final class EntitlementsResource implements CollectionResourceProvider {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        try {
+            Privilege policy = policyStoreProvider.getPolicyStore(context).read(resourceId);
+            handler.handleResult(policyResource(policy));
+        } catch (EntitlementException ex) {
+            handler.handleError(resourceErrorHandler.handleError(request, ex));
+        }
     }
 
     /**
@@ -104,6 +153,34 @@ public final class EntitlementsResource implements CollectionResourceProvider {
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        try {
+            Privilege policy = policyParser.parsePolicy(resourceId, request.getContent());
+            Resource result = policyResource(policyStoreProvider.getPolicyStore(context).update(policy));
+            handler.handleResult(result);
+        } catch (EntitlementException ex) {
+            handler.handleError(resourceErrorHandler.handleError(request, ex));
+        }
+    }
+
+    /**
+     * Returns a resource based on the given policy.
+     *
+     * @param policy the policy to return a resource representation of.
+     * @return the policy as a resource.
+     * @throws EntitlementException if the policy cannot be serialised into JSON.
+     */
+    private Resource policyResource(Privilege policy) throws EntitlementException {
+        return new Resource(policy.getName(), policyRevision(policy), policyParser.printPolicy(policy));
+    }
+
+    /**
+     * Determines the revision value to use for the eTag attribute in the result. Currently just uses the last modified
+     * timestamp. Currently etag values are not validated for requests.
+     *
+     * @param policy the policy to generate a revision string for.
+     * @return the revision string (last modified time stamp).
+     */
+    private String policyRevision(Privilege policy) {
+        return Long.toString(policy.getLastModifiedDate());
     }
 }

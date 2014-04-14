@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock, AS.
  */
 
 package com.sun.identity.entitlement;
@@ -35,10 +35,13 @@ import com.sun.identity.shared.JSONUtils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.openam.entitlement.CachingEntitlementCondition;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +51,18 @@ import org.json.JSONObject;
  * Class representing entitlement privilege
  */
 public abstract class Privilege implements IPrivilege {
+
+    /**
+     * The system property defining the default Privilege sub-class to use when constructing new privilege instances.
+     */
+    public static final String PRIVILEGE_CLASS_PROPERTY = "com.sun.identity.entitlement.default.privilege.class";
+
+    /**
+     * Default privilege concrete class to use. We use the name rather than the class here so that we can perform
+     * lazy initialisation (the OpenSSOPrivilege does a lot of stuff in static initialisers).
+     */
+    private static final String DEFAULT_PRIVILEGE_CLASS = "com.sun.identity.entitlement.opensso.OpenSSOPrivilege";
+
     /**
      * application index key
      */
@@ -94,7 +109,7 @@ public abstract class Privilege implements IPrivilege {
      */
     public static final String DESCRIPTION_ATTRIBUTE = "description";
 
-    private static Class privilegeClass;
+    private static Class<? extends Privilege> privilegeClass;
     public static final NoSubject NOT_SUBJECT = new NoSubject();
 
     private boolean active = true;
@@ -113,10 +128,9 @@ public abstract class Privilege implements IPrivilege {
 
 
     static {
+        String privilegeClassName = SystemPropertiesManager.get(PRIVILEGE_CLASS_PROPERTY, DEFAULT_PRIVILEGE_CLASS);
         try {
-            //REF: should be customizable
-            privilegeClass = Class.forName(
-                "com.sun.identity.entitlement.opensso.OpenSSOPrivilege");
+            privilegeClass = Class.forName(privilegeClassName).asSubclass(Privilege.class);
         } catch (ClassNotFoundException ex) {
             PrivilegeManager.debug.error("Privilege.<init>", ex);
         }
@@ -133,7 +147,7 @@ public abstract class Privilege implements IPrivilege {
             throw new EntitlementException(2);
         }
         try {
-            return (Privilege)privilegeClass.newInstance();
+            return privilegeClass.newInstance();
         } catch (InstantiationException ex) {
             throw new EntitlementException(1, ex);
         } catch (IllegalAccessException ex) {
@@ -451,7 +465,8 @@ public abstract class Privilege implements IPrivilege {
             EntitlementCondition eCondition = (EntitlementCondition)
                 clazz.newInstance();
             eCondition.setState(sbj.getString("state"));
-            return new CachingEntitlementCondition(eCondition);
+            // Caching moved to #doesConditionMatch(..) method
+            return eCondition;
         } catch (InstantiationException ex) {
             PrivilegeManager.debug.error("Privilege.getECondition", ex);
         } catch (IllegalAccessException ex) {
@@ -623,7 +638,8 @@ public abstract class Privilege implements IPrivilege {
         boolean result = true;
 
         if (eCondition != null) {
-            ConditionDecision decision = eCondition.evaluate(realm,
+            EntitlementCondition cachedCondition = new CachingEntitlementCondition(eCondition);
+            ConditionDecision decision = cachedCondition.evaluate(realm,
                 subject, resourceName, environment);
             Map<String, Set<String>> advices = decision.getAdvices();
             if (advices != null) {
@@ -790,8 +806,7 @@ public abstract class Privilege implements IPrivilege {
         if (set == null) {
             this.eResourceAttributes = null;
         } else {
-            this.eResourceAttributes = new HashSet();
-            this.eResourceAttributes.addAll(set);
+            this.eResourceAttributes = new LinkedHashSet<ResourceAttribute>(set);
         }
     }
 

@@ -37,6 +37,50 @@ import java.util.ResourceBundle;
 public class EntitlementException extends Exception {
     private static final String RES_BUNDLE_NAME = "EntitlementException";
 
+    /*
+     * Selected error code constants. See EntitlementException.properties for full list.
+     */
+
+    public static final int UNABLE_TO_CREATE_POLICY = 1;
+    public static final int INVALID_PRIVILEGE_CLASS = 2;
+    public static final int EMPTY_PRIVILEGE_NAME = 3;
+    public static final int NULL_ENTITLEMENT = 4;
+    public static final int UNSUPPORTED_OPERATION = 5;
+    public static final int INVALID_APPLICATION_CLASS = 6;
+    public static final int INVALID_XML = 7;
+    public static final int INVALID_WSDL_LOCATION = 8;
+    public static final int MISSING_PRIVILEGE_JSON = 9;
+    public static final int SESSION_HAS_EXPIRED = 10;
+    public static final int INVALID_JSON = 11;
+    public static final int MISSING_PRIVILEGE_NAME = 12;
+
+    public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
+    public static final int NO_SUCH_POLICY = 203;
+    public static final int APPLICATION_ALREADY_EXISTS = 228;
+    public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
+
+    public static final int INCONSISTENT_WILDCARDS = 300;
+    public static final int INVALID_PORT = 301;
+    public static final int MALFORMED_URL = 302;
+    public static final int INVALID_RESOURCE = 303;
+    public static final int INVALID_ENTITLEMENT_SUBJECT_CLASS = 310;
+
+    public static final int NO_SUCH_APPLICATION = 321;
+    public static final int NOT_FOUND = 325;
+
+    public static final int PERMISSION_DENIED = 326;
+
+    public static final int SUBJECT_REQUIRED = 327;
+    public static final int INVALID_SEARCH_FILTER = 328;
+    public static final int UNKNOWN_POLICY_CLASS = 329;
+    public static final int INVALID_PROPERTY_VALUE = 400;
+    public static final int INVALID_VALUE = 401;
+    public static final int START_DATE_AFTER_END_DATE = 402;
+
+    public static final int MISSING_RESOURCE = 420;
+    public static final int JSON_PARSE_ERROR = 425;
+    public static final int AUTHENTICATION_ERROR = 434;
+
     private int errorCode;
     private String message;
     private Object[] params;
