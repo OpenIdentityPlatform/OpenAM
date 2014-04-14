@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.config;
 
@@ -49,7 +49,7 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class AMAuthLevelManager implements ServiceListener {
     // instance
-    private static AMAuthLevelManager instance = null;
+    private static volatile AMAuthLevelManager instance = null;
 
     /**
      * listener Map for the auth modules, key is the module name,
@@ -89,7 +89,7 @@ public class AMAuthLevelManager implements ServiceListener {
     /**
      * Constructor
      */
-    public AMAuthLevelManager() {
+    private AMAuthLevelManager() {
         initialize();
     }
 

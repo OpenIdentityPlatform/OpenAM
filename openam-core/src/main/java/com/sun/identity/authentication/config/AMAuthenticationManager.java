@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.config;
 
@@ -49,14 +49,13 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 
 import java.security.AccessController;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,44 +64,31 @@ import org.w3c.dom.Element;
  * This class provides interfaces to manage authentication module instances. 
  */
 public class AMAuthenticationManager {
-    private static String bundleName;
-    private static Debug debug;
-    private static Set authTypes;
-    private static Map moduleServiceNames;
-    private static Set globalModuleNames;
 
+    private static final String BUNDLE_NAME = "amAuthConfig";
+    private static final Debug DEBUG = Debug.getInstance(BUNDLE_NAME);
+    private static final Set<String> AUTH_TYPES = new HashSet<String>();
+    private static final Map<String, String> MODULE_SERVICE_NAMES = new ConcurrentHashMap<String, String>();
+    private static final Set<String> GLOBAL_MODULE_NAMES = new HashSet<String>();
+    private static final Map<String, Map<String, Set<String>>> MODULE_INSTANCE_TABLE = Collections.synchronizedMap(
+            new HashMap<String, Map<String, Set<String>>>());
     private SSOToken token;
     private String realm;
     private ServiceConfig orgServiceConfig;
-    private static Hashtable moduleInstanceTable;
-    private static SSOToken adminToken;
 
     static {
-        adminToken = (SSOToken)AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-        authTypes = new HashSet();
-        moduleServiceNames = new HashMap();
-        bundleName = "amAuthConfig";
-        debug = Debug.getInstance(bundleName);
-        moduleInstanceTable = new Hashtable();
-        globalModuleNames = Collections.EMPTY_SET;
-        initAuthenticationService(adminToken);
+        initAuthenticationService();
     }
 
     /**
-     * Constructs an instance of <code>AMAuthenticationManager</code> for the
-     * specified realm to manage the authentication module instances available 
-     * to this realm. 
+     * Constructs an instance of <code>AMAuthenticationManager</code> for the specified realm to manage the
+     * authentication module instances available to this realm.
      *
-     * @param token Single sign on token of the user identity on whose behalf
-     *        the operations are performed.
-     * @param org The realm in which the module instance management is 
-     *              performed.
-     * @throws AMConfigrationException if Service Management related error
-     *         occurs.
+     * @param token Single sign on token of the user identity on whose behalf the operations are performed.
+     * @param org The realm in which the module instance management is performed.
+     * @throws AMConfigurationException if Service Management related error occurs.
      */
-    public AMAuthenticationManager(SSOToken token, String org)
-        throws AMConfigurationException {
+    public AMAuthenticationManager(SSOToken token, String org) throws AMConfigurationException {
         try {
             SMSEntry.validateToken(token);
             this.token = token;
@@ -112,12 +98,12 @@ public class AMAuthenticationManager {
             }
             orgServiceConfig = getOrgServiceConfig();
             if (orgServiceConfig == null) {
-                throw new AMConfigurationException(bundleName, "badRealm",
+                throw new AMConfigurationException(BUNDLE_NAME, "badRealm",
                 new Object[]{realm});
             }
             synchronized (AMAuthenticationManager.class) {
-                if (moduleInstanceTable.get(realm) == null) {
-                           buildModuleInstanceTable(token, realm);
+                if (MODULE_INSTANCE_TABLE.get(realm) == null) {
+                    buildModuleInstanceTable(token, realm);
                 }
             }
         } catch (SMSException e) {
@@ -126,7 +112,7 @@ public class AMAuthenticationManager {
             String installTime = SystemProperties.get(
                 AdminTokenAction.AMADMIN_MODE);
             if ((installTime != null) && installTime.equalsIgnoreCase("false")){
-                debug.error("Token is invalid." , ee);
+                DEBUG.error("Token is invalid." , ee);
             }
         }
     }
@@ -136,11 +122,9 @@ public class AMAuthenticationManager {
      * This method is meant for global authentication configuration change.
      */
     public static synchronized void reInitializeAuthServices() {
-        authTypes.clear();
-        if (globalModuleNames != Collections.EMPTY_SET) {
-            globalModuleNames.clear();
-        }
-        initAuthenticationService(adminToken);
+        AUTH_TYPES.clear();
+        GLOBAL_MODULE_NAMES.clear();
+        initAuthenticationService();
     }
 
     /**
@@ -149,8 +133,8 @@ public class AMAuthenticationManager {
      * @return Set of String values of the authentication types available on 
      *         this server.
      */
-    public static Set getAuthenticationTypes() {
-        return authTypes;
+    public static Set<String> getAuthenticationTypes() {
+        return AUTH_TYPES;
     }
 
     /**
@@ -159,12 +143,11 @@ public class AMAuthenticationManager {
      * @return Set of String values of the module service names available on 
      *         this server.
      */
-    public static Set getAuthenticationServiceNames() {
-        Collection keys = moduleServiceNames.values();
-        Set names = (keys != null) ? new HashSet(keys) : Collections.EMPTY_SET;
+    public static Set<String> getAuthenticationServiceNames() {
+        Set<String> names = new HashSet<String>(MODULE_SERVICE_NAMES.values());
 
-        if (debug.messageEnabled()) {
-            debug.message("Authenticator serviceNames: " + names);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Authenticator serviceNames: " + names);
         }
         return names;
     }
@@ -176,59 +159,50 @@ public class AMAuthenticationManager {
      * @return authentication service name of a module.
      */
     public static String getAuthenticationServiceName(String moduleName) {
-        return (String)moduleServiceNames.get(moduleName);
+        return MODULE_SERVICE_NAMES.get(moduleName);
     }
 
     /**
      * This code makes the authentication type list static. In case the list
      * is expanded or shrinked, the server needs to be restarted.
      */
-    private static void initAuthenticationService(SSOToken token) {
+    private static void initAuthenticationService() {
+        SSOToken token = getAdminToken();
         try {
-            ServiceSchemaManager scm = new ServiceSchemaManager(
-                ISAuthConstants.AUTH_SERVICE_NAME, token);
+            ServiceSchemaManager scm = new ServiceSchemaManager(ISAuthConstants.AUTH_SERVICE_NAME, token);
             ServiceSchema schema = scm.getGlobalSchema();
-            Set authenticators = (Set)schema.getAttributeDefaults().get(
-                ISAuthConstants.AUTHENTICATORS);
-            for (Iterator it = authenticators.iterator(); it.hasNext(); ) {
-                String module = (String)it.next();
+            Set<String> authenticators = (Set<String>) schema.getAttributeDefaults().get(
+                    ISAuthConstants.AUTHENTICATORS);
+            for (String module : authenticators) {
                 int index = module.lastIndexOf(".");
                 if (index != -1) {
                     module = module.substring(index + 1);
                 }
-                   // Application is not one of the selectable instance type.
+                // Application is not one of the selectable instance type.
                 if (!module.equals(ISAuthConstants.APPLICATION_MODULE)) { 
-                    authTypes.add(module);
+                    AUTH_TYPES.add(module);
                 }
-                String serviceName = (String)moduleServiceNames.get(module);
+                String serviceName = MODULE_SERVICE_NAMES.get(module);
                 if (serviceName == null) {
                     serviceName = AuthUtils.getModuleServiceName(module);
                     try {
                         new ServiceSchemaManager(serviceName, token);
-                        synchronized(moduleServiceNames) {
-                            Map newMap = new HashMap(moduleServiceNames);
-                            newMap.put(module, serviceName);
-                            moduleServiceNames = newMap;
-                        }
+                        MODULE_SERVICE_NAMES.put(module, serviceName);
                     } catch (Exception e) {
-                        if (globalModuleNames == Collections.EMPTY_SET) {
-                            globalModuleNames = new HashSet();
-                        }
-                        globalModuleNames.add(module);
-                        authTypes.remove(module);
-                        continue;
+                        GLOBAL_MODULE_NAMES.add(module);
+                        AUTH_TYPES.remove(module);
                     }
                 }
             }
-            if (debug.messageEnabled()) {
-                debug.message("Global module names: " + globalModuleNames);
-                debug.message("moduleServiceNames: " + moduleServiceNames);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Global module names: " + GLOBAL_MODULE_NAMES);
+                DEBUG.message("moduleServiceNames: " + MODULE_SERVICE_NAMES);
             }
        } catch (Exception smse) {
             String installTime = SystemProperties.get(
                 AdminTokenAction.AMADMIN_MODE);
             if ((installTime != null) && installTime.equalsIgnoreCase("false")){
-                debug.error("Failed to get module types", smse);
+                DEBUG.error("Failed to get module types", smse);
             }
         }
     }
@@ -242,18 +216,16 @@ public class AMAuthenticationManager {
      */
     private static void buildModuleInstanceTable(SSOToken token, String realm) {
         try {
-            if (debug.messageEnabled()) {
-                debug.message("AMAuthenticationManager." +
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("AMAuthenticationManager." +
                     "buildModuleInstanceTable: realm = " + realm);
             }
-            Collection authServiceNames = moduleServiceNames.values();
-            for (Iterator it = authServiceNames.iterator(); it.hasNext(); ) {
-                String service = (String) it.next();
+            for (String service : MODULE_SERVICE_NAMES.values()) {
                 buildModuleInstanceForService(realm, service);
             }
         } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("building module instance table error", e);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("building module instance table error", e);
             }
         }
     }
@@ -268,47 +240,46 @@ public class AMAuthenticationManager {
     public static synchronized void buildModuleInstanceForService(
         String realm,
         String serviceName) {
-        if (debug.messageEnabled()) {
-            debug.message("start moduleInstanceTable : " + moduleInstanceTable +
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("start moduleInstanceTable : " + MODULE_INSTANCE_TABLE +
             " for realm : " + realm + " and service : " + serviceName);
         }
         try {
             String moduleName = getModuleName(serviceName);
-            if (debug.messageEnabled()) {
-                debug.message("Module name : " + moduleName);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Module name : " + moduleName);
             }
             if ((moduleName != null) && (moduleName.length() != 0)) {
-                ServiceConfigManager scm = new ServiceConfigManager(
-                    serviceName, adminToken);
+                ServiceConfigManager scm = new ServiceConfigManager(serviceName, getAdminToken());
                 ServiceConfig config = scm.getOrganizationConfig(realm, null);
                 if (config == null) {
-                    if (debug.messageEnabled()) {
-                        debug.message("AMAuthenticationManager." +
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("AMAuthenticationManager." +
                             "buildModuleInstanceForService: Service="
                             + serviceName + " not configured in realm="+realm);
                     }
                 }
                 realm = com.sun.identity.sm.DNMapper.orgNameToDN(realm);
-                synchronized (moduleInstanceTable) {
-                    Map moduleMap = (Map)moduleInstanceTable.remove(realm);
+                synchronized (MODULE_INSTANCE_TABLE) {
+                    Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.remove(realm);
                     if (moduleMap != null) {
                     /*
                      * this code is to not manipulate the hashmap that might
                      * be in iteration by other threads
                      */
-                        Map newMap = new HashMap(moduleMap);
+                        Map<String, Set<String>> newMap = new HashMap<String, Set<String>>(moduleMap);
                         newMap.remove(moduleName);
                         moduleMap = newMap;
                     }
-                    Set instanceSet = new HashSet();
-                    Map defaultAttrs = null;
+                    Set<String> instanceSet = new HashSet<String>();
+                    Map<String, Set<String>> defaultAttrs = null;
                     if (config != null) {
                         defaultAttrs = config.getAttributesWithoutDefaults();
                     }
                     if (defaultAttrs != null && !defaultAttrs.isEmpty()) {
                         instanceSet.add(moduleName);
                     }
-                    Set instances = null;
+                    Set<String> instances = null;
                     if (config != null) {
                         instances = config.getSubConfigNames();
                     }
@@ -317,7 +288,7 @@ public class AMAuthenticationManager {
                     }
                     if (!instanceSet.isEmpty()){
                         if (moduleMap == null) {
-                            moduleMap = new HashMap();
+                            moduleMap = new HashMap<String, Set<String>>();
                         }
                         /*
                          * this operation is safe as moduleMap is a local object
@@ -326,25 +297,24 @@ public class AMAuthenticationManager {
                         moduleMap.put(moduleName, instanceSet);
                     }
                     if (moduleMap != null && !moduleMap.isEmpty()) {
-                        moduleInstanceTable.put(realm, moduleMap);
+                        MODULE_INSTANCE_TABLE.put(realm, moduleMap);
                     }
                 }
             }
         } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("build module instance for service error: " , e);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("build module instance for service error: " , e);
             }
         }
-        if (debug.messageEnabled()) {
-            debug.message("return moduleInstanceTable: " + moduleInstanceTable);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("return moduleInstanceTable: " + MODULE_INSTANCE_TABLE);
         }
     }
     
     // get the module name from its service name.
     private static String getModuleName(String serviceName) {
-        for (Iterator it=moduleServiceNames.keySet().iterator();it.hasNext();){
-            String moduleName = (String) it.next();
-            if (moduleServiceNames.get(moduleName).equals(serviceName)) {
+        for (String moduleName : MODULE_SERVICE_NAMES.keySet()) {
+            if (MODULE_SERVICE_NAMES.get(moduleName).equals(serviceName)) {
                 return moduleName;
             }
         }
@@ -368,8 +338,8 @@ public class AMAuthenticationManager {
 
     private static AMAuthenticationSchema getAuthenticationSchema(
         String authType, SSOToken token) throws AMConfigurationException {
-        if (debug.messageEnabled()) {
-            debug.message("getting auth schema for " + authType);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("getting auth schema for " + authType);
         }
         try {
             ServiceSchema serviceSchema;
@@ -420,7 +390,7 @@ public class AMAuthenticationManager {
         String authName,
         String type){
         // for global authentication modules
-        if (globalModuleNames.contains(authName)) {
+        if (GLOBAL_MODULE_NAMES.contains(authName)) {
             return new AMAuthenticationInstance(authName, type, null, null);
         }
         String serviceName = getServiceName(type);
@@ -430,12 +400,12 @@ public class AMAuthenticationManager {
         try {
             ssm = new ServiceSchemaManager( serviceName, token);
         } catch (SMSException e) {
-            if (debug.messageEnabled()) {
-                debug.message("Instance type does not exist: " + type);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Instance type does not exist: " + type);
             }
             return null;
         } catch (SSOException ee) {
-            debug.error("SSO token is invalid", ee);
+            DEBUG.error("SSO token is invalid", ee);
             return null;
         }
         Map globalAttrs = null;
@@ -467,8 +437,8 @@ public class AMAuthenticationManager {
                 }
             }
         } catch (SSOException e) {
-            if (debug.warningEnabled()) {
-                debug.warning("Token doesn't have access to service: " +
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("Token doesn't have access to service: " +
                    token + " :: " + serviceName); 
             }
         } catch (SMSException e) {
@@ -476,9 +446,9 @@ public class AMAuthenticationManager {
             // no need to log anything. 
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("global attrs = " + globalAttrs);
-            debug.message("org attrs = ");
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("global attrs = " + globalAttrs);
+            DEBUG.message("org attrs = ");
             if (orgAttrs != null) {
                 for (Iterator it=orgAttrs.entrySet().iterator(); it.hasNext();){
                     Map.Entry e = (Map.Entry) it.next();
@@ -487,10 +457,10 @@ public class AMAuthenticationManager {
                        (((String)e.getKey()).endsWith("password")) ||
                        (((String)e.getKey()).endsWith("Password")) ||
                        (((String)e.getKey()).endsWith("secret"))) {
-                        debug.message(e.getKey() + ": " + "<BLOCKED>");
+                        DEBUG.message(e.getKey() + ": " + "<BLOCKED>");
                     }
                     else {
-                        debug.message(e.getKey() + ": " + e.getValue());
+                        DEBUG.message(e.getKey() + ": " + e.getValue());
                     }
                 }
             }
@@ -510,19 +480,17 @@ public class AMAuthenticationManager {
      */
     private String getAuthInstanceType(String authName) {
         String returnValue = null;
-        if (globalModuleNames.contains(authName)) {
+        if (GLOBAL_MODULE_NAMES.contains(authName)) {
             returnValue = authName;
         } else {
-            Map moduleMap = (Map)moduleInstanceTable.get(realm);
+            Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.get(realm);
             if (moduleMap != null) {
-                for (Iterator types = moduleMap.keySet().iterator(); 
-                    types.hasNext();) {
-                        String type = (String) types.next();
-                        Set instanceNames = (Set)moduleMap.get(type);
-                        if (instanceNames.contains(authName)) {
+                for (String type : moduleMap.keySet()) {
+                    Set<String> instanceNames = moduleMap.get(type);
+                    if (instanceNames.contains(authName)) {
                         returnValue = type;
                         break;
-                        }
+                    }
                 }
             }
         }
@@ -533,23 +501,21 @@ public class AMAuthenticationManager {
      * including both the old instances from 6.3 DIT and the new instances
      * in 7.0.
      */
-    public Set getModuleInstanceNames(String aModuleType) {
-        Set instances = Collections.EMPTY_SET;
-        Map moduleMap = (Map)moduleInstanceTable.get(realm);
-        if (moduleMap != null || !globalModuleNames.isEmpty()) {
-        instances = new HashSet();
+    public Set<String> getModuleInstanceNames(String aModuleType) {
+        Set<String> instances = Collections.EMPTY_SET;
+        Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.get(realm);
+        if (moduleMap != null || !GLOBAL_MODULE_NAMES.isEmpty()) {
+        instances = new HashSet<String>();
             if (moduleMap != null) {
-                for (Iterator keys = moduleMap.keySet().iterator();
-                    keys.hasNext(); ) {
-                    String key = (String)keys.next();
-                    if (key.equals(aModuleType)) {
-                        instances.addAll((Set)moduleMap.get(key));
-                    }
+            for (String key : moduleMap.keySet()) {
+                if (key.equals(aModuleType)) {
+                    instances.addAll(moduleMap.get(key));
                 }
             }
+            }
         }
-        if (debug.messageEnabled()) {
-            debug.message("Registered module names: " + instances);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Registered module names: " + instances);
         }
         return instances;
     }
@@ -559,24 +525,22 @@ public class AMAuthenticationManager {
      * Returns a Set of all registered module instance names, including 
      * both the old instances from 6.3 DIT and the new instances in 7.0. 
      */
-    private Set getRegisteredModuleNames() {
-        Set instances = Collections.EMPTY_SET;
-        Map moduleMap = (Map)moduleInstanceTable.get(realm);
-        if (moduleMap != null || !globalModuleNames.isEmpty()) {
-            instances = new HashSet();
+    private Set<String> getRegisteredModuleNames() {
+        Set<String> instances = Collections.EMPTY_SET;
+        Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.get(realm);
+        if (moduleMap != null || !GLOBAL_MODULE_NAMES.isEmpty()) {
+            instances = new HashSet<String>();
             if (moduleMap != null) {
-                for (Iterator keys = moduleMap.keySet().iterator(); 
-                    keys.hasNext(); ) {
-                    String key = (String)keys.next();
-                    instances.addAll((Set)moduleMap.get(key));
+                for (String key : moduleMap.keySet()) {
+                    instances.addAll(moduleMap.get(key));
                 }
             }
-            if (!globalModuleNames.isEmpty()){
-                instances.addAll(globalModuleNames);
+            if (!GLOBAL_MODULE_NAMES.isEmpty()){
+                instances.addAll(GLOBAL_MODULE_NAMES);
             }
         }
-        if (debug.messageEnabled()) {
-            debug.message("Registered module names: " + instances);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Registered module names: " + instances);
         }
         return instances;
     }
@@ -588,19 +552,17 @@ public class AMAuthenticationManager {
      * empty set.
      * @return a Set of String values for module instance names.
      */
-    public Set getAllowedModuleNames() {
-        Set retVal = null;
-        if (AuthUtils.getAuthRevisionNumber() 
-            >= ISAuthConstants.AUTHSERVICE_REVISION7_0) {
+    public Set<String> getAllowedModuleNames() {
+        Set<String> retVal;
+        if (AuthUtils.getAuthRevisionNumber() >= ISAuthConstants.AUTHSERVICE_REVISION7_0) {
             retVal = getRegisteredModuleNames();
         } else {
-            Map attrMap = orgServiceConfig.getAttributes();
-            Set defaultModuleNames = (Set)attrMap.get(
-                ISAuthConstants.AUTH_ALLOWED_MODULES);
-            Set returnSet = Collections.EMPTY_SET;
-            if (defaultModuleNames != null && !globalModuleNames.isEmpty()) {
-                   returnSet = new HashSet();
-                returnSet.addAll(globalModuleNames);
+            Map<String, Set<String>> attrMap = orgServiceConfig.getAttributes();
+            Set<String> defaultModuleNames = attrMap.get(ISAuthConstants.AUTH_ALLOWED_MODULES);
+            Set<String> returnSet = Collections.EMPTY_SET;
+            if (defaultModuleNames != null && !GLOBAL_MODULE_NAMES.isEmpty()) {
+                   returnSet = new HashSet<String>();
+                returnSet.addAll(GLOBAL_MODULE_NAMES);
                 returnSet.addAll(defaultModuleNames);
             }
             retVal = returnSet;
@@ -631,7 +593,7 @@ public class AMAuthenticationManager {
             String installTime = SystemProperties.get(
                 AdminTokenAction.AMADMIN_MODE);
             if ((installTime != null) && installTime.equalsIgnoreCase("false")){
-                debug.error("Service config for " + realm + " is null." + 
+                DEBUG.error("Service config for " + realm + " is null." +
                     e.getMessage());
             }
             return null;
@@ -645,37 +607,29 @@ public class AMAuthenticationManager {
      * @return A Set of <code>AMAuthenticationInstance</code> objects that are 
      *         available to this realm.
      */
-    public Set getAuthenticationInstances() {
-        Set instanceSet = Collections.EMPTY_SET;
-        Map moduleMap = (Map)moduleInstanceTable.get(realm);
-        if (moduleMap != null || !globalModuleNames.isEmpty()) {
-            instanceSet = new HashSet();
-            if (!globalModuleNames.isEmpty()) {
-                for (Iterator names = globalModuleNames.iterator(); 
-                    names.hasNext();) {
-                    String name = (String)names.next();
-                        if (name.equals(ISAuthConstants.APPLICATION_MODULE)) {
+    public Set<AMAuthenticationInstance> getAuthenticationInstances() {
+        Set<AMAuthenticationInstance> instanceSet = Collections.EMPTY_SET;
+        Map<String, Set<String>> moduleMap = MODULE_INSTANCE_TABLE.get(realm);
+        if (moduleMap != null || !GLOBAL_MODULE_NAMES.isEmpty()) {
+            instanceSet = new HashSet<AMAuthenticationInstance>();
+            if (!GLOBAL_MODULE_NAMES.isEmpty()) {
+                for (String name : GLOBAL_MODULE_NAMES) {
+                    if (name.equals(ISAuthConstants.APPLICATION_MODULE)) {
                         continue;
-                        }
-                    AMAuthenticationInstance instance = 
-                        getAuthenticationInstance(name, name);
+                    }
+                    AMAuthenticationInstance instance = getAuthenticationInstance(name, name);
                     if (instance != null) {
                         instanceSet.add(instance);
                     }
                 }
             }
             if (moduleMap != null) {
-                for (Iterator types = moduleMap.keySet().iterator(); 
-                    types.hasNext(); ) {
-                        String type = (String) types.next();
-                        Set instanceNameSet = (Set)moduleMap.get(type);
-                        for (Iterator names = instanceNameSet.iterator(); 
-                        names.hasNext(); ){
-                          String name = (String)names.next();
-                        AMAuthenticationInstance instance = 
-                            getAuthenticationInstance(name, type);
+                for (String type : moduleMap.keySet()) {
+                    Set<String> instanceNameSet = moduleMap.get(type);
+                    for (String name : instanceNameSet) {
+                        AMAuthenticationInstance instance = getAuthenticationInstance(name, type);
                         if (instance != null) {
-                                instanceSet.add(instance);
+                            instanceSet.add(instance);
                         }
                     }
                 }
@@ -701,21 +655,21 @@ public class AMAuthenticationManager {
         Map attributes
     ) throws AMConfigurationException {
         if (name.indexOf(' ') != -1) {
-            throw new AMConfigurationException(bundleName,
+            throw new AMConfigurationException(BUNDLE_NAME,
                 "invalidAuthenticationInstanceName", null);
         }
         Set moduleTypes = getAuthenticationTypes();
         if (!moduleTypes.contains(type)) {
-            throw new AMConfigurationException(bundleName, "wrongType",
+            throw new AMConfigurationException(BUNDLE_NAME, "wrongType",
                 new Object[]{type} );
         }
         AMAuthenticationInstance instance = getAuthenticationInstance(name);
         if (instance != null) {
             if (instance.getServiceConfig() != null) {
-                throw new AMConfigurationException(bundleName, 
+                throw new AMConfigurationException(BUNDLE_NAME,
                     "authInstanceExist", new Object[]{name});
             } else {
-                throw new AMConfigurationException(bundleName, 
+                throw new AMConfigurationException(BUNDLE_NAME,
                     "authInstanceIsGlobal", new Object[]{name});
             }
         }
@@ -728,8 +682,8 @@ public class AMAuthenticationManager {
                 new ServiceSchemaManager(serviceName, token);
             schema = ssm.getSchema(SchemaType.GLOBAL);
         } catch (SSOException e) {
-            if (debug.warningEnabled()) {
-                debug.warning("Token doesn't have access to service: " +
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("Token doesn't have access to service: " +
                    token + " -> " + serviceName); 
             }
         } catch (SMSException e) {
@@ -759,6 +713,12 @@ public class AMAuthenticationManager {
                 subConfig.setAttributes(attributes);
             }
 
+            //In case of server mode AMAuthLevelManager will update AMAuthenticationManager about the change, and
+            //there is no need to reinitialize the configuration twice. In client mode it is less likely that
+            //AMAuthLevelManager listeners are in place, so let's reinitialize to be on the safe side.
+            if (!SystemProperties.isServerMode()) {
+                buildModuleInstanceForService(realm, serviceName);
+            }
             return new AMAuthenticationInstance(name, type, subConfig, schema);
         } catch (Exception e) {
             throw new AMConfigurationException(e);
@@ -777,18 +737,18 @@ public class AMAuthenticationManager {
         throws AMConfigurationException {
         AMAuthenticationInstance instance = getAuthenticationInstance(name);
         if (instance == null) {
-            throw new AMConfigurationException(bundleName, 
+            throw new AMConfigurationException(BUNDLE_NAME,
                 "authInstanceNotExist", new Object[] {name});
         }
 
         if (isModuleInstanceInUse(name)) {
-            throw new AMConfigurationException(bundleName,
+            throw new AMConfigurationException(BUNDLE_NAME,
                 "authInstanceInUse", new Object[]{name});
         }
         String type = getAuthInstanceType(name);
         ServiceConfig serviceConfig = instance.getServiceConfig();
         if (serviceConfig == null) {
-            throw new AMConfigurationException(bundleName, 
+            throw new AMConfigurationException(BUNDLE_NAME,
                 "authInstanceIsGloal", new Object[] {type});
              }
         try {
@@ -807,11 +767,18 @@ public class AMAuthenticationManager {
                 orgConfig.removeSubConfig(name);
             }
             if (isInheritedAuthInstance(name)) {
-                Set moduleNames = new HashSet();
+                Set<String> moduleNames = new HashSet<String>();
                 moduleNames.add(name);
                 orgServiceConfig.removeAttributeValues(
                     ISAuthConstants.AUTH_ALLOWED_MODULES, moduleNames);
-            } 
+            }
+
+            //In case of server mode AMAuthLevelManager will update AMAuthenticationManager about the change, and
+            //there is no need to reinitialize the configuration twice. In client mode it is less likely that
+            //AMAuthLevelManager listeners are in place, so let's reinitialize to be on the safe side.
+            if (!SystemProperties.isServerMode()) {
+                buildModuleInstanceForService(realm, serviceConfig.getServiceName());
+            }
         } catch (Exception e) {
             throw new AMConfigurationException(e);
         }
@@ -829,7 +796,7 @@ public class AMAuthenticationManager {
     }
 
     private static String getServiceName(String module) {
-        return (String)moduleServiceNames.get(module);
+        return MODULE_SERVICE_NAMES.get(module);
     }
 
     /**
@@ -856,19 +823,19 @@ public class AMAuthenticationManager {
                 }
             }
            } catch (Exception e) {
-            if (debug.messageEnabled()) {
-                debug.message("Failed to get named sub configurations.");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Failed to get named sub configurations.");
             }
         }
 
         for (Iterator it = services.iterator(); it.hasNext(); ) {
             String service = (String)it.next();
-            if (debug.messageEnabled()) {
-                debug.message("Checking " + service + " ...");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Checking " + service + " ...");
             }
             if (serviceContains(service, moduleInstance)) {
-                if (debug.messageEnabled()) {
-                    debug.message(moduleInstance + " is used in " + service);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message(moduleInstance + " is used in " + service);
                 }
                 returnValue = true;
                 break;
@@ -892,8 +859,8 @@ public class AMAuthenticationManager {
                 dataMap = AMAuthConfigUtils.getNamedConfig(serviceName,
                     realm, this.token);
             } catch (Exception e) {
-                if (debug.messageEnabled()) {
-                    debug.message("Failed to get named sub config attrs.");
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Failed to get named sub config attrs.");
                 }
             }
         }
@@ -902,13 +869,13 @@ public class AMAuthenticationManager {
             Set xmlConfigValues = (Set)dataMap.get(AMAuthConfigUtils.ATTR_NAME);
             if (xmlConfigValues != null && !xmlConfigValues.isEmpty()) {
                 String xmlConfig = (String)xmlConfigValues.iterator().next();
-                if (debug.messageEnabled()) {
-                    debug.message("service config for " + serviceName + "  = "
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("service config for " + serviceName + "  = "
                         + xmlConfig);
                 } 
 
                 if (xmlConfig != null && xmlConfig.length() != 0) {
-                        Document doc = XMLUtils.toDOMDocument(xmlConfig, debug);
+                        Document doc = XMLUtils.toDOMDocument(xmlConfig, DEBUG);
                     if (doc != null) {
                         Element vPair = doc.getDocumentElement();
                         Set values = XMLUtils.getAttributeValuePair(vPair);
@@ -924,5 +891,9 @@ public class AMAuthenticationManager {
             }
         }
         return returnValue;
+    }
+
+    private static SSOToken getAdminToken() {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 }
