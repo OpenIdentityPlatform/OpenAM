@@ -24,7 +24,7 @@
  *
  * $Id: IDPSingleLogout.java,v 1.28 2009/11/25 01:20:47 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.saml2.profile;
 
@@ -558,10 +558,12 @@ public class IDPSingleLogout {
             // through HTTP_Redirect, nothing to do here
             return;
         }
+
         // this is the case where there is no more SP session
         // participant
-
-        String location = getSingleLogoutLocation(spEntityID, realm, binding);
+        SingleLogoutServiceElement endpoint = getLogoutResponseEndpoint(realm, spEntityID, binding);
+        binding = endpoint.getBinding();
+        String location = getResponseLocation(endpoint);
         logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
 
         // call multi-federation protocol processing
@@ -608,6 +610,28 @@ public class IDPSingleLogout {
         }
     }
 
+    private static SingleLogoutServiceElement getLogoutResponseEndpoint(String realm, String spEntityID,
+            String binding) throws SAML2Exception {
+        SingleLogoutServiceElement endpoint =
+                LogoutUtil.getMostAppropriateSLOServiceLocation(getSPSLOServiceEndpoints(realm, spEntityID), binding);
+        if (endpoint == null) {
+            debug.error("Unable to find the SP's single logout response service with " + binding + " binding");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("sloResponseServiceLocationNotfound"));
+        }
+        if (SAML2Constants.SOAP.equals(endpoint.getBinding())) {
+            debug.error("Unable to send logout response with SOAP binding");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("unsupportedBinding"));
+        }
+        return endpoint;
+    }
+
+    private static String getResponseLocation(SingleLogoutServiceElement endpoint) {
+        String location = endpoint.getResponseLocation();
+        if (location == null) {
+            location = endpoint.getLocation();
+        }
+        return location;
+    }
 
     /**
      * Returns single logout location for the service provider.
@@ -1277,17 +1301,14 @@ public class IDPSingleLogout {
                 set.add(session);
                 String sessUser =
                     SessionManager.getProvider().getPrincipalName(session);
-                boolean isSOAPInitiated = binding.equals(SAML2Constants.SOAP)
-                    ? true : false;
-                logRes.setDestination(XMLUtils.escapeSpecialCharacters(
-                    getSingleLogoutLocation(spEntity, realm, binding)));
+                boolean isSOAPInitiated = binding.equals(SAML2Constants.SOAP);
+                SingleLogoutServiceElement endpoint = getLogoutResponseEndpoint(realm, spEntity, binding);
+                String location = getResponseLocation(endpoint);
+                logRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
                 debug.message("IDPSingleLogout.processLogReq : call MP");
-                int retStat = SingleLogoutManager.getInstance().
-                    doIDPSingleLogout(set, sessUser, request, response,
-                    isSOAPInitiated, false, SingleLogoutManager.SAML2,
-                    realm, idpEntityID, spEntity, relayState,
-                    logoutReq.toXMLString(true, true),
-                    logRes.toXMLString(true, true),
+                int retStat = SingleLogoutManager.getInstance().doIDPSingleLogout(set, sessUser, request, response,
+                    isSOAPInitiated, false, SingleLogoutManager.SAML2, realm, idpEntityID, spEntity, relayState,
+                    logoutReq.toXMLString(true, true), logRes.toXMLString(true, true),
                     SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS);
                 if (retStat != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS) {
                     logRes = updateLogoutResponse(logRes, retStat);
@@ -1449,31 +1470,6 @@ public class IDPSingleLogout {
                      SAML2Utils.bundle.getString("invalid_name_identifier")));
     }
 
-    private static LogoutRequest copyAndMakeMutable(LogoutRequest src) {
-        LogoutRequest dest =
-            ProtocolFactory.getInstance().createLogoutRequest();
-        try {
-            dest.setNotOnOrAfter(src.getNotOnOrAfter());
-            dest.setReason(src.getReason());
-            dest.setEncryptedID(src.getEncryptedID());
-            dest.setNameID(src.getNameID());
-            dest.setBaseID(src.getBaseID());
-            dest.setSessionIndex(src.getSessionIndex());
-            dest.setIssuer(src.getIssuer());
-            dest.setExtensions(src.getExtensions());
-            dest.setID(src.getID());
-            dest.setVersion(src.getVersion());
-            dest.setIssueInstant(src.getIssueInstant());
-            dest.setDestination(XMLUtils.escapeSpecialCharacters(
-                src.getDestination()));
-            dest.setConsent(src.getConsent());
-            // TODO : handle signature in case of list of session case
-        } catch(SAML2Exception ex) {
-            debug.error("IDPSingleLogout.copyAndMakeMutable:", ex);
-        }
-        return dest;
-    }
-
    /**
      * Removes transient nameid from the cache.
      */
@@ -1606,10 +1602,10 @@ public class IDPSingleLogout {
                 logoutReq.getID(), SAML2Utils.createIssuer(idpEntityID),
                 realm, SAML2Constants.IDP_ROLE,
                 logoutReq.getIssuer().getSPProvidedID());
-        String location = getSingleLogoutLocation(
-                spEntityID, realm, binding);
-        debug.message(classMethod + "Location found: " + location
-                + " for binding " + binding);
+        SingleLogoutServiceElement endpoint = getLogoutResponseEndpoint(realm, spEntityID, binding);
+        binding = endpoint.getBinding();
+        String location = getResponseLocation(endpoint);
+        debug.message(classMethod + "Location found: " + location + " for binding " + binding);
         logRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
         LogoutUtil.sendSLOResponse(response, request, logRes, location,
                 relayState, realm, idpEntityID, SAML2Constants.IDP_ROLE,
