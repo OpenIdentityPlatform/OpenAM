@@ -1,7 +1,7 @@
 <%--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved.
+  Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved.
  
   The contents of this file are subject to the terms
   of the Common Development and Distribution License
@@ -26,6 +26,7 @@
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="org.owasp.esapi.ESAPI"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List" %>
 
 <html>
@@ -40,7 +41,7 @@
             String samlIdP = "";
             String relayState = "";
             String idpListSt = "";
-            String requestedAuthnContext ="";
+            List<String> requestedAuthnContext;
 
             HttpSession hts = request.getSession();
             if (hts == null) {
@@ -67,13 +68,8 @@
         <%
             }
 
-            requestedAuthnContext = (String) hts.getAttribute("_REQAUTHNCONTEXT_");
-            if ( requestedAuthnContext == null) {
-            %>
-            <jsp:forward page="<%= errorURL %>" />
-        <%
-            }
-            if (requestedAuthnContext.isEmpty()) {
+            requestedAuthnContext = (List<String>) hts.getAttribute("_REQAUTHNCONTEXT_");
+            if (requestedAuthnContext != null && requestedAuthnContext.isEmpty()) {
         %>
             <jsp:forward page="<%= errorURL %>" />
         <%
@@ -106,7 +102,7 @@
         %>
         <h2>Welcome to the Federation Broker</h2>
         <p>You are here because you initiated a request in the Service Provider <b><%= spRequester %></b> and
-            <br>You asked for the Assurance level <b><%= requestedAuthnContext %></b>:
+            <br>You asked for the <%= requestedAuthnContext == null ? "<b>default</b> " : "" %>Assurance level <b><%= requestedAuthnContext != null ? StringUtils.join(requestedAuthnContext, " ") : "" %></b>:
         </p>
         <p>Please select your preferred IdP:</p>
         <form action="" method="POST">
