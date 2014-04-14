@@ -49,23 +49,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>i18n-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate-messages</goal>
-                        </goals>
-                        <configuration>
-                            <messageFiles>
-                                <messageFile>org/forgerock/openam/session/ha/i18n/amsessionstore.properties</messageFile>
-                            </messageFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
