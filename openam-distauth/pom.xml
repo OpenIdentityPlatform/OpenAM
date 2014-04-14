@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2012-2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -114,38 +114,91 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.github.goldin</groupId>
-                <artifactId>copy-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <verbose>false</verbose>
-                    <resource>
-                        <directory>${basedir}/../openam-core/src/main/resources</directory>
-                        <includes>
-                            <include>BasicClientTypesManager.properties</include>
-                            <include>debugfiles.properties</include>
-                            <include>amAuth.properties</include>
-                            <include>amAuthUI.properties</include>
-                            <include>amAuthContext.properties</include>
-                            <include>amClientDetection.properties</include>
-                            <include>*_*/amAuth_*.properties</include>
-                            <include>*_*/amAuthUI_*.properties</include>
-                            <include>*_*/amAuthContext_*.properties</include>
-                            <include>*_*/amClientDetection_*.properties</include>
-                        </includes>
-                        <targetPath>${project.build.outputDirectory}</targetPath>
-                    </resource>
-                </configuration>
-            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources</directory>
+                <includes>
+                    <include>BasicClientTypesManager.properties</include>
+                    <include>debugfiles.properties</include>
+                    <include>amAuth.properties</include>
+                    <include>amAuthUI.properties</include>
+                    <include>amAuthContext.properties</include>
+                    <include>amClientDetection.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/de_DE</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/es_ES</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/fr_FR</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/ko_KR</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/ja_JP</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/zh_CN</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}/../openam-core/src/main/resources/zh_TW</directory>
+                <includes>
+                    <include>amAuth_*.properties</include>
+                    <include>amAuthUI_*.properties</include>
+                    <include>amAuthContext_*.properties</include>
+                    <include>amClientDetection_*.properties</include>
+                </includes>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+        </resources>
     </build>
 
     <dependencies>
