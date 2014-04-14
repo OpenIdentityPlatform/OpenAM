@@ -24,7 +24,7 @@
 #
 # $Id: CommandLineIdrepo.sh,v 1.6 2009/01/28 05:34:45 ww203982 Exp $
 #
-# Portions Copyrighted 2013 ForgeRock, Inc.
+# Portions Copyrighted 2013-2014 ForgeRock AS
 #
-java -cp resources:lib/openam-clientsdk-${project.version}.jar:lib/servlet-api-2.5.jar:lib/openam-example-clientsdk-cli-${project.version}.jar com.sun.identity.samples.clientsdk.idrepo.IdRepoSample
+java -cp resources:lib/openam-clientsdk-${project.version}.jar:lib/servlet-api-${servlet-api.version}.jar:lib/openam-example-clientsdk-cli-${project.version}.jar com.sun.identity.samples.clientsdk.idrepo.IdRepoSample
 
