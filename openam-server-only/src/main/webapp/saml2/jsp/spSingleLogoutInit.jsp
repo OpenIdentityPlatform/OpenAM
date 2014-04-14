@@ -167,15 +167,7 @@
             spEntityID = manager.getEntityByMetaAlias(metaAlias);
         }
         String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
-        if (!SAML2Utils.isSPProfileBindingSupported(
-            realm, spEntityID, SAML2Constants.SLO_SERVICE, binding))
-        {
-            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                "unsupportedBinding",
-                SAML2Utils.bundle.getString("unsupportedBinding"));
-            return;
-        }
- 
+
         /**
         * Parses the request parameters and builds the Logout
         * Request to be sent to the IDP.
