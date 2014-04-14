@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
+ * Copyright (c) 2010-2014 ForgeRock AS. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 
 package com.sun.identity.saml2.plugins;
 
@@ -47,6 +46,7 @@ import com.sun.identity.saml2.profile.IDPSSOUtil;
 import com.sun.identity.saml2.profile.SPSSOFederate;
 import com.sun.identity.saml2.profile.SPCache;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.RequestedAuthnContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +58,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class <code>SAML2IDPProxyFRImpl</code> is used to find a preferred Identity
@@ -173,10 +174,9 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
             if (!isIntroductionForProxyingEnabled && !isIdPFinderEnabled
                     && !isIdpFinderForAllSPsEnabled) {
                 debugMessage(methodName, " idpFinder wil use the static list of the SP");
-                List proxyIDPs = null;
-                if ((spConfigAttrsMap != null) && (!spConfigAttrsMap.isEmpty())) {
-                    proxyIDPs = (List) spConfigAttrsMap.get(
-                            SAML2Constants.IDP_PROXY_LIST);
+                List<String> proxyIDPs = null;
+                if (spConfigAttrsMap != null && !spConfigAttrsMap.isEmpty()) {
+                    proxyIDPs = (List<String>) spConfigAttrsMap.get(SAML2Constants.IDP_PROXY_LIST);
                 }
                 
                 debugMessage(methodName, " List from the configuration: " + proxyIDPs);
@@ -302,7 +302,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         String classMethod = "idpList";
         
         try {            
-            List idpList = SAML2Utils.getSAML2MetaManager().getAllRemoteIdentityProviderEntities(realm);
+            List<String> idpList = SAML2Utils.getSAML2MetaManager().getAllRemoteIdentityProviderEntities(realm);
             return selectIDPBasedOnLOA(idpList, realm, authnRequest);
         } catch (SAML2MetaException me) {
             debugMessage(classMethod, "SOmething went wrong: " + me);
@@ -310,7 +310,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         }
     }
 
-    private String selectIDPBasedOnLOA(List idpList, String realm, AuthnRequest authnRequest) {
+    private String selectIDPBasedOnLOA(List<String> idpList, String realm, AuthnRequest authnRequest) {
 
         String classMethod = "selectIdPBasedOnLOA";
         EntityDescriptorElement idpDesc = null;
@@ -318,8 +318,13 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         String idps = "";
 
         try {
-
-            List listOfAuthnContexts = authnRequest.getRequestedAuthnContext().getAuthnContextClassRef();
+            RequestedAuthnContext requestedAuthnContext = authnRequest.getRequestedAuthnContext();
+            if (requestedAuthnContext == null) {
+                //Handle the special case when the original request did not contain any Requested AuthnContext:
+                //In this case we just simply return all the IdPs as each one should support a default AuthnContext.
+                return StringUtils.join(idpList, " ");
+            }
+            List listOfAuthnContexts = requestedAuthnContext.getAuthnContextClassRef();
             debugMessage(classMethod, "listofAuthnContexts: " + listOfAuthnContexts);
 
             try {
@@ -486,17 +491,6 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         return returnURL;
     }
 
-    private String listToString(List listToConvert) {
-        String result ="";
-        if ((listToConvert != null) && (!listToConvert.isEmpty())) {
-          Iterator it = listToConvert.iterator();
-          while(it.hasNext()) {
-              result = it.next() + " ";
-          }
-        } else return null;
-        return result.trim();
-    }
-
     private void storeSessionParamsAndCache(
             HttpServletRequest request,
             String idpListSt,
@@ -514,8 +508,9 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
         debugMessage(methodName, " Setting " + SESSION_ATTR_NAME_RELAYSTATE);
         hts.setAttribute(SESSION_ATTR_NAME_SPREQUESTER, authnRequest.getIssuer().getValue().toString());
         debugMessage(methodName, " Setting " + SESSION_ATTR_NAME_SPREQUESTER);
-        String authnRequestStr = listToString(authnRequest.getRequestedAuthnContext().getAuthnContextClassRef());
-        hts.setAttribute(SESSION_ATTR_NAME_REQAUTHNCONTEXT, authnRequestStr);
+        RequestedAuthnContext requestedAuthnContext = authnRequest.getRequestedAuthnContext();
+        hts.setAttribute(SESSION_ATTR_NAME_REQAUTHNCONTEXT,
+                requestedAuthnContext == null ? null : requestedAuthnContext.getAuthnContextClassRef());
         debugMessage(methodName, " Setting " + SESSION_ATTR_NAME_REQAUTHNCONTEXT);
 
         // Save the important param in the reqParamHash so we can
