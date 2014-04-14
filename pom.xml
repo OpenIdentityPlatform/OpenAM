@@ -2059,11 +2059,6 @@
                     <artifactId>cargo-maven2-plugin</artifactId>
                     <version>1.4.3</version>
                 </plugin>
-                <plugin>
-                    <groupId>com.github.goldin</groupId>
-                    <artifactId>copy-maven-plugin</artifactId>
-                    <version>0.2.5</version>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>

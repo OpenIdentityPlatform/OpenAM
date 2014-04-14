@@ -35,8 +35,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM Core</name>
-    <description>OpenAM Core Components
-    </description>
+    <description>OpenAM Core Components</description>
     <artifactId>openam-core</artifactId>
     <packaging>jar</packaging>
 
@@ -106,27 +105,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
-                <groupId>com.github.goldin</groupId>
-                <artifactId>copy-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <verbose>false</verbose>
-                    <resource>
-                        <directory>${basedir}/src/main/resources</directory>
-                        <include>*_*/*</include>
-                        <filtering>true</filtering>
-                        <targetPath>${project.build.outputDirectory}</targetPath>
-                    </resource>
-                </configuration>
-            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -137,6 +115,55 @@
                 <excludes>
                     <exclude>*_*/*</exclude>
                 </excludes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/de_DE</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/es_ES</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/fr_FR</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/ja_JP</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/ko_KR</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/zh_CN</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/zh_TW</directory>
+                <includes>
+                    <include>*</include>
+                </includes>
                 <filtering>true</filtering>
             </resource>
             <resource>
