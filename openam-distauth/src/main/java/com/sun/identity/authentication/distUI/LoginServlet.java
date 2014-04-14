@@ -115,9 +115,10 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
             if (debug.messageEnabled()) {
                 debug.message("authCookieValue : " + authCookieValue);
             }
-            
-            if ((authCookieValue != null) && (authCookieValue.length() != 0) &&
-                    (!AuthClientUtils.isLocalServer(authCookieValue, false))) {
+
+            final boolean isLoginRequest = LOGIN_PAGE_NAME.equals(getPageName(request));
+            if (isLoginRequest && authCookieValue != null && !authCookieValue.isEmpty()
+                    && !AuthClientUtils.isLocalServer(authCookieValue, false)) {
 
                 boolean isRoutingAllowed = 
                     AuthClientUtils.isDistAuthServerTrusted(authCookieValue);
@@ -310,6 +311,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
     /** Confiured page name for configured servlet */
     public static String PACKAGE_NAME=
     getPackageName(LoginServlet.class.getName());
+    private static final String LOGIN_PAGE_NAME = "Login";
     
     private static final String REDIRECT_JSP = "Redirect.jsp";
     private static final String UNTRUSTED_SERVER_ERROR_CODE =
