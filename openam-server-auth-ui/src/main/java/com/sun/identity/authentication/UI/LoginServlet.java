@@ -144,8 +144,9 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             throw new CompleteRequestException();
         }
 
+        final boolean isLoginRequest = LOGIN_PAGE_NAME.equals(getPageName(request));
         String cookieURL = AuthUtils.getCookieURLForSessionUpgrade(request);
-        if (cookieURL != null) {
+        if (cookieURL != null && isLoginRequest) {
             rerouteRequest(request, response, cookieURL);
             return;
         }
@@ -168,8 +169,8 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             if (debug.messageEnabled()) {
                 debug.message("cookieURL : " + cookieURL);
             }
-            if ((cookieURL != null) && (cookieURL.length() != 0) &&
-                (!AuthUtils.isLocalServer(cookieURL,true))) {
+            if (isLoginRequest && cookieURL != null && !cookieURL.isEmpty()
+                    && !AuthUtils.isLocalServer(cookieURL,true)) {
                 rerouteRequest(request, response, cookieURL);
             }
         }
@@ -435,7 +436,7 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
     private static final String DEFAULT_CONTENT_TYPE = "text/html; charset=" + G11NSettings.CDM_DEFAULT_CHARSET;
     // the debug file
     private static final Debug debug = Debug.getInstance("amLoginServlet");
-    
+    private static final String LOGIN_PAGE_NAME = "Login";
     private static String serviceURI = SystemProperties.get(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR) + "/UI/Login";
 }
