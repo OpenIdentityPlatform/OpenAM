@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS. 
  * 
  * The contents of this file are subject to the terms
@@ -118,7 +118,7 @@ public class OAuth extends AMLoginModule {
             case ISAuthConstants.LOGIN_START: {
                 config.validateConfiguration();
                 serverName = request.getServerName();
-                String requestedURL = request.getRequestURL().toString();
+                String requestedURI = request.getRequestURI();
                 String requestedQuery = request.getQueryString();
 
                 String authCookieName = AuthUtils.getAuthCookieName();
@@ -128,7 +128,7 @@ public class OAuth extends AMLoginModule {
                         requestedQuery = requestedQuery.substring(0,
                                 requestedQuery.length() - authCookieName.length() - 1);
                     }
-                    requestedURL += "?" + requestedQuery;
+                    requestedURI += "?" + requestedQuery;
                 }
 
                 // Find the domains for which we are configured
@@ -145,7 +145,7 @@ public class OAuth extends AMLoginModule {
                    CookieUtils.addCookieToResponse(response,
                            CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
                     CookieUtils.addCookieToResponse(response,
-                            CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURL, "/", domain));
+                            CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURI, "/", domain));
                    if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
                        CookieUtils.addCookieToResponse(response,
                                CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
@@ -154,7 +154,7 @@ public class OAuth extends AMLoginModule {
 
                 // The Proxy is used to return with a POST to the module
                 setUserSessionProperty(ISAuthConstants.FULL_LOGIN_URL,
-                        requestedURL);
+                        requestedURI);
 
                 setUserSessionProperty(SESSION_LOGOUT_BEHAVIOUR,
                         config.getLogoutBhaviour());
