@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.share;
@@ -53,17 +53,10 @@ public class RedirectCallbackHandler {
 
         String qString = AuthUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
 
-        String requestURL = request.getRequestURL().toString();
-        String requestURI = request.getRequestURI();
-        int index = requestURL.indexOf(requestURI);
-        String redirectBackServerCookieValue = null;
-        if (index != -1) {
-            redirectBackServerCookieValue = requestURL.substring(0, index) + loginURL;
-        }
         // Create Cookie
         try {
             AuthUtils.setRedirectBackServerCookie(redirectCallback.getRedirectBackUrlCookieName(),
-                    redirectBackServerCookieValue, request, response);
+            		loginURL, request, response);
         } catch (Exception e) {
             if (debug.messageEnabled()){
                 debug.message("Could not set RedirectBackUrlCookie!" + e.toString());
