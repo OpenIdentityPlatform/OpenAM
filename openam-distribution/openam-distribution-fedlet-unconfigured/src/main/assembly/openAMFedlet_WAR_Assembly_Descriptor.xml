@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -49,6 +49,8 @@
                 <include>xerces-J:xml-apis</include>
                 <include>xerces-J:xml-resolver</include>
                 <include>xerces-J:xml-serializer</include>
+                <include>org.apache.santuario:xmlsec</include>
+                <include>commons-logging:commons-logging-api</include>
             </includes>
         </dependencySet>
     </dependencySets>
@@ -70,7 +72,6 @@
                 <include>masthead-background.jpg</include>
                 <include>masthead-sunname.gif</include>
                 <include>masthead-sun-background.jpg</include>
-                <include>masthead-sunname.gif</include>
             </includes>
         </fileSet>
         <fileSet>
@@ -86,7 +87,6 @@
             <outputDirectory></outputDirectory>
             <directory>${project.basedir}/../../openam-server-only/src/main/webapp/saml2/jsp</directory>
             <includes>
-                <include>fedletAttrQuery.jsp</include>
                 <include>fedletAttrQuery.jsp</include>
                 <include>fedletAttrResp.jsp</include>
                 <include>fedletEncode.jsp</include>

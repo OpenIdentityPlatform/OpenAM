@@ -24,6 +24,7 @@
  *
  * $Id: SecurityUtils.java,v 1.5 2009/06/08 23:42:33 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -39,12 +40,10 @@ import com.sun.identity.liberty.ws.common.wsse.BinarySecurityToken;
 import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.soapbinding.Message;
 
-import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.assertion.AuthenticationStatement;
 import com.sun.identity.saml.assertion.Statement;
 import com.sun.identity.saml.assertion.Subject;
 import com.sun.identity.saml.assertion.SubjectConfirmation;
-import com.sun.identity.saml.assertion.SubjectStatement;
 
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
@@ -53,13 +52,10 @@ import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml.xmlsig.XMLSignatureException;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
-import com.sun.org.apache.xml.internal.security.Init;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       DSAKeyValue;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       RSAKeyValue;
-import com.sun.org.apache.xml.internal.security.utils.Constants;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.utils.Constants;
 
 import java.io.ByteArrayInputStream;
 
@@ -68,8 +64,6 @@ import java.math.BigInteger;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import java.util.Collection;

@@ -75,6 +75,8 @@
                 <include>com.sun.msv.datatype.xsd:xsdlib</include>
                 <include>org.slf4j:slf4j-api</include>
                 <include>org.slf4j:slf4j-nop</include>
+                <include>org.apache.santuario:xmlsec</include>
+                <include>commons-logging:commons-logging-api</include>
             </includes>
         </dependencySet>
         <dependencySet>

@@ -24,10 +24,7 @@
  *
  * $Id: WSFederationMetaSecurityUtils.java,v 1.6 2009/10/28 23:58:59 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.wsfederation.meta;
 
@@ -42,12 +39,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
-import com.sun.org.apache.xml.internal.security.keys.storage.implementations.KeyStoreResolver;
-import com.sun.org.apache.xml.internal.security.keys.storage.StorageResolver;
-import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
-import com.sun.org.apache.xml.internal.security.utils.Constants;
+import org.apache.xpath.XPathAPI;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.storage.implementations.KeyStoreResolver;
+import org.apache.xml.security.keys.storage.StorageResolver;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.utils.Constants;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -55,7 +52,6 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
-import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.key.KeyUtil;
 
@@ -106,7 +102,7 @@ public final class WSFederationMetaSecurityUtils {
             return;
         }
 
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
 
         keyProvider = KeyUtil.getKeyProviderInstance();
         if (keyProvider != null) {
@@ -246,7 +242,7 @@ public final class WSFederationMetaSecurityUtils {
         NodeList sigElements = null;
         try {
             Element nscontext =
-                    com.sun.org.apache.xml.internal.security.utils.XMLUtils
+                    org.apache.xml.security.utils.XMLUtils
                             .createDSctx (doc,"ds", Constants.SignatureSpecNS);
             sigElements =
                     XPathAPI.selectNodeList(doc, "//ds:Signature", nscontext);

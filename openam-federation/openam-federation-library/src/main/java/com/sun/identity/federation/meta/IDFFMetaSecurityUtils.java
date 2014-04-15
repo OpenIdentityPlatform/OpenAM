@@ -24,11 +24,9 @@
  *
  * $Id: IDFFMetaSecurityUtils.java,v 1.5 2009/06/08 23:40:42 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
-/**
- * Portions Copyrighted 2011 ForgeRock AS
- */
 package com.sun.identity.federation.meta;
 
 import com.sun.identity.federation.common.FSUtils;
@@ -45,7 +43,6 @@ import java.util.List;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 
-import com.sun.identity.saml.xmlsig.JKSKeyProvider;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 
 import com.sun.identity.federation.key.KeyUtil;
@@ -55,15 +52,11 @@ import com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorElement;
 import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType;
-import com.sun.identity.shared.xml.XMLUtils;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * The <code>IDFFMetaSecurityUtils</code> class provides metadata security 
@@ -89,7 +82,7 @@ public final class IDFFMetaSecurityUtils {
             return;
         }
 
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
 
         keyProvider = KeyUtil.getKeyProviderInstance();
         if (keyProvider != null) {

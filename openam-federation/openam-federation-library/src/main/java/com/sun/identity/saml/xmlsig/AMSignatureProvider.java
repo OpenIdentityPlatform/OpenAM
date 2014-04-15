@@ -24,10 +24,7 @@
  *
  * $Id: AMSignatureProvider.java,v 1.11 2009/08/29 03:06:47 mallas Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -44,20 +41,21 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.saml.common.*;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
-import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.DSAKeyValue;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.RSAKeyValue;
-import com.sun.org.apache.xml.internal.security.keys.storage.StorageResolver;
-import com.sun.org.apache.xml.internal.security.keys.storage.implementations.KeyStoreResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509CertificateResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509SubjectNameResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509IssuerSerialResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509SKIResolver;
-import com.sun.org.apache.xml.internal.security.utils.Constants;
-import com.sun.org.apache.xml.internal.security.transforms.Transforms;
+import org.apache.xpath.XPathAPI;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.keys.storage.StorageResolver;
+import org.apache.xml.security.keys.storage.implementations.KeyStoreResolver;
+import org.apache.xml.security.keys.keyresolver.implementations.X509CertificateResolver;
+import org.apache.xml.security.keys.keyresolver.implementations.X509SubjectNameResolver;
+import org.apache.xml.security.keys.keyresolver.implementations.X509IssuerSerialResolver;
+import org.apache.xml.security.keys.keyresolver.implementations.X509SKIResolver;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.ElementProxy;
+import org.apache.xml.security.transforms.Transforms;
 import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.soapbinding.SOAPBindingConstants;
 
@@ -83,7 +81,7 @@ public class AMSignatureProvider implements SignatureProvider {
      * Default Constructor
      */
     public AMSignatureProvider() {
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
         try {
             String kprovider = SystemConfigurationUtil.getProperty(
                 SAMLConstants.KEY_PROVIDER_IMPL_CLASS,
@@ -183,7 +181,7 @@ public class AMSignatureProvider implements SignatureProvider {
         org.w3c.dom.Element root = null; 
         XMLSignature sig = null; 
         try {
-            Constants.setSignatureSpecNSprefix("ds");    
+            ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
             if (keystore == null) { 
                 throw new XMLSignatureException(
                           SAMLUtilsCommon.bundle.getString("nullkeystore"));
@@ -478,7 +476,7 @@ public class AMSignatureProvider implements SignatureProvider {
         Element root = null;
         XMLSignature sig = null; 
         try {      
-            Constants.setSignatureSpecNSprefix("ds");
+            ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
             PrivateKey privateKey;
             if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
                 privateKey = keystore.getPrivateKey(certAlias);
@@ -633,7 +631,7 @@ public class AMSignatureProvider implements SignatureProvider {
 
         XMLSignature signature = null;
         try {
-            Constants.setSignatureSpecNSprefix("ds");    
+            ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
             PrivateKey privateKey =         
                 (PrivateKey) keystore.getPrivateKey(certAlias);
             if (privateKey == null) {         
@@ -789,8 +787,8 @@ public class AMSignatureProvider implements SignatureProvider {
             getElementsByTagNameNS(wsseNS, SAMLConstants.TAG_SECURITY).item(0);
         XMLSignature signature = null;
         try {
-            Constants.setSignatureSpecNSprefix("ds");
-            Element wsucontext = com.sun.org.apache.xml.internal.security.utils.
+            ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
+            Element wsucontext = org.apache.xml.security.utils.
                       XMLUtils.createDSctx(doc, "wsu", wsuNS);
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                                 "//*[@wsu:Id]", wsucontext);
@@ -930,8 +928,8 @@ public class AMSignatureProvider implements SignatureProvider {
 
         XMLSignature signature = null;
         try {
-            Constants.setSignatureSpecNSprefix("ds");    
-            Element wsucontext = com.sun.org.apache.xml.internal.security.utils.
+            ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
+            Element wsucontext = org.apache.xml.security.utils.
                 XMLUtils.createDSctx(doc, "wsu", wsuNS);
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
                 "//*[@wsu:Id]", wsucontext);
@@ -1060,7 +1058,7 @@ public class AMSignatureProvider implements SignatureProvider {
                wsseNS = WSSEConstants.NS_WSSE_WSF11;
             }
 
-            Element wsucontext = com.sun.org.apache.xml.internal.security.utils.
+            Element wsucontext = org.apache.xml.security.utils.
                 XMLUtils.createDSctx(doc, "wsu", wsuNS);
 
             NodeList wsuNodes = (NodeList)XPathAPI.selectNodeList(doc,
@@ -1097,7 +1095,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 }
             }
            
-            Element nscontext = com.sun.org.apache.xml.internal.security.utils.
+            Element nscontext = org.apache.xml.security.utils.
                   XMLUtils.createDSctx (doc,"ds",Constants.SignatureSpecNS); 
             NodeList sigElements = XPathAPI.selectNodeList (doc,  
                 "//ds:Signature", nscontext);    
@@ -1366,7 +1364,7 @@ public class AMSignatureProvider implements SignatureProvider {
                                       java.lang.String certAlias)
         throws XMLSignatureException {
         try {
-            Element nscontext = com.sun.org.apache.xml.internal.security.utils.
+            Element nscontext = org.apache.xml.security.utils.
                  XMLUtils.createDSctx(doc,"ds",Constants.SignatureSpecNS);
             Element sigElement = (Element) XPathAPI.selectSingleNode(doc,
                                  "//ds:Signature[1]", nscontext);
@@ -1574,7 +1572,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 return null;
             }
 
-            Element nscontext = com.sun.org.apache.xml.internal.security.utils.
+            Element nscontext = org.apache.xml.security.utils.
                 XMLUtils.createDSctx(doc,"ds",Constants.SignatureSpecNS);
             Element sigElement = (Element) XPathAPI.selectSingleNode(
 					securityElement, "ds:Signature[1]",
@@ -1590,7 +1588,7 @@ public class AMSignatureProvider implements SignatureProvider {
             if (reference != null) {
 	        String id = reference.getAttribute(SAMLConstants.TAG_URI);
 	        id = id.substring(1);
-	        nscontext = com.sun.org.apache.xml.internal.security.utils.
+	        nscontext = org.apache.xml.security.utils.
                     XMLUtils.createDSctx(doc, SAMLConstants.PREFIX_WSU, wsuNS);
 	        Node n = XPathAPI.selectSingleNode(
 		    doc, "//*[@"+ SAMLConstants.PREFIX_WSU + ":" +

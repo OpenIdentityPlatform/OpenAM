@@ -24,6 +24,7 @@
  *
  * $Id: AMTokenProvider.java,v 1.9 2009/06/09 00:41:57 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 package com.sun.identity.wss.security;
 
@@ -39,7 +40,6 @@ import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
@@ -51,10 +51,9 @@ import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.shared.Constants;
 
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
-import com.sun.org.apache.xml.internal.security.keys.content.x509.
-           XMLX509IssuerSerial;
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.keys.content.x509.XMLX509IssuerSerial;
 import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.encode.Base64;
 

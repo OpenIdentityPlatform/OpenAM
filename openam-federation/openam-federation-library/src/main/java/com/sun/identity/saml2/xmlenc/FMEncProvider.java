@@ -24,6 +24,7 @@
  *
  * $Id: FMEncProvider.java,v 1.5 2008/06/25 05:48:03 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -34,20 +35,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import java.security.Key;
-import java.security.PublicKey;
-import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedData;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedKey;
-import com.sun.org.apache.xml.internal.security.encryption.XMLEncryptionException;
-import java.io.IOException;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+
 import java.util.Hashtable;
 
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -84,7 +81,7 @@ public final class FMEncProvider implements EncProvider {
     private static boolean encryptedKeyInKeyInfo = true;
 
     static {
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
         String tmp = SystemConfigurationUtil.getProperty(
             "com.sun.identity.saml.xmlenc.encryptedKeyInKeyInfo");
         if ((tmp != null) && (tmp.equalsIgnoreCase("false"))) {

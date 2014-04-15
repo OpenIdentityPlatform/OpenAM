@@ -169,6 +169,12 @@
         <dependency>
             <groupId>xerces-J</groupId>
             <artifactId>xml-apis</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+       	    <artifactId>xmlsec</artifactId>
         </dependency>
 
         <dependency>

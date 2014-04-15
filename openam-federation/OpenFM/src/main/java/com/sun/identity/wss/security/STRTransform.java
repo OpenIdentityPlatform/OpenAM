@@ -24,6 +24,7 @@
  *
  * $Id: STRTransform.java,v 1.6 2008/07/21 17:18:32 mallas Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.security;
@@ -34,18 +35,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
-import com.sun.org.apache.xml.internal.security.c14n.CanonicalizationException;
-import com.sun.org.apache.xml.internal.security.c14n.
-                                       InvalidCanonicalizerException;
-import com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput;
-import com.sun.org.apache.xml.internal.security.transforms.Transform;
-import com.sun.org.apache.xml.internal.security.transforms.TransformSpi;
-import com.sun.org.apache.xml.internal.security.transforms.
-                                                TransformationException;
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.c14n.CanonicalizationException;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
+import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.Transform;
+import org.apache.xml.security.transforms.TransformSpi;
+import org.apache.xml.security.transforms.TransformationException;
+import org.apache.xml.security.keys.content.X509Data;
 import com.sun.identity.shared.xml.XMLUtils;
-import com.sun.identity.shared.debug.Debug;
 
 /**
  * This class <code>STRTransform</code> extends from <code>TransformSpi</code>
@@ -79,12 +77,12 @@ public class STRTransform extends TransformSpi {
     /**
      * Perform the XMLSignature transformation for the given input.
      */
-    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input)
+    protected XMLSignatureInput enginePerformTransform(XMLSignatureInput input, Transform transformObject)
           throws IOException, CanonicalizationException, 
           InvalidCanonicalizerException, TransformationException {
   
         WSSUtils.debug.message("STRTransform.enginePerformTransform:: Start");
-        Document doc = this._transformObject.getDocument();
+        Document doc = transformObject.getDocument();
         Element str = null;
         if(input.isElement()) {
         } else {
@@ -112,7 +110,7 @@ public class STRTransform extends TransformSpi {
             throw new TransformationException(
                   WSSUtils.bundle.getString("transformfailed"));
         }
-        String canonAlgo = getCanonicalizationAlgo();
+        String canonAlgo = getCanonicalizationAlgo(transformObject);
         Canonicalizer canon = Canonicalizer.getInstance(canonAlgo);
         byte[] buf = canon.canonicalizeSubtree(dereferencedToken, "#default");
         StringBuffer bf = new StringBuffer(new String(buf));
@@ -186,12 +184,12 @@ public class STRTransform extends TransformSpi {
     /**
      * Returns the canonicalization algorithm in transformation params.
      */
-    private String getCanonicalizationAlgo() {
+    private String getCanonicalizationAlgo(Transform transformObject) {
         String canonAlgo = null;
-        if (this._transformObject.length(WSSConstants.WSSE_NS,
+        if (transformObject.length(WSSConstants.WSSE_NS,
                     WSSConstants.TRANSFORMATION_PARAMETERS) == 1) {
             Node tmpE = XMLUtils.getChildNode(
-                this._transformObject.getElement(), WSSConstants.WSSE_TAG + ":" 
+                transformObject.getElement(), WSSConstants.WSSE_TAG + ":"
                        + WSSConstants.TRANSFORMATION_PARAMETERS);
             Element canonElem = (Element) WSSUtils.getDirectChild(
                         tmpE, "CanonicalizationMethod", 

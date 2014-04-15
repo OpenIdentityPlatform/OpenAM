@@ -24,10 +24,7 @@
  *
  * $Id: KeyUtil.java,v 1.10 2009/08/28 23:42:14 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.key;
@@ -42,7 +39,7 @@ import java.security.PublicKey;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLCipher;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
@@ -576,7 +573,7 @@ public class KeyUtil {
      * Returns the <code>EncInfo</code> from the <code>KeyDescriptor</code>.
      *
      * @param kd the M<code>KeyDescriptor</code> object.
-     * @param pentityID the entity identfier 
+     * @param entityID the entity identfier
      * @param role the role of the entity . Value can be PEP or PDP.
      * @return <code>EncInfo</code> the encryption info.
      */

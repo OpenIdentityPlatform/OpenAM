@@ -24,10 +24,9 @@
  *
  * $Id: FAMSTSTokenProvider.java,v 1.18 2010/01/15 18:54:35 mrudul_uchil Exp $
  *
+ *  Portions Copyrighted 2012-2014 ForgeRock AS
  */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
- */
+
 package com.sun.identity.wss.sts.spi;
 
 import com.sun.xml.ws.api.security.trust.STSAttributeProvider;
@@ -59,14 +58,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.KeyResolverException;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedKey;
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.keys.keyresolver.KeyResolverException;
 import com.sun.identity.wss.sts.STSUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.xml.ws.security.trust.WSTrustElementFactory;
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
 import com.sun.identity.wss.sts.STSConstants;
 import com.sun.identity.plugin.session.impl.FMSessionProvider;
 import com.sun.identity.plugin.session.SessionProvider;
@@ -443,11 +442,10 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
         if (wstVer.getSymmetricKeyTypeURI().equals(keyType)){
             final byte[] key = ctx.getProofKey();
             try {
-                final EncryptedKey encKey = 
-                    WSTrustUtil.encryptKey(doc, key, 
-                    (X509Certificate)ctx.getOtherProperties().get(
-                    IssuedTokenContext.TARGET_SERVICE_CERTIFICATE),null);
-                 keyInfo.add(encKey);
+                final X509Certificate cert =
+                    (X509Certificate)ctx.getOtherProperties().get(IssuedTokenContext.TARGET_SERVICE_CERTIFICATE);
+                final EncryptedKey encKey = WSSUtils.encryptKey(doc, key, cert, null);
+                keyInfo.add(encKey);
             } catch (Exception ex) {
                  STSUtils.debug.error("FAMSTSTokenProvider.createKeyInfo : " + 
                 "ERROR_ENCRYPT_PROOFKEY : ", ex);

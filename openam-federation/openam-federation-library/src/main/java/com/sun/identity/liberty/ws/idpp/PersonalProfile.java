@@ -24,6 +24,7 @@
  *
  * $Id: PersonalProfile.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 
@@ -32,10 +33,9 @@ package com.sun.identity.liberty.ws.idpp;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.NodeList;
 import javax.xml.bind.JAXBException;
-import com.sun.org.apache.xpath.internal.XPathAPI;
+import org.apache.xpath.XPathAPI;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -55,7 +55,6 @@ import com.sun.identity.liberty.ws.interfaces.ResourceIDMapper;
 import com.sun.identity.liberty.ws.dst.DSTConstants;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
 
 /**
  * This class <code>PersonalProfile</code> is an implementation of 

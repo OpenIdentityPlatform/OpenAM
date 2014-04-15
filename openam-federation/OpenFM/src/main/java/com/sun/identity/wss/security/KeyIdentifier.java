@@ -24,11 +24,11 @@
  *
  * $Id: KeyIdentifier.java,v 1.4 2008/07/30 05:00:44 mallas Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.security;
 
-import java.io.ByteArrayInputStream;
 import java.security.cert.X509Certificate;
 import javax.xml.transform.TransformerException;
 import java.util.ResourceBundle;
@@ -37,9 +37,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
 import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.org.apache.xpath.internal.XPathAPI;
+import org.apache.xpath.XPathAPI;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.encode.Base64;
 
 /**
  * This class <code>KeyIdentifier</code> can be be used to insert the
@@ -187,7 +186,7 @@ public class KeyIdentifier {
                       doc,  "//*[@ID=\"" + value + "\"]");
             } else {
                Element nscontext =
-                   com.sun.org.apache.xml.internal.security.utils.
+                   org.apache.xml.security.utils.
                    XMLUtils.createDSctx(doc, WSSConstants.WSU_TAG,
                                         WSSConstants.WSU_NS);
                tokenElement =  (Element) XPathAPI.selectSingleNode(

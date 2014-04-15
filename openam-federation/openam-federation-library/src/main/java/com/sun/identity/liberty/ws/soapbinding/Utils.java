@@ -24,15 +24,12 @@
  *
  * $Id: Utils.java,v 1.9 2008/11/10 22:56:59 veiming Exp $
  *
+ * Portions Copyright 2013-2014 ForgeRock AS
  */
 
-/*
- * Portions Copyright 2013 ForgeRock AS
- */
 package com.sun.identity.liberty.ws.soapbinding; 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 import java.text.MessageFormat;
 
@@ -62,7 +59,6 @@ import java.util.ResourceBundle;
 import com.sun.identity.common.PeriodicCleanUpMap;
 import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TaskRunnable;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.liberty.ws.util.ProviderManager;
 import com.sun.identity.liberty.ws.util.ProviderUtil;
 import com.sun.identity.shared.debug.Debug;
@@ -72,7 +68,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import com.sun.org.apache.xml.internal.utils.PrefixResolverDefault;
+import org.apache.xml.utils.PrefixResolverDefault;
 
 /**
  * This class contains utility methods.
@@ -625,10 +621,10 @@ public class Utils {
     }
 
     /**
-     * Enforces message Provider header processiong rules defined
+     * Enforces message Provider header processing rules defined
      * in the spec.
      *
-     * @param corrH a Correlation header
+     * @param provH a Correlation header
      * @param messageID the messageID in Correlation header
      * @param isServer true if this is a server
      * @throws SOAPBindingException if the Provider header violates rules

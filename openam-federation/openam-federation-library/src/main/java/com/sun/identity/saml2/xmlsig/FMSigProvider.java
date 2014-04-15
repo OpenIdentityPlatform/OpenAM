@@ -24,11 +24,9 @@
  *
  * $Id: FMSigProvider.java,v 1.5 2009/05/09 15:43:59 mallas Exp $
  *
+ *  Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
-/**
- * Portions Copyrighted 2011-2013 ForgeRock AS
- */
 package com.sun.identity.saml2.xmlsig;
 
 import java.security.PrivateKey;
@@ -39,21 +37,22 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-
-import com.sun.org.apache.xml.internal.security.utils.Constants;
-import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer; 
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
-import com.sun.org.apache.xml.internal.security.signature.XMLSignature; 
-import com.sun.org.apache.xml.internal.security.signature.XMLSignatureException;
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo; 
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.KeyResolverException;
-import com.sun.org.apache.xml.internal.security.transforms.Transforms; 
-import com.sun.org.apache.xml.internal.security.transforms.TransformationException;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.keyresolver.KeyResolverException;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.TransformationException;
+import org.apache.xml.security.utils.ElementProxy;
+import org.apache.xpath.XPathAPI;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
 
+import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -74,7 +73,7 @@ public final class FMSigProvider implements SigProvider {
     private static boolean checkCert = true;
 
     static {
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
 
 	c14nMethod = SystemPropertiesManager.get(
 	    SAML2Constants.CANONICALIZATION_METHOD,
@@ -149,7 +148,7 @@ public final class FMSigProvider implements SigProvider {
 	Element root = doc.getDocumentElement();
 	XMLSignature sig = null;
 	try {
-	    Constants.setSignatureSpecNSprefix("ds");
+        ElementProxy.setDefaultPrefix(Constants.SignatureSpecNS, SAMLConstants.PREFIX_DS);
 	} catch (XMLSecurityException xse1) {
 	    throw new SAML2Exception(xse1);
 	}
@@ -270,13 +269,13 @@ public final class FMSigProvider implements SigProvider {
 	    );
         }
 	Element nscontext =
-	    com.sun.org.apache.xml.internal.security.utils.XMLUtils.
+	    org.apache.xml.security.utils.XMLUtils.
 	    createDSctx(doc,"ds",Constants.SignatureSpecNS);
 	Element sigElement = null;
 	try {
-	    sigElement = (Element) XPathAPI.selectSingleNode(
-	    doc,
-	    "//ds:Signature[1]", nscontext);
+	    sigElement = (Element) org.apache.xpath.XPathAPI.selectSingleNode(
+                doc,
+                "//ds:Signature[1]", nscontext);
 	} catch (TransformerException te) {
 	    throw new SAML2Exception(te);
 	}

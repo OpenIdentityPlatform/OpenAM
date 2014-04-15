@@ -24,6 +24,7 @@
  *
  * $Id: FAMCallbackHandler.java,v 1.5 2008/07/02 16:57:24 mallas Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.sts.config;
@@ -32,13 +33,11 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.Callback;
 import com.sun.xml.wss.impl.callback.EncryptionKeyCallback;
 import com.sun.xml.wss.impl.callback.SignatureKeyCallback;
-//import java.security.KeyStore;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.wss.sts.STSUtils;
 
-import java.io.*;
 import java.security.cert.X509Certificate;
 import java.security.PrivateKey;
 
@@ -48,7 +47,7 @@ public class FAMCallbackHandler implements CallbackHandler {
     private String certAlias;
 
     static {
-        com.sun.org.apache.xml.internal.security.Init.init();
+        org.apache.xml.security.Init.init();
     }
 
     /** Creates a new instance of FAMCallbackHandler */

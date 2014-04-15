@@ -24,6 +24,7 @@
  *
  * $Id: SecurityTokenReference.java,v 1.4 2008/06/25 05:50:09 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.security;
@@ -35,9 +36,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
-import com.sun.org.apache.xpath.internal.XPathAPI;
+import org.apache.xml.security.keys.content.X509Data;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xpath.XPathAPI;
 
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.common.SAMLConstants;
@@ -238,7 +239,7 @@ public class SecurityTokenReference {
                       doc,  "//*[@ID=\"" + uri + "\"]");
             } else {
                Element nscontext =  
-                   com.sun.org.apache.xml.internal.security.utils.
+                   org.apache.xml.security.utils.
                    XMLUtils.createDSctx(doc, WSSConstants.WSU_TAG, 
                                         WSSConstants.WSU_NS);
                tokenElement =  (Element) XPathAPI.selectSingleNode(

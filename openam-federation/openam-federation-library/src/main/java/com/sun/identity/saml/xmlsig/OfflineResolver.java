@@ -24,23 +24,18 @@
  *
  * $Id: OfflineResolver.java,v 1.2 2008/06/25 05:47:38 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
-
-
-//package org.apache.xml.security.samples.utils.resolver;
 
 package com.sun.identity.saml.xmlsig;
 
 import java.util.*;
-import java.net.*;
 import java.io.*;
 import org.w3c.dom.*;
-import com.sun.org.apache.xml.internal.utils.URI;
-import com.sun.org.apache.xml.internal.security.utils.resolver
-                                            .ResourceResolverException;
-import com.sun.org.apache.xml.internal.security.signature.XMLSignatureInput;
-import com.sun.org.apache.xml.internal.security.utils.resolver
-                                            .ResourceResolverSpi;
+import org.apache.xml.utils.URI;
+import org.apache.xml.security.utils.resolver.ResourceResolverException;
+import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 
 /**
  * This class helps us home users to resolve http URIs without a network
@@ -135,7 +130,7 @@ public class OfflineResolver extends ResourceResolverSpi {
    }
 
    static {
-      com.sun.org.apache.xml.internal.security.Init.init();
+      org.apache.xml.security.Init.init();
 
       OfflineResolver._uriMap = new HashMap();
       OfflineResolver._mimeMap = new HashMap();

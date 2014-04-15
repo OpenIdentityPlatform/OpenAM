@@ -24,10 +24,9 @@
  *
  * $Id: WSSUtils.java,v 1.23 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
+ *  Portions Copyrighted 2012-2014 ForgeRock AS
  */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
- */
+
 package com.sun.identity.wss.security;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +37,6 @@ import java.util.ResourceBundle;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
@@ -53,16 +51,16 @@ import java.security.AccessController;
 import java.security.cert.CertificateFactory;
 import java.security.Key;
 import java.security.PublicKey;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import javax.xml.soap.SOAPConstants;
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       DSAKeyValue;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       RSAKeyValue;
-import com.sun.org.apache.xml.internal.security.utils.Constants;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
+import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
+import org.apache.xml.security.utils.Constants;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.sso.SSOException;
@@ -77,7 +75,6 @@ import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml.xmlsig.XMLSignatureException;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
-import com.sun.identity.saml.xmlsig.JKSKeyProvider;
 import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.assertion.Subject;
 import com.sun.identity.saml.assertion.SubjectConfirmation;
@@ -103,17 +100,13 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.wss.trust.ClaimType;
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
+import org.apache.xml.security.keys.content.X509Data;
 import com.sun.identity.wss.security.handler.WSSCacheRepository;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.wss.sts.spi.NameIdentifierMapper;
 import com.sun.identity.xmlenc.EncryptionConstants;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedKey;
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
 import com.sun.identity.wss.provider.ProviderConfig;
 import javax.xml.parsers.DocumentBuilder;
-import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 
 /**
  * This class provides util methods for the web services security. 
@@ -373,8 +366,9 @@ public class WSSUtils {
     }
 
     /**
-     * Get the X509Certificate embedded in SAML Assertion
-     * @param assertion SAML assertion
+     * Get the X509Certificate from the provided string representation
+     * @param certString The certificate in string form
+     * @param format The format that the certificate is in, supports PKCS7 and X509:v3
      * @return a X509Certificate
      */
     private static X509Certificate getCertificate(String certString,

@@ -24,10 +24,7 @@
  *
  * $Id: KeyUtil.java,v 1.5 2009/06/08 23:41:03 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.key;
@@ -42,7 +39,7 @@ import java.security.PublicKey;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLCipher;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.federation.common.FSUtils;

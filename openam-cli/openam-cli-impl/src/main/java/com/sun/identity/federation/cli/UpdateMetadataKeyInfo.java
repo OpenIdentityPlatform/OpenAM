@@ -24,6 +24,7 @@
  *
  * $Id: UpdateMetadataKeyInfo.java,v 1.5 2009/10/29 00:03:50 exu Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.federation.cli;
@@ -37,7 +38,6 @@ import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.federation.meta.IDFFMetaSecurityUtils;
-import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
@@ -47,7 +47,7 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import com.sun.identity.wsfederation.meta.WSFederationMetaSecurityUtils;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLCipher;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 
@@ -55,7 +55,7 @@ import java.util.logging.Level;
  * Export Meta Data.
  */
 public class UpdateMetadataKeyInfo extends AuthenticatedCommand {
-    // costant to remove cert alias from entity
+    // constant to remove cert alias from entity
     private static final String NULL_ALIAS = "null";
     
     private String realm;

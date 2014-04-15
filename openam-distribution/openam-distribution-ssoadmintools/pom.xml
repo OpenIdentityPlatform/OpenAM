@@ -177,6 +177,21 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.santuario</groupId>
+       	    <artifactId>xmlsec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+        	<groupId>commons-logging</groupId>
+        	<artifactId>commons-logging-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <scope>runtime</scope>

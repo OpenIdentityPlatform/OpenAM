@@ -24,43 +24,33 @@
  *
  * $Id: WSSEncryptionProvider.java,v 1.7 2009/08/29 03:06:01 mallas Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.xmlenc;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
+
 import java.security.Key;
 import java.security.PublicKey;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedData;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptedKey;
-import com.sun.org.apache.xml.internal.security.encryption.ReferenceList;
-import com.sun.org.apache.xml.internal.security.encryption.Reference;
-import com.sun.org.apache.xml.internal.security.encryption.EncryptionMethod;
-import com.sun.org.apache.xml.internal.security.encryption.
-       XMLEncryptionException;
-import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
-import com.sun.org.apache.xml.internal.security.utils.IdResolver;
-import com.sun.org.apache.xml.internal.security.keys.content.X509Data;
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.EncryptedData;
+import org.apache.xml.security.encryption.EncryptedKey;
+import org.apache.xml.security.encryption.ReferenceList;
+import org.apache.xml.security.encryption.Reference;
+import org.apache.xml.security.encryption.EncryptionMethod;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.X509Data;
 
 import com.sun.identity.xmlenc.EncryptionException;
 import com.sun.identity.xmlenc.EncryptionUtils;
@@ -68,24 +58,12 @@ import com.sun.identity.xmlenc.AMEncryptionProvider;
 import com.sun.identity.xmlenc.EncryptionConstants;
 
 import java.security.cert.X509Certificate;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+
 import com.sun.identity.wss.security.WSSConstants;
 import com.sun.identity.wss.security.WSSUtils;
 import com.sun.identity.wss.security.SecurityToken;
 import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
-import com.sun.org.apache.xml.internal.security.keys.storage.StorageResolver;
-import com.sun.org.apache.xml.internal.security.keys.storage.
-       implementations.KeyStoreResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509CertificateResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509SubjectNameResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509IssuerSerialResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509SKIResolver;
 
 /**
  * <code>WSSEncryptionProvider</code> is a class for encrypting and 
@@ -219,8 +197,8 @@ public class WSSEncryptionProvider extends AMEncryptionProvider {
             securityTokenRef.setAttributeNS(WSSConstants.WSU_NS, 
                 WSSConstants.WSU_ID, secRefId);            
             insideKi.addUnknownElement(securityTokenRef);
-            IdResolver.registerElementById(securityTokenRef, secRefId);
-            
+            securityTokenRef.setIdAttribute(secRefId, true);
+
             Element reference = doc.createElementNS(WSSConstants.WSSE_NS,
                 SAMLConstants.TAG_REFERENCE);            
             reference.setPrefix(WSSConstants.WSSE_TAG); 
