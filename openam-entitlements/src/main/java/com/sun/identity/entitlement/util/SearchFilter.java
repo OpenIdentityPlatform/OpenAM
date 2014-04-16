@@ -25,6 +25,10 @@
  * $Id: SearchFilter.java,v 1.2 2009/10/14 03:18:41 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.sun.identity.entitlement.util;
 
 /**
@@ -130,5 +134,37 @@ public class SearchFilter {
         }
 
         return "(ou" + op + Long.toString(longValue) + "=" + attrName + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SearchFilter)) {
+            return false;
+        }
+
+        SearchFilter that = (SearchFilter) o;
+
+        return longValue == that.longValue
+                && !(attrName != null ? !attrName.equals(that.attrName) : that.attrName != null)
+                && operator == that.operator
+                && !(value != null ? !value.equals(that.value) : that.value != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = attrName != null ? attrName.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (int) (longValue ^ (longValue >>> 32));
+        result = 31 * result + (operator != null ? operator.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchFilter " + getFilter();
     }
 }

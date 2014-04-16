@@ -25,6 +25,7 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
@@ -35,6 +36,8 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
+
+import java.util.List;
 
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
@@ -130,7 +133,19 @@ public final class EntitlementsResource implements CollectionResourceProvider {
      */
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        try {
+            List<Privilege> policies = policyStoreProvider.getPolicyStore(context).query(request);
+
+            if (policies != null) {
+                for (Privilege policy : policies) {
+                    handler.handleResource(policyResource(policy));
+                }
+            }
+
+            handler.handleResult(new QueryResult());
+        } catch (EntitlementException ex) {
+            handler.handleError(resourceErrorHandler.handleError(request, ex));
+        }
     }
 
     /**

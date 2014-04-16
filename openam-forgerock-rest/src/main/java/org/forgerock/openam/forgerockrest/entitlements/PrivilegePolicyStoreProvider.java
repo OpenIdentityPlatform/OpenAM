@@ -18,11 +18,15 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.PrivilegeManager;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Reject;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.security.auth.Subject;
+import java.util.Map;
 
 /**
  * A policy store provider that returns {@link PrivilegePolicyStore} instances.
@@ -30,24 +34,32 @@ import javax.security.auth.Subject;
  * @since 12.0.0
  */
 public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
+    public static final String POLICY_QUERY_ATTRIBUTES = "PolicyQueryAttributes";
+
     private final PrivilegeManagerFactory factory;
+    private final Map<String, QueryAttribute> queryAttributes;
 
     /**
      * Constructs a policy store provider that looks up privilege managers using the given abstract factory.
      *
      * @param factory a non-null privilege manager factory.
+     * @param queryAttributes the set of query attributes to allow in queries.
      */
-    public PrivilegePolicyStoreProvider(PrivilegeManagerFactory factory) {
-        Reject.ifNull(factory);
+    public PrivilegePolicyStoreProvider(PrivilegeManagerFactory factory,
+                                        Map<String, QueryAttribute> queryAttributes) {
+        Reject.ifNull(factory, queryAttributes);
         this.factory = factory;
+        this.queryAttributes = queryAttributes;
     }
 
     /**
      * Constructs a policy store provider that looks up privilege managers using the standard
-     * {@link PrivilegeManager#getInstance(String, javax.security.auth.Subject)} method.
+     * {@link PrivilegeManager#getInstance(String, javax.security.auth.Subject)} method. Uses the given query
+     * attribute definitions.
      */
-    public PrivilegePolicyStoreProvider() {
-        this(new DefaultPrivilegeManagerFactory());
+    @Inject
+    public PrivilegePolicyStoreProvider(@Named(POLICY_QUERY_ATTRIBUTES) Map<String, QueryAttribute> queryAttributes) {
+        this(new DefaultPrivilegeManagerFactory(), queryAttributes);
     }
 
     @Override
@@ -55,7 +67,11 @@ public final class PrivilegePolicyStoreProvider implements PolicyStoreProvider {
         Subject adminSubject = context.asContext(SubjectContext.class).getCallerSubject();
         String realm = context.asContext(RealmContext.class).getRealm();
 
-        return new PrivilegePolicyStore(factory.getPrivilegeManager(realm, adminSubject));
+        if (realm.isEmpty()) {
+            realm = "/";
+        }
+
+        return new PrivilegePolicyStore(factory.getPrivilegeManager(realm, adminSubject), queryAttributes);
     }
 
     /**

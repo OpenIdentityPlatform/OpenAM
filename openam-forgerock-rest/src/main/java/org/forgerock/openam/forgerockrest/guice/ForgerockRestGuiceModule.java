@@ -34,6 +34,7 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
@@ -44,6 +45,8 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.CrestRealmConnectionFactoryProvider;
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestCollectionResourceEndpointsBinder;
 import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestServiceEndpointsBinder;
@@ -78,6 +81,10 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         bind(new TypeLiteral<Map<Integer, Integer>>() {})
                 .annotatedWith(Names.named(EntitlementsResourceErrorHandler.RESOURCE_ERROR_MAPPING))
                 .toProvider(EntitlementsResourceErrorMappingProvider.class)
+                .asEagerSingleton();
+        bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
+                .annotatedWith(Names.named(PrivilegePolicyStoreProvider.POLICY_QUERY_ATTRIBUTES))
+                .toProvider(PolicyQueryAttributesMapProvider.class)
                 .asEagerSingleton();
 
         // vvvv Rest Endpoint Bindings vvvv
@@ -139,6 +146,26 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
 
             return handlers;
+        }
+    }
+
+    /**
+     * Defines all allowed query attributes in queries against the policy endpoint.
+     */
+    private static class PolicyQueryAttributesMapProvider implements Provider<Map<String, QueryAttribute>> {
+        @Override
+        public Map<String, QueryAttribute> get() {
+            final Map<String, QueryAttribute> attributes = new HashMap<String, QueryAttribute>();
+
+            attributes.put("name", new QueryAttribute(STRING, Privilege.NAME_ATTRIBUTE));
+            attributes.put("description", new QueryAttribute(STRING, Privilege.DESCRIPTION_ATTRIBUTE));
+            attributes.put("applicationName", new QueryAttribute(STRING, Privilege.APPLICATION_ATTRIBUTE));
+            attributes.put("createdBy", new QueryAttribute(STRING, Privilege.CREATED_BY_ATTRIBUTE));
+            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_ATTRIBUTE));
+            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_ATTRIBUTE));
+            attributes.put("lastModified", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
+
+            return attributes;
         }
     }
 }

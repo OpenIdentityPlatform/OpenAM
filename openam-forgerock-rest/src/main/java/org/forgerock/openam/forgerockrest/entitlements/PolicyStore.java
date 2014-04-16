@@ -17,12 +17,14 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.Privilege;
+import org.forgerock.json.resource.QueryRequest;
+
+import java.util.List;
 
 /**
  * Interface used to decouple the resource from storage of entitlements policies (privileges). Provides basic
- * CRUD(PQ) operations for policies.
+ * CRUDQ operations for policies.
  *
  * @since 12.0.0
  */
@@ -59,4 +61,13 @@ public interface PolicyStore {
      * @throws EntitlementException if an error occurs or the policy does not exist.
      */
     void delete(String policyName) throws EntitlementException;
+
+    /**
+     * Queries the store for a set of policies that match the given query.
+     *
+     * @param request the query request.
+     * @return the query results.
+     * @throws EntitlementException if an error occurs or the query is invalid.
+     */
+    List<Privilege> query(QueryRequest request) throws EntitlementException;
 }

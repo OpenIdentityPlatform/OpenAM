@@ -24,6 +24,9 @@ import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
@@ -35,11 +38,15 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("unchecked")
@@ -246,6 +253,40 @@ public class EntitlementsResourceTest {
 
         // Then
         verify(mockResultHandler).handleResult(new Resource(id, Long.toString(lastModified), content));
+    }
+
+    @Test
+    public void shouldHandleQueryRequests() throws Exception {
+        // Given
+        QueryRequest request = mock(QueryRequest.class);
+        QueryResultHandler handler = mock(QueryResultHandler.class);
+        List<Privilege> policies = Arrays.<Privilege>asList(
+                new StubPrivilege("one"),
+                new StubPrivilege("two")
+        );
+        given(mockStore.query(request)).willReturn(policies);
+
+        // When
+        entitlementsResource.queryCollection(mockServerContext, request, handler);
+
+        // Then
+        verify(handler, times(policies.size())).handleResource(any(Resource.class));
+        verify(handler).handleResult(any(QueryResult.class));
+    }
+
+    @Test
+    public void shouldHandleInvalidQueryErrors() throws Exception {
+        // Given
+        QueryRequest request = mock(QueryRequest.class);
+        QueryResultHandler handler = mock(QueryResultHandler.class);
+        given(mockStore.query(request)).willThrow(
+                new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER));
+
+        // When
+        entitlementsResource.queryCollection(mockServerContext, request, handler);
+
+        // Then
+        verify(handler).handleError(isA(BadRequestException.class));
     }
 
     private Privilege mockPrivilege(String name, long lastModified) throws EntitlementException {

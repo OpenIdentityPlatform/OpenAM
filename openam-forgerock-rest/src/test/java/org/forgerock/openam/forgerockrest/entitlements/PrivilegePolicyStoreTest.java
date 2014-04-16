@@ -16,19 +16,43 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.DateUtils;
+import org.forgerock.json.resource.QueryFilter;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.singleton;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.resource.QueryFilter.*;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class PrivilegePolicyStoreTest {
+
+    private static final String STRING_ATTRIBUTE = "stringAttribute";
+    private static final String DATE_ATTRIBUTE = "dateAttribute";
+    private static final String NUMERIC_ATTRIBUTE = "numberAttribute";
 
     private PrivilegeManager mockManager;
     private PrivilegePolicyStore testStore;
@@ -46,7 +70,13 @@ public class PrivilegePolicyStoreTest {
     @BeforeMethod
     public void setupMocks() {
         mockManager = mock(PrivilegeManager.class);
-        testStore = new PrivilegePolicyStore(mockManager);
+
+        Map<String, QueryAttribute> queryAttributes = new HashMap<String, QueryAttribute>();
+        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, STRING_ATTRIBUTE));
+        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, NUMERIC_ATTRIBUTE));
+        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_ATTRIBUTE));
+
+        testStore = new PrivilegePolicyStore(mockManager, queryAttributes);
     }
 
     @Test
@@ -101,5 +131,202 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).removePrivilege(id);
+    }
+
+    @Test
+    public void shouldTranslateAlwaysTrueQueryFilterToEmptySearchFilters() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(alwaysTrue());
+
+        // When
+        testStore.query(request);
+
+        // Then
+        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet(), 0, 0);
+    }
+
+    @Test
+    public void shouldSendAllMatchingPoliciesToQueryHandler() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(alwaysTrue());
+        List<Privilege> policies = Arrays.<Privilege>asList(
+                new StubPrivilege("one"), new StubPrivilege("two"), new StubPrivilege("three"));
+        given(mockManager.searchPrivileges(anySetOf(SearchFilter.class), anyInt(), anyInt())).willReturn(policies);
+
+        // When
+        List<Privilege> result = testStore.query(request);
+
+        // Then
+        assertThat(result).isEqualTo(policies);
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*'false' not supported.*")
+    public void shouldRejectAlwaysFalseQueryFilters() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(QueryFilter.alwaysFalse());
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    @Test
+    public void shouldHandleStringEquality() throws Exception {
+        // Given
+        String value = "testValue";
+        QueryRequest request = mockQueryRequest(equalTo(STRING_ATTRIBUTE, value));
+
+        // When
+        testStore.query(request);
+
+        // Then
+        verify(mockManager).searchPrivileges(singleton(new SearchFilter(STRING_ATTRIBUTE, value)), 0, 0);
+    }
+
+    @DataProvider(name = "SupportedQueryOperators")
+    public static Object[][] supportedQueryOperators() {
+        return new Object[][] {
+                { "eq", SearchFilter.Operator.EQUAL_OPERATOR },
+                // Treat >= and > as both greater-than-or-equals as that is all the search filters support
+                { "gt", SearchFilter.Operator.GREATER_THAN_OPERATOR },
+                { "ge", SearchFilter.Operator.GREATER_THAN_OPERATOR },
+                // Same for <= and <.
+                { "lt", SearchFilter.Operator.LESSER_THAN_OPERATOR },
+                { "le", SearchFilter.Operator.LESSER_THAN_OPERATOR }
+        };
+    }
+
+    @Test(dataProvider = "SupportedQueryOperators")
+    public void shouldTranslateSupportedOperators(String queryOperator, SearchFilter.Operator expectedOperator)
+    throws Exception {
+        // Given
+        long value = 123l;
+        QueryRequest request = mockQueryRequest(comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, value));
+
+        // When
+        testStore.query(request);
+
+        // Then
+        verify(mockManager).searchPrivileges(singleton(
+                new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator)), 0, 0);
+    }
+
+    @DataProvider(name = "UnsupportedOperators")
+    public static Object[][] unsupportedQueryOperators() {
+        // We do not support starts-with, contains or any extended operators
+        return new Object[][] {{ "sw" }, { "co" }, { "someExtendedOperator" }};
+    }
+
+    @Test(dataProvider = "UnsupportedOperators", expectedExceptions = EntitlementException.class,
+        expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectUnsupportedQueryOperators(String queryOperator) throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, 123l));
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*Unknown query field.*")
+    public void shouldRejectUnknownAttributes() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(equalTo("unknown", "a value"));
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    @Test(dataProvider = "SupportedQueryOperators")
+    public void shouldSupportDateQueries(String queryOperator, SearchFilter.Operator expectedOperator)
+            throws Exception {
+        // Given
+        Date value = new Date(123456789000l); // Note: only second accuracy supported in timestamp format
+        QueryRequest request = mockQueryRequest(comparisonFilter(DATE_ATTRIBUTE, queryOperator,
+                DateUtils.toUTCDateFormat(value)));
+
+        // When
+        testStore.query(request);
+
+        // Then
+        // Date should be converted into a time-stamp long value
+        verify(mockManager).searchPrivileges(
+                singleton(new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator)), 0, 0);
+    }
+
+    @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectPresenceQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(present(STRING_ATTRIBUTE));
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    @Test
+    public void shouldSupportQueryResultSizeLimits() throws Exception {
+        // Given
+        final int maxResults = 123;
+        QueryRequest request = mockQueryRequest(alwaysTrue());
+        given(request.getPageSize()).willReturn(maxResults);
+
+        // When
+        testStore.query(request);
+
+        // Then
+        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet(), maxResults, 0);
+    }
+
+    @Test
+    public void shouldHandleAndQueries() throws Exception {
+        // Given
+        String value1 = "value1";
+        String value2 = "value2";
+        QueryRequest request = mockQueryRequest(
+                and(equalTo(STRING_ATTRIBUTE, value1),
+                        equalTo(STRING_ATTRIBUTE, value2)));
+
+        // When
+        testStore.query(request);
+
+        // Then
+        verify(mockManager).searchPrivileges(
+                asSet(new SearchFilter(STRING_ATTRIBUTE, value1),
+                        new SearchFilter(STRING_ATTRIBUTE, value2)), 0, 0);
+    }
+
+    @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*'Or' not supported.*")
+    public void shouldRejectOrQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(or(alwaysTrue(), alwaysTrue()));
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectNotQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(not(alwaysTrue()));
+
+        // When
+        testStore.query(request);
+
+        // Then - exception
+    }
+
+    private QueryRequest mockQueryRequest(QueryFilter filter) {
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(filter);
+        return request;
     }
 }

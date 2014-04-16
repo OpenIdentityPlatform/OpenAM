@@ -18,12 +18,16 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.PrivilegeManager;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -32,13 +36,16 @@ import static org.mockito.Mockito.verify;
 
 public class PrivilegePolicyStoreProviderTest {
 
+    private static final Map<String, QueryAttribute> ATTRIBUTE_MAP = new HashMap<String, QueryAttribute>();
+
     private PrivilegePolicyStoreProvider testProvider;
     private PrivilegePolicyStoreProvider.PrivilegeManagerFactory mockFactory;
+
 
     @BeforeMethod
     public void setupMocks() {
         mockFactory = mock(PrivilegePolicyStoreProvider.PrivilegeManagerFactory.class);
-        testProvider = new PrivilegePolicyStoreProvider(mockFactory);
+        testProvider = new PrivilegePolicyStoreProvider(mockFactory, ATTRIBUTE_MAP);
     }
 
     @Test

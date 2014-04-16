@@ -33,6 +33,16 @@ import java.util.Set;
  * @since 12.0.0
  */
 public class StubPrivilege extends Privilege {
+
+    public StubPrivilege() {
+        super();
+    }
+
+    public StubPrivilege(String name) throws EntitlementException {
+        super();
+        setName(name);
+    }
+
     @Override
     public List<Entitlement> evaluate(Subject adminSubject, String realm, Subject subject, String applicationName,
                                       String resourceName, Set<String> actionNames, Map<String,

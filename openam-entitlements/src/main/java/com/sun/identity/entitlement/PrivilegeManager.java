@@ -25,15 +25,17 @@
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
  */
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.security.auth.Subject;
@@ -197,23 +199,43 @@ public abstract class PrivilegeManager {
         int searchSizeLimit,
         int searchTimeLimit
     ) throws EntitlementException {
+
+        List<Privilege> privileges = searchPrivileges(filter, searchSizeLimit, searchTimeLimit);
+        Set<String> result = new HashSet<String>(privileges.size());
+
+        for (Privilege privilege : privileges) {
+            result.add(privilege.getName());
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns a set of privileges that match the given search criteria.
+     *
+     * @param filter the search filters to apply. An empty set means no filtering (returns all privileges).
+     * @param searchSizeLimit the maximum number of privileges to return.
+     * @param searchTimeLimit the maximum time limit in seconds. NOT IMPLEMENTED.
+     * @return the matching privileges.
+     * @throws EntitlementException if the search fails for any reason.
+     */
+    public List<Privilege> searchPrivileges(Set<SearchFilter> filter, int searchSizeLimit, int searchTimeLimit)
+            throws EntitlementException {
         boolean hasSizeLimit = (searchSizeLimit > 0);
-        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            adminSubject, realm);
-        Set<String> privilegeNames = pis.searchPrivilegeNames(
-            filter, true, searchSizeLimit, false, false); // TODO Search time limit
-        Set<String> results = new HashSet<String>();
+
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, realm);
+        Set<String> privilegeNames = pis.searchPrivilegeNames(filter, true, searchSizeLimit, false, false); // TODO Search time limit
+
+        List<Privilege> results = new ArrayList<Privilege>(privilegeNames.size());
 
         ApplicationPrivilegeManager applPrivilegeMgr =
-            ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+                ApplicationPrivilegeManager.getInstance(realm, adminSubject);
 
         for (String name : privilegeNames) {
-            Privilege privilege = getPrivilege(name,
-                PrivilegeManager.superAdminSubject);
+            Privilege privilege = getPrivilege(name, PrivilegeManager.superAdminSubject);
 
-            if (applPrivilegeMgr.hasPrivilege(privilege,
-                ApplicationPrivilege.Action.READ)) {
-                results.add(name);
+            if (applPrivilegeMgr.hasPrivilege(privilege, ApplicationPrivilege.Action.READ)) {
+                results.add(privilege);
 
                 if (hasSizeLimit && (results.size() >= searchSizeLimit)) {
                     break;
@@ -222,6 +244,17 @@ public abstract class PrivilegeManager {
         }
 
         return results;
+    }
+
+    /**
+     * Returns a set of privileges that match the given search criteria with no size or time limits.
+     *
+     * @param filter the search filters to apply. An empty set means no filtering (returns all privileges).
+     * @return the matching privileges.
+     * @throws EntitlementException if the search fails for any reason.
+     */
+    public List<Privilege> searchPrivileges(Set<SearchFilter> filter) throws EntitlementException {
+        return searchPrivileges(filter, 0, 0);
     }
 
     /**
