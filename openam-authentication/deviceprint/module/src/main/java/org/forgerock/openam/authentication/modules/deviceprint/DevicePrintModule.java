@@ -25,7 +25,8 @@
  */
 /*
  * Portions Copyrighted 2013 Syntegrity.
- * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint;
@@ -130,8 +131,13 @@ public class DevicePrintModule extends AMLoginModule {
                 results = searchResults.getSearchResults();
             }
 
-            if (results == null || results.size() != 1) {
-                throw new IdRepoException("getIdentity : More than one user found");
+            if (results.isEmpty()) {
+                throw new IdRepoException("getIdentity : User " + userName
+                        + " is not found");
+            } else if (results.size() > 1) {
+                throw new IdRepoException(
+                        "getIdentity : More than one user found for the userName "
+                                + userName);
             }
 
             amIdentity = results.iterator().next();

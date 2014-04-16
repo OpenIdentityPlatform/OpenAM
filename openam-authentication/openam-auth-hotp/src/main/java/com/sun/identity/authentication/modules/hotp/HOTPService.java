@@ -26,7 +26,8 @@
  *
  */
 /*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.authentication.modules.hotp;
@@ -189,8 +190,13 @@ public class HOTPService {
                 results = searchResults.getSearchResults();
             }
 
-            if (results == null || results.size() != 1) {
-                throw new IdRepoException("HTOP:sendSMS : More than one user found");
+            if (results.isEmpty()) {
+                throw new IdRepoException("HTOP:sendSMS : User " + userName
+                        + " is not found");
+            } else if (results.size() > 1) {
+                throw new IdRepoException(
+                        "HTOP:sendSMS : More than one user found for the userName "
+                                + userName);
             }
 
             Object[] identities = results.toArray();
