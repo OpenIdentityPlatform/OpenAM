@@ -134,6 +134,14 @@ $ <userinput>cp -r default_fr/* openam_fr/html</userinput>
     See <xref linkend="lookup-for-ui-files" /> for details.
    </para>
   </step>
+
+  <step>
+   <para>
+    You can now either follow
+    the steps in <xref linkend="copy-ui-to-customize-subrealm" />,
+    or in <xref linkend="customize-ui-copy" />.
+   </para>
+  </step>
  </procedure>
 
  <procedure xml:id="copy-ui-to-customize-subrealm">
@@ -163,11 +171,17 @@ $ <userinput>cd /path/to/tomcat/webapps/openam/config/auth</userinput>
    a realm named <literal>ventes</literal>.</para>
 
    <screen>
-$ <userinput>mkdir -p openam/html/ventes/html</userinput>
+$ <userinput>mkdir -p openam/services/ventes/html</userinput>
 $ <userinput>cp -r default/* openam/services/ventes/html</userinput>
 $ <userinput>mkdir -p openam_fr/services/ventes/html</userinput>
 $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
    </screen>
+  </step>
+
+  <step>
+   <para>
+    You can now follow the steps in <xref linkend="customize-ui-copy" />.
+   </para>
   </step>
  </procedure>
  
@@ -190,9 +204,18 @@ $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
    the top-level realm for the French locale, edit
    <filename>openam_fr/html/DataStore.xml</filename>.</para>
   </step>
+
   <step>
-   <para>If necessary, restart OpenAM or the web container to test the changes
-   you have made.</para>
+   <para>
+    After making the changes, restart OpenAM or the web container where it runs.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Test the changes you have made.
+   </para>
+
    <para>The following screen shot shows a customized French login page
    where the string <literal>Nom d'utilisateur</literal> has been replaced
    with the string <literal>Votre identifiant</literal>, and the string
@@ -208,8 +231,15 @@ $ <userinput>cp -r default_fr/* openam_fr/services/ventes/html</userinput>
     above.</para></textobject>
    </mediaobject>
   </step>
- </procedure>
 
+  <step>
+   <para>
+    As mentioned in the tip at the outset of this section,
+    build a customized OpenAM .war that includes your tested changes,
+    and use this customized .war to deploy OpenAM.
+   </para>
+  </step>
+ </procedure>
  </section>
 
  <section xml:id="lookup-for-ui-files">
