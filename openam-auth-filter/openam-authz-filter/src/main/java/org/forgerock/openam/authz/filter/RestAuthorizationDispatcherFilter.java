@@ -33,9 +33,9 @@ import java.io.IOException;
 /**
  * Dispatcher for Rest Resource authorization.
  * <p>
- * As realms, users, groups and agents REST resources are dynamically routed based on the realm they are in, means
- * that the authorization filter cannot be applied specifically at, ie /json/realms/{realm}, as the realm being accessed
- * might be under a sub-realm, ie /json/subrealm/realms/{realm}.
+ * As realms, users, groups, applications, and agents REST resources are dynamically routed based on the realm they are
+ * in, means that the authorization filter cannot be applied specifically at, ie /json/realms/{realm}, as the realm
+ * being accessed might be under a sub-realm, ie /json/subrealm/realms/{realm}.
  * <p>
  * Because of this this class contains the mapping logic for the type of resource to the authroization to be applied to
  * it.
@@ -50,6 +50,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_USERS_AUTHZ_CONFIGURATOR = "usersAuthzConfigurator";
     private static final String INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR = "groupsAuthzConfigurator";
     private static final String INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR = "agentsAuthzConfigurator";
+    private static final String INIT_PARAM_APP_AUTHZ_CONFIGURATOR = "applicationsAuthzConfigurator";
 
     private final RestEndpointManager endpointManager;
     private final AuthZFilter authZFilter;
@@ -59,6 +60,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private String usersAuthzConfiguratorClassName;
     private String groupsAuthzConfiguratorClassName;
     private String agentsAuthzConfiguratorClassName;
+    private String applicationsAuthzConfiguratorClassName;
 
     /**
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
@@ -92,14 +94,19 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         usersAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_USERS_AUTHZ_CONFIGURATOR);
         groupsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR);
         agentsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR);
+        applicationsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_APP_AUTHZ_CONFIGURATOR);
 
         if (realmsAuthzConfiguratorClassName == null || usersAuthzConfiguratorClassName == null
                 || groupsAuthzConfiguratorClassName == null || agentsAuthzConfiguratorClassName == null) {
-            String message = INIT_PARAM_REALMS_AUTHZ_CONFIGURATOR  + ", "
-                    + INIT_PARAM_USERS_AUTHZ_CONFIGURATOR + ", " + INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR
-                    + " and " + INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR + " init params must be set!";
-            DEBUG.error(message);
-            throw new ServletException(message);
+            String msg = new StringBuilder().append(INIT_PARAM_REALMS_AUTHZ_CONFIGURATOR)
+                    .append(", ").append(INIT_PARAM_USERS_AUTHZ_CONFIGURATOR)
+                    .append(", ").append(INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR)
+                    .append(", ").append(INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR)
+                    .append(", and ").append(INIT_PARAM_APP_AUTHZ_CONFIGURATOR)
+                    .append(" init params must be set!").toString();
+
+            DEBUG.error(msg);
+            throw new ServletException(msg);
         }
     }
 
@@ -139,6 +146,8 @@ public class RestAuthorizationDispatcherFilter implements Filter {
             authorize(groupsAuthzConfiguratorClassName, request, servletResponse, chain);
         } else if (RestEndpointManager.AGENTS.equalsIgnoreCase(endpoint)) {
             authorize(agentsAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.APPLICATIONS.equalsIgnoreCase(endpoint)) {
+            authorize(applicationsAuthzConfiguratorClassName, request, servletResponse, chain);
         } else {
             chain.doFilter(servletRequest, servletResponse);
         }
@@ -173,5 +182,6 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         usersAuthzConfiguratorClassName = null;
         groupsAuthzConfiguratorClassName = null;
         agentsAuthzConfiguratorClassName = null;
+        applicationsAuthzConfiguratorClassName = null;
     }
 }

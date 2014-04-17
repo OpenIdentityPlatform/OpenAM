@@ -19,8 +19,10 @@ package org.forgerock.openam.forgerockrest.guice;
 import com.google.inject.Binder;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
+import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ConnectionFactory;
@@ -32,7 +34,10 @@ import org.forgerock.openam.forgerockrest.RealmResource;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
+import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResource;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
@@ -185,6 +190,8 @@ public final class RestEndpointGuiceProvider {
                             InjectorHolder.getInstance(MailServerLoader.class));
                 }
             });
+            collectionResourceEndpoints.addBinding(RestEndpointManager.APPLICATIONS)
+                    .toProvider(ApplicationsResourceProvider.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.REALMS).to(RealmResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.DASHBOARD).to(DashboardResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.SESSIONS).to(SessionResource.class);
@@ -248,6 +255,41 @@ public final class RestEndpointGuiceProvider {
             return new CoreTokenResource(jsonSerialisation, InjectorHolder.getInstance(CTSPersistentStoreProxy.class));
         }
     }
+
+    /**
+     * Provider for the ApplicationsResourceProvider.
+     *
+     * @since 12.0.0
+     */
+    private static class ApplicationsResourceProvider implements Provider<ApplicationsResource> {
+
+        private final Debug debug;
+        private final ApplicationManagerWrapper appManager;
+        private final ApplicationTypeManagerWrapper appTypeManagerWrapper;
+
+        /**
+         * Constructs an instance of the ApplicationsResourceProvider.
+         *
+         * @param debug An instance of the debugger
+         * @param appManager An instance of the application manager's instantiable wrapper
+         */
+        @Inject
+        public ApplicationsResourceProvider(@Named("frRest")final Debug debug, ApplicationManagerWrapper appManager,
+                                            ApplicationTypeManagerWrapper appTypeManagerWrapper) {
+            this.debug = debug;
+            this.appManager = appManager;
+            this.appTypeManagerWrapper = appTypeManagerWrapper;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ApplicationsResource get() {
+            return new ApplicationsResource(debug, appManager, appTypeManagerWrapper);
+        }
+    }
+
 
     /**
      * Binder for the Map of URI Template route to ServiceProvider class.

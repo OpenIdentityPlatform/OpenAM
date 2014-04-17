@@ -34,7 +34,6 @@ import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.ResourceNameIndexGenerator;
 import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import java.util.Map;
-import org.forgerock.json.fluent.JsonValue;
 
 /**
  * Application Type defines the default supported action names; search and save
@@ -43,11 +42,19 @@ import org.forgerock.json.fluent.JsonValue;
 public final class ApplicationType {
 
     private String name;
+
     private Map<String, Boolean> actions;
+
     private ResourceName resourceCompInstance;
+
     private ISaveIndex saveIndexInstance;
+
     private ISearchIndex searchIndexInstance;
+
     private String applicationClassName;
+
+    //Json field reference
+    public static String FIELD_NAME = "name";
 
     /**
      * Constructs an instance.
@@ -205,33 +212,11 @@ public final class ApplicationType {
 
     /**
      * Returns search index.
-     * 
+     *
      * @return search index.
      */
     public ISearchIndex getSearchIndex() {
         return searchIndexInstance;
-    }
-
-    /**
-     * Converts this {@link ApplicationType} to a {@link JsonValue} for use in CREST communications.
-     *
-     * @return a {@link JsonValue} representation of this object.
-     */
-    public JsonValue toJsonValue() throws EntitlementException {
-
-        return JsonValue.json(
-                JsonValue.object(
-                        JsonValue.field("applicationType", JsonValue.object(
-                            JsonValue.field("name", name),
-                            JsonValue.field("className", getApplicationClass().getCanonicalName()),
-                            JsonValue.field("saveIndex", saveIndexInstance.getClass().getCanonicalName()),
-                            JsonValue.field("searchIndex", searchIndexInstance.getClass().getCanonicalName()),
-                            JsonValue.field("resourceComparator", resourceCompInstance.getClass().getCanonicalName()),
-                            JsonValue.field("supportedActions", actions)
-                        ))
-                )
-        );
-
     }
 
 }

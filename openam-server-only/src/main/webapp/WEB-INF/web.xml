@@ -124,6 +124,11 @@
             <param-name>agentsAuthzConfigurator</param-name>
             <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
         </init-param>
+        <init-param>
+            <param-name>applicationsAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.AdminAuthorizationConfigurator</param-value>
+        </init-param>
+
     </filter>
 
     <!-- filter declaration -->

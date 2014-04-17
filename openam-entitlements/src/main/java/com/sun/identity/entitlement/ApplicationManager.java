@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -37,9 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -705,6 +703,27 @@ public final class ApplicationManager {
             throw new EntitlementException(6, ex);
         } catch (InvocationTargetException ex) {
             throw new EntitlementException(6, ex);
+        }
+    }
+
+    /**
+     * Replaces an existing application with a newer version of itself.
+     *
+     * @param oldApplication The application to update
+     * @param newApplication The updated version of the application
+     * @retun the new application
+     */
+    public static void updateApplication(Application oldApplication, Application newApplication, Subject subject,
+                                            String realm)
+            throws EntitlementException {
+
+        readWriteLock.writeLock().lock();
+
+        try {
+            deleteApplication(subject, realm, oldApplication.getName());
+            saveApplication(subject, realm, newApplication);
+        } finally {
+            readWriteLock.writeLock().unlock();
         }
     }
 }

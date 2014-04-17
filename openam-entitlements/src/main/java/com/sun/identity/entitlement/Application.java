@@ -24,7 +24,7 @@
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2014 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement;
 
@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.util.Reject;
 
 /**
  * Application class contains the information on how an application behaves
@@ -105,7 +106,26 @@ public class Application implements Cloneable {
     private ISaveIndex saveIndexInstance;
     private ISearchIndex searchIndexInstance;
 
-    protected Application() {
+    public Application() {
+    }
+
+    /**
+     * Sets the application type of this Application
+     *
+     * @param applicationType The non-null application type
+     */
+    public void setApplicationType(ApplicationType applicationType) {
+        Reject.ifNull(applicationType);
+        this.applicationType = applicationType;
+    }
+
+    /**
+     * Returns the realm of this Application
+     *
+     * @return A string representation of the Application's realm, not-null.
+     */
+    public String getRealm() {
+        return realm;
     }
 
     /**
@@ -740,8 +760,12 @@ public class Application implements Cloneable {
         }
     }
 
-    protected void setRealm(String realm) {
+    public void setRealm(String realm) {
         this.realm = realm;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean canBeDeleted() {

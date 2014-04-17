@@ -57,6 +57,7 @@ public class EntitlementException extends Exception {
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;
     public static final int APPLICATION_ALREADY_EXISTS = 228;
+    public static final int APPLICATION_NAMES_ERROR = 249;
     public static final int NO_SUCH_REFERRAL_PRIVILEGE = 263;
 
     public static final int INCONSISTENT_WILDCARDS = 300;

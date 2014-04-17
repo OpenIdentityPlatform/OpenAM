@@ -17,12 +17,17 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.google.inject.name.Named;
 import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.ApplicationTypeManager;
-import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import static java.lang.Math.max;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -40,6 +45,8 @@ import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**
@@ -50,7 +57,7 @@ import org.forgerock.openam.rest.resource.SubjectContext;
  */
 public class ApplicationTypesResource implements CollectionResourceProvider {
 
-    private static final String APPLICATION_TYPE_NAMES = "applicationTypeNames";
+    private final ApplicationTypeManagerWrapper typeManager;
     private final Debug debug;
 
     /**
@@ -59,9 +66,11 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
      * @param debug Debugger to use
      */
     @Inject
-    public ApplicationTypesResource(@Named("frRest") Debug debug) {
+    public ApplicationTypesResource(final ApplicationTypeManagerWrapper typeManager, @Named("frRest") Debug debug) {
+        this.typeManager = typeManager;
         this.debug = debug;
     }
+
 
     /**
      * {@inheritDoc}
@@ -123,38 +132,80 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
+        //auth
         final SubjectContext sc = context.asContext(SubjectContext.class);
         final Subject mySubject = sc.getCallerSubject();
 
         if (mySubject == null) {
             debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
             return;
         }
 
-        final Set<String> applTypeNames =  ApplicationTypeManager.getApplicationTypeNames(mySubject);
-        final JsonValue applTypeNamesJson = jsonify(APPLICATION_TYPE_NAMES, applTypeNames);
+        //select
+        final Set<String> appTypeNames =  typeManager.getApplicationTypeNames(mySubject);
+        List<ApplicationTypeWrapper> appTypes = new LinkedList<ApplicationTypeWrapper>();
 
-        final Resource resource = new Resource(APPLICATION_TYPE_NAMES, Integer.toString(applTypeNames.hashCode()), applTypeNamesJson);
-        handler.handleResource(resource);
+        for (String appTypeName : appTypeNames) {
+            final ApplicationType type = typeManager.getApplicationType(mySubject, appTypeName);
+            final ApplicationTypeWrapper wrap = new ApplicationTypeWrapper(type);
+            if (type != null) {
+                appTypes.add(wrap);
+            }
+        }
 
-        //we are only ever returning a single entry with an array of Strings. This won't require pagination.
-        handler.handleResult(new QueryResult());
+        int totalSize = appTypes.size();
+        int pageSize = request.getPageSize();
+        int offset = request.getPagedResultsOffset();
+
+        if (pageSize > 0) {
+            Collections.sort(appTypes);
+            appTypes = appTypes.subList(offset, offset + pageSize);
+        }
+
+        final List<JsonValue> jsonifiedAppTypes = jsonify(appTypes);
+
+        final JsonPointer jp = new JsonPointer(ApplicationType.FIELD_NAME);
+
+        for (JsonValue appTypeToReturn : jsonifiedAppTypes) {
+
+            final JsonValue resourceId = appTypeToReturn.get(jp);
+            final String id = resourceId != null ? resourceId.toString() : null;
+
+            final Resource resource = new Resource(id, "0", appTypeToReturn);
+
+            handler.handleResource(resource);
+        }
+
+        //paginate
+        if (pageSize > 0) {
+            final String lastIndex = offset + pageSize > totalSize ? String.valueOf(totalSize) : String.valueOf(offset + pageSize);
+            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
+        } else {
+            handler.handleResult(new QueryResult(null, -1));
+        }
+
     }
 
     /**
-     * Create a JSON object's representation of a set of Strings, returned in the form
-     * of an array contained within an object whose name is supplied as the containerName
-     * argument to this function.
+     * Takes a set of ApplicationTypes and returns their Json representation in JsonValue.
      *
-     * @param containerName The name of the Json array to return
-     * @param arrayEntries The entries in the array
+     * @param types The ApplicationTypes whose values to look up and return in the JsonValue
      * @return a {@link JsonValue} object representing the provided {@link Set}
      */
-    private JsonValue jsonify(String containerName, Set<String> arrayEntries) {
+    protected List<JsonValue> jsonify(List<ApplicationTypeWrapper> types) {
 
-        return JsonValue.json(JsonValue.object(JsonValue.field(containerName, arrayEntries)));
+        final List<JsonValue> applicationsList = new ArrayList<JsonValue>();
 
+        for (ApplicationTypeWrapper entry : types) {
+            try {
+                applicationsList.add(entry.toJsonValue());
+            } catch (IOException e) {
+                debug.error("Error converting entry to Json value.");
+            }
+        }
+
+        return applicationsList;
     }
 
     /**
@@ -176,11 +227,12 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
 
         if (mySubject == null) {
             debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
             return;
         }
 
-        final ApplicationType applType = ApplicationTypeManager.getAppplicationType(mySubject, resourceId);
+        final ApplicationType applType = typeManager.getApplicationType(mySubject, resourceId);
+        final ApplicationTypeWrapper wrap = new ApplicationTypeWrapper(applType);
 
         if (applType == null) {
             debug.error("Read failed on invalid ApplicationType.");
@@ -189,10 +241,11 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
         }
 
         try {
-            final Resource resource = new Resource(resourceId, Integer.toString(applType.hashCode()), applType.toJsonValue());
+            final Resource resource = new Resource(resourceId, "0",
+                    JsonValue.json(wrap.toJsonValue()));
             handler.handleResult(resource);
-        } catch (EntitlementException e) {
-            debug.message("ApplicationType could not locate class associated with defined Type.", e);
+        } catch (IOException e) {
+            debug.message("ApplicationType could not jsonify class associated with defined Type.", e);
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
     }
