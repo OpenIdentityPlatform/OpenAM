@@ -75,7 +75,7 @@
      </para>
 
      <para>
-      This file specifies how to build the sample post authentication plugin,
+      This file specifies how to build the sample policy evaluation plugin,
       and also specifies its dependencies on OpenAM components.
      </para>
     </listitem>
@@ -131,7 +131,7 @@
   </para>
 
   <screen>
-$ <userinput>cd /path/to/openam-post-auth-sample</userinput>
+$ <userinput>cd /path/to/openam-policy-eval-sample</userinput>
 $ <userinput>mvn install</userinput>
 <computeroutput>[INFO] Scanning for projects...
 [INFO]
