@@ -27,7 +27,8 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -400,7 +401,7 @@ public class LDAPAuthUtils {
                // retrying in case "disconnect in progress"
 
                // there should be arg to err 53 from LDAPAuthUtils
-               if (e.getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM) ) {
+               if (ResultCode.UNWILLING_TO_PERFORM.equals(e.getResultCode())) {
                      // if the flag is already on, then we've already retried.
                      // not retrying more than once
                      if (!shouldRetry) {
