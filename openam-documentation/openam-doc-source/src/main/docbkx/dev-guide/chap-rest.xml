@@ -184,7 +184,7 @@
 
    <screen>
 $ <userinput>curl \
- --request POST
+ --request POST \
  --header "X-OpenAM-Username: demo" \
  --header "X-OpenAM-Password: changeit" \
  --header "Content-Type: application/json" \
