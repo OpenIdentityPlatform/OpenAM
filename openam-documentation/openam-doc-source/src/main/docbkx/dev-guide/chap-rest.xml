@@ -3043,78 +3043,52 @@ $ <userinput>curl \
    <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
    xlink:show="new">HTTP status code</link>.</para>
 
-   <para>You can use HTTP PUT to update other objects as well, such as policy
-   agent profiles groups.</para>
+   <para>
+    You can use HTTP PUT to update other objects as well,
+    such as policy agent profiles and groups.
+   </para>
+
+   <para>
+    The following example creates a web policy agent profile.
+   </para>
 
    <screen>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*" \
  --header "Content-Type: application/json" \
+ --header "If-None-Match: *" \
  --data '{
-   "name":"masterClient",
-   "realm":"/",
-   "accesstoken":[],
-   "clientsessionuri":[],
-   "subjecttype":["Pairwise"],
-   "defaultscopes":["[0]=openid"],
-   "clienttype":["Confidential"],
-   "universalid":["id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"],
-   "userpassword":"changeit",
-   "name":["[0]="],
-   "redirectionuris":["[0]="],
-   "idtokensignedresponsealg":["HmacSHA512"],
-   "scopes":["[0]=openid"],
-   "postlogoutredirecturi":[],
-   "sunidentityserverdevicestatus":["Active"],
-   "agenttype":["OAuth2Client"],
-   "description":["[0]="]
+  "username" : "myWebAgent",
+  "realm" : "/",
+  "com.sun.identity.agents.config.fqdn.default" : [ "www.example.com" ],
+  "sunIdentityServerDeviceKeyValue" :
+   [ "agentRootURL=http://www.example.com:80/" ],
+  "com.sun.identity.agents.config.remote.logfile" :
+   [ "amAgent_www_example_com_80.log" ],
+  "com.sun.identity.agents.config.repository.location" : [ "centralized" ],
+  "AgentType" : [ "WebAgent" ],
+  "com.sun.identity.agents.config.cdsso.cdcservlet.url" :
+   [ "[0]=https://openam.example.com:8443/openam/cdcservlet" ],
+  "com.sun.identity.client.notification.url" :
+   [ "http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false" ],
+  "universalid" : [ "id=myWebAgent,ou=agent,dc=openam,dc=forgerock,dc=org" ],
+  "userpassword" : [ "changeit" ],
+  "com.sun.identity.agents.config.agenturi.prefix" :
+   [ "http://www.example.com:80/amagent" ],
+  "com.sun.identity.agents.config.login.url" :
+   [ "[0]=https://openam.example.com:8443/openam/UI/Login" ],
+  "com.sun.identity.agents.config.logout.url" :
+   [ "[0]=https://openam.example.com:8443/openam/UI/Logout" ],
+  "sunIdentityServerDeviceStatus" : [ "Active" ]
  }' \
- https://openam.example.com:8443/openam/json/agents/masterClient</userinput>
-<computeroutput>{
-    "name": "masterClient",
-    "realm": "/",
-    "com.forgerock.openam.oauth2provider.accesstoken": [],
-    "com.forgerock.openam.oauth2provider.clientsessionuri": [],
-    "com.forgerock.openam.oauth2provider.subjecttype": [
-        "Pairwise"
-    ],
-    "com.forgerock.openam.oauth2provider.defaultscopes": [
-        "[0]="
-    ],
-    "com.forgerock.openam.oauth2provider.clienttype": [
-        "Confidential"
-    ],
-    "universalid": [
-        "id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"
-    ],
-    "userpassword": [
-        "{SHA-1}W6ph5Mm5Pz8GgiULbPgzG37mj9g="
-    ],
-    "com.forgerock.openam.oauth2provider.name": [
-        "[0]="
-    ],
-    "com.forgerock.openam.oauth2provider.redirectionuris": [
-        "[0]="
-    ],
-    "com.forgerock.openam.oauth2provider.idtokensignedresponsealg": [
-        "HmacSHA256"
-    ],
-    "com.forgerock.openam.oauth2provider.scopes": [
-        "[0]="
-    ],
-    "com.forgerock.openam.oauth2provider.postlogoutredirecturi": [],
-    "sunidentityserverdevicestatus": [
-        "Active"
-    ],
-    "agenttype": [
-        "OAuth2Client"
-    ],
-    "com.forgerock.openam.oauth2provider.description": [
-        "[0]="
-    ]
-}</computeroutput>
+ https://openam.example.com:8443/openam/json/agents/myWebAgent?_prettyPrint=true</userinput>
    </screen>
+
+   <para>
+    When you create a policy agent profile,
+    OpenAM returns the full profile in JSON format.
+   </para>
 
    <para>Notice in the following example that updates <literal>myGroup</literal>
    the object class value is not included in the JSON sent to OpenAM.</para>
