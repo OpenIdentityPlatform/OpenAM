@@ -631,21 +631,27 @@ $ <userinput>sudo \
              <literal>add-config-entries.ldif</literal>.
              The entries include the base DN suffix, an organizational unit entry,
              and the OpenAM user entry needed to access the directory service.</para>
+             <para>Note that if you are having trouble with this LDIF file,
+             consider removing the line feeds for the ACI attributes
+             and let it wrap to the next line. If you are still having trouble using
+             the <command>ldapmodify</command>, you can use the
+             <command>import-ldif</command> command although you may have to re-apply
+             the <literal>targetcontrol</literal> ACI attribute.</para>
              <programlisting language="ldif">dn: dc=example,dc=com
 objectclass: top
 objectclass: domain
 dc: example
-aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
-aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
-aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl
-     "Allow persistent search"; allow (search, read)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
-aci: (version 3.0;acl "Add config entry"; allow (add)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
-aci: (version 3.0;acl "Delete config entry"; allow (delete)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (
+ search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)(
+ userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+ persistent search"; allow (search, read)(userdn = "ldap:///uid=openam
+ ,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
 
 dn: ou=admins,dc=example,dc=com
 objectclass: top
@@ -723,13 +729,20 @@ $ <userinput>sudo \
          </screen>
 
          </step>
+
+         <step><para>At this point, install the OpenAM server if you haven't done so
+          already. For details,
+              see <link xlink:href="install-guide#chap-install-core"
+              xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Installing OpenAM Core Services</citetitle></link>.</para></step>
+
          <step><para>Copy the schema files, located at
              <literal>/path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha</literal>
              to a local folder.
              The <literal>cts-indices.ldif</literal> and
              <literal>cts-container.ldif</literal> files require some minor editing.</para>
 
-         <screen width="85">
+         <screen>
 $ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-add-schema.ldif .</userinput>
 $ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-indices.ldif .</userinput>
 $ <userinput>cp /path/to/tomcat/webapps/openam/WEB-INF/template/ldif/sfha/cts-container.ldif .</userinput>

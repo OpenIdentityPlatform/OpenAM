@@ -532,21 +532,28 @@ $ <userinput>sudo \
      and the OpenAM user entry needed to access the directory service.
      Note that the OpenAM user entry provides the Login ID with only those privileges
      required by the OpenAM server to write to the directory server. </para>
+     <para>Also note that if you are having trouble with this LDIF file,
+      consider removing the line feeds for the ACI attributes
+      and let it wrap to the next line. If you are still having trouble using
+      the <command>ldapmodify</command>, you can use the
+      <command>import-ldif</command> command although you may have to re-apply
+      the <literal>targetcontrol</literal> ACI attribute.</para>
+
      <programlisting language="ldif">dn: dc=openam-cts,dc=example,dc=com
 objectclass: top
 objectclass: domain
 dc: openam-cts
-aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
-aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
-aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl
-     “Allow persistent search”; allow (search, read)
-      (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
-aci: (version 3.0;acl "Add config entry"; allow (add)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
-aci: (version 3.0;acl "Delete config entry"; allow (delete)
-     (userdn = "ldap:///uid=openam,ou=admins,dc=openam-cts,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (
+ search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)(
+ userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+ persistent search"; allow (search, read)(userdn = "ldap:///uid=openam
+ ,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
 
 dn: ou=admins,dc=openam-cts,dc=example,dc=com
 objectclass: top
