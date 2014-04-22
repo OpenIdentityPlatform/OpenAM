@@ -268,10 +268,10 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
- --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1", \
-   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt", \
-   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] }, \
-   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ], \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
  https://openam.example.com:8443/openam/json/authenticate</userinput>
 <computeroutput>
@@ -289,10 +289,10 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
- --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1", \
-   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt", \
-   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] }, \
-   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ], \
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }' \
  https://openam.example.com:8443/openam/json/authenticate?noSession=true</userinput>
 <computeroutput>
@@ -1551,16 +1551,16 @@ $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*" \
  --header "Content-Type: application/json" \
  --data \
- '{"client_id":["testClient"], \
-   "realm":["/"], \
-   "userpassword":["secret12"], \
-   "com.forgerock.openam.oauth2provider.clientType":["Confidential"], \
-   "com.forgerock.openam.oauth2provider.redirectionURIs": \
-     ["www.client.com","www.example.com"], \
-   "com.forgerock.openam.oauth2provider.scopes":["cn","sn"], \
-   "com.forgerock.openam.oauth2provider.defaultScopes":["cn"], \
-   "com.forgerock.openam.oauth2provider.name":["My Test Client"], \
-   "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"] \
+ '{"client_id":["testClient"],
+   "realm":["/"],
+   "userpassword":["secret12"],
+   "com.forgerock.openam.oauth2provider.clientType":["Confidential"],
+   "com.forgerock.openam.oauth2provider.redirectionURIs":
+     ["www.client.com","www.example.com"],
+   "com.forgerock.openam.oauth2provider.scopes":["cn","sn"],
+   "com.forgerock.openam.oauth2provider.defaultScopes":["cn"],
+   "com.forgerock.openam.oauth2provider.name":["My Test Client"],
+   "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"]
   }' \
  https://openam.example.com:8443/openam/frrest/oauth2/client/?_action=create</userinput>
 <computeroutput>{"success":"true"}</computeroutput>
@@ -1867,10 +1867,10 @@ $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
  --data \
- '{ \
-   "email": "newuser@example.com", \
-   "subject": "Confirm registration with OpenAM", \
-   "message": "Follow this link to confirm your registration" \
+ '{
+   "email": "newuser@example.com",
+   "subject": "Confirm registration with OpenAM",
+   "message": "Follow this link to confirm your registration"
  }' \
  https://openam.example.com:8443/openam/json/users/?_action=register</userinput>
 <computeroutput>{}</computeroutput>
@@ -1906,10 +1906,10 @@ $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
  --data \
- '{ \
-   "email":"newuser@example.com", \
-   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=", \
-   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=" \
+ '{
+   "email":"newuser@example.com",
+   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
+   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg="
  }' \
  https://openam.example.com:8443/openam/json/users?_action=confirm</userinput>
 <computeroutput>{
@@ -1933,12 +1933,12 @@ $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
  --data \
- '{ \
-   "email":"newuser@example.com", \
-   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=", \
-   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=", \
-   "username":"newuser", \
-   "userpassword":"password" \
+ '{
+   "email":"newuser@example.com",
+   "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
+   "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=",
+   "username":"newuser",
+   "userpassword":"password"
  }' \
  https://openam.example.com:8443/openam/json/users?_action=anonymousCreate</userinput>
 <computeroutput>{
@@ -2078,10 +2078,10 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
- --data '{ \
-   "username": "demo", \
-   "subject": "Reset your forgotten password with OpenAM", \
-   "message": "Follow this link to reset your password" \
+ --data '{
+   "username": "demo",
+   "subject": "Reset your forgotten password with OpenAM",
+   "message": "Follow this link to reset your password"
  }' \
  https://openam.example.com:8443/openam/json/users/?_action=forgotPassword</userinput>
 <computeroutput>{}</computeroutput>
@@ -2118,11 +2118,11 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request POST \
  --header "Content-Type: application/json" \
- --data '{ \
- "username":"demo", \
- "userpassword":"password", \
- "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=", \
- "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=" \
+ --data '{
+ "username":"demo",
+ "userpassword":"password",
+ "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=",
+ "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ="
  }' \
  https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset</userinput>
 <computeroutput>{
@@ -2304,10 +2304,10 @@ $ <userinput>curl \
  --header "iplanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data \
- '{ \
-   "username": "bjensen", \
-   "userpassword": "secret12", \
-   "mail": "bjensen@example.com" \
+ '{
+   "username": "bjensen",
+   "userpassword": "secret12",
+   "mail": "bjensen@example.com"
  }' \
  https://openam.example.com:8443/openam/json/users/?_action=create</userinput>
 <computeroutput>{
@@ -2367,10 +2367,10 @@ $ <userinput>curl \
  --header "Content-Type: application/json" \
  --header "If-None-Match: *" \
  --data \
- '{ \
-   "username": "janedoe", \
-   "userpassword": "secret12", \
-   "mail": "janedoe@example.com" \
+ '{
+   "username": "janedoe",
+   "userpassword": "secret12",
+   "mail": "janedoe@example.com"
  }' \
  https://openam.example.com:8443/openam/json/users/janedoe</userinput>
 <computeroutput>{
@@ -2435,27 +2435,27 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data \
- '{ \
-   "name":"myWebAgent","realm":"/", \
-   "com.sun.identity.agents.config.fqdn.default":["www.example.com"], \
-   "sunidentityserverdevicekeyvalue": \
-     ["agentRootURL=http://www.example.com:80/"], \
-   "com.sun.identity.agents.config.remote.logfile": \
-     ["amAgent_www_example_com_80.log"], \
-   "com.sun.identity.agents.config.repository.location":["centralized"], \
+ '{
+   "name":"myWebAgent","realm":"/",
+   "com.sun.identity.agents.config.fqdn.default":["www.example.com"],
+   "sunidentityserverdevicekeyvalue":
+     ["agentRootURL=http://www.example.com:80/"],
+   "com.sun.identity.agents.config.remote.logfile":
+     ["amAgent_www_example_com_80.log"],
+   "com.sun.identity.agents.config.repository.location":["centralized"],
    "agenttype":["WebAgent"],
-    "com.sun.identity.agents.config.cdsso.cdcservlet.url": \
-     ["[0]=https://openam.example.com:8443/openam/cdcservlet"], \
-   "com.sun.identity.client.notification.url": \
-     ["http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false"], \
-   "com.sun.identity.agents.config.agenturi.prefix": \
-     ["http://www.example.com:80/amagent"], \
-   "userpassword":["password"], \
-   "com.sun.identity.agents.config.login.url": \
-     ["[0]=https://openam.example.com:8443/openam/UI/Login"], \
-   "com.sun.identity.agents.config.logout.url": \
-     ["[0]=https://openam.example.com:8443/openam/UI/Logout"], \
-   "sunidentityserverdevicestatus":["Active"] \
+    "com.sun.identity.agents.config.cdsso.cdcservlet.url":
+     ["[0]=https://openam.example.com:8443/openam/cdcservlet"],
+   "com.sun.identity.client.notification.url":
+     ["http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false"],
+   "com.sun.identity.agents.config.agenturi.prefix":
+     ["http://www.example.com:80/amagent"],
+   "userpassword":["password"],
+   "com.sun.identity.agents.config.login.url":
+     ["[0]=https://openam.example.com:8443/openam/UI/Login"],
+   "com.sun.identity.agents.config.logout.url":
+     ["[0]=https://openam.example.com:8443/openam/UI/Logout"],
+   "sunidentityserverdevicestatus":["Active"]
  }' \
  https://openam.example.com:8443/openam/json/agents/?_action=create</userinput>
 <computeroutput>{
@@ -2747,10 +2747,10 @@ $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
- --data '{ \
-   "name":"newGroup", \
-   "realm":"/", \
-   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"] \
+ --data '{
+   "name":"newGroup",
+   "realm":"/",
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]
  }' \
  https://openam.example.com:8443/openam/json/groups?_action=create</userinput>
 <computeroutput>{
@@ -2776,10 +2776,10 @@ $ <userinput>curl \
  --header "If-None-Match: *" \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
- --data '{ \
-   "name":"anotherGroup", \
-   "realm":"/", \
-   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"] \
+ --data '{
+   "name":"anotherGroup",
+   "realm":"/",
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]
  }' \
  https://openam.example.com:8443/openam/json/groups/anotherGroup</userinput>
 <computeroutput>{
@@ -3051,24 +3051,24 @@ $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*" \
  --header "Content-Type: application/json" \
- --data '{ \
-   "name":"masterClient", \
-   "realm":"/", \
-   "accesstoken":[], \
-   "clientsessionuri":[], \
-   "subjecttype":["Pairwise"], \
-   "defaultscopes":["[0]=openid"], \
-   "clienttype":["Confidential"], \
-   "universalid":["id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"], \
-   "userpassword":"changeit", \
-   "name":["[0]="], \
-   "redirectionuris":["[0]="], \
-   "idtokensignedresponsealg":["HmacSHA512"], \
-   "scopes":["[0]=openid"], \
-   "postlogoutredirecturi":[], \
-   "sunidentityserverdevicestatus":["Active"], \
-   "agenttype":["OAuth2Client"], \
-   "description":["[0]="] \
+ --data '{
+   "name":"masterClient",
+   "realm":"/",
+   "accesstoken":[],
+   "clientsessionuri":[],
+   "subjecttype":["Pairwise"],
+   "defaultscopes":["[0]=openid"],
+   "clienttype":["Confidential"],
+   "universalid":["id=masterClient,ou=agent,dc=openam,dc=forgerock,dc=org"],
+   "userpassword":"changeit",
+   "name":["[0]="],
+   "redirectionuris":["[0]="],
+   "idtokensignedresponsealg":["HmacSHA512"],
+   "scopes":["[0]=openid"],
+   "postlogoutredirecturi":[],
+   "sunidentityserverdevicestatus":["Active"],
+   "agenttype":["OAuth2Client"],
+   "description":["[0]="]
  }' \
  https://openam.example.com:8443/openam/json/agents/masterClient</userinput>
 <computeroutput>{
@@ -3124,12 +3124,12 @@ $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5...Y3MTAx*" \
  --header "Content-Type: application/json" \
- --data '{ \
-   "name":"myGroup", \
-   "realm":"/", \
-   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"], \
-   "cn":["myGroup"], \
-   "description":["Updated the group"] \
+ --data '{
+   "name":"myGroup",
+   "realm":"/",
+   "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"],
+   "cn":["myGroup"],
+   "description":["Updated the group"]
  }' \
  https://openam.example.com:8443/openam/json/groups/myGroup</userinput>
 <computeroutput>{
