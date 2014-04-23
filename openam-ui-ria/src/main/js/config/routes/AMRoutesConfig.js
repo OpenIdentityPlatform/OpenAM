@@ -1,7 +1,7 @@
 /** 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,6 +26,7 @@
  * "Portions Copyrighted 2011-2013 ForgeRock Inc"
  */
 /*global define*/
+/*jslint regexp:false */
 
 /**
  * @author jfeasel
@@ -36,20 +37,24 @@ define("config/routes/AMRoutesConfig", [
     var obj = {
         "forgotPassword": {
             view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
-            url: "forgotPassword/",
-            forceUpdate: true
+            url: /forgotPassword(\/[^\&]*)(\&.+)?/,
+            pattern: "forgotPassword??",
+            forceUpdate: true,
+            argumentNames: ["realm", "additionalParameters"]
         },
         "forgotPasswordChange": {
             view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
-            url: /forgotPasswordChange(.*)?/,
-            pattern: "forgotPasswordChange?",
-            forceUpdate: true
+            url: /forgotPasswordChange(\/[^\&]*)(\&.+)?/,
+            pattern: "forgotPasswordChange??",
+            forceUpdate: true,
+            argumentNames: ["realm", "additionalParameters"]
         },
         "continueSelfRegister": {
             view: "org/forgerock/openam/ui/user/profile/RegisterView",
-            url: /continueRegister(.*)?/,
-            pattern: "continueRegister?",
-            forceUpdate: true
+            url: /continueRegister(\/[^\&]*)(\&.+)?/,
+            pattern: "continueRegister??",
+            forceUpdate: true,
+            argumentNames: ["realm", "additionalParameters"]
         },
         "confirmLogin": {
             view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             }
             expire.setDate(expire.getDate() + 1);
             cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
-            location.href = e.target.href;
+            location.href = e.target.href + conf.globalData.auth.realm;
         },
         autoLogin: function() {
               var index,
@@ -101,7 +101,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         render: function(args, callback) {
             var urlParams = {};//deserialized querystring params
-            
+  
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
                 conf.globalData.auth.additional = args[1]; // may be "undefined"
@@ -234,10 +234,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     this.data.showRegister = false;
                                     this.data.showSpacer = false;
 
-                                    if(conf.globalData.auth.forgotPassword === "true"){
+                                    if(conf.globalData.forgotPassword === "true"){
                                         this.data.showForgotPassword = true;
                                     }
-                                    if(conf.globalData.auth.selfRegistration === "true"){
+                                    if(conf.globalData.selfRegistration === "true"){
                                         if(this.data.showForgotPassword){
                                             this.data.showSpacer = true;
                                         }

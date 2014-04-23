@@ -42,6 +42,7 @@ import java.security.AccessController;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collections;
 
 /**
  * A collection of ForgeRock-REST based utility functions.
@@ -199,6 +200,16 @@ final public class  RestUtils {
             return attribute.iterator().next();
         } else {
             return null;
+        }
+    }
+
+    public static Set<String> getSetAttribute(ServiceConfig serviceConfig, String attributeName) {
+        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
+        Set attribute = (Set)attributes.get(attributeName);
+        if (attribute == null) {
+            return Collections.EMPTY_SET;
+        } else {
+            return attribute;
         }
     }
 }

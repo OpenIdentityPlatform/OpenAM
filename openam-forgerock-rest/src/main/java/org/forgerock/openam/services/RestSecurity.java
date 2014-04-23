@@ -34,6 +34,7 @@ import com.sun.identity.sm.ServiceNotFoundException;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
+import java.util.Set;
 
 public class RestSecurity {
 
@@ -48,6 +49,8 @@ public class RestSecurity {
     private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRESTSecuritySelfRegTokenTTL";
     private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRESTSecurityForgotPassTokenTTL";
     private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
+    private final static String PROTECTED_USER_ATTRIBUTES = "forgerockRESTSecurityProtectedUserAttributes";
+    private final static String SUCCESSFUL_USER_REGISTRATION_DESTINATION = "forgerockRESTSecuritySuccessfulUserRegistrationDestination";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -111,33 +114,42 @@ public class RestSecurity {
         final String forgotPasswordConfirmationUrl;
         final Boolean selfRegistration;
         final Boolean forgotPassword;
+        final Set protectedUserAttributes;
+        final String successfulUserRegistrationDestination;
 
-        private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl, Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration, Boolean forgotPassword) {
+        private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl, Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, 
+        		Boolean selfRegistration, Boolean forgotPassword, Set protectedUserAttributes, String successfulUserRegistrationDestination) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
             this.forgotPasswordConfirmationUrl = forgotPasswordConfirmationUrl;
             this.selfRegistration = selfRegistration;
             this.forgotPassword = forgotPassword;
+            this.protectedUserAttributes = protectedUserAttributes;
+            this.successfulUserRegistrationDestination = successfulUserRegistrationDestination;
         }
     }
 
     private void initializeSettings(ServiceConfigManager serviceConfigManager) {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
-            boolean selfRegistration = RestUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
+            Boolean selfRegistration = RestUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
             String selfRegistrationConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
-            boolean forgotPassword = RestUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
+            Boolean forgotPassword = RestUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
             String forgotPasswordConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
             Long selfRegTokLifeTime = RestUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
             Long forgotPassTokLifeTime = RestUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
+            Set protectedUserAttributes = RestUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
+            String successfulUserRegistrationDestination = RestUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,
                     forgotPassTokLifeTime,
                     forgotPasswordConfirmationUrl,
                     selfRegistration,
-                    forgotPassword);
+                    forgotPassword,
+                    protectedUserAttributes,
+                    successfulUserRegistrationDestination);
 
             setProviderConfig(newRestSecuritySettings);
             if (debug.messageEnabled()) {
@@ -212,6 +224,14 @@ public class RestSecurity {
             debug.error(message);
             throw new ServiceNotFoundException(message);
         }
+    }
+    
+    public Set getProtectedUserAttributes() {
+        return restSecurityConfiguration.protectedUserAttributes;
+    }
+    
+    public String getSuccessfulUserRegistrationDestination() {
+    	return restSecurityConfiguration.successfulUserRegistrationDestination;
     }
 
     /**

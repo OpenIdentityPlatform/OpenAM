@@ -95,14 +95,18 @@ public class ServerInfoResource implements CollectionResourceProvider {
             ResultHandler<Resource> handler, final String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
+        Set<String> protectedUserAttributes;
         Resource resource;
         RestSecurity restSecurity = new RestSecurity(realm);
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
+            protectedUserAttributes = restSecurity.getProtectedUserAttributes();
             result.put("domains", cookieDomains);
+            result.put("protectedUserAttributes", protectedUserAttributes);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME,"iPlanetDirectoryPro"));
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
+            result.put("successfulUserRegistrationDestination", restSecurity.getSuccessfulUserRegistrationDestination());
             resource = new Resource(resourceId, Integer.toString(result.asMap().hashCode()), result);
             handler.handleResult(resource);
         } catch (Exception e) {

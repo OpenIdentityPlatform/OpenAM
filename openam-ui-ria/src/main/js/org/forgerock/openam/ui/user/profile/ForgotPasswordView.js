@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -59,6 +59,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         },
         continueProcess: function(e) {
             e.preventDefault();
+            $('#username').prop('readonly', true);
             var _this = this,
                 postData = {
                         username: $('#username').val(),
@@ -66,12 +67,13 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                         message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
                 },
                 success = function() {
-                    $("#step1").hide();
-                    $("#emailSent").show();
+                    _this.$el.find("#step1").slideUp();
+                    _this.$el.find("#emailSent").slideDown();            
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
                     _this.$el.find("input[type=submit]").prop('disabled', true);
+                    $('#username').prop('readonly', false);
                     if(response.message.indexOf("No email provided in profile.") === 0) {
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "noEmailProvided");
                     }
@@ -89,22 +91,30 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         },
         changePassword: function(e) {
             e.preventDefault();
+            $('#password').prop('readonly', true);
+            $('#passwordConfirm').prop('readonly', true);
+            this.$el.find("input[type=submit]").prop('disabled', true);
+
             var postData = {
-                    userpassword: $('#password').val()
+                userpassword: $('#password').val()
             },
             success = function() {
-                $("#step2").hide();
-                $("#passwordChangeSuccess").show();
+                $("#step2").slideUp();
+                $("#passwordChangeSuccess").fadeIn();
+            },
+            error = function(e) {
+                $('#password').prop('readonly', false);
+                $('#passwordConfirm').prop('readonly', false);
+                console.error(e.status, e.responseText, e.statusText);
             };
-            _.extend(postData,this.data.urlParams);
-            this.$el.find("input[type=submit]").prop('disabled', true);
-            userDelegate.doAction("forgotPasswordReset",postData,success);
+            _.extend(postData,this.data.urlParams);    
+            userDelegate.doAction("forgotPasswordReset",postData,success, error);
         },
         cancel: function(e) {
             e.preventDefault();
             var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
             cookieHelper.deleteCookie("loginUrlParams");
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "");
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : conf.globalData.auth.realm);
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
@@ -112,12 +122,9 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             }
             else {
                 this.$el.find("input[type=submit]").prop('disabled', true);
-               
             }
         }
-    }); 
-    
+    });
+
     return new ForgottenPasswordView();
 });
-
-

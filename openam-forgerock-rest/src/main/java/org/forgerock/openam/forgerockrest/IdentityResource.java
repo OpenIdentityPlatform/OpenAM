@@ -88,6 +88,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String EMAIL = "email";
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
+    final static String CURRENTPASSWORD = "currentpassword";
 
     private final MailServerLoader mailServerLoader;
 
@@ -251,6 +252,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
                     .append("&email=").append(emailAddress)
                     .append("&tokenId=").append(tokenID)
+                    .append("&realm=").append(realm)
                     .toString();
 
             // Send Registration
@@ -552,6 +554,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
                     .append("&tokenId=").append(ctsToken.getTokenId())
                     .append("&username=").append(requestParamEncode(username))
+                    .append("&realm=").append(realm)
                     .toString();
 
             // Send Registration
@@ -1168,9 +1171,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         return false;
     }
 
-    private String getPasswordFromHeader(ServerContext context){
+    private String getPasswordFromHeader(ServerContext context, String headerName){
         List<String> headerList = null;
-        String oldUserPasswordHeaderName = "olduserpassword";
         HttpContext header = null;
 
         try {
@@ -1181,7 +1183,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 return null;
             }
             //get the oldusername from header directly
-            headerList = header.getHeaders().get(oldUserPasswordHeaderName.toLowerCase());
+            headerList = header.getHeaders().get(headerName);
             if (headerList != null && !headerList.isEmpty()) {
                 for (String s : headerList) {
                 	return (s != null && !s.isEmpty()) ? s : null;
@@ -1189,7 +1191,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             }
         } catch (Exception e) {
             debug.error("IdentityResource.getPasswordFromHeader :: " +
-                    "Cannot get olduserpassword from ServerContext!" + e);
+                    "Cannot get currentpassword from ServerContext!" + e);
         }
         return null;
     }
@@ -1227,6 +1229,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
+            
+            // Handle userpassword change
             String userpass = jVal.get("userpassword").asString();
             // Check that the attribute userpassword is in the json object
             if(userpass != null && !userpass.isEmpty()) {
@@ -1234,16 +1238,59 @@ public final class IdentityResource implements CollectionResourceProvider {
                 if(checkValidPassword(resourceId, userpass.toCharArray(), realm) || isAdmin(context)) {
                     // same password as before, update the attributes
                 } else {
-                    // check header to make sure that oldpassword is there check to see if it's correct
-                    String strPass = getPasswordFromHeader(context);
+                    // check header to make sure that currentpassword is there check to see if it's correct
+                    String strPass = getPasswordFromHeader(context,CURRENTPASSWORD);
                     if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
                         //continue will allow password change
                     } else{
                     	throw new BadRequestException("Invalid Password");
                     }
                 }
+            } else {
+                // Handle attribute change when password is required
+                // Get restSecurity for this realm
+                RestSecurity restSecurity = new RestSecurity(realm);
+                // Make sure user is not admin and check to see if we are requiring a password to change any attributes
+                Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
+                if (protectedUserAttributes != null && !isAdmin(context)) {
+                	Boolean hasReauthenticated = false;
+                    for (String protectedAttr : protectedUserAttributes) {
+                    	JsonValue jValAttr = jVal.get(protectedAttr);
+                        if(!jValAttr.isNull()){
+                            // If attribute is not available set newAttr variable to empty string for use in comparison
+                            String newAttr = (jValAttr.isString()) ? jValAttr.asString() : "";
+                            // Get the value of current attribut
+                            String currentAttr = "";
+                            Attribute[] attrs = dtls.getAttributes();
+                            for (Attribute attribute : attrs){
+                                String attributeName = attribute.getName();
+                                if(protectedAttr.equalsIgnoreCase(attributeName)){
+                                    currentAttr = attribute.getValues()[0];
+                                }
+                            }
+                            // Compare newAttr and currentAttr
+                            if (currentAttr.equals(newAttr)){
+                                // attribute has not changed
+                            } else {
+                                if(hasReauthenticated){
+                                    //already reauthed continue with attr change
+                                } else {
+                                    // check header to make sure that password is there then check to see if it's correct
+                                    String strCurrentPass = getPasswordFromHeader(context,CURRENTPASSWORD);
+                                    if(strCurrentPass != null && !strCurrentPass.isEmpty() && checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)){
+                                        //set a boolean value so we know reauth has been done
+                                        hasReauthenticated = true;
+                                        //continue will allow attribute(s) change(s)
+                                    } else{
+                                        throw new BadRequestException("Must provide a valid confirmation password to change protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" + newAttr + "'");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
+            
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
             // read updated identity back to client

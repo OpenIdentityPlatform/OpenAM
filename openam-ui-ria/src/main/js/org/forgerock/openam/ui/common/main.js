@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,14 +24,9 @@
 
 /*global define*/
 
-define("org/forgerock/openam/ui/common/util/Constants", [
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (commonConstants) {
-    commonConstants.context = "openam";
-    commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
-    commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
-    commonConstants.CONSOLE_USERS = ['amadmin']; 
-    commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword"; 
-    
-    return commonConstants;
-});
+define([
+    "./util/Constants",
+    "./util/ThemeManager",
+    "./delegates/SiteConfigurationDelegate",
+    "./delegates/PolicyDelegate"
+]);

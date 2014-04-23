@@ -5,7 +5,7 @@
 <!--
       DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2013 ForgeRock AS. All Rights Reserved
+   Copyright (c) 2013-2014 ForgeRock AS. All Rights Reserved
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -95,6 +95,24 @@
                         <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySuccessfulUserRegistrationDestination"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a107">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a107a">default</ChoiceValue>
+                        <ChoiceValue i18nKey="a107b">login</ChoiceValue>
+                        <ChoiceValue i18nKey="a107c">autologin</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>default</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityProtectedUserAttributes" 
+                                type="list" 
+                                syntax="string" 
+                                i18nKey="a108"> 
+                </AttributeSchema> 
             </Organization>
         </Schema>
     </Service>

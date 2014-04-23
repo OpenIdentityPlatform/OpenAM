@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -43,12 +43,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
             
-            _.each(requirements.callbacks, function (obj, i) {
-                if (params.hasOwnProperty("callback_" + i)) {
-                    populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
-                }
-            });
-            
+            // used in auto login from self registration
+            if (params.userName &&  params.password && requirements.stage === "DataStore1"){
+                populatedRequirements.callbacks[0].input[0].value = params.userName;
+                populatedRequirements.callbacks[1].input[0].value = params.password;
+            } else {
+                _.each(requirements.callbacks, function (obj, i) {
+                    if (params.hasOwnProperty("callback_" + i)) {
+                        populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
+                    }
+                });       
+            }
+
             authNDelegate
                 .submitRequirements(populatedRequirements)
                 .then(function (result) {
@@ -61,7 +67,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                             }, errorCallback);
                         } else if (result.hasOwnProperty("authId")) {
                             // re-render login form for next set of required inputs
-                            viewManager.refresh();
+                            if (viewManager.currentView === 'LoginView') {
+                                viewManager.refresh();
+                            } else {
+                                // TODO: If using a module chain with autologin the user is currently routed to the first login screen.
+                                location.href = '#login' + conf.globalData.auth.realm;
+                            }
                         }
                     },
                     function (failedStage) {

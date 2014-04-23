@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,9 +24,6 @@
 
 /*global $, define, _, console */
 
-/**
- * @author yaromin
- */
 define("UserDelegate", [
 	"org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
@@ -37,11 +34,18 @@ define("UserDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json");
 
+
+    obj.getUserResourceName = function (user) {
+        return user.resourceName;
+    };
+
     obj.getUserById = function(id, realm, successCallback, errorCallback) {
 
+        var resourceName = this.cleanRealm(realm) + "/users/" + id;
+
         obj.serviceCall({
-            url: realm + "/users/" + id, 
-            type: "GET", 
+            url: resourceName,
+            type: "GET",
             headers: {"Cache-Control": "no-cache"}, // needed to prevent reads from getting cached
             success: function(user) {
                 var user_cleaned = {},i=0;
@@ -57,13 +61,15 @@ define("UserDelegate", [
                 } else {
                     user_cleaned.roles += ",ui-user";
                 }
-                
+
+                user_cleaned.resourceName = resourceName;
+
                 successCallback(user_cleaned);
-            }, 
+            },
             error: errorCallback
         });
     };
-    
+
     /**
      * Checks if logged in and returns users id
      */
@@ -81,37 +87,42 @@ define("UserDelegate", [
             errorsHandlers: errorsHandlers
         });
     };
-    
-    obj.updateUser = function(oldUserData, realm, objectParam, successCallback, errorCallback) {
-        var headers = {}, 
-            picked = _.pick(objectParam, ["givenname","sn","mail","postaladdress","telephonenumber","userpassword"]);
-        
+
+    obj.updateUser = function(oldUserData, objectParam, successCallback, errorCallback) {
+        var headers = {},
+            picked = _.pick(objectParam, ["givenName","sn","mail","postalAddress","telephoneNumber","userpassword"]);
+
         if(objectParam._rev) {
             headers["If-Match"] = '"' + objectParam._rev + '"';
         } else {
             headers["If-Match"] = '"' + "*" + '"';
         }
-        
-        if(objectParam.oldPassword) {
-            headers[constants.OPENAM_HEADER_PARAM_OLD_PASSWORD] = objectParam.oldPassword;
+
+        // temporay fix - deleted after frui 1.0.13 is released
+        if(objectParam.currentPassword){
+            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentPassword ; 
+        }
+        // 
+
+        if(objectParam.currentpassword ) {
+            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentpassword ;   
         }
 
-        this.serviceCall({url: realm + "/users/" + objectParam.username,
+        this.serviceCall({url: this.getUserResourceName(oldUserData),
             type: "PUT",
-            success: successCallback, 
-            error: errorCallback, 
+            success: successCallback,
+            error: errorCallback,
             data: JSON.stringify(picked, function(key, value) { return value === "" ? [] : value; }),
-            headers: headers
+            headers: headers,
+            errorsHandlers : { "error": { status: "400" } }
         });
 
     };
 
 
     obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {
-        var realm = configuration.globalData.auth.realm;
-        if(realm === "/"){
-            realm = "";
-        }
+        var realm = this.cleanRealm(configuration.globalData.auth.realm);
+
         return obj.serviceCall({
             url: realm + "/users/?_action=" + action,
             data: JSON.stringify(postData),
@@ -123,9 +134,17 @@ define("UserDelegate", [
             errorsHandlers: errorsHandlers
         });
     };
-    
+
+    obj.cleanRealm = function(realm) {
+        if(realm.charAt(0) !== "/"){
+            realm = "/" + realm;
+        }
+        if(realm === "/"){
+            realm = "";
+        }
+        return realm;
+    };
+
+
     return obj;
 });
-
-
-

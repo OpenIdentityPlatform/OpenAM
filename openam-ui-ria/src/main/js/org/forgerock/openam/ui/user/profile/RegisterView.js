@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -59,6 +59,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
         },
         continueProcess: function(e) {
             e.preventDefault();
+            $('#email').prop('readonly', true);
             var _this = this,
                 postData = {
                         email: $('#email').val(),
@@ -66,14 +67,14 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                         message: $.t("templates.user.UserRegistrationTemplate.emailMessage")
                 },
                 success = function() {
-                    _this.$el.find("#step1").hide();
-                    _this.$el.find("#emailSent").show();
+                    _this.$el.find("#emailSent").slideDown();
+                    _this.$el.find("#step1").slideUp();   
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
                     _this.$el.find("input[type=submit]").prop('disabled', true);
+                    $('#email').prop('readonly', false);
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
-                    console.error('unableToRegister', e);
                 };
             
             this.$el.find("input[type=submit]").prop('disabled', true);
@@ -89,8 +90,23 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     {userpassword:this.$el.find("#password").val()}
             ),
             success = function() {
-                _this.$el.find("#step2").hide();
-                _this.$el.find("#registerSuccess").show();
+
+                switch(conf.globalData.successfulUserRegistrationDestination){
+                    
+                    case 'login':
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, 'afterRegistration');
+                        _this.cancel();
+                        
+                    break;
+                    case 'autologin':
+                        eventManager.sendEvent(constants.EVENT_USER_SUCCESSFULLY_REGISTERED, { user: {userName:postData.username, password:postData.password}, autoLogin: true });  
+                    break;
+                    default: 
+                        _this.$el.find("#step2").slideUp();
+                        _this.$el.find("#registerSuccess").fadeIn();
+                    break;
+                }
+
             },
             error = function(e) {
                 var response = JSON.parse(e.responseText);
@@ -99,7 +115,7 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
                 }
             };
-         
+
             userDelegate.doAction("confirm", this.data.urlParams,
                 function(d){
                     _.extend(postData,d);
@@ -113,10 +129,12 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
 
         },
         cancel: function(e) {
-            e.preventDefault();
+            if(e){
+                e.preventDefault();
+            }
             var loginUrlParams = cookieHelper.getCookie("loginUrlParams");
-            cookieHelper.deleteCookie("loginUrlParams");
-            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "");
+            cookieHelper.deleteCookie("loginUrlParams"); 
+            location.href = "#login" + ((loginUrlParams) ? loginUrlParams : conf.globalData.auth.realm);
         },
         customValidate: function () {
             if(validatorsManager.formValidated(this.$el.find("#registration")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {

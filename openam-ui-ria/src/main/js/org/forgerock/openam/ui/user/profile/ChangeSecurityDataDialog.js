@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -51,20 +51,21 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
         },
 
         formSubmit: function(event) {
-            var data = {};
+            var data = {}, _this = this;
             
             event.preventDefault();
             
-            if(validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
-                data.username = form2js("content", '.', false).username;
-                $.extend(data, form2js("passwordChange", '.', false));
-                data.userpassword = data.password;
-                this.delegate.updateUser(data.username, conf.globalData.auth.realm, data, _.bind(function() {
+            if (validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
+                data.username = form2js("content", '.', false).uid;
+                data.currentpassword = this.$el.find("#currentPassword").val(); 
+                data.userpassword =  this.$el.find("#password").val();
+                this.delegate.updateUser(conf.loggedUser, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
-                    this.close();
+                    _this.close();
                 }, this), function(e) {
                     if(JSON.parse(e.responseText).message === "Invalid Password"){
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidOldPassword");
+                        _this.close();
                     }
                 });
 
@@ -72,14 +73,12 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             
         },
         customValidate: function () {
-
-            if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#securityDataChange"))) {
+            if (validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#securityDataChange"))) {
                 this.$el.find("input[type=submit]").prop('disabled', false);
             }
             else {
                 this.$el.find("input[type=submit]").prop('disabled', true);
             } 
-            
         },
         render: function() {
             this.actions = [];

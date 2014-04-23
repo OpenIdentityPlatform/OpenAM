@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -33,97 +33,99 @@ define("config/AppConfiguration", [
 ], function(constants, eventManager) {
     var obj = {
             moduleDefinition: [
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
-                   configuration: {
-                       loginHelperClass: "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/GenericRouteInterfaceMap",
-                   configuration: {
-                       LoginView : "org/forgerock/openam/ui/user/login/RESTLoginView",
-                       UserProfileView : "org/forgerock/commons/ui/user/profile/UserProfileView",
-                       LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
-                       RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
-                       ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
-                   configuration: {
-                       selfRegistration: false,
-                       enterprise: false
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
-                   configuration: {
-                       processConfigurationFiles: [
-                           "config/process/UserConfig",
-                           "config/process/CommonConfig"
-                       ]
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/Router",
-                   configuration: {
-                       routes: {
-                       },
-                       loader: [ 
-                                {"routes":"config/routes/AMRoutesConfig"}, 
-                                {"routes":"config/routes/CommonRoutesConfig"},
-                                {"routes":"config/routes/UserRoutesConfig"}
-                       ]
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
-                   configuration: {
-                       defaultHeaders: {
-                       }
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/ErrorsHandler",
-                   configuration: {
-                       defaultHandlers: {
-                       },
-                       loader: [
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
+                    configuration: {
+                        loginHelperClass: "org/forgerock/openam/ui/user/login/RESTLoginHelper"
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/GenericRouteInterfaceMap",
+                    configuration: {
+                        LoginView : "org/forgerock/openam/ui/user/login/RESTLoginView",
+                        UserProfileView : "org/forgerock/commons/ui/user/profile/UserProfileView",
+                        LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+                        RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
+                        ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
+                        ConfirmPasswordDialog : "org/forgerock/commons/ui/user/profile/ConfirmPasswordDialog"
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/Router",
+                    configuration: {
+                        routes: { },
+                        loader: [ 
+                            {"routes":"config/routes/AMRoutesConfig"}, 
+                            {"routes":"config/routes/CommonRoutesConfig"},
+                            {"routes":"config/routes/UserRoutesConfig"}
+                        ]
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
+                    configuration: {
+                        selfRegistration: false,
+                        enterprise: false,
+                        remoteConfig: true,
+                        delegate: "org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate"
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
+                    configuration: {
+                        processConfigurationFiles: [
+                            "config/process/UserConfig",
+                            "config/process/CommonConfig"
+                        ]
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
+                    configuration: {
+                        defaultHeaders: {
+                        }
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/ErrorsHandler",
+                    configuration: {
+                        defaultHandlers: {
+                        },
+                        loader: [
                                 {"defaultHandlers":"config/errorhandlers/CommonErrorHandlers"}
-                       ]
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
-                   configuration: {
-                       templateUrls: [
-                       ]
-                   } 
-               },               
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/components/Messages",
-                   configuration: {
-                       messages: {
-                       },
-                       loader: [
+                        ]
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
+                    configuration: {
+                        templateUrls: [
+                        ]
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/components/Messages",
+                    configuration: {
+                        messages: {
+                        },
+                        loader: [
                                 {"messages":"config/messages/CommonMessages"},
                                 {"messages":"config/messages/UserMessages"}
-                       ]
-                   } 
-               },
-               {
-                   moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
-                   configuration: {
-                       validators: {
-                       },
-                       loader: [
-                                {"validators":"config/validators/UserValidators"},
-                                {"validators":"config/validators/CommonValidators"}
-                       ]
-                   } 
-               },
-               {
+                        ]
+                    }
+                },
+                {
+                    moduleClass: "org/forgerock/commons/ui/common/main/ValidatorsManager",
+                    configuration: {
+                         policyDelegate: "org/forgerock/openam/ui/common/delegates/PolicyDelegate",
+                         validators: { },
+                         loader: [
+                             {"validators": "config/validators/UserValidators"},
+                             {"validators": "config/validators/CommonValidators"}
+                         ]
+                    }
+                },
+                {
                     moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
                     configuration: {
                         links: {
@@ -143,9 +145,9 @@ define("config/AppConfiguration", [
                             }
                         }
                     }
-               }
-               ],
-               loggerLevel: 'debug'
-    };
+                }
+            ],
+            loggerLevel: 'debug'
+        };
     return obj;
 });
