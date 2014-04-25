@@ -244,10 +244,6 @@ Agreement (yes/no): [no]:</computeroutput>
   <para>This section covers software and hardware prerequisites for installing
   and running OpenAM web policy agents.</para>
 
-  <para>If you have a special request to support a combination not listed here,
-  contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
-  >info@forgerock.com</link>.</para>
-
   <section xml:id="java-requirements-web-agents">
    <title>Web Agents Java Requirements</title>
 
@@ -344,6 +340,16 @@ Agreement (yes/no): [no]:</computeroutput>
 
     <para>ForgeRock has tested this release on x86 and x64 based systems,
     and also on Solaris SPARC systems.</para>
+   </section>
+
+   <section xml:id="special-requests">
+    <title>Special Requests</title>
+
+    <para>
+     <emphasis role="strong">If you have a special request regarding support
+     for a combination not listed here, contact ForgeRock at
+     <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis>
+    </para>
    </section>
   </section>
 

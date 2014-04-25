@@ -58,6 +58,16 @@
   OpenAM's configuration model. If the upgrade fails, you must be able to
   roll back before the configuration changes impact other sites.</para>
 
+  <important>
+   <para>
+    Do <emphasis>not</emphasis> perform an upgrade
+    by deploying the new version
+    and then importing an existing configuration
+    by running the <command>ssoadm import-svc-config</command> command.
+    Importing an outdated configuration can result in a corrupted installation.
+   </para>
+  </important>
+
   <step>
    <para>Prepare your customized OpenAM server .war file.</para>
   </step>

@@ -50,13 +50,6 @@
        the installer or upgrader will interactively present a license agreement
        screen to the user.</para>
    </listitem>
-   <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
-   <listitem>
-    <para>When you create a new OpenAM custom configuration that uses an
-    external LDAP directory server for the configuration data store, you must
-    use a root suffix DN with at least two domain components, such as
-    <literal>dc=example,dc=com</literal>.</para>
-   </listitem>
 
      <listitem>
       <para>The advanced server property used to set the HTTP header name,
