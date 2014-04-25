@@ -54,7 +54,15 @@
     xlink:show="new"
     xlink:href="release-notes#update-from-earlier-release"
     xlink:role="http://docbook.org/xlink/role/olink"
-    ><citetitle>To Update OpenAM 11.0.0</citetitle></link>.
+    ><citetitle>To Update OpenAM From 11.0.0</citetitle></link>.
+   </para>
+   
+   <para>
+    Do <emphasis>not</emphasis> perform an upgrade
+    by deploying the new version
+    and then importing an existing configuration
+    by running the <command>ssoadm import-svc-config</command> command.
+    Importing an outdated configuration can result in a corrupted installation.
    </para>
   </listitem>
 
@@ -208,7 +216,7 @@
   
     <listitem>
      <para>
-      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/javadoc/"
+      <link xlink:href="http://docs.forgerock.org/en/openam/11.0.0/apidocs/"
             xlink:show="new">OpenAM 11.0.0 Javadoc</link>
      </para>
     </listitem>

@@ -89,10 +89,6 @@
    </para>
   </note>
 
-  <para>If you have a special request to support a combination not listed here,
-  contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
-  >info@forgerock.com</link>.</para>
-
   <section xml:id="java-requirements-web-agents">
    <title>Web Agents Java Requirements</title>
 
@@ -152,11 +148,7 @@
     <title>Web Agents Platform Requirements</title>
 
     <para>Apache HTTP web policy agents have been tested on Linux 2.6 or later,
-    and on Oracle Solaris 10 or later. Apache HTTP web policy agents require
-    Apache Portable Runtime 1.3.x or later. You can check your installation by
-    running <command>httpd -v</command>. On some systems, the packaged version of
-    Apache HTTP server uses earlier versions of APR that are not compatible with
-    the current policy web agents.</para>
+    and on Oracle Solaris 10 or later.</para>
 
     <para>The Microsoft IIS 6 web policy agent has been tested on Windows Server
     2003.</para>
@@ -185,6 +177,16 @@
 
     <para>ForgeRock has tested this release on x86 and x64 based systems,
     and also on Solaris SPARC systems.</para>
+   </section>
+
+   <section xml:id="special-requests">
+    <title>Special Requests</title>
+
+    <para>
+     <emphasis role="strong">If you have a special request regarding support
+     for a combination not listed here, contact ForgeRock at
+     <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis>
+    </para>
    </section>
   </section>
 
