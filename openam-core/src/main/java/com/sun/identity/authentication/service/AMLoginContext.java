@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.service;
 
@@ -42,6 +42,7 @@ import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfiguration;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.service.DSAMECallbackHandler.DSAMECallbackHandlerError;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.MessageLoginException;
@@ -758,9 +759,8 @@ public class AMLoginContext {
             logFailedError = null;
             authContext.setLoginException(new AuthLoginException(
             bundleName, "loginFailed", null, e));
-        } catch (java.lang.Error er) {
-            debug.message(
-                "Caught java.lang.Error returned from DSAMEHandler", er);
+        } catch (DSAMECallbackHandlerError error) {
+            debug.message("Caught error returned from DSAMEHandler");
             return;
         }
         debug.message("Came to before if Failed loop");

@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.authentication.service;
 
 import java.io.IOException;
@@ -58,6 +60,8 @@ public class DSAMECallbackHandler implements CallbackHandler {
     Callback[] submitRequiredInfo = null;
     static AuthThreadManager authThreadManager ;
     String sid = null;
+    private static final DSAMECallbackHandlerError HANDLER_ERROR =
+            new DSAMECallbackHandlerError("return from DSAMECallback");
 
     /**
      * Creates <code>DSAMECallbackHandler</code> object and it associates 
@@ -138,7 +142,7 @@ public class DSAMECallbackHandler implements CallbackHandler {
                     setPageTimeout(callbacks);
                     loginState.setReceivedCallback_NoThread(callbacks) ;
                     debug.message("Set callbacks, throwing java.lang.Error.");
-                    throw new java.lang.Error("return from DSAMECallback");
+                    throw HANDLER_ERROR;
                 }
              }
 
@@ -230,4 +234,20 @@ public class DSAMECallbackHandler implements CallbackHandler {
         }
     }
 
+    /**
+     * This error is used to control the authentication processing: if there is a problem while processing the
+     * callbacks this error prevents the auth framework consider this error as an authentication module failure.
+     */
+    public static class DSAMECallbackHandlerError extends Error {
+
+        public DSAMECallbackHandlerError(String message) {
+            super(message);
+        }
+
+        @Override
+        public synchronized Throwable fillInStackTrace() {
+            //As this is an expected error that's used for flow control, we do not need to populate the stacktrace.
+            return this;
+        }
+    }
 }
