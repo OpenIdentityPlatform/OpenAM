@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.iplanet.services.cdc.client;
@@ -61,26 +61,22 @@ import java.util.Enumeration;
 import com.sun.identity.shared.Constants;
 
 /**
- * The <code>CDCClientServlet</code> is the heart of the Cross Domain Single
- * Signon mechanism of OpenSSO in the DMZ along with the distributed
- * auth.
- * <BR><BR>
- * The following is the algorithm used by the program.
- * <BR><OL>
- *  <LI> If request does not contain SSO related cookie or policy
- *       has generated some advices then redirect request to
- *       the distributed auth service</LI>
- *  <LI> if request contains SSO related cookie and no advices
- *       <UL>
- *           <LI>Tunnel the Request to the OpenSSO</LI>
- *           <LI>send the received AuthNResponse as Form POST to the
- *               original request requested using the goto parameter in 
- *               the query string.</LI>
- *       </UL>
- *  </LI></OL>
+ * The <code>CDCClientServlet</code> is the heart of the Cross Domain Single Signon mechanism of OpenAM in the DMZ
+ * along with the distributed auth.
+ * <br/>
+ * The following is the algorithm used by the program:
+ * <ol>
+ *  <li>If request does not contain SSO related cookie or policy has generated some advices then redirect request to
+ *  the distributed auth service.</li>
+ *  <li>If request contains SSO related cookie and no advices.</li>
+ *  <ul>
+ *   <li>Tunnel the Request to OpenAM.</li>
+ *   <li>Send the received AuthNResponse as Form POST to the original request requested using the goto parameter in
+ *   the query string.</li>
+ *  </ul>
+ * </ol>
  */
-public class CDCClientServlet
-extends HttpServlet {
+public class CDCClientServlet extends HttpServlet {
     private static final ArrayList adviceParams = new ArrayList();
     private static HashSet invalidSet = new HashSet();
     private static final String LEFT_ANGLE              = "<";
@@ -123,9 +119,9 @@ extends HttpServlet {
         String invalidStrings = SystemPropertiesManager.get(
             Constants.INVALID_GOTO_STRINGS);
         if (invalidSet.isEmpty()) {
-            debug.message("CDCServlet:static block: creating invalidSet");
+            debug.message("CDCClientServlet:static block: creating invalidSet");
             if (invalidStrings == null) {
-                debug.message("CDCServlet: invalidStrings is null");
+                debug.message("CDCClientServlet: invalidStrings is null");
                 invalidSet.add(LEFT_ANGLE);
                 invalidSet.add(RIGHT_ANGLE);
                 invalidSet.add(URLENC_LEFT_ANGLE);
@@ -133,9 +129,11 @@ extends HttpServlet {
                 invalidSet.add(JAVASCRIPT);
                 invalidSet.add(URLENC_JAVASCRIPT);
             } else {
-                debug.message("CDCServlet: invalidStrings is NOT null");
+                if (debug.messageEnabled()) {
+                    debug.message("CDCClientServlet: invalidStrings is: " + invalidStrings);
+                }
                 StringTokenizer st = new StringTokenizer(invalidStrings, DELIM);
-                while ( st.hasMoreTokens()) {
+                while (st.hasMoreTokens()) {
                     invalidSet.add((String)st.nextToken());
                 }
             }
@@ -244,7 +242,10 @@ extends HttpServlet {
         // accepting invalid injected javascript.
 
         if ((gotoParameter != null ) || (targetParameter != null)) {
-            debug.message("CDCServlet:doGetPost():goto or target is not null");
+            if (debug.messageEnabled()) {
+                debug.message("CDCClientServlet:doGetPost():validating goto: " + gotoParameter
+                        + " and target: " + targetParameter);
+            }
             for (Iterator it = invalidSet.iterator(); it.hasNext();) {
                 String invalidStr = (String)it.next();
                 if ((gotoParameter != null ) &&
@@ -293,7 +294,7 @@ extends HttpServlet {
     /**
      * This the main method of this servlet which takes in the request
      * opens a URLConnection to the CDCServlet endpoint in the
-     * OpenSSO, and tunnels the request content to it.
+     * OpenAM, and tunnels the request content to it.
      * It parses the Response received and if the HTTP_STATUS is "HTTP_OK"
      * or "HTTP_MOVED_TEMP" POSTs the received Liberty Authn Response to the
      * goto URL specified in the original request.
@@ -309,13 +310,13 @@ extends HttpServlet {
             sessionServiceURL = Session.getSessionServiceURL(sessid);
         } catch (SessionException se) {
             debug.error("CDCClientServlet.sendAuthnRequest: Cannot locate"
-                +" OpenSSO instance to forward to.", se);
+                +" OpenAM instance to forward to.", se);
             showError(response,
-                "Cannot locate OpenSSO instance to forward to");
+                "Cannot locate OpenAM instance to forward to");
         }
         if (sessionServiceURL == null) {
             showError(response,
-                "Cannot locate OpenSSO instance to forward to");
+                "Cannot locate OpenAM instance to forward to");
         }
         // replace "sessionservice" by cdcservlet in obtained URL
         // we use naming so that we get the URL of the exact server
@@ -531,7 +532,7 @@ extends HttpServlet {
         StringBuilder redirectURL = new StringBuilder(100);
         StringBuilder gotoURL = new StringBuilder(100);
 
-        // Check if user has authenticated to another OpenSSO
+        // Check if user has authenticated to another OpenAM
         // instance
         String authURL = null;
         Cookie authCookie = 
@@ -747,7 +748,7 @@ extends HttpServlet {
             }
             return;
         } catch(IOException ioe){
-            debug.error("CDCServlet.sendAuthnResponse:" + ioe.getMessage());
+            debug.error("CDCClientServlet.sendAuthnResponse:" + ioe.getMessage());
         }
     }   
 }
