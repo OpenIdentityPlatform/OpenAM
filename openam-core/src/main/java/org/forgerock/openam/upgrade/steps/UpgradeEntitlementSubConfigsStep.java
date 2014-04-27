@@ -19,13 +19,10 @@ package org.forgerock.openam.upgrade.steps;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.interfaces.ISaveIndex;
-import com.sun.identity.entitlement.interfaces.ISearchIndex;
-import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.sm.SMSUtils;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
@@ -43,7 +40,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,8 +52,8 @@ import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 
 /**
  * Upgrade step is responsible for ensuring any new application types and/or applications defined in the
- * entitlement.xml are reflected within the entitlements framework. It currently does not take into account
- * modifications to existing entries, only new entries.
+ * entitlement.xml are reflected within the entitlements framework. It is also capable to update existing application
+ * types with newly added actions.
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
@@ -66,14 +62,6 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     private static final String ID = "id";
     private static final String NAME = "name";
-    private static final String ACTIONS = "actions";
-    private static final String SEARCH_INDEX = "searchIndexImpl";
-    private static final String SAVE_INDEX = "saveIndexImpl";
-    private static final String RESOURCE_COMPARATOR = "resourceComparator";
-    private static final String ENTITLEMENT_COMBINER = "entitlementCombiner";
-    private static final String RESOURCES = "resources";
-    private static final String SUBJECTS = "subjects";
-    private static final String CONDITIONS = "conditions";
     private static final String APPLICATION = "application";
     private static final String APPLICATION_TYPE = "applicationType";
     private static final String REALM = "/";
@@ -81,14 +69,17 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_REPORT = "upgrade.entitlementapps";
     private static final String AUDIT_NEW_TYPE = "upgrade.entitlement.new.type";
     private static final String AUDIT_NEW_APPLICATION = "upgrade.entitlement.new.application";
+    private static final String AUDIT_MODIFIED_TYPE = "upgrade.entitlement.modified.type";
     private static final String AUDIT_NEW_TYPE_START = "upgrade.entitlement.new.type.start";
     private static final String AUDIT_NEW_APPLICATION_START = "upgrade.entitlement.new.application.start";
+    private static final String AUDIT_MODIFIED_TYPE_START = "upgrade.entitlement.modified.type.start";
     private static final String AUDIT_UPGRADE_SUCCESS = "upgrade.success";
     private static final String AUDIT_UPGRADE_FAIL = "upgrade.failed";
 
     private final EntitlementConfiguration entitlementService;
     private final List<Node> missingTypes;
     private final List<Node> missingApps;
+    private final Map<String, Map<String, Boolean>> missingActions;
 
     @Inject
     public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
@@ -98,13 +89,15 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         this.entitlementService = entitlementService;
         missingTypes = new ArrayList<Node>();
         missingApps = new ArrayList<Node>();
+        missingActions = new HashMap<String, Map<String, Boolean>>();
     }
 
     @Override
     public void initialize() throws UpgradeException {
         DEBUG.message("Initialising the upgrade entitlement sub-config step");
 
-        final Set<String> presentTypes = extract(entitlementService.getApplicationTypes(), new TypeNameExtractor());
+        final Set<ApplicationType> existingApplicationTypes = entitlementService.getApplicationTypes();
+        final Set<String> presentTypes = extract(existingApplicationTypes, new TypeNameExtractor());
         final Set<String> presentApps = extract(entitlementService.getApplications(), new AppNameExtractor());
 
         final Document entitlementDoc = getEntitlementXML();
@@ -117,6 +110,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
             if (APPLICATION_TYPE.equals(id)) {
                 captureMissingEntry(subConfig, presentTypes, missingTypes);
+                captureMissingActions(subConfig);
             } else if (APPLICATION.equals(id)) {
                 captureMissingEntry(subConfig, presentApps, missingApps);
             }
@@ -144,9 +138,28 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         }
     }
 
+    /**
+     * Compares the provided subconfig element's action list against what is currently present in the existing
+     * application type definition and captures the missing entries.
+     *
+     * @param subConfig The new application type's XML representation.
+     */
+    private void captureMissingActions(final Node subConfig) {
+        final String name = getNodeAttributeValue(subConfig, NAME);
+        ApplicationType applicationType = getType(name);
+        if (applicationType != null) {
+            Map<String, Boolean> existingActions = applicationType.getActions();
+            Map<String, Boolean> newActions = EntitlementUtils.getActions(parseAttributeValuePairTags(subConfig));
+            if (!existingActions.equals(newActions)) {
+                newActions.keySet().removeAll(existingActions.keySet());
+                missingActions.put(name, newActions);
+            }
+        }
+    }
+
     @Override
     public boolean isApplicable() {
-        return !missingTypes.isEmpty() || !missingApps.isEmpty();
+        return !missingTypes.isEmpty() || !missingApps.isEmpty() || !missingActions.isEmpty();
     }
 
     @Override
@@ -156,6 +169,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         }
         if (!missingApps.isEmpty()) {
             addMissingApplications();
+        }
+        if (!missingActions.isEmpty()) {
+            addMissingActions();
         }
     }
 
@@ -173,15 +189,17 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             UpgradeProgress.reportStart(AUDIT_NEW_TYPE_START, name);
             keyValueMap.put(NAME, Collections.singleton(name));
 
-            final ApplicationType type = new TypeBuilder().build(keyValueMap);
 
             try {
                 DEBUG.message("Saving new entitlement application type: " + name);
-                entitlementService.storeApplicationType(type);
+                entitlementService.storeApplicationType(EntitlementUtils.createApplicationType(name, keyValueMap));
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException(eE);
+            } catch (ReflectiveOperationException roe) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(roe);
             }
         }
     }
@@ -201,22 +219,50 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             keyValueMap.put(NAME, Collections.singleton(name));
 
             final String typeName = retrieveSingleValue(APPLICATION_TYPE, keyValueMap);
-            final ApplicationType type = getType(typeName);
+            final ApplicationType applicationType = getType(typeName);
 
-            if (type == null) {
+            if (applicationType == null) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException("Unknown requested application type " + typeName);
             }
 
-            final Application application = new ApplicationBuilder(type).build(keyValueMap);
-
             try {
                 DEBUG.message("Saving new entitlement application: " + name);
-                entitlementService.storeApplication(application);
+                entitlementService.storeApplication(EntitlementUtils.createApplication(
+                        applicationType, REALM, name, keyValueMap));
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException(eE);
+            } catch (ReflectiveOperationException roe) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(roe);
+            }
+        }
+    }
+
+    /**
+     * Adds the missing actions to their corresponding application type's.
+     *
+     * @throws UpgradeException If there was an error while updating the application type.
+     */
+    private void addMissingActions() throws UpgradeException {
+        for (final Map.Entry<String, Map<String, Boolean>> entry : missingActions.entrySet()) {
+            final String name = entry.getKey();
+            final Map<String, Boolean> actions = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_TYPE_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application type " + name + " ; adding actions: " + actions);
+                }
+                final ApplicationType type = getType(name);
+                type.getActions().putAll(actions);
+                entitlementService.storeApplicationType(type);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
             }
         }
     }
@@ -253,6 +299,11 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             builder.append(delimiter);
         }
 
+        if (!missingActions.isEmpty()) {
+            builder.append(BUNDLE.getString(AUDIT_MODIFIED_TYPE));
+            builder.append(delimiter);
+        }
+
         return builder.toString();
     }
 
@@ -281,6 +332,16 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         for (final Node applicationNode : missingApps) {
             builder.append(getNodeAttributeValue(applicationNode, NAME));
             builder.append(delimiter);
+        }
+
+        if (!missingActions.isEmpty()) {
+            builder.append(BUNDLE.getString(AUDIT_MODIFIED_TYPE)).append(": ").append(delimiter);
+            for (final Map.Entry<String, Map<String, Boolean>> entry : missingActions.entrySet()) {
+                builder.append(INDENT).append(entry.getKey()).append(delimiter);
+                for (final String action : entry.getValue().keySet()) {
+                    builder.append(INDENT).append(INDENT).append(action).append(delimiter);
+                }
+            }
         }
 
         reportEntries.put("%ENTITLEMENT_DATA%", builder.toString());
@@ -378,131 +439,6 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     }
 
-    // Builds a new instance of ApplicationType from a key/value map.
-    private static class TypeBuilder implements Builder<Map<String, Set<String>>, ApplicationType> {
-
-        @Override
-        public ApplicationType build(final Map<String, Set<String>> keyValueMap) throws UpgradeException {
-
-            final String name = retrieveSingleValue(NAME, keyValueMap);
-            final Set<String> actions = retrieveValues(ACTIONS, keyValueMap);
-            final String searchIndexClass = retrieveSingleValue(SEARCH_INDEX, keyValueMap);
-            final String saveIndexClass = retrieveSingleValue(SAVE_INDEX, keyValueMap);
-            final String resourceComparatorClass = retrieveSingleValue(RESOURCE_COMPARATOR, keyValueMap);
-
-            try {
-                return new ApplicationType(name,
-                        getActions(actions),
-                        getClazz(searchIndexClass, ISearchIndex.class),
-                        getClazz(saveIndexClass, ISaveIndex.class),
-                        getClazz(resourceComparatorClass, ResourceName.class));
-
-            } catch (InstantiationException iE) {
-                throw new UpgradeException(iE);
-            } catch (IllegalAccessException iaE) {
-                throw new UpgradeException(iaE);
-            }
-        }
-
-        /**
-         * Pulls out the action values from the passed string set.
-         *
-         * @param actionStrings
-         *         action strings in the format actionName=booleanValue
-         *
-         * @return map of action/values
-         */
-        private Map<String, Boolean> getActions(final Set<String> actionStrings) {
-            final Map<String, Boolean> actions = new HashMap<String, Boolean>(actionStrings.size());
-
-            for (final String actionString : actionStrings) {
-                final String[] actionParts = actionString.split("=");
-                actions.put(actionParts[0], Boolean.valueOf(actionParts[1]));
-            }
-
-            return actions;
-        }
-
-    }
-
-    // Builds a new instance of Application from a key/value map.
-    private static class ApplicationBuilder implements Builder<Map<String, Set<String>>, Application> {
-
-        private final ApplicationType type;
-
-        public ApplicationBuilder(final ApplicationType type) {
-            this.type = type;
-        }
-
-        @Override
-        public Application build(final Map<String, Set<String>> keyValueMap) throws UpgradeException {
-            final String name = retrieveSingleValue(NAME, keyValueMap);
-            final String entitlementCombinerClass = retrieveSingleValue(ENTITLEMENT_COMBINER, keyValueMap);
-            final Set<String> resources = retrieveValues(RESOURCES, keyValueMap);
-            final Set<String> subjects = retrieveValues(SUBJECTS, keyValueMap);
-            final Set<String> conditions = retrieveValues(CONDITIONS, keyValueMap);
-            final long creationDate = new Date().getTime();
-
-            final Application application = new Application(REALM, name, type);
-            application.setEntitlementCombiner(getClazz(entitlementCombinerClass, EntitlementCombiner.class));
-            application.setResources(resources);
-            application.setSubjects(subjects);
-            application.setConditions(conditions);
-            application.setCreationDate(creationDate);
-            application.setLastModifiedDate(creationDate);
-            return application;
-        }
-    }
-
-    /**
-     * A builder knows how to build a new instance from the passed payload.
-     *
-     * @param <V>
-     *         the payload type
-     * @param <T>
-     *         the new instance type
-     */
-    private static interface Builder<V, T> {
-
-        /**
-         * Build a new instance from the payload.
-         *
-         * @param payload
-         *         the passed payload used to assist construction
-         *
-         * @return a new instance
-         *
-         * @throws UpgradeException
-         *         should the process of building a new instance fail
-         */
-        public T build(final V payload) throws UpgradeException;
-
-    }
-
-    /**
-     * Gets the class representation of the passed class name.
-     *
-     * @param className
-     *         the class name
-     * @param type
-     *         the class representation of the super type
-     * @param <T>
-     *         the class type of the super type
-     *
-     * @return a class instance representation
-     *
-     * @throws UpgradeException
-     *         should retrieving the class representation fail
-     */
-    private static <T> Class<? extends T> getClazz(final String className,
-                                                   final Class<T> type) throws UpgradeException {
-        try {
-            return Class.forName(className).asSubclass(type);
-        } catch (ClassNotFoundException cnfE) {
-            throw new UpgradeException(cnfE);
-        }
-    }
-
     /**
      * Helper method to retrieve the set of strings from the passed key/value map.
      *
@@ -535,5 +471,4 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         final Set<String> values = retrieveValues(key, keyValueMap);
         return values.isEmpty() ? null : values.iterator().next();
     }
-
 }

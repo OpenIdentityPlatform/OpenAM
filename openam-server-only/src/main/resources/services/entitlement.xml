@@ -287,6 +287,11 @@
                             <Attribute name="actions" />
                             <Value>GET=true</Value>
                             <Value>POST=true</Value>
+                            <Value>PUT=true</Value>
+                            <Value>DELETE=true</Value>
+                            <Value>HEAD=true</Value>
+                            <Value>OPTIONS=true</Value>
+                            <Value>PATCH=true</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />

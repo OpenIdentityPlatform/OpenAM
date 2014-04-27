@@ -16,9 +16,15 @@
 
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.entitlement.*;
+import com.sun.identity.entitlement.Application;
+import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.ResourceMatch;
+import com.sun.identity.entitlement.ResourceSaveIndexes;
+import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -31,7 +37,13 @@ import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -43,6 +55,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
     private static final String DETAILED_REPORT = "Entitlement Application Types and Applications Report-" +
             "-------------------------------------------------------%ENTITLEMENT_DATA%-";
+    private static final Map<String, Boolean> TYPE_ACTIONS = new HashMap<String, Boolean>();
 
     private UpgradeStep upgradeStep;
 
@@ -53,6 +66,16 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
     private ApplicationType type1;
+
+    static {
+        TYPE_ACTIONS.put("CREATE", Boolean.TRUE);
+        TYPE_ACTIONS.put("READ", Boolean.TRUE);
+        TYPE_ACTIONS.put("UPDATE", Boolean.TRUE);
+        TYPE_ACTIONS.put("DELETE", Boolean.TRUE);
+        TYPE_ACTIONS.put("PATCH", Boolean.TRUE);
+        TYPE_ACTIONS.put("ACTION", Boolean.TRUE);
+        TYPE_ACTIONS.put("QUERY", Boolean.TRUE);
+    }
 
     @BeforeMethod
     public void setUp() throws IllegalAccessException, InstantiationException {
@@ -87,14 +110,14 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         upgradeStep.initialize();
 
-        assertThat(upgradeStep.isApplicable()).isEqualTo(false);
+        assertThat(upgradeStep.isApplicable()).isFalse();
         assertThat(upgradeStep.getShortReport("-")).isEqualTo("");
         assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
                 DETAILED_REPORT.replace("%ENTITLEMENT_DATA%", ""));
 
         upgradeStep.perform();
 
-        verify(entitlementService).getApplicationTypes();
+        verify(entitlementService, atMost(2)).getApplicationTypes();
         verify(entitlementService).getApplications();
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
@@ -109,14 +132,14 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         upgradeStep.initialize();
 
-        assertThat(upgradeStep.isApplicable()).isEqualTo(true);
+        assertThat(upgradeStep.isApplicable()).isTrue();
         assertThat(upgradeStep.getShortReport("-")).isEqualTo("New entitlement application types-");
         assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
                 DETAILED_REPORT.replace("%ENTITLEMENT_DATA%", "New entitlement application types:-type4-"));
 
         upgradeStep.perform();
 
-        verify(entitlementService).getApplicationTypes();
+        verify(entitlementService, atMost(2)).getApplicationTypes();
         verify(entitlementService).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
@@ -133,7 +156,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         upgradeStep.initialize();
 
-        assertThat(upgradeStep.isApplicable()).isEqualTo(true);
+        assertThat(upgradeStep.isApplicable()).isTrue();
         assertThat(upgradeStep.getShortReport("-")).isEqualTo("New entitlement applications-");
         assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
                 DETAILED_REPORT.replace("%ENTITLEMENT_DATA%", "New entitlement applications:-application4-"));
@@ -141,7 +164,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(type1));
         upgradeStep.perform();
 
-        verify(entitlementService, atMost(2)).getApplicationTypes();
+        verify(entitlementService, atMost(3)).getApplicationTypes();
         verify(entitlementService).getApplications();
         verify(entitlementService).storeApplication(argThat(new ApplicationMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
@@ -154,7 +177,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         upgradeStep.initialize();
 
-        assertThat(upgradeStep.isApplicable()).isEqualTo(true);
+        assertThat(upgradeStep.isApplicable()).isTrue();
         assertThat(upgradeStep.getShortReport("-")).isEqualTo("New entitlement application types-" +
                 "New entitlement applications-");
         assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
@@ -164,10 +187,33 @@ public class UpgradeEntitlementSubConfigsStepTest {
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(type1));
         upgradeStep.perform();
 
-        verify(entitlementService, atMost(2)).getApplicationTypes();
+        verify(entitlementService, atMost(3)).getApplicationTypes();
         verify(entitlementService).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
         verify(entitlementService).storeApplication(argThat(new ApplicationMatch()));
+        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
+    }
+
+    @Test
+    public void modifiedApplicationType() throws Exception {
+        //application type type4 does not have the UPDATE action, so it needs to be upgraded
+        ApplicationType type = newType("type4");
+        type.getActions().remove("UPDATE");
+        mockTypes.add(type);
+        mockApplications.add(newApplication("application4", type1));
+
+        when(entitlementService.getApplicationTypes()).thenReturn(mockTypes);
+        when(entitlementService.getApplications()).thenReturn(mockApplications);
+
+        upgradeStep.initialize();
+
+        assertThat(upgradeStep.isApplicable()).isTrue();
+
+        upgradeStep.perform();
+
+        verify(entitlementService, atMost(3)).getApplicationTypes();
+        verify(entitlementService).getApplications();
+        verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
@@ -200,13 +246,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
             boolean matches = true;
             final ApplicationType type = (ApplicationType)argument;
             matches &= "type4".equals(type.getName());
-            matches &= Boolean.TRUE.equals(type.getActions().get("CREATE"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("READ"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("UPDATE"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("DELETE"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("PATCH"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("ACTION"));
-            matches &= Boolean.TRUE.equals(type.getActions().get("QUERY"));
+            matches &= TYPE_ACTIONS.equals(type.getActions());
             matches &= type.getSearchIndex() instanceof DumbSearchIndex;
             matches &= type.getSaveIndex() instanceof DumbSaveIndex;
             matches &= type.getResourceComparator() instanceof DumbResourceName;
@@ -229,8 +269,8 @@ public class UpgradeEntitlementSubConfigsStepTest {
      *         should an error occur when creating the new type
      */
     private static ApplicationType newType(final String name) throws IllegalAccessException, InstantiationException {
-        return new ApplicationType(name, Collections.singletonMap("TEST", Boolean.TRUE),
-                DumbSearchIndex.class, DumbSaveIndex.class, DumbResourceName.class);
+        return new ApplicationType(name, new HashMap<String, Boolean>(TYPE_ACTIONS), DumbSearchIndex.class,
+                DumbSaveIndex.class, DumbResourceName.class);
     }
 
     /**

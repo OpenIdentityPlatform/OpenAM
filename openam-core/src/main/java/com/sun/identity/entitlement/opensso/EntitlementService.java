@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -47,7 +47,6 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyException;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
@@ -58,7 +57,6 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,6 +66,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import javax.security.auth.Subject;
 
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+
 /**
  *
  */
@@ -76,46 +76,33 @@ public class EntitlementService extends EntitlementConfiguration {
      * Entitlement Service name.
      */
     public static final String SERVICE_NAME = "sunEntitlementService";
+    public static final String ATTR_NAME_SUBJECT_ATTR_NAMES = "subjectAttributeNames";
+    public static final String ATTR_NAME_META = "meta";
+    public static final String CONFIG_ACTIONS = "actions";
+    public static final String CONFIG_APPLICATION_DESC = "description";
+    public static final String CONFIG_APPLICATIONTYPE = "applicationType";
+    public static final String CONFIG_RESOURCES = "resources";
+    public static final String CONFIG_CONDITIONS = "conditions";
+    public static final String CONFIG_SUBJECTS = "subjects";
+    public static final String CONFIG_ENTITLEMENT_COMBINER = "entitlementCombiner";
+    public static final String CONFIG_SEARCH_INDEX_IMPL = "searchIndexImpl";
+    public static final String CONFIG_SAVE_INDEX_IMPL = "saveIndexImpl";
+    public static final String CONFIG_RESOURCE_COMP_IMPL = "resourceComparator";
+    public static final String APPLICATION_CLASSNAME = "applicationClassName";
 
-    private static final String ATTR_NAME_SUBJECT_ATTR_NAMES =
-        "subjectAttributeNames";
-    private static final String ATTR_NAME_META = "meta";
     private static final String CONFIG_APPLICATIONS = "registeredApplications";
-    private static final String CONFIG_APPLICATION_DESC = "description";
     private static final String SCHEMA_APPLICATIONS = "applications";
-    private static final String CONFIG_APPLICATIONTYPE = "applicationType";
-    private static final String CONFIG_ACTIONS = "actions";
-    private static final String CONFIG_RESOURCES = "resources";
-    private static final String CONFIG_CONDITIONS = "conditions";
-    private static final String CONFIG_SUBJECTS = "subjects";
-    private static final String CONFIG_ENTITLEMENT_COMBINER =
-        "entitlementCombiner";
-    private static final String CONFIG_SEARCH_INDEX_IMPL = "searchIndexImpl";
-    private static final String CONFIG_SAVE_INDEX_IMPL = "saveIndexImpl";
-    private static final String CONFIG_RESOURCE_COMP_IMPL = "resourceComparator";
     private static final String CONFIG_APPLICATION_TYPES = "applicationTypes";
-    private static final String CONFIG_SUBJECT_ATTRIBUTES_COLLECTORS =
-        "subjectAttributesCollectors";
-    private static final String SCHEMA_SUBJECT_ATTRIBUTES_COLLECTORS =
-        "subjectAttributesCollectors";
-    private static final String SCHEMA_OPENSSO_SUBJECT_ATTRIBUTES_COLLECTOR =
-        "OpenSSOSubjectAttributesCollector";
-    private static final String USE_NEW_CONSOLE = "usenewconsole";
-    private static final String NETWORK_MONITOR_ENABLED = 
-        "network-monitor-enabled";
-    private static final String MIGRATED_TO_ENTITLEMENT_SERVICES =
-        "migratedtoentitlementservice";
-    private static final String XACML_PRIVILEGE_ENABLED =
-        "xacml-privilege-enabled";
-    private static final String APPLICATION_CLASSNAME = "applicationClassName";
-    private static final String REALM_DN_TEMPLATE =
-         "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou=" + SERVICE_NAME +
-         ",ou=services,{1}";
+    private static final String CONFIG_SUBJECT_ATTRIBUTES_COLLECTORS = "subjectAttributesCollectors";
+    private static final String SCHEMA_SUBJECT_ATTRIBUTES_COLLECTORS = "subjectAttributesCollectors";
+    private static final String SCHEMA_OPENSSO_SUBJECT_ATTRIBUTES_COLLECTOR = "OpenSSOSubjectAttributesCollector";
+    private static final String NETWORK_MONITOR_ENABLED = "network-monitor-enabled";
+    private static final String MIGRATED_TO_ENTITLEMENT_SERVICES = "migratedtoentitlementservice";
+    private static final String XACML_PRIVILEGE_ENABLED = "xacml-privilege-enabled";
+    private static final String REALM_DN_TEMPLATE = "ou={0},ou=default,ou=OrganizationConfig,ou=1.0,ou="
+            + SERVICE_NAME + ",ou=services,{1}";
 
     private String realm;
-    private static SSOToken adminToken =
-        (SSOToken)AccessController.doPrivileged(
-        AdminTokenAction.getInstance());
 
     /**
      * Constructor.
@@ -131,11 +118,11 @@ public class EntitlementService extends EntitlementConfiguration {
      * @return set of attribute values of a given attribute name,
      */
     public Set<String> getConfiguration(String attrName) {
-        return getConfiguration(adminToken, attrName);
+        return getConfiguration(getAdminToken(), attrName);
     }
 
     public static int getConfiguration(String attrName, int defaultValue) {
-        Set<String> values = getConfiguration(adminToken, attrName);
+        Set<String> values = getConfiguration(getAdminToken(), attrName);
         if ((values == null) || values.isEmpty()) {
             return defaultValue;
         }
@@ -251,40 +238,6 @@ public class EntitlementService extends EntitlementConfiguration {
         return null;
     }
 
-    private Set<String> getActionSet(Map<String, Boolean> actions) {
-        Set<String> set = new HashSet<String>();
-        if (actions != null) {
-            for (String k : actions.keySet()) {
-                set.add(k + "=" + Boolean.toString(actions.get(k)));
-            }
-        }
-        return set;
-    }
-
-    private Map<String, Boolean> getActions(Map<String, Set<String>> data) {
-        Map<String, Boolean> results = new HashMap<String, Boolean>();
-        Set<String> actions = data.get(CONFIG_ACTIONS);
-        for (String a : actions) {
-            int index = a.indexOf('=');
-            String name = a;
-            Boolean defaultVal = Boolean.TRUE;
-
-            if (index != -1) {
-                name = a.substring(0, index);
-                defaultVal = Boolean.parseBoolean(a.substring(index+1));
-            }
-            results.put(name, defaultVal);
-        }
-        return results;
-    }
-
-    private String getAttribute(
-        Map<String, Set<String>> data,
-        String attributeName) {
-        Set<String> set = data.get(attributeName);
-        return ((set != null) && !set.isEmpty()) ? set.iterator().next() : null;
-    }
-
     private Set<String> getSet(String str) {
         Set<String> set = new HashSet<String>();
         if (str != null) {
@@ -293,30 +246,9 @@ public class EntitlementService extends EntitlementConfiguration {
         return set;
     }
 
-    private Application getRawApplication(String name) {
-        SSOToken token = getSSOToken();
-        Set<Application> applications = getRawApplications(token);
-        for (Application a : applications) {
-            if (a.getName().equals(name)) {
-                return a;
-            }
-        }
-        return null;
-    }
-
-    private Application getApplication(String name) {
-        Set<Application> applications = getApplications();
-        for (Application a : applications) {
-            if (a.getName().equals(name)) {
-                return a;
-            }
-        }
-        return null;
-    }
-
     private SSOToken getSSOToken() {
         return (getAdminSubject() == PrivilegeManager.superAdminSubject) ?
-            adminToken :
+            getAdminToken() :
             SubjectUtils.getSSOToken(getAdminSubject());
     }
 
@@ -370,7 +302,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
     private SSOToken getSSOToken(Subject subject) {
         if (subject == PrivilegeManager.superAdminSubject) {
-            return adminToken;
+            return getAdminToken();
         }
         return SubjectUtils.getSSOToken(subject);
     }
@@ -462,19 +394,6 @@ public class EntitlementService extends EntitlementConfiguration {
         return results;
     }
 
-
-    /**
-     * Returns a set of registered applications.
-     *
-     * @return a set of registered applications.
-     */
-    private Set<Application> getRawApplications(SSOToken token) {
-        if (realm.startsWith(SMSEntry.SUN_INTERNAL_REALM_PREFIX)) {
-            realm = "/";
-        }
-        return getRawApplications(token, realm);
-    }
-
     /**
      * Returns a set of registered applications.
      *
@@ -506,10 +425,10 @@ public class EntitlementService extends EntitlementConfiguration {
 
                         for (String name : names) {
                             ServiceConfig applConf = conf.getSubConfig(name);
-                            Map<String, Set<String>> data =
-                                applConf.getAttributes();
-                            Application app = createApplication(curRealm, name,
-                                data);
+                            Map<String, Set<String>> data = applConf.getAttributes();
+                            ApplicationType applicationType = ApplicationTypeManager.getAppplicationType(
+                                    getAdminSubject(), getAttribute(data, CONFIG_APPLICATIONTYPE));
+                            Application app = createApplication(applicationType, curRealm, name, data);
                             results.add(app);
                         }
                     }
@@ -539,19 +458,6 @@ public class EntitlementService extends EntitlementConfiguration {
                 "EntitlementService.getApplications", ex);
         }
         return results;
-    }
-
-    private static Class getEntitlementCombiner(String className) {
-        if (className == null) {
-            return null;
-        }
-        try {
-            return Class.forName(className);
-        } catch (ClassNotFoundException ex) {
-            PrivilegeManager.debug.error(
-                "EntitlementService.getEntitlementCombiner", ex);
-        }
-        return com.sun.identity.entitlement.DenyOverride.class;
     }
 
     /**
@@ -901,23 +807,6 @@ public class EntitlementService extends EntitlementConfiguration {
         return data;
     }
 
-    private Map<String, Integer> getResourceCount(Set<String> res) {
-        Map<String, Integer> results = new HashMap<String, Integer>();
-        for (String r : res) {
-            int idx = r.indexOf('\t');
-            if (idx != -1) {
-                try {
-                    String resource = r.substring(idx + 1);
-                    int cnt = Integer.parseInt(r.substring(0, idx));
-                    results.put(resource, cnt);
-                } catch (NumberFormatException e) {
-                    results.put(r, 1);
-                }
-            }
-        }
-        return results;
-    }
-
     private Map<String, Set<String>> getApplicationData(Application appl) {
         Set<String> resources = appl.getResources();
 
@@ -1046,113 +935,6 @@ public class EntitlementService extends EntitlementConfiguration {
             info.add("|" + data);
         }
         return info;
-    }
-
-    private ApplicationType createApplicationType(
-        String name,
-        Map<String, Set<String>> data
-    ) throws InstantiationException, IllegalAccessException {
-        Map<String, Boolean> actions = getActions(data);
-        String saveIndexImpl = getAttribute(data,
-            CONFIG_SAVE_INDEX_IMPL);
-        Class saveIndex = ApplicationTypeManager.getSaveIndex(
-            saveIndexImpl);
-        String searchIndexImpl = getAttribute(data,
-            CONFIG_SEARCH_INDEX_IMPL);
-        Class searchIndex =
-            ApplicationTypeManager.getSearchIndex(searchIndexImpl);
-        String resourceComp = getAttribute(data,
-            CONFIG_RESOURCE_COMP_IMPL);
-        Class resComp =
-            ApplicationTypeManager.getResourceComparator(resourceComp);
-        String applicationClassName = getAttribute(data,APPLICATION_CLASSNAME);
-
-        ApplicationType appType = new ApplicationType(name, actions,
-            searchIndex, saveIndex, resComp);
-        if (applicationClassName != null) {
-            appType.setApplicationClassName(applicationClassName);
-        }
-        return appType;
-    }
-    
-    private Application createApplication(
-        String realm,
-        String name,
-        Map<String, Set<String>> data
-    ) throws InstantiationException, IllegalAccessException,
-        EntitlementException {
-        String applicationType = getAttribute(data,
-            CONFIG_APPLICATIONTYPE);
-        ApplicationType appType = ApplicationTypeManager.getAppplicationType(
-            getAdminSubject(), applicationType);
-        Application app = ApplicationManager.newApplication(realm, name,
-            appType);
-
-        Map<String, Boolean> actions = getActions(data);
-        if ((actions != null) && !actions.isEmpty()) {
-            app.setActions(actions);
-        }
-
-        Set<String> resources = data.get(CONFIG_RESOURCES);
-        if (resources != null) {
-            app.setResources(resources);
-        }
-
-        String description = getAttribute(data, CONFIG_APPLICATION_DESC);
-        if (description != null) {
-            app.setDescription(description);
-        }
-
-        String entitlementCombiner = getAttribute(data,
-            CONFIG_ENTITLEMENT_COMBINER);
-        Class combiner = getEntitlementCombiner(
-            entitlementCombiner);
-        app.setEntitlementCombiner(combiner);
-
-        Set<String> conditionClassNames = data.get(
-            CONFIG_CONDITIONS);
-        if (conditionClassNames != null) {
-            app.setConditions(conditionClassNames);
-        }
-
-        Set<String> subjectClassNames = data.get(
-            CONFIG_SUBJECTS);
-        if (subjectClassNames != null) {
-            app.setSubjects(subjectClassNames);
-        }
-
-        String saveIndexImpl = getAttribute(data,
-            CONFIG_SAVE_INDEX_IMPL);
-        Class saveIndex = ApplicationTypeManager.getSaveIndex(
-            saveIndexImpl);
-        if (saveIndex != null) {
-            app.setSaveIndex(saveIndex);
-        }
-
-        String searchIndexImpl = getAttribute(data,
-            CONFIG_SEARCH_INDEX_IMPL);
-        Class searchIndex =
-            ApplicationTypeManager.getSearchIndex(searchIndexImpl);
-        if (searchIndex != null) {
-            app.setSearchIndex(searchIndex);
-        }
-
-        String resourceComp = getAttribute(data,
-            CONFIG_RESOURCE_COMP_IMPL);
-        Class resComp =
-            ApplicationTypeManager.getResourceComparator(resourceComp);
-        if (resComp != null) {
-            app.setResourceComparator(resComp);
-        }
-
-        Set<String> attributeNames = data.get(
-            ATTR_NAME_SUBJECT_ATTR_NAMES);
-        if (attributeNames != null) {
-            app.setAttributeNames(attributeNames);
-        }
-
-        app.setMetaData(data.get(ATTR_NAME_META));
-        return app;
     }
 
     /**
@@ -1369,7 +1151,7 @@ public class EntitlementService extends EntitlementConfiguration {
      */
     public boolean hasEntitlementDITs() {
         try {
-            new ServiceSchemaManager(SERVICE_NAME, adminToken);
+            new ServiceSchemaManager(SERVICE_NAME, getAdminToken());
             return true;
         } catch (SMSException ex) {
             return false;
@@ -1418,15 +1200,6 @@ public class EntitlementService extends EntitlementConfiguration {
                 : false;
     }
 
-
-    public static void useNewConsole(boolean flag) {
-        if (canSwitchToNewConsole()) {
-            Set<String> values = new HashSet<String>();
-            values.add(Boolean.toString(flag));
-            setConfiguration(adminToken, USE_NEW_CONSOLE, values);
-        }
-    }
-    
     public boolean networkMonitorEnabled() {
         if (!hasEntitlementDITs()) {
             return false;
@@ -1442,38 +1215,7 @@ public class EntitlementService extends EntitlementConfiguration {
     public void setNetworkMonitorEnabled(boolean enabled) {
         Set<String> values = new HashSet<String>();
         values.add(Boolean.toString(enabled));
-        setConfiguration(adminToken, NETWORK_MONITOR_ENABLED, values);
-    }
-
-    public static boolean canSwitchToNewConsole() {
-        try {
-            new ServiceSchemaManager(SERVICE_NAME, adminToken);
-
-            Set<String> setMigrated = getConfiguration(adminToken,
-                MIGRATED_TO_ENTITLEMENT_SERVICES);
-            String migrated = ((setMigrated != null) && !setMigrated.isEmpty())
-                ? setMigrated.iterator().next() : null;
-            return (migrated != null) ? Boolean.parseBoolean(migrated) : false;
-        } catch (SMSException ex) {
-            return false;
-        } catch (SSOException ex) {
-            return false;
-        }
-    }
-
-    public static String useNewConsole() {
-        if (!canSwitchToNewConsole()) {
-            return "";
-        }
-
-        Set<String> values = getConfiguration(adminToken, USE_NEW_CONSOLE);
-        return ((values != null) && !values.isEmpty()) ?
-            values.iterator().next() : "";
-    }
-
-    public static boolean toUseNewConsole() {
-        String val = useNewConsole();
-        return Boolean.parseBoolean(val);
+        setConfiguration(getAdminToken(), NETWORK_MONITOR_ENABLED, values);
     }
 
     public void reindexApplications() {
@@ -1490,7 +1232,7 @@ public class EntitlementService extends EntitlementConfiguration {
     public boolean doesRealmExist() {
         try {
             OrganizationConfigManager mgr = new OrganizationConfigManager(
-                adminToken, realm);
+                getAdminToken(), realm);
             return true;
         } catch (SMSException ex) {
             return false;
@@ -1503,7 +1245,7 @@ public class EntitlementService extends EntitlementConfiguration {
 
         try {
             OrganizationConfigManager mgr = new OrganizationConfigManager(
-                adminToken, realm);
+                getAdminToken(), realm);
             mgr = mgr.getParentOrgConfigManager();
             String parentRealm = DNMapper.orgNameToRealmName(
                 mgr.getOrganizationName());

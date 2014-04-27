@@ -2864,7 +2864,7 @@
                         syntax="string"
                         i18nKey="a239">
                         <DefaultValues>
-                            <Value>iPlanetAMWebAgentService|GET|allow|deny:iPlanetAMWebAgentService|POST|allow|deny</Value>
+                            <Value>iPlanetAMWebAgentService|GET|allow|deny:iPlanetAMWebAgentService|POST|allow|deny:iPlanetAMWebAgentService|PUT|allow|deny:iPlanetAMWebAgentService|DELETE|allow|deny:iPlanetAMWebAgentService|HEAD|allow|deny:iPlanetAMWebAgentService|OPTIONS|allow|deny:iPlanetAMWebAgentService|PATCH|allow|deny</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
