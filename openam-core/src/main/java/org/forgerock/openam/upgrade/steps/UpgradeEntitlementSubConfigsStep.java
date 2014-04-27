@@ -197,9 +197,12 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException(eE);
-            } catch (ReflectiveOperationException roe) {
+            } catch (InstantiationException ie) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
-                throw new UpgradeException(roe);
+                throw new UpgradeException(ie);
+            } catch (IllegalAccessException iae) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(iae);
             }
         }
     }
@@ -234,9 +237,12 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             } catch (EntitlementException eE) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
                 throw new UpgradeException(eE);
-            } catch (ReflectiveOperationException roe) {
+            } catch (InstantiationException ie) {
                 UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
-                throw new UpgradeException(roe);
+                throw new UpgradeException(ie);
+            } catch (IllegalAccessException iae) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(iae);
             }
         }
     }
