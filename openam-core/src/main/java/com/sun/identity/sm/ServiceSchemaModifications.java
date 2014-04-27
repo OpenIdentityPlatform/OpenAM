@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,8 +27,10 @@ package com.sun.identity.sm;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.xml.XMLUtils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
@@ -51,6 +53,10 @@ import org.w3c.dom.Node;
  * @author steve
  */
 public class ServiceSchemaModifications {
+
+    private static final List<String> SCHEMA_TYPES = Arrays.asList(new String[]{SMSUtils.GLOBAL_SCHEMA,
+        SMSUtils.ORG_SCHEMA, SMSUtils.DYNAMIC_SCHEMA, SMSUtils.USER_SCHEMA, SMSUtils.GROUP_SCHEMA,
+        SMSUtils.DOMAIN_SCHEMA, SMSUtils.POLICY_SCHEMA});
     protected String serviceName = null;
     protected Document serviceSchemaDoc = null;
     protected SSOToken adminToken = null;
@@ -141,29 +147,11 @@ public class ServiceSchemaModifications {
     private static Map<String, ServiceSchemaImpl> getAttributes(Document document) {
         Map<String, ServiceSchemaImpl> schemas = new HashMap<String, ServiceSchemaImpl>();
         Node schemaRoot = XMLUtils.getRootNode(document, SMSUtils.SCHEMA);
-
-        Node childNode = XMLUtils.getChildNode(schemaRoot, SMSUtils.GLOBAL_SCHEMA);
-
-        if (childNode != null) {
-            schemas.put(SMSUtils.GLOBAL_SCHEMA, new ServiceSchemaImpl(null, childNode));
-        }
-
-        childNode = XMLUtils.getChildNode(schemaRoot, SMSUtils.ORG_SCHEMA);
-
-        if (childNode != null) {
-            schemas.put(SMSUtils.ORG_SCHEMA, new ServiceSchemaImpl(null, childNode));
-        }
-
-        childNode = XMLUtils.getChildNode(schemaRoot, SMSUtils.DYNAMIC_SCHEMA);
-
-        if (childNode != null) {
-            schemas.put(SMSUtils.DYNAMIC_SCHEMA, new ServiceSchemaImpl(null, childNode));
-        }
-
-        childNode = XMLUtils.getChildNode(schemaRoot, SMSUtils.USER_SCHEMA);
-
-        if (childNode != null) {
-            schemas.put(SMSUtils.USER_SCHEMA, new ServiceSchemaImpl(null, childNode));
+        for (final String schemaType : SCHEMA_TYPES) {
+            Node childNode = XMLUtils.getChildNode(schemaRoot, schemaType);
+            if (childNode != null) {
+                schemas.put(schemaType, new ServiceSchemaImpl(childNode));
+            }
         }
 
         return schemas;

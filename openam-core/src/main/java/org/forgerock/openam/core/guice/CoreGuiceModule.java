@@ -29,6 +29,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.entitlement.EntitlementConfiguration;
+import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -82,6 +84,15 @@ public class CoreGuiceModule extends AbstractModule {
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
         bind(new TypeLiteral<TokenAdapter<JsonValue>>(){}).to(OAuthAdapter.class);
+
+        bind(EntitlementConfiguration.class).toProvider(new Provider<EntitlementConfiguration>() {
+
+            @Override
+            public EntitlementConfiguration get() {
+                return EntitlementConfiguration.getInstance(SubjectUtils.createSuperAdminSubject(), "/");
+            }
+
+        }).in(Singleton.class);
 
         /**
          * Configuration data for Data Layer LDAP connections.
