@@ -53,6 +53,7 @@ public class EntitlementException extends Exception {
     public static final int SESSION_HAS_EXPIRED = 10;
     public static final int INVALID_JSON = 11;
     public static final int MISSING_PRIVILEGE_NAME = 12;
+    public static final int POLICY_NAME_MISMATCH = 13;
 
     public static final int UNABLE_TO_SERIALIZE_OBJECT = 200;
     public static final int NO_SUCH_POLICY = 203;

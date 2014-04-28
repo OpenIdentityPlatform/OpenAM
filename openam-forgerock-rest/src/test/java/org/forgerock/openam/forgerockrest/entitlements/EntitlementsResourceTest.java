@@ -33,6 +33,8 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.guice.ForgerockRestGuiceModule;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -52,11 +54,21 @@ import static org.mockito.Mockito.verify;
 @SuppressWarnings("unchecked")
 public class EntitlementsResourceTest {
 
+    @Mock
     private PolicyParser mockParser;
+
+    @Mock
     private PolicyStoreProvider mockStoreProvider;
+
+    @Mock
     private PolicyStore mockStore;
+
     private ResourceErrorHandler resourceErrorHandler;
+
+    @Mock
     private ServerContext mockServerContext;
+
+    @Mock
     private ResultHandler<Resource> mockResultHandler;
 
     private EntitlementsResource entitlementsResource;
@@ -73,11 +85,7 @@ public class EntitlementsResourceTest {
 
     @BeforeMethod
     public void setupMocks() throws Exception {
-        mockParser = mock(PolicyParser.class);
-        mockStoreProvider = mock(PolicyStoreProvider.class);
-        mockStore = mock(PolicyStore.class);
-        mockServerContext = mock(ServerContext.class);
-        mockResultHandler = mock(ResultHandler.class);
+        MockitoAnnotations.initMocks(this);
 
         given(mockStoreProvider.getPolicyStore(any(ServerContext.class))).willReturn(mockStore);
 
@@ -136,6 +144,86 @@ public class EntitlementsResourceTest {
 
         // Then
         verify(mockResultHandler).handleError(isA(InternalServerErrorException.class));
+    }
+
+    @Test
+    public void shouldAcceptPolicyNameFromUrl() throws Exception {
+        // Given
+        String policyName = "policyName";
+        JsonValue json = new JsonValue("");
+
+        CreateRequest request = mockCreateRequest(policyName, json);
+        Privilege policy = mockPrivilege(policyName, 123l);
+        given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
+
+        // When
+        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+
+        // Then
+        verify(mockParser).parsePolicy(policyName, json);
+    }
+
+    @Test
+    public void shouldAcceptPolicyNameFromJson() throws Exception {
+        // Given
+        String policyName = "policyName";
+        // Specify policy name in JSON rather than in request URL:
+        JsonValue json = JsonValue.json(JsonValue.object(JsonValue.field("name", policyName)));
+
+        CreateRequest request = mockCreateRequest(null, json);
+        Privilege policy = mockPrivilege(policyName, 123l);
+        given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
+
+        // When
+        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+
+        // Then
+        verify(mockParser).parsePolicy(policyName, json);
+    }
+
+    @Test
+    public void shouldAcceptConsistentPolicyNamesFromURLandJSON() throws Exception {
+        // Given
+        String policyName = "policyName";
+        // Policy name can be specified in *both* URL and JSON so long as it is equal
+        JsonValue json = JsonValue.json(JsonValue.object(JsonValue.field("name", policyName)));
+
+        CreateRequest request = mockCreateRequest(policyName, json);
+        Privilege policy = mockPrivilege(policyName, 123l);
+        given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
+
+        // When
+        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+
+        // Then
+        verify(mockParser).parsePolicy(policyName, json);
+    }
+
+    @Test
+    public void shouldRejectMismatchedPolicyName() throws Exception {
+        // Given
+        String policyName = "policyName";
+        JsonValue json = JsonValue.json(JsonValue.object(JsonValue.field("name", policyName)));
+        CreateRequest request = mockCreateRequest("Different!", json);
+
+        // When
+        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+
+        // Then
+        verify(mockResultHandler).handleError(isA(BadRequestException.class));
+    }
+
+    @Test
+    public void shouldRejectUnspecifiedPolicyName() throws Exception {
+        // Given
+        JsonValue json = new JsonValue("");
+        CreateRequest request = mockCreateRequest(null, json);
+
+        // When
+        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+
+        // Then
+        verify(mockResultHandler).handleError(isA(BadRequestException.class));
     }
 
     @Test

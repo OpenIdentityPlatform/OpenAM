@@ -36,9 +36,10 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
-
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
@@ -95,12 +96,40 @@ public final class EntitlementsResource implements CollectionResourceProvider {
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         try {
-            Privilege policy = policyParser.parsePolicy(request.getNewResourceId(), request.getContent());
+            Privilege policy = policyParser.parsePolicy(determineNewPolicyName(request), request.getContent());
             policyStoreProvider.getPolicyStore(context).create(policy);
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
+    }
+
+    /**
+     * Determines the policy name to use for a new policy based on either the name specified in the URL (for PUT
+     * requests) or the name specified in the JSON body (for POST requests). If neither is specified then an error is
+     * raised as we do not support auto-generating policy names. If both are specified, and they are different, then
+     * an error is raised indicating client confusion.
+     *
+     * @param request the create request for the policy.
+     * @return the name to use for the new policy.
+     * @throws EntitlementException if the name cannot be determined from the request.
+     */
+    private String determineNewPolicyName(CreateRequest request) throws EntitlementException {
+
+        String requestPolicyName = request.getNewResourceId();
+        String jsonPolicyName = request.getContent().get("name").asString();
+
+        if (isNotBlank(requestPolicyName) && isNotBlank(jsonPolicyName) && !requestPolicyName.equals(jsonPolicyName)) {
+            throw new EntitlementException(EntitlementException.POLICY_NAME_MISMATCH);
+        }
+
+        String policyName = isNotBlank(requestPolicyName) ? requestPolicyName : jsonPolicyName;
+
+        if (isBlank(policyName)) {
+            throw new EntitlementException(EntitlementException.MISSING_PRIVILEGE_NAME);
+        }
+
+        return policyName;
     }
 
     /**
