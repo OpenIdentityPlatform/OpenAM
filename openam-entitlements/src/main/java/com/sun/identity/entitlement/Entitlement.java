@@ -851,6 +851,12 @@ public class Entitlement {
     ) throws EntitlementException {
         if ((resourceNames != null) && !resourceNames.isEmpty()) {
             Application app = getApplication(adminSubject, realm);
+
+            if (app == null) {
+                throw new EntitlementException(EntitlementException.NO_SUCH_APPLICATION,
+                        new Object[] { applicationName });
+            }
+
             for (String r : resourceNames) {
                 ValidateResourceResult result = app.validateResourceName(r);
                 if (!result.isValid()) {

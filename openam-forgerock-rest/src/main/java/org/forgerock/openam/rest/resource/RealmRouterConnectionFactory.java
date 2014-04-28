@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.resource;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -38,6 +39,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Map;
 
@@ -50,6 +52,11 @@ import java.util.Map;
 public class RealmRouterConnectionFactory {
 
     public static final String CONNECTION_FACTORY_NAME = "CrestRealmRouter";
+
+    /**
+     * Debug logger for reporting any uncaught exceptions.
+     */
+    private final Debug debug;
 
     private final Map<String, CollectionResourceProvider> collectionResourceEndpoints;
     private final Map<String, SingletonResourceProvider> singletonResourceEndpoints;
@@ -65,10 +72,12 @@ public class RealmRouterConnectionFactory {
     @Inject
     public RealmRouterConnectionFactory(final Map<String, CollectionResourceProvider> collectionResourceEndpoints,
             final Map<String, SingletonResourceProvider> singletonResourceEndpoints,
-            final RestRealmValidator realmValidator) {
+            final RestRealmValidator realmValidator,
+            final @Named("frRest") Debug debug) {
         this.collectionResourceEndpoints = collectionResourceEndpoints;
         this.singletonResourceEndpoints = singletonResourceEndpoints;
         this.realmValidator = realmValidator;
+        this.debug = debug;
     }
 
     /**
@@ -104,7 +113,11 @@ public class RealmRouterConnectionFactory {
              */
             public void actionCollection(ServerContext context, ActionRequest request,
                     ResultHandler<JsonValue> handler) {
-                provider.actionCollection(realmContext(context, realm), request, handler);
+                try {
+                    provider.actionCollection(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
@@ -112,14 +125,22 @@ public class RealmRouterConnectionFactory {
              */
             public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
                     ResultHandler<JsonValue> handler) {
-                provider.actionInstance(realmContext(context, realm), resourceId, request, handler);
+                try {
+                    provider.actionInstance(realmContext(context, realm), resourceId, request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-                provider.createInstance(realmContext(context, realm), request, handler);
+                try {
+                    provider.createInstance(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
@@ -127,7 +148,11 @@ public class RealmRouterConnectionFactory {
              */
             public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                     ResultHandler<Resource> handler) {
-                provider.deleteInstance(realmContext(context, realm), resourceId, request, handler);
+                try {
+                    provider.deleteInstance(realmContext(context, realm), resourceId, request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
@@ -135,14 +160,22 @@ public class RealmRouterConnectionFactory {
              */
             public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                     ResultHandler<Resource> handler) {
-                provider.patchInstance(realmContext(context, realm), resourceId, request, handler);
+                try {
+                    provider.patchInstance(realmContext(context, realm), resourceId, request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-                provider.queryCollection(realmContext(context, realm), request, handler);
+                try {
+                    provider.queryCollection(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
@@ -150,7 +183,11 @@ public class RealmRouterConnectionFactory {
              */
             public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                     ResultHandler<Resource> handler) {
-                provider.readInstance(realmContext(context, realm), resourceId, request, handler);
+                try {
+                    provider.readInstance(realmContext(context, realm), resourceId, request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
@@ -158,7 +195,11 @@ public class RealmRouterConnectionFactory {
              */
             public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                     ResultHandler<Resource> handler) {
-                provider.updateInstance(realmContext(context, realm), resourceId, request, handler);
+                try {
+                    provider.updateInstance(realmContext(context, realm), resourceId, request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
         };
     }
@@ -189,28 +230,44 @@ public class RealmRouterConnectionFactory {
              * {@inheritDoc}
              */
             public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-                provider.actionInstance(realmContext(context, realm), request, handler);
+                try {
+                    provider.actionInstance(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void patchInstance(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-                provider.patchInstance(realmContext(context, realm), request, handler);
+                try {
+                    provider.patchInstance(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void readInstance(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
-                provider.readInstance(realmContext(context, realm), request, handler);
+                try {
+                    provider.readInstance(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
 
             /**
              * {@inheritDoc}
              */
             public void updateInstance(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-                provider.updateInstance(realmContext(context, realm), request, handler);
+                try {
+                    provider.updateInstance(realmContext(context, realm), request, handler);
+                } catch (RuntimeException ex) {
+                    handleUncaughtException(ex);
+                }
             }
         };
     }
@@ -324,5 +381,18 @@ public class RealmRouterConnectionFactory {
                 return realmRouter(realm);
             }
         };
+    }
+
+    /**
+     * Handles any uncaught exceptions in the web service layer by logging them to the debug logger and then re-throwing
+     * them up to the CREST layer for reporting to the end user.
+     *
+     * @param ex the uncaught exception.
+     */
+    private void handleUncaughtException(RuntimeException ex) {
+        if (debug.errorEnabled()) {
+            debug.error("Uncaught exception reached CREST layer: " + ex, ex);
+        }
+        throw ex;
     }
 }

@@ -32,6 +32,8 @@ package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.debug.Debug;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
@@ -50,6 +52,8 @@ import javax.security.auth.Subject;
  * for each realm.
  */
 public final class ApplicationManager {
+    private static final Debug DEBUG = Debug.getInstance("Entitlement");
+
     private static Map<String, Set<Application>> applications =
         new ConcurrentHashMap<String, Set<Application>>();
     private static final ReentrantReadWriteLock readWriteLock =
@@ -242,9 +246,14 @@ public final class ApplicationManager {
             appls = ec.getApplications();
             applications.put(realm, appls);
 
-            ReferredApplicationManager mgr =
-                ReferredApplicationManager.getInstance();
-            appls.addAll(mgr.getReferredApplications(realm));
+            ReferredApplicationManager mgr = ReferredApplicationManager.getInstance();
+            Set<ReferredApplication> referredApplications = mgr.getReferredApplications(realm);
+
+            if (!"/".equals(realm) && (referredApplications == null || referredApplications.isEmpty())) {
+                DEBUG.warning("No referred applications for sub-realm: " + realm);
+            }
+
+            appls.addAll(referredApplications);
             return appls;
         } finally {
             readWriteLock.writeLock().unlock();

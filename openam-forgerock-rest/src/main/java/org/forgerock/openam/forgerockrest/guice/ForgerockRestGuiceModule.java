@@ -27,6 +27,7 @@ import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResourceErrorHandler;
 import org.forgerock.openam.forgerockrest.entitlements.JsonPolicyParser;
@@ -42,6 +43,8 @@ import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.util.SignatureUtil;
 
 import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,6 +85,18 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(EntitlementsResourceErrorHandler.RESOURCE_ERROR_MAPPING))
                 .toProvider(EntitlementsResourceErrorMappingProvider.class)
                 .asEagerSingleton();
+
+        // Error code overrides for particular request types. Maps NOT FOUND errors on Create requests to BAD REQUESTs.
+        final Map<RequestType, Map<Integer, Integer>> errorCodeOverrides =
+                new EnumMap<RequestType, Map<Integer, Integer>>(RequestType.class);
+        errorCodeOverrides.put(RequestType.CREATE,
+                Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
+
+        bind(new TypeLiteral<Map<RequestType, Map<Integer, Integer>>>() {})
+                .annotatedWith(Names.named(EntitlementsResourceErrorHandler.REQUEST_TYPE_ERROR_OVERRIDES))
+                .toInstance(errorCodeOverrides);
+
+
         bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
                 .annotatedWith(Names.named(PrivilegePolicyStoreProvider.POLICY_QUERY_ATTRIBUTES))
                 .toProvider(PolicyQueryAttributesMapProvider.class)
@@ -143,6 +158,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.JSON_PARSE_ERROR,             ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.AUTHENTICATION_ERROR,         ResourceException.FORBIDDEN);
             handlers.put(EntitlementException.INVALID_VALUE,                ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.POLICY_NAME_MISMATCH,         ResourceException.BAD_REQUEST);
 
 
             return handlers;

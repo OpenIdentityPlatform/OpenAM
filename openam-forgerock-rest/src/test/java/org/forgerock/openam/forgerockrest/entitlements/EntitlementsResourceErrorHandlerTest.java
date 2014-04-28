@@ -17,12 +17,17 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.Request;
+import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -61,6 +66,28 @@ public class EntitlementsResourceErrorHandlerTest {
         assertThat(result).isInstanceOf(InternalServerErrorException.class)
                 .hasMessage(ERROR_MESSAGE);
 
+    }
+
+    @Test
+    public void shouldApplyRequestTypeOverrides() {
+        // Given
+        Map<RequestType, Map<Integer, Integer>> overrides = new HashMap<RequestType, Map<Integer, Integer>>();
+        RequestType requestType = RequestType.CREATE;
+        overrides.put(requestType, Collections.singletonMap(ResourceException.NOT_FOUND, ResourceException.BAD_REQUEST));
+        EntitlementsResourceErrorHandler errorHandler = new EntitlementsResourceErrorHandler(
+                Collections.singletonMap(ERROR_CODE, ResourceException.NOT_FOUND),
+                overrides
+        );
+        EntitlementException error = exception(ERROR_CODE, ERROR_MESSAGE);
+        Request request = mock(Request.class);
+        given(request.getRequestType()).willReturn(requestType);
+
+        // When
+        ResourceException result = errorHandler.handleError(request, error);
+
+        // Then
+        assertThat(result).isInstanceOf(BadRequestException.class)
+                          .hasMessage(ERROR_MESSAGE);
     }
 
     private EntitlementException exception(int code, String message) {
