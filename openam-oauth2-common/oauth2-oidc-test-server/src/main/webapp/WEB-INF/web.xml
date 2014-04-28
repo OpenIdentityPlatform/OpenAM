@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>OAuth2 OpenID Connect Provider</display-name>
+
+    <servlet>
+        <servlet-name>LoginJsp</servlet-name>
+        <jsp-file>/login.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LoginJsp</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OAuth2Login</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.server.AuthenticateApplication</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OAuth2Login</servlet-name>
+        <url-pattern>/authenticate/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OAuth2RestletAdapter</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.openidconnect.restlet.OpenIdConnectApplication</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>RIAP CLAP</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>org.restlet.autoWire</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OAuth2RestletAdapter</servlet-name>
+        <url-pattern>/provider/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>WebFinger</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.openidconnect.restlet.WebFinger</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>RIAP CLAP</param-value>
+        </init-param>
+
+        <init-param>
+            <param-name>org.restlet.autoWire</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>WebFinger</servlet-name>
+        <url-pattern>/.well-known/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- TODO these JSPs are OpenAM specific still -->
+    <!--<servlet>-->
+        <!--<servlet-name>OAuth2RegisterClient</servlet-name>-->
+        <!--<jsp-file>/oauth2/registerClient.jsp</jsp-file>-->
+    <!--</servlet>-->
+
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>OAuth2RegisterClient</servlet-name>-->
+        <!--<url-pattern>/oauth2/registerClient.jsp</url-pattern>-->
+    <!--</servlet-mapping>-->
+
+    <!--<servlet>-->
+        <!--<servlet-name>OAuth2ConnectCheckSession</servlet-name>-->
+        <!--<jsp-file>/oauth2/checkSession.jsp</jsp-file>-->
+    <!--</servlet>-->
+
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>OAuth2ConnectCheckSession</servlet-name>-->
+        <!--<url-pattern>/oauth2/connect/checkSession</url-pattern>-->
+    <!--</servlet-mapping>-->
+
+    <servlet>
+        <servlet-name>OAuth2Rest</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openidconnect.admin.RestConnectionManager</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OAuth2Provider</servlet-name>
+        <url-pattern>/json/server/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>OAuth2Provider</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.server.ConfigurationResource</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>OAuth2Rest</servlet-name>
+        <url-pattern>/json/admin/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

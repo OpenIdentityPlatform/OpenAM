@@ -21,83 +21,89 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Represents a clients registration details on the OAuth2 Provider.
+ * Models a client registration in the OAuth2 provider.
  *
  * @since 12.0.0
  */
 public interface ClientRegistration {
 
     /**
-     * Whether the client is registered as a confidential or public client.
+     * Gets the registered redirect uris for the client.
+     *
+     * @return The redirect uris.
+     */
+    Set<URI> getRedirectUris();
+
+    /**
+     * Gets the allowed response types.
+     *
+     * @return The allowed response types.
+     */
+    Set<String> getAllowedResponseTypes();
+
+    /**
+     * Gets the client's identifier.
+     *
+     * @return The client's id.
+     */
+    String getClientId();
+
+    /**
+     * Gets the type of access token the client requires.
+     *
+     * @return The access token type.
+     */
+    String getAccessTokenType();
+
+    /**
+     * Gets the display name of the client in the specified locale.
+     *
+     * @param locale The locale.
+     * @return The display name.
+     */
+    String getDisplayName(String locale);
+
+    /**
+     * Gets the display description of the client in the specified locale.
+     *
+     * @param locale The locale.
+     * @return The display description.
+     */
+    String getDisplayDescription(String locale);
+
+    /**
+     * Gets the display descriptions for the allowed scopes, in the specified locale.
+     *
+     * @param locale The locale.
+     * @return The allowed scope descriptions.
+     */
+    Map<String, String> getAllowedScopeDescriptions(String locale);
+
+    /**
+     * Gets the default scopes configured for the client.
+     *
+     * @return The default scopes.
+     */
+    Set<String> getDefaultScopes();
+
+    /**
+     * Gets the allowed scopes configured for the client.
+     *
+     * @return The allowed scopes.
+     */
+    Set<String> getAllowedScopes();
+
+    /**
+     * Gets whether the client is confidential or not.
      *
      * @return {@code true} if the client is confidential.
      */
     boolean isConfidential();
 
     /**
-     * The client's identifier.
+     * Gets the client's session URI.
      *
-     * @return The client's identifier.
+     * @return The client's session URI.
      */
-    String getClientId();
-
-    /**
-     * The scopes that have been configured as allowed for the client.
-     *
-     * @return The client's allowed scopes.
-     */
-    Set<String> getAllowedScopes();
-
-    /**
-     * A {@code Map<String, String>} of the client's allowed scopes mapped to their descriptions in the specified
-     * locale.
-     *
-     * @param locale The locale the scope descriptions should be returned in.
-     * @return The Client's allowed scopes and their description.
-     */
-    Map<String, String> getAllowedScopeDescriptions(final String locale);
-
-    /**
-     * The scopes that have been configured as default for the client.
-     *
-     * @return The client's default scopes.
-     */
-    Set<String> getDefaultScopes();
-
-    /**
-     * The redirect uris that have been registered for the client.
-     *
-     * @return A {@code Set<URI>} of client redirect uris
-     */
-    Set<URI> getRedirectUris();
-
-    /**
-     * The response types that have been configured as allowed for the client.
-     *
-     * @return The client's allowed response types.
-     */
-    Set<String> getAllowedResponseTypes();
-
-    /**
-     * The displayable name of the client.
-     *
-     * @param locale The locale the display name should be returned in.
-     * @return The client's display name.
-     */
-    String getDisplayName(final String locale);
-
-    /**
-     * The displayable description of the client.
-     *
-     * @param locale The locale the display description should be returned in.
-     * @return The client's display description.
-     */
-    String getDisplayDescription(final String locale);
-
-    /**
-     * The type of access token the client registration has requested, (i.e. Bearer).
-     *
-     * @return The type of access token.
-     */
-    String getAccessTokenType();
+    String getClientSessionURI();
 }

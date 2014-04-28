@@ -16,27 +16,21 @@
 
 package org.forgerock.oauth2.core;
 
-import java.util.Map;
-
 /**
- * Allows for a layer of abstraction between the OAuth2 process and the OAuth2 Provider implementation.
+ * A factory for creating/retrieving OAuth2ProviderSettings instances.
  * <br/>
- * This allows for multiple OAuth2 Provider Settings to be configured for a single OAuth2 Provider server.
- * For example, OpenAM allows a OAuth2 Provider per realm.
- * <br/>
- * The OAuth2 Provider will implement this interface and use the context map to return/create the appropriate
- * OAuth2 Provider Settings instance.
+ * It is up to the implementation to provide caching of OAuth2ProviderSettings instance if it wants to supported
+ * multiple OAuth2 providers.
  *
  * @since 12.0.0
  */
 public interface OAuth2ProviderSettingsFactory {
 
     /**
-     * Gets the OAuth2 Provider Settings instance based on the content of the specified context map.
+     * Gets a OAuth2ProviderSettings instance.
      *
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return The OAuth2 Provider Settings instance.
+     * @param request The OAuth2 request.
+     * @return A OAuth2ProviderSettings instance.
      */
-    OAuth2ProviderSettings getProviderSettings(final Map<String, Object> context);
+    OAuth2ProviderSettings get(final OAuth2Request request);
 }

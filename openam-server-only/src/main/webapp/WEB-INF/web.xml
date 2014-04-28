@@ -1076,7 +1076,7 @@
         <!-- Your application class name (Optional - For mode 3) -->
         <init-param>
             <param-name>org.restlet.application</param-name>
-            <param-value>org.forgerock.openam.oauth2.OAuth2Application</param-value>
+            <param-value>org.forgerock.openidconnect.restlet.OpenIdConnectApplication</param-value>
         </init-param>
 
         <!-- List of supported client protocols (Optional - Only in mode 3) -->
@@ -1090,11 +1090,6 @@
             <param-name>org.restlet.autoWire</param-name>
             <param-value>true</param-value>
         </init-param>
-
-        <init-param>
-            <param-name>oauth2-configuration-factory-class</param-name>
-            <param-value>org.forgerock.openam.oauth2.OpenAMOAuth2ConfigurationFactory</param-value>
-        </init-param>
     </servlet>
 
     <servlet>
@@ -1104,7 +1099,7 @@
         <!-- Your application class name (Optional - For mode 3) -->
         <init-param>
             <param-name>org.restlet.application</param-name>
-            <param-value>org.forgerock.openam.WebFinger</param-value>
+            <param-value>org.forgerock.openidconnect.restlet.WebFinger</param-value>
         </init-param>
 
         <!-- List of supported client protocols (Optional - Only in mode 3) -->

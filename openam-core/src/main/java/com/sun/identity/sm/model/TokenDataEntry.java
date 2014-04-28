@@ -18,7 +18,7 @@ package com.sun.identity.sm.model;
 
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.fluent.JsonValue;
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 

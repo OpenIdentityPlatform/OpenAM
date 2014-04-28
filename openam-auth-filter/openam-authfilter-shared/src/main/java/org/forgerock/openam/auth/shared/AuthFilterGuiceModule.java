@@ -23,10 +23,10 @@ import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.oauth2.ext.cts.repo.DefaultOAuthTokenStoreImpl;
-import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.OpenAMTokenStore;
 import org.forgerock.openam.utils.Config;
 
 /**
@@ -68,13 +68,13 @@ public class AuthFilterGuiceModule extends AbstractModule {
                 }
             }
         });
-        bind(new TypeLiteral<Config<OAuth2TokenStore>>() {}).toInstance(new Config<OAuth2TokenStore>() {
+        bind(new TypeLiteral<Config<TokenStore>>() {}).toInstance(new Config<TokenStore>() {
             public boolean isReady() {
                 return true;
             }
 
-            public OAuth2TokenStore get() {
-                return InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
+            public TokenStore get() {
+                return InjectorHolder.getInstance(OpenAMTokenStore.class);
             }
         });
     }

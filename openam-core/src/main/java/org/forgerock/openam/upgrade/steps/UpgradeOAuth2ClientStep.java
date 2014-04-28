@@ -19,12 +19,16 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.idm.IdConstants;
-import static com.sun.identity.shared.OAuth2Constants.OAuth2Client.*;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
 
+import javax.inject.Inject;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -35,16 +39,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.DEFAULT_SCOPES;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.DESCRIPTION;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.NAME;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.REDIRECT_URI;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.SCOPES;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-
-import javax.inject.Inject;
-
-import static org.forgerock.openam.upgrade.steps.AbstractUpgradeStep.DEBUG;
 
 /**
  * This upgrade step discovers first OAuth2 Client profiles available in OpenAM (across the different realms), and then

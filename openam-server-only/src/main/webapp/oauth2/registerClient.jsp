@@ -1,4 +1,4 @@
-<%@ page import="com.sun.identity.shared.OAuth2Constants" %>
+<%@ page import="org.forgerock.oauth2.core.OAuth2Constants" %>
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
 <%@ page import="com.iplanet.sso.SSOTokenManager" %>
 <%@ page import="com.iplanet.sso.SSOToken" %>

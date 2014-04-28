@@ -18,10 +18,13 @@ package org.forgerock.openam.authz.modules;
 
 import org.forgerock.authz.modules.oauth2.AccessTokenValidationResponse;
 import org.forgerock.authz.modules.oauth2.OAuth2Exception;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.openidconnect.UserInfoService;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.utils.Config;
+import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,12 +32,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 /**
  * @since 12.0.0
@@ -43,21 +46,21 @@ public class OpenAMOAuth2AccessTokenValidatorTest {
 
     private OpenAMOAuth2AccessTokenValidator accessTokenValidator;
 
-    private OAuth2TokenStore tokenStore;
-    private OAuth2UserInfoService userInfoService;
+    private TokenStore tokenStore;
+    private UserInfoService userInfoService;
 
     @BeforeMethod
     public void setUp() {
 
-        tokenStore = mock(OAuth2TokenStore.class);
-        userInfoService = mock(OAuth2UserInfoService.class);
+        tokenStore = mock(TokenStore.class);
+        userInfoService = mock(UserInfoService.class);
 
-        Config<OAuth2TokenStore> tokenStoreConfig = new Config<OAuth2TokenStore>() {
+        Config<TokenStore> tokenStoreConfig = new Config<TokenStore>() {
             public boolean isReady() {
                 return true;
             }
 
-            public OAuth2TokenStore get() {
+            public TokenStore get() {
                 return tokenStore;
             }
         };
@@ -65,33 +68,20 @@ public class OpenAMOAuth2AccessTokenValidatorTest {
         accessTokenValidator = new OpenAMOAuth2AccessTokenValidator(tokenStoreConfig, userInfoService);
     }
 
-    @Test (expectedExceptions = OAuth2Exception.class)
-    public void shouldThrowOAuth2ExceptionWhenOAuthProblemExceptionCaught() throws OAuth2Exception {
-
-        //Given
-        OAuthProblemException exception = mock(OAuthProblemException.class);
-        given(exception.getDescription()).willReturn("DESCRIPTION");
-        doThrow(exception).when(tokenStore).readAccessToken("ACCESS_TOKEN");
-
-        //When
-        accessTokenValidator.validate("ACCESS_TOKEN");
-
-        //Then
-        fail();
-    }
-
     @Test
-    public void shouldReturnValidResponseWhenTokenIsNotExpired() throws OAuth2Exception {
+    public void shouldReturnValidResponseWhenTokenIsNotExpired() throws OAuth2Exception,
+            org.forgerock.oauth2.core.exceptions.OAuth2Exception {
 
         //Given
-        CoreToken token = mock(CoreToken.class);
+        AccessToken accessToken = mock(AccessToken.class);
         Map<String, Object> userInfo = Collections.emptyMap();
         Set<String> scope = Collections.emptySet();
 
-        given(tokenStore.readAccessToken("ACCESS_TOKEN")).willReturn(token);
-        given(token.getExpireTime()).willReturn(System.currentTimeMillis() + 1000);
-        given(userInfoService.getUserInfo(token)).willReturn(userInfo);
-        given(token.getScope()).willReturn(scope);
+        given(tokenStore.readAccessToken("ACCESS_TOKEN")).willReturn(accessToken);
+        given(accessToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 1000);
+        given(userInfoService.getUserInfo(eq("ACCESS_TOKEN"), Matchers.<OAuth2Request>anyObject()))
+                .willReturn(new JsonValue(userInfo));
+        given(accessToken.getScope()).willReturn(scope);
 
         //When
         AccessTokenValidationResponse validationResponse = accessTokenValidator.validate("ACCESS_TOKEN");
@@ -103,17 +93,19 @@ public class OpenAMOAuth2AccessTokenValidatorTest {
     }
 
     @Test
-    public void shouldReturnInvalidResponseWhenTokenIsExpired() throws OAuth2Exception {
+    public void shouldReturnInvalidResponseWhenTokenIsExpired() throws OAuth2Exception,
+            org.forgerock.oauth2.core.exceptions.OAuth2Exception {
 
         //Given
-        CoreToken token = mock(CoreToken.class);
+        AccessToken accessToken = mock(AccessToken.class);
         Map<String, Object> userInfo = Collections.emptyMap();
         Set<String> scope = Collections.emptySet();
 
-        given(tokenStore.readAccessToken("ACCESS_TOKEN")).willReturn(token);
-        given(token.getExpireTime()).willReturn(System.currentTimeMillis() - 1000);
-        given(userInfoService.getUserInfo(token)).willReturn(userInfo);
-        given(token.getScope()).willReturn(scope);
+        given(tokenStore.readAccessToken("ACCESS_TOKEN")).willReturn(accessToken);
+        given(accessToken.getExpiryTime()).willReturn(System.currentTimeMillis() - 1000);
+        given(userInfoService.getUserInfo(eq("ACCESS_TOKEN"), Matchers.<OAuth2Request>anyObject()))
+                .willReturn(new JsonValue(userInfo));
+        given(accessToken.getScope()).willReturn(scope);
 
         //When
         AccessTokenValidationResponse validationResponse = accessTokenValidator.validate("ACCESS_TOKEN");

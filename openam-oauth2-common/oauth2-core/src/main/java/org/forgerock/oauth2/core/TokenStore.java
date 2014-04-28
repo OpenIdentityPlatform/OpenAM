@@ -16,10 +16,12 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.json.fluent.JsonValue;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,36 +34,54 @@ import java.util.Set;
 public interface TokenStore {
 
     /**
+     * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
+     *
+     * @param scope The requested scope.
+     * @param resourceOwnerId The resource owner's id.
+     * @param clientId The client's id.
+     * @param redirectUri The redirect uri.
+     * @param nonce The nonce.
+     * @param request The OAuth2 request.
+     * @return An AuthorizationCode.
+     * @throws ServerException If any internal server error occurs.
+     */
+    AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
+            String redirectUri, String nonce, OAuth2Request request) throws ServerException;
+
+    /**
      * Creates an Access Token and stores it in the OAuth2 Provider's store.
      *
-     * @param grantType The OAuth2 Grant Type.
-     * @param resourceOwnerId The resource owner's identifier.
-     * @param client The client registration.
+     * @param grantType The grant type.
+     * @param accessTokenType The access token type.
+     * @param authorizationCode The authorization code.
+     * @param resourceOwnerId The resource owner's id.
+     * @param clientId The client's id.
+     * @param redirectUri The redirect uri.
      * @param scope The requested scope.
      * @param refreshToken The refresh token. May be {@code null}.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
+     * @param nonce The nonce.
+     * @param request The OAuth2 request.
      * @return An Access Token.
+     * @throws ServerException If any internal server error occurs.
      */
-    AccessToken createAccessToken(final GrantType grantType, final String resourceOwnerId,
-            final ClientRegistration client, final Set<String> scope, final RefreshToken refreshToken,
-            final Map<String, Object> context);
+    AccessToken createAccessToken(String grantType, String accessTokenType, String authorizationCode,
+            String resourceOwnerId, String clientId, String redirectUri, Set<String> scope, RefreshToken refreshToken,
+            String nonce, OAuth2Request request) throws ServerException;
 
     /**
      * Creates a Refresh Token and stores it in the OAuth2 Provider's store.
      *
      * @param grantType The OAuth2 Grant Type.
-     * @param clientRegistration The client registration.
-     * @param resourceOwnerId The resource owner's identifier.
-     * @param redirectUri The requested redirect uri.
+     * @param clientId The client's id.
+     * @param resourceOwnerId The resource owner's id.
+     * @param redirectUri The redirect uri.
      * @param scope The requested scope.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return A RefreshToken.
+     * @param request The OAuth2 request.
+     * @return A RefreshToken
+     * @throws ServerException If any internal server error occurs.
      */
-    RefreshToken createRefreshToken(final GrantType grantType, final ClientRegistration clientRegistration,
-            final String resourceOwnerId, final String redirectUri, final Set<String> scope,
-            final Map<String, Object> context);
+    RefreshToken createRefreshToken(String grantType, String clientId, String resourceOwnerId, String redirectUri,
+            Set<String> scope, OAuth2Request request) throws ServerException;
 
     /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
@@ -69,22 +89,23 @@ public interface TokenStore {
      * @param code The authorization code identifier.
      * @return The Authorization Code.
      * @throws InvalidGrantException If a problem occurs whilst retrieving the Authorization Code.
+     * @throws ServerException If any internal server error occurs.
      */
-    AuthorizationCode getAuthorizationCode(final String code) throws InvalidGrantException;
+    AuthorizationCode readAuthorizationCode(String code) throws InvalidGrantException, ServerException;
 
     /**
      * Updates an Authorization Code.
      *
      * @param authorizationCode The authorization code.
      */
-    void updateAuthorizationCode(final AuthorizationCode authorizationCode);
+    void updateAuthorizationCode(AuthorizationCode authorizationCode);
 
     /**
      * Deletes an Authorization Code from the OAuth2 Provider's store.
      *
      * @param authorizationCode The authorization code.
      */
-    void deleteAuthorizationCode(final String authorizationCode);
+    void deleteAuthorizationCode(String authorizationCode);
 
     /**
      * Queries the OAuth2 Provider's store for a specified token.
@@ -92,21 +113,21 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return A {@link JsonValue} containing the token.
      */
-    JsonValue queryForToken(final String tokenId);
+    JsonValue queryForToken(String tokenId) throws InvalidRequestException;
 
     /**
      * Deletes an Access Token from the OAuth2 Provider's store.
      *
      * @param accessTokenId The access token identifier.
      */
-    void deleteAccessToken(final String accessTokenId);
+    void deleteAccessToken(String accessTokenId) throws ServerException;
 
     /**
      * Deletes a Refresh Token from the OAuth2 Provider's store.
      *
      * @param refreshTokenId The refresh token identifier.
      */
-    void deleteRefreshToken(final String refreshTokenId);
+    void deleteRefreshToken(String refreshTokenId) throws InvalidRequestException;
 
     /**
      * Reads an Access Token from the OAuth2 Provider's store with the specified identifier.
@@ -114,7 +135,7 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Access Token.
      */
-    AccessToken readAccessToken(final String tokenId);
+    AccessToken readAccessToken(String tokenId) throws ServerException, BadRequestException;
 
     /**
      * Reads a Refresh Token from the OAuth2 Provider's store with the specified identifier.
@@ -122,5 +143,5 @@ public interface TokenStore {
      * @param tokenId The token identifier.
      * @return The Refresh Token.
      */
-    RefreshToken readRefreshToken(final String tokenId);
+    RefreshToken readRefreshToken(String tokenId) throws BadRequestException, InvalidRequestException;
 }

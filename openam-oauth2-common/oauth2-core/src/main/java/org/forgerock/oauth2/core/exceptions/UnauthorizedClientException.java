@@ -17,18 +17,25 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the client authorization fails.
+ * Thrown when client authorization fails.
  *
  * @since 12.0.0
  */
 public class UnauthorizedClientException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with the specified detail message.
-     *
-     * @param message The detail message.
+     * Constructs a new UnauthorizedClientException with the default message.
      */
-    public UnauthorizedClientException(final String message) {
-        super(message);
+    public UnauthorizedClientException() {
+        this("The client is not authorized to request an authorization code using this method.");
+    }
+
+    /**
+     * Constructs a new UnauthorizedClientException with the specified message.
+     *
+     * @param message The reason for the exception.
+     */
+    public UnauthorizedClientException(String message) {
+        super(400, "unauthorized_client", message);
     }
 }

@@ -17,17 +17,17 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the request requires the resource owner
- * to be involved, yet the OpenID prompt has been sent to force no interaction by the resource owner.
+ * Thrown when the OpenID connect prompt parameter enforces that the resource owner is not asked to authenticate, but
+ * the resource owner does not have a current authenticated session.
  *
  * @since 12.0.0
  */
 public class InteractionRequiredException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new InteractionRequiredException with the default message.
      */
     public InteractionRequiredException() {
-        super();
+        super(400, "interaction_required", "The request requires some interaction that is not allowed.");
     }
 }

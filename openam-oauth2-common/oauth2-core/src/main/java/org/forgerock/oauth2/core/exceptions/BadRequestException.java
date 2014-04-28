@@ -17,18 +17,18 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the request is malformed.
+ * Thrown when the request is malformed.
  *
  * @since 12.0.0
  */
 public class BadRequestException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Constructs a new BadRequestException with the specified message.
      *
-     * @param message The detail message.
+     * @param message The reason for the exception.
      */
     public BadRequestException(final String message) {
-        super(message);
+        super(400, "bad_request", message);
     }
 }

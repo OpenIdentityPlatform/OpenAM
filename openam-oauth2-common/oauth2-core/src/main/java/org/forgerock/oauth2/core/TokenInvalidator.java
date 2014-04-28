@@ -17,6 +17,8 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -38,7 +40,7 @@ public class TokenInvalidator {
      * @param tokenStore An instance of the TokenStore.
      */
     @Inject
-    public TokenInvalidator(final TokenStore tokenStore) {
+    public TokenInvalidator(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
 
@@ -48,7 +50,7 @@ public class TokenInvalidator {
      * @param tokenId The token identifier of the token to invalidate.
      */
     @SuppressWarnings("unchecked")
-    public void invalidateTokens(final String tokenId) {
+    public void invalidateTokens(String tokenId) throws InvalidRequestException, ServerException {
 
         JsonValue token = tokenStore.queryForToken(tokenId);
 
@@ -84,7 +86,7 @@ public class TokenInvalidator {
      * @param type The type of token.
      * @param id The token's identifier.
      */
-    private void deleteToken(final String type, final String id) {
+    private void deleteToken(String type, String id) throws ServerException, InvalidRequestException {
         if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
             tokenStore.deleteAccessToken(id);
         } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)) {

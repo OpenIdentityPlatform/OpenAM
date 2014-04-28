@@ -11,95 +11,49 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ServerException;
+
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Implements the common methods and attributes of all standard OAuth 2 tokens.
+ * Models a OAuth2 token.
  *
- * @since 11.0.0
+ * @since 12.0.0
  */
 public interface Token {
 
     /**
-     * Get the string representation of the identifier of this token.
+     * Gets the token's identifier.
      *
-     * @return The unique identifier of the represented token.
+     * @return The token's id.
+     * @throws ServerException If any internal server error occurs.
      */
-    public String getTokenID();
+    String getTokenId() throws ServerException;
 
     /**
-     * Get tokens UserID.
+     * Gets the token's name.
      *
-     * @return The ID of user.
+     * @return The token's name.
      */
-    public String getUserID();
+    String getTokenName();
 
     /**
-     * Get Tokens Realm.
+     * Converts the token into a {@code Map} of its key data.
      *
-     * @return The realm.
+     * @return A {@code Map} of the token's key data.
+     * @throws ServerException If any internal server error occurs.
      */
-    public String getRealm();
+    Map<String, Object> toMap() throws ServerException;
 
     /**
-     * Gets the tokens scope.
+     * Gets the token's information.
      *
-     * @return Set of strings that are the tokens scope.
+     * @return A {@code Map} of the token's information.
      */
-    public Set<String> getScope();
-
-    /**
-     * Get the exact expiration time in POSIX format.
-     *
-     * @return long representation of the maximum valid date.
-     */
-    public long getExpireTime();
-
-    /**
-     * Checks if token is expired.
-     *
-     * @return true if expired, false if not expired.
-     */
-    public boolean isExpired();
-
-    /**
-     * Returns the token type.
-     *
-     * @return The type of token. For example "BearerToken".
-     */
-    public String getTokenType();
-
-    /**
-     * Returns the name of the token.
-     *
-     * @return The name of token. Will be either access_token, code, refresh_token.
-     */
-    public String getTokenName();
-
-    /**
-     * Returns the client_id associated token.
-     *
-     * @return The client_id associated with token.
-     */
-    public String getClientID();
-
-    /**
-     * Converts the token to Map.
-     *
-     * @return new Map representation of this AccessToken.
-     */
-    public Map<String, Object> convertToMap();
-
-    /**
-     * Gets information about the token for the tokeninfo end point.
-     *
-     * @return The token info.
-     */
-    public Map<String, Object> getTokenInfo();
+    Map<String, Object> getTokenInfo();
 }

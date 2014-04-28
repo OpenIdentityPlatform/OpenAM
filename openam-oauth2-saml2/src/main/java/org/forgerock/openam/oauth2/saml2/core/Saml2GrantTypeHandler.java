@@ -27,16 +27,22 @@ import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
 import com.sun.identity.saml2.common.SAML2Exception;
 import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.ClientAuthenticator;
-import org.forgerock.oauth2.core.ClientCredentials;
 import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.GrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.ScopeValidator;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.util.Reject;
 import org.forgerock.util.encode.Base64;
+import org.restlet.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,35 +51,39 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
+import static org.forgerock.oauth2.core.Utils.splitScope;
 
 /**
  * @since 12.0.0
  */
-public class Saml2GrantTypeHandler implements GrantTypeHandler<Saml2AccessTokenRequest> {
+public class Saml2GrantTypeHandler implements GrantTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final ClientAuthenticator clientAuthenticator;
-    private final ScopeValidator scopeValidator;
+    private final ClientRegistrationStore clientRegistrationStore;
     private final TokenStore tokenStore;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     @Inject
-    public Saml2GrantTypeHandler(final ClientAuthenticator clientAuthenticator, final ScopeValidator scopeValidator,
-            final TokenStore tokenStore) {
-        this.clientAuthenticator = clientAuthenticator;
-        this.scopeValidator = scopeValidator;
+    public Saml2GrantTypeHandler(ClientRegistrationStore clientRegistrationStore, TokenStore tokenStore,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        this.clientRegistrationStore = clientRegistrationStore;
         this.tokenStore = tokenStore;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
-    public AccessToken handle(final Saml2AccessTokenRequest accessTokenRequest) throws InvalidGrantException,
-            InvalidClientException {
+    public AccessToken handle(OAuth2Request request) throws InvalidGrantException, InvalidClientException,
+            ClientAuthenticationFailedException, InvalidRequestException, ServerException {
 
-        final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
+        String clientId = request.getParameter("client_id");
+        Reject.ifTrue(isEmpty(clientId), "Missing parameter, 'client_id'");
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientCredentials,
-                accessTokenRequest.getContext());
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
 
-        final String assertion = accessTokenRequest.getAssertion();
+        Reject.ifTrue(isEmpty(request.<String>getParameter("assertion")), "Missing parameter, 'assertion'");
+
+        final String assertion = request.getParameter(OAuth2Constants.SAML20.ASSERTION);
         logger.trace("Assertion:\n" + assertion);
 
         final byte[] decodedAssertion = Base64.decode(assertion.replace(" ", "+"));
@@ -88,10 +98,10 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler<Saml2AccessTokenR
         try {
             final AssertionFactory factory = AssertionFactory.getInstance();
             assertionObject = factory.createAssertion(finalAssertion);
-            valid = validAssertion(assertionObject, (String) accessTokenRequest.getContext().get("deploymentURL"));
+            valid = validAssertion(assertionObject, getDeploymentUrl(request));
         } catch (SAML2Exception e) {
             logger.error("Error parsing assertion", e);
-            throw new InvalidGrantException("Assertion is invalid", e);
+            throw new InvalidGrantException("Assertion is invalid");
         }
 
         if (!valid) {
@@ -101,19 +111,21 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler<Saml2AccessTokenR
 
         logger.trace("Assertion is valid");
 
-        final Set<String> scope = accessTokenRequest.getScope();
-        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope,
-                accessTokenRequest.getContext());
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final String grantType = request.getParameter("grant_type");
+        final Set<String> scope = splitScope(request.<String>getParameter("scope"));
+        final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
+                request);
         logger.trace("Granting scope: " + validatedScope.toString());
 
         logger.trace("Creating token with data: " + clientRegistration.getAccessTokenType() + "\n"
-                + validatedScope.toString() + "\n" + accessTokenRequest.getContext().get("realm") + "\n"
+                + validatedScope.toString() + "\n" + normaliseRealm(request.<String>getParameter("realm")) + "\n"
                 + assertionObject.getSubject().getNameID().getValue() + "\n" + clientRegistration.getClientId());
 
-        final AccessToken accessToken = tokenStore.createAccessToken(accessTokenRequest.getGrantType(),
-                assertionObject.getSubject().getNameID().getValue(), clientRegistration, validatedScope, null,
-                accessTokenRequest.getContext());
-        logger.trace("Token created: " + accessToken.getCoreToken().toString());
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
+                assertionObject.getSubject().getNameID().getValue(), clientRegistration.getClientId(), null,
+                validatedScope, null, null, request);
+        logger.trace("Token created: " + accessToken.toString());
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
             accessToken.add("scope", joinScope(validatedScope));
@@ -122,7 +134,19 @@ public class Saml2GrantTypeHandler implements GrantTypeHandler<Saml2AccessTokenR
         return accessToken;
     }
 
-    private boolean validAssertion(final Assertion assertion, final String deploymentURL) throws SAML2Exception {
+    private String getDeploymentUrl(OAuth2Request request) {
+        final Request req = request.getRequest();
+        return req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
+    }
+
+    private String normaliseRealm(String realm) {
+        if (realm == null) {
+            return "/";
+        }
+        return realm;
+    }
+
+    private boolean validAssertion(Assertion assertion, String deploymentURL) throws SAML2Exception {
         //must contain issuer
         final Issuer issuer = assertion.getIssuer();
         if (issuer == null) {

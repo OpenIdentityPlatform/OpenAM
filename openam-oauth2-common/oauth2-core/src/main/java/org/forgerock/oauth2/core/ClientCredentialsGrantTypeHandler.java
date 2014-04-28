@@ -16,79 +16,77 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest;
-
 /**
- * Handles the OAuth2 Client Credentials grant type for the 'token' endpoint.
+ * Implementation of the GrantTypeHandler for the OAuth2 Client Credentials grant.
  *
  * @since 12.0.0
  */
-public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler<ClientCredentialsAccessTokenRequest> {
+@Singleton
+public class ClientCredentialsGrantTypeHandler implements GrantTypeHandler {
 
-    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final ClientAuthenticator clientAuthenticator;
-    private final ScopeValidator scopeValidator;
+    private final List<ClientCredentialsRequestValidator> requestValidators;
     private final TokenStore tokenStore;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new ClientCredentialsGrantTypeHandler.
      *
      * @param clientAuthenticator An instance of the ClientAuthenticator.
-     * @param scopeValidator An instance of the ScopeValidator.
+     * @param requestValidators A {@code List} of ClientCredentialsRequestValidators.
      * @param tokenStore An instance of the TokenStore.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      */
     @Inject
-    public ClientCredentialsGrantTypeHandler(final ClientAuthenticator clientAuthenticator,
-            final ScopeValidator scopeValidator, final TokenStore tokenStore) {
+    public ClientCredentialsGrantTypeHandler(ClientAuthenticator clientAuthenticator,
+            List<ClientCredentialsRequestValidator> requestValidators, TokenStore tokenStore,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.clientAuthenticator = clientAuthenticator;
-        this.scopeValidator = scopeValidator;
+        this.requestValidators = requestValidators;
         this.tokenStore = tokenStore;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
-     * Handles the OAuth2 request for the Client Credentials grant type.
-     *
-     * @param accessTokenRequest {@inheritDoc}
-     * @return {@inheritDoc}
-     * @throws InvalidClientException If the client's registration could not be found.
-     * @throws UnauthorizedClientException If the client is not confidential.
+     * {@inheritDoc}
      */
-    public AccessToken handle(final ClientCredentialsAccessTokenRequest accessTokenRequest)
-            throws InvalidClientException, UnauthorizedClientException {
+    public AccessToken handle(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
+            InvalidRequestException, ServerException, UnauthorizedClientException {
 
-        final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientCredentials,
-                accessTokenRequest.getContext());
-
-        if (!clientRegistration.isConfidential()) {
-            logger.error("Client is not confidential. Public clients cannot use the client credentials grant.");
-            throw new UnauthorizedClientException("Public clients can't use client credentials grant.");
+        for (final ClientCredentialsRequestValidator requestValidator : requestValidators) {
+            requestValidator.validateRequest(request, clientRegistration);
         }
 
-        final Set<String> scope = accessTokenRequest.getScope();
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
+        final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope,
+                request);
+        final String grantType = request.getParameter("grant_type");
 
-        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope,
-                accessTokenRequest.getContext());
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
+                clientRegistration.getClientId(), clientRegistration.getClientId(), null, validatedScope, null, null,
+                request);
 
-        final AccessToken accessToken = tokenStore.createAccessToken(accessTokenRequest.getGrantType(),
-                clientRegistration.getClientId(), clientRegistration, validatedScope, null,
-                accessTokenRequest.getContext());
-
-        scopeValidator.addAdditionalDataToReturnFromTokenEndpoint(accessToken, accessTokenRequest.getContext());
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", Utils.joinScope(validatedScope));
+            accessToken.addExtraData("scope", Utils.joinScope(validatedScope));
         }
 
         return accessToken;
+
     }
 }

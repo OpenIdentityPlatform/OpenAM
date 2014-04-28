@@ -35,6 +35,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -83,7 +84,8 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class),
+                mock(OAuth2AuditLogger.class)));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -113,7 +115,8 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class),
+                mock(OAuth2AuditLogger.class)));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);

@@ -38,11 +38,11 @@
     <name>OpenAM OAuth2</name>
     <description>OpenAM OAuth2 integration</description>
 
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
-
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openid-connect-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>oauth2-restlet</artifactId>

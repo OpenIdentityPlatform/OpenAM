@@ -16,73 +16,98 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface for performing validation on the requested scope at both the OAuth2 authorize and token endpoints.
+ * Provided as extension points to allow the OAuth2 provider to customise the requested scope of authorize,
+ * access token and refresh token requests and to allow the OAuth2 provider to return additional data from these
+ * endpoints as well.
  *
  * @since 12.0.0
  */
 public interface ScopeValidator {
 
     /**
-     * Validates at the 'token' endpoint that the scope requested is valid and allowed.
+     * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when authorization
+     * is requested.
      *
-     * @param clientRegistration The client's registration.
+     * @param clientRegistration The client registration.
      * @param scope The requested scope.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return A {@code Set<String>} of the validated and allowed scopes.
+     * @return The updated scope used in the remaining OAuth2 process.
      */
-    Set<String> validateAccessTokenScope(final ClientRegistration clientRegistration, final Set<String> scope,
-            final Map<String, Object> context);
+    Set<String> validateAuthorizationScope(ClientRegistration clientRegistration, Set<String> scope);
 
     /**
-     * Extension point to allow additional data to be added to the access token before it is sent back to the client.
+     * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when an access token
+     * is requested.
      *
-     * @param accessToken The access token.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     */
-    void addAdditionalDataToReturnFromTokenEndpoint(final AccessToken accessToken, final Map<String, Object> context);
-
-    /**
-     * Validates at the 'authorize' endpoint that the scope requested is valid and allowed.
-     *
-     * @param clientRegistration The client's registration.
+     * @param clientRegistration The client registration.
      * @param scope The requested scope.
-     * @return A {@code Set<String>} of the validated and allowed scopes.
+     * @param request The OAuth2 request.
+     * @return The updated scope used in the remaining OAuth2 process.
      */
-    Set<String> validateAuthorizationScope(final ClientRegistration clientRegistration, final Set<String> scope);
+    Set<String> validateAccessTokenScope(ClientRegistration clientRegistration, Set<String> scope,
+            OAuth2Request request);
 
     /**
-     * Extension point to allow additional data to be returned so that it is added to the response from the 'authorize'
-     * endpoint.
+     * Provided as an extension point to allow the OAuth2 provider to customise the scope requested when a refresh token
+     * is requested.
      *
-     * @param tokens The tokens that will be returned.
-     * @return A {@code Map<String, String>} of additional data to be returned from the 'authorize' endpoint.
+     * @param clientRegistration The client registration.
+     * @param requestedScope The requested scope.
+     * @param tokenScope The scope from the access token.
+     * @param request The OAuth2 request.
+     * @return The updated scope used in the remaining OAuth2 process.
      */
-    Map<String, String> addAdditionalDataToReturnFromAuthorizeEndpoint(final Map<String, CoreToken> tokens);
+    Set<String> validateRefreshTokenScope(ClientRegistration clientRegistration, Set<String> requestedScope,
+            Set<String> tokenScope, OAuth2Request request);
 
     /**
-     * Gets resource owner's, for whom the access token was issued on behalf of, information.
+     * Gets the resource owners information based on an issued access token.
      *
      * @param token The access token.
+     * @param request The OAuth2 request.
      * @return A {@code Map<String, Object>} of the resource owner's information.
+     * @throws UnauthorizedClientException If the client's authorization fails.
      */
-    Map<String, Object> getUserInfo(final AccessToken token);
+    Map<String, Object> getUserInfo(AccessToken token, OAuth2Request request) throws UnauthorizedClientException;
 
     /**
-     * Validates that the refresh token request's requested scope requested is valid and allowed.
+     * Gets the specified access token's information.
      *
-     * @param clientRegistration The client's registration.
-     * @param requestedScope The requested scope.
-     * @param tokenScope The scope on the refresh token.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return A {@code Set<String>} of the validated and allowed scopes.
+     * @param accessToken The access token.
+     * @return A {@code Map<String, Object>} of the access token's information.
      */
-    Set<String> validateRefreshTokenScope(final ClientRegistration clientRegistration, final Set<String> requestedScope,
-            final Set<String> tokenScope, final Map<String, Object> context);
+    Map<String, Object> evaluateScope(AccessToken accessToken);
+
+    /**
+     * Provided as an extension point to allow the OAuth2 provider to return additional data from an authorization
+     * request.
+     *
+     * @param tokens The tokens that will be returned from the authorization call.
+     * @param request The OAuth2 request.
+     * @return A {@code Map<String, String>} of the additional data to return.
+     */
+    Map<String, String> additionalDataToReturnFromAuthorizeEndpoint(Map<String, Token> tokens, OAuth2Request request);
+
+    /**
+     * Provided as an extension point to allow the OAuth2 provider to return additional data from an access token
+     * request.
+     * <br/>
+     * Any additional data to be returned should be added to the access token by invoking,
+     * AccessToken#addExtraData(String, String).
+     *
+     * @param accessToken The access token.
+     * @param request The OAuth2 request.
+     * @throws ServerException If any internal server error occurs.
+     * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
+     *          authenticated.
+     */
+    void additionalDataToReturnFromTokenEndpoint(AccessToken accessToken, OAuth2Request request) throws ServerException,
+            InvalidClientException;
 }

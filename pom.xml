@@ -690,7 +690,17 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openid-connect-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>oauth2-restlet</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openid-connect-restlet</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1604,11 +1614,10 @@
                 <groupId>com.google.inject.extensions</groupId>
                 <artifactId>guice-assistedinject</artifactId>
                 <version>${guice.version}</version>
-                <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
                 <exclusions>
                     <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
+                        <groupId>com.google.inject</groupId>
+                        <artifactId>guice</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

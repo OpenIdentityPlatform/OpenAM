@@ -17,19 +17,18 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the authorization code on the request
- * is not valid (i.e. expired).
+ * Thrown when an expired authorization code is used to request an access token.
  *
  * @since 12.0.0
  */
 public class InvalidCodeException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Constructs a new InvalidCodeException with the specified message.
      *
-     * @param message The detail message.
+     * @param message The reason for the exception.
      */
     public InvalidCodeException(final String message) {
-        super(message);
+        super(400, "invalid_code", message);
     }
 }

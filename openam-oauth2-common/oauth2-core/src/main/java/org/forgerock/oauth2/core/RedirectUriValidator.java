@@ -24,24 +24,24 @@ import java.net.URI;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 
 /**
- * Validates OAuth2 Redirect URIs.
+ * Validates that the redirect uri on the request matches against the client's registered redirect uris.
  *
  * @since 12.0.0
  */
 public class RedirectUriValidator {
 
     /**
-     * Validates a OAuth2 redirect URI against pre-registered redirect URIs for the client.
+     * Validates that the requested redirect uri matches against one of the pre-registered redirect uris on the
+     * client's registration.
      *
      * @param clientRegistration The client's registration.
-     * @param redirectUri The redirect URI to validate.
-     * @throws InvalidRequestException If the redirect URI is empty and the client does not have just a single redirect
-     * URI registered.
-     * @throws RedirectUriMismatchException If the redirect URI does not match, exactly, on of the client's registered
-     * redirect URIs or the redirect URI is not absoulte or contains a fragment.
+     * @param redirectUri The redirect uri.
+     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
+     * @throws RedirectUriMismatchException If the redirect uri on the request does not match the redirect uri
+     *          registered for the client.
      */
-    public void validate(final ClientRegistration clientRegistration, final String redirectUri)
-            throws InvalidRequestException, RedirectUriMismatchException {
+    public void validate(ClientRegistration clientRegistration, String redirectUri) throws InvalidRequestException,
+            RedirectUriMismatchException {
 
         if (isEmpty(redirectUri)) {
             if (clientRegistration.getRedirectUris().size() == 1) {

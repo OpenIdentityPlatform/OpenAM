@@ -32,8 +32,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -53,9 +52,11 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.oauth2.IdentityManager;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.oauth2.ext.cts.repo.OAuthTokenStore;
-import org.forgerock.openam.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuthTokenStore;
 
 import javax.inject.Inject;
 import java.security.AccessController;
@@ -65,7 +66,7 @@ import java.util.Set;
 
 public class TokenResource implements CollectionResourceProvider {
 
-    private OAuthTokenStore oAuthTokenStore;
+    private OAuthTokenStore tokenStore;
 
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
@@ -77,9 +78,12 @@ public class TokenResource implements CollectionResourceProvider {
         }
     }
 
+    private final IdentityManager identityManager;
+
     @Inject
-    public TokenResource(OAuthTokenStore oAuthTokenStore) {
-        this.oAuthTokenStore = oAuthTokenStore;
+    public TokenResource(final OAuthTokenStore tokenStore, final IdentityManager identityManager) {
+        this.tokenStore = tokenStore;
+        this.identityManager = identityManager;
     }
 
     @Override
@@ -115,7 +119,7 @@ public class TokenResource implements CollectionResourceProvider {
 
         	JsonValue response = null;
             try {
-            	response = oAuthTokenStore.read(resourceId);
+            	response = tokenStore.read(resourceId);
                 if (response == null){
                     throw new NotFoundException("Token Not Found", null);
                 }
@@ -135,16 +139,16 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 
                 if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS)) {
-                    oAuthTokenStore.delete(resourceId);
+                    tokenStore.delete(resourceId);
                 } else {
                     Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
                     String realm = null;
                     if (realms != null && !realms.isEmpty()){
                         realm = realms.iterator().next();
                     }
-                    AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+                    AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                     if (uid.equals(uid2) || uid.equals(adminUserId)) {
-                        oAuthTokenStore.delete(resourceId);
+                        tokenStore.delete(resourceId);
                     } else {
                         throw new PermanentException(401, "Unauthorized", null);
                     }
@@ -163,6 +167,8 @@ public class TokenResource implements CollectionResourceProvider {
             handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         } catch (IdRepoException e){
             handler.handleError(new PermanentException(401, "Unauthorized" ,e));
+        } catch (UnauthorizedClientException e) {
+            handler.handleError(new PermanentException(401, "Unauthorized", e));
         }
     }
 
@@ -206,7 +212,7 @@ public class TokenResource implements CollectionResourceProvider {
                     }
                 }
 
-                response = oAuthTokenStore.query(query);
+                response = tokenStore.query(query);
             } catch (CoreTokenException e) {
                 throw new ServiceUnavailableException(e.getMessage(),e);
             }
@@ -241,7 +247,7 @@ public class TokenResource implements CollectionResourceProvider {
         	JsonValue response;
             Resource resource;
             try {
-                response = oAuthTokenStore.read(resourceId);
+                response = tokenStore.read(resourceId);
             } catch (CoreTokenException e) {
                 throw new NotFoundException("Token Not Found", e);
             }
@@ -272,7 +278,7 @@ public class TokenResource implements CollectionResourceProvider {
                 if(username == null || username.isEmpty()){
                     throw new PermanentException(404, "Not Found", null);
                 }
-                AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+                AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(adminUserId) || uid.equals(uid2)){
                     resource = new Resource(OAuth2Constants.Params.ID, "1", response);
                     handler.handleResult(resource);
@@ -286,6 +292,8 @@ public class TokenResource implements CollectionResourceProvider {
             handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         } catch (IdRepoException e){
             handler.handleError(new PermanentException(401, "Unauthorized" ,e));
+        } catch (UnauthorizedClientException e) {
+            handler.handleError(new PermanentException(401, "Unauthorized", e));
         }
     }
 
@@ -307,11 +315,11 @@ public class TokenResource implements CollectionResourceProvider {
         return RestUtils.getCookieFromServerContext(context);
     }
 
-    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
+    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException, UnauthorizedClientException {
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
-        return OAuth2Utils.getIdentity(token.getProperty("UserToken"), token.getProperty("Organization"));
+        return identityManager.getResourceOwnerIdentity(token.getProperty("UserToken"), token.getProperty("Organization"));
     }
 
 }

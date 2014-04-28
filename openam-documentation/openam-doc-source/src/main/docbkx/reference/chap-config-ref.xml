@@ -2218,9 +2218,9 @@
      >plugin-class-name</replaceable></literal>.</para>
 
      <para>Defaults:
-     <literal>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</literal>,
-     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</literal>,
-     <literal>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</literal></para>
+     <literal>code|org.forgerock.oauth2.reslet.responseTypes.CodeResponseType</literal>,
+     <literal>id_token|org.forgerock.oauth2.reslet.responseTypes.IDTokenResponseType</literal>,
+     <literal>token|org.forgerock.oauth2.reslet.responseTypes.TokenResponseType</literal></para>
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-response-type-map-class</literal></para>

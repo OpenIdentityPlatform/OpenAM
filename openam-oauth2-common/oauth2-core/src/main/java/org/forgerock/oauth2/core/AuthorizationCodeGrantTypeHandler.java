@@ -16,92 +16,80 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest;
+import static org.forgerock.oauth2.core.Utils.joinScope;
 
 /**
- * Handles the OAuth2 Authorization Code grant type for the 'token' endpoint.
+ * Implementation of the GrantTypeHandler for the OAuth2 Authorization Code grant.
  *
  * @since 12.0.0
  */
-public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler<AuthorizationCodeAccessTokenRequest> {
+@Singleton
+public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-
+    private final List<AuthorizationCodeRequestValidator> requestValidators;
     private final ClientAuthenticator clientAuthenticator;
     private final TokenStore tokenStore;
-    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private final ScopeValidator scopeValidator;
-    private final RedirectUriValidator redirectUriValidator;
     private final TokenInvalidator tokenInvalidator;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
-     * Constructs a new AuthorizationCodeGrantHandler.
+     * Constructs a new AuthorizationCodeGrantTypeHandler.
      *
+     * @param requestValidators A {@code List} of AuthorizationCodeRequestValidator.
      * @param clientAuthenticator An instance of the ClientAuthenticator.
      * @param tokenStore An instance of the TokenStore.
-     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
-     * @param scopeValidator An instance of the ScopeValidator.
-     * @param redirectUriValidator An instance of the RedirectUriValidator.
      * @param tokenInvalidator An instance of the TokenInvalidator.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      */
     @Inject
-    public AuthorizationCodeGrantTypeHandler(final ClientAuthenticator clientAuthenticator,
-            final TokenStore tokenStore, final OAuth2ProviderSettingsFactory providerSettingsFactory,
-            final ScopeValidator scopeValidator, final RedirectUriValidator redirectUriValidator,
-            final TokenInvalidator tokenInvalidator) {
+    public AuthorizationCodeGrantTypeHandler(List<AuthorizationCodeRequestValidator> requestValidators,
+            ClientAuthenticator clientAuthenticator, TokenStore tokenStore, TokenInvalidator tokenInvalidator,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
+        this.requestValidators = requestValidators;
         this.clientAuthenticator = clientAuthenticator;
         this.tokenStore = tokenStore;
-        this.providerSettingsFactory = providerSettingsFactory;
-        this.scopeValidator = scopeValidator;
-        this.redirectUriValidator = redirectUriValidator;
         this.tokenInvalidator = tokenInvalidator;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
-     * Handles the OAuth2 request for the Authorization Code grant type.
-     *
-     * @param accessTokenRequest {@inheritDoc}
-     * @return {@inheritDoc}
-     * @throws InvalidClientException If the client's registration could not be found.
-     * @throws InvalidGrantException If the authorization code not be retrieved, the authorization code is already
-     * issued, for a different client or for a different redirect uri.
-     * @throws InvalidRequestException If the authorization code could not be found or the redirect URI is not valid.
-     * @throws InvalidCodeException If the authorization code has expired.
-     * @throws RedirectUriMismatchException If the redirect URI is not valid.
+     * {@inheritDoc}
      */
-    public AccessToken handle(final AuthorizationCodeAccessTokenRequest accessTokenRequest)
-            throws InvalidClientException, InvalidGrantException, InvalidRequestException, InvalidCodeException,
-            RedirectUriMismatchException {
+    public AccessToken handle(OAuth2Request request) throws RedirectUriMismatchException, InvalidClientException,
+            InvalidRequestException, ClientAuthenticationFailedException, InvalidCodeException, InvalidGrantException,
+            ServerException {
 
-        final ClientCredentials clientCredentials = accessTokenRequest.getClientCredentials();
+        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
-        final ClientRegistration clientRegistration = clientAuthenticator.authenticate(clientCredentials,
-                accessTokenRequest.getContext());
+        for (final AuthorizationCodeRequestValidator requestValidator : requestValidators) {
+            requestValidator.validateRequest(request, clientRegistration);
+        }
 
-        final String code = accessTokenRequest.getCode();
+        final String code = request.getParameter("code");
+        final String redirectUri = request.getParameter("redirect_uri");
 
-        final AuthorizationCode authorizationCode = tokenStore.getAuthorizationCode(code);
+        final AuthorizationCode authorizationCode = tokenStore.readAuthorizationCode(code);
 
         if (authorizationCode == null) {
             logger.error("Authorization code doesn't exist, " + code);
             throw new InvalidRequestException("Authorization code doesn't exist.");
         }
-
-        final String redirectUri = accessTokenRequest.getRedirectUri();
-        redirectUriValidator.validate(clientRegistration, redirectUri);
-
-        final Set<String> scope = authorizationCode.getScope();
 
         if (authorizationCode.isIssued()) {
             tokenInvalidator.invalidateTokens(code);
@@ -118,7 +106,7 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler<Autho
 
         if (!authorizationCode.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
             logger.error("Authorization Code was issued to a different client, " + code + ". Expected, "
-                    + authorizationCode.getClientId() + ", actual, " + clientCredentials.getClientId());
+                    + authorizationCode.getClientId() + ", actual, " + clientRegistration.getClientId());
             throw new InvalidGrantException();
         }
 
@@ -127,33 +115,36 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler<Autho
             throw new InvalidCodeException("Authorization code expired.");
         }
 
+        final String grantType = request.getParameter("grant_type");
+        final Set<String> scope = authorizationCode.getScope();
         final String resourceOwnerId = authorizationCode.getResourceOwnerId();
 
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         RefreshToken refreshToken = null;
-        if (providerSettingsFactory.getProviderSettings(accessTokenRequest.getContext()).issueRefreshTokens()) {
-            refreshToken = tokenStore.createRefreshToken(accessTokenRequest.getGrantType(), clientRegistration,
-                    resourceOwnerId, redirectUri, authorizationCode.getScope(), accessTokenRequest.getContext());
+        if (providerSettings.issueRefreshTokens()) {
+            refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
+                    resourceOwnerId, redirectUri, scope, request);
         }
 
-        final AccessToken accessToken = tokenStore.createAccessToken(accessTokenRequest.getGrantType(),
-                resourceOwnerId, clientRegistration, scope, refreshToken, accessTokenRequest.getContext());
+        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", code,
+                resourceOwnerId, clientRegistration.getClientId(), redirectUri, scope, refreshToken,
+                authorizationCode.getNonce(), request);
 
         authorizationCode.setIssued();
         tokenStore.updateAuthorizationCode(authorizationCode);
 
         if (refreshToken != null) {
-            accessToken.add(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getTokenId());
+            accessToken.addExtraData("refresh_token", refreshToken.getTokenId());
         }
 
         final String nonce = authorizationCode.getNonce();
-        accessToken.add(OAuth2Constants.Custom.NONCE, nonce);
-        scopeValidator.addAdditionalDataToReturnFromTokenEndpoint(accessToken, accessTokenRequest.getContext());
+        accessToken.addExtraData("nonce", nonce);
+        providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
-        final Set<String> validatedScope = scopeValidator.validateAccessTokenScope(clientRegistration, scope,
-                accessTokenRequest.getContext());
+        final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope, request);
 
         if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.add("scope", Utils.joinScope(validatedScope));
+            accessToken.addExtraData("scope", joinScope(validatedScope));
         }
 
         return accessToken;

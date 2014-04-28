@@ -17,17 +17,16 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the request requires the resource
- * owner to login before processing can proceed.
+ * Thrown when the authentication of the resource owner fails.
  *
  * @since 12.0.0
  */
 public class LoginRequiredException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new LoginRequiredException with the default message.
      */
     public LoginRequiredException() {
-        super();
+        super(400, "login_required", "The request requires login.");
     }
 }

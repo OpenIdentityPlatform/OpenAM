@@ -21,37 +21,32 @@
 package org.forgerock.openam.oauth2.saml2.restlet;
 
 import org.forgerock.oauth2.core.AccessToken;
-import org.forgerock.oauth2.core.AccessTokenRequest;
 import org.forgerock.oauth2.core.AccessTokenService;
-import org.forgerock.oauth2.core.ClientCredentials;
-import org.forgerock.oauth2.core.ContextHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.OAuth2RequestFactory;
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
-import org.forgerock.oauth2.reslet.ClientCredentialsExtractor;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.saml2.core.Saml2AccessTokenRequest;
-import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
+import org.forgerock.oauth2.restlet.OAuth2RestletException;
+import org.restlet.Request;
+import org.restlet.engine.header.Header;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
+import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
 
-import static org.forgerock.openam.oauth2.saml2.core.Saml2AccessTokenRequest.createSaml2AccessTokenRequestBuilder;
-
 /**
  * Implements a SAML 2.0 Flow. This is an Extension grant.
  *
  * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.5">4.5.  Extension Grants</a>
  */
-public class Saml2BearerServerResource extends AbstractFlow {
+public class Saml2BearerServerResource extends ServerResource {
 
     /*
      * 2.1. Using Saml2BearerServerResource Assertions as Authorization Grants
@@ -95,55 +90,37 @@ public class Saml2BearerServerResource extends AbstractFlow {
      */
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
+
+    private final OAuth2RequestFactory<Request> requestFactory;
     private final AccessTokenService accessTokenService;
-    private final ClientCredentialsExtractor clientCredentialsExtractor;
-    private final ContextHandler contextHandler;
 
     @Inject
-    public Saml2BearerServerResource(final AccessTokenService accessTokenService,
-            final ClientCredentialsExtractor clientCredentialsExtractor, final ContextHandler contextHandler) {
+    public Saml2BearerServerResource(final OAuth2RequestFactory<Request> requestFactory,
+            final AccessTokenService accessTokenService) {
+        this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
-        this.clientCredentialsExtractor = clientCredentialsExtractor;
-        this.contextHandler = contextHandler;
     }
 
     @Post
-    public Representation token(final Representation entity) {
+    public Representation token(final Representation entity) throws OAuth2RestletException {
 
-        final String assertion = getAttribute(OAuth2Constants.SAML20.ASSERTION);
-        final String scope = getAttribute("scope");
-
-        final ClientCredentials clientCredentials;
-        try {
-            clientCredentials = clientCredentialsExtractor.extract(getRequest());
-        } catch (InvalidClientException e) {
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
-        } catch (InvalidRequestException e) {
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
-        }
+        final OAuth2Request request = requestFactory.create(getRequest());
 
         try {
-            final AccessTokenRequest accessTokenRequest = createSaml2AccessTokenRequestBuilder()
-                    .clientCredentials(clientCredentials)
-                    .assertion(assertion)
-                    .scope(scope)
-                    .context(contextHandler.createContext(ServletUtils.getRequest(getRequest())))
-                    .build();
-
-            final AccessToken accessToken = accessTokenService.requestAccessToken(accessTokenRequest);
-
+            final AccessToken accessToken = accessTokenService.requestAccessToken(request);
             return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
-
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid parameters in request, " + e.getMessage());
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), e.getMessage());
         } catch (InvalidGrantException e) {
-            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(), "Assertion is invalid.");
-        } catch (InvalidClientException e) {
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(), e.getMessage());
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), "Assertion is invalid.", request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
+        } catch (ClientAuthenticationFailedException e) {
+            Series<Header> responseHeaders = (Series<Header>) getResponse().getAttributes().get("org.restlet.http.headers");
+            if (responseHeaders == null) {
+                responseHeaders = new Series(Header.class);
+                getResponse().getAttributes().put("org.restlet.http.headers", responseHeaders);
+            }
+            responseHeaders.add(new Header(e.getHeaderName(), e.getHeaderValue()));
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
-            //CATCH ALL
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), e.getMessage());
+            throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
         }
     }
 }

@@ -16,32 +16,28 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-
-import java.util.Map;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 
 /**
- * Handles the authentication of the OAuth2 Client.
- * <br/>
- * Root interface to be implemented to provide client authentication based on the client registration.
+ * Authenticates OAuth2 clients by extracting the client's identifier and secret from the request.
  *
  * @since 12.0.0
  */
 public interface ClientAuthenticator {
 
     /**
-     * Authenticates the OAuth2 Client.
-     * <br/>
-     * If authentication succeeds, then the authenticated client is returned, else if authentication fails
-     * a InvalidClientException will be thrown.
+     * Authenticates the client making the OAuth2 request by extracting the client's id and secret from the request
+     * and authenticating against the OAuth2 providers client registrations.
      *
-     * @param clientCredentials An instance of the ClientCredentials which contain the clients credentials.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return The authenticated Client.
-     * @throws InvalidClientException org.forgerock.oauth2.core.exceptions.InvalidClientException authenticating the
-     * Client fails.
+     * @param request The OAuth2Request. Must not be {@code null}.
+     * @return The client's registration.
+     * @throws InvalidClientException If either the request does not contain the client's id or the client fails to be
+     *          authenticated.
+     * @throws InvalidRequestException If the request is missing any required parameters or is otherwise malformed.
+     * @throws ClientAuthenticationFailedException If client authentication fails.
      */
-    ClientRegistration authenticate(final ClientCredentials clientCredentials, final Map<String, Object> context)
-            throws InvalidClientException;
+    ClientRegistration authenticate(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+            ClientAuthenticationFailedException;
 }

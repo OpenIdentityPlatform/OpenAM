@@ -17,7 +17,6 @@
 package org.forgerock.oauth2.core;
 
 /**
- * TODO Finish this class with all constants TODO refactor to clean up what is
  * interface, storage, or both
  */
 public class OAuth2Constants {

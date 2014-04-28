@@ -17,36 +17,25 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the grant type used is invalid for the
- * request being made.
+ * Thrown when the requested grant type is not supported/
  *
  * @since 12.0.0
  */
 public class InvalidGrantException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new InvalidGrantException with the default message.
      */
     public InvalidGrantException() {
-        super();
+        this("The provided access grant is invalid, expired, or revoked.");
     }
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Constructs a new InvalidGrantException with the specified message.
      *
-     * @param message The detail message.
+     * @param message The reason for the exception.
      */
     public InvalidGrantException(final String message) {
-        super(message);
-    }
-
-    /**
-     * Constructs a new exception with the specified detail message and cause.
-     *
-     * @param message The detail message.
-     * @param cause The exception which caused this exception to be thrown.
-     */
-    public InvalidGrantException(final String message, final Throwable cause) {
-        super(message, cause);
+        super(400, "invalid_grant", message);
     }
 }

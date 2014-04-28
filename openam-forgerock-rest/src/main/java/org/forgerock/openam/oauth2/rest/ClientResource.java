@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,7 +29,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
@@ -50,11 +50,12 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.oauth2.OAuth2Utils;
+import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -67,40 +68,45 @@ import java.util.Set;
 
 public class ClientResource  implements CollectionResourceProvider {
 
+    private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final OAuth2AuditLogger auditLogger;
     private final ClientResourceManager manager;
     private final CTSPersistentStore store;
     private ServiceSchemaManager serviceSchemaManager = null;
     private ServiceSchema serviceSchema = null;
 
     @Inject
-    public ClientResource(ClientResourceManager manager, CTSPersistentStore store) {
+    public ClientResource(ClientResourceManager manager, CTSPersistentStore store, OAuth2AuditLogger auditLogger) {
         this.store = store;
         this.manager = manager;
+        this.auditLogger = auditLogger;
         try {
             SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             this.serviceSchemaManager = new ServiceSchemaManager("AgentService", token);
             this.serviceSchema = serviceSchemaManager.getOrganizationSchema().getSubSchema("OAuth2Client");
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("Unable to get Client Schema", e);
-            if (OAuth2Utils.logStatus) {
+            logger.error("Unable to get Client Schema", e);
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", "Unable to get Client Schema"};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
         }
     }
 
-    public ClientResource(ClientResourceManager manager, CTSPersistentStore store, ServiceSchemaManager mgr) {
+    public ClientResource(ClientResourceManager manager, CTSPersistentStore store, ServiceSchemaManager mgr,
+            OAuth2AuditLogger auditLogger) {
         this.store = store;
         this.manager = manager;
+        this.auditLogger = auditLogger;
         try {
             SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             this.serviceSchemaManager = mgr;
             this.serviceSchema = serviceSchemaManager.getOrganizationSchema().getSubSchema("OAuth2Client");
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("Unable to get Client Schema", e);
-            if (OAuth2Utils.logStatus) {
+            logger.error("Unable to get Client Schema", e);
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", "Unable to get Client Schema"};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
         }
     }
@@ -202,30 +208,30 @@ public class ClientResource  implements CollectionResourceProvider {
             response = new JsonValue(responseVal);
 
             Resource resource = new Resource("results", "1", response);
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"CREATED_CLIENT", responseVal.toString()};
-                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, null);
+                auditLogger.logAccessMessage("CREATED_CLIENT", obs, null);
             }
             handler.handleResult(resource);
         } catch(IdRepoException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client", e));
         } catch (SSOException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client", e));
         } catch (PermanentException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(e);
         }
@@ -255,9 +261,9 @@ public class ClientResource  implements CollectionResourceProvider {
             try {
                 store.delete(query);
             } catch (DeleteFailedException e) {
-                if (OAuth2Utils.logStatus) {
+                if (auditLogger.isAuditLogEnabled()) {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                    OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                    auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
                 }
                 throw new InternalServerErrorException("Unable to delete client", e);
             }
@@ -266,30 +272,30 @@ public class ClientResource  implements CollectionResourceProvider {
 	        response = new JsonValue(responseVal);
 
             Resource resource = new Resource("results", "1", response);
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"DELETED_CLIENT", response.toString()};
-                OAuth2Utils.logAccessMessage("DELETED_CLIENT", obs, null);
+                auditLogger.logAccessMessage("DELETED_CLIENT", obs, null);
             }
             handler.handleResult(resource);
         } catch(IdRepoException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         } catch (SSOException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         } catch (InternalServerErrorException e){
             responseVal.put("success", "false");
-            if (OAuth2Utils.logStatus) {
+            if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         }

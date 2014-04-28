@@ -18,9 +18,10 @@ package org.forgerock.oauth2.core;
 
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
@@ -33,121 +34,127 @@ import static org.testng.Assert.assertTrue;
 public class UtilsTest {
 
     @Test
+    public void isEmptyShouldReturnTrueWhenStringIsNull() {
+        assertTrue(Utils.isEmpty((String) null));
+    }
+
+    @Test
+    public void isEmptyShouldReturnTrueWhenStringIsEmpty() {
+        assertTrue(Utils.isEmpty(""));
+    }
+
+    @Test
+    public void isEmptyShouldReturnFalseWhenStringIsNotEmpty() {
+        assertFalse(Utils.isEmpty("WHATEVER"));
+    }
+
+    @Test
+    public void isEmptyShouldReturnTrueWhenCollectionIsNull() {
+        assertTrue(Utils.isEmpty((Collection<?>) null));
+    }
+
+    @Test
+    public void isEmptyShouldReturnTrueWhenCollectionIsEmpty() {
+        assertTrue(Utils.isEmpty(Collections.emptyList()));
+    }
+
+    @Test
+    public void isEmptyShouldReturnFalseWhenCollectionIsNotEmpty() {
+        assertFalse(Utils.isEmpty(Collections.singleton("WHATEVER")));
+    }
+
+    @Test
+    public void isEmptyShouldReturnTrueWhenMapIsNull() {
+        assertTrue(Utils.isEmpty((Map<?, ?>) null));
+    }
+
+    @Test
+    public void isEmptyShouldReturnTrueWhenMapIsEmpty() {
+        assertTrue(Utils.isEmpty(Collections.emptyMap()));
+    }
+
+    @Test
+    public void isEmptyShouldReturnFalseWhenMapIsNotEmpty() {
+        assertFalse(Utils.isEmpty(Collections.singletonMap("WHAT", "EVER")));
+    }
+
+    @Test
+    public void shouldSplitResponseTypeWhenResponseTypesIsNull() {
+        assertEquals(Utils.splitResponseType(null), Collections.emptySet());
+    }
+
+    @Test
+    public void shouldSplitResponseTypeWhenResponseTypesIsEmpty() {
+        assertEquals(Utils.splitResponseType(""), Collections.emptySet());
+    }
+
+    @Test
     public void shouldSplitResponseType() {
+        Set<String> expectedResponseTypes = new HashSet<String>();
+        expectedResponseTypes.add("a");
+        expectedResponseTypes.add("b");
+        expectedResponseTypes.add("c");
+        assertEquals(Utils.splitResponseType("a b c"), expectedResponseTypes);
+    }
 
-        //Given
-        final String responseType = "a b c";
+    @Test
+    public void shouldSplitScopeWhenScopeIsNull() {
+        assertEquals(Utils.splitScope(null), Collections.emptySet());
+    }
 
-        //When
-        final Set<String> s = Utils.splitResponseType(responseType);
-
-        //Then
-        assertEquals(s, new HashSet<String>(Arrays.asList(new String[]{"a", "b", "c"})));
+    @Test
+    public void shouldSplitScopeWhenScopeIsEmpty() {
+        assertEquals(Utils.splitScope(""), Collections.emptySet());
     }
 
     @Test
     public void shouldSplitScope() {
-
-        //Given
-        final String scope = "a b c";
-
-        //When
-        final Set<String> s = Utils.splitScope(scope);
-
-        //Then
-        assertEquals(s, new HashSet<String>(Arrays.asList(new String[]{"a", "b", "c"})));
+        Set<String> expectedScope = new HashSet<String>();
+        expectedScope.add("a");
+        expectedScope.add("b");
+        expectedScope.add("c");
+        assertEquals(Utils.splitScope("a b c"), expectedScope);
     }
 
     @Test
-    public void shouldCreateSetFromNullString() {
-
-        //Given
-        final String s = null;
-
-        //When
-        final Set<String> set = Utils.stringToSet(s);
-
-        //Then
-        assertEquals(set, Collections.emptySet());
+    public void shouldJoinScopeWhenScopeIsNull() {
+        assertEquals(Utils.joinScope(null), "");
     }
 
     @Test
-    public void shouldCreateSetFromEmptyString() {
-
-        //Given
-        final String s = "";
-
-        //When
-        final Set<String> set = Utils.stringToSet(s);
-
-        //Then
-        assertEquals(set, Collections.emptySet());
-    }
-
-    @Test
-    public void shouldCreateSetFromSpaceDelimitedString() {
-
-        //Given
-        final String s = "a b c";
-
-        //When
-        final Set<String> set = Utils.stringToSet(s);
-
-        //Then
-        assertEquals(set, new HashSet<String>(Arrays.asList(new String[]{"a", "b", "c"})));
+    public void shouldJoinScopeWhenScopeIsEmpty() {
+        assertEquals(Utils.joinScope(Collections.<String>emptySet()), "");
     }
 
     @Test
     public void shouldJoinScope() {
 
         //Given
-        final Set<String> scope = new HashSet<String>(Arrays.asList(new String[]{"a", "b", "c"}));
+        Set<String> scope = new HashSet<String>();
+        scope.add("a");
+        scope.add("b");
+        scope.add("c");
 
-        //When
-        final String s = Utils.joinScope(scope);
-
-        //Then
-        assertTrue(s.contains("a"));
-        assertTrue(s.contains("b"));
-        assertTrue(s.contains("c"));
+        //When/Then
+        assertEquals(Utils.joinScope(scope), "b c a");
     }
 
     @Test
-    public void isEmptyShouldReturnTrueWhenStringIsNull() {
-
-        //Given
-        final String s = null;
-
-        //When
-        final boolean empty = Utils.isEmpty(s);
-
-        //Then
-        assertTrue(empty);
+    public void shouldConvertStringToSetWhenStringIsNull() {
+        assertEquals(Utils.stringToSet(null), Collections.emptySet());
     }
 
     @Test
-    public void isEmptyShouldReturnTrueWhenStringIsEmpty() {
-
-        //Given
-        final String s = "";
-
-        //When
-        final boolean empty = Utils.isEmpty(s);
-
-        //Then
-        assertTrue(empty);
+    public void shouldConvertStringToSetWhenStringIsEmpty() {
+        assertEquals(Utils.stringToSet(""), Collections.emptySet());
     }
 
     @Test
-    public void isEmptyShouldReturnFalseWhenStringIsNotEmpty() {
-
-        //Given
-        final String s = "A";
-
-        //When
-        final boolean empty = Utils.isEmpty(s);
-
-        //Then
-        assertFalse(empty);
+    public void shouldConvertStringToSet() {
+        Set<String> expectedResponseTypes = new HashSet<String>();
+        expectedResponseTypes.add("a");
+        expectedResponseTypes.add("b");
+        expectedResponseTypes.add("c");
+        assertEquals(Utils.stringToSet("a b c"), expectedResponseTypes);
     }
 }

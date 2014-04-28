@@ -25,8 +25,8 @@
 --%>
 
 <%@ page pageEncoding="UTF-8" %>
-<%@ page import="org.forgerock.openam.oauth2.openid.CheckSessionImpl" %>
-<%@ page import="org.forgerock.openam.oauth2.openid.CheckSession" %>
+<%@ page import="org.forgerock.openam.openidconnect.CheckSessionImpl" %>
+<%@ page import="org.forgerock.openidconnect.CheckSession" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 <%
     CheckSession checkSession = new CheckSessionImpl();

@@ -16,22 +16,24 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.AUTHORIZATION_CODE;
-import static org.forgerock.oauth2.core.AccessTokenRequest.ClientCredentialsAccessTokenRequest;
 
 /**
  * @since 12.0.0
@@ -41,108 +43,81 @@ public class ClientCredentialsGrantTypeHandlerTest {
     private ClientCredentialsGrantTypeHandler grantTypeHandler;
 
     private ClientAuthenticator clientAuthenticator;
-    private ScopeValidator scopeValidator;
+    private ClientCredentialsRequestValidator requestValidator;
     private TokenStore tokenStore;
+    private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
     public void setUp() {
 
         clientAuthenticator = mock(ClientAuthenticator.class);
-        scopeValidator = mock(ScopeValidator.class);
+        requestValidator = mock(ClientCredentialsRequestValidator.class);
+        List<ClientCredentialsRequestValidator> requestValidators
+                = new ArrayList<ClientCredentialsRequestValidator>();
+        requestValidators.add(requestValidator);
         tokenStore = mock(TokenStore.class);
+        OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
 
-        grantTypeHandler = new ClientCredentialsGrantTypeHandler(clientAuthenticator, scopeValidator, tokenStore);
+        grantTypeHandler = new ClientCredentialsGrantTypeHandler(clientAuthenticator, requestValidators, tokenStore,
+                providerSettingsFactory);
+
+        providerSettings = mock(OAuth2ProviderSettings.class);
+        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
     }
 
     @Test
-    public void shouldFailToCreateAccessTokenWhenClientIsNotConfidential() throws UnauthorizedClientException,
-            InvalidClientException {
+    public void shouldHandle() throws InvalidClientException, ServerException, InvalidRequestException,
+            UnauthorizedClientException, ClientAuthenticationFailedException {
 
         //Given
-        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        Set<String> validatedScope = new HashSet<String>();
+        AccessToken accessToken = mock(AccessToken.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(clientRegistration.isConfidential()).willReturn(false);
-
-        //When
-        try {
-            grantTypeHandler.handle(accessTokenRequest);
-            fail();
-        } catch (UnauthorizedClientException e) {
-            //Then
-            assertTrue(e.getMessage().toLowerCase().contains("public clients can't use client credentials grant"));
-        }
-    }
-
-    @Test
-    public void shouldCreateAccessTokenIncludingScope() throws UnauthorizedClientException, InvalidClientException {
-
-        //Given
-        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
-        final Set<String> validatedScope = Collections.singleton("SCOPE");
-        final AccessToken accessToken = mock(AccessToken.class);
-
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(clientRegistration.isConfidential()).willReturn(true);
-        given(accessTokenRequest.getScope()).willReturn(scope);
-        given(scopeValidator.validateAccessTokenScope(eq(clientRegistration), eq(scope),
-                anyMapOf(String.class, Object.class))).willReturn(validatedScope);
-        given(accessTokenRequest.getGrantType()).willReturn(AUTHORIZATION_CODE);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(tokenStore.createAccessToken(eq(AUTHORIZATION_CODE), eq("CLIENT_ID"), eq(clientRegistration),
-                eq(validatedScope), Matchers.<RefreshToken>anyObject(), anyMapOf(String.class, Object.class)))
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class),
+                eq(request))).willReturn(validatedScope);
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
-        final AccessToken token = grantTypeHandler.handle(accessTokenRequest);
+        final AccessToken actualAccessToken = grantTypeHandler.handle(request);
 
         //Then
-        assertEquals(token, accessToken);
-        verify(scopeValidator)
-                .addAdditionalDataToReturnFromTokenEndpoint(eq(accessToken), anyMapOf(String.class, Object.class));
-        verify(accessToken).add("scope", "SCOPE");
+        verify(requestValidator).validateRequest(eq(request), Matchers.<ClientRegistration>anyObject());
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        assertEquals(actualAccessToken, accessToken);
     }
 
     @Test
-    public void shouldCreateAccessToken() throws UnauthorizedClientException, InvalidClientException {
+    public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidClientException, ServerException,
+            InvalidRequestException, UnauthorizedClientException, ClientAuthenticationFailedException {
 
         //Given
-        final ClientCredentialsAccessTokenRequest accessTokenRequest = mock(ClientCredentialsAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
-        final Set<String> validatedScope = Collections.emptySet();
-        final AccessToken accessToken = mock(AccessToken.class);
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        Set<String> validatedScope = Collections.singleton("SCOPE");
+        AccessToken accessToken = mock(AccessToken.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(clientRegistration.isConfidential()).willReturn(true);
-        given(accessTokenRequest.getScope()).willReturn(scope);
-        given(scopeValidator.validateAccessTokenScope(eq(clientRegistration), eq(scope),
-                anyMapOf(String.class, Object.class))).willReturn(validatedScope);
-        given(accessTokenRequest.getGrantType()).willReturn(AUTHORIZATION_CODE);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(providerSettings.validateAccessTokenScope(Matchers.<ClientRegistration>anyObject(),
+                anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(tokenStore.createAccessToken(eq(AUTHORIZATION_CODE), eq("CLIENT_ID"), eq(clientRegistration),
-                eq(validatedScope), Matchers.<RefreshToken>anyObject(), anyMapOf(String.class, Object.class)))
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
                 .willReturn(accessToken);
 
         //When
-        final AccessToken token = grantTypeHandler.handle(accessTokenRequest);
+        final AccessToken actualAccessToken = grantTypeHandler.handle(request);
 
         //Then
-        assertEquals(token, accessToken);
-        verify(scopeValidator)
-                .addAdditionalDataToReturnFromTokenEndpoint(eq(accessToken), anyMapOf(String.class, Object.class));
-        verify(accessToken, never()).add(eq("scope"), anyString());
+        verify(requestValidator).validateRequest(eq(request), Matchers.<ClientRegistration>anyObject());
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken).addExtraData(eq("scope"), anyString());
+        assertEquals(actualAccessToken, accessToken);
     }
 }

@@ -17,16 +17,16 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the token on the request has expired.
+ * Thrown when an expired access token or refresh token is used.
  *
  * @since 12.0.0
  */
 public class ExpiredTokenException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new ExpiredTokenException with the default message.
      */
     public ExpiredTokenException() {
-        super();
+        super(401, "expired_token", "The request contains a token no longer valid.");
     }
 }

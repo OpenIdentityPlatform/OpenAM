@@ -17,17 +17,16 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the redirect uri on the request does
- * not match the pre-registered redirect uris.
+ * Thrown when the redirect uri on the request does not match the redirect uri registered for the client.
  *
  * @since 12.0.0
  */
 public class RedirectUriMismatchException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new RedirectMismatchException with the default message.
      */
     public RedirectUriMismatchException() {
-        super();
+        super(400, "redirect_uri_mismatch", "The redirection URI provided does not match a pre-registered value.");
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.forgerock.openam.cts.api.fields;
 
-import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2Constants;
 
 /**
  * The OAuthTokenField provides a mapping between known OAuth fields and the LDAP Attributes

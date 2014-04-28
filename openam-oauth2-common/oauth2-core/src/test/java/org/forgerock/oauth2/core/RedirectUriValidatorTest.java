@@ -18,12 +18,12 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
+import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.Set;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
@@ -42,18 +42,17 @@ public class RedirectUriValidatorTest {
     }
 
     @Test
-    public void validateShouldThrowInvalidRequestExceptionWhenRedirectUriIsNull()
+    public void validateShouldThrowInvalidRequestExceptionWhenRedirectUriIsNullAndNoClientRegistrationRedirectUris()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = null;
-        final Set<URI> registeredRedirectUris = Collections.emptySet();
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = null;
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris()).willReturn(Collections.<URI>emptySet());
 
-        //When
         try {
+            //When
             redirectUriValidator.validate(clientRegistration, redirectUri);
         } catch (InvalidRequestException e) {
             //Then
@@ -62,18 +61,17 @@ public class RedirectUriValidatorTest {
     }
 
     @Test
-    public void validateShouldThrowInvalidRequestExceptionWhenRedirectUriIsEmpty()
+    public void validateShouldThrowInvalidRequestExceptionWhenRedirectUriIsEmptyAndNoClientRegistrationRedirectUris()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = "";
-        final Set<URI> registeredRedirectUris = Collections.singleton(URI.create("http://localhost"));
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "";
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris()).willReturn(Collections.<URI>emptySet());
 
-        //When
         try {
+            //When
             redirectUriValidator.validate(clientRegistration, redirectUri);
         } catch (InvalidRequestException e) {
             //Then
@@ -82,102 +80,120 @@ public class RedirectUriValidatorTest {
     }
 
     @Test
-    public void shouldValidateSuccessfullyWhenRedirectUriIsNullAndOnlyOneRegisteredRedirectUri()
+    public void validateShouldReturnSuccessfullyWhenRedirectUriIsNullAndSingleClientRegistrationRedirectUri()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = null;
-        final Set<URI> registeredRedirectUris = Collections.singleton(URI.create("http://localhost"));
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = null;
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris())
+                .willReturn(Collections.<URI>singleton(URI.create("http://localhost:8080/")));
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
-        // All good
+        // Expect no exceptions
     }
 
     @Test
-    public void shouldValidateSuccessfullyWhenRedirectUriIsEmptyAndOnlyOneRegisteredRedirectUri()
+    public void validateShouldReturnSuccessfullyWhenRedirectUriIsEmptyAndSingleClientRegistrationRedirectUri()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = "";
-        final Set<URI> registeredRedirectUris = Collections.singleton(URI.create("http://localhost"));
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "";
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris())
+                .willReturn(Collections.<URI>singleton(URI.create("http://localhost:8080/")));
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
-        // All good
+        // Expect no exceptions
     }
 
     @Test (expectedExceptions = RedirectUriMismatchException.class)
-    public void validateShouldThrowRedirectUriMismatchExceptionWhenRedirectUriContainsAFragment()
+    public void validateShouldThrowRedirectUriMismatchExceptionWhenRedirectUriContainsFragment()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = URI.create("http://localhost#fragment").toString();
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "http://localhost:8080/#fragment";
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
-
+        // Expect RedirectUriMismatchException
     }
 
     @Test (expectedExceptions = RedirectUriMismatchException.class)
-    public void validateShouldThrowRedirectUriMismatchExceptionWhenRedirectUriIsNotAbsoulte()
+    public void validateShouldThrowRedirectUriMismatchExceptionWhenRedirectUriIsNotAbsolute()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = URI.create("localhost").toString();
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "localhost:8080/";
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
-
+        // Expect RedirectUriMismatchException
     }
 
     @Test (expectedExceptions = RedirectUriMismatchException.class)
-    public void validateShouldThrowRedirectUriMismatchExceptionWhenRedirectUriDoesNotMatch()
+    public void validateShouldThrowRedirectUriMismatchExceptionWhenNoClientRegistrationRedirectUris()
             throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = URI.create("http://localhost/").toString();
-        final Set<URI> registeredRedirectUris = Collections.singleton(URI.create("http://localhost"));
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "http://localhost:8080/";
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris()).willReturn(Collections.<URI>emptySet());
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
+        // Expect RedirectUriMismatchException
+    }
+
+    @Test (expectedExceptions = RedirectUriMismatchException.class)
+    public void validateShouldThrowRedirectUriMismatchExceptionWhenNoMatchingClientRegistrationRedirectUri()
+            throws InvalidRequestException, RedirectUriMismatchException {
+
+        //Given
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "http://localhost:8080/";
+
+        given(clientRegistration.getRedirectUris())
+                .willReturn(Collections.<URI>singleton(URI.create("http://localhost:8080/other")));
+
+        //When
+        redirectUriValidator.validate(clientRegistration, redirectUri);
+
+        //Then
+        // Expect RedirectUriMismatchException
     }
 
     @Test
-    public void shouldValidateSuccessfullyWhenRedirectUriMatches() throws InvalidRequestException,
-            RedirectUriMismatchException {
+    public void shouldValidateRedirectUri() throws InvalidRequestException, RedirectUriMismatchException {
 
         //Given
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final String redirectUri = URI.create("http://localhost").toString();
-        final Set<URI> registeredRedirectUris = Collections.singleton(URI.create("http://localhost"));
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        String redirectUri = "http://localhost:8080/";
 
-        given(clientRegistration.getRedirectUris()).willReturn(registeredRedirectUris);
+        given(clientRegistration.getRedirectUris())
+                .willReturn(Collections.<URI>singleton(URI.create("http://localhost:8080/")));
 
         //When
         redirectUriValidator.validate(clientRegistration, redirectUri);
 
         //Then
+        // Expect no exceptions
     }
 }

@@ -16,31 +16,27 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.GrantType.DefaultGrantType.AUTHORIZATION_CODE;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.anyMapOf;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
-import static org.forgerock.oauth2.core.AccessTokenRequest.AuthorizationCodeAccessTokenRequest;
 
 /**
  * @since 12.0.0
@@ -49,346 +45,273 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
     private AuthorizationCodeGrantTypeHandler grantTypeHandler;
 
+    private AuthorizationCodeRequestValidator requestValidator;
     private ClientAuthenticator clientAuthenticator;
     private TokenStore tokenStore;
-    private OAuth2ProviderSettingsFactory providerSettingsFactory;
-    private ScopeValidator scopeValidator;
-    private RedirectUriValidator redirectUriValidator;
     private TokenInvalidator tokenInvalidator;
+    private OAuth2ProviderSettings providerSettings;
 
     @BeforeMethod
     public void setUp() {
 
+        List<AuthorizationCodeRequestValidator> requestValidators = new ArrayList<AuthorizationCodeRequestValidator>();
+        requestValidator = mock(AuthorizationCodeRequestValidator.class);
+        requestValidators.add(requestValidator);
         clientAuthenticator = mock(ClientAuthenticator.class);
         tokenStore = mock(TokenStore.class);
-        providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
-        scopeValidator = mock(ScopeValidator.class);
-        redirectUriValidator = mock(RedirectUriValidator.class);
         tokenInvalidator = mock(TokenInvalidator.class);
+        OAuth2ProviderSettingsFactory providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
 
-        grantTypeHandler = new AuthorizationCodeGrantTypeHandler(clientAuthenticator, tokenStore,
-                providerSettingsFactory, scopeValidator, redirectUriValidator, tokenInvalidator);
+        grantTypeHandler = new AuthorizationCodeGrantTypeHandler(requestValidators, clientAuthenticator, tokenStore,
+                tokenInvalidator, providerSettingsFactory);
+
+        providerSettings = mock(OAuth2ProviderSettings.class);
+        given(providerSettingsFactory.get(Matchers.<OAuth2Request>anyObject())).willReturn(providerSettings);
     }
 
-    @Test
-    public void shouldFailToCreateAccessTokenWhenAuthorizationCodeDoesNotExist() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
+    @Test (expectedExceptions = InvalidRequestException.class)
+    public void handleShouldThrowInvalidRequestExceptionWhenAuthorizationCodeNotFound() throws InvalidGrantException,
+            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
+            InvalidCodeException, InvalidClientException, ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = null;
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(null);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
 
         //When
-        try {
-            grantTypeHandler.handle(accessTokenRequest);
-            fail();
-        } catch (InvalidRequestException e) {
-            //Then
-            assertTrue(e.getMessage().toLowerCase().contains("code doesn't exist"));
-        }
+        grantTypeHandler.handle(request);
+
+        //Then
+        // Expect InvalidRequestException
     }
 
     @Test
-    public void shouldFailToCreateAccessTokenWhenAuthorizationCodeHasAlreadyBeenIssued() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
+    public void handleShouldThrowInvalidGrantExceptionWhenAuthorizationCodeHasAlreadyBeenIssued()
+            throws InvalidGrantException, RedirectUriMismatchException, ClientAuthenticationFailedException,
+            InvalidRequestException, InvalidCodeException, InvalidClientException, ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(true);
 
-        //When
         try {
-            grantTypeHandler.handle(accessTokenRequest);
+            //When
+            grantTypeHandler.handle(request);
             fail();
         } catch (InvalidGrantException e) {
             //Then
-            verify(redirectUriValidator).validate(clientRegistration, "REDIRECT_URI");
-            verify(tokenInvalidator).invalidateTokens("CODE");
-            verify(tokenStore).deleteAuthorizationCode("CODE");
+            verify(requestValidator).validateRequest(request, clientRegistration);
+            verify(tokenInvalidator).invalidateTokens(anyString());
+            verify(tokenStore).deleteAuthorizationCode(anyString());
         }
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void shouldFailToCreateAccessTokenWhenRedirectUriDoesNotMatch() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
+    public void handleShouldThrowInvalidGrantExceptionWhenRedirectUriDontMatch() throws InvalidGrantException,
+            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
+            InvalidCodeException, InvalidClientException, ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("OTHER_REDIRECT_URI");
 
         //When
-        grantTypeHandler.handle(accessTokenRequest);
+        grantTypeHandler.handle(request);
 
         //Then
+        // Expect InvalidGrantException
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void shouldFailToCreateAccessTokenWhenClientIdDoesNotMatch() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
+    public void handleShouldThrowInvalidGrantExceptionWhenClientDoesNotMatch() throws InvalidGrantException,
+            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
+            InvalidCodeException, InvalidClientException, ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getClientId()).willReturn("OTHER_CLIENT_ID");
-        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("OTHER_CLIENT_ID");
 
         //When
-        grantTypeHandler.handle(accessTokenRequest);
+        grantTypeHandler.handle(request);
 
         //Then
+        // Expect InvalidGrantException
     }
 
-    @Test
-    public void shouldFailToCreateAccessTokenWhenAuthorizationCodeHasExpired() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
+    @Test (expectedExceptions = InvalidCodeException.class)
+    public void handleShouldThrowInvalidCodeExceptionWhenAuthorizationCodeHasExpired() throws InvalidGrantException,
+            RedirectUriMismatchException, ClientAuthenticationFailedException, InvalidRequestException,
+            InvalidCodeException, InvalidClientException, ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.isExpired()).willReturn(true);
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() - 10);
 
         //When
-        try {
-            grantTypeHandler.handle(accessTokenRequest);
-            fail();
-        } catch (InvalidCodeException e) {
-            //Then
-            verify(redirectUriValidator).validate(clientRegistration, "REDIRECT_URI");
-            assertTrue(e.getMessage().toLowerCase().contains("code expired"));
-        }
-    }
-
-    @Test
-    public void shouldCreateAccessTokenWithoutRefreshToken() throws InvalidGrantException,
-            InvalidCodeException, UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException,
-            InvalidClientException {
-
-        //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
-        final OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        final AccessToken accessToken = mock(AccessToken.class);
-        final Set<String> validatedScope = Collections.singleton("SCOPE");
-
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
-        given(authorizationCode.isIssued()).willReturn(false);
-        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
-        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.isExpired()).willReturn(false);
-        given(authorizationCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
-        given(providerSettingsFactory.getProviderSettings(anyMapOf(String.class, Object.class)))
-                .willReturn(providerSettings);
-        given(providerSettings.issueRefreshTokens()).willReturn(false);
-        given(accessTokenRequest.getGrantType()).willReturn(AUTHORIZATION_CODE);
-        given(tokenStore.createAccessToken(eq(AUTHORIZATION_CODE), eq("RESOURCE_OWNER_ID"), eq(clientRegistration),
-                eq(scope), Matchers.<RefreshToken>anyObject(), anyMapOf(String.class, Object.class)))
-                .willReturn(accessToken);
-        given(authorizationCode.getNonce()).willReturn("NONCE");
-        given(scopeValidator.validateAccessTokenScope(eq(clientRegistration), eq(scope),
-                anyMapOf(String.class, Object.class))).willReturn(validatedScope);
-
-        //When
-        final AccessToken token = grantTypeHandler.handle(accessTokenRequest);
+        grantTypeHandler.handle(request);
 
         //Then
-        assertEquals(token, accessToken);
-        verify(redirectUriValidator).validate(clientRegistration, "REDIRECT_URI");
-
-        verify(tokenStore, never()).createRefreshToken(eq(AUTHORIZATION_CODE), eq(clientRegistration),
-                eq("RESOURCE_OWNER_ID"), eq("REDIRECT_URI"), eq(scope), anyMapOf(String.class, Object.class));
-        verify(authorizationCode).setIssued();
-        verify(tokenStore).updateAuthorizationCode(authorizationCode);
-        verify(accessToken, never()).add(eq(OAuth2Constants.Params.REFRESH_TOKEN), anyString());
-        verify(accessToken).add(OAuth2Constants.Custom.NONCE, "NONCE");
-        verify(scopeValidator)
-                .addAdditionalDataToReturnFromTokenEndpoint(eq(accessToken), anyMapOf(String.class, Object.class));
-        verify(accessToken).add("scope", "SCOPE");
+        // Expect InvalidCodeException
     }
 
     @Test
-    public void shouldCreateAccessTokenWithoutRefreshTokenAndScope() throws InvalidGrantException, InvalidCodeException,
-            UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException, InvalidClientException {
+    public void shouldHandleAndIssueRefreshToken() throws InvalidGrantException, RedirectUriMismatchException,
+            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
+            ServerException {
 
         //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
-        final OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        final AccessToken accessToken = mock(AccessToken.class);
-        final Set<String> validatedScope = Collections.emptySet();
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        RefreshToken refreshToken = mock(RefreshToken.class);
+        AccessToken accessToken = mock(AccessToken.class);
+        Set<String> validatedScope = new HashSet<String>();
 
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.isExpired()).willReturn(false);
-        given(authorizationCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
-        given(providerSettingsFactory.getProviderSettings(anyMapOf(String.class, Object.class)))
-                .willReturn(providerSettings);
-        given(providerSettings.issueRefreshTokens()).willReturn(false);
-        given(accessTokenRequest.getGrantType()).willReturn(AUTHORIZATION_CODE);
-        given(tokenStore.createAccessToken(eq(AUTHORIZATION_CODE), eq("RESOURCE_OWNER_ID"), eq(clientRegistration),
-                eq(scope), Matchers.<RefreshToken>anyObject(), anyMapOf(String.class, Object.class)))
-                .willReturn(accessToken);
-        given(authorizationCode.getNonce()).willReturn("NONCE");
-        given(scopeValidator.validateAccessTokenScope(eq(clientRegistration), eq(scope),
-                anyMapOf(String.class, Object.class))).willReturn(validatedScope);
-
-        //When
-        final AccessToken token = grantTypeHandler.handle(accessTokenRequest);
-
-        //Then
-        assertEquals(token, accessToken);
-        verify(redirectUriValidator).validate(clientRegistration, "REDIRECT_URI");
-
-        verify(tokenStore, never()).createRefreshToken(eq(AUTHORIZATION_CODE), eq(clientRegistration),
-                eq("RESOURCE_OWNER_ID"), eq("REDIRECT_URI"), eq(scope), anyMapOf(String.class, Object.class));
-        verify(authorizationCode).setIssued();
-        verify(tokenStore).updateAuthorizationCode(authorizationCode);
-        verify(accessToken, never()).add(eq(OAuth2Constants.Params.REFRESH_TOKEN), anyString());
-        verify(accessToken).add(OAuth2Constants.Custom.NONCE, "NONCE");
-        verify(scopeValidator)
-                .addAdditionalDataToReturnFromTokenEndpoint(eq(accessToken), anyMapOf(String.class, Object.class));
-        verify(accessToken, never()).add(eq("scope"), anyString());
-    }
-
-    @Test
-    public void shouldCreateAccessTokenWithRefreshToken() throws InvalidGrantException, InvalidCodeException,
-            UnauthorizedClientException, RedirectUriMismatchException, InvalidRequestException, InvalidClientException {
-
-        //Given
-        final AuthorizationCodeAccessTokenRequest accessTokenRequest = mock(AuthorizationCodeAccessTokenRequest.class);
-        final ClientCredentials clientCredentials = new ClientCredentials("USER", "".toCharArray());
-        final ClientRegistration clientRegistration = mock(ClientRegistration.class);
-        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
-        final Set<String> scope = Collections.singleton("SCOPE");
-        final OAuth2ProviderSettings providerSettings = mock(OAuth2ProviderSettings.class);
-        final AccessToken accessToken = mock(AccessToken.class);
-        final Set<String> validatedScope = Collections.emptySet();
-
-        given(accessTokenRequest.getClientCredentials()).willReturn(clientCredentials);
-        given(clientAuthenticator.authenticate(eq(clientCredentials), anyMapOf(String.class, Object.class)))
-                .willReturn(clientRegistration);
-        given(accessTokenRequest.getCode()).willReturn("CODE");
-        given(tokenStore.getAuthorizationCode("CODE")).willReturn(authorizationCode);
-        given(accessTokenRequest.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getScope()).willReturn(scope);
-        given(authorizationCode.isIssued()).willReturn(false);
-        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
-        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
-        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.isExpired()).willReturn(false);
-        given(authorizationCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER_ID");
-        given(providerSettingsFactory.getProviderSettings(anyMapOf(String.class, Object.class)))
-                .willReturn(providerSettings);
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
-        given(accessTokenRequest.getGrantType()).willReturn(AUTHORIZATION_CODE);
-        given(tokenStore.createAccessToken(eq(AUTHORIZATION_CODE), eq("RESOURCE_OWNER_ID"), eq(clientRegistration),
-                eq(scope), Matchers.<RefreshToken>anyObject(), anyMapOf(String.class, Object.class)))
+        given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
+                eq(request))).willReturn(refreshToken);
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
                 .willReturn(accessToken);
-        given(authorizationCode.getNonce()).willReturn("NONCE");
-        given(scopeValidator.validateAccessTokenScope(eq(clientRegistration), eq(scope),
-                anyMapOf(String.class, Object.class))).willReturn(validatedScope);
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+                .willReturn(validatedScope);
 
         //When
-        final AccessToken token = grantTypeHandler.handle(accessTokenRequest);
+        AccessToken actualAccessToken = grantTypeHandler.handle(request);
 
         //Then
-        assertEquals(token, accessToken);
-        verify(redirectUriValidator).validate(clientRegistration, "REDIRECT_URI");
-
-        verify(tokenStore).createRefreshToken(eq(AUTHORIZATION_CODE), eq(clientRegistration),
-                eq("RESOURCE_OWNER_ID"), eq("REDIRECT_URI"), eq(scope), anyMapOf(String.class, Object.class));
+        verify(requestValidator).validateRequest(request, clientRegistration);
         verify(authorizationCode).setIssued();
         verify(tokenStore).updateAuthorizationCode(authorizationCode);
-        verify(accessToken, never()).add(eq(OAuth2Constants.Params.REFRESH_TOKEN), anyString());
-        verify(accessToken).add(OAuth2Constants.Custom.NONCE, "NONCE");
-        verify(scopeValidator)
-                .addAdditionalDataToReturnFromTokenEndpoint(eq(accessToken), anyMapOf(String.class, Object.class));
-        verify(accessToken, never()).add(eq("scope"), anyString());
+        verify(accessToken).addExtraData(eq("refresh_token"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        assertEquals(actualAccessToken, accessToken);
+    }
+
+    @Test
+    public void shouldHandle() throws InvalidGrantException, RedirectUriMismatchException,
+            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
+            ServerException {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        AccessToken accessToken = mock(AccessToken.class);
+        Set<String> validatedScope = new HashSet<String>();
+
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(authorizationCode.isIssued()).willReturn(false);
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(providerSettings.issueRefreshTokens()).willReturn(false);
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                .willReturn(accessToken);
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+                .willReturn(validatedScope);
+
+        //When
+        AccessToken actualAccessToken = grantTypeHandler.handle(request);
+
+        //Then
+        verify(requestValidator).validateRequest(request, clientRegistration);
+        verify(authorizationCode).setIssued();
+        verify(tokenStore).updateAuthorizationCode(authorizationCode);
+        verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        assertEquals(actualAccessToken, accessToken);
+    }
+
+    @Test
+    public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidGrantException, RedirectUriMismatchException,
+            ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
+            ServerException {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        AccessToken accessToken = mock(AccessToken.class);
+        Set<String> validatedScope = Collections.singleton("SCOPE");
+
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(authorizationCode.isIssued()).willReturn(false);
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(providerSettings.issueRefreshTokens()).willReturn(false);
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                .willReturn(accessToken);
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+                .willReturn(validatedScope);
+
+        //When
+        AccessToken actualAccessToken = grantTypeHandler.handle(request);
+
+        //Then
+        verify(requestValidator).validateRequest(request, clientRegistration);
+        verify(authorizationCode).setIssued();
+        verify(tokenStore).updateAuthorizationCode(authorizationCode);
+        verify(accessToken, never()).addExtraData(eq("refresh_token"), anyString());
+        verify(accessToken).addExtraData(eq("nonce"), anyString());
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken).addExtraData(eq("scope"), anyString());
+        assertEquals(actualAccessToken, accessToken);
     }
 }

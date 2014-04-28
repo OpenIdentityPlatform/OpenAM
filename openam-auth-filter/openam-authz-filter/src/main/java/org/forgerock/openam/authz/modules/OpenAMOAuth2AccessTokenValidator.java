@@ -21,15 +21,16 @@ import com.google.inject.TypeLiteral;
 import org.forgerock.authz.modules.oauth2.AccessTokenValidationResponse;
 import org.forgerock.authz.modules.oauth2.OAuth2AccessTokenValidator;
 import org.forgerock.authz.modules.oauth2.OAuth2Exception;
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.openidconnect.UserInfoService;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.oauth2.OpenAMAccessToken;
 import org.forgerock.openam.utils.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * Access Token Validator for validating OAuth2 tokens issued by OpenAM by making internal API calls to OpenAM's
@@ -41,24 +42,24 @@ public class OpenAMOAuth2AccessTokenValidator implements OAuth2AccessTokenValida
 
     private final Logger logger = LoggerFactory.getLogger(OpenAMOAuth2AccessTokenValidator.class);
 
-    private final Config<OAuth2TokenStore> tokenStore;
-    private final OAuth2UserInfoService userInfoService;
+    private final Config<TokenStore> tokenStore;
+    private final UserInfoService userInfoService;
 
     /**
      * Creates a new instance of the OpenAMOAuth2AccessTokenValidator.
      */
     public OpenAMOAuth2AccessTokenValidator() {
-        this(InjectorHolder.getInstance(Key.get(new TypeLiteral<Config<OAuth2TokenStore>>() {})),
-                InjectorHolder.getInstance(OAuth2UserInfoService.class));
+        this(InjectorHolder.getInstance(Key.get(new TypeLiteral<Config<TokenStore>>() {})),
+                InjectorHolder.getInstance(UserInfoService.class));
     }
 
     /**
      * Constructor for test usage.
      *
      * @param tokenStore An instance of the OAuth2TokenStore.
-     * @param userInfoService An instance of the OAuth2UserInfoService;
+     * @param userInfoService An instance of the UserInfoService;
      */
-    OpenAMOAuth2AccessTokenValidator(final Config<OAuth2TokenStore> tokenStore, final OAuth2UserInfoService userInfoService) {
+    OpenAMOAuth2AccessTokenValidator(final Config<TokenStore> tokenStore, final UserInfoService userInfoService) {
         this.tokenStore = tokenStore;
         this.userInfoService = userInfoService;
     }
@@ -70,15 +71,30 @@ public class OpenAMOAuth2AccessTokenValidator implements OAuth2AccessTokenValida
     public AccessTokenValidationResponse validate(final String accessToken) throws OAuth2Exception {
 
         try {
-            final CoreToken token = tokenStore.get().readAccessToken(accessToken);
-            final long expireTime = token.getExpireTime();
-            final Map<String, Object> userInfo = userInfoService.getUserInfo(token);
+            final AccessToken token = tokenStore.get().readAccessToken(accessToken);
+            final long expireTime = token.getExpiryTime();
+            final JsonValue userInfo = userInfoService.getUserInfo(accessToken, new OAuth2Request() {
+                public <T> T getRequest() {
+                    throw new UnsupportedOperationException();
+                }
 
-            return new AccessTokenValidationResponse(expireTime, userInfo, token.getScope());
+                public <T> T getParameter(String name) {
+                    if ("realm".equals(name)) {
+                        return (T) ((OpenAMAccessToken) token).getRealm();
+                    }
+                    throw new UnsupportedOperationException();
+                }
 
-        } catch (OAuthProblemException e) {
-            logger.error(e.getDescription(), e);
-            throw new OAuth2Exception(e.getDescription(), e);
+                public JsonValue getBody() {
+                    throw new UnsupportedOperationException();
+                }
+            });
+
+            return new AccessTokenValidationResponse(expireTime, userInfo.asMap(), token.getScope());
+
+        } catch (org.forgerock.oauth2.core.exceptions.OAuth2Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new OAuth2Exception(e.getMessage(), e);
         }
     }
 }

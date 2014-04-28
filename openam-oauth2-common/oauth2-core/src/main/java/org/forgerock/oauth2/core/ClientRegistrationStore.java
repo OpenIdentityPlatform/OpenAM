@@ -16,22 +16,22 @@
 
 package org.forgerock.oauth2.core;
 
-import java.util.Map;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 
 /**
- * Represents the store in which all clients registrations are kept on the OAuth2 Provider.
+ * The OAuth2 providers store for all client registrations.
  *
  * @since 12.0.0
  */
 public interface ClientRegistrationStore {
 
     /**
-     * Gets the Client Registration from the store.
+     * Gets the client registration for the given client id.
      *
-     * @param clientId The identifier of the client.
-     * @param context A {@code Map<String, Object>} containing OAuth2 Provider implementation specific context
-     *                information.
-     * @return The Client Registration.
+     * @param clientId The client id
+     * @param request The OAuth2 request.
+     * @return The ClientRegistration.
+     * @throws InvalidClientException If client cannot be retrieved from the store.
      */
-    ClientRegistration get(final String clientId, final Map<String, Object> context);
+    ClientRegistration get(String clientId, OAuth2Request request) throws InvalidClientException;
 }

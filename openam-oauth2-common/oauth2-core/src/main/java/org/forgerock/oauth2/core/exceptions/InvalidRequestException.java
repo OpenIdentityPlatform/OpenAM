@@ -17,18 +17,25 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the request validation fails.
+ * Thrown when the request is missing any required parameters or is otherwise malformed.
  *
  * @since 12.0.0
  */
 public class InvalidRequestException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Constructs a new InvalidRequestException with the default message.
+     */
+    public InvalidRequestException() {
+        this("The request is missing a required parameter, includes an invalid parameter value, or is otherwise malformed.");
+    }
+
+    /**
+     * Constructs a new InvalidRequestException with the specified message.
      *
-     * @param message The detail message.
+     * @param message The reason for the exception.
      */
     public InvalidRequestException(final String message) {
-        super(message);
+        super(400, "invalid_request", message);
     }
 }

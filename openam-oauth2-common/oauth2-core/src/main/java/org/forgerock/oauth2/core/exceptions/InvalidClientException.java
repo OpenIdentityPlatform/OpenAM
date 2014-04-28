@@ -17,34 +17,26 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of a OAuth2 request when the client validation fails.
+ * Thrown when either the request does not contain the client's id or the client fails to be authenticated.
  *
  * @since 12.0.0
  */
 public class InvalidClientException extends OAuth2Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new InvalidClientException, with the default message.
      */
     public InvalidClientException() {
-        super();
+        this("The client identifier provided is invalid, the client failed to authenticate, the client did not include "
+                + "its credentials, provided multiple client credentials, or used unsupported credentials type.");
     }
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Constructs a new InvalidClientException, with the specified message.
      *
-     * @param message The detail message.
+     * @param message The reason for the exception.
      */
     public InvalidClientException(final String message) {
-        super(message);
-    }
-
-    /**
-     * Constructs a new exception with the specified cause.
-     *
-     * @param cause The exception which caused this exception to be thrown.
-     */
-    public InvalidClientException(final Throwable cause) {
-        super(cause);
+        super(400, "invalid_client", message);
     }
 }

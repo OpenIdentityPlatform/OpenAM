@@ -265,9 +265,9 @@ $ <userinput>curl \
 $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-configuration</userinput>
 <computeroutput>{
     "response_types_supported": [
-        "id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType",
-        "token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType",
-        "code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType"
+    "id_token|org.forgerock.oauth2.reslet.responseTypes.IDTokenResponseType",
+    "token|org.forgerock.oauth2.reslet.responseTypes.TokenResponseType",
+    "code|org.forgerock.oauth2.reslet.responseTypes.CodeResponseType"
     ],
     "registration_endpoint": "https://openam.example.com:8443/openam/oauth2/connect/register",
     "token_endpoint": "https://openam.example.com:8443/openam/oauth2/access_token",
@@ -275,25 +275,25 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
     "version": "3.0",
     "userinfo_endpoint": "https://openam.example.com:8443/openam/oauth2/userinfo",
     "subject_types_supported": [
-        "public"
+    "public"
     ],
     "issuer": "https://openam.example.com:8443/openam",
     "jwks_uri": "",
     "id_token_siging_alg_values_supported": [
-        "HmacSHA256",
-        "HmacSHA512",
-        "HmacSHA384"
+    "HmacSHA256",
+    "HmacSHA512",
+    "HmacSHA384"
     ],
     "check_session_iframe": "https://openam.example.com:8443/openam/oauth2/connect/checkSession",
     "claims_supported": [
-        "phone",
-        "email",
-        "address",
-        "openid",
-        "profile"
+    "phone",
+    "email",
+    "address",
+    "openid",
+    "profile"
     ],
     "authorization_endpoint": "https://openam.example.com:8443/openam/oauth2/authorize"
-}</computeroutput>
+    }</computeroutput>
   </screen>
   </informalexample>
  </section>

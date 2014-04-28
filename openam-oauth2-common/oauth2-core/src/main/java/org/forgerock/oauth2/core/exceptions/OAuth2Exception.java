@@ -17,47 +17,43 @@
 package org.forgerock.oauth2.core.exceptions;
 
 /**
- * An exception that is thrown during the processing of OAuth2 requests.
- * <br/>
- * Represents a general OAuth2 exception, sub-types of this exception are prefered to provide more meaning behind
- * the reason for the exception.
+ * Base exception for all OAuth2 exceptions.
  *
  * @since 12.0.0
  */
-public class OAuth2Exception extends Exception {
+public abstract class OAuth2Exception extends Exception {
+
+    private final int statusCode;
+    private final String error;
 
     /**
-     * Constructs a new exception with {@code null} as its detail message.
+     * Constructs a new OAuth2Exception with specified status code, error and description.
+     *
+     * @param statusCode The status code of the exception. Maps to HTTP status codes.
+     * @param error The error/name of the exception.
+     * @param description The reason and description for the exception.
      */
-    public OAuth2Exception() {
-        super();
+    public OAuth2Exception(final int statusCode, final String error, final String description) {
+        super(description);
+        this.statusCode = statusCode;
+        this.error = error;
     }
 
     /**
-     * Constructs a new exception with the specified detail message.
+     * Gets the status code of the exception.
      *
-     * @param message The detail message.
+     * @return The status code.
      */
-    public OAuth2Exception(final String message) {
-        super(message);
+    public int getStatusCode() {
+        return statusCode;
     }
 
     /**
-     * Constructs a new exception with the specified detail message and cause.
+     * Gets the error/name of the exception.
      *
-     * @param message The detail message.
-     * @param cause The exception which caused this exception to be thrown.
+     * @return The error.
      */
-    public OAuth2Exception(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Constructs a new exception with the specified cause.
-     *
-     * @param cause The exception which caused this exception to be thrown.
-     */
-    public OAuth2Exception(final Throwable cause) {
-        super(cause);
+    public String getError() {
+        return error;
     }
 }

@@ -17,70 +17,81 @@
 package org.forgerock.oauth2.core;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Utils class containing common utility methods used by various OAuth2 response and grant type handlers.
+ * Utility class containing common utility functions.
  *
  * @since 12.0.0
  */
 public final class Utils {
 
     /**
-     * Private constructor.
-     */
-    private Utils() { }
-
-    /**
-     * Splits the response type string on ' ' character and returns a {@code Set<String>} of the contents.
+     * Determines whether the specified String is {@code null} or empty.
      *
-     * @param responseType The response type string.
-     * @return A {@code Set<String>} of the response types.
+     * @param s The String to check.
+     * @return {@code true} if the String is {@code null} or empty.
      */
-    static Set<String> splitResponseType(final String responseType) {
-        if (responseType == null) {
-            return new HashSet<String>();
-        }
-        return new HashSet<String>(Arrays.asList(responseType.split(" ")));
+    public static boolean isEmpty(final String s) {
+        return s == null || s.isEmpty();
     }
 
     /**
-     * Splits the scope string on ' ' character and returns a {@code Set<String>} of the contents.
+     * Determines whether the specified Collection is {@code null} or empty.
      *
-     * @param scope The response type string.
-     * @return A {@code Set<String>} of the scope.
+     * @param c The Collection to check.
+     * @return {@code true} if the Collection is {@code null} or empty.
+     */
+    public static boolean isEmpty(final Collection<?> c) {
+        return c == null || c.isEmpty();
+    }
+
+    /**
+     * Determines whether the specified Map is {@code null} or empty.
+     *
+     * @param m The Map to check.
+     * @return {@code true} if the Map is {@code null} or empty.
+     */
+    public static boolean isEmpty(final Map<?, ?> m) {
+        return m == null || m.isEmpty();
+    }
+
+    /**
+     * Splits the specified String of response types into a {@code Set} of response types.
+     * <br/>
+     * If the String of response types is {@code null} an empty {@code Set} is returned.
+     *
+     * @param responseType The String of response types.
+     * @return A {@code Set} of response types.
+     */
+    public static Set<String> splitResponseType(final String responseType) {
+        return stringToSet(responseType);
+    }
+
+    /**
+     * Splits the specified String of scopes into a {@code Set} of scopes.
+     * <br/>
+     * If the String of scopes is {@code null} an empty {@code Set} is returned.
+     *
+     * @param scope The String of scopes.
+     * @return A {@code Set} of scopes.
      */
     public static Set<String> splitScope(final String scope) {
-        if (scope == null) {
-            return new HashSet<String>();
-        }
-        return new HashSet<String>(Arrays.asList(scope.split(" ")));
+        return stringToSet(scope);
     }
 
     /**
-     * Splits the string on ' ' character and returns a {@code Set<String>} of the contents.
+     * Joins the specified {@code Set} of scopes into a space delimited String.
+     * <br/>
+     * If the specified {@code Set} of scopes is null, an empty String is returned.
      *
-     * @param string The string.
-     * @return A {@code Set<String>}.
-     */
-    static Set<String> stringToSet(String string) {
-        if (string == null || string.isEmpty()) {
-            return Collections.emptySet();
-        }
-        String[] values = string.split(" ");
-        Set<String> set = new HashSet<String>(Arrays.asList(values));
-        return set;
-    }
-
-    /**
-     * Joins together a {@code Set<String>} of scope into a String using the ' ' character to separate the individual
-     * scopes.
-     *
-     * @param scope The scope.
-     * @return A concatenated String of the scope.
+     * @param scope The scopes to join.
+     * @return A String of the joined scopes.
      */
     public static String joinScope(final Set<String> scope) {
 
@@ -101,12 +112,16 @@ public final class Utils {
     }
 
     /**
-     * Determines if the specified String is {@code null} or empty.
+     * Splits the string on ' ' character and returns a {@code Set<String>} of the contents.
      *
-     * @param s The String.
-     * @return {@code true} if the String is {@code null} or empty.
+     * @param string The string.
+     * @return A {@code Set<String>}.
      */
-    static boolean isEmpty(final String s) {
-        return s == null ? true : s.trim().isEmpty();
+    public static Set<String> stringToSet(String string) {
+        if (string == null || string.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return new HashSet<String>(Arrays.asList(string.split(" ")));
     }
+
 }

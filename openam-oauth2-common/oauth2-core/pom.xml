@@ -34,6 +34,7 @@
     </parent>
 
     <artifactId>oauth2-core</artifactId>
+    <version>12.0.0-SNAPSHOT</version>
 
     <name>OAuth2 Core</name>
     <description>OAuth2 Core library</description>
@@ -43,13 +44,6 @@
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assistedinject</artifactId>
-            <!-- Exclude aopalliance dependency due to ambiguous licensing terms. -->
-            <exclusions>
-                <exclusion>
-                    <groupId>aopalliance</groupId>
-                    <artifactId>aopalliance</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -62,6 +56,10 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-fluent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-web-token</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
