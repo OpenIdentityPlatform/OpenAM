@@ -184,8 +184,19 @@ Agreement (yes/no): [no]:</screen>
 
   <listitem>
     <para>
+     <emphasis role="bold">Policy Support for Common HTTP Operations</emphasis>.
+     OpenAM policies now let you allow and deny not only HTTP GET and HTTP POST,
+     but also HTTP DELETE, HEAD, OPTIONS, PATCH, and PUT
+     (<link xlink:show="new"
+            xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-336"
+     >OPENAM-336</link>).
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
      TODO: Update for next version
     </para>
-   </listitem>
+  </listitem>
  </itemizedlist>
 </chapter>

@@ -195,7 +195,7 @@
     <listitem>
      <para>A <firstterm>URL Policy Agent</firstterm> protects resources on a
      specific web site or web application. Your policy protects what URLs
-     client applications can access with HTTP GET and POST operations.</para>
+     client applications can access with HTTP operations.</para>
     </listitem>
    </itemizedlist>
    
@@ -373,9 +373,11 @@
       <para>Select URL Policy Agent (with resource name), and click Next.</para>
      </step>
      <step>
-      <para>Name the new rule, add the URL to protect in the Resource Name
-      field, and set whether to allow or deny HTTP GET and POST requests
-      to the URL.</para>
+      <para>
+       Name the new rule,
+       add the URL to protect in the Resource Name field,
+       and set which HTTP requests to allow or deny when accessing the resource.
+      </para>
      </step>
      <step>
       <para>Click Finish.</para>
