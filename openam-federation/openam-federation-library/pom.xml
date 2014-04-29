@@ -44,6 +44,18 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <com.sun.identity.saml.xmlsig.keystore>${project.build.testOutputDirectory}/keystore.jks</com.sun.identity.saml.xmlsig.keystore>
+                        <com.sun.identity.saml.xmlsig.storetype>JKS</com.sun.identity.saml.xmlsig.storetype>
+                        <com.sun.identity.saml.xmlsig.storepass>${project.build.testOutputDirectory}/keystorepass</com.sun.identity.saml.xmlsig.storepass>
+                        <com.sun.identity.saml.xmlsig.keypass>${project.build.testOutputDirectory}/keystorepass</com.sun.identity.saml.xmlsig.keypass>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>

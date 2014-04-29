@@ -257,6 +257,10 @@ public final class SAML2MetaSecurityUtils {
             return;
         }
 
+        // If there are signatures then explicitly identify the ID Attribute, See comments section of
+        // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8017265
+        doc.getDocumentElement().setIdAttribute(SAML2Constants.ID, true);
+
         initializeKeyStore();
 
         for(int i = 0; i < numSigs; i++) {
