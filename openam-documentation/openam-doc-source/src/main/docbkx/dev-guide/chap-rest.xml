@@ -1208,11 +1208,16 @@ userdetails.attribute.value=6319</computeroutput>
      <title>Creating Policies</title>
 
      <para>
-      To create a policy, perform an HTTP PUT
-      specifying the resource name
-      with the policy definition as the JSON resource data,
+      To create a policy,
+      either perform an HTTP PUT indicating the full path to the resource
+      and the name in the resource matching the name in the path,
+      or perform an HTTP POST with the name to use specified in the resource.
+     </para>
+
+     <para>
+      The HTTP PUT form includes the policy definition as the JSON resource data,
       with the header <literal>Content-Type: application/json</literal>
-      and using the <literal>If-None-Match: *</literal> header.
+      and uses the <literal>If-None-Match: *</literal> header.
      </para>
 
      <para>
@@ -1281,6 +1286,70 @@ $ <userinput>curl \
       and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
       to limit the fields returned in the output.
      </para>
+
+     <para>
+      The HTTP POST form includes the policy definition as the JSON resource data,
+      with the header <literal>Content-Type: application/json</literal>
+      and uses the <literal>_action=create</literal> operation.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "example",
+    "active": true,
+    "description": "Example Policy",
+    "resources": {
+        "included": [
+            "http://www.example.com:80/*",
+            "http://www.example.com:80/*?*"
+        ],
+        "excluded": []
+    },
+    "actionValues": {
+        "POST": false,
+        "GET": true
+    },
+    "subject": {
+        "type": "User",
+        "subjectName": "Bob Dobbs"
+    }
+}' \
+ https://openam.example.com:8443/openam/json/realm/entitlements?_action=create</userinput>
+<computeroutput>{
+  "name" : "example",
+  "active" : true,
+  "description" : "Example Policy",
+  "resources" : {
+    "included" : [ "http://www.example.com:80/*",
+                   "http://www.example.com:80/*?*" ],
+    "excluded" : [ ]
+  },
+  "applicationName" : "iPlanetAMWebAgentService",
+  "actionValues" : {
+    "POST" : false,
+    "GET" : true
+  },
+  "subject" : {
+    "type" : "User",
+    "subjectName" : "Bob Dobbs"
+  },
+  "lastModifiedBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "lastModified" : "2014-04-29T07:33:54Z",
+  "createdBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "creationDate" : "2014-04-29T07:33:54Z"
+}</computeroutput>
+     </screen>
     </section>
 
     <section xml:id="rest-api-authz-policies-read">
