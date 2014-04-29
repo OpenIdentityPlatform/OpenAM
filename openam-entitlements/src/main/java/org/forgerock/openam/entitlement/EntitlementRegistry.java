@@ -39,9 +39,9 @@ import com.sun.identity.entitlement.StringAttributeCondition;
 import com.sun.identity.entitlement.TimeCondition;
 import com.sun.identity.entitlement.UserAttributes;
 import com.sun.identity.entitlement.UserSubject;
-
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -290,5 +290,35 @@ public final class EntitlementRegistry {
         if (previous != null && previous != type) {
             throw new NameAlreadyRegisteredException(shortName);
         }
+    }
+
+    /**
+     * Returns all the short names of {@link EntitlementCondition}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unqiue EntitlementConditions registered at point of query.
+     */
+    public Set<String> getConditionsShortNames() {
+        return conditions.keySet();
+    }
+
+    /**
+     * Returns all the short names of {@link EntitlementSubject}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unqiue EntitlementSubject registered at point of query.
+     */
+    public Set<String> getSubjectsShortNames() {
+        return subjects.keySet();
+    }
+
+    /**
+     * Returns all the short names of {@link ResourceAttribute}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unqiue ResourceAttribute registered at point of query.
+     */
+    public Set<String> getAttributesShortNames() {
+        return attributes.keySet();
     }
 }

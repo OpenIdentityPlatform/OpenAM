@@ -200,6 +200,8 @@ public final class RestEndpointGuiceProvider {
             collectionResourceEndpoints.addBinding(RestEndpointManager.SERVER_INFO).to(ServerInfoResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.POLICIES).to(PolicyResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.APPLICATIONTYPES).to(ApplicationTypesResource.class);
+            collectionResourceEndpoints.addBinding(RestEndpointManager.CONDITIONTYPES).to(ApplicationTypesResource.class);
+
 
             return collectionResourceEndpoints;
         }

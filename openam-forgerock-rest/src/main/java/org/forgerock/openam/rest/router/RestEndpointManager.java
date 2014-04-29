@@ -69,6 +69,11 @@ public interface RestEndpointManager {
     String APPLICATIONTYPES = "/applicationtypes";
 
     /**
+     * The conditiontype resource endpoint.
+     */
+    String CONDITIONTYPES = "/conditiontypes";
+
+    /**
      * The applications resource endpoint.
      */
     String APPLICATIONS = "/applications";
