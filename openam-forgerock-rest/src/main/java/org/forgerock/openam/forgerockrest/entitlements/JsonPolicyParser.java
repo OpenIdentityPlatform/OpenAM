@@ -25,14 +25,19 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.exc.UnrecognizedPropertyException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonDecision;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlement;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicy;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.TimeZone;
 
 
@@ -42,6 +47,7 @@ import java.util.TimeZone;
  * @since 12.0.0
  */
 public final class JsonPolicyParser implements PolicyParser {
+
     private static final Debug DEBUG = Debug.getInstance(JsonPolicyParser.class.getName());
 
     /**
@@ -51,6 +57,8 @@ public final class JsonPolicyParser implements PolicyParser {
      * for various entitlements classes.
      */
     private static final ObjectMapper MAPPER = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
+
+    private static final EntitlementToDecisionMapper ENTITLEMENT_TO_DECISION = new EntitlementToDecisionMapper();
 
     static {
         // Configure the JSON MAPPER to use a standard ISO-8601 format for timestamps.
@@ -105,6 +113,21 @@ public final class JsonPolicyParser implements PolicyParser {
         }
     }
 
+    @Override
+    public JsonValue printEntitlements(final List<Entitlement> entitlements) throws EntitlementException {
+        final List<JsonDecision> jsonDecisions = CollectionUtils.transformList(entitlements, ENTITLEMENT_TO_DECISION);
+
+        try {
+            final String json = MAPPER.writeValueAsString(jsonDecisions);
+            return JsonValueBuilder.toJsonArray(json);
+        } catch (IOException ioE) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Unable to serialise entitlement to json", ioE);
+            }
+            throw new EntitlementException(EntitlementException.UNABLE_TO_SERIALIZE_OBJECT);
+        }
+    }
+
     private Privilege parsePrivilege(String name, JsonValue jsonValue) throws EntitlementException {
         try {
             // Note: this is a bit ugly as we re-serialise the JsonValue back into a JSON String to then parse it
@@ -122,5 +145,18 @@ public final class JsonPolicyParser implements PolicyParser {
         } catch (IOException e) {
             throw new EntitlementException(EntitlementException.UNABLE_TO_CREATE_POLICY, e);
         }
+    }
+
+    /**
+     * Mapping function that maps an entitlement to a json decision.
+     */
+    private static final class EntitlementToDecisionMapper
+            implements Function<Entitlement, JsonDecision, NeverThrowsException> {
+
+        @Override
+        public JsonDecision apply(final Entitlement entitlement) {
+            return new JsonDecision(entitlement);
+        }
+
     }
 }

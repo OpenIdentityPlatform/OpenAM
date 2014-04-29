@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,6 +23,8 @@
  *
  */
 package org.forgerock.openam.utils;
+
+import org.forgerock.util.Reject;
 
 import java.util.Map;
 
@@ -50,4 +52,20 @@ public final class StringUtils {
     public static String insertContent(String original, int position, String content) {
         return original.substring(0, position) + content + original.substring(position);
     }
+
+    /**
+     * Checks that the original string is not null nor empty, if so it returns the non-null default string instead.
+     *
+     * @param original
+     *         the original string
+     * @param defaultString
+     *         the non-null default string
+     *
+     * @return the original string if not null and not empty, else the default string
+     */
+    public static String ifNullOrEmpty(final String original, final String defaultString) {
+        Reject.ifNull(defaultString, "Default string must not be null");
+        return (original == null || original.isEmpty()) ? defaultString : original;
+    }
+
 }

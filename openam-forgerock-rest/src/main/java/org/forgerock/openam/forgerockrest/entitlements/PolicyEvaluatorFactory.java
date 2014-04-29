@@ -1,6 +1,4 @@
 /*
- * Copyright 2014 ForgeRock, AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,37 +10,37 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.rest.resource;
+package org.forgerock.openam.forgerockrest.entitlements;
 
-import org.forgerock.json.resource.Context;
+import com.sun.identity.entitlement.EntitlementException;
 
 import javax.security.auth.Subject;
 
 /**
- * CREST context interface for ServerContexts that allow retrieving an authenticated caller subject.
+ * Factory provides policy evaluators used to process policy requests.
  *
  * @since 12.0.0
  */
-public interface SubjectContext extends Context {
+public interface PolicyEvaluatorFactory {
 
     /**
-     * Returns the authenticated subject associated with this request.
+     * Given the subject looking to request policy decisions within an
+     * application context, retrieve the relevant policy evaluator.
      *
-     * @return the authenticated subject associated with this request, or null if not authenticated.
+     * @param subject
+     *         the subject looking to request policy decisions
+     * @param application
+     *         the application context
+     *
+     * @return a policy evaluator
+     *
+     * @throws EntitlementException
+     *         should an error occur retrieve a policy evaluator
      */
-    Subject getCallerSubject();
-
-    /**
-     * Given a token Id returns the subject representation.
-     * If the token Id is null or invalid, a null subject will be returned.
-     *
-     * @param tokenId
-     *         a valid token Id
-     *
-     * @return the corresponding subject, or null if the token Id is invalid
-     */
-    Subject getSubject(String tokenId);
+    public PolicyEvaluator getEvaluator(final Subject subject, final String application) throws EntitlementException;
 
 }

@@ -35,6 +35,7 @@ import javax.security.auth.Subject;
  * @since 12.0.0
  */
 public class SSOTokenContext extends ServerContext implements SubjectContext {
+
     public SSOTokenContext(Context parent) {
         super(parent);
         Reject.ifFalse(parent.containsContext(SecurityContext.class), "Parent context must contain a SecurityContext");
@@ -54,10 +55,24 @@ public class SSOTokenContext extends ServerContext implements SubjectContext {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Subject getSubject(final String tokenId) {
+        try {
+            return SubjectUtils.createSubject(getSSOToken(tokenId));
+        } catch (SSOException ssoE) {
+            return null;
+        }
+    }
+
+    /**
      * Returns the SSO token associated with this request.
      *
      * @return the SSO token associated with this request.
-     * @throws SSOException if there is no SSO token associated with this request.
+     *
+     * @throws SSOException
+     *         if there is no SSO token associated with this request.
      */
     public SSOToken getCallerSSOToken() throws SSOException {
         return getCallerSSOToken(SSOTokenManager.getInstance());
@@ -66,12 +81,50 @@ public class SSOTokenContext extends ServerContext implements SubjectContext {
     /**
      * Returns the SSO token associated with this request.
      *
-     * @param tokenManager The SSOTokenManager instance that will get the SSOToken.
+     * @param tokenManager
+     *         The SSOTokenManager instance that will get the SSOToken.
+     *
      * @return the SSO token associated with this request.
-     * @throws SSOException if there is no SSO token associated with this request.
+     *
+     * @throws SSOException
+     *         if there is no SSO token associated with this request.
      */
     public SSOToken getCallerSSOToken(final SSOTokenManager tokenManager) throws SSOException {
         String tokenId = RestUtils.getCookieFromServerContext(this);
+        return getSSOToken(tokenId, tokenManager);
+    }
+
+    /**
+     * Given a valid non-null token Id, returns its SSO token representation.
+     *
+     * @param tokenId
+     *         valid non-null token id
+     *
+     * @return SSO token representation
+     *
+     * @throws SSOException
+     *         if there is no SSO token associated with this request.
+     */
+    public SSOToken getSSOToken(final String tokenId) throws SSOException {
+        return getSSOToken(tokenId, SSOTokenManager.getInstance());
+    }
+
+    /**
+     * Given a valid non-null token Id, returns its SSO token representation.
+     *
+     * @param tokenId
+     *         valid non-null token id
+     * @param tokenManager
+     *         non-null token managed used to assist with retrieving the SSO token
+     *
+     * @return SSO token representation
+     *
+     * @throws SSOException
+     *         if there is no SSO token associated with this request.
+     */
+    public SSOToken getSSOToken(final String tokenId, final SSOTokenManager tokenManager) throws SSOException {
+        Reject.ifNull(tokenManager, "A valid SSO token manager is required");
         return tokenManager.createSSOToken(tokenId);
     }
+
 }

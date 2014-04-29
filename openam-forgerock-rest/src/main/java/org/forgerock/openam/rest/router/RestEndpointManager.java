@@ -79,9 +79,9 @@ public interface RestEndpointManager {
     String AUTHENTICATE = "/authenticate";
 
     /**
-     * The entitlements service endpoint.
+     * The policies service endpoint.
      */
-    String ENTITLEMENTS = "/entitlements";
+    String POLICIES = "/policies";
 
     /**
      * Determines whether the given token matches one of the registered endpoints.

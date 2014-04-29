@@ -21,6 +21,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import org.forgerock.json.fluent.JsonValue;
 
+import java.util.List;
+
 /**
  * Interface for parsing policies from some resource representation.
  *
@@ -53,4 +55,18 @@ public interface PolicyParser {
      * @throws EntitlementException if an error occurs.
      */
     JsonValue printEntitlement(Entitlement entitlement) throws EntitlementException;
+
+    /**
+     * Converts a list of policy decisions to a json representation.
+     *
+     * @param entitlements
+     *         the list of policy decisions
+     *
+     * @return the json representation
+     *
+     * @throws EntitlementException
+     *         should an error occur during the transformation
+     */
+    JsonValue printEntitlements(final List<Entitlement> entitlements) throws EntitlementException;
+
 }

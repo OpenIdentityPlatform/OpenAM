@@ -29,8 +29,10 @@ import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.entitlements.EntitlementEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResourceErrorHandler;
 import org.forgerock.openam.forgerockrest.entitlements.JsonPolicyParser;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
@@ -75,7 +77,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
         bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
 
-        // EntitlementsResource configuration
+        // PolicyResource configuration
         bind(PrivilegeManager.class).to(PolicyPrivilegeManager.class);
         bind(new TypeLiteral<ResourceErrorHandler<EntitlementException>>() {})
                 .to(EntitlementsResourceErrorHandler.class);
@@ -101,6 +103,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(PrivilegePolicyStoreProvider.POLICY_QUERY_ATTRIBUTES))
                 .toProvider(PolicyQueryAttributesMapProvider.class)
                 .asEagerSingleton();
+        bind(PolicyEvaluatorFactory.class).to(EntitlementEvaluatorFactory.class).in(Singleton.class);
 
         // vvvv Rest Endpoint Bindings vvvv
         bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
@@ -159,6 +162,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             handlers.put(EntitlementException.AUTHENTICATION_ERROR,         ResourceException.FORBIDDEN);
             handlers.put(EntitlementException.INVALID_VALUE,                ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_NAME_MISMATCH,         ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.APP_RETRIEVAL_ERROR,          ResourceException.BAD_REQUEST);
 
 
             return handlers;

@@ -52,7 +52,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("unchecked")
-public class EntitlementsResourceTest {
+public class PolicyResourceTest {
 
     @Mock
     private PolicyParser mockParser;
@@ -71,7 +71,10 @@ public class EntitlementsResourceTest {
     @Mock
     private ResultHandler<Resource> mockResultHandler;
 
-    private EntitlementsResource entitlementsResource;
+    @Mock
+    private PolicyEvaluatorFactory mockFactory;
+
+    private PolicyResource policyResource;
 
     @BeforeClass
     public void mockPrivilegeClass() {
@@ -92,22 +95,22 @@ public class EntitlementsResourceTest {
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
         resourceErrorHandler = new EntitlementsResourceErrorHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
 
-        entitlementsResource = new EntitlementsResource(mockParser, mockStoreProvider, resourceErrorHandler);
+        policyResource = new PolicyResource(mockFactory, mockParser, mockStoreProvider, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullParser() {
-        new EntitlementsResource(null, mockStoreProvider, resourceErrorHandler);
+        new PolicyResource(mockFactory, null, mockStoreProvider, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullStoreProvider() {
-        new EntitlementsResource(mockParser, null, resourceErrorHandler);
+        new PolicyResource(mockFactory, mockParser, null, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullErrorHandler() {
-        new EntitlementsResource(mockParser, mockStoreProvider, null);
+        new PolicyResource(mockFactory, mockParser, mockStoreProvider, null);
     }
 
     @Test
@@ -120,7 +123,7 @@ public class EntitlementsResourceTest {
         given(mockParser.parsePolicy(id, json)).willThrow(new EntitlementException(EntitlementException.INVALID_JSON));
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(BadRequestException.class));
@@ -140,7 +143,7 @@ public class EntitlementsResourceTest {
                 .given(mockStore).create(policy);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(InternalServerErrorException.class));
@@ -157,7 +160,7 @@ public class EntitlementsResourceTest {
         given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockParser).parsePolicy(policyName, json);
@@ -175,7 +178,7 @@ public class EntitlementsResourceTest {
         given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockParser).parsePolicy(policyName, json);
@@ -193,7 +196,7 @@ public class EntitlementsResourceTest {
         given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockParser).parsePolicy(policyName, json);
@@ -207,7 +210,7 @@ public class EntitlementsResourceTest {
         CreateRequest request = mockCreateRequest("Different!", json);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(BadRequestException.class));
@@ -220,7 +223,7 @@ public class EntitlementsResourceTest {
         CreateRequest request = mockCreateRequest(null, json);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(BadRequestException.class));
@@ -241,7 +244,7 @@ public class EntitlementsResourceTest {
         given(mockParser.printPolicy(policy)).willReturn(result);
 
         // When
-        entitlementsResource.createInstance(mockServerContext, request, mockResultHandler);
+        policyResource.createInstance(mockServerContext, request, mockResultHandler);
 
         // Then
         verify(mockStore).create(policy);
@@ -255,7 +258,7 @@ public class EntitlementsResourceTest {
         DeleteRequest request = mock(DeleteRequest.class);
 
         // When
-        entitlementsResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockStore).delete(id);
@@ -271,7 +274,7 @@ public class EntitlementsResourceTest {
                 .given(mockStore).delete(id);
 
         // When
-        entitlementsResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(BadRequestException.class));
@@ -286,7 +289,7 @@ public class EntitlementsResourceTest {
                 .given(mockStore).delete(id);
 
         // When
-        entitlementsResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.deleteInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(NotFoundException.class));
@@ -304,7 +307,7 @@ public class EntitlementsResourceTest {
         given(mockParser.printPolicy(policy)).willReturn(content);
 
         // When
-        entitlementsResource.readInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.readInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleResult(new Resource(id, Long.toString(lastModified), content));
@@ -318,7 +321,7 @@ public class EntitlementsResourceTest {
         ReadRequest request = mock(ReadRequest.class);
 
         // When
-        entitlementsResource.readInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.readInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleError(isA(NotFoundException.class));
@@ -337,7 +340,7 @@ public class EntitlementsResourceTest {
         given(mockStore.update(privilege)).willReturn(privilege);
 
         // When
-        entitlementsResource.updateInstance(mockServerContext, id, request, mockResultHandler);
+        policyResource.updateInstance(mockServerContext, id, request, mockResultHandler);
 
         // Then
         verify(mockResultHandler).handleResult(new Resource(id, Long.toString(lastModified), content));
@@ -355,7 +358,7 @@ public class EntitlementsResourceTest {
         given(mockStore.query(request)).willReturn(policies);
 
         // When
-        entitlementsResource.queryCollection(mockServerContext, request, handler);
+        policyResource.queryCollection(mockServerContext, request, handler);
 
         // Then
         verify(handler, times(policies.size())).handleResource(any(Resource.class));
@@ -371,7 +374,7 @@ public class EntitlementsResourceTest {
                 new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER));
 
         // When
-        entitlementsResource.queryCollection(mockServerContext, request, handler);
+        policyResource.queryCollection(mockServerContext, request, handler);
 
         // Then
         verify(handler).handleError(isA(BadRequestException.class));

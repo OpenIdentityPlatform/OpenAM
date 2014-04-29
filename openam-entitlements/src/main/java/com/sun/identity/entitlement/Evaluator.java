@@ -41,9 +41,6 @@ import javax.security.auth.Subject;
  */
 public class Evaluator {
 
-    // Application retrieval log message code.
-    private static final int APP_RETRIEVAL_ERROR = 248;
-
     private Subject adminSubject;
     private String applicationName =
         ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
@@ -190,7 +187,7 @@ public class Evaluator {
 
         if (application == null) {
             // App retrieval error.
-            throw new EntitlementException(APP_RETRIEVAL_ERROR, new String[] {realm});
+            throw new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR, new String[] {realm});
         }
 
         // Normalise the incoming resource URL.

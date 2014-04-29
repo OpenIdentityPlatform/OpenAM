@@ -16,13 +16,16 @@
 
 package org.forgerock.openam.forgerockrest.entitlements;
 
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
@@ -33,6 +36,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicyRequest;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
@@ -42,13 +46,18 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicyRequest.Builder;
 
 /**
  * REST endpoint for policy/entitlements management and evaluation.
  *
  * @since 12.0.0
  */
-public final class EntitlementsResource implements CollectionResourceProvider {
+public final class PolicyResource implements CollectionResourceProvider {
+
+    private static final Debug DEBUG = Debug.getInstance("amPolicy");
+
+    private final static String EVAL_ACTION = "evaluate";
 
     /**
      * Parser for converting between JSON and concrete entitlements policy instances.
@@ -63,11 +72,15 @@ public final class EntitlementsResource implements CollectionResourceProvider {
      */
     private final ResourceErrorHandler<EntitlementException> resourceErrorHandler;
 
+    private final PolicyEvaluatorFactory factory;
+
     @Inject
-    public EntitlementsResource(final PolicyParser parser,
-                                final PolicyStoreProvider provider,
-                                final ResourceErrorHandler<EntitlementException> handler) {
-        Reject.ifNull(parser, provider, handler);
+    public PolicyResource(final PolicyEvaluatorFactory factory,
+                          final PolicyParser parser,
+                          final PolicyStoreProvider provider,
+                          final ResourceErrorHandler<EntitlementException> handler) {
+        Reject.ifNull(factory, parser, provider, handler);
+        this.factory = factory;
         this.policyParser = parser;
         this.policyStoreProvider = provider;
         this.resourceErrorHandler = handler;
@@ -78,7 +91,46 @@ public final class EntitlementsResource implements CollectionResourceProvider {
      */
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        final String action = request.getAction();
+
+        if (EVAL_ACTION.equals(action)) {
+            try {
+                final JsonPolicyRequest policyRequest = new Builder(context, request).build();
+                handler.handleResult(evaluateRequest(policyRequest));
+                return;
+            } catch (EntitlementException eE) {
+                DEBUG.error("Error evaluating policy request", eE);
+                handler.handleError(resourceErrorHandler.handleError(request, eE));
+                return;
+            }
+        }
+
+        final String errorMsg = "Action '" + action + "' not implemented for this resource";
+        final NotSupportedException nsE = new NotSupportedException(errorMsg);
+        DEBUG.error(errorMsg, nsE);
+        handler.handleError(nsE);
+    }
+
+    /**
+     * Evaluates the given policy request and returns a json decision.
+     *
+     * @param request
+     *         a non-null policy request
+     *
+     * @return a json representation of the decision
+     *
+     * @throws EntitlementException
+     *         in the event of a failure during the evaluation process
+     */
+    private JsonValue evaluateRequest(final JsonPolicyRequest request) throws EntitlementException {
+        DEBUG.message("Evaluating policy request");
+
+        final PolicyEvaluator evaluator = factory.getEvaluator(request.getRestSubject(), request.getApplication());
+
+        final List<Entitlement> entitlements = evaluator.evaluate(
+                request.getRealm(), request.getPolicySubject(), request.getResources(), request.getEnvironment());
+
+        return policyParser.printEntitlements(entitlements);
     }
 
     /**
@@ -227,4 +279,5 @@ public final class EntitlementsResource implements CollectionResourceProvider {
     private String policyRevision(Privilege policy) {
         return Long.toString(policy.getLastModifiedDate());
     }
+
 }

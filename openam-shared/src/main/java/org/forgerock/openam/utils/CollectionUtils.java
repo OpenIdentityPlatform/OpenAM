@@ -11,15 +11,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 package org.forgerock.openam.utils;
 
+import org.forgerock.util.Reject;
+import org.forgerock.util.promise.Function;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -77,4 +82,69 @@ public class CollectionUtils {
             return new LinkedHashSet<T>(Arrays.asList(values));
         }
     }
+
+    /**
+     * Maps the values of a non-null map from one type to another type using a non-null mapper function.
+     *
+     * @param map
+     *         the non-null original map
+     * @param mapper
+     *         the non-null mapping function
+     * @param <K>
+     *         the type of key
+     * @param <I>
+     *         the type of the initial value
+     * @param <M>
+     *         the type of the mapped value
+     * @param <E>
+     *         the type of exception that the function may throw
+     *
+     * @return a new map with the mapped values
+     *
+     * @throws E
+     *         should an exception occur during the mapping process
+     */
+    public static <K, I, M, E extends Exception> Map<K, M> transformMap(final Map<K, I> map,
+                                                                        final Function<I, M, E> mapper) throws E {
+        Reject.ifNull(map, mapper);
+        final Map<K, M> newMap = new HashMap<K, M>(map.size());
+
+        for (Map.Entry<K, I> entry : map.entrySet()) {
+            newMap.put(entry.getKey(), mapper.apply(entry.getValue()));
+        }
+
+        return newMap;
+    }
+
+    /**
+     * Maps the values of a non-null list from one type to another type using a non-null mapper function.
+     *
+     * @param list
+     *         the non-null original list
+     * @param mapper
+     *         the non-null mapping function
+     * @param <I>
+     *         the type of the initial value
+     * @param <M>
+     *         the type of the mapped value
+     * @param <E>
+     *         the type of exception that the function may throw
+     *
+     * @return a new list with the mapped values
+     *
+     * @throws E
+     *         should an exception occur during the mapping process
+     */
+    public static <I, M, E extends Exception> List<M> transformList(final List<I> list,
+                                                                    final Function<I, M, E> mapper) throws E {
+        Reject.ifNull(list, mapper);
+        final List<M> newList = new ArrayList<M>(list.size());
+
+        for (I value : list) {
+            newList.add(mapper.apply(value));
+        }
+
+        return newList;
+    }
+
 }

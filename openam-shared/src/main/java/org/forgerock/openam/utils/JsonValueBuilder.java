@@ -21,6 +21,7 @@ import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,6 +51,25 @@ public class JsonValueBuilder {
     public static JsonValue toJsonValue(String json) throws JsonException {
         try {
             return new JsonValue(mapper.readValue(json, Map.class));
+        } catch (IOException e) {
+            throw new JsonException("Failed to parse json", e);
+        }
+    }
+
+    /**
+     * Converts the passed json string into a {@link JsonValue} represented as a list.
+     *
+     * @param json
+     *         the json string
+     *
+     * @return a JsonValue instance represented as a list
+     *
+     * @throws JsonException
+     *         should an error occur whilst parsing the json
+     */
+    public static JsonValue toJsonArray(final String json) throws JsonException {
+        try {
+            return new JsonValue(mapper.readValue(json, List.class));
         } catch (IOException e) {
             throw new JsonException("Failed to parse json", e);
         }
