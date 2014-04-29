@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 ForgeRock AS
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.xmlsig;
@@ -20,7 +20,6 @@ package com.sun.identity.saml2.xmlsig;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.testng.Assert;
@@ -31,11 +30,6 @@ import org.w3c.dom.NodeList;
 
 public class SigProviderTest {
 
-    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks")
-            .getFile());
-    private static final String KEY_STORE_TYPE = "JKS";
-    private static final String KEY_STORE_PASS = "testcase";
-    private static final String DEFAULT_PRIVATE_KEY_PASS = "testcase";
     private static final String DEFAULT_PRIVATE_KEY_ALIAS = "defaultkey";
     private static final String XML_DOCUMENT_TO_SIGN = "documenttosign.xml";
     private static final String SIGNED_XML_DOCUMENT = "signeddocument.xml";
@@ -47,7 +41,8 @@ public class SigProviderTest {
     @BeforeClass
     public void setUp() {
 
-        keyProvider = new AMKeyProvider(true, KEY_STORE_FILE, KEY_STORE_PASS, KEY_STORE_TYPE, DEFAULT_PRIVATE_KEY_PASS);
+        // The keystore properties required to bootstrap this class are setup in the POM
+        keyProvider = new AMKeyProvider();
         sigProvider = SigManager.getSigInstance();
     }
 

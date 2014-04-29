@@ -24,10 +24,7 @@
  *
  * $Id: SAML2MetaSecurityUtils.java,v 1.6 2009/06/08 23:43:18 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.meta;
@@ -259,6 +256,10 @@ public final class SAML2MetaSecurityUtils {
         if (numSigs == 0) {
             return;
         }
+
+        // If there are signatures then explicitly identify the ID Attribute, See comments section of
+        // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=8017265
+        doc.getDocumentElement().setIdAttribute(SAML2Constants.ID, true);
 
         initializeKeyStore();
 
