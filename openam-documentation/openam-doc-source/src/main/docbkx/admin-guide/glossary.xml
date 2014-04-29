@@ -40,6 +40,38 @@
  </glossentry>
 
  <glossentry>
+  <glossterm>Application</glossterm>
+  <glossdef>
+   <para>
+    In general terms, a service exposing protected resources
+   </para>
+
+   <para>
+    Specifically for authorization,
+    a constrained application of policy for a given context
+   </para>
+
+   <para>
+    An application configuration defines
+    the root resources,
+    the subset of environment and subject conditions,
+    the set of actions,
+    the comparator logic,
+    and the pre-defined policy configuration properties
+    for how policy applies for a specific application.
+    The application configuration constrains
+    policies created for the application.
+   </para>
+
+   <para>
+    Application types act as templates for creating applications.
+    Application types define a preset list of actions and functional logic,
+    such as policy lookup and resource comparator logic.
+   </para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
   <glossterm>Authentication</glossterm>
   <glossdef>
    <para>The act of confirming the identity of a principal</para>
@@ -198,7 +230,12 @@
  <glossentry>
   <glossterm>Entitlement</glossterm>
   <glossdef>
-   <para>XACML-based policy</para>
+   <para>
+    Decision that defines which resource names can and cannot be accessed
+    for a given subject in the context of a particular application,
+    which actions are allowed and which are denied,
+    and any related advice and attributes
+   </para>
   </glossdef>
  </glossentry>
 
@@ -345,6 +382,17 @@
   <glossdef>
    <para>Entity that can be authenticated (such as a user, a device, or an
    application)</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Privilege</glossterm>
+  <glossdef>
+   <para>
+    In the context of delegated administration,
+    a set of administrative tasks that can be performed by specified subjects
+    in a given realm
+   </para>
   </glossdef>
  </glossentry>
 

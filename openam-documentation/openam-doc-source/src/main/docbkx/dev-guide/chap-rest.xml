@@ -684,122 +684,1057 @@ userdetails.attribute.value=6319</computeroutput>
    <primary>Policy</primary>
    <secondary>REST API</secondary>
   </indexterm>
-  
-  <para>You can call on OpenAM to decide whether to authorize access to a
-  protected resource based on a valid token. Of course, you must percent
-  encode the resource URI.</para>
 
-  <!-- Pending replacement
-  <para>Interface Stability: <link xlink:show="new"
-  xlink:href="admin-guide#interface-stability"
-  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
+  <para>
+   OpenAM provides REST APIs both for requesting policy decisions,
+   and also for administering policy definitions.
+  </para>
 
-  <screen>
+  <itemizedlist>
+   <listitem>
+    <para>
+     Under <literal>/json[/<replaceable>realm</replaceable>]/entitlements</literal>,
+     you find the newer JSON-based APIs.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-authz-json" /> below.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Under <literal>/identity/authorize</literal>
+     and <literal>/ws/1/entitlement/</literal>,
+     you find the backwards-compatible, legacy APIs.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-authz-legacy" /> below.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-authz-json">
+   <title>Authorization</title>
+   
+   <para>
+    This section describes how to request policy decisions
+    and how to manage policies.
+   </para>
+
+   <section xml:id="rest-api-authz-policy-decisions">
+    <title>Requesting Policy Decisions</title>
+
+    <para>
+     TODO: Pending AME-3381
+    </para>
+   </section>
+
+   <section xml:id="rest-api-authz-policies">
+    <title>Managing Policies</title>
+
+    <para>
+     Policy resources are represented in JSON and take the following form.
+     Policy resources are built from standard JSON objects and values
+     (strings, numbers, objects, arrays, <literal>true</literal>,
+     <literal>false</literal>, and <literal>null</literal>).
+    </para>
+
+    <programlisting language="java">
+{
+    "name": "test",
+    "active": true,
+    "description": "A test policy",
+    "resources": {
+        "included": [
+            "http://www.example.com:80/*"
+        ],
+        "excluded": [
+            "http://www.example.com:80/images/*"
+        ]
+    },
+    "applicationName": "application name",
+    "actionValues": {
+        "read": true,
+        "write": false
+    },
+    "subject": {
+        "a subject or": "a composite of subjects"
+    },
+    "condition": {
+        "a condition or": "a composite of conditions"
+    },
+    "resourceAttributes": [
+        {
+            "type": "Static",
+            "propertyName": "name",
+            "propertyValues": [
+                "value"
+            ]
+        },
+        {
+            "type": "User",
+            "propertyName": "profile attribute",
+            "propertyValues": [
+                "profile attribute", ...
+            ]
+        },
+    ]
+}
+    </programlisting>
+
+    <variablelist>
+     <para>
+      The values for the fields shown in the example are explained below.
+     </para>
+
+     <varlistentry>
+      <term><literal>"name"</literal></term>
+      <listitem>
+       <para>
+        String matching the name
+        in the URL used when creating the policy by HTTP PUT
+        or in the body when creating the policy by HTTP POST
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"active"</literal></term>
+      <listitem>
+       <para>
+        Boolean indicating whether OpenAM considers the policy active
+        for evaluation purposes, defaults to <literal>false</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"description"</literal></term>
+      <listitem>
+       <para>
+        String describing the policy
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resources"</literal></term>
+      <listitem>
+       <para>
+        List of the resource name pattern strings
+        to which the policy applies (<literal>"included"</literal>)
+        and does not apply (<literal>"excluded"</literal>)
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"applicationName"</literal></term>
+      <listitem>
+       <para>
+        String application name,
+        such as <literal>"iPlanetAMWebAgentService"</literal>,
+        <literal>"crestPolicyService"</literal>,
+        or some other application name
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"actionValues"</literal></term>
+      <listitem>
+       <para>
+        Set of string action names,
+        each set to a boolean indicating whether the action is allowed
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"subject"</literal></term>
+      <listitem>
+       <para>
+        Specifies the subjects to which the policy applies,
+        where subjects can be combined by using the built-in types
+        <literal>"AND"</literal>, <literal>"OR"</literal>,
+        and <literal>"NOT"</literal>,
+        and where subject implementations are pluggable
+       </para>
+
+       <para>
+        Subjects are shown as JSON objects
+        with <literal>"type"</literal> set to the name of the implementation
+        (using a short name for all registered subject implementations),
+        and also other fields depending on the implementation.
+        The subject types registered by default include the following.
+       </para>
+
+       <itemizedlist>
+        <listitem>
+         <para>
+          <literal>"AnyUser"</literal>, meaning any authenticated user
+         </para>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"Attribute"</literal> to specify attributes
+          of the subject's profile as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "subject": {
+        "type": "Attribute",
+        "name": "ou",
+        "value": "Product Testing"
+    }
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"Group"</literal> to specify a particular group
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "subject": {
+        "type": "Group",
+        "subjectName": "HR Managers"
+    }
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"NONE"</literal>, meaning no subject
+         </para>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"Role"</literal> to specify a particular OpenAM role
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "subject": {
+        "type": "Role",
+        "subjectName": "System Administrators"
+    }
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"User"</literal> to specify a particular user
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "subject": {
+        "type": "User",
+        "subjectName": "Bob Dobbs"
+    }
+}
+         </programlisting>
+        </listitem>
+       </itemizedlist>
+
+       <para>
+        <literal>"Policy"</literal> subject types can be used
+        to correspond to the subject configured for policies
+        as in the following example.
+       </para>
+
+       <programlisting language="java">
+{
+    "type": "Policy",
+    "name": "All authenticated users",
+    "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
+    "values": []
+}
+       </programlisting>
+       <para>
+        The following example defines the subject
+        either as Bob Dobbs or as a member of the HR Managers group.
+       </para>
+
+       <programlisting language="java">
+{
+    "subject": {
+        "type": "OR",
+        "subjects": [
+            {
+                "subject": {
+                    "type": "User",
+                    "subjectName": "Bob Dobbs"
+                }
+            },
+            {
+                "subject": {
+                    "type": "Group",
+                    "subjectName": "HR Managers"
+                }
+            }
+        ]
+    }
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"condition"</literal></term>
+      <listitem>
+       <para>
+        Specifies additional conditions, where conditions can be combined
+        by using the built-in types <literal>"AND"</literal>,
+        <literal>"OR"</literal>, and <literal>"NOT"</literal>,
+        and where condition implementations are pluggable
+       </para>
+
+       <para>
+        Conditions are shown as JSON objects
+        with <literal>"type"</literal> set to the name of the implementation
+        (using a short name for all registered condition implementations),
+        and also other fields depending on the implementation.
+        The condition types registered by default include the following.
+       </para>
+
+       <itemizedlist>
+        <listitem>
+         <para>
+          <literal>"AttributeLookup"</literal> to specify
+          a value to match in the resource as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "AttributeLookup",
+    "key": "postaladdress",
+    "value": "33 New Montgomery St."
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"DNSName"</literal> to specify domain names
+          where the request originated as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "DNSName",
+    "domainNameMask": "*.example.com"
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"IP"</literal> to specify an IP address range
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "IP",
+    "startIp": "127.0.0.1",
+    "endIp": "127.0.0.255"
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"NumericAttribute"</literal> to specify a value or range
+          for a numeric attribute from the subject's user profile
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "NumericAttribute",
+    "attributeName": "gidNumber",
+    "caseSensitive": "&lt;=",
+    "value": "1000"
+}
+         </programlisting>
+
+         <para><!-- This is my reading of NumericAttributeCondition.java. Looks like a bug. -->
+          <literal>"caseSensitive"</literal> is optional, but if used
+          then it should be set to a comparison operator, one of:
+          <literal>&lt; &lt;= = > >=</literal>.
+          If not specified, then OpenAM checks for equality.
+         </para>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"StringAttribute"</literal> to specify a value
+          for a string-valued attribute from the subject's user profile
+          as in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "StringAttribute",
+    "attributeName": "location",
+    "caseSensitive": false,
+    "value": "Bristol"
+}
+         </programlisting>
+        </listitem>
+
+        <listitem>
+         <para>
+          <literal>"Time"</literal> to specify a time range,
+          where type is the only required field in the following example.
+         </para>
+
+         <programlisting language="java">
+{
+    "type": "Time",
+    "startTime": "08:30",
+    "endTime": "17:30",
+    "startDay": "MONDAY",
+    "endDay": "FRIDAY",
+    "startDate": "01/01/2014",
+    "endDate": "12/31/2014",
+    "enforcementTimeZone": "GMT-8"
+}
+         </programlisting>
+        </listitem>
+       </itemizedlist>
+
+       <para>
+        <literal>"Policy"</literal> condition types can be used
+        to correspond to the conditions configured for policies
+        as in the following example.
+       </para>
+
+       <programlisting language="java">
+{
+    "type": "Policy",
+    "className": "org.forgerock.openam.policy.plugins.OAuth2ScopeCondition",
+    "name": "oauth2scope",
+    "properties": {
+        "OAuth2Scope": [
+            "openid profile"
+        ]
+    }
+}
+       </programlisting>
+
+       <para>
+        The following example defines the condition as
+        neither Saturday or Sunday, nor certain client IP addresses.
+       </para>
+
+       <programlisting language="java">
+{
+    "type": "NOT",
+    "condition": {
+        "type": "OR",
+        "conditions": [
+            {
+                "type": "Time",
+                "startDay": "SATURDAY",
+                "endDay": "SUNDAY",
+                "enforcementTimeZone": "GMT"
+            },
+            {
+                "type": "IP",
+                "startIp": "192.168.0.1",
+                "endIp": "192.168.0.255"
+            }
+        ]
+    }
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resourceAttributes"</literal></term>
+      <listitem>
+       <para>
+        List of resource attributes to return with decisions,
+        where resource attribute implementations are pluggable
+       </para>
+
+       <para>The default implementations provide
+        for statically defined attributes
+        and for attributes retrieved from user profiles.
+       </para>
+
+       <para>
+        Attributes are shown as JSON objects
+        with <literal>"type"</literal> set to the name of the implementation
+        (by default either
+        <literal>"Static"</literal> for statically defined attributes
+        or <literal>"User"</literal> for attributes from the user profile),
+        <literal>"propertyName"</literal> set to the attribute names.
+        In the current implementation,
+        <literal>"propertyValues"</literal> also holds attribute names
+        rather than attribute values.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>
+     The examples above do not show the fields added to a policy by OpenAM
+     to indicate when the policy was created and last updated, and by whom.
+     Those field are
+     <literal>"createdBy"</literal> and <literal>"lastModifiedBy"</literal>,
+     which take strings holding universal identifier DNs as their values,
+     and <literal>"creationDate"</literal> and <literal>"lastModified"</literal>,
+     which take strings holding ISO-8601 timestamps.
+    </para>
+
+    <section xml:id="rest-api-authz-policies-create">
+     <title>Creating Policies</title>
+
+     <para>
+      To create a policy, perform an HTTP PUT
+      specifying the resource name
+      with the policy definition as the JSON resource data,
+      with the header <literal>Content-Type: application/json</literal>
+      and using the <literal>If-None-Match: *</literal> header.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ --header "If-None-Match: *" \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "example",
+    "active": true,
+    "description": "Example Policy",
+    "resources": {
+        "included": [
+            "http://www.example.com:80/*",
+            "http://www.example.com:80/*?*"
+        ],
+        "excluded": []
+    },
+    "actionValues": {
+        "POST": false,
+        "GET": true
+    },
+    "subject": {
+        "type": "User",
+        "subjectName": "Bob Dobbs"
+    }
+}' \
+ https://openam.example.com:8443/openam/json/realm/entitlements/example
+</userinput>
+<computeroutput>{
+  "name" : "example",
+  "active" : true,
+  "description" : "Example Policy",
+  "resources" : {
+    "included" : [ "http://www.example.com:80/*",
+                   "http://www.example.com:80/*?*" ],
+    "excluded" : [ ]
+  },
+  "applicationName" : "iPlanetAMWebAgentService",
+  "actionValues" : {
+    "POST" : false,
+    "GET" : true
+  },
+  "subject" : {
+    "type" : "User",
+    "subjectName" : "Bob Dobbs"
+  },
+  "lastModifiedBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "lastModified" : "2014-04-24T16:23:34Z",
+  "createdBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "creationDate" : "2014-04-24T16:23:34Z"
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-policies-read">
+     <title>Reading Policies</title>
+
+     <para>
+      To read a policy definition, perform an HTTP GET
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/entitlements/example
+</userinput>
+<computeroutput>{
+  "name" : "example",
+  "active" : true,
+  "description" : "Example Policy",
+  "resources" : {
+    "included" : [ "http://www.example.com:80/*",
+                   "http://www.example.com:80/*?*" ],
+    "excluded" : [ ]
+  },
+  "applicationName" : "iPlanetAMWebAgentService",
+  "actionValues" : {
+    "POST" : false,
+    "GET" : true
+  },
+  "subject" : {
+    "type" : "User",
+    "subjectName" : "Bob Dobbs"
+  },
+  "lastModifiedBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "lastModified" : "2014-04-24T16:23:34Z",
+  "createdBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "creationDate" : "2014-04-24T16:23:34Z"
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-policies-update">
+     <title>Update Policies</title>
+
+     <para>
+      To update a policy definition, perform an HTTP PUT
+      specifying the resource name
+      with the policy definition as the JSON resource data,
+      and with the header <literal>Content-Type: application/json</literal>.
+      This is essentially the same as creating a policy,
+      but without the <literal>If-None-Match: *</literal> header.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "example",
+    "active": true,
+    "description": "Updated example policy",
+    "resources": {
+        "included": [
+            "http://www.example.com:80/*",
+            "http://www.example.com:80/*?*"
+        ],
+        "excluded": []
+    },
+    "actionValues": {
+        "POST": true,
+        "GET": true
+    },
+    "subject": {
+        "type": "User",
+        "subjectName": "Bob Dobbs"
+    }
+}' \
+ https://openam.example.com:8443/openam/json/realm/entitlements/example
+</userinput>
+<computeroutput>{
+  "name" : "example",
+  "active" : true,
+  "description" : "Updated example policy",
+  "resources" : {
+    "included" : [ "http://www.example.com:80/*",
+                   "http://www.example.com:80/*?*" ],
+    "excluded" : [ ]
+  },
+  "applicationName" : "iPlanetAMWebAgentService",
+  "actionValues" : {
+    "POST" : true,
+    "GET" : true
+  },
+  "subject" : {
+    "type" : "User",
+    "subjectName" : "Bob Dobbs"
+  },
+  "lastModifiedBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "lastModified" : "2014-04-24T16:44:01Z",
+  "createdBy" :
+   "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+  "creationDate" : "2014-04-24T16:23:34Z"
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-policies-delete">
+     <title>Deleting Policies</title>
+
+     <para>
+      To delete a policy definition, perform an HTTP DELETE
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ --request DELETE \
+ https://openam.example.com:8443/openam/json/realm/entitlements/example</userinput>
+<computeroutput>{}</computeroutput>
+     </screen>
+    </section>
+
+    <section xml:id="rest-api-authz-policies-query">
+     <title>Listing Policies</title>
+
+     <para>
+      To list policy definitions, perform an HTTP GET on the endpoint, setting
+      at least the <literal>_queryFilter</literal> query string parameter.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ https://openam.example.com:8443/openam/json/realm/entitlements?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ ...policies... ],
+  "resultCount" : 0,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+     </screen>
+
+     <para>
+      The <literal>_queryFilter</literal> parameter can take
+      <literal>true</literal> to match every policy,
+      <literal>false</literal> to match no policies,
+      or a filter of the following form to match field values:
+      <literal><replaceable>field</replaceable> <replaceable>operator</replaceable> <replaceable>value</replaceable></literal>
+      where <replaceable>field</replaceable> represents the field name,
+      <replaceable>operator</replaceable> is the operator code,
+      <replaceable>value</replaceable> is the value to match,
+      and the entire filter is URL encoded.
+      Supported operators are as follows.
+     </para>
+
+     <itemizedlist>
+<!-- Not supported
+      <listitem>
+       <para>
+        <literal>co</literal>: contains
+       </para>
+      </listitem>
+-->
+
+      <listitem>
+       <para>
+        <literal>eq</literal>: equals
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>ge</literal>: greater than or equal to
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>gt</literal>: greater than
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>le</literal>: less than or equal to
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>lt</literal>: less than
+       </para>
+      </listitem>
+
+<!-- Not supported
+      <listitem>
+       <para>
+        <literal>pr</literal>: exists, is present
+       </para>
+
+       <para>
+        Do not set a <replaceable>value</replaceable> when using this operator.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>sw</literal>: starts with
+       </para>
+      </listitem>
+-->
+     </itemizedlist>
+
+     <itemizedlist>
+      <para>
+       The <literal><replaceable>field</replaceable></literal> value
+       can take the following values.
+      </para>
+
+      <listitem>
+       <para>
+        <literal>"name"</literal> (string equality only)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"description"</literal> (string equality only)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"applicationName"</literal> (string equality only)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"createdBy"</literal> (string equality only)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"lastModifiedBy"</literal> (string equality only)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"creationDate"</literal> (all comparisons are supported;
+        the date is either an
+        <link
+         xlink:show="new"
+         xlink:href="http://sources.forgerock.org/action/jira-issue.do?key=ISO-8601"
+        >ISO-8601</link> string,
+        or a integer number of seconds from the UNIX epoch)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"lastModified"</literal> (all comparisons are supported;
+        the date is either an
+        <link
+         xlink:show="new"
+         xlink:href="http://sources.forgerock.org/action/jira-issue.do?key=ISO-8601"
+        >ISO-8601</link> string,
+        or a integer number of seconds from the UNIX epoch)
+       </para>
+      </listitem>
+     </itemizedlist>
+
+     <para>
+      Filters can be composed of multiple expressions
+      by a using boolean operator <literal>AND</literal>,
+      <!-- Not supported: <literal>OR</literal>, or <literal>!</literal> (NOT),-->
+      and by using parentheses,
+      <literal>(<replaceable>expression</replaceable>)</literal>,
+      to group expressions.
+      You must URL encode the filter expression
+      in <literal>_queryFilter=<replaceable>filter</replaceable></literal>.
+     </para>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+
+     <para>
+      You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
+      to limit the number of results returned.
+     </para>
+    </section>
+   </section>
+  </section>
+
+  <section xml:id="rest-api-authz-legacy">
+   <title>Authorization (Legacy)</title>
+
+   <para>You can call on OpenAM to decide whether to authorize access to a
+   protected resource based on a valid token. Of course, you must percent
+   encode the resource URI.</para>
+
+   <para>Interface Stability:
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#interface-stability"
+     xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link>
+   </para>
+
+   <screen>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/authorize?\
 uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
 &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"</userinput>
 <computeroutput>boolean=true</computeroutput>
-  </screen>
-  
-  <para>To indicate access denied, OpenAM returns
-  <literal>boolean=false</literal>.</para>
+   </screen>
 
-  <section xml:id="rest-api-policy-decisions">
-   <title>Requesting Policy Decisions</title>
+   <para>To indicate access denied, OpenAM returns
+   <literal>boolean=false</literal>.</para>
 
-   <para>OpenAM provides additional REST APIs for requesting policy
-   decisions.</para>
+   <section xml:id="rest-api-policy-decisions">
+    <title>Requesting Policy Decisions</title>
 
-   <!-- Pending replacement
-   <para>Interface Stability: <link xlink:show="new"
-   xlink:href="admin-guide#interface-stability"
-   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
+    <para>OpenAM provides additional REST APIs for requesting policy
+    decisions.</para>
 
-   <itemizedlist>
-    <para>The policy decision interfaces use the following path suffixes and
-    query string parameters.</para>
+    <!-- Pending replacement
+    <para>Interface Stability: <link xlink:show="new"
+    xlink:href="admin-guide#interface-stability"
+    xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
 
-    <para>Path suffixes for policy decision requests include the following.</para>
-    <listitem>
-     <para><literal>ws/1/entitlement/decision</literal>: request a decision
-     pertaining to a single resource</para>
-    </listitem>
-    <listitem>
-     <para><literal>ws/1/entitlement/decisions</literal>: request decisions
-     pertaining to multiple resources</para>
-    </listitem>
-    <listitem>
-     <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
-     for a specified resource URL</para>
-    </listitem>
-    <listitem>
-     <para><literal>ws/1/entitlement/entitlements</literal>: request decisions
-     for a specified resource URL and all resources underneath</para>
-    </listitem>
-   </itemizedlist>
+    <itemizedlist>
+     <para>The policy decision interfaces use the following path suffixes and
+     query string parameters.</para>
 
-   <itemizedlist>
-    <para>Query string parameters for policy decision requests include the
-    following.</para>
+     <para>Path suffixes for policy decision requests include the following.</para>
+     <listitem>
+      <para><literal>ws/1/entitlement/decision</literal>: request a decision
+      pertaining to a single resource</para>
+     </listitem>
+     <listitem>
+      <para><literal>ws/1/entitlement/decisions</literal>: request decisions
+      pertaining to multiple resources</para>
+     </listitem>
+     <listitem>
+      <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
+      for a specified resource URL</para>
+     </listitem>
+     <listitem>
+      <para><literal>ws/1/entitlement/entitlements</literal>: request decisions
+      for a specified resource URL and all resources underneath</para>
+     </listitem>
+    </itemizedlist>
 
-    <listitem>
-     <para><literal>subject=<replaceable>encoded-token</replaceable></literal>,
-     where the token is encoded using the method implemented in <link
-     xlink:show="new"
-     xlink:href="http://sources.forgerock.org/browse/~raw,r=6/openam/trunk/opensso/www/public/use/docs/fampdf/Encoder.java"
-     ><filename>Encoder.java</filename></link>.</para>
+    <itemizedlist>
+     <para>Query string parameters for policy decision requests include the
+     following.</para>
 
-     <para>In the examples for this section, the token ID obtained during
-     authentication for <literal>amadmin</literal> is abbreviated as
-     <literal>AQIC5...DU3*</literal> and the encoded token ID for the subject
-     is <literal>MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=</literal>.</para>
-    </listitem>
+     <listitem>
+      <para><literal>subject=<replaceable>encoded-token</replaceable></literal>,
+      where the token is encoded using the method implemented in <link
+      xlink:show="new"
+      xlink:href="http://sources.forgerock.org/browse/~raw,r=6/openam/trunk/opensso/www/public/use/docs/fampdf/Encoder.java"
+      ><filename>Encoder.java</filename></link>.</para>
 
-    <listitem>
-     <para><literal>action=get</literal>, or <literal>action=post</literal>,
-     which identifies the user agent action when requesting a decision.</para>
-    </listitem>
+      <para>In the examples for this section, the token ID obtained during
+      authentication for <literal>amadmin</literal> is abbreviated as
+      <literal>AQIC5...DU3*</literal> and the encoded token ID for the subject
+      is <literal>MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=</literal>.</para>
+     </listitem>
 
-    <listitem>
-     <para>
-      <literal>application=iPlanetAMWebAgentService</literal>
-      or <literal>application=crestPolicyService</literal>
-     </para>
-    </listitem>
+     <listitem>
+      <para><literal>action=get</literal>, or <literal>action=post</literal>,
+      which identifies the user agent action when requesting a decision.</para>
+     </listitem>
 
-    <listitem>
-     <para><literal>resource=<replaceable>resource-url</replaceable></literal>,
-     or multiple <literal>resources=<replaceable>resource-url</replaceable></literal>
-     parameters for multiple decisions.</para>
-    </listitem>
+     <listitem>
+      <para>
+       <literal>application=iPlanetAMWebAgentService</literal>
+       or <literal>application=crestPolicyService</literal>
+      </para>
+     </listitem>
 
-    <listitem>
-     <para><literal>env=<replaceable>requestDnsName%3Dfqdn</replaceable></literal>,
-     <literal>env=<replaceable>requestIP%3Ddotted-quads</replaceable></literal>,
-     <literal>env=<replaceable>requestTime%3Dseconds-since-epoch</replaceable></literal>,
-     and <literal>env=<replaceable>requestDnsName%3Dtime-zone</replaceable></literal>
-     where <replaceable>time-zone</replaceable> is from Java
-     <literal>TimeZone.getTimeZone().getID()</literal>. The
-     <literal>env</literal> parameters thus express conditions.</para>
+     <listitem>
+      <para><literal>resource=<replaceable>resource-url</replaceable></literal>,
+      or multiple <literal>resources=<replaceable>resource-url</replaceable></literal>
+      parameters for multiple decisions.</para>
+     </listitem>
 
-     <para>
-      In order to express a condition that specifies OAuth 2.0 scopes,
-      set the value of the parameter
-      to <literal>scope=<replaceable>scopes</replaceable></literal>.
-      To set scopes to <literal>openid</literal> and <literal>profile</literal>,
-      use <literal>env=scope%3Dopenid%20profile</literal> for example.
-     </para>
-    </listitem>
-   </itemizedlist>
+     <listitem>
+      <para><literal>env=<replaceable>requestDnsName%3Dfqdn</replaceable></literal>,
+      <literal>env=<replaceable>requestIP%3Ddotted-quads</replaceable></literal>,
+      <literal>env=<replaceable>requestTime%3Dseconds-since-epoch</replaceable></literal>,
+      and <literal>env=<replaceable>requestDnsName%3Dtime-zone</replaceable></literal>
+      where <replaceable>time-zone</replaceable> is from Java
+      <literal>TimeZone.getTimeZone().getID()</literal>. The
+      <literal>env</literal> parameters thus express conditions.</para>
 
-   <para>Authentication for these interfaces uses cookies, so if your
-   application is not running in a browser, first authenticate as described in
-   <xref linkend="rest-api-auth" />.</para>
+      <para>
+       In order to express a condition that specifies OAuth 2.0 scopes,
+       set the value of the parameter
+       to <literal>scope=<replaceable>scopes</replaceable></literal>.
+       To set scopes to <literal>openid</literal> and <literal>profile</literal>,
+       use <literal>env=scope%3Dopenid%20profile</literal> for example.
+      </para>
+     </listitem>
+    </itemizedlist>
 
-   <para>To request a decision for a single resource, use an HTTP GET on
-   <literal>/ws/1/entitlement/decision</literal> as in the following example.</para>
+    <para>Authentication for these interfaces uses cookies, so if your
+    application is not running in a browser, first authenticate as described in
+    <xref linkend="rest-api-auth" />.</para>
 
-   <screen>
+    <para>To request a decision for a single resource, use an HTTP GET on
+    <literal>/ws/1/entitlement/decision</literal> as in the following example.</para>
+
+    <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -808,14 +1743,14 @@ $ <userinput>curl \
 &amp;application=iPlanetAMWebAgentService\
 &amp;resource=http%3A%2F%2Fwww.example.com%2Findex.html"</userinput>
 <computeroutput>allow</computeroutput>
-   </screen>
+    </screen>
 
-   <para>If access is denied, the result is <literal>deny</literal>.</para>
+    <para>If access is denied, the result is <literal>deny</literal>.</para>
 
-   <para>To request decisions for multiple resources, use an HTTP GET on
-   <literal>/ws/1/entitlement/decisions</literal> as in the following example.</para>
+    <para>To request decisions for multiple resources, use an HTTP GET on
+    <literal>/ws/1/entitlement/decisions</literal> as in the following example.</para>
 
-   <screen>
+    <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -850,15 +1785,15 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+    </screen>
 
-   <para>
-    To request decisions for a given resource,
-    use an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal>
-    as in the following example.
-   </para>
+    <para>
+     To request decisions for a given resource,
+     use an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal>
+     as in the following example.
+    </para>
 
-   <screen>
+    <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -879,16 +1814,16 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+    </screen>
 
-   <para>
-    To request decisions for all resources underneath a given resource,
-    use an HTTP GET on <literal>/ws/1/entitlement/entitlements</literal>
-    as in the following example.
-   </para>
+    <para>
+     To request decisions for all resources underneath a given resource,
+     use an HTTP GET on <literal>/ws/1/entitlement/entitlements</literal>
+     as in the following example.
+    </para>
 
-   <screen>
-$ <userinput>curl \
+    <screen>
+ $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
  "https://openam.example.com:8443/openam/ws/1/entitlement/entitlements\
@@ -924,8 +1859,9 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-   </screen>
+    </screen>
 
+   </section>
   </section>
 
   <section xml:id="rest-api-policy-management">
@@ -3275,7 +4211,7 @@ $ <userinput>curl \
  --header "Content-Type: application/json" \
  --header "olduserpassword: changeit" \
  --data '{"userpassword":"newpassword"}' \
- http://openam.example.com:8080/openam/json/users/demo</userinput>
+ https://openam.example.com:8443/openam/json/users/demo</userinput>
 <computeroutput>{
     "username": "demo",
     "realm": "/",
