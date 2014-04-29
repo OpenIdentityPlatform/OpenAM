@@ -354,6 +354,12 @@ public class SessionService {
                     CoreTokenConstants.IS_SFO_ENABLED,
                     "false")).booleanValue();
 
+    /**
+     * Indicates whether to use crosstalk or session persistence to resolve remote sessions. Always true when session
+     * persistence/SFO is disabled.
+     */
+    private static volatile boolean isCrosstalkEnabled = true;
+
     // Must be True to permit Session Failover HA to be available.
     private static boolean isSiteEnabled = false;  // If this is set to True and no Site is found, issues will arise
     // Trying to resolve the serverID and will hang install and subsequent login attempts.
@@ -821,6 +827,13 @@ public class SessionService {
      */
     public boolean isSessionFailoverEnabled() {
         return isSessionFailoverEnabled;
+    }
+
+    /**
+     * Returns true if crosstalk is enabled (or is session failover is disabled).
+     */
+    public boolean isCrossTalkEnabled() {
+        return !isSessionFailoverEnabled || isCrosstalkEnabled;
     }
 
     /**
@@ -2178,10 +2191,9 @@ public class SessionService {
             if ((subConfig != null) && subConfig.exists()) {
 
                 Map sessionAttrs = subConfig.getAttributes();
-                boolean sfoEnabled = Boolean.valueOf(
-                        CollectionHelper.getMapAttr(
-                                sessionAttrs, CoreTokenConstants.IS_SFO_ENABLED, "false")
-                ).booleanValue();
+                boolean sfoEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs,
+                        CoreTokenConstants.IS_SFO_ENABLED, false);
+
                 // Currently, we are not allowing to default to Session Failover HA,
                 // even with a single server to enable session persistence.
                 // But can easily be turned on in the Session SubConfig.
@@ -2192,6 +2204,10 @@ public class SessionService {
                     useRemoteSaveMethod = true;
 
                     useInternalRequestRouting = true;
+
+                    // Determine whether crosstalk is enabled or disabled (default to false in SFO case).
+                    isCrosstalkEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs,
+                            CoreTokenConstants.IS_CROSSTALK_ENABLED, false);
 
                     // Obtain Site Ids
                     Set<String> serverIDs = WebtopNaming.getSiteNodes(sessionServerID);

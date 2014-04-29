@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -94,6 +94,9 @@ public class ServerSessionOperationStrategyTest {
         // The Site is up.
         given(mockSessionService.checkSiteUp(anyString())).willReturn(true);
 
+        // Cross-talk is enabled
+        given(mockSessionService.isCrossTalkEnabled()).willReturn(true);
+
         // When
         SessionOperations operation = strategy.getOperation(mockSession);
 
@@ -111,8 +114,29 @@ public class ServerSessionOperationStrategyTest {
         // The Session is a Site
         given(mockNamingQuery.isSite(anyString())).willReturn(true);
 
-        // The Site is up.
+        // The Site is down.
         given(mockSessionService.checkSiteUp(anyString())).willReturn(false);
+
+        // When
+        SessionOperations operation = strategy.getOperation(mockSession);
+
+        // Then
+        assertThat(operation).isEqualTo(mockCTS);
+    }
+
+    @Test
+    public void shouldUseCTSWhenCrossTalkDisabledAndSessionIsRemote() throws SessionException {
+        // Given
+        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
+        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
+
+        // Session is part of a site.
+        given(mockNamingQuery.isSite(anyString())).willReturn(true);
+        // The site is up
+        given(mockSessionService.checkSiteUp(anyString())).willReturn(true);
+
+        // Cross talk is disabled.
+        given(mockSessionService.isCrossTalkEnabled()).willReturn(false);
 
         // When
         SessionOperations operation = strategy.getOperation(mockSession);

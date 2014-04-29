@@ -29,7 +29,7 @@
 -->
 
 <!--
-  Portions Copyrighted 2011-2012 ForgeRock AS
+  Portions Copyrighted 2011-2014 ForgeRock AS
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -192,6 +192,18 @@
                         </BooleanValues>
                         <DefaultValues>
                             <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-session-crosstalk-enabled"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a121c.session.crosstalk.enabled">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <!-- This property is deprecated as of 10.1.0 -->

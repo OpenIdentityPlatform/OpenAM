@@ -87,8 +87,8 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * Based on the Session, determine the appropriate SessionOperations strategy to select.
      *
      * Local - For local Sessions which are hosted on the current Server.
-     * Remote - For Sessions which are from a remote Site, and the Site is up.
-     * CTS - For Sessions which are from a remote Site, which is down.
+     * Remote - The Session is from a remote Site, and the Site is up.
+     * CTS - When cross talk is disabled, or if the Session is from a remote Site, which is down.
      *
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
@@ -98,8 +98,16 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
             return log(session, local);
         }
 
-        if (service.isSessionFailoverEnabled() && !isLocalSite(session) && !isSiteUp(getSiteId(session))) {
-            return log(session, cts);
+        if (service.isSessionFailoverEnabled()) {
+            // Cross talk is disabled.
+            if (!service.isCrossTalkEnabled()) {
+                return log(session, cts);
+            }
+
+            // Remote Site which is known to be down
+            if (!isLocalSite(session) && !isSiteUp(getSiteId(session))) {
+                return log(session, cts);
+            }
         }
 
         return log(session, remote);

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.shared.datastruct;
 
@@ -71,6 +71,20 @@ public class CollectionHelper {
     public static String getMapAttr(Map map, String name, String defaultValue) {
         String str = getMapAttr(map, name);
         return ((str != null) && (str.length() > 0)) ? str : defaultValue;
+    }
+
+    /**
+     * Gets a boolean attribute from a {@code Map<String, Set<String>>}, defaulting to the given default value if
+     * the attribute is not present.
+     *
+     * @param map the attribute map.
+     * @param name the name of the attribute to retrieve.
+     * @param defaultValue the value to use if the attribute is not present.
+     * @return the boolean value using {@link Boolean#parseBoolean(String)}.
+     */
+    public static boolean getBooleanMapAttr(Map map, String name, boolean defaultValue) {
+        String value = getMapAttr(map, name, Boolean.toString(defaultValue));
+        return Boolean.parseBoolean(value);
     }
 
     /**

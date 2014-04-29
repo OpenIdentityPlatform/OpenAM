@@ -117,7 +117,7 @@ import java.util.Vector;
 
 public class Session extends GeneralTaskRunnable {
 
-    private static SessionOperationStrategy sessionStrategy;
+    private final SessionOperationStrategy sessionStrategy;
     /**
      * Used for uniquely referencing this Session object.
      */
