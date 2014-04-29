@@ -29,8 +29,8 @@
 package com.sun.identity.common;
 
 import com.iplanet.am.util.AMClientDetector;
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.Misc;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.cdm.Client;
 import com.iplanet.services.cdm.ClientException;
 import com.iplanet.services.cdm.ClientsManager;
@@ -48,6 +48,7 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import java.security.AccessController;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
 
 /**
  * Sets the locale suitable for the given situation. Each response to end-user
@@ -70,19 +71,30 @@ import javax.servlet.http.HttpServletRequest;
  * Usage: There are three key parameters in the request that can decide the
  * locale of a given request. This class expects application to pass all these
  * parameters whenever they are available and use getLocale method to get the
- * current locale The three key parameters are HttpServletRequest - to process
- * Accept-langyage and URL parameter locale UserPreferredLocale - user attribute
- * if user has sucessful login OrgDN - DN of the org in which the user resides
- * it can take take core auth locale of this org <code>
+ * current locale.
+ *
+ * The four key parameters are:
+ *
+ * - HttpServletRequest - to process Accept-language and URL parameter locale.
+ * - HttpContext - to process Accept-language and URL parameter locale.
+ * - UserPreferredLocale - user attribute, if user has sucessful login.
+ * - OrgDN - DN of the org in which the user resides- it can take take core auth locale of this org.
+ *
+ * <code>
  * ISLocaleContext is = new ISLocaleContext();
  * is.setOrgLocale ("o=isp,dc=iplanet,dc=com"); // sets the org locale 
- * is.setLocale (req) // get locale from accept-lang,locale param etc
+ * is.setLocale(req); // get locale from accept-lang,locale param etc
  * // if user logs in
  * is.setUserLocale (loc);
  * </code>
- * For your response , get the locale using is.getLocale();
- * 
- * Locale with highest priority takes precentse over lower priority.
+ *
+ * For your response, get the locale using:
+ *
+ * <code>
+ * is.getLocale();
+ * </code>
+ *
+ * Locale with highest priority takes precedence over lower priority.
  */
 public class ISLocaleContext {
     public static final int OS_LOCALE = 0;
@@ -239,6 +251,23 @@ public class ISLocaleContext {
     }
 
     /**
+     * Returns the locale based on the Http Context supplied.
+     *
+     * @param context The {@link HttpContext} of the request
+     * @return The locale determined by the request
+     */
+    public void setLocale(HttpContext context) {
+        final String superLocale = context.getParameterAsString("locale");
+        final String acceptLangHeader = context.getHeaderAsString("accept-language");
+
+        if (superLocale != null && !superLocale.isEmpty()) {
+            setLocale(URL_LOCALE, superLocale);
+        } else if (acceptLangHeader != null && !acceptLangHeader.isEmpty()) {
+            setLocale(HTTP_HEADER_LOCALE, acceptLangHeader);
+        }
+    }
+
+    /**
      * Set locale based on HTTP Servlet Request.
      * 
      * @param request Analyze HttpHeader and look for URL parameter called
@@ -270,7 +299,7 @@ public class ISLocaleContext {
                 String acceptLangHeader = request.getHeader("Accept-Language");
                 if ((acceptLangHeader != null)
                         && (acceptLangHeader.length() > 0)) {
-                    String acclocale = 
+                    String acclocale =
                         Locale.getLocaleStringFromAcceptLangHeader(
                                 acceptLangHeader);
                     setLocale(HTTP_HEADER_LOCALE, acclocale);

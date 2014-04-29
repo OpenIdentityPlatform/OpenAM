@@ -207,6 +207,10 @@
             <artifactId>openam-common-auth-ui</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-servlet</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-clientsdk</artifactId>
         </dependency>

@@ -26,8 +26,11 @@ package org.forgerock.openam.forgerockrest.server;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.util.LinkedHashMap;
+import java.util.Set;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -44,12 +47,10 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.services.RestSecurity;
-
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
@@ -98,6 +99,12 @@ public class ServerInfoResource implements CollectionResourceProvider {
         Set<String> protectedUserAttributes;
         Resource resource;
         RestSecurity restSecurity = new RestSecurity(realm);
+
+        //added for the XUI to be able to understand its locale to request the appropriate translations to cache
+        ISLocaleContext locale = new ISLocaleContext();
+        HttpContext httpContext = context.asContext(HttpContext.class);
+        locale.setLocale(httpContext); //we have nothing else to go on at this point other than their request
+
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
             protectedUserAttributes = restSecurity.getProtectedUserAttributes();
@@ -106,7 +113,9 @@ public class ServerInfoResource implements CollectionResourceProvider {
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME,"iPlanetDirectoryPro"));
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
+            result.put("lang", locale.getLocale().getLanguage());
             result.put("successfulUserRegistrationDestination", restSecurity.getSuccessfulUserRegistrationDestination());
+
             resource = new Resource(resourceId, Integer.toString(result.asMap().hashCode()), result);
             handler.handleResult(resource);
         } catch (Exception e) {
@@ -126,7 +135,6 @@ public class ServerInfoResource implements CollectionResourceProvider {
      */
     public void actionInstance(ServerContext context, String s, ActionRequest request,
             ResultHandler<JsonValue> handler) {
-        //To change body of implemented methods use File | Settings | File Templates.
         RestUtils.generateUnsupportedOperation(handler);
     }
 
