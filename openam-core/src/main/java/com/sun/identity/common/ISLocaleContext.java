@@ -263,7 +263,8 @@ public class ISLocaleContext {
         if (superLocale != null && !superLocale.isEmpty()) {
             setLocale(URL_LOCALE, superLocale);
         } else if (acceptLangHeader != null && !acceptLangHeader.isEmpty()) {
-            setLocale(HTTP_HEADER_LOCALE, acceptLangHeader);
+            String acclocale = Locale.getLocaleStringFromAcceptLangHeader(acceptLangHeader);
+            setLocale(HTTP_HEADER_LOCALE, acclocale);
         }
     }
 
