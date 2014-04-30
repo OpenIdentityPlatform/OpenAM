@@ -127,6 +127,18 @@ Agreement (yes/no): [no]:</screen>
     </itemizedlist>
   </listitem>
 
+  <listitem>
+   <para>
+    <emphasis role="bold">New REST APIs for policy</emphasis>.
+    OpenAM now exposes new common REST APIs for requesting decisions,
+    and for defining policies, applications, and conditions.
+    For details, see the <citetitle>Developer Guide</citetitle> section on
+    <link
+     xlink:href="dev-guide#rest-api-authz"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"><citetitle>Authorization</citetitle></link>.
+   </para>
+  </listitem>
  </itemizedlist>
 
  <itemizedlist>

@@ -231,7 +231,7 @@
     <simplelist type="vert" columns="2">
      <member>/identity/attributes</member>
      <member>/identity/authenticate</member>
-     <!-- Pending replacement <member>/identity/authorize</member> -->
+     <member>/identity/authorize</member>
      <member>/identity/create</member>
      <member>/identity/delete</member>
      <!-- Pending replacement <member>/identity/isTokenValid</member>
@@ -240,9 +240,10 @@
      <member>/identity/read</member>
      <member>/identity/search</member>
      <member>/identity/update</member>
-     <!-- Pending replacement <member>/ws/1/entitlement/decision</member>
+     <member>/ws/1/entitlement/decision</member>
      <member>/ws/1/entitlement/decisions</member>
-     <member>/ws/1/entitlement/entitlement</member> -->
+     <member>/ws/1/entitlement/entitlement</member>
+     <member>/ws/1/entitlement/entitlements</member>
     </simplelist>
 
     <para>The following table shows how legacy and newer end points
@@ -271,16 +272,29 @@
        </row>
 
        <row>
+        <entry>N/A</entry>
+        <entry>/json/applications</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/applicationtypes</entry>
+       </row>
+
+       <row>
         <entry>/identity/authenticate</entry>
         <entry>/json/authenticate</entry>
        </row>
 
-       <!--
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/conditiontypes</entry>
+       </row>
+
        <row>
         <entry>/identity/authorize</entry>
-        <entry>Pending replacement</entry>
+        <entry>/json/policies?_action=evaluate<!--, /json/policies?_evaluateTree--></entry>
        </row>
-       -->
 
        <row>
         <entry>/identity/create, /identity/delete, /identity/read,
@@ -307,17 +321,20 @@
         <entry>/json/sessions/?_action=logout</entry>
        </row>
 
-       <!--
        <row>
         <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
-        /ws/1/entitlement/entitlement</entry>
-        <entry>Pending replacement</entry>
+        /ws/1/entitlement/entitlement, /ws/1/entitlement/entitlements</entry>
+        <entry>/json/policies?_action=evaluate<!--, /json/policies?_evaluateTree--></entry>
        </row>
-       -->
 
        <row>
         <entry>N/A</entry>
         <entry>/json/dashboard</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/policies</entry>
        </row>
 
        <row>
