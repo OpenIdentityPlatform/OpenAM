@@ -21,7 +21,8 @@
                 "notFoundError" : "Not found error.",
                 "badRequestError" : "Bad request error.",
                 "conflictError" : "Detected conflict in request.",
-                "incorrectRevisionError" : "Cannot update the record because the version is not the latest."
+                "incorrectRevisionError" : "Cannot update the record because the version is not the latest.",
+                "tokenNotFound" : "Token not found."
             },
             "UserMessages" : {
                 "invalidOldPassword" : "Old password is invalid.",

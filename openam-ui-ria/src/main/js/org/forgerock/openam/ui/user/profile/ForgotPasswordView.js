@@ -38,7 +38,6 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     var ForgottenPasswordView = AbstractView.extend({
         template: "templates/openam/ForgotPasswordTemplate.html",
         baseTemplate: "templates/common/MediumBaseTemplate.html",
-        
         data: {},
         events: {
             "click #continue": "continueProcess",
@@ -46,6 +45,13 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             "onValidate": "onValidate",
             "customValidate": "customValidate",
             "click .cancelButton": "cancel"
+        },
+        errorsHandlers: { 
+            "Bad Request":              { status: "400" },
+            "Not found":                { status: "404" },
+            "Gone":                     { status: "410" },
+            "Internal Server Error":    { status: "500" },
+            "Service Unavailable":      { status: "503" }  
         },
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
@@ -61,41 +67,33 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             e.preventDefault();
             $('#username').prop('readonly', true);
             var _this = this,
-                postData = {
-                        username: $('#username').val(),
-                        subject: $.t("templates.user.ForgottenPasswordTemplate.emailSubject"),
-                        message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
-                },
-                success = function() {
-                    _this.$el.find("#step1").slideUp();
-                    _this.$el.find("#emailSent").slideDown();            
-                },
-                error = function(e) {
-                    var response = JSON.parse(e.responseText);
-                    _this.$el.find("input[type=submit]").prop('disabled', true);
-                    $('#username').prop('readonly', false);
-                    if(response.message.indexOf("No email provided in profile.") === 0) {
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "noEmailProvided");
-                    }
-                    else if(response.reason.indexOf("Not Found") === 0) {
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "usernameNotFound");
-                    } 
-                    else{
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "serviceUnavailable");
-                        console.error(response);
-                    }
-                };
+            postData = {
+                    username: $('#username').val(),
+                    subject: $.t("templates.user.ForgottenPasswordTemplate.emailSubject"),
+                    message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
+            },
+            success = function() {
+                _this.$el.find("#step1").slideUp();
+                _this.$el.find("#emailSent").slideDown();            
+            },
+            error = function(e) {
+                _this.$el.find("input[type=submit]").prop('disabled', true);
+                $('#username').prop('readonly', false);
+                _this.displayError(e);
+            };
             
             this.$el.find("input[type=submit]").prop('disabled', true);
-            userDelegate.doAction("forgotPassword",postData,success,error);
+            userDelegate.doAction("forgotPassword",postData,success,error,_this.errorsHandlers);
         },
         changePassword: function(e) {
+            
             e.preventDefault();
             $('#password').prop('readonly', true);
             $('#passwordConfirm').prop('readonly', true);
             this.$el.find("input[type=submit]").prop('disabled', true);
 
-            var postData = {
+            var _this = this,
+            postData = {
                 userpassword: $('#password').val()
             },
             success = function() {
@@ -105,10 +103,10 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             error = function(e) {
                 $('#password').prop('readonly', false);
                 $('#passwordConfirm').prop('readonly', false);
-                console.error(e.status, e.responseText, e.statusText);
+                _this.displayError(e);
             };
             _.extend(postData,this.data.urlParams);    
-            userDelegate.doAction("forgotPasswordReset",postData,success, error);
+            userDelegate.doAction("forgotPasswordReset",postData,success,error,_this.errorsHandlers);
         },
         cancel: function(e) {
             e.preventDefault();
@@ -123,6 +121,38 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             else {
                 this.$el.find("input[type=submit]").prop('disabled', true);
             }
+        },
+        displayError: function(e) {
+            var message = "notFoundError", responseMessage = JSON.parse(e.responseText).message;
+            switch (e.status) {
+                case 400:
+                    if (responseMessage === 'No email provided in profile.') {
+                        message = "noEmailProvided";
+                    }
+                    /* //not required as the XUI does not allow it
+                    else if (responseMessage === "Username not provided") {
+                        message = "noUserNameProvided"; 
+                    }*/
+                break;
+
+                case 404:
+                    message = "usernameNotFound";
+                break;
+
+                case 410: //Forgotten Password Link Expired
+                    message = "tokenNotFound"; 
+                break;
+
+                case 500: //Invalid Server Configuration
+                    message = "internalError"; 
+                break;
+
+                case 503: //503 - Forgot password is not accessible. 
+                    message = "serviceUnavailable"; 
+                break;
+            }
+            
+            eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, message);       
         }
     });
 

@@ -52,6 +52,7 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -458,6 +459,22 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Generates the e-mail contents based on the incoming request.
+     *
+     * Will only send the e-mail if all the following conditions are true:
+     *
+     * - Forgotten Password service is enabled
+     * - User exists
+     * - User has an e-mail address in their profile
+     * - E-mail service is correctly configured.
+     *
+     * @param context Non null.
+     * @param request Non null.
+     * @param realm Used as part of user lookup.
+     * @param restSecurity Non null.
+     * @param handler Required for return response to caller.
+     */
     private void generateNewPasswordEmail(final ServerContext context, final ActionRequest request, final String realm,
             final RestSecurity restSecurity, final ResultHandler<JsonValue> handler){
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -470,15 +487,17 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
 
             // Check to make sure forgotPassword enabled
-            if(restSecurity == null){
-                debug.warning("IdentityResource.generateNewPasswordEmail(): " +
-                        "Rest Security not created. restSecurity = " + restSecurity);
-                throw new NotFoundException("Rest Security Service not created" );
+            if(restSecurity == null) {
+                if (debug.warningEnabled()) {
+                    debug.warning("Rest Security not created. restSecurity = " + restSecurity);
+                }
+                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Rest Security Service not created");
             }
             if(!restSecurity.isForgotPassword()){
-                debug.warning("IdentityResource.generateNewPasswordEmail(): Forgot Password set to : "
-                        + restSecurity.isForgotPassword());
-                throw new NotFoundException("Forgot password is not accessible.");
+                if (debug.warningEnabled()) {
+                    debug.warning("Forgot Password set to : " + restSecurity.isForgotPassword());
+                }
+                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Forgot password is not accessible.");
             }
 
             // Generate Admin Token
@@ -513,7 +532,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             }
             // Check if email is provided
             if(email == null || email.isEmpty()){
-                throw new InternalServerErrorException("No email provided in profile.");
+                throw new BadRequestException("No email provided in profile.");
             }
 
             // Get full deployment URL
@@ -526,8 +545,9 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Retrieve email registration token life time
             if(restSecurity == null){
-                debug.warning("IdentityResource.generateNewPasswordEmail(): " +
-                        "Rest Security not created. restSecurity = " + restSecurity);
+                if (debug.warningEnabled()) {
+                    debug.warning("Rest Security not created. restSecurity = " + restSecurity);
+                }
                 throw new NotFoundException("Rest Security Service not created" );
             }
             Long tokenLifeTime = restSecurity.getForgotPassTLT();
@@ -560,33 +580,29 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Send Registration
             sendNotification(email, subject, message, realm, confirmationLink);
             handler.handleResult(result);
-        } catch (BadRequestException be) {
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + be);
-            handler.handleError(be);
-        } catch (NotFoundException nfe){
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + nfe);
-            handler.handleError(nfe);
-        } catch (ForbiddenException fe){
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + fe);
-            handler.handleError(fe);
-        }catch (CoreTokenException cte){
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + cte);
-            handler.handleError(new NotFoundException("Email not sent"));
-        } catch (InternalServerErrorException ise){
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + ise);
-            handler.handleError(ise);
-        } catch (Exception e){
-            debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + " Exception " + e);
+        } catch (ResourceException re){ // Service not available & Username not provided
+            debug.error(re.getMessage(), re);
+            handler.handleError(re);
+        } catch (ObjectNotFound onf) { // User not found
+            debug.error("Could not find username", onf);
+            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND, "Username not found", onf));
+        } catch (Exception e){ // Intentional - all other errors are considered Internal Error.
+            debug.error("Internal error", e);
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, "Failed to send mail", e));
         }
     }
 
+    /**
+     * Perform an anonymous update of a user's password using the provided token.
+     *
+     * The token must match a token placed in the CTS in order for the request
+     * to proceed.
+     *
+     * @param context Non null
+     * @param request Non null
+     * @param realm Non null
+     * @param handler Non null
+     */
     private void anonymousUpdate(final ServerContext context, final ActionRequest request, final String realm,
             final ResultHandler<JsonValue> handler) {
         String tokenID;
@@ -612,14 +628,13 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Check that tokenID is not expired
             if(CTSHolder.getCTS().read(tokenID) == null){
-                throw new NotFoundException("Cannot find tokenID: " + tokenID);
+                throw new InvalidTokenException("Token not found", tokenID);
             }
 
             // check confirmationId
             if(!confirmationId.equalsIgnoreCase(Hash.hash(
                     tokenID + username + SystemProperties.get("am.encryption.pwd")))){
-                debug.error("IdentityResource.anonymousUpdate(): Invalid confirmationId : "
-                            + confirmationId);
+                debug.error("Invalid confirmationId: " + confirmationId);
                 throw new BadRequestException("Invalid confirmationId", null);
             }
             // update Identity
@@ -638,20 +653,21 @@ public final class IdentityResource implements CollectionResourceProvider {
                     // Catch this rather than letting it stop the process as it is possible that between successfully
                     // reading and deleting, the token has expired.
                     if (debug.messageEnabled()) {
-                        debug.message("IdentityResource.anonymousUpdate(): Deleting token " + tokenID +
-                                " after a successful read failed due to " + e.getMessage(), e);
+                        debug.message("Deleting token " + tokenID + " after a successful " +
+                                      "read failed due to " + e.getMessage(), e);
                     }
                 }
             }
-        } catch (BadRequestException be){
-            debug.error("IdentityResource.anonymousUpdate():" + be.getMessage());
-            handler.handleError(be);
-        } catch (CoreTokenException cte){
-            debug.error("IdentityResource.anonymousUpdate():" + cte.getMessage());
-            handler.handleError(new NotFoundException(cte.getMessage()));
-        } catch (Exception e){
-            debug.error("IdentityResource.anonymousUpdate():" + e.getMessage());
-            handler.handleError(new NotFoundException(e.getMessage()));
+        } catch (BadRequestException bre){ // For any malformed request.
+            debug.error(bre.getMessage());
+            handler.handleError(bre);
+        } catch (CoreTokenException cte){ // For any unexpected CTS error
+            debug.error(cte.getMessage());
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+        } catch (InvalidTokenException ite) { // For an invalid token.
+            debug.error(ite.getMessage() + ":" + ite.getTokenID());
+            // 410 = Gone - indicates that access to the target resource is no longer available
+            handler.handleError(ResourceException.getException(HttpURLConnection.HTTP_GONE, ite.getMessage(), ite));
         }
 
     }
@@ -1348,5 +1364,20 @@ public final class IdentityResource implements CollectionResourceProvider {
             return toEncode;
         }
     }
-    
+
+    /**
+     * Indicates that the requested Token has not been found.
+     */
+    private static class InvalidTokenException extends Throwable {
+        private final String tokenID;
+
+        public InvalidTokenException(String error, String tokenID) {
+            super(error);
+            this.tokenID = tokenID;
+        }
+
+        private String getTokenID() {
+            return tokenID;
+        }
+    }
 }
