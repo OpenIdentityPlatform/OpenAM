@@ -35,6 +35,7 @@ import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
+import org.forgerock.openam.forgerockrest.entitlements.ConditionTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
@@ -200,7 +201,7 @@ public final class RestEndpointGuiceProvider {
             collectionResourceEndpoints.addBinding(RestEndpointManager.SERVER_INFO).to(ServerInfoResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.POLICIES).to(PolicyResource.class);
             collectionResourceEndpoints.addBinding(RestEndpointManager.APPLICATIONTYPES).to(ApplicationTypesResource.class);
-            collectionResourceEndpoints.addBinding(RestEndpointManager.CONDITIONTYPES).to(ApplicationTypesResource.class);
+            collectionResourceEndpoints.addBinding(RestEndpointManager.CONDITIONTYPES).to(ConditionTypesResource.class);
 
 
             return collectionResourceEndpoints;
