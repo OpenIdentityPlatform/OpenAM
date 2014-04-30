@@ -19,6 +19,10 @@
  *
  * Contributor(s): 
  */
+
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.shared.ldap;
 
 import com.sun.identity.shared.ldap.ber.stream.BERElement;
@@ -177,12 +181,12 @@ public class LDAPEntry implements java.io.Serializable {
                                         while ((setLength >
                                             setBytesProcessed[0]) ||
                                             (setLength == -1)) {
-                                            if ((setLength == -1) &&
-                                                (content[offset[0]] ==
-                                                BERElement.EOC)) {
+                                            if (content[offset[0]] == BERElement.EOC) {
                                                 offset[0] += 2;
                                                 setBytesProcessed[0] += 2;
-                                                break;
+                                                if (setLength == -1) {
+                                                    break;
+                                                }
                                             }
                                             if (((int) content[offset[0]]) ==
                                                 BERElement.OCTETSTRING) {
