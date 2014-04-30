@@ -33,11 +33,11 @@ import java.io.IOException;
 /**
  * Dispatcher for Rest Resource authorization.
  * <p>
- * As realms, users, groups, applications, and agents REST resources are dynamically routed based on the realm they are
- * in, means that the authorization filter cannot be applied specifically at, ie /json/realms/{realm}, as the realm
- * being accessed might be under a sub-realm, ie /json/subrealm/realms/{realm}.
+ * As realms, users, groups, applications, policies and agents REST resources are dynamically routed based on the realm
+ * they are in, means that the authorization filter cannot be applied specifically at, ie /json/realms/{realm}, as the
+ * realm being accessed might be under a sub-realm, ie /json/subrealm/realms/{realm}.
  * <p>
- * Because of this this class contains the mapping logic for the type of resource to the authroization to be applied to
+ * Because of this this class contains the mapping logic for the type of resource to the authorization to be applied to
  * it.
  *
  * @since 12.0.0
@@ -51,6 +51,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR = "groupsAuthzConfigurator";
     private static final String INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR = "agentsAuthzConfigurator";
     private static final String INIT_PARAM_APP_AUTHZ_CONFIGURATOR = "applicationsAuthzConfigurator";
+    private static final String INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR = "policiesAuthzConfigurator";
 
     private final RestEndpointManager endpointManager;
     private final AuthZFilter authZFilter;
@@ -61,6 +62,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private String groupsAuthzConfiguratorClassName;
     private String agentsAuthzConfiguratorClassName;
     private String applicationsAuthzConfiguratorClassName;
+    private String policiesAuthzConfiguratorClassName;
 
     /**
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
@@ -95,6 +97,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         groupsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR);
         agentsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR);
         applicationsAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_APP_AUTHZ_CONFIGURATOR);
+        policiesAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR);
 
         if (realmsAuthzConfiguratorClassName == null || usersAuthzConfiguratorClassName == null
                 || groupsAuthzConfiguratorClassName == null || agentsAuthzConfiguratorClassName == null) {
@@ -102,6 +105,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
                     .append(", ").append(INIT_PARAM_USERS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR)
+                    .append(", ").append(INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR)
                     .append(", and ").append(INIT_PARAM_APP_AUTHZ_CONFIGURATOR)
                     .append(" init params must be set!").toString();
 
@@ -148,6 +152,8 @@ public class RestAuthorizationDispatcherFilter implements Filter {
             authorize(agentsAuthzConfiguratorClassName, request, servletResponse, chain);
         } else if (RestEndpointManager.APPLICATIONS.equalsIgnoreCase(endpoint)) {
             authorize(applicationsAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.POLICIES.equalsIgnoreCase(endpoint))  {
+            authorize(policiesAuthzConfiguratorClassName, request, servletResponse, chain);
         } else {
             chain.doFilter(servletRequest, servletResponse);
         }
@@ -183,5 +189,6 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         groupsAuthzConfiguratorClassName = null;
         agentsAuthzConfiguratorClassName = null;
         applicationsAuthzConfiguratorClassName = null;
+        policiesAuthzConfiguratorClassName = null;
     }
 }
