@@ -99,7 +99,7 @@
             },
             "ConfirmPasswordDialogTemplate" : {
                 "title" : "Current Password",
-                "explanation1" : "The following attributes require re-authentication: ",
+                "explanation1" : "Changing the following attributes requires re-authentication: ",
                 "explanation2" : "Please confirm your current password to continue."
             },
             "ChangeSiteIdentificationDialogTemplate" : {

@@ -98,14 +98,8 @@ define("UserDelegate", [
             headers["If-Match"] = '"' + "*" + '"';
         }
 
-        // temporay fix - deleted after frui 1.0.13 is released
-        if(objectParam.currentPassword){
-            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentPassword ; 
-        }
-        // 
-
         if(objectParam.currentpassword ) {
-            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentpassword ;   
+            headers[constants.OPENAM_HEADER_PARAM_CUR_PASSWORD] = objectParam.currentpassword;   
         }
 
         this.serviceCall({url: this.getUserResourceName(oldUserData),
@@ -118,7 +112,6 @@ define("UserDelegate", [
         });
 
     };
-
 
     obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {
         var realm = this.cleanRealm(configuration.globalData.auth.realm);
