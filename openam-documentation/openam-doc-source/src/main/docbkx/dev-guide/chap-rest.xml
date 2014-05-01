@@ -694,7 +694,16 @@ userdetails.attribute.value=6319</computeroutput>
    <listitem>
     <para>
      Under <literal>/json[/<replaceable>realm</replaceable>]/entitlements</literal>,
-     you find the newer JSON-based APIs.
+     you find the newer JSON-based APIs
+     for administering policies and requesting decisions.
+    </para>
+
+    <para>
+     Under
+     <literal>/json[/<replaceable>realm</replaceable>]/applications</literal>
+     and <literal>/json/applicationtypes</literal>
+     you find JSON-based APIs
+     for administering applications and reading application types.
     </para>
 
     <para>
@@ -721,6 +730,13 @@ userdetails.attribute.value=6319</computeroutput>
    <para>
     This section describes how to request policy decisions
     and how to manage policies.
+   </para>
+
+   <para>
+    It also covers defining applications,
+    which let you constrain policies for a given application context,
+    and view application types,
+    which serve as templates for creating applications.
    </para>
 
    <section xml:id="rest-api-authz-policy-decisions">
@@ -838,6 +854,11 @@ userdetails.attribute.value=6319</computeroutput>
         such as <literal>"iPlanetAMWebAgentService"</literal>,
         <literal>"crestPolicyService"</literal>,
         or some other application name
+       </para>
+
+       <para>
+        For more about applications,
+        see <xref linkend="rest-api-authz-applications" />.
        </para>
       </listitem>
      </varlistentry>
@@ -1680,6 +1701,1147 @@ $ <userinput>curl \
       You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
       to limit the number of results returned.
      </para>
+    </section>
+   </section>
+
+   <section xml:id="rest-api-authz-applications">
+    <title>Defining Applications</title>
+
+    <para>
+     Application definitions set constraints
+     for the policies that can be defined for a particular application.
+    </para>
+
+    <para>
+     Application resources are represented in JSON and take the following form.
+     Application resources are built from standard JSON objects and values
+     (strings, numbers, objects, arrays, <literal>true</literal>,
+     <literal>false</literal>, and <literal>null</literal>).
+    </para>
+
+    <programlisting language="java">
+{
+  "name": "application name string",
+  "resources": [
+     "resource name pattern",
+     ...
+  ],
+  "actions": {
+     "action name string": true,
+     "other action name string": false,
+     ...
+  },
+  "conditions": [
+     "condition class name",
+     ...
+  ],
+  "realm": "/realm",
+  "applicationType": "application type name string",
+  "description": "string describing application",
+  "resourceComparator": "resource comparator class name",
+  "subjects": [
+     "subject implementation class name",
+     ...
+  ],
+  "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+  "saveIndex": "save index class name",
+  "searchIndex": "search index class name",
+  "attributeNames": [
+     "attribute implementation class name",
+     ...
+  ]
+}
+    </programlisting>
+
+    <variablelist>
+     <para>
+      The values for the fields shown in the description are explained below.
+     </para>
+
+     <varlistentry>
+      <term><literal>"name"</literal></term>
+      <listitem>
+       <para>
+        String matching the name
+        in the URL used when creating the application by HTTP PUT
+        or in the body when creating the application by HTTP POST
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resources"</literal></term>
+      <listitem>
+       <para>
+        Strings specifying resource name patterns as in the following example
+       </para>
+
+       <programlisting language="java">
+{
+    "resources": [
+        "http://www.example.com:8080/*",
+        "http://www.example.com:8080/*?*"
+    ]
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"actions"</literal></term>
+      <listitem>
+       <para>
+        Set of string action names,
+        each set to a boolean indicating whether the action is allowed
+        in the context of this application as in the following example
+       </para>
+
+       <programlisting language="java">
+{
+    "actions": {
+        "UPDATE": true,
+        "PATCH": true,
+        "QUERY": true,
+        "CREATE": true,
+        "DELETE": true,
+        "READ": true,
+        "ACTION": true
+    }
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"conditions"</literal></term>
+      <listitem>
+       <para>
+        Class names of condition implementations allowed
+        in the context of this application
+       </para>
+
+       <para>
+        Short names can be used for registered condition implementations.
+       </para>
+
+       <para>
+        The following condition implementations are available.
+       </para>
+
+       <simplelist>
+        <member><literal>"and"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.AttributeLookupCondition"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.CachingEntitlementCondition"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.NumericAttributeCondition"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.PolicyCondition"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.StringAttributeCondition"</literal></member>
+        <member><literal>"dateRange"</literal></member>
+        <member><literal>"daysOfWeek"</literal></member>
+        <member><literal>"dnsName"</literal></member>
+        <member><literal>"ipRange"</literal></member>
+        <member><literal>"not"</literal></member>
+        <member><literal>"or"</literal></member>
+        <member><literal>"timeRange"</literal></member>
+        <member><literal>"timezone"</literal></member>
+       </simplelist>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"realm"</literal></term>
+      <listitem>
+       <para>
+        Name of the realm where this application is defined
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"applicationType"</literal></term>
+      <listitem>
+       <para>
+        Name of the application type used as a template for this application
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"description"</literal></term>
+      <listitem>
+       <para>
+        String describing the application
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resourceComparator"</literal></term>
+      <listitem>
+       <para>
+        Class name of the resource comparator implementation used
+        in the context of this application
+       </para>
+
+       <para>
+        The following implementations are available.
+       </para>
+
+       <simplelist>
+        <member><literal>"com.sun.identity.entitlement.ExactMatchResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.PrefixResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.RegExResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.URLResourceName"</literal></member>
+       </simplelist>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"subjects"</literal></term>
+      <listitem>
+       <para>
+        Class name of the subject implementation used
+        in the context of this application
+       </para>
+
+       <para>
+        The following implementations are available.
+       </para>
+
+       <simplelist>
+        <member><literal>"com.sun.identity.admin.model.AndViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.AttributeViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.IdRepoGroupViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.IdRepoRoleViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.IdRepoUserViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.NotViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.OrViewSubject"</literal></member>
+        <member><literal>"com.sun.identity.admin.model.VirtualViewSubject"</literal></member>
+       </simplelist>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"entitlementCombiner"</literal></term>
+      <listitem>
+       <para>
+        Class name of the implementation to combine entitlements,
+        such as <literal>"com.sun.identity.entitlement.DenyOverride"</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"saveIndex"</literal></term>
+      <listitem>
+       <para>
+        Class name of the implementation for creating indexes for resource names,
+        such as <literal>"com.sun.identity.entitlement.util.ResourceNameIndexGenerator"</literal>
+        for URL resource names
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"searchIndex"</literal></term>
+      <listitem>
+       <para>
+        Class name of the implementation for searching indexes for resource names,
+        such as <literal>"com.sun.identity.entitlement.util.ResourceNameSplitter"</literal>
+        for URL resource names
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"attributeNames"</literal></term>
+      <listitem>
+       <para>
+        Class names of implementations for getting attributes such as
+        <literal>"com.sun.identity.entitlement.StaticAttributes"</literal>,
+        and <literal>"com.sun.identity.entitlement.UserAttributes"</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>
+     The examples above do not show the fields added by OpenAM
+     to indicate when the application was created and last updated, and by whom.
+     Those field are
+     <literal>"createdBy"</literal> and <literal>"lastModifiedBy"</literal>,
+     which take strings holding universal identifier DNs as their values,
+     and <literal>"creationDate"</literal> and <literal>"lastModifiedDate"</literal>,
+     which an integer number of seconds since the Unix epoch.
+    </para>
+
+    <section xml:id="rest-api-authz-applications-create">
+     <title>Creating Applications</title>
+
+     <para>
+      To create an application definition,
+      either perform an HTTP PUT indicating the full path to the resource
+      and the name in the resource matching the name in the path,
+      or perform an HTTP POST with the name to use specified in the resource.
+     </para>
+
+     <para>
+      The HTTP PUT form includes the application definition
+      as the JSON resource data,
+      with the header <literal>Content-Type: application/json</literal>
+      and uses the <literal>If-None-Match: *</literal> header.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "If-None-Match: *" \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "crest",
+    "resources": [
+        "http://www.example.com:8080/*",
+        "http://www.example.com:8080/*?*"
+    ],
+    "actions": {
+        "UPDATE": true,
+        "PATCH": true,
+        "QUERY": true,
+        "CREATE": true,
+        "DELETE": true,
+        "READ": true,
+        "ACTION": true
+    },
+    "conditions": [
+        "not",
+        "dateRange",
+        "timezone",
+        "timeRange",
+        "or",
+        "dnsName",
+        "ipRange",
+        "daysOfWeek",
+        "and"
+    ],
+    "realm": "/realm",
+    "applicationType": "crestPolicyService",
+    "description": "An example application for Common REST",
+    "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
+    "subjects": [
+        "com.sun.identity.admin.model.IdRepoUserViewSubject",
+        "com.sun.identity.admin.model.NotViewSubject",
+        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+        "com.sun.identity.admin.model.AndViewSubject",
+        "com.sun.identity.admin.model.VirtualViewSubject",
+        "com.sun.identity.admin.model.OrViewSubject",
+        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+        "com.sun.identity.admin.model.AttributeViewSubject"
+    ],
+    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "saveIndex": null,
+    "searchIndex": null,
+    "attributeNames": []
+}' \
+ https://openam.example.com:8443/openam/json/applications/crest</userinput>
+<computeroutput>{
+  "name" : "crest",
+  "resources" : [
+   "http://www.example.com:8080/*",
+   "http://www.example.com:8080/*?*"
+  ],
+  "actions" : {
+    "UPDATE" : true,
+    "PATCH" : true,
+    "QUERY" : true,
+    "CREATE" : true,
+    "DELETE" : true,
+    "READ" : true,
+    "ACTION" : true
+  },
+  "conditions" : [
+   "not",
+   "dateRange",
+   "timezone",
+   "timeRange",
+   "or",
+   "dnsName",
+   "ipRange",
+   "daysOfWeek",
+   "and"
+  ],
+  "realm" : "/",
+  "creationDate" : 1398761708295,
+  "lastModifiedDate" : 1398761708295,
+  "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "applicationType" : "crestPolicyService",
+  "description" : "An example application for Common REST",
+  "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+  "subjects" : [
+   "com.sun.identity.admin.model.IdRepoUserViewSubject",
+   "com.sun.identity.admin.model.NotViewSubject",
+   "com.sun.identity.admin.model.AndViewSubject",
+   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+   "com.sun.identity.admin.model.OrViewSubject",
+   "com.sun.identity.admin.model.VirtualViewSubject",
+   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+   "com.sun.identity.admin.model.AttributeViewSubject"
+  ],
+  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "saveIndex" : null,
+  "searchIndex" : null,
+  "attributeNames" : [ ]
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+
+     <para>
+      The HTTP POST form includes the application definition
+      as the JSON resource data,
+      with the header <literal>Content-Type: application/json</literal>
+      and uses the <literal>_action=create</literal> operation.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "crest",
+    "resources": [
+        "http://www.example.com:8080/*",
+        "http://www.example.com:8080/*?*"
+    ],
+    "actions": {
+        "UPDATE": true,
+        "PATCH": true,
+        "QUERY": true,
+        "CREATE": true,
+        "DELETE": true,
+        "READ": true,
+        "ACTION": true
+    },
+    "conditions": [
+        "not",
+        "dateRange",
+        "timezone",
+        "timeRange",
+        "or",
+        "dnsName",
+        "ipRange",
+        "daysOfWeek",
+        "and"
+    ],
+    "realm": "/realm",
+    "applicationType": "crestPolicyService",
+    "description": "An example application for Common REST",
+    "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
+    "subjects": [
+        "com.sun.identity.admin.model.IdRepoUserViewSubject",
+        "com.sun.identity.admin.model.NotViewSubject",
+        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+        "com.sun.identity.admin.model.AndViewSubject",
+        "com.sun.identity.admin.model.VirtualViewSubject",
+        "com.sun.identity.admin.model.OrViewSubject",
+        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+        "com.sun.identity.admin.model.AttributeViewSubject"
+    ],
+    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "saveIndex": null,
+    "searchIndex": null,
+    "attributeNames": []
+}' \
+ https://openam.example.com:8443/openam/json/applications/?_action=create</userinput>
+<computeroutput>{
+  "name" : "crest",
+  "resources" : [
+   "http://www.example.com:8080/*",
+   "http://www.example.com:8080/*?*"
+  ],
+  "actions" : {
+    "UPDATE" : true,
+    "PATCH" : true,
+    "QUERY" : true,
+    "CREATE" : true,
+    "DELETE" : true,
+    "READ" : true,
+    "ACTION" : true
+  },
+  "conditions" : [
+   "not",
+   "dateRange",
+   "timezone",
+   "timeRange",
+   "or",
+   "dnsName",
+   "ipRange",
+   "daysOfWeek",
+   "and"
+  ],
+  "realm" : "/",
+  "creationDate" : 1398762452667,
+  "lastModifiedDate" : 1398762452667,
+  "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "applicationType" : "crestPolicyService",
+  "description" : "An example application for Common REST",
+  "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+  "subjects" : [
+   "com.sun.identity.admin.model.IdRepoUserViewSubject",
+   "com.sun.identity.admin.model.NotViewSubject",
+   "com.sun.identity.admin.model.AndViewSubject",
+   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+   "com.sun.identity.admin.model.OrViewSubject",
+   "com.sun.identity.admin.model.VirtualViewSubject",
+   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+   "com.sun.identity.admin.model.AttributeViewSubject"
+  ],
+  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "saveIndex" : null,
+  "searchIndex" : null,
+  "attributeNames" : [ ]
+}</computeroutput>
+     </screen>
+    </section>
+
+    <section xml:id="rest-api-authz-applications-read">
+     <title>Reading Applications</title>
+
+     <para>
+      To read an application definition, perform an HTTP GET
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen width="89">
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/applications/iPlanetAMWebAgentService</userinput>
+<computeroutput>{
+  "name" : "iPlanetAMWebAgentService",
+  "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
+  "actions" : {
+    "POST" : true,
+    "PATCH" : true,
+    "GET" : true,
+    "DELETE" : true,
+    "OPTIONS" : true,
+    "PUT" : true,
+    "HEAD" : true
+  },
+  "conditions" : [
+   "not",
+   "dateRange",
+   "timezone",
+   "timeRange",
+   "or",
+   "dnsName",
+   "ipRange",
+   "daysOfWeek",
+   "and"
+  ],
+  "realm" : "/realm",
+  "creationDate" : 1398760362341,
+  "lastModifiedDate" : 1398760362341,
+  "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+  "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+  "applicationType" : "iPlanetAMWebAgentService",
+  "description" : null,
+  "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+  "subjects" : [
+   "com.sun.identity.admin.model.IdRepoUserViewSubject",
+   "com.sun.identity.admin.model.NotViewSubject",
+   "com.sun.identity.admin.model.AndViewSubject",
+   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+   "com.sun.identity.admin.model.OrViewSubject",
+   "com.sun.identity.admin.model.VirtualViewSubject",
+   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+   "com.sun.identity.admin.model.AttributeViewSubject"
+  ],
+  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "saveIndex" : null,
+  "searchIndex" : null,
+  "attributeNames" : [ ]
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-applications-update">
+     <title>Updating Applications</title>
+
+     <para>
+      To update an application definition, perform an HTTP PUT
+      specifying the resource name
+      with the application definition as the JSON resource data,
+      and with the header <literal>Content-Type: application/json</literal>.
+      This is essentially the same as creating an application definition,
+      but without the <literal>If-None-Match: *</literal> header.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen width="81">
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "name": "crest",
+    "resources": [
+        "http://www.example.com:8080/*",
+        "http://www.example.com:8080/*?*"
+    ],
+    "actions": {
+        "UPDATE": false,
+        "PATCH": false,
+        "QUERY": true,
+        "CREATE": false,
+        "DELETE": false,
+        "READ": true,
+        "ACTION": false
+    },
+    "conditions": [
+        "not",
+        "dateRange",
+        "timezone",
+        "timeRange",
+        "or",
+        "dnsName",
+        "ipRange",
+        "daysOfWeek",
+        "and"
+    ],
+    "realm": "/realm",
+    "applicationType": "crestPolicyService",
+    "description": "An read-only example application for Common REST",
+    "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
+    "subjects": [
+        "com.sun.identity.admin.model.IdRepoUserViewSubject",
+        "com.sun.identity.admin.model.NotViewSubject",
+        "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+        "com.sun.identity.admin.model.AndViewSubject",
+        "com.sun.identity.admin.model.VirtualViewSubject",
+        "com.sun.identity.admin.model.OrViewSubject",
+        "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+        "com.sun.identity.admin.model.AttributeViewSubject"
+    ],
+    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "saveIndex": null,
+    "searchIndex": null,
+    "attributeNames": []
+}' \
+ https://openam.example.com:8443/openam/json/applications/crest</userinput>
+<computeroutput>{
+  "name" : "crest",
+  "resources" : [
+   "http://www.example.com:8080/*",
+   "http://www.example.com:8080/*?*"
+  ],
+  "actions" : {
+    "UPDATE" : false,
+    "PATCH" : false,
+    "QUERY" : true,
+    "CREATE" : false,
+    "DELETE" : false,
+    "READ" : true,
+    "ACTION" : false
+  },
+  "conditions" : [
+   "not",
+   "dateRange",
+   "timezone",
+   "timeRange",
+   "or",
+   "dnsName",
+   "ipRange",
+   "daysOfWeek",
+   "and"
+  ],
+  "realm" : "/",
+  "creationDate" : 1398762194628,
+  "lastModifiedDate" : 1398762194628,
+  "createdBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "lastModifiedBy" : "id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+  "applicationType" : "crestPolicyService",
+  "description" : "An read-only example application for Common REST",
+  "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+  "subjects" : [
+   "com.sun.identity.admin.model.IdRepoUserViewSubject",
+   "com.sun.identity.admin.model.NotViewSubject",
+   "com.sun.identity.admin.model.AndViewSubject",
+   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+   "com.sun.identity.admin.model.OrViewSubject",
+   "com.sun.identity.admin.model.VirtualViewSubject",
+   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+   "com.sun.identity.admin.model.AttributeViewSubject"
+  ],
+  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "saveIndex" : null,
+  "searchIndex" : null,
+  "attributeNames" : [ ]
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-applications-delete">
+     <title>Deleting Applications</title>
+
+     <para>
+      To delete an application definition, perform an HTTP DELETE
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --request DELETE \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/applications/crest</userinput>
+<computeroutput>{}</computeroutput>
+     </screen>
+    </section>
+
+    <section xml:id="rest-api-authz-applications-query">
+     <title>Listing Applications</title>
+
+     <para>
+      To list application definitions, perform an HTTP GET on the endpoint,
+      setting at least the <literal>_queryFilter</literal> query string parameter.
+     </para>
+
+     <screen width="81">
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/applications?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ {
+    "name" : "iPlanetAMWebAgentService",
+    "resources" : [ "http://*:*/*", "http://*:*/*?*" ],
+    "actions" : {
+      "POST" : true,
+      "PATCH" : true,
+      "GET" : true,
+      "DELETE" : true,
+      "OPTIONS" : true,
+      "PUT" : true,
+      "HEAD" : true
+    },
+    "conditions" : [
+     "not",
+     "dateRange",
+     "timezone",
+     "timeRange",
+     "or",
+     "dnsName",
+     "ipRange",
+     "daysOfWeek",
+     "and"
+    ],
+    "realm" : "/realm",
+    "creationDate" : 1398760362341,
+    "lastModifiedDate" : 1398760362341,
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "applicationType" : "iPlanetAMWebAgentService",
+    "description" : null,
+    "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+    "subjects" : [
+     "com.sun.identity.admin.model.IdRepoUserViewSubject",
+     "com.sun.identity.admin.model.NotViewSubject",
+     "com.sun.identity.admin.model.AndViewSubject",
+     "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+     "com.sun.identity.admin.model.OrViewSubject",
+     "com.sun.identity.admin.model.VirtualViewSubject",
+     "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+     "com.sun.identity.admin.model.AttributeViewSubject"
+    ],
+    "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+    "saveIndex" : null,
+    "searchIndex" : null,
+    "attributeNames" : [ ]
+  } ],
+  "resultCount" : 1,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+     </screen>
+
+     <para>
+      The <literal>_queryFilter</literal> parameter can take
+      <literal>true</literal> to match every policy,
+      <literal>false</literal> to match no policies,
+      or a filter of the following form to match field values:
+      <literal><replaceable>field</replaceable> <replaceable>operator</replaceable> <replaceable>value</replaceable></literal>
+      where <replaceable>field</replaceable> represents the field name,
+      <replaceable>operator</replaceable> is the operator code,
+      <replaceable>value</replaceable> is the value to match,
+      and the entire filter is URL encoded.
+      Supported operators are as follows.
+     </para>
+
+     <itemizedlist>
+      <listitem>
+       <para>
+        <literal>eq</literal>: equals (for matching strings)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>ge</literal>: greater than or equal to (for matching integers)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>gt</literal>: greater than (for matching integers)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>le</literal>: less than or equal to (for matching integers)
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>lt</literal>: less than (for matching integers)
+       </para>
+      </listitem>
+     </itemizedlist>
+
+     <itemizedlist>
+      <para>
+       The <literal><replaceable>field</replaceable></literal> value
+       can take the following values.
+      </para>
+
+      <listitem>
+       <para>
+        <literal>"name"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"description"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"applicationName"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"createdBy"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"lastModifiedBy"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"creationDate"</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        <literal>"lastModified"</literal>
+       </para>
+      </listitem>
+     </itemizedlist>
+
+     <para>
+      Filters can be composed of multiple expressions
+      by a using boolean operator <literal>AND</literal>,
+      and by using parentheses,
+      <literal>(<replaceable>expression</replaceable>)</literal>,
+      to group expressions.
+      You must URL encode the filter expression
+      in <literal>_queryFilter=<replaceable>filter</replaceable></literal>.
+     </para>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+
+     <para>
+      You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
+      to limit the number of results returned.
+     </para>
+    </section>
+   </section>
+
+   <section xml:id="rest-api-authz-application-types">
+    <title>Viewing Application Types</title>
+
+    <para>
+     Application types act as templates for creating applications.
+    </para>
+
+    <para>
+     Applications types are server-wide, and do not differ by realm.
+     Hence the URI for the application types API
+     does not contain a realm component,
+     but is <literal>/json/applicationtypes</literal>.
+    </para>
+
+    <para>
+     Application type resources are represented in JSON and take the following form.
+     Application type resources are built from standard JSON objects and values
+     (strings, numbers, objects, arrays, <literal>true</literal>,
+     <literal>false</literal>, and <literal>null</literal>).
+    </para>
+
+    <programlisting language="java">
+{
+  "name": "application type name string",
+  "actions": {
+     "action name string": true,
+     "other action name string": false,
+     ...
+  },
+  "resourceComparator": "resource comparator class name",
+  "saveIndex": "save index class name",
+  "searchIndex": "search index class name",
+  "applicationClassName": "com.sun.identity.entitlement.Application"
+}
+    </programlisting>
+
+    <variablelist>
+     <para>
+      The values for the fields shown in the description are explained below.
+     </para>
+
+     <varlistentry>
+      <term><literal>"name"</literal></term>
+      <listitem>
+       <para>
+        String matching the name
+        in the URL used when creating the application type by HTTP PUT
+        or in the body when creating the application type by HTTP POST
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"actions"</literal></term>
+      <listitem>
+       <para>
+        Set of string action names,
+        each set to a boolean indicating whether the action is allowed
+        as in the following example
+       </para>
+
+       <programlisting language="java">
+{
+    "actions": {
+        "UPDATE": true,
+        "PATCH": true,
+        "QUERY": true,
+        "CREATE": true,
+        "DELETE": true,
+        "READ": true,
+        "ACTION": true
+    }
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resourceComparator"</literal></term>
+      <listitem>
+       <para>
+        Class name of the resource comparator implementation used
+        in the context of this application
+       </para>
+
+       <para>
+        The following implementations are available.
+       </para>
+
+       <simplelist>
+        <member><literal>"com.sun.identity.entitlement.ExactMatchResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.PrefixResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.RegExResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.URLResourceName"</literal></member>
+       </simplelist>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"resourceComparator"</literal></term>
+      <listitem>
+       <para>
+        Class name of the resource comparator implementation used
+        in the context of this application
+       </para>
+
+       <para>
+        The following implementations are available.
+       </para>
+
+       <simplelist>
+        <member><literal>"com.sun.identity.entitlement.ExactMatchResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.PrefixResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.RegExResourceName"</literal></member>
+        <member><literal>"com.sun.identity.entitlement.URLResourceName"</literal></member>
+       </simplelist>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"saveIndex"</literal></term>
+      <listitem>
+       <para>
+        Class name of the implementation for creating indexes for resource names,
+        such as <literal>"com.sun.identity.entitlement.util.ResourceNameIndexGenerator"</literal>
+        for URL resource names
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"searchIndex"</literal></term>
+      <listitem>
+       <para>
+        Class name of the implementation for searching indexes for resource names,
+        such as <literal>"com.sun.identity.entitlement.util.ResourceNameSplitter"</literal>
+        for URL resource names
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"applicationClassName"</literal></term>
+      <listitem>
+       <para>
+        Class name of the application implementation,
+        such as <literal>"com.sun.identity.entitlement.Application"</literal>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <section xml:id="rest-api-authz-application-types-read">
+     <title>Reading Application Types</title>
+
+     <para>
+      To read an application type, perform an HTTP GET
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/applicationtypes/crestPolicyService</userinput>
+<computeroutput>{
+  "name" : "crestPolicyService",
+  "actions" : {
+    "UPDATE" : true,
+    "PATCH" : true,
+    "QUERY" : true,
+    "CREATE" : true,
+    "DELETE" : true,
+    "READ" : true,
+    "ACTION" : true
+  },
+  "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+  "saveIndex" : "org.forgerock.openam.entitlement.indextree.TreeSaveIndex",
+  "searchIndex" : "org.forgerock.openam.entitlement.indextree.TreeSearchIndex",
+  "applicationClassName" : "com.sun.identity.entitlement.Application"
+}
+</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameters
+      <literal>_prettyPrint=true</literal> to make the output easier to read,
+      and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+      to limit the fields returned in the output.
+     </para>
+    </section>
+
+    <section xml:id="rest-api-authz-application-types-query">
+     <title>Listing Application Types</title>
+
+     <para>
+      To list application types, perform an HTTP GET on the endpoint,
+      setting at least the <literal>_queryFilter</literal> query string parameter
+      as in the following example.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/applicationtypes?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ ... application types ... ],
+  "resultCount" : 8,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+     </screen>
     </section>
    </section>
   </section>
