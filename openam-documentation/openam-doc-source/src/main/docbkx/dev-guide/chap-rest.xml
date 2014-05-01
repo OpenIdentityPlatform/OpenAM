@@ -693,9 +693,8 @@ userdetails.attribute.value=6319</computeroutput>
   <itemizedlist>
    <listitem>
     <para>
-     Under <literal>/json[/<replaceable>realm</replaceable>]/entitlements</literal>,
-     you find the newer JSON-based APIs
-     for administering policies and requesting decisions.
+     Under <literal>/json[/<replaceable>realm</replaceable>]/policies</literal>,
+     you find the newer JSON-based APIs.
     </para>
 
     <para>
@@ -743,132 +742,111 @@ userdetails.attribute.value=6319</computeroutput>
     <title>Requesting Policy Decisions</title>
 
     <para>
-     TODO: Pending AME-3381
+     You can request policy decisions from OpenAM
+     by using the REST APIs described in this section.
+     OpenAM evaluates the request
+     based on the context and the policies configured,
+     and returns decision that indicate what actions are allowed or denied,
+     as well as any attributes or advice
+     for the resources specified.
     </para>
-   </section>
-
-   <section xml:id="rest-api-authz-policies">
-    <title>Managing Policies</title>
 
     <para>
-     Policy resources are represented in JSON and take the following form.
-     Policy resources are built from standard JSON objects and values
-     (strings, numbers, objects, arrays, <literal>true</literal>,
-     <literal>false</literal>, and <literal>null</literal>).
+     To request a decision for specific resources,
+     see <xref linkend="rest-api-authz-policy-decision-concrete" />.
+     <!-- Pending AME-3196
+     To request decisions for a resource and all resources beneath it,
+     see <xref linkend="rest-api-authz-policy-decision-multiple" />.
+     -->
+    </para>
+
+   <section xml:id="rest-api-authz-policy-decision-concrete">
+    <title>Requesting Policy Decisions For Specific Resources</title>
+
+    <para>
+     This section shows how you can request a policy decision over REST
+     for specific resources.
+    </para>
+
+    <para>
+     To request policy decisions for specific resources,
+     perform an HTTP POST using the evaluation action
+     to the appropriate path under the URI where OpenAM is deployed,
+     <literal>/json[/<replaceable>realm</replaceable>]/policies?_action=evaluate</literal>,
+     where <replaceable>realm</replaceable> optionally specifies the realm.
+     The payload for the HTTP POST is a JSON object
+     that specifies at least the resources,
+     and takes the following form.
     </para>
 
     <programlisting language="java">
 {
-    "name": "test",
-    "active": true,
-    "description": "A test policy",
-    "resources": {
-        "included": [
-            "http://www.example.com:80/*"
+    "resources": [
+        "resource1",
+        "resource2",
+        ...,
+        "resourceN"
+    ],
+    "application": "optional, defaults to iPlanetAMWebAgentService",
+    "subject": "optional subject SSOToken",
+    "environment": {
+        "optional key1": [
+            "value",
+            "another value",
+            ...
         ],
-        "excluded": [
-            "http://www.example.com:80/images/*"
-        ]
-    },
-    "applicationName": "application name",
-    "actionValues": {
-        "read": true,
-        "write": false
-    },
-    "subject": {
-        "a subject or": "a composite of subjects"
-    },
-    "condition": {
-        "a condition or": "a composite of conditions"
-    },
-    "resourceAttributes": [
-        {
-            "type": "Static",
-            "propertyName": "name",
-            "propertyValues": [
-                "value"
-            ]
-        },
-        {
-            "type": "User",
-            "propertyName": "profile attribute",
-            "propertyValues": [
-                "profile attribute", ...
-            ]
-        },
-    ]
+        "optional key2": [
+            "value",
+            "another value",
+            ...
+        ],
+        ...
+    }
 }
     </programlisting>
 
     <variablelist>
      <para>
-      The values for the fields shown in the example are explained below.
+      The values for the fields shown above are explained below.
      </para>
-
-     <varlistentry>
-      <term><literal>"name"</literal></term>
-      <listitem>
-       <para>
-        String matching the name
-        in the URL used when creating the policy by HTTP PUT
-        or in the body when creating the policy by HTTP POST
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>"active"</literal></term>
-      <listitem>
-       <para>
-        Boolean indicating whether OpenAM considers the policy active
-        for evaluation purposes, defaults to <literal>false</literal>
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>"description"</literal></term>
-      <listitem>
-       <para>
-        String describing the policy
-       </para>
-      </listitem>
-     </varlistentry>
 
      <varlistentry>
       <term><literal>"resources"</literal></term>
       <listitem>
        <para>
-        List of the resource name pattern strings
-        to which the policy applies (<literal>"included"</literal>)
-        and does not apply (<literal>"excluded"</literal>)
+        This required field specifies the list of resources
+        for which to return decisions.
        </para>
+
+       <para>
+        For example, when using the default application,
+        <literal>"iPlanetAMWebAgentService"</literal>,
+        you can request decisions for resource URLs.
+       </para>
+
+       <programlisting language="java">
+{
+    "resources": [
+        "http://www.example.com/index.html",
+        "http://www.example.com/do?action=run"
+    ]
+}
+       </programlisting>
       </listitem>
      </varlistentry>
 
      <varlistentry>
-      <term><literal>"applicationName"</literal></term>
+      <term><literal>"application"</literal></term>
       <listitem>
        <para>
-        String application name,
-        such as <literal>"iPlanetAMWebAgentService"</literal>,
-        <literal>"crestPolicyService"</literal>,
-        or some other application name
+        This optional field holds the name of the application,
+        and defaults to <literal>"iPlanetAMWebAgentService"</literal>
+        if not specified.
        </para>
 
        <para>
-        For more about applications,
+        For more on available applications,
         see <xref linkend="rest-api-authz-applications" />.
-       </para>
-      </listitem>
-     </varlistentry>
-
-     <varlistentry>
-      <term><literal>"actionValues"</literal></term>
-      <listitem>
-       <para>
-        Set of string action names,
-        each set to a boolean indicating whether the action is allowed
        </para>
       </listitem>
      </varlistentry>
@@ -877,223 +855,534 @@ userdetails.attribute.value=6319</computeroutput>
       <term><literal>"subject"</literal></term>
       <listitem>
        <para>
-        Specifies the subjects to which the policy applies,
-        where subjects can be combined by using the built-in types
-        <literal>"AND"</literal>, <literal>"OR"</literal>,
-        and <literal>"NOT"</literal>,
-        and where subject implementations are pluggable
+        This optional field holds the token ID of the subject,
+        returned for example on successful authentication.
+        See <xref linkend="rest-api-auth" />.
        </para>
 
        <para>
-        Subjects are shown as JSON objects
-        with <literal>"type"</literal> set to the name of the implementation
-        (using a short name for all registered subject implementations),
-        and also other fields depending on the implementation.
-        The subject types registered by default include the following.
+        If you do not specify the token ID,
+        OpenAM uses the token ID of the subject making the request.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"environment"</literal></term>
+      <listitem>
+       <para>
+        This optional field holds a map of keys to lists of values.
        </para>
 
-       <itemizedlist>
-        <listitem>
-         <para>
-          <literal>"AnyUser"</literal>, meaning any authenticated user
-         </para>
-        </listitem>
+       <para>
+        If you do not specify the environment, the default is an empty map.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
 
-        <listitem>
-         <para>
-          <literal>"Attribute"</literal> to specify attributes
-          of the subject's profile as in the following example.
-         </para>
+    <para>
+     The example below requests policy decisions for two URL resources.
+     The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+     for a user who has access to perform the operation.
+    </para>
 
-         <programlisting language="java">
-{
-    "subject": {
-        "type": "Attribute",
-        "name": "ou",
-        "value": "Product Testing"
-    }
-}
-         </programlisting>
-        </listitem>
+    <programlisting language="java">
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ --header "Content-Type: application/json" \
+ --data '{
+    "resources": [
+        "http://www.example.com/index.html",
+        "http://www.example.com/do?action=run"
+    ],
+    "application": "iPlanetAMWebAgentService"
+ }' \
+ https://openam.example.com:8443/openam/json/realm/policies?_action=evaluate</userinput>
+<computeroutput>[ {
+  "resource" : "http://www.example.com:80/do?action=run",
+  "actions" : {
+  },
+  "attributes" : {
+  },
+  "advices" : {
+    "AuthLevelConditionAdvice" : [ "/realm:3" ]
+  }
+}, {
+  "resource" : "http://www.example.com:80/index.html",
+  "actions" : {
+    "POST" : false,
+    "GET" : true
+  },
+  "attributes" : {
+    "cn" : [ "demo" ]
+  },
+  "advices" : {
+  }
+} ]</computeroutput>
+    </programlisting>
 
-        <listitem>
-         <para>
-          <literal>"Group"</literal> to specify a particular group
-          as in the following example.
-         </para>
+    <variablelist>
+     <para>
+      In the JSON list of decisions returned for each resource,
+      OpenAM includes a these fields.
+     </para>
 
-         <programlisting language="java">
-{
-    "subject": {
-        "type": "Group",
-        "subjectName": "HR Managers"
-    }
-}
-         </programlisting>
-        </listitem>
-
-        <listitem>
-         <para>
-          <literal>"NONE"</literal>, meaning no subject
-         </para>
-        </listitem>
-
-        <listitem>
-         <para>
-          <literal>"Role"</literal> to specify a particular OpenAM role
-          as in the following example.
-         </para>
-
-         <programlisting language="java">
-{
-    "subject": {
-        "type": "Role",
-        "subjectName": "System Administrators"
-    }
-}
-         </programlisting>
-        </listitem>
-
-        <listitem>
-         <para>
-          <literal>"User"</literal> to specify a particular user
-          as in the following example.
-         </para>
-
-         <programlisting language="java">
-{
-    "subject": {
-        "type": "User",
-        "subjectName": "Bob Dobbs"
-    }
-}
-         </programlisting>
-        </listitem>
-       </itemizedlist>
+     <varlistentry>
+      <term><literal>"resource"</literal></term>
+      <listitem>
+       <para>
+        A resource specified in the request
+       </para>
 
        <para>
-        <literal>"Policy"</literal> subject types can be used
-        to correspond to the subject configured for policies
-        as in the following example.
+        Notice that the resources are normalized.
+        In the example, the request does not explicitly specify port 80,
+        but the response does show the port number.
+        Notice also that the decisions returned are not guaranteed
+        to be in the same order as the resources were requested.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"actions"</literal></term>
+      <listitem>
+       <para>
+        A map of action name keys
+        to Boolean values that indicate whether
+        the action is allowed (<literal>true</literal>)
+        or denied (<literal>false</literal>)
+        for the specified resource
+       </para>
+
+       <para>
+        In the example,
+        for resource <literal>http://www.example.com:80/index.html</literal>
+        HTTP GET is allowed, whereas HTTP POST is denied.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"attributes"</literal></term>
+      <listitem>
+       <para>
+        A map of attribute names to their values,
+        if any resource attributes are returned
+        according to applicable policies
+       </para>
+
+       <para>
+        In the example, the policy that applies
+        to <literal>http://www.example.com:80/index.html</literal>
+        causes that the value of the subject's "cn" profile attribute
+        to be returned.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"advices"</literal></term>
+      <listitem>
+       <para>
+        A map of advice names to their values,
+        if any advice is returned according to applicable policies
+       </para>
+
+       <para>
+        The <literal>"advices"</literal> field can provide hints
+        regarding what OpenAM needs to take the authorization decision.
+       </para>
+
+       <para>
+        In the example, the policy that applies
+        to <literal>http://www.example.com:80/do?action=run</literal>
+        requests that the subject be authenticated
+        in realm <literal>/realm</literal>
+        at an authentication level of at least 3.
        </para>
 
        <programlisting language="java">
 {
-    "type": "Policy",
-    "name": "All authenticated users",
-    "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
-    "values": []
-}
-       </programlisting>
-       <para>
-        The following example defines the subject
-        either as Bob Dobbs or as a member of the HR Managers group.
-       </para>
-
-       <programlisting language="java">
-{
-    "subject": {
-        "type": "OR",
-        "subjects": [
-            {
-                "subject": {
-                    "type": "User",
-                    "subjectName": "Bob Dobbs"
-                }
-            },
-            {
-                "subject": {
-                    "type": "Group",
-                    "subjectName": "HR Managers"
-                }
-            }
+    "advices": {
+        "AuthLevelConditionAdvice": [
+            "/realm:3"
         ]
     }
 }
        </programlisting>
       </listitem>
      </varlistentry>
+    </variablelist>
 
-     <varlistentry>
-      <term><literal>"condition"</literal></term>
-      <listitem>
-       <para>
-        Specifies additional conditions, where conditions can be combined
-        by using the built-in types <literal>"AND"</literal>,
-        <literal>"OR"</literal>, and <literal>"NOT"</literal>,
-        and where condition implementations are pluggable
-       </para>
+    <para>
+     You can use the query string parameters
+     <literal>_prettyPrint=true</literal> to make the output easier to read,
+     and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+     to limit the fields returned in the output.
+    </para>
+   </section>
 
-       <para>
-        Conditions are shown as JSON objects
-        with <literal>"type"</literal> set to the name of the implementation
-        (using a short name for all registered condition implementations),
-        and also other fields depending on the implementation.
-        The condition types registered by default include the following.
-       </para>
+    <!-- Pending AME-3196
+    <section xml:id="rest-api-authz-policy-decision-subtree">
+     <title>Requesting Policy Decisions For a Tree of Resources</title>
 
-       <itemizedlist>
-        <listitem>
-         <para>
-          <literal>"AttributeLookup"</literal> to specify
-          a value to match in the resource as in the following example.
-         </para>
+     <para>
+      This section shows how you can request policy decisions over REST
+      for a resource and all other resources in the subtree beneath it.
+     </para>
 
-         <programlisting language="java">
+     <para>
+      TODO
+     </para>
+    </section>
+    -->
+  </section>
+
+  <section xml:id="rest-api-authz-policies">
+   <title>Managing Policies</title>
+
+   <para>
+    Policy resources are represented in JSON and take the following form.
+    Policy resources are built from standard JSON objects and values
+    (strings, numbers, objects, arrays, <literal>true</literal>,
+    <literal>false</literal>, and <literal>null</literal>).
+   </para>
+
+   <programlisting language="java">
 {
-    "type": "AttributeLookup",
-    "key": "postaladdress",
-    "value": "33 New Montgomery St."
+   "name": "test",
+   "active": true,
+   "description": "A test policy",
+   "resources": {
+       "included": [
+           "http://www.example.com:80/*"
+       ],
+       "excluded": [
+           "http://www.example.com:80/images/*"
+       ]
+   },
+   "applicationName": "application name",
+   "actionValues": {
+       "read": true,
+       "write": false
+   },
+   "subject": {
+       "a subject or": "a composite of subjects"
+   },
+   "condition": {
+       "a condition or": "a composite of conditions"
+   },
+   "resourceAttributes": [
+       {
+           "type": "Static",
+           "propertyName": "name",
+           "propertyValues": [
+               "value"
+           ]
+       },
+       {
+           "type": "User",
+           "propertyName": "profile attribute",
+           "propertyValues": [
+               "profile attribute", ...
+           ]
+       },
+   ]
 }
-         </programlisting>
-        </listitem>
+   </programlisting>
 
-        <listitem>
-         <para>
-          <literal>"DNSName"</literal> to specify domain names
-          where the request originated as in the following example.
-         </para>
+   <variablelist>
+    <para>
+     The values for the fields shown in the example are explained below.
+    </para>
 
-         <programlisting language="java">
+    <varlistentry>
+     <term><literal>"name"</literal></term>
+     <listitem>
+      <para>
+       String matching the name
+       in the URL used when creating the policy by HTTP PUT
+       or in the body when creating the policy by HTTP POST
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"active"</literal></term>
+     <listitem>
+      <para>
+       Boolean indicating whether OpenAM considers the policy active
+       for evaluation purposes, defaults to <literal>false</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"description"</literal></term>
+     <listitem>
+      <para>
+       String describing the policy
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"resources"</literal></term>
+     <listitem>
+      <para>
+       List of the resource name pattern strings
+       to which the policy applies (<literal>"included"</literal>)
+       and does not apply (<literal>"excluded"</literal>)
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"applicationName"</literal></term>
+     <listitem>
+      <para>
+       String application name,
+       such as <literal>"iPlanetAMWebAgentService"</literal>,
+       <literal>"crestPolicyService"</literal>,
+       or some other application name
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"actionValues"</literal></term>
+     <listitem>
+      <para>
+       Set of string action names,
+       each set to a boolean indicating whether the action is allowed
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"subject"</literal></term>
+     <listitem>
+      <para>
+       Specifies the subjects to which the policy applies,
+       where subjects can be combined by using the built-in types
+       <literal>"AND"</literal>, <literal>"OR"</literal>,
+       and <literal>"NOT"</literal>,
+       and where subject implementations are pluggable
+      </para>
+
+      <para>
+       Subjects are shown as JSON objects
+       with <literal>"type"</literal> set to the name of the implementation
+       (using a short name for all registered subject implementations),
+       and also other fields depending on the implementation.
+       The subject types registered by default include the following.
+      </para>
+
+      <itemizedlist>
+       <listitem>
+        <para>
+         <literal>"AnyUser"</literal>, meaning any authenticated user
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+         <literal>"Attribute"</literal> to specify attributes
+         of the subject's profile as in the following example.
+        </para>
+
+        <programlisting language="java">
 {
-    "type": "DNSName",
-    "domainNameMask": "*.example.com"
+   "subject": {
+       "type": "Attribute",
+       "name": "ou",
+       "value": "Product Testing"
+   }
 }
-         </programlisting>
-        </listitem>
+        </programlisting>
+       </listitem>
 
-        <listitem>
-         <para>
-          <literal>"IP"</literal> to specify an IP address range
-          as in the following example.
-         </para>
+       <listitem>
+        <para>
+         <literal>"Group"</literal> to specify a particular group
+         as in the following example.
+        </para>
 
-         <programlisting language="java">
+        <programlisting language="java">
 {
-    "type": "IP",
-    "startIp": "127.0.0.1",
-    "endIp": "127.0.0.255"
+   "subject": {
+       "type": "Group",
+       "subjectName": "HR Managers"
+   }
 }
-         </programlisting>
-        </listitem>
+        </programlisting>
+       </listitem>
 
-        <listitem>
-         <para>
-          <literal>"NumericAttribute"</literal> to specify a value or range
-          for a numeric attribute from the subject's user profile
-          as in the following example.
-         </para>
+       <listitem>
+        <para>
+         <literal>"NONE"</literal>, meaning no subject
+        </para>
+       </listitem>
 
-         <programlisting language="java">
+       <listitem>
+        <para>
+         <literal>"Role"</literal> to specify a particular OpenAM role
+         as in the following example.
+        </para>
+
+        <programlisting language="java">
 {
-    "type": "NumericAttribute",
-    "attributeName": "gidNumber",
-    "caseSensitive": "&lt;=",
-    "value": "1000"
+   "subject": {
+       "type": "Role",
+       "subjectName": "System Administrators"
+   }
 }
-         </programlisting>
+        </programlisting>
+       </listitem>
 
-         <para><!-- This is my reading of NumericAttributeCondition.java. Looks like a bug. -->
+       <listitem>
+        <para>
+         <literal>"User"</literal> to specify a particular user
+         as in the following example.
+        </para>
+
+        <programlisting language="java">
+{
+   "subject": {
+       "type": "User",
+       "subjectName": "Bob Dobbs"
+   }
+}
+        </programlisting>
+       </listitem>
+      </itemizedlist>
+
+      <para>
+       <literal>"Policy"</literal> subject types can be used
+       to correspond to the subject configured for policies
+       as in the following example.
+      </para>
+
+      <programlisting language="java">
+{
+   "type": "Policy",
+   "name": "All authenticated users",
+   "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
+   "values": []
+}
+      </programlisting>
+      <para>
+       The following example defines the subject
+       either as Bob Dobbs or as a member of the HR Managers group.
+      </para>
+
+      <programlisting language="java">
+{
+   "subject": {
+       "type": "OR",
+       "subjects": [
+           {
+               "subject": {
+                   "type": "User",
+                   "subjectName": "Bob Dobbs"
+               }
+           },
+           {
+               "subject": {
+                   "type": "Group",
+                   "subjectName": "HR Managers"
+               }
+           }
+       ]
+   }
+}
+      </programlisting>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"condition"</literal></term>
+     <listitem>
+      <para>
+       Specifies additional conditions, where conditions can be combined
+       by using the built-in types <literal>"AND"</literal>,
+       <literal>"OR"</literal>, and <literal>"NOT"</literal>,
+       and where condition implementations are pluggable
+      </para>
+
+      <para>
+       Conditions are shown as JSON objects
+       with <literal>"type"</literal> set to the name of the implementation
+       (using a short name for all registered condition implementations),
+       and also other fields depending on the implementation.
+       The condition types registered by default include the following.
+      </para>
+
+      <itemizedlist>
+       <listitem>
+        <para>
+         <literal>"AttributeLookup"</literal> to specify
+         a value to match in the resource as in the following example.
+        </para>
+
+        <programlisting language="java">
+{
+   "type": "AttributeLookup",
+   "key": "postaladdress",
+   "value": "33 New Montgomery St."
+}
+        </programlisting>
+       </listitem>
+
+       <listitem>
+        <para>
+         <literal>"DNSName"</literal> to specify domain names
+         where the request originated as in the following example.
+        </para>
+
+        <programlisting language="java">
+{
+   "type": "DNSName",
+   "domainNameMask": "*.example.com"
+}
+        </programlisting>
+       </listitem>
+
+       <listitem>
+        <para>
+         <literal>"IP"</literal> to specify an IP address range
+         as in the following example.
+        </para>
+
+        <programlisting language="java">
+{
+   "type": "IP",
+   "startIp": "127.0.0.1",
+   "endIp": "127.0.0.255"
+}
+        </programlisting>
+       </listitem>
+
+       <listitem>
+        <para>
+         <literal>"NumericAttribute"</literal> to specify a value or range
+         for a numeric attribute from the subject's user profile
+         as in the following example.
+        </para>
+
+        <programlisting language="java">
+{
+   "type": "NumericAttribute",
+   "attributeName": "gidNumber",
+   "caseSensitive": "&lt;=",
+   "value": "1000"
+}
+        </programlisting>
+
+        <para><!-- This is my reading of NumericAttributeCondition.java. Looks like a bug. -->
           <literal>"caseSensitive"</literal> is optional, but if used
           then it should be set to a comparison operator, one of:
           <literal>&lt; &lt;= = > >=</literal>.
@@ -1272,7 +1561,7 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/entitlements/example
+ https://openam.example.com:8443/openam/json/realm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1344,7 +1633,7 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/entitlements?_action=create</userinput>
+ https://openam.example.com:8443/openam/json/realm/policies?_action=create</userinput>
 <computeroutput>{
   "name" : "example",
   "active" : true,
@@ -1389,7 +1678,7 @@ $ <userinput>curl \
      <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
- https://openam.example.com:8443/openam/json/realm/entitlements/example
+ https://openam.example.com:8443/openam/json/realm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1468,7 +1757,7 @@ $ <userinput>curl \
         "subjectName": "Bob Dobbs"
     }
 }' \
- https://openam.example.com:8443/openam/json/realm/entitlements/example
+ https://openam.example.com:8443/openam/json/realm/policies/example
 </userinput>
 <computeroutput>{
   "name" : "example",
@@ -1522,7 +1811,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  --request DELETE \
- https://openam.example.com:8443/openam/json/realm/entitlements/example</userinput>
+ https://openam.example.com:8443/openam/json/realm/policies/example</userinput>
 <computeroutput>{}</computeroutput>
      </screen>
     </section>
@@ -1538,7 +1827,7 @@ $ <userinput>curl \
      <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
- https://openam.example.com:8443/openam/json/realm/entitlements?_queryFilter=true</userinput>
+ https://openam.example.com:8443/openam/json/realm/policies?_queryFilter=true</userinput>
 <computeroutput>{
   "result" : [ ...policies... ],
   "resultCount" : 0,
