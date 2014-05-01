@@ -260,7 +260,7 @@ public class PolicyResourceTest {
 
         // Then
         verify(mockStore).delete(id);
-        verify(mockResultHandler).handleResult(new Resource(id, null, JsonValue.json("Deleted")));
+        verify(mockResultHandler).handleResult(new Resource(id, "0", JsonValue.json("Deleted")));
     }
 
     @Test

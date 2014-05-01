@@ -194,7 +194,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             PolicyStore store = policyStoreProvider.getPolicyStore(context);
             store.delete(resourceId);
             // Return an empty resource to indicate success?
-            handler.handleResult(new Resource(resourceId, null, json(object())));
+            handler.handleResult(new Resource(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
