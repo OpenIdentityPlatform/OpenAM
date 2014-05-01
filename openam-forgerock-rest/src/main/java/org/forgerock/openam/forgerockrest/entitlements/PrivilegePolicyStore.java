@@ -55,7 +55,11 @@ final class PrivilegePolicyStore implements PolicyStore {
 
     @Override
     public Privilege read(String policyName) throws EntitlementException {
-        return privilegeManager.getPrivilege(policyName);
+        final Privilege policy = privilegeManager.getPrivilege(policyName);
+        if (policy == null) {
+            throw new EntitlementException(EntitlementException.NO_SUCH_POLICY, new Object[] { policyName });
+        }
+        return policy;
     }
 
     @Override
