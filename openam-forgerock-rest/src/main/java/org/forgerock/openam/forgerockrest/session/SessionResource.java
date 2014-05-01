@@ -23,7 +23,10 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -212,7 +215,7 @@ public class SessionResource implements CollectionResourceProvider {
      * Will validate that the specified SSO Token Id is valid or not.
      * <br/>
      * Example response:
-     * { "valid": true }
+     * { "valid": true, "uid": "demo", "realm": "/subrealm" }
      * <br/>
      * If there is any problem getting or validating the token which causes an exception the json response will be
      * false. In addition if the token is expired then the json response will be set to true. Otherwise it will be
@@ -232,6 +235,19 @@ public class SessionResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Will validate that the specified SSOToken is valid or not.
+     * <br/>
+     * Example response:
+     * { "valid": true, "uid": "demo", "realm": "/subrealm" }
+     * <br/>
+     * If there is any problem getting or validating the token which causes an exception the json response will be
+     * false. In addition if the token is expired then the json response will be set to true. Otherwise it will be
+     * set to true.
+     *
+     * @param ssoToken The SSO Token.
+     * @return The json response of the validation.
+     */
     private JsonValue validateSession(final SSOToken ssoToken) {
         try {
             if (!ssoTokenManager.isValidToken(ssoToken)) {
@@ -240,11 +256,38 @@ public class SessionResource implements CollectionResourceProvider {
             }
 
             DEBUG.message("Session validation for token, " + ssoToken.getTokenID() + ", returning true.");
-            return json(object(field("valid", true), field("prn", ssoToken.getPrincipal().getName())));
+            final AMIdentity identity = getIdentity(ssoToken);
+            return json(object(field("valid", true), field("uid", identity.getName()),
+                    field("realm", convertDNToRealm(identity.getRealm()))));
         } catch (SSOException e) {
             DEBUG.error("Session validation for token, " + ssoToken.getTokenID() + ", failed.", e);
             return json(object(field("valid", false)));
+        } catch (IdRepoException e) {
+            DEBUG.error("Session validation for token, " + ssoToken.getTokenID() + ", failed.", e);
+            return json(object(field("valid", false)));
         }
+    }
+
+    /**
+     * Creates a AMIdentity from the specified SSOToken.
+     *
+     * @param ssoToken The SSOToken.
+     * @return The AMIdentity.
+     * @throws IdRepoException If a problem occurs creating the AMIdentity.
+     * @throws SSOException If a problem occurs creating the AMIdentity.
+     */
+    AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
+        return new AMIdentity(ssoToken);
+    }
+
+    /**
+     * Converts the specified DN into a realm string.
+     *
+     * @param dn The DN.
+     * @return The realm.
+     */
+    String convertDNToRealm(String dn) {
+        return DNMapper.orgNameToRealmName(dn);
     }
 
     /**

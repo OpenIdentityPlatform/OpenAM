@@ -20,6 +20,9 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.ldap.util.DN;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -58,13 +61,27 @@ public class SessionResourceTest {
     private SessionQueryManager sessionQueryManager;
     private SSOTokenManager ssoTokenManager;
 
+    private AMIdentity amIdentity;
+
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws IdRepoException {
 
         sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
 
-        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager);
+        amIdentity = new AMIdentity(new DN("id=demo,dc=example,dc=com"), null);
+
+        sessionResource = new SessionResource(sessionQueryManager, ssoTokenManager) {
+            @Override
+            AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
+                return amIdentity;
+            }
+
+            @Override
+            String convertDNToRealm(String dn) {
+                return "/";
+            }
+        };
     }
 
     @Test
@@ -144,15 +161,12 @@ public class SessionResourceTest {
         final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
         final SSOToken ssoToken = mock(SSOToken.class);
         final SSOTokenID ssoTokenId = mock(SSOTokenID.class);
-        final Principal principal = mock(Principal.class);
 
         given(request.getAction()).willReturn("validate");
         given(tokenContext.getCallerSSOToken(ssoTokenManager)).willReturn(ssoToken);
         given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
-        given(ssoToken.getPrincipal()).willReturn(principal);
-        given(principal.getName()).willReturn("PRINCIPAL");
 
         //When
         sessionResource.actionCollection(context, request, handler);
@@ -161,7 +175,8 @@ public class SessionResourceTest {
         final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(handler).handleResult(responseCaptor.capture());
         assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
-        assertThat(responseCaptor.getValue().get("prn").asString()).isEqualTo("PRINCIPAL");
+        assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
+        assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
     }
 
     @Test
@@ -210,6 +225,7 @@ public class SessionResourceTest {
         final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(handler).handleResult(responseCaptor.capture());
         assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
-        assertThat(responseCaptor.getValue().get("prn").asString()).isEqualTo("PRINCIPAL");
+        assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
+        assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
     }
 }
