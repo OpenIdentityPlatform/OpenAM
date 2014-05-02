@@ -24,9 +24,7 @@
 #
 # $Id: AMDistAuthConfig.properties.template,v 1.6 2009/08/12 17:43:03 beomsuk Exp $
 #
-#
-
-# Portions Copyrighted 2010-2011 ForgeRock AS
+# Portions Copyrighted 2010-2014 ForgeRock AS.
 
 /* The following keys are used to configure the Debug service.
  * Possible values for the key 'level' are: off | error | warning | message. 
@@ -67,7 +65,7 @@ com.iplanet.am.naming.url=@NAMING_URL@
 com.sun.identity.client.notification.url=@NOTIFICATION_URL@
 
 /*
- * Security Credentails to read the configuration data
+ * Security Credentials to read the configuration data
  */
 com.sun.identity.agents.app.username=@APPLICATION_USER@
 com.iplanet.am.service.password=@APPLICATION_PASSWD@
@@ -267,6 +265,11 @@ com.iplanet.am.cookie.c66Encode=false
  * Invalid characters enforced by the CDCServlet
  */
 com.iplanet.services.cdc.invalidGotoStrings=<,>,javascript:,javascript%3a,%3c,%3e
+
+/*
+ * A comma delimited list of valid Login URI values, enforced by the DAS CDCServlet.
+ */
+org.forgerock.openam.cdc.validLoginURIs=/UI/Login
 
 /*
  * Enable this setting if you want the original session _not_ to be destroyed

@@ -24,10 +24,7 @@
  *
  * $Id: Constants.java,v 1.47 2009/08/12 23:10:44 ericow Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock, SA.
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.shared;
@@ -65,6 +62,12 @@ public interface Constants {
      */
     static final String INVALID_GOTO_STRINGS =
             "com.iplanet.services.cdc.invalidGotoStrings";
+
+    /**
+     * Property string representing set of valid strings in a loginURI query parameter for a CDC Servlet. Values are
+     * delmited by "," (comma) character.
+     */
+    static final String VALID_LOGIN_URIS = "org.forgerock.openam.cdc.validLoginURIs";
 
     /**
      * Property string for state of <code>Stats</code> service.

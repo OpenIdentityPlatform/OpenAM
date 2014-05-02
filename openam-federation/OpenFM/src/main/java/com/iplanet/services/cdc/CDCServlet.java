@@ -24,11 +24,9 @@
  *
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
- */
 package com.iplanet.services.cdc;
 
 import com.iplanet.dpro.session.SessionException;
@@ -54,7 +52,6 @@ import com.sun.identity.federation.message.common.AuthnContext;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.message.common.IDPProvidedNameIdentifier;
 import com.sun.identity.federation.services.util.FSServiceUtils;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.saml.assertion.AssertionIDReference;
 import com.sun.identity.saml.assertion.AudienceRestrictionCondition;
 import com.sun.identity.saml.assertion.Conditions;
@@ -75,11 +72,8 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.SMSEntry;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -102,7 +96,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * The <code>CDCServlet</code> is the heart of the Cross Domain Single
- * Signon mechanism of OpenSSO.
+ * Signon mechanism of OpenAM.
  * <p>
  * The following is the algorithm used by the program.
  * <ol>
@@ -142,7 +136,8 @@ public class CDCServlet extends HttpServlet {
     private static final String SERVER_ERROR_STR_MATCH = "#500x";
     
     private static final List adviceParams = new ArrayList();
-    private static HashSet invalidSet = new HashSet();
+    private static final Set<String> INVALID_SET = new HashSet<String>();
+    private static final Set<String> VALID_LOGIN_URIS = new HashSet<String>();
     private static final String LEFT_ANGLE              = "<";
     private static final String RIGHT_ANGLE             = ">";
     private static final String URLENC_RIGHT_ANGLE      = "%3e";
@@ -155,37 +150,9 @@ public class CDCServlet extends HttpServlet {
     private static final char	AMP                     = '&';
     private static final char	EQUALS                  = '=';
     static Debug  debug = Debug.getInstance(DEBUG_FILE_NAME);
+
     static {
-        adviceParams.add("module");
-        adviceParams.add("authlevel");
-        adviceParams.add("role");
-        adviceParams.add("service");
-        adviceParams.add("user");
-        adviceParams.add("realm");
-        adviceParams.add("org");
-        adviceParams.add("domain");
-        adviceParams.add("sunamcompositeadvice");
-        adviceParams.add("resource");
-        String invalidStrings = SystemPropertiesManager.get(
-            Constants.INVALID_GOTO_STRINGS);
-        if (invalidSet.isEmpty()) {
-            debug.message("CDCServlet:static block: creating invalidSet");
-            if (invalidStrings == null) {
-                debug.message("CDCServlet: invalidStrings is null");
-                invalidSet.add(LEFT_ANGLE);
-                invalidSet.add(RIGHT_ANGLE);
-                invalidSet.add(URLENC_LEFT_ANGLE);
-                invalidSet.add(URLENC_RIGHT_ANGLE);
-                invalidSet.add(JAVASCRIPT);
-                invalidSet.add(URLENC_JAVASCRIPT);
-            } else {
-                debug.message("CDCServlet: invalidStrings is NOT null");
-                StringTokenizer st = new StringTokenizer(invalidStrings, DELIM);
-                while ( st.hasMoreTokens()) {
-                    invalidSet.add((String)st.nextToken());
-                }
-            }
-        }
+        initConfig();
     }
     
     private SSOTokenManager tokenManager;
@@ -312,20 +279,13 @@ public class CDCServlet extends HttpServlet {
 
         if ((gotoParameter != null ) || (targetParameter != null)) {
             debug.message("CDCServlet:doGetPost():goto or target is not null");
-            for (Iterator it = invalidSet.iterator(); it.hasNext();) {
-                String invalidStr = (String)it.next();
-                if ((gotoParameter != null ) &&
-                    (gotoParameter.toLowerCase().indexOf(invalidStr) != -1 ))
-                {
-                    showError(response, "GOTO parameter has invalid "
-                        +"characters");
+            for (String invalidStr : INVALID_SET) {
+                if (gotoParameter != null && gotoParameter.toLowerCase().contains(invalidStr)) {
+                    showError(response, "GOTO parameter has invalid characters");
                     return;
                 }
-                if ((targetParameter != null ) &&
-                   (targetParameter.toLowerCase().indexOf(invalidStr) != -1 ))
-                {
-                    showError(response, "TARGET parameter has invalid "
-                        +"characters");
+                if (targetParameter != null && targetParameter.toLowerCase().contains(invalidStr)) {
+                    showError(response, "TARGET parameter has invalid characters");
                     return;
                 }
             }
@@ -458,14 +418,13 @@ public class CDCServlet extends HttpServlet {
         HttpServletResponse response
     ) {
         String gotoURL = request.getParameter(GOTO_PARAMETER);
-        String targetURL = request.getParameter(TARGET_PARAMETER);
-        
+
         if (gotoURL == null || (gotoURL.length() == 0)) {
             gotoURL = request.getParameter(TARGET_PARAMETER);
         }
         
         if (gotoURL == null || (gotoURL.length() == 0)) {
-            // this is unlikely tohappen in a normal execution.
+            // this is unlikely to happen in a normal execution.
             debug.error("No GOTO or TARGET URL present in the Query !!");
             showError(response);
             return null;
@@ -592,7 +551,7 @@ public class CDCServlet extends HttpServlet {
     ) throws IOException {
         StringBuilder redirectURL = new StringBuilder(1024);
         
-        // Check if user has authenticated to another OpenSSO
+        // Check if user has authenticated to another OpenAM
         // instance
         String authURL = null;
         Cookie authCookie = CookieUtils.getCookieFromReq(
@@ -621,28 +580,26 @@ public class CDCServlet extends HttpServlet {
 
                     // Construct the login URL
                     String loginURI = request.getParameter(LOGIN_URI);
-                    String cdcUrl;
+                    String cdcUri;
 
-                    if (loginURI != null && !finalURL.equals("")) {
+                    if (loginURI != null && !finalURL.isEmpty() && isValidCDCURI(loginURI)) {
                         if (debug.messageEnabled()) {
-                            debug.message("CDCServlet.redirectForAuthentication"
-                                +":found " + LOGIN_URI + "=" + loginURI);
+                            debug.message("CDCServlet.redirectForAuthentication:found " + LOGIN_URI + "=" + loginURI);
                         }
 
-                        cdcUrl = loginURI;
+                        cdcUri = loginURI;
                     } else {
-                        cdcUrl = AUTHURI;
+                        cdcUri = AUTHURI;
                     }
 
                     if (debug.messageEnabled()) {
-                        debug.message("CDCServlet init redirect URL is" +
-                            "set to= " + cdcUrl);
+                        debug.message("CDCServlet.redirectForAuthentication: redirect URL is set to = " + cdcUri);
                     }
                     
-                    if (cdcUrl.indexOf(QUESTION_MARK) == -1) {
-                        redirectURL.append(cdcUrl).append(QUESTION_MARK);
+                    if (cdcUri.indexOf(QUESTION_MARK) == -1) {
+                        redirectURL.append(cdcUri).append(QUESTION_MARK);
                     } else {
-                        redirectURL.append(cdcUrl).append(AMP);
+                        redirectURL.append(cdcUri).append(AMP);
                     }
                     
                     // check if this is resource based auth case
@@ -658,7 +615,7 @@ public class CDCServlet extends HttpServlet {
                         String resourceUrl = request.getParameter(
                             ISAuthConstants.RESOURCE_URL_PARAM);
                         if (resourceUrl == null) {
-                            // not presnet, use goto/TARGET as the resource URL
+                            // not present, use goto/TARGET as the resource URL
                             redirectURL.append(URLEncDec.encode(finalURL))
                                 .append(AMP);
                         } else {
@@ -927,5 +884,79 @@ public class CDCServlet extends HttpServlet {
         } catch (ServletException se) {
             debug.error("CDCServlet.sendAuthnResponse:" + se);
         }
+    }
+
+    /**
+     * Return <code>true</code> if the passed URI is valid compared to the valid set loaded during initialization.
+     *
+     * @param cdcUri The URI to test.
+     * @return <code>true</code> if the URI is considered valid, <code>false</code> otherwise.
+     */
+    private boolean isValidCDCURI(String cdcUri) {
+        int questionMark = cdcUri.indexOf(QUESTION_MARK);
+
+        // We are only interested in the URI part up to any parameters that may be included.
+        if (questionMark != -1) {
+            cdcUri = cdcUri.substring(0, questionMark);
+        }
+
+        // If there is not an exact match for the passed value then it cannot be considered valid
+        boolean result = VALID_LOGIN_URIS.contains(cdcUri);
+
+        if (debug.messageEnabled()) {
+            debug.message("CDCServlet.isValidCDCURI: checking if " + cdcUri + " is in validLoginURISet: "
+                    + VALID_LOGIN_URIS + " result:" + result);
+        }
+
+        return result;
+    }
+
+    private static void initConfig() {
+        adviceParams.add("module");
+        adviceParams.add("authlevel");
+        adviceParams.add("role");
+        adviceParams.add("service");
+        adviceParams.add("user");
+        adviceParams.add("realm");
+        adviceParams.add("org");
+        adviceParams.add("domain");
+        adviceParams.add("sunamcompositeadvice");
+        adviceParams.add("resource");
+        String invalidStrings = SystemPropertiesManager.get(Constants.INVALID_GOTO_STRINGS);
+        if (INVALID_SET.isEmpty()) {
+            debug.message("CDCServlet.initConfig: creating invalidSet");
+            if (invalidStrings == null) {
+                debug.message("CDCServlet.initConfig: invalidStrings is null");
+                INVALID_SET.add(LEFT_ANGLE);
+                INVALID_SET.add(RIGHT_ANGLE);
+                INVALID_SET.add(URLENC_LEFT_ANGLE);
+                INVALID_SET.add(URLENC_RIGHT_ANGLE);
+                INVALID_SET.add(JAVASCRIPT);
+                INVALID_SET.add(URLENC_JAVASCRIPT);
+            } else {
+                debug.message("CDCServlet.initConfig: invalidStrings is NOT null");
+                StringTokenizer st = new StringTokenizer(invalidStrings, DELIM);
+                while (st.hasMoreTokens()) {
+                    INVALID_SET.add(st.nextToken());
+                }
+            }
+            debug.message("CDCServlet.initConfig: created invalidSet " + INVALID_SET);
+        }
+
+        String validLoginURIStrings = SystemPropertiesManager.get(Constants.VALID_LOGIN_URIS);
+        debug.message("CDCServlet.initConfig: creating validLoginURISet");
+        if (validLoginURIStrings == null) {
+            debug.message("CDCServlet.initConfig: validLoginURIStrings is null, creating default set");
+            VALID_LOGIN_URIS.add(AUTHURI);
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("CDCServlet.initConfig: validLoginURIStrings is: " + validLoginURIStrings);
+            }
+            StringTokenizer st = new StringTokenizer(validLoginURIStrings, DELIM);
+            while (st.hasMoreTokens()) {
+                VALID_LOGIN_URIS.add(st.nextToken());
+            }
+        }
+        debug.message("CDCServlet.initConfig: created validLoginURISet " + VALID_LOGIN_URIS);
     }
 }
