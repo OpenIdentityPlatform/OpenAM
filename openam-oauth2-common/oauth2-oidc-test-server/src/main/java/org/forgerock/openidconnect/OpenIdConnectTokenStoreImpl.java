@@ -26,7 +26,7 @@ import org.restlet.Request;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.security.PrivateKey;
+import java.nio.charset.Charset;
 
 /**
  * @since 12.0.0
@@ -45,12 +45,13 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         this.clientRegistrationStore = clientRegistrationStore;
     }
 
-    public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId, String authorizationParty, String nonce, String ops, OAuth2Request request) throws ServerException, InvalidClientException {
+    public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId, String authorizationParty,
+            String nonce, String ops, OAuth2Request request) throws ServerException, InvalidClientException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
-        final PrivateKey privateKey = providerSettings.getServerKeyPair().getPrivate();
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
+        final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Charset.forName("UTF-8"));
 
         final long timeInSeconds = System.currentTimeMillis()/1000;
         final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
@@ -62,6 +63,7 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         final Request req = request.getRequest();
         final String iss = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
 
-        return new OpenIdConnectToken(privateKey, algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, iat, ath, nonce, ops);
+        return new OpenIdConnectToken(clientSecret, algorithm, iss, resourceOwnerId, clientId,  authorizationParty, exp,
+                iat, ath, nonce, ops);
     }
 }

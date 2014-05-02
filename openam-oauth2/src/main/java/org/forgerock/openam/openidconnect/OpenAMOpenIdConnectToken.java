@@ -33,7 +33,7 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
     /**
      * Constructs a new OpenAMOpenIdConnectToken.
      *
-     * @param privateKey The private key.
+     * @param clientSecret The client's secret.
      * @param algorithm The algorithm.
      * @param iss The issuer.
      * @param sub The subject.
@@ -46,9 +46,9 @@ public class OpenAMOpenIdConnectToken extends OpenIdConnectToken {
      * @param ops The ops.
      * @param realm The realm.
      */
-    public OpenAMOpenIdConnectToken(PrivateKey privateKey, String algorithm, String iss, String sub,
+    public OpenAMOpenIdConnectToken(byte[] clientSecret, String algorithm, String iss, String sub,
             String aud, String azp, long exp, long iat, long ath, String nonce, String ops, String realm) {
-        super(privateKey, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops);
+        super(clientSecret, algorithm, iss, sub, aud, azp, exp, iat, ath, nonce, ops);
         setRealm(realm);
     }
 

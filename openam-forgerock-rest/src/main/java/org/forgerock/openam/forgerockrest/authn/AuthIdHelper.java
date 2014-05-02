@@ -26,6 +26,8 @@ import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
@@ -37,7 +39,7 @@ import org.forgerock.openam.utils.AMKeyProvider;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.math.BigInteger;
-import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.util.HashMap;
@@ -57,6 +59,7 @@ public class AuthIdHelper {
     private final CoreServicesWrapper coreServicesWrapper;
     private final AMKeyProvider amKeyProvider;
     private final JwtBuilderFactory jwtBuilderFactory;
+    private final SigningManager signingManager;
 
     /**
      * Constructs an instance of the AuthIdHelper.
@@ -64,13 +67,15 @@ public class AuthIdHelper {
      * @param coreServicesWrapper An instance of the CoreServicesWrapper.
      * @param amKeyProvider An instance of the AMKeyProvider.
      * @param jwtBuilderFactory An instance of the JwtBuilderFactory.
+     * @param signingManager An instance of the SigningManager.
      */
     @Inject
     public AuthIdHelper(CoreServicesWrapper coreServicesWrapper, AMKeyProvider amKeyProvider,
-            JwtBuilderFactory jwtBuilderFactory) {
+            JwtBuilderFactory jwtBuilderFactory, SigningManager signingManager) {
         this.coreServicesWrapper = coreServicesWrapper;
         this.amKeyProvider = amKeyProvider;
         this.jwtBuilderFactory = jwtBuilderFactory;
+        this.signingManager = signingManager;
     }
 
     /**
@@ -157,7 +162,7 @@ public class AuthIdHelper {
                     "Could not find Key Store with alias, " + keyStoreAlias);
         }
 
-        PrivateKey privateKey = amKeyProvider.getPrivateKey(keyStoreAlias);
+        PublicKey publicKey = amKeyProvider.getPublicKey(keyStoreAlias);
 
         String otk = new BigInteger(130, RANDOM).toString(32);
 
@@ -166,7 +171,8 @@ public class AuthIdHelper {
                 .claims(jwtValues)
                 .build();
 
-        String jwt = jwtBuilderFactory.jws(privateKey)
+        final SigningHandler signingHandler = signingManager.newHmacSigningHandler(publicKey.getEncoded());
+        String jwt = jwtBuilderFactory.jws(signingHandler)
                 .headers()
                 .alg(JwsAlgorithm.HS256)
                 .done()
@@ -201,10 +207,11 @@ public class AuthIdHelper {
 
         String keyAlias = getKeyAlias(realmDN);
 
-        PrivateKey privateKey = amKeyProvider.getPrivateKey(keyAlias);
+        PublicKey publicKey = amKeyProvider.getPublicKey(keyAlias);
 
         try {
-            boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(privateKey);
+            final SigningHandler signingHandler = signingManager.newHmacSigningHandler(publicKey.getEncoded());
+            boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(signingHandler);
             if (!verified) {
                 throw new RestAuthException(ResourceException.BAD_REQUEST, "AuthId JWT Signature not valid");
             }

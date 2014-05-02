@@ -48,6 +48,10 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
         return client.getClientID();
     }
 
+    public String getClientSecret() {
+        return client.getClientSecret();
+    }
+
     public String getAccessTokenType() {
         return "Bearer";
     }

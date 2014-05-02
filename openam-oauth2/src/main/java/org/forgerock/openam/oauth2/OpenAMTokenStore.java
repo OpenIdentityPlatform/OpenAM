@@ -17,8 +17,10 @@
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthorizationCode;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -28,21 +30,19 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.openidconnect.OpenIdConnectToken;
 import org.forgerock.openidconnect.OpenIdConnectTokenStore;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuthProblemException;
-import org.forgerock.openam.openidconnect.OpenAMOpenIdConnectToken;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.restlet.Request;
 import org.restlet.data.Status;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,8 +128,8 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final Request req = request.getRequest();
         final String iss = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
 
-        return new OpenAMOpenIdConnectToken(privateKey, algorithm, iss, resourceOwnerId, clientId, authorizationParty,
-                exp, iat, ath, nonce, ops, realm);
+        return new OpenAMOpenIdConnectToken(clientRegistration.getClientSecret().getBytes(Charset.forName("UTF-8")),
+                algorithm, iss, resourceOwnerId, clientId, authorizationParty, exp, iat, ath, nonce, ops, realm);
     }
 
     /**

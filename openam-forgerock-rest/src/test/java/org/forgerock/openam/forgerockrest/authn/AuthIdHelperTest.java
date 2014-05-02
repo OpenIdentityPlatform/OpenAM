@@ -22,12 +22,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
@@ -35,6 +29,8 @@ import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.json.jose.jwt.Algorithm;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
@@ -44,22 +40,20 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrappe
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.BDDMockito.given;
 import org.mockito.Matchers;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyObject;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 public class AuthIdHelperTest {
 
@@ -68,6 +62,7 @@ public class AuthIdHelperTest {
     private CoreServicesWrapper coreServicesWrapper;
     private AMKeyProvider amKeyProvider;
     private JwtBuilderFactory jwtBuilderFactory;
+    private SigningManager signingManager;
 
     private JwsHeaderBuilder jwsHeaderBuilder;
     private JwtClaimsSetBuilder claimsSetBuilder;
@@ -78,8 +73,9 @@ public class AuthIdHelperTest {
         coreServicesWrapper = mock(CoreServicesWrapper.class);
         amKeyProvider = mock(AMKeyProvider.class);
         jwtBuilderFactory = mock(JwtBuilderFactory.class);
+        signingManager = mock(SigningManager.class);
 
-        authIdHelper = new AuthIdHelper(coreServicesWrapper, amKeyProvider, jwtBuilderFactory);
+        authIdHelper = new AuthIdHelper(coreServicesWrapper, amKeyProvider, jwtBuilderFactory, signingManager);
 
         jwsHeaderBuilder = mock(JwsHeaderBuilder.class);
         claimsSetBuilder = mock(JwtClaimsSetBuilder.class);
@@ -92,7 +88,7 @@ public class AuthIdHelperTest {
         given(claimsSetBuilder.build()).willReturn(claimsSet);
 
 
-        given(jwtBuilderFactory.jws(Matchers.<PrivateKey>anyObject())).willReturn(signedJwtBuilder);
+        given(jwtBuilderFactory.jws(Matchers.<SigningHandler>anyObject())).willReturn(signedJwtBuilder);
         given(signedJwtBuilder.headers()).willReturn(jwsHeaderBuilder);
         given(jwsHeaderBuilder.alg(Matchers.<Algorithm>anyObject())).willReturn(jwsHeaderBuilder);
         given(jwsHeaderBuilder.done()).willReturn(signedJwtBuilder);
@@ -134,8 +130,8 @@ public class AuthIdHelperTest {
 
         mockGetKeyAliasMethod("ORG_DN", false);
 
-        PrivateKey privateKey = mock(PrivateKey.class);
-        given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
+        PublicKey publicKey = mock(PublicKey.class);
+        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
         //When
         String authId = authIdHelper.createAuthId(loginConfiguration, authContext);
@@ -170,8 +166,8 @@ public class AuthIdHelperTest {
 
         mockGetKeyAliasMethod("ORG_DN", false);
 
-        PrivateKey privateKey = mock(PrivateKey.class);
-        given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
+        PublicKey publicKey = mock(PublicKey.class);
+        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
         //When
         String authId = authIdHelper.createAuthId(loginConfiguration, authContext);
@@ -315,11 +311,11 @@ public class AuthIdHelperTest {
 
         //Given
         SignedJwt signedJwt = mock(SignedJwt.class);
-        PrivateKey privateKey = mock(PrivateKey.class);
+        PublicKey publicKey = mock(PublicKey.class);
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
-        given(signedJwt.verify(privateKey)).willReturn(true);
-        given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
+        given(signedJwt.verify(Matchers.<SigningHandler>anyObject())).willReturn(true);
+        given(amKeyProvider.getPublicKey(anyString())).willReturn(publicKey);
 
         mockGetKeyAliasMethod("REALM_DN", false);
 
@@ -328,7 +324,7 @@ public class AuthIdHelperTest {
 
         //Then
         verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
-        verify(signedJwt).verify(privateKey);
+        verify(signedJwt).verify(Matchers.<SigningHandler>anyObject());
     }
 
     @Test
@@ -336,11 +332,12 @@ public class AuthIdHelperTest {
 
         //Given
         SignedJwt signedJwt = mock(SignedJwt.class);
-        PrivateKey privateKey = mock(PrivateKey.class);
+        PublicKey publicKey = mock(PublicKey.class);
+        SigningHandler signingHandler = mock(SigningHandler.class);
 
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
-        given(signedJwt.verify(privateKey)).willReturn(false);
-        given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
+        given(signedJwt.verify(signingHandler)).willReturn(false);
+        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
         mockGetKeyAliasMethod("REALM_DN", false);
 
@@ -355,7 +352,7 @@ public class AuthIdHelperTest {
 
         //Then
         verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
-        verify(signedJwt).verify(privateKey);
+        verify(signedJwt).verify(Matchers.<SigningHandler>anyObject());
         assertTrue(exceptionCaught);
     }
 
@@ -363,7 +360,10 @@ public class AuthIdHelperTest {
     public void shouldVerifyAuthIdAndFailWhenReconstructingJwt() throws SignatureException, SSOException, SMSException {
 
         //Given
+        PublicKey publicKey = mock(PublicKey.class);
+
         given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willThrow(JwtRuntimeException.class);
+        given(amKeyProvider.getPublicKey("KEY_ALIAS")).willReturn(publicKey);
 
         mockGetKeyAliasMethod("REALM_DN", false);
 

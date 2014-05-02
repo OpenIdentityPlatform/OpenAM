@@ -21,7 +21,6 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
-import org.forgerock.openam.oauth2.OAuthProblemException;
 import org.restlet.Request;
 
 import java.net.URI;
@@ -84,6 +83,21 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
         return convertAttributeValues(set);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getClientSecret() {
+        Set<String> set;
+        try {
+            set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.USERPASSWORD);
+        } catch (Exception e) {
+            logger.error("Unable to get "+ OAuth2Constants.OAuth2Client.USERPASSWORD +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.USERPASSWORD +" from repository");
+        }
+        return set.iterator().next();
     }
 
     /**

@@ -18,25 +18,26 @@ package org.forgerock.openam.openidconnect;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.common.JwtReconstruction;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
-import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openam.oauth2.OpenAMSettings;
 import org.forgerock.openidconnect.CheckSession;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.security.KeyPair;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class CheckSessionImpl implements CheckSession {
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final SSOTokenManager ssoTokenManager;
     private final OpenAMSettings openAMSettings;
-    private final IdentityManager identityManager;
+    private final SigningManager signingManager;
     private final ClientRegistrationStore clientRegistrationStore;
 
     /**
@@ -60,7 +61,7 @@ public class CheckSessionImpl implements CheckSession {
     public CheckSessionImpl() {
         ssoTokenManager = InjectorHolder.getInstance(SSOTokenManager.class);
         openAMSettings = InjectorHolder.getInstance(OpenAMSettings.class);
-        identityManager = InjectorHolder.getInstance(IdentityManager.class);
+        signingManager = InjectorHolder.getInstance(SigningManager.class);
         clientRegistrationStore = InjectorHolder.getInstance(ClientRegistrationStore.class);
     }
 
@@ -78,21 +79,34 @@ public class CheckSessionImpl implements CheckSession {
             InvalidClientException {
 
         SignedJwt jwt = getIDToken(request);
-        final KeyPair keyPair;
-        try {
-            keyPair = openAMSettings.getServerKeyPair(request.getParameter("realm"));
-        } catch (Exception e) {
+
+        if (jwt == null) {
             return "";
         }
-        if (jwt == null || !jwt.verify(keyPair.getPrivate())) {
+
+        final ClientRegistration clientRegistration = getClientRegistration(jwt);
+
+        if (clientRegistration != null && !isJwtValid(jwt, clientRegistration)) {
             return "";
         }
+
+        return clientRegistration.getClientSessionURI();
+    }
+
+    /**
+     * Gets the Client's registration based from the audience set in the JWT.
+     *
+     * @param jwt The JWT.
+     * @return The Client's registration.
+     * @throws InvalidClientException If the client's registration is not found.
+     */
+    private ClientRegistration getClientRegistration(Jwt jwt) throws InvalidClientException {
+
         List<String> clients = jwt.getClaimsSet().getAudience();
         final String realm = (String)jwt.getClaimsSet().getClaim("realm");
-        if (clients != null && !clients.isEmpty()){
+        if (clients != null && !clients.isEmpty()) {
             String client = clients.iterator().next();
 
-            AMIdentity id = identityManager.getClientIdentity(client, realm);
             ClientRegistration clientRegistration = clientRegistrationStore.get(client, new OAuth2Request() {
                 public <T> T getRequest() {
                     throw new UnsupportedOperationException();
@@ -109,9 +123,22 @@ public class CheckSessionImpl implements CheckSession {
                     throw new UnsupportedOperationException();
                 }
             });
-            return clientRegistration.getClientSessionURI();
+            return clientRegistration;
         }
-        return "";
+        return null;
+    }
+
+    /**
+     * Determines if the specified signed JWT is valid.
+     *
+     * @param jwt The signed JWT.
+     * @param clientRegistration The client's registration.
+     * @return {@code true} if the JWT is valid.
+     */
+    private boolean isJwtValid(SignedJwt jwt, ClientRegistration clientRegistration) {
+        final SigningHandler signingHandler = signingManager.newHmacSigningHandler(
+                clientRegistration.getClientSecret().getBytes(Charset.forName("UTF-8")));
+        return jwt == null || !jwt.verify(signingHandler);
     }
 
     /**
@@ -119,21 +146,23 @@ public class CheckSessionImpl implements CheckSession {
      */
     public boolean getValidSession(HttpServletRequest request) {
         SignedJwt jwt = getIDToken(request);
-        final KeyPair keyPair;
-        try {
-            keyPair = openAMSettings.getServerKeyPair(request.getParameter("realm"));
-        } catch (Exception e) {
+
+        if (jwt == null) {
             return false;
         }
-        if (jwt == null || !jwt.verify(keyPair.getPrivate())) {
-            return false;
-        }
+
         try {
+            final ClientRegistration clientRegistration = getClientRegistration(jwt);
+
+            if (clientRegistration != null && !isJwtValid(jwt, clientRegistration)) {
+                return false;
+            }
+
             String sessionID = (String) jwt.getClaimsSet().getClaim(OAuth2Constants.JWTTokenParams.OPS);
             SSOToken ssoToken = ssoTokenManager.createSSOToken(sessionID);
             return ssoTokenManager.isValidToken(ssoToken);
         } catch (Exception e){
-            logger.error("CheckSessionImpl.getValidSession():Unable to get the SSO token in the JWT", e);
+            logger.error("Unable to get the SSO token in the JWT", e);
             return false;
         }
 

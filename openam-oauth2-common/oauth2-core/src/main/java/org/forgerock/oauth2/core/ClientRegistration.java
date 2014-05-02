@@ -49,6 +49,13 @@ public interface ClientRegistration {
     String getClientId();
 
     /**
+     * Gets the client's secret.
+     *
+     * @return The client's secret.
+     */
+    String getClientSecret();
+
+    /**
      * Gets the type of access token the client requires.
      *
      * @return The access token type.

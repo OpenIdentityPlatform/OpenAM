@@ -16,18 +16,18 @@
 
 package org.forgerock.openidconnect;
 
-import org.forgerock.oauth2.core.Token;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.JwsHeader;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.SigningManager;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,13 +43,13 @@ public class OpenIdConnectToken extends JsonValue implements Token {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
-    private final PrivateKey privateKey;
+    private final byte[] clientSecret;
     private final String algorithm;
 
     /**
      * Constructs a new OpenIdConnectToken.
      *
-     * @param privateKey The private key.
+     * @param clientSecret The client's secret.
      * @param algorithm The algorithm.
      * @param iss The issuer.
      * @param sub The subject.
@@ -61,10 +61,10 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param nonce The nonce.
      * @param ops The ops.
      */
-    public OpenIdConnectToken(PrivateKey privateKey, String algorithm, String iss, String sub, String aud, String azp,
+    public OpenIdConnectToken(byte[] clientSecret, String algorithm, String iss, String sub, String aud, String azp,
             long exp, long iat, long ath, String nonce, String ops) {
         super(new HashMap<String, Object>());
-        this.privateKey = privateKey;
+        this.clientSecret = clientSecret;
         this.algorithm = algorithm;
         setIss(iss);
         setSub(sub);
@@ -245,6 +245,9 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         final JwsHeader header = new JwsHeader();
         header.setAlgorithm(jwsAlgorithm);
         header.setContentType("JWT");
-        return new SignedJwt(header, jwtBuilderFactory.claims().claims(asMap()).build(), privateKey);
+        final SigningManager signingManager = new SigningManager();
+        return jwtBuilderFactory.jws(signingManager.newHmacSigningHandler(clientSecret)).headers()
+                .alg(jwsAlgorithm).cty("JWT").done()
+                .claims(jwtBuilderFactory.claims().claims(asMap()).build()).asJwt();
     }
 }
