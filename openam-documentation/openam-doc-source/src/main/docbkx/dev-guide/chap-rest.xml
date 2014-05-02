@@ -1716,7 +1716,7 @@ $ <userinput>curl \
     </section>
 
     <section xml:id="rest-api-authz-policies-update">
-     <title>Update Policies</title>
+     <title>Updating Policies</title>
 
      <para>
       To update a policy definition, perform an HTTP PUT
