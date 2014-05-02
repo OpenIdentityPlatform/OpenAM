@@ -318,9 +318,12 @@ $ <userinput>curl \
  --header "X-OpenAM-Username: demo" \
  --header "X-OpenAM-Password: badpassword" \
  https://openam.example.com:8443/openam/json/authenticate</userinput>
-<computeroutput>
-{ "errorMessage": "Invalid Password!!",
-  "failureUrl": "http://www.example.com/401.html" }</computeroutput>
+<computeroutput>{
+  "code":401,
+  "reason":"Unauthorized",
+  "message":"Invalid Password!!",
+  "failureUrl": "http://www.example.com/401.html"
+}</computeroutput>
    </screen>
 
    <para>To specify a realm in your request, first make sure that the name of your realm does not match
