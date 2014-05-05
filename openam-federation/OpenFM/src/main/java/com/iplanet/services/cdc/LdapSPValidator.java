@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -159,10 +159,10 @@ public class LdapSPValidator implements SPValidator {
                 if (CDCServlet.debug.warningEnabled()) {
                     CDCServlet.debug.warning(
                         "LdapSPValidator.validateAndGetRestriction: " +
-                        "Invalid agent ID: " + rootPrefix);
+                        "Invalid Agent Root URL: " + rootPrefix);
                 }
                 throw new Exception(
-                    "Invalid Agent: Not configured in directory");
+                    "Invalid Agent Root URL: " + rootPrefix + " not found.");
             }
 
             // Obtain the DNs and hostlists from the entries
