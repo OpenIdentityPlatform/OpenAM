@@ -32,6 +32,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-federation-library</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-util</artifactId>
         </dependency>
@@ -97,6 +101,14 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

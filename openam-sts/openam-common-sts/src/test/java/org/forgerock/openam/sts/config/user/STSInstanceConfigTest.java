@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import java.io.UnsupportedEncodingException;
 
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 public class STSInstanceConfigTest {
     private static final String JSON_BASE = "json";
@@ -52,6 +53,35 @@ public class STSInstanceConfigTest {
         assertTrue(instance.equals(secondInstance));
     }
 
+    @Test
+    public void testJsonRoundTripWithSaml2Config() throws UnsupportedEncodingException {
+        STSInstanceConfig instance = buildConfigWithSaml2Config();
+        STSInstanceConfig secondInstance = STSInstanceConfig.fromJson(instance.toJson());
+        assertTrue(instance.equals(secondInstance));
+    }
+
+    @Test
+    public void testEquals() throws UnsupportedEncodingException {
+        STSInstanceConfig instance1 = buildConfig();
+        STSInstanceConfig instance2 = buildConfig();
+        assertTrue(instance1.equals(instance2));
+    }
+
+    @Test
+    public void testEqualsWithSamlConfig() throws UnsupportedEncodingException {
+        STSInstanceConfig instance1 = buildConfigWithSaml2Config();
+        STSInstanceConfig instance2 = buildConfigWithSaml2Config();
+        assertTrue(instance1.equals(instance2));
+    }
+
+    @Test
+    public void testNotEquals() throws UnsupportedEncodingException {
+        STSInstanceConfig instance1 = buildConfig();
+        STSInstanceConfig instance2 = buildConfigWithSaml2Config();
+        assertFalse(instance2.equals(instance1));
+        assertFalse(instance1.equals(instance2));
+    }
+
     private STSInstanceConfig buildConfig() throws UnsupportedEncodingException {
         KeystoreConfig keystoreConfig =
                 KeystoreConfig.builder()
@@ -74,4 +104,36 @@ public class STSInstanceConfigTest {
                 .keystoreConfig(keystoreConfig)
                 .build();
     }
+
+    private STSInstanceConfig buildConfigWithSaml2Config() throws UnsupportedEncodingException {
+        KeystoreConfig keystoreConfig =
+                KeystoreConfig.builder()
+                        .fileName(KEYSTORE)
+                        .password(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .encryptionKeyAlias(KEYSTORE)
+                        .signatureKeyAlias(KEYSTORE)
+                        .encryptionKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .signatureKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .build();
+
+        SAML2Config saml2Config =
+                SAML2Config.builder()
+                .authenticationContext("authContext")
+                .nameIdFormat("transient")
+                .tokenLifetimeInSeconds(500000)
+                .build();
+
+        return STSInstanceConfig.builder()
+                .amJsonRestBase(JSON_BASE)
+                .amDeploymentUrl(AM_DEPLOYMENT)
+                .amRestAuthNUriElement(AUTH)
+                .amRestIdFromSessionUriElement(ID_FROM_SESSION)
+                .amRestLogoutUriElement(LOGOUT)
+                .amSessionCookieName(COOKIE)
+                .issuerName(ISSUER)
+                .keystoreConfig(keystoreConfig)
+                .saml2Config(saml2Config)
+                .build();
+    }
+
 }

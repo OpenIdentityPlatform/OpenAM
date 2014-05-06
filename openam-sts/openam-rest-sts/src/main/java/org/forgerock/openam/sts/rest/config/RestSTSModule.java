@@ -19,13 +19,14 @@ package org.forgerock.openam.sts.rest.config;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
-import com.google.inject.name.Names;
+import com.google.inject.TypeLiteral;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.persistence.STSInstancePersister;
-import org.forgerock.openam.sts.persistence.STSInstancePersisterImpl;
+import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisherImpl;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class RestSTSModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(RestSTSInstancePublisher.class).to(RestSTSInstancePublisherImpl.class).in(Scopes.SINGLETON);
-        bind(STSInstancePersister.class).to(STSInstancePersisterImpl.class).in(Scopes.SINGLETON);
+        bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigPersister.class).in(Scopes.SINGLETON);
 
     }
 

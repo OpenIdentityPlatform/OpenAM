@@ -655,6 +655,15 @@
     </servlet>
 
     <servlet>
+        <servlet-name>sts-tokengeneration-service</servlet-name>
+        <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
+        <init-param>
+            <param-name>connection-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceConnectionFactoryProvider</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
         <description>JAX-WS endpoint - sts</description>
         <display-name>sts</display-name>
         <servlet-name>sts</servlet-name>
@@ -1071,7 +1080,10 @@
         <servlet-name>rest-sts-publish</servlet-name>
         <url-pattern>/rest_sts_publish/*</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>sts-tokengeneration-service</servlet-name>
+        <url-pattern>/sts_tokengen/*</url-pattern>
+    </servlet-mapping>
 
     <!-- end of servlet mapping -->
 

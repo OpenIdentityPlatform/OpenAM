@@ -51,6 +51,7 @@ public class STSInstanceConfig {
     protected static final String AM_SESSION_COOKIE_NAME = "amSessionCookieName";
     protected static final String KEYSTORE_CONFIG =  "keystoreConfig";
     protected static final String ISSUER_NAME = "issuerName";
+    protected static final String SAML2_CONFIG = "saml2config";
 
     protected final String amJsonRestBase;
     protected final String amDeploymentUrl;
@@ -60,6 +61,7 @@ public class STSInstanceConfig {
     protected final String amSessionCookieName;
     protected final KeystoreConfig keystoreConfig;
     protected final String issuerName;
+    protected final SAML2Config saml2Config;
 
     public static abstract class STSInstanceConfigBuilderBase<T extends STSInstanceConfigBuilderBase<T>> {
         private String amJsonRestBase;
@@ -70,6 +72,7 @@ public class STSInstanceConfig {
         private String amSessionCookieName;
         private KeystoreConfig keystoreConfig;
         private String issuerName;
+        private SAML2Config saml2Config;
 
 
         protected abstract T self();
@@ -114,6 +117,11 @@ public class STSInstanceConfig {
             return self();
         }
 
+        public T saml2Config(SAML2Config saml2Config) {
+            this.saml2Config = saml2Config;
+            return self();
+        }
+
         public STSInstanceConfig build() {
             return new STSInstanceConfig(this);
         }
@@ -135,6 +143,8 @@ public class STSInstanceConfig {
         amSessionCookieName = builder.amSessionCookieName;
         keystoreConfig = builder.keystoreConfig;
         issuerName = builder.issuerName;
+        //can be null if STS does not issue SAML tokens - but if SAML2 tokens only output, this must be non-null. TODO:
+        saml2Config = builder.saml2Config;
         Reject.ifNull(keystoreConfig, "KeystoreConfig cannot be null");
         Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(amDeploymentUrl, "AM deployment url cannot be null");
@@ -204,6 +214,15 @@ public class STSInstanceConfig {
         return amSessionCookieName;
     }
 
+    /**
+     *
+     * @return The SAML2Config object which specifies the state necessary for STS-instance-specific SAML2 assertions to
+     * be generated. This state is used by the token generation service.
+     */
+    public SAML2Config getSaml2Config() {
+        return saml2Config;
+    }
+
     public static STSInstanceConfigBuilderBase<?> builder() {
         return new STSInstanceConfigBuilder();
     }
@@ -218,6 +237,7 @@ public class STSInstanceConfig {
         sb.append('\t').append("amRestLogoutUriElement: ").append(amRestLogoutUriElement).append('\n');
         sb.append('\t').append("amRestAMTokenValidationUriElement: ").append(amRestIdFromSessionUriElement).append('\n');
         sb.append('\t').append("amSessionCookieName: ").append(amSessionCookieName).append('\n');
+        sb.append('\t').append("saml2Config: ").append(saml2Config).append('\n');
         return sb.toString();
     }
 
@@ -232,20 +252,27 @@ public class STSInstanceConfig {
                     amRestIdFromSessionUriElement.equals(otherConfig.getAMRestIdFromSessionUriElement()) &&
                     amSessionCookieName.equals(otherConfig.getAMSessionCookieName()) &&
                     amRestLogoutUriElement.equals(otherConfig.getAMRestLogoutUriElement()) &&
-                    amJsonRestBase.equals(otherConfig.getJsonRestBase());
+                    amJsonRestBase.equals(otherConfig.getJsonRestBase()) &&
+                    ((saml2Config != null ? saml2Config.equals(otherConfig.getSaml2Config()) : (otherConfig.getSaml2Config() == null)));
         }
         return false;
     }
 
     public JsonValue toJson() {
-        return json(object(field(AM_JSON_REST_BASE, amJsonRestBase), field(AM_DEPLOYMENT_URL, amDeploymentUrl),
+        JsonValue jsonValue =  json(object(field(AM_JSON_REST_BASE, amJsonRestBase), field(AM_DEPLOYMENT_URL, amDeploymentUrl),
                 field(AM_REST_AUTHN_URI_ELEMENT, amRestAuthNUriElement), field(AM_REST_LOGOUT_URI_ELEMENT, amRestLogoutUriElement),
                 field(AM_REST_ID_FROM_SESSION_URI_ELEMENT, amRestIdFromSessionUriElement), field(AM_SESSION_COOKIE_NAME, amSessionCookieName),
                 field(KEYSTORE_CONFIG, keystoreConfig.toJson()), field(ISSUER_NAME, issuerName)));
+        if (saml2Config == null) {
+            return jsonValue;
+        } else {
+            jsonValue.add(SAML2_CONFIG, saml2Config.toJson());
+            return jsonValue;
+        }
     }
 
     public static STSInstanceConfig fromJson(JsonValue json) {
-        return STSInstanceConfig.builder()
+        STSInstanceConfigBuilderBase builder =  STSInstanceConfig.builder()
                 .amJsonRestBase(json.get(AM_JSON_REST_BASE).asString())
                 .amDeploymentUrl(json.get(AM_DEPLOYMENT_URL).asString())
                 .amRestAuthNUriElement(json.get(AM_REST_AUTHN_URI_ELEMENT).asString())
@@ -253,7 +280,12 @@ public class STSInstanceConfig {
                 .amRestIdFromSessionUriElement(json.get(AM_REST_ID_FROM_SESSION_URI_ELEMENT).asString())
                 .amSessionCookieName(json.get(AM_SESSION_COOKIE_NAME).asString())
                 .keystoreConfig(KeystoreConfig.fromJson(json.get(KEYSTORE_CONFIG)))
-                .issuerName(json.get(ISSUER_NAME).asString())
-                .build();
+                .issuerName(json.get(ISSUER_NAME).asString());
+        final JsonValue samlConfig = json.get(SAML2_CONFIG);
+        if (samlConfig.isNull()) {
+            return builder.build();
+        } else {
+            return builder.saml2Config(SAML2Config.fromJson(samlConfig)).build();
+        }
     }
 }

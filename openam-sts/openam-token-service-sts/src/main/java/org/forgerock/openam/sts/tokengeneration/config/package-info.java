@@ -15,7 +15,6 @@
  */
 
 /**
- * The classes in this package pertain to persisting a representation of published STS instances, so that
- * they may be reconstituted following a server restart.
+ * This package contains classes related to the guice configuration of the TokenGenerationService.
  */
-package org.forgerock.openam.sts.persistence;
+package org.forgerock.openam.sts.tokengeneration.config;

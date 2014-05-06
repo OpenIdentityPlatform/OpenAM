@@ -14,15 +14,15 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.persistence;
+package org.forgerock.openam.sts.tokengeneration.saml2;
 
-import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 
 /**
- * Interface defining the act of persisting, or of removing, state corresponding to a published STS instance so that
- * this instance may be reconstituted following a server restart.
+ * Defines concern related to obtaining the STSInstanceConfig state corresponding to the sts instance identifier.
+ * Allows a single token-generation-service to generate STS-instance-specific tokens.
+ *
+ * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
  */
-public interface STSInstancePersister {
-    void persistSTSInstance(STSInstanceConfig instance);
-    void removeSTSInstance(String realmPath);
+public interface STSInstanceStateProvider<T> {
+    T getSTSInstanceState(String instanceId);
 }

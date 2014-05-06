@@ -38,8 +38,7 @@ import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
-import org.forgerock.openam.sts.persistence.STSInstancePersister;
-import org.forgerock.openam.sts.persistence.STSInstancePersisterImpl;
+import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
 import org.forgerock.openam.sts.STSCallbackHandler;
@@ -50,6 +49,7 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
+import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
 import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
@@ -131,8 +131,7 @@ public class RestSTSInstanceModule extends AbstractModule {
         Needed by the AMTokenProvider.
          */
         bind(OpenAMSessionIdElementBuilder.class).to(OpenAMSessionIdElementBuilderImpl.class);
-
-        bind(STSInstancePersister.class).to(STSInstancePersisterImpl.class);
+        bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigPersister.class);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
     }
 

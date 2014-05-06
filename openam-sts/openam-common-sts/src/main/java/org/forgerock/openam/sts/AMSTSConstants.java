@@ -22,6 +22,12 @@ import javax.xml.namespace.QName;
 
 public class AMSTSConstants {
     /*
+    Necessary to distinguish the originator of the invocation to the Token Generation Service. Calls need to
+    be distinguished so that the appropriate STSInstanceConfigPersister can be referenced to pull config state for the
+    STS instance.
+     */
+    public enum STSType {REST, SOAP}
+    /*
     The namespace defined by the WS-Trust specification.
      */
     public static final String WS_TRUST_NAMESPACE = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/";

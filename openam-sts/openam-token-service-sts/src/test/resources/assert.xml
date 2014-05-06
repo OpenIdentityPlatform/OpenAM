@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s28cf6b911a0b8df238be3160fe680e1e39bd046e0" IssueInstant="2014-04-24T16:42:45Z" Version="2.0">
+    <saml:Issuer>http://host.forgerock.com:8080/openam</saml:Issuer>
+    <saml:Subject>
+        <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">amadmin</saml:NameID>
+        <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer" />
+    </saml:Subject>
+    <saml:Conditions NotBefore="2014-04-24T16:42:45Z" NotOnOrAfter="2014-04-24T16:52:45Z" />
+    <saml:AuthnStatement AuthnInstant="2014-04-24T16:42:45Z">
+        <saml:AuthnContext>
+            <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>
+        </saml:AuthnContext>
+    </saml:AuthnStatement>
+    <saml:AttributeStatement>
+        <saml:Attribute Name="email">
+            <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">amadmin@cornholio.com</saml:AttributeValue>
+        </saml:Attribute>
+        <saml:Attribute Name="static_attr">
+            <saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">bobo</saml:AttributeValue>
+        </saml:Attribute>
+    </saml:AttributeStatement>
+</saml:Assertion>
+

@@ -93,6 +93,9 @@ public class RestSTSPublishService implements SingletonResourceProvider {
     }
 
     public void readInstance(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
+        /*
+        This should be updated to call publisher.getPublishedInstances().
+         */
         handler.handleError(new NotSupportedException());
     }
 

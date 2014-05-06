@@ -29,5 +29,6 @@
         <module>openam-common-sts</module>
         <module>openam-rest-sts</module>
         <module>openam-soap-sts</module>
+        <module>openam-token-service-sts</module>
     </modules>
 </project>

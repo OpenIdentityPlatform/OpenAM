@@ -14,21 +14,14 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.persistence;
+package org.forgerock.openam.sts.tokengeneration.saml2;
 
-import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 
 /**
- * @see org.forgerock.openam.sts.persistence.STSInstancePersister
- * It may be that this class will ultimately reference the SMS in OpenAM to persist(remove) the json corresponding to the
- * STSInstanceConfig. For now, the implementation remains empty.
+ * Defines concern related to creating an instance of RestSTSInstanceState class. Will be used by the
+ * RestSTSInstanceStateCache to obtain an new instance of the RestSTSInstanceState class.
  */
-public class STSInstancePersisterImpl implements STSInstancePersister {
-    public void persistSTSInstance(STSInstanceConfig instance) {
-
-    }
-
-    public void removeSTSInstance(String realmPath) {
-
-    }
+public interface RestSTSInstanceStateFactory {
+    RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config);
 }

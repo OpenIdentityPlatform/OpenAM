@@ -20,7 +20,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.persistence.STSInstancePersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.service.RestSTSService;
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,12 +43,12 @@ import java.util.Map;
  */
 public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     private final Router router;
-    private final STSInstancePersister persistentStore;
+    private final STSInstanceConfigPersister<RestSTSInstanceConfig> persistentStore;
     private final Map<String, Route> publishedRoutes;
     private final Logger logger;
 
     @Inject
-    RestSTSInstancePublisherImpl(Router router, STSInstancePersister persistentStore, Logger logger) {
+    RestSTSInstancePublisherImpl(Router router, STSInstanceConfigPersister<RestSTSInstanceConfig> persistentStore, Logger logger) {
         this.router = router;
         this.persistentStore = persistentStore;
         publishedRoutes = new HashMap<String, Route>();
@@ -88,7 +89,12 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         Need to persist the published Route instance as it is necessary for router removal.
          */
         publishedRoutes.put(subPath, route);
-        persistentStore.persistSTSInstance(instanceConfig);
+        /*
+        TODO: it is not clear that the deployment config element will be unique across both rest and soap sts instances.
+        Safest will be to generate a uuid in the STSInstanceConfig ctor, and reference this value as an indexed ldap
+        attribute when persisting the STSInstanceConfig to the SMS.
+         */
+        persistentStore.persistSTSInstance(instanceConfig.getDeploymentConfig().getUriElement(), instanceConfig);
     }
 
     /**
@@ -104,5 +110,9 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         }
         persistentStore.removeSTSInstance(subPath);
         router.removeRoute(route);
+    }
+
+    public List<RestSTSInstanceConfig> getPublishedInstances() {
+        return persistentStore.getAllPublishedInstances();
     }
 }

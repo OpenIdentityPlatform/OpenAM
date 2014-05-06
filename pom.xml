@@ -136,6 +136,8 @@
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
         <cxf-rt-ws-security.version>2.7.8</cxf-rt-ws-security.version>
+        <!-- Same version as required by cxf-rt-ws-security. 2.x release introduced major changes -->
+        <wss4j.version>1.6.13</wss4j.version>
         <click.version>2.3.0</click.version>
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
         <commons-codec.version>1.6</commons-codec.version>
@@ -790,6 +792,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-common-sts</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-token-service-sts</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1655,6 +1662,11 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-ws-security</artifactId>
                 <version>${cxf-rt-ws-security.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.security</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
             </dependency>
 
             <!-- Test dependency -->

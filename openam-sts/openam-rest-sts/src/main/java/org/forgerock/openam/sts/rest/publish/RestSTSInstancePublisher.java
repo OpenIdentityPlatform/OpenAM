@@ -17,14 +17,30 @@
 package org.forgerock.openam.sts.rest.publish;
 
 import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+
+import java.util.List;
 
 /**
  * Defines the interface consumed to publish a Rest STS instance, and to remove this instance once its functionality
  * should no longer be exposed.
+ *
+ * It may well be that this interface should be enhanced to handle a GET to the RestSTSPublishService, which will
+ * return the RestSTSInstanceConfig instances corresponding to all published REST STS instances. This method would then
+ * be consumed by a servlet-context-listener (or similar startup context) associated with the REST STS deployment. This
+ * would allow REST STS instances to re-constitute themselves after a server restart regardless of whether they are deployed
+ * locally (in the OpenAM .war) or remotely (in their own .war).
  */
 public interface RestSTSInstancePublisher {
     void publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, String subPath) throws STSInitializationException;
     void removeInstance(String subPath) throws IllegalArgumentException;
+
+    /**
+     * Called to obtain the configuration elements corresponding to previously-published STS instances.
+     * @return The STSInstanceConfig super-class (RestSTSInstanceConfig or SoapSTSInstanceConfig) instances corresponding
+     * to published STS instances.
+     */
+    List<RestSTSInstanceConfig> getPublishedInstances();
 }

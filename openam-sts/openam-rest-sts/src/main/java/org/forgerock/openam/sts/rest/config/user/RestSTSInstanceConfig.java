@@ -96,6 +96,18 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         this.deploymentConfig = builder.deploymentConfig;
         Reject.ifNull(supportedTokenTranslations, "Supported token translations cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
+        /*
+        throw an exception if no SAML2Config is set, but a SAML token is specified as
+        output in one of the token transformations.
+         */
+        if (this.saml2Config == null) {
+            for (TokenTransformConfig tokenTransformConfig : supportedTokenTranslations) {
+                if (TokenType.SAML2.equals(tokenTransformConfig.getOutputTokenType())) {
+                    throw new IllegalStateException("A SAML2 token is a transformation output, but no Saml2Config " +
+                            "state has been specified to guide the production of SAML2 tokens.");
+                }
+            }
+        }
     }
 
     public static RestSTSInstanceConfigBuilderBase<?> builder() {
@@ -120,16 +132,10 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("STSInstanceConfig instance:\n");
-        sb.append('\t').append("KeyStoreConfig: ").append(keystoreConfig).append('\n');
-        sb.append('\t').append("issuerName: ").append(issuerName).append('\n');
+        StringBuilder sb = new StringBuilder("RestSTSInstanceConfig instance:\n");
+        sb.append('\t').append("STSInstanceConfig: ").append(super.toString()).append('\n');
         sb.append('\t').append("supportedTokenTranslations: ").append(supportedTokenTranslations).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
-        sb.append('\t').append("amDeploymentUrl: ").append(amDeploymentUrl).append('\n');
-        sb.append('\t').append("amRestAuthNUriElement: ").append(amRestAuthNUriElement).append('\n');
-        sb.append('\t').append("amRestLogoutUriElement: ").append(amRestLogoutUriElement).append('\n');
-        sb.append('\t').append("amRestAMTokenValidationUriElement: ").append(amRestIdFromSessionUriElement).append('\n');
-        sb.append('\t').append("amSessionCookieName: ").append(amSessionCookieName).append('\n');
         return sb.toString();
     }
 
@@ -137,16 +143,9 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
     public boolean equals(Object other) {
         if (other instanceof RestSTSInstanceConfig) {
             RestSTSInstanceConfig otherConfig = (RestSTSInstanceConfig)other;
-            return keystoreConfig.equals(otherConfig.getKeystoreConfig()) &&
-                    issuerName.equals(otherConfig.getIssuerName()) &&
+            return  super.equals(otherConfig) &&
                     supportedTokenTranslations.equals(otherConfig.getSupportedTokenTranslations())  &&
-                    deploymentConfig.equals(otherConfig.getDeploymentConfig()) &&
-                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl()) &&
-                    amRestAuthNUriElement.equals(otherConfig.getAMRestAuthNUriElement()) &&
-                    amRestIdFromSessionUriElement.equals(otherConfig.getAMRestIdFromSessionUriElement()) &&
-                    amSessionCookieName.equals(otherConfig.getAMSessionCookieName()) &&
-                    amRestLogoutUriElement.equals(otherConfig.getAMRestLogoutUriElement()) &&
-                    amJsonRestBase.equals(otherConfig.getJsonRestBase());
+                    deploymentConfig.equals(otherConfig.getDeploymentConfig());
         }
         return false;
     }
@@ -173,15 +172,17 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         if (json == null) {
             throw new NullPointerException("JsonValue cannot be null!");
         }
+        STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
-                .amJsonRestBase(json.get(AM_JSON_REST_BASE).asString())
-                .amDeploymentUrl(json.get(AM_DEPLOYMENT_URL).asString())
-                .amRestAuthNUriElement(json.get(AM_REST_AUTHN_URI_ELEMENT).asString())
-                .amRestLogoutUriElement(json.get(AM_REST_LOGOUT_URI_ELEMENT).asString())
-                .amRestIdFromSessionUriElement(json.get(AM_REST_ID_FROM_SESSION_URI_ELEMENT).asString())
-                .amSessionCookieName(json.get(AM_SESSION_COOKIE_NAME).asString())
-                .keystoreConfig(KeystoreConfig.fromJson(json.get(KEYSTORE_CONFIG)))
-                .issuerName(json.get(ISSUER_NAME).asString())
+                .amJsonRestBase(baseConfig.getJsonRestBase())
+                .amDeploymentUrl(baseConfig.getAMDeploymentUrl())
+                .amRestAuthNUriElement(baseConfig.getAMRestAuthNUriElement())
+                .amRestLogoutUriElement(baseConfig.getAMRestLogoutUriElement())
+                .amRestIdFromSessionUriElement(baseConfig.getAMRestIdFromSessionUriElement())
+                .amSessionCookieName(baseConfig.getAMSessionCookieName())
+                .keystoreConfig(baseConfig.getKeystoreConfig())
+                .issuerName(baseConfig.getIssuerName())
+                .saml2Config(baseConfig.getSaml2Config())
                 .deploymentConfig(RestDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
         JsonValue supportedTranslations = json.get(SUPPORTED_TOKEN_TRANSLATIONS);
         if (!supportedTranslations.isList()) {

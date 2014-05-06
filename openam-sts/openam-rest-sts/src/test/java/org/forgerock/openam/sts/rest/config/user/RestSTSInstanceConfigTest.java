@@ -24,6 +24,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -62,6 +63,11 @@ public class RestSTSInstanceConfigTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void testRejectIfNull() throws UnsupportedEncodingException {
         createIncompleteInstanceConfig();
+    }
+
+    @Test(expectedExceptions = IllegalStateException.class)
+    public void testIllegalStateExceptionNoSaml2Config() throws UnsupportedEncodingException {
+        createInstanceConfigWithoutSaml2Config("/bob", "http://localhost:8080/openam");
     }
 
     @Test
@@ -124,6 +130,13 @@ public class RestSTSInstanceConfigTest {
                         .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .build();
 
+        SAML2Config saml2Config =
+                SAML2Config.builder()
+                        .authenticationContext("authContext")
+                        .nameIdFormat("transient")
+                        .tokenLifetimeInSeconds(500000)
+                        .build();
+
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl(amDeploymentUrl)
@@ -134,6 +147,7 @@ public class RestSTSInstanceConfigTest {
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
+                .saml2Config(saml2Config)
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,
                         TokenType.OPENAM,
@@ -189,5 +203,59 @@ public class RestSTSInstanceConfigTest {
                         !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .build();
     }
+
+    /*
+    Create RestSTSInstanceConfig with SAML2 output tokens, but without SAML2Config, to test IllegalStateException
+     */
+    private RestSTSInstanceConfig createInstanceConfigWithoutSaml2Config(String uriElement, String amDeploymentUrl) throws UnsupportedEncodingException {
+        AuthTargetMapping mapping = AuthTargetMapping.builder()
+                .addMapping(UsernameToken.class, "service", "ldapService")
+                .build();
+
+        RestDeploymentConfig deploymentConfig =
+                RestDeploymentConfig.builder()
+                        .uriElement(uriElement)
+                        .authTargetMapping(mapping)
+                        .build();
+
+        KeystoreConfig keystoreConfig =
+                KeystoreConfig.builder()
+                        .fileName("stsstore.jks")
+                        .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .encryptionKeyAlias("mystskey")
+                        .signatureKeyAlias("mystskey")
+                        .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .build();
+
+        return RestSTSInstanceConfig.builder()
+                .deploymentConfig(deploymentConfig)
+                .amDeploymentUrl(amDeploymentUrl)
+                .amJsonRestBase("/json")
+                .amRestAuthNUriElement("/authenticate")
+                .amRestLogoutUriElement("/sessions/?_action=logout")
+                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
+                .amSessionCookieName("iPlanetDirectoryPro")
+                .keystoreConfig(keystoreConfig)
+                .issuerName("Cornholio")
+                .addSupportedTokenTranslation(
+                        TokenType.USERNAME,
+                        TokenType.OPENAM,
+                        !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .addSupportedTokenTranslation(
+                        TokenType.USERNAME,
+                        TokenType.SAML2,
+                        AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .addSupportedTokenTranslation(
+                        TokenType.OPENAM,
+                        TokenType.SAML2,
+                        !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .addSupportedTokenTranslation(
+                        TokenType.OPENIDCONNECT,
+                        TokenType.SAML2,
+                        AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .build();
+    }
+
 
 }
