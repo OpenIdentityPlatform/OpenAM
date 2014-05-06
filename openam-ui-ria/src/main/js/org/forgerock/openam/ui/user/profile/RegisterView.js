@@ -47,6 +47,10 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             "customValidate": "customValidate",
             "click .cancelButton": "cancel"
         },
+        errorsHandlers: { 
+            "Bad Request":  { status: "400" },
+            "Not found":    { status: "404" }
+        },
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
             this.data.isStageOne = true;
@@ -119,11 +123,13 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
             userDelegate.doAction("confirm", this.data.urlParams,
                 function(d){
                     _.extend(postData,d);
-                    userDelegate.doAction("anonymousCreate",postData,success,error);
+                    userDelegate.doAction("anonymousCreate",postData,success,error,_this.errorsHandlers);
                 },
                 function(e){
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRegister");
-                });
+                },
+                _this.errorsHandlers
+            );
 
            this.$el.find("input[type=submit]").prop('disabled', true);
 
