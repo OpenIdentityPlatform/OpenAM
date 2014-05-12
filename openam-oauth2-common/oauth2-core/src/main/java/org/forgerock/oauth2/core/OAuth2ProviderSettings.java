@@ -163,6 +163,14 @@ public interface OAuth2ProviderSettings {
     boolean issueRefreshTokens() throws ServerException;
 
     /**
+     * Whether the OAuth2 provider should issue refresh tokens when refreshing access tokens.
+     *
+     * @return {@code true} if refresh tokens should be issued when access tokens are refreshed.
+     * @throws ServerException If any internal server error occurs.
+     */
+    boolean issueRefreshTokensOnRefreshingToken() throws ServerException;
+
+    /**
      * Gets the lifetime an authorization code will have before it expires.
      *
      * @return The lifetime of an authorization code in seconds.

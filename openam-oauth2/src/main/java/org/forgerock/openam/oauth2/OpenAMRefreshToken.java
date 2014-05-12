@@ -197,6 +197,18 @@ public class OpenAMRefreshToken extends RefreshToken {
      * {@inheritDoc}
      */
     @Override
+    public String getRedirectUri() {
+        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+        if (value != null && !value.isEmpty()) {
+            return value.iterator().next();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getTokenId() {
         final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.ID);
         if (value != null && !value.isEmpty()) {

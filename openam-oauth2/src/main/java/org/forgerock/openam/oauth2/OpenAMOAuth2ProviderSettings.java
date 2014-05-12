@@ -465,6 +465,21 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     /**
      * {@inheritDoc}
      */
+    public boolean issueRefreshTokensOnRefreshingToken() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN);
+        } catch (SMSException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        } catch (SSOException e) {
+            logger.error(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public long getAuthorizationCodeLifetime() throws ServerException {
         try {
             return getLongSetting(realm, OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME);

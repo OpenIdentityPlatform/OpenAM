@@ -2,7 +2,7 @@
 /*
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright © 2012 ForgeRock Inc. All rights reserved.
+* Copyright 2012-2014 ForgeRock AS.
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -115,12 +115,14 @@ function getData(){
    var acl = frm.elements['ConfigureOAuth2.choiceCodeLifetime'].value;
    var atl = frm.elements['ConfigureOAuth2.choiceTokenLifetime'].value;
    var irt = frm.elements['ConfigureOAuth2.choiceRefreshToken'].value;
+   var irtr = frm.elements['ConfigureOAuth2.choiceRefreshTokenOnRefreshing'].value;
    var sic = frm.elements['ConfigureOAuth2.choiceScopeImpl'].value;
    return "&realm=" + escapeEx(realm) +
            "&rtl=" + escapeEx(rtl) +
            "&acl=" + escapeEx(acl) +
            "&atl=" + escapeEx(atl) +
            "&irt=" + escapeEx(irt) +
+           "&irtr=" + escapeEx(irtr) +
            "&sic=" + escapeEx(sic);
 }
  

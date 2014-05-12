@@ -36,7 +36,7 @@ public class RealmNormaliser {
      * @return The normalised realm.
      */
     public String normalise(String realm) {
-        if (realm == null) {
+        if (realm == null || realm.isEmpty()) {
             return "/";
         }
         return realm;

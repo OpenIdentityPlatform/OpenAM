@@ -150,6 +150,10 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         return configurationResource.getConfiguration().get("issueRefreshTokens").asBoolean();
     }
 
+    public boolean issueRefreshTokensOnRefreshingToken() throws ServerException {
+        return configurationResource.getConfiguration().get("issueRefreshTokensOnRefreshingToken").asBoolean();
+    }
+
     public long getAuthorizationCodeLifetime() throws ServerException {
         return configurationResource.getConfiguration().get("authorizationCodeLifetime").asLong();
     }

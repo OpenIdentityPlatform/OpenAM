@@ -2193,6 +2193,17 @@
    </varlistentry>
 
    <varlistentry>
+    <term>Issue Refresh Tokens on Refreshing Access Tokens</term>
+    <listitem>
+     <para>Whether to issue a refresh token when refreshing an access
+     token.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token</literal></para>
+     </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term>Scope Implementation Class</term>
     <listitem>
      <para>Name of class on OpenAM classpath implementing scopes.</para>

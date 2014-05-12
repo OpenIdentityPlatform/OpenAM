@@ -130,9 +130,20 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 Collections.unmodifiableSet(scope), Collections.unmodifiableSet(tokenScope),
                 request);
 
+        RefreshToken newRefreshToken = null;
+        if (providerSettings.issueRefreshTokensOnRefreshingToken()) {
+            newRefreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
+                    refreshToken.getResourceOwnerId(), refreshToken.getRedirectUri(), refreshToken.getScope(), request);
+            tokenStore.deleteRefreshToken(refreshToken.getTokenId());
+        }
+
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", null,
                 refreshToken.getResourceOwnerId(), clientRegistration.getClientId(), null, validatedScope,
-                refreshToken, null, request);
+                newRefreshToken == null ? refreshToken : newRefreshToken, null, request);
+
+        if (newRefreshToken != null) {
+            accessToken.addExtraData("refresh_token", refreshToken.getTokenId());
+        }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 

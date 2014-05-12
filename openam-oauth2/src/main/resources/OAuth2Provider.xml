@@ -16,7 +16,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  */
 -->
 
@@ -63,6 +63,20 @@
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
                                  i18nKey="a103">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a103a">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -224,6 +238,20 @@
                                      syntax="boolean"
                                      validator="RequiredValueValidator"
                                      i18nKey="a103">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token"
+                                     type="single"
+                                     syntax="boolean"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a103a">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>

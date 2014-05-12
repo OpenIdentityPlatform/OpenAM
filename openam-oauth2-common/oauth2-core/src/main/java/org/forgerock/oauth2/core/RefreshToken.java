@@ -186,6 +186,18 @@ public class RefreshToken extends JsonValue implements Token {
     }
 
     /**
+     * Gets the client's redirect uri.
+     *
+     * @return The client's redirect uri.
+     */
+    public String getRedirectUri() {
+        if (isDefined(OAuth2Constants.CoreTokenParams.REDIRECT_URI)) {
+            return get(OAuth2Constants.CoreTokenParams.REDIRECT_URI).asString();
+        }
+        return null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public String getTokenId() {

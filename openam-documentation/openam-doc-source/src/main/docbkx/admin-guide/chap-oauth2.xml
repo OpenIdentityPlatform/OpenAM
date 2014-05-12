@@ -402,6 +402,11 @@
     service to supply a refresh token when returning an access token.</para>
    </step>
    <step performance="optional">
+    <para>Select Issue Refresh Tokens on Refreshing Access Tokens if you want
+    the authorization service to supply a refresh token when refreshing an
+    access token.</para>
+   </step>
+   <step performance="optional">
     <para>If you want to use the default scope implementation, whereby
     scopes are taken to be resource owner profile attribute names, then
     keep the default setting.</para>
