@@ -29,7 +29,11 @@ import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
+
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * This class is used by the upgrade mechanism (pre-upgrade) to set the value of
@@ -68,6 +72,8 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
     private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
 
+    private final static String CROSSTALK_ENABLED = CoreTokenConstants.IS_CROSSTALK_ENABLED;
+
     public SessionServiceHelper() {
         attributes.add(SFO_USER_ATTR);
         attributes.add(SFO_PWD_ATTR);
@@ -96,6 +102,8 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
                     break;
                 }
             }
+        } else if (CROSSTALK_ENABLED.equals(newAttr.getName())) {
+            updateDefaultValues(newAttr, asSet("true"));
         }
 
         return newAttr;
