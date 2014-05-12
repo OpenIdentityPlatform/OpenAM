@@ -106,10 +106,6 @@
             <groupId>xerces-J</groupId>
             <artifactId>xml-apis</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
