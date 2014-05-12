@@ -4,7 +4,7 @@
 
         <div class="group-field-row">
             <label for="currentPassword">{{t "common.user.oldPassword"}}</label> 
-            <input  id="currentPassword"  type="password" name="currentPassword" value="" data-validator="required" pattern=".{8,}" required autofocus />
+            <input  id="currentPassword"  type="password" name="currentPassword" value="" data-validator="required" pattern=".{8,}" data-validator-event="keyup change" required autofocus />
             <span class="error">x</span>
         </div>
 
