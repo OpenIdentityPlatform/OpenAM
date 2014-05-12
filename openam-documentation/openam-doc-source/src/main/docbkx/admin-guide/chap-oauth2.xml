@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2'
@@ -389,6 +389,11 @@
    <step performance="optional">
     <para>Select Issue Refresh Tokens unless you do not want the authorization
     service to supply a refresh token when returning an access token.</para>
+   </step>
+   <step performance="optional">
+    <para>Select Issue Refresh Tokens on Refreshing Access Tokens unless you
+    do not want the authorization service to supply a refresh token when
+    refreshing an access token.</para>
    </step>
    <step performance="optional">
     <para>If you want to use the default scope implementation, whereby

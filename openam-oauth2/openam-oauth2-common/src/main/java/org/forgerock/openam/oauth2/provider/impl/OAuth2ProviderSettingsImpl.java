@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
  */
+
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
@@ -105,6 +106,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         final Long accessTokenLifetime;
         final Long jwtTokenLifetime;
         final Boolean refreshTokensEnabled;
+        final Boolean issueRefreshTokenOnRefreshingToken;
         final String scopeImplementationClass;
         final Set<String> responseTypes;
         final Set<String> resourceOwnerAuthenticationAttributes;
@@ -120,6 +122,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
                                      Long accessTokenLifetime,
                                      Long jwtTokenLifetime,
                                      Boolean refreshTokensEnabled,
+                                     Boolean issueRefreshTokenOnRefreshingToken,
                                      String scopeImplementationClass,
                                      Set<String> responseTypes,
                                      Set<String> resourceOwnerAuthenticationAttributes,
@@ -135,6 +138,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             this.accessTokenLifetime = accessTokenLifetime;
             this.jwtTokenLifetime = jwtTokenLifetime;
             this.refreshTokensEnabled = refreshTokensEnabled;
+            this.issueRefreshTokenOnRefreshingToken = issueRefreshTokenOnRefreshingToken;
             this.scopeImplementationClass = scopeImplementationClass;
             this.responseTypes = (responseTypes != null) ? Collections.unmodifiableSet(responseTypes) : null;
             this.resourceOwnerAuthenticationAttributes =
@@ -228,7 +232,8 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             Long refreshTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME);
             Long accessTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME);
             Long jwtTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.JWT_TOKEN_LIFETIME_NAME);
-            boolean issueRefreshToken = getBooleanAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN);
+            Boolean issueRefreshToken = getBooleanAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN);
+            Boolean issueRefreshTokenOnRefreshingToken = getBooleanAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN);
             String scopeImplementationClass = getStringAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS);
             Set<String> responseTypes = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST);
             Set<String> authenticationAttributes = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES);
@@ -245,6 +250,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
                     accessTokenLifetime,
                     jwtTokenLifetime,
                     issueRefreshToken,
+                    issueRefreshTokenOnRefreshingToken,
                     scopeImplementationClass,
                     responseTypes,
                     authenticationAttributes,
@@ -403,6 +409,18 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     public boolean getRefreshTokensEnabledState() {
         if ((providerConfiguration != null) && (providerConfiguration.refreshTokensEnabled != null)) {
             return providerConfiguration.refreshTokensEnabled;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
+    }
+
+    @Override
+    public boolean issueRefreshTokenOnRefreshingToken() {
+        if ((providerConfiguration != null) && (providerConfiguration.issueRefreshTokenOnRefreshingToken != null)) {
+            return providerConfiguration.issueRefreshTokenOnRefreshingToken;
         } else {
             String message = "OAuth2Utils::Unable to get provider setting for : "+
                     OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN;

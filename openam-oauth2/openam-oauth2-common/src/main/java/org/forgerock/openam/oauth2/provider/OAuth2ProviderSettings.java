@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,6 +60,13 @@ public interface OAuth2ProviderSettings {
      * @return true - issue refresh tokens, false - don't issue refresh tokens
      */
     public boolean getRefreshTokensEnabledState();
+
+    /**
+     * Gets whether or not refresh tokens should be issued when refreshing access token.
+     *
+     * @return {@code true} if refresh tokens should be issued when refreshing access tokens.
+     */
+    public boolean issueRefreshTokenOnRefreshingToken();
 
     /**
      * Gets the class that implements OAuth2 Scope

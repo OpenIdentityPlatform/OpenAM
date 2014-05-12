@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
+
 package com.sun.identity.workflow;
 
 import com.iplanet.am.util.SystemProperties;
@@ -42,6 +43,7 @@ public class ConfigureOAuth2 extends Task {
     private static final String REFRESH_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-refresh-token-lifetime";
     private static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
     private static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
+    private static final String ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN = "forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token";
     private static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
 
     //params
@@ -52,6 +54,7 @@ public class ConfigureOAuth2 extends Task {
     private static final String ACL = "acl";
     private static final String ATL = "atl";
     private static final String IRT = "irt";
+    private static final String IRTR = "irtr";
     private static final String SIC = "sic";
 
     //policy params
@@ -74,23 +77,27 @@ public class ConfigureOAuth2 extends Task {
         String accessCodeLifetime = getString(params, ACL);
         String accessTokenLifetime = getString(params, ATL);
         String issueRefreshToken = getString(params, IRT);
+        String issueRefreshTokenOnRefreshing = getString(params, IRTR);
         String scopeImplementationClass = getString(params, SIC);
 
         //create service attrs
-        Map<String,Set<String>> attrValues = new HashMap<String, Set<String>>();
-        Set<String> temp = new HashSet<String>();
+        Map<String,Set<String>> attrValues = new HashMap<String, Set<String>>(6);
+        Set<String> temp = new HashSet<String>(1);
         temp.add(refreshTokenLifetime);
         attrValues.put(REFRESH_TOKEN_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
+        temp = new HashSet<String>(1);
         temp.add(accessCodeLifetime);
         attrValues.put(AUTHZ_CODE_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
+        temp = new HashSet<String>(1);
         temp.add(accessTokenLifetime);
         attrValues.put(ACCESS_TOKEN_LIFETIME_NAME, temp);
-        temp = new HashSet<String>();
+        temp = new HashSet<String>(1);
         temp.add(issueRefreshToken);
         attrValues.put(ISSUE_REFRESH_TOKEN, temp);
-        temp = new HashSet<String>();
+        temp = new HashSet<String>(1);
+        temp.add(issueRefreshTokenOnRefreshing);
+        attrValues.put(ISSUE_REFRESH_TOKEN_ON_REFRESHING_TOKEN, temp);
+        temp = new HashSet<String>(1);
         temp.add(scopeImplementationClass);
         attrValues.put(SCOPE_PLUGIN_CLASS, temp);
 

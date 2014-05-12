@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -97,6 +97,10 @@ public class RefreshTokenServerResource extends AbstractFlow {
             CoreToken token = createAccessToken(refreshToken, checkedScope);
             Map<String, Object> response = token.convertToMap();
 
+            if (checkIfRefreshTokenIsRequiredOnRefreshingToken(getRequest())) {
+                response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
+            }
+
             //execute post token creation pre return scope plugin for extra return data.
             Map<String, String> data = new HashMap<String, String>();
             response.putAll(executeExtraDataScopePlugin(data, token));
@@ -116,17 +120,38 @@ public class RefreshTokenServerResource extends AbstractFlow {
     }
 
     /**
-     * This method is intended to be overridden by subclasses.
+     * Creates a new refresh token with the same scope as the previous refresh token.
      *
-     * @param checkedScope
-     * @return
-     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     *
+     * @param refreshToken The current refresh token.
+     * @return A new refresh token.
      */
-    protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
-                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID(), getGrantType());
+    private CoreToken createRefreshToken(CoreToken refreshToken) {
+        return getTokenStore().createRefreshToken(refreshToken.getScope(), OAuth2Utils.getRealm(getRequest()),
+                refreshToken.getUserID(), refreshToken.getClientID(), refreshToken.getRedirectURI());
     }
 
+    /**
+     * Creates a new access token for the given refresh token and checked scope.
+     * <br/>
+     * If refresh tokens are configured to be sent the given refresh token will be replaced and the old one will be
+     * deleted from the token store.
+     *
+     * @param refreshToken The given refresh token.
+     * @param checkedScope The checked scope.
+     * @return A new access token.
+     * @throws OAuthProblemException If there is any problem issuing the refresh token or access token.
+     */
+    protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
+        if (checkIfRefreshTokenIsRequired(getRequest())) {
+            final String oldRefreshTokenId = refreshToken.getTokenID();
+            refreshToken = createRefreshToken(refreshToken);
+
+            getTokenStore().deleteRefreshToken(oldRefreshTokenId);
+        }
+
+        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
+                checkedScope, OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
+                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID(),
+                getGrantType());
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2012-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -89,6 +89,10 @@ public abstract class AbstractFlow extends ServerResource {
         OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(request);
         issueRefreshToken = settings.getRefreshTokensEnabledState();
         return issueRefreshToken;
+    }
+    protected boolean checkIfRefreshTokenIsRequiredOnRefreshingToken(Request request) {
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(request);
+        return settings.issueRefreshTokenOnRefreshingToken();
     }
     public ClientVerifier getClientVerifier() throws OAuthProblemException {
         if (null == clientVerifier) {

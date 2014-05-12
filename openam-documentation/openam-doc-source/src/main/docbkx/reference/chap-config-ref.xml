@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-config-ref'
@@ -1632,6 +1632,17 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-issue-refresh-token</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Issue Refresh Tokens on Refreshing Access Tokens</term>
+    <listitem>
+     <para>Whether to issue a refresh token when refreshing an access
+     token.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-issue-refresh-token-on-refreshing-token</literal></para>
     </listitem>
    </varlistentry>
 
