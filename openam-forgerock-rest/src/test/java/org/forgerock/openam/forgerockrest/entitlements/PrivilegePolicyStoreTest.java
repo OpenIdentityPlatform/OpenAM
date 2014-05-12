@@ -142,7 +142,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet(), 0, 0);
+        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class PrivilegePolicyStoreTest {
         QueryRequest request = mockQueryRequest(alwaysTrue());
         List<Privilege> policies = Arrays.<Privilege>asList(
                 new StubPrivilege("one"), new StubPrivilege("two"), new StubPrivilege("three"));
-        given(mockManager.searchPrivileges(anySetOf(SearchFilter.class), anyInt(), anyInt())).willReturn(policies);
+        given(mockManager.searchPrivileges(anySetOf(SearchFilter.class))).willReturn(policies);
 
         // When
         List<Privilege> result = testStore.query(request);
@@ -182,7 +182,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(singleton(new SearchFilter(STRING_ATTRIBUTE, value)), 0, 0);
+        verify(mockManager).searchPrivileges(singleton(new SearchFilter(STRING_ATTRIBUTE, value)));
     }
 
     @DataProvider(name = "SupportedQueryOperators")
@@ -210,7 +210,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).searchPrivileges(singleton(
-                new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator)), 0, 0);
+                new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator)));
     }
 
     @DataProvider(name = "UnsupportedOperators")
@@ -256,7 +256,7 @@ public class PrivilegePolicyStoreTest {
         // Then
         // Date should be converted into a time-stamp long value
         verify(mockManager).searchPrivileges(
-                singleton(new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator)), 0, 0);
+                singleton(new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator)));
     }
 
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*not supported.*")
@@ -268,20 +268,6 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then - exception
-    }
-
-    @Test
-    public void shouldSupportQueryResultSizeLimits() throws Exception {
-        // Given
-        final int maxResults = 123;
-        QueryRequest request = mockQueryRequest(alwaysTrue());
-        given(request.getPageSize()).willReturn(maxResults);
-
-        // When
-        testStore.query(request);
-
-        // Then
-        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet(), maxResults, 0);
     }
 
     @Test
@@ -299,7 +285,7 @@ public class PrivilegePolicyStoreTest {
         // Then
         verify(mockManager).searchPrivileges(
                 asSet(new SearchFilter(STRING_ATTRIBUTE, value1),
-                        new SearchFilter(STRING_ATTRIBUTE, value2)), 0, 0);
+                        new SearchFilter(STRING_ATTRIBUTE, value2)));
     }
 
     @Test(expectedExceptions = EntitlementException.class, expectedExceptionsMessageRegExp = ".*'Or' not supported.*")

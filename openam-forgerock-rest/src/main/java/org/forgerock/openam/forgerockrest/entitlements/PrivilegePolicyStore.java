@@ -87,13 +87,11 @@ final class PrivilegePolicyStore implements PolicyStore {
             queryFilter = QueryFilter.alwaysTrue();
         }
 
-        int maxResults = request.getPageSize();
-
         try {
             Set<SearchFilter> searchFilters = queryFilter.accept(new PrivilegeQueryBuilder(queryAttributes),
                                                                  new HashSet<SearchFilter>());
 
-            return privilegeManager.searchPrivileges(searchFilters, maxResults, DEFAULT_QUERY_TIME_LIMIT_SECONDS);
+            return privilegeManager.searchPrivileges(searchFilters);
         } catch (UnsupportedOperationException ex) {
             throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER,
                     new Object[] { ex.getMessage() });

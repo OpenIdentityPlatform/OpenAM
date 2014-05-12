@@ -354,6 +354,7 @@ public class PolicyResourceTest {
                 new StubPrivilege("two")
         );
         given(mockStore.query(request)).willReturn(policies);
+        given(handler.handleResource(any(Resource.class))).willReturn(true);
 
         // When
         policyResource.queryCollection(mockServerContext, request, handler);

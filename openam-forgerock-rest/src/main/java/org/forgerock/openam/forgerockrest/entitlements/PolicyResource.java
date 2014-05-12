@@ -32,11 +32,13 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
@@ -215,17 +217,26 @@ public final class PolicyResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
         try {
+            handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
             List<Privilege> policies = policyStoreProvider.getPolicyStore(context).query(request);
 
+            int remaining = 0;
             if (policies != null) {
+                remaining = policies.size();
                 for (Privilege policy : policies) {
-                    handler.handleResource(policyResource(policy));
+                    boolean keepGoing = handler.handleResource(policyResource(policy));
+                    remaining--;
+                    if (!keepGoing) {
+                        break;
+                    }
                 }
             }
 
-            handler.handleResult(new QueryResult());
+            handler.handleResult(new QueryResult(null, remaining));
         } catch (EntitlementException ex) {
             handler.handleError(resourceErrorHandler.handleError(request, ex));
+        } catch (IllegalArgumentException ex) {
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
         }
     }
 
