@@ -38,7 +38,7 @@
  </listitem>
 </varlistentry>
 <varlistentry>
- <term><filename>license.txt</filename></term>
+ <term><filename>legal-notices</filename></term>
  <listitem>
   <para>Contains licensing information including third-party licenses</para>
  </listitem>
@@ -61,11 +61,11 @@
   <para>README file containing platform and install information for the agent</para>
  </listitem>
 </varlistentry>
-<varlistentry>
+<!--varlistentry>
  <term><filename>sampleapp</filename></term>
  <listitem>
   <para>Sample application that demonstrates key features of the policy
    agent. Wait until you have installed the agent to deploy this.</para>
  </listitem>
-</varlistentry>
+</varlistentry-->
 </variablelist>

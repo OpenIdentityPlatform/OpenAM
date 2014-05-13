@@ -30,7 +30,9 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
  <title>Protecting a Web Site With OpenAM</title>
 
  <para>You can get started with OpenAM using this chapter. Follow the steps in
@@ -790,15 +792,7 @@ $ <userinput>unzip ~/Downloads/apache_v22_Linux_agent*.zip</userinput>
     you provide the correct information to the installer as shown in the
     following example.</para>
 
-    <para>When you run the command, you will be prompted to read and accept the
-     software license agreement for the agent install. If you agree to its terms,
-     enter <literal>yes</literal> to continue the install.</para>
-
-    <para>You can suppress the license agreement prompt by including the
-     <option>--acceptLicense</option> option on the command line.
-     The inclusion of the option indicates that you have read and accepted
-     the terms stated in the license.
-     To view the license agreement, open <filename>license.txt</filename>.</para>
+   <xinclude:include  href="../shared/para-licensing-agreement-procedure.xml" />
 
        <screen>
 $ <userinput>cd /path/to/web_agents/apache22_agent/bin</userinput>

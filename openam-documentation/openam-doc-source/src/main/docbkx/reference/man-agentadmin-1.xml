@@ -113,7 +113,7 @@
      <para>Auto-accepts the software license agreement. If this option is present
       on the command line with the <option>--install</option> or <option>--custom-install</option>
       option, the license agreement prompt is suppressed and the agent install continues.
-      To view the license agreement, open <filename>license.txt</filename>.</para>
+      To view the license agreement, open <filename>&lt;server-root&gt;/legal-notices/license.txt</filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>

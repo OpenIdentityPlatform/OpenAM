@@ -110,15 +110,7 @@ $ <userinput>echo $JAVA_HOME</userinput>
     <para>Run <command>agentadmin --install</command> to install the
     agent.</para>
 
-    <para>When you run the command, you will be prompted to read and accept the
-     software license agreement for the agent installation. If you agree to its terms,
-     enter <literal>yes</literal> to continue.</para>
-
-    <para>You can suppress the license agreement prompt by including the
-     <option>--acceptLicense</option> option on the command line.
-     The inclusion of the option indicates that you have read and accepted
-     the terms stated in the license.
-     To view the license agreement, open <filename>license.txt</filename>.</para>
+    <xinclude:include  href="../shared/para-licensing-agreement-procedure.xml" />
 
     <screen>
 $ <userinput>/path/to/web_agents/sjsws_agent/bin/agentadmin --install --acceptLicense</userinput>

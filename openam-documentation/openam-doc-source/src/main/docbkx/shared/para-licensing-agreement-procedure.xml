@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<para xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+              xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+              xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+              xmlns:xlink='http://www.w3.org/1999/xlink'
+              xmlns:xinclude='http://www.w3.org/2001/XInclude'>When you run the command, you will be prompted to read and accept the
+  software license agreement for the agent installation.
+  You can suppress the license agreement prompt by including the
+  <option>--acceptLicense</option> option on the command line.
+  The inclusion of the option indicates that you have read and accepted
+  the terms stated in the license.
+  To view the license agreement, open <filename>&lt;server-root&gt;/legal-notices/license.txt</filename>.
+ </para>

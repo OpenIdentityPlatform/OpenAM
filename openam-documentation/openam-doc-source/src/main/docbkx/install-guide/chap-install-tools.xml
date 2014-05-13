@@ -345,12 +345,14 @@ $ <userinput>mkdir -p /path/to/openam-tools/config</userinput>
 $ <userinput>cd /path/to/openam-tools/config</userinput>
 $ <userinput>unzip ~/Downloads/openam/${ssoconfigZipFile}</userinput>
 <computeroutput>Archive:  ~/Downloads/openam/${ssoconfigZipFile}
-  inflating: README
-  inflating: sampleconfiguration
-  inflating: sampleupgrade
+   creating: legal-notices/
+  inflating: legal-notices/LICENSE.DOM-software.html
+  inflating: legal-notices/NOTICE.resolver.txt
+  inflating: legal-notices/LICENSE.DOM-documentation.html
+        ... (more output) ...
+ extracting: lib/xml-apis-2.11.0.jar
  extracting: ${ssoconfigJarFile}
- extracting: ${ssoconfigUpgradeJarFile}
-  inflating: license.txt</computeroutput>
+ extracting: lib/servlet-api-2.5.jar</computeroutput>
    </screen>
    </informalexample>
   </step>
