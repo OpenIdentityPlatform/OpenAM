@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.federation.services.util;
 
@@ -35,9 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,7 +69,6 @@ import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
-import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.federation.plugins.FederationSPAdapter;
@@ -85,9 +81,8 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.search.FileLookup;
 import com.sun.identity.shared.xml.XMLUtils;
-import javax.xml.XMLConstants;
+import org.w3c.dom.Node;
 
 /**
  * Util class to provide methods to manage ID-FF service.
@@ -400,12 +395,9 @@ public class FSServiceUtils {
      * @exception TransformerException, TransformerConfigurationException,
      *  FileNotFoundException
      */
-    public static String printDocument (org.w3c.dom.Node root)
-        throws TransformerException,
-        TransformerConfigurationException,
-        FileNotFoundException
-    {
-        TransformerFactory tf = TransformerFactory.newInstance();
+    public static String printDocument (Node root) throws TransformerException, TransformerConfigurationException,
+            FileNotFoundException {
+        TransformerFactory tf = XMLUtils.getTransformerFactory();
         Transformer transformer = tf.newTransformer();
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(root), new StreamResult(writer));
