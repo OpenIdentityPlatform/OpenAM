@@ -125,10 +125,26 @@
 
   <step>
    <para>
-    Activate the Session Persistence and High Availability Failover Enabled option.
+    To activate the Session Persistence and High Availability Failover option,
+    click the Enabled box.
    </para>
   </step>
 
+  <step>
+   <para>To enable crosstalk between OpenAM instances, click the Enabled box. This
+    ensures that OpenAM instances talk with each other to resolve any non-local
+    sessions, rather than using session persistence.</para>
+
+   <para>Note that if you have a large numbers of requests (for example, millions
+    of requests per hour), the crosstalk could adversely affect server performance
+    with the increase in network traffic.</para>
+
+   <para>If session persistence is enabled, the crosstalk option is not enabled by default.
+    If session persistence is <emphasis>not</emphasis> enabled, crosstalk is
+    automatically enabled by default. If both session persistence and crosstalk is enabled,
+    both features will be implemented, which could result in more network traffic.
+   </para>
+  </step>
   <step>
    <para>
     Click Add to save your work.
