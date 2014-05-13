@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.liberty.ws.interaction;
 
@@ -464,8 +464,7 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
             documentElement.setAttribute(LINK_LABEL, linkLabel);
             documentElement.setAttribute(MORE_LINK_LABEL, moreLinkLabel);
 
-            TransformerFactory transformerFactory 
-                    = TransformerFactory.newInstance();
+            TransformerFactory transformerFactory = XMLUtils.getTransformerFactory();
             DOMSource domSource = new DOMSource(doc);
             StreamResult streamResult = new StreamResult(out);
             Transformer transformer 

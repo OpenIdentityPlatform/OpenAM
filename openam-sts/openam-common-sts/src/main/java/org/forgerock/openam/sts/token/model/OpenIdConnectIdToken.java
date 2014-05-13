@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.token.model;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -27,7 +28,6 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
@@ -91,7 +91,7 @@ public class OpenIdConnectIdToken {
         } else {
             String tokenString = null;
             try {
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                 transformer.transform(new DOMSource(element), res);
                 tokenString = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());

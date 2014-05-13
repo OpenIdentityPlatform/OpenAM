@@ -21,30 +21,20 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.identity.shared.xml.XMLUtils;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
-import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.restlet.engine.header.Header;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import org.restlet.util.Series;
 import org.w3c.dom.Element;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.security.Principal;
-import java.util.Map;
 import org.slf4j.Logger;
 
 /**
@@ -117,7 +107,7 @@ public class AMTokenValidator implements TokenValidator {
                 return ((Element)token).getFirstChild().getNodeValue();
             } else {
                 try {
-                    Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                    Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
                     StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                     transformer.transform(new DOMSource(tokenElement), res);
                     String message = "Unexpected state: should be dealing with a DOM Element defining an AM session, but " +

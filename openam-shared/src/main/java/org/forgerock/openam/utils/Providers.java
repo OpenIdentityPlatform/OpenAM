@@ -58,4 +58,14 @@ public final class Providers {
     public static SAXParserProvider saxParserProvider(int maxSize) {
         return new PerThreadSAXParserProvider(new SafeSAXParserProvider(), maxSize);
     }
+
+    /**
+     * Gets a basic TransformerFactory instance that can be used to create new Transformer objects.
+     *
+     * @param maxSize The maximum size of the per-thread cache. Should be sized to match thread pool size.
+     * @return A per-thread caching, TransformerFactory provider.
+     */
+    public static TransformerFactoryProvider transformerFactoryProvider(final int maxSize) {
+        return new PerThreadTransformerFactoryProvider(maxSize);
+    }
 }

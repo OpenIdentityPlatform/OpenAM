@@ -1321,4 +1321,10 @@ public interface Constants {
      */
     public static final String AUTH_LEVEL_EXCLUDE_REQUIRED_REQUISITE
         = "org.forgerock.openam.authLevel.excludeRequiredOrRequisite";
+
+    /**
+     * Size of XML shared TransformerFactory cache.
+     */
+    public static final String XML_TRANSFORMER_FACTORY_CACHE_SIZE =
+            "org.forgerock.openam.utils.xml.transformerfactory.cache.size";
 }

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.rest.marshal;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -28,7 +29,6 @@ import javax.inject.Inject;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
@@ -56,7 +56,7 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
         if (TokenType.SAML2.equals(desiredTokenType)) {
             Transformer transformer = null;
             try {
-                transformer = TransformerFactory.newInstance().newTransformer();
+                transformer = XMLUtils.getTransformerFactory().newTransformer();
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                 transformer.transform(new DOMSource(tokenProviderResponse.getToken()), res);
                 String token = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());

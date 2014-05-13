@@ -30,7 +30,6 @@
 package com.sun.identity.wss.security;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.Set;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -85,10 +84,6 @@ import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.xmlenc.XMLEncryptionManager;
 import com.sun.identity.shared.encode.Base64;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.MimeHeaders;
@@ -433,21 +428,8 @@ public class WSSUtils {
         }
     }
 
-   public static String print(Node node) {
-       try {
-           TransformerFactory tFactory =
-                TransformerFactory.newInstance();
-           Transformer transformer = tFactory.newTransformer();
-           transformer.setOutputProperty("omit-xml-declaration", "yes");
-           DOMSource source = new DOMSource(node);
-           ByteArrayOutputStream os = new ByteArrayOutputStream(2000);
-           StreamResult result = new StreamResult(os);
-           transformer.transform(source, result);
-           return os.toString();
-       } catch (Exception ex) {
-           ex.printStackTrace();
-           return null;
-       }
+    public static String print(Node node) {
+        return XMLUtils.print(node);
     }
 
     public static Element prependChildElement(

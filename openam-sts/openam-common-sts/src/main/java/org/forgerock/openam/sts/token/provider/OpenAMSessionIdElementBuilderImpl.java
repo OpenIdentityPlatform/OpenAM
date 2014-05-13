@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.token.provider;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.ws.security.WSConstants;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -23,13 +24,11 @@ import org.forgerock.openam.sts.TokenMarshalException;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
@@ -78,7 +77,7 @@ public class OpenAMSessionIdElementBuilderImpl implements OpenAMSessionIdElement
         } else {
             String tokenString = null;
             try {
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                 transformer.transform(new DOMSource(element), res);
                 tokenString = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());

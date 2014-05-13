@@ -44,7 +44,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -74,6 +73,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.forgerock.openam.utils.TransformerFactoryProvider;
 
 
 
@@ -118,22 +118,34 @@ public class XMLUtils {
     /**
      * Size of document builder cache.
      */
-    private static final int DOCBUILDER_CACHE_SIZE = SystemPropertiesManager.getAsInt(Constants.XML_DOCUMENT_BUILDER_CACHE_SIZE, 500);
+    private static final int DOCBUILDER_CACHE_SIZE =
+            SystemPropertiesManager.getAsInt(Constants.XML_DOCUMENT_BUILDER_CACHE_SIZE, 500);
 
     /**
      * Size of the SAXParser cache. Defaults to same size as document builder cache.
      */
-    private static final int SAXPARSER_CACHE_SIZE = SystemPropertiesManager.getAsInt(Constants.XML_SAXPARSER_CACHE_SIZE, DOCBUILDER_CACHE_SIZE);
+    private static final int SAXPARSER_CACHE_SIZE =
+            SystemPropertiesManager.getAsInt(Constants.XML_SAXPARSER_CACHE_SIZE, DOCBUILDER_CACHE_SIZE);
+
+    private static final int TRANSFORMER_FACTORY_CACHE_SIZE =
+            SystemPropertiesManager.getAsInt(Constants.XML_TRANSFORMER_FACTORY_CACHE_SIZE, 500);
 
     /**
      * Provider for DocumentBuilder instances. Caches in an LRU cache per thread.
      */
-    private static final DocumentBuilderProvider DOCUMENT_BUILDER_PROVIDER = Providers.documentBuilderProvider(DOCBUILDER_CACHE_SIZE);
+    private static final DocumentBuilderProvider DOCUMENT_BUILDER_PROVIDER =
+            Providers.documentBuilderProvider(DOCBUILDER_CACHE_SIZE);
 
     /**
-     * Provider for SAXParse instances. Caches in a per-thread LRU cache.
+     * Provider for SAXParser instances. Caches in a per-thread LRU cache.
      */
     private static final SAXParserProvider SAX_PARSER_PROVIDER = Providers.saxParserProvider(SAXPARSER_CACHE_SIZE);
+
+    /**
+     * Provider for TransformerFactory instances. Caches in a per-thread LRU cache.
+     */
+    private static final TransformerFactoryProvider TRANSFORMER_FACTORY_PROVIDER =
+            Providers.transformerFactoryProvider(TRANSFORMER_FACTORY_CACHE_SIZE);
 
     public String getATTR_VALUE_PAIR_NODE() {
         return ATTR_VALUE_PAIR_NODE;
@@ -931,6 +943,15 @@ public class XMLUtils {
      */
     public static SAXParser getSafeSAXParser(boolean validating) throws ParserConfigurationException, SAXException {
         return SAX_PARSER_PROVIDER.getSAXParser(validating);
+    }
+
+    /**
+     * Provides a cached {@link TransformerFactory} instance for the current thread.
+     *
+     * @return A cached {@link TransformerFactory} instance.
+     */
+    public static TransformerFactory getTransformerFactory() {
+        return TRANSFORMER_FACTORY_PROVIDER.getTransformerFactory();
     }
 
     /**

@@ -24,10 +24,12 @@
  *
  * $Id: FAMSTSImpl.java,v 1.6 2010/01/15 18:54:35 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.wss.sts;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
@@ -67,7 +69,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 
 import org.w3c.dom.Document;
@@ -129,7 +130,7 @@ public class FAMSTSImpl extends BaseSTSImpl implements Provider<Source>{
        Element ele = null;
        try{
            DOMResult result = new DOMResult();
-           Transformer tf = TransformerFactory.newInstance().newTransformer();
+           Transformer tf = XMLUtils.getTransformerFactory().newTransformer();
            tf.transform(source, result);
 
            Node node = result.getNode();

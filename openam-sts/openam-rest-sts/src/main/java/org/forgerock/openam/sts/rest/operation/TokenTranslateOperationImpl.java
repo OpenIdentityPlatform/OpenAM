@@ -34,16 +34,13 @@ import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
 import org.forgerock.openam.sts.rest.marshal.TokenResponseMarshaller;
 import org.forgerock.openam.sts.rest.marshal.WebServiceContextFactory;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.WebServiceContext;
-import java.io.ByteArrayOutputStream;
-import java.util.*;
 
 import org.slf4j.Logger;
 

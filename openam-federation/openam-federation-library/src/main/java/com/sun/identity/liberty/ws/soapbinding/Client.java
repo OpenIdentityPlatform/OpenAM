@@ -24,19 +24,18 @@
  *
  * $Id: Client.java,v 1.6 2008/10/10 00:15:09 hengming Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
-
 package com.sun.identity.liberty.ws.soapbinding;
 
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
-import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.security.SecurityUtils;
 import com.sun.identity.saml.xmlsig.JKSKeyProvider;
 
-import java.io.FileInputStream;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +43,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import java.security.cert.X509Certificate;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.KeyStoreException;
@@ -62,11 +60,9 @@ import javax.net.ssl.X509KeyManager;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * The <code>Client</code> class provides web service clients with a method to
@@ -75,9 +71,7 @@ import org.w3c.dom.Node;
  * @supported.all.api
  */
 public class Client {
-    
-    private static TransformerFactory tfactory =
-            TransformerFactory.newInstance();
+
     private static KeyManager[] kms = null;
     private static TrustManager[] tms = null;
     private static X509KeyManager defaultX509km = null;
@@ -194,7 +188,7 @@ public class Client {
         OutputStream os = null;
         try {
             os = con.getOutputStream();
-            Transformer transformer = tfactory.newTransformer();
+            Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
             transformer.setOutputProperty("omit-xml-declaration", "yes");
             transformer.transform(new DOMSource(doc.getDocumentElement()),
                     new StreamResult(os));
