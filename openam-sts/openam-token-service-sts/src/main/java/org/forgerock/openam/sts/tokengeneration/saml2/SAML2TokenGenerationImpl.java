@@ -16,35 +16,33 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
-import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.xml.security.signature.XMLSignature;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.invocation.ProofTokenState;
 import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import static org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation;
+
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration
@@ -52,17 +50,24 @@ import java.util.List;
 public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
     private static final String DSA_PRIVATE_KEY_ALGORITHM = "DSA";
     private static final String RSA_PRIVATE_KEY_ALGORITHM = "RSA";
+    private static final boolean ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX = true;
+    private static final boolean ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX = true;
 
     private static final String DSA_DEFAULT_SIGNATURE_ALGORITHM = XMLSignature.ALGO_ID_SIGNATURE_DSA;
     private static final String RSA_DEFAULT_SIGNATURE_ALGORITHM = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
 
     private final SAML2AssertionSigner saml2AssertionSigner;
     private final StatementProvider statementProvider;
+    private final XMLUtilities xmlUtilities;
+    private final SSOTokenIdentity ssoTokenIdentity;
 
     @Inject
-    SAML2TokenGenerationImpl(SAML2AssertionSigner saml2AssertionSigner, StatementProvider statementProvider) {
+    SAML2TokenGenerationImpl(SAML2AssertionSigner saml2AssertionSigner, StatementProvider statementProvider,
+                             XMLUtilities xmlUtilities, SSOTokenIdentity ssoTokenIdentity) {
         this.saml2AssertionSigner = saml2AssertionSigner;
         this.statementProvider = statementProvider;
+        this.xmlUtilities = xmlUtilities;
+        this.ssoTokenIdentity = ssoTokenIdentity;
         /*
         Initialize the santuario library context. Multiple calls to this method are idempotent.
          */
@@ -70,42 +75,45 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
     }
 
     /*
-    TODO: what about invocation-specified claims - do I want to support this?
+    For now, a set of claims specified in the invocation will not be supported. In other words, in the standard WS-Trust
+    model, the SecurityPolicy bindings in a web-service wsdl can specify that a token must be obtained from an STS, and,
+    furthermore, that a given set of claims should be included in the token. Thus the RequestSecurityToken handled by
+    a WS-Trust STS allows for the specification of a set of claims. The CXF-STS handles these claims, rejecting them
+    if no handler for a given claim has been registered. If I want to support this model all the way through to the
+     TokenGenerationService, then I would have to allow for claims specification in the TokenGenerationInvocationState.
+     I will not add this support for now, as the ability to publish a set of STS instances, each with a distinct set
+     of attribute mappings, may well accommodate any needs around the flexible inclusion of claims. Furthermore, adding
+     invocation parameters supporting the relatively complicated attribute mapping strings (static and binary attr support)
+     may make the API a bit unwieldy, and this attribute format does not map to the claims as defined in WS-Trust and
+     implemented in the CXF-STS.
      */
     public String generate(SSOToken subjectToken, STSInstanceState stsInstanceState,
-                               TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation,
-                               List<String> invocationClaims, String audienceId) throws TokenCreationException {
+                               TokenGenerationServiceInvocationState invocationState) throws TokenCreationException {
 
         final SAML2Config saml2Config = stsInstanceState.getConfig().getSaml2Config();
-        final String subjectId = getSubjectId(subjectToken);
+        final String subjectId = ssoTokenIdentity.validateAndGetTokenPrincipal(subjectToken);
         final Assertion assertion = AssertionFactory.getInstance().createAssertion();
         setVersionAndId(assertion);
         setIssuer(assertion, stsInstanceState.getConfig());
 
         final Date issueInstant = new Date();
         setIssueInstant(assertion, issueInstant);
-        setConditions(assertion, statementProvider, saml2Config, issueInstant, subjectConfirmation);
-        setSubject(assertion, subjectId, audienceId, statementProvider, saml2Config, subjectConfirmation, issueInstant);
-        setAuthenticationStatements(assertion, statementProvider, saml2Config);
-        setAttributeStatements(assertion, subjectToken, statementProvider, saml2Config);
-        //TODO: add check in TokenGenerationServiceInvocationState to toggle assertion signing
-        return signAssertion(assertion, stsInstanceState);
-    }
+        setConditions(assertion, saml2Config, issueInstant, invocationState.getSaml2SubjectConfirmation());
+        setSubject(assertion, subjectId, invocationState.getSpAcsUrl(), saml2Config,
+                invocationState.getSaml2SubjectConfirmation(), issueInstant, invocationState.getProofTokenState());
+        setAuthenticationStatements(assertion, saml2Config, invocationState.getAuthnContextClassRef());
+        setAttributeStatements(assertion, subjectToken, saml2Config);
+        setAuthzDecisionStatements(assertion, subjectToken, saml2Config);
 
-    private String getSubjectId(SSOToken subjectToken) throws TokenCreationException {
-        try {
-            if (SSOTokenManager.getInstance().isValidToken(subjectToken)) {
-                return IdUtils.getIdentity(subjectToken).getName();
-            } else {
+        if (invocationState.getSignAssertion()) {
+            return signAssertion(assertion, stsInstanceState);
+        } else {
+            try {
+                return assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
+            } catch (SAML2Exception e) {
                 throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                        "SSOToken corresponding to subject identity is invalid.");
+                        "Exception caught calling Assertion.toXMLString: " + e, e);
             }
-        } catch (SSOException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught getting identity from subject SSOToken in SAML2TokenGenerationImpl: " + e, e);
-        } catch (IdRepoException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught getting identity from subject SSOToken in SAML2TokenGenerationImpl: " + e, e);
         }
     }
 
@@ -117,7 +125,6 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught setting version and/or id in SAML2TokenGenerationImpl: " + e, e);
         }
-
     }
 
     private void setIssuer(Assertion assertion, STSInstanceConfig config) throws TokenCreationException {
@@ -140,9 +147,9 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         }
     }
 
-    private void setConditions(Assertion assertion, StatementProvider statementProvider, SAML2Config saml2Config,
+    private void setConditions(Assertion assertion, SAML2Config saml2Config,
                                Date issueInstant,
-                               TokenGenerationServiceInvocationState.SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException {
+                               SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException {
         try {
             assertion.setConditions(statementProvider.getConditionsProvider(saml2Config).get(saml2Config, issueInstant, saml2SubjectConfirmation));
         } catch (SAML2Exception e) {
@@ -150,37 +157,43 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
                     "Exception caught setting conditions in SAML2TokenGenerationImpl: " + e, e);
         }
     }
-    private void setSubject(Assertion assertion, String subjectId, String audienceId, StatementProvider statementProvider,
-                            SAML2Config saml2Config, TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation,
-                            Date assertionIssueInstant) throws TokenCreationException {
+    private void setSubject(Assertion assertion, String subjectId, String spAcsUrl, SAML2Config saml2Config,
+                            SAML2SubjectConfirmation subjectConfirmation,
+                            Date assertionIssueInstant, ProofTokenState proofTokenState) throws TokenCreationException {
         try {
-            assertion.setSubject(statementProvider.getSubjectProvider(saml2Config).get(subjectId, audienceId, saml2Config,
-                    subjectConfirmation, assertionIssueInstant));
+            assertion.setSubject(statementProvider.getSubjectProvider(saml2Config).get(subjectId, spAcsUrl, saml2Config,
+                    subjectConfirmation, assertionIssueInstant, proofTokenState));
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught setting subject in SAML2TokenGenerationImpl: " + e, e);
         }
     }
 
-    private void setAuthenticationStatements(Assertion assertion, StatementProvider statementProvider, SAML2Config saml2Config) throws TokenCreationException {
+    private void setAuthenticationStatements(Assertion assertion, SAML2Config saml2Config, String authnContextClassRef) throws TokenCreationException {
         try {
-            assertion.setAuthnStatements(statementProvider.getAuthenticationStatementsProvider(saml2Config).get(saml2Config));
+            assertion.setAuthnStatements(statementProvider.getAuthenticationStatementsProvider(saml2Config).get(saml2Config, authnContextClassRef));
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught setting authentication statement in SAML2TokenGenerationImpl: " + e, e);
         }
     }
 
-    private void setAttributeStatements(Assertion assertion, SSOToken token, StatementProvider statementProvider, SAML2Config saml2Config) throws TokenCreationException {
+    private void setAttributeStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
         assertion.getAttributeStatements().addAll(
                 statementProvider.getAttributeStatementsProvider(saml2Config).get(
                         token, saml2Config, statementProvider.getAttributeMapper(saml2Config)));
     }
 
+    private void setAuthzDecisionStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
+        assertion.getAuthzDecisionStatements().addAll(
+                statementProvider.getAuthzDecisionStatementsProvider(saml2Config).get(token, saml2Config));
+    }
+
     private String signAssertion(Assertion assertion, STSInstanceState instanceState) throws TokenCreationException {
-        Document assertionDocument = null;
+        Document assertionDocument;
         try {
-            assertionDocument = XMLUtils.toDOMDocument(assertion.toXMLString(true, true), null); //TODO: define constants for all - possibly non-null debug
+            assertionDocument = xmlUtilities.stringToDocumentConversion(
+                    assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX));
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught obtaining String representation of Assertion in SAML2TokenGenerationImpl: " + e, e);
@@ -191,7 +204,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         }
         final STSKeyProvider stsKeyProvider = instanceState.getKeyProvider();
         final KeystoreConfig keystoreConfig = instanceState.getConfig().getKeystoreConfig();
-        String signatureKeyPassword = null;
+        String signatureKeyPassword;
         try {
             signatureKeyPassword = new String(keystoreConfig.getSignatureKeyPassword(), AMSTSConstants.UTF_8_CHARSET_ID);
         } catch (UnsupportedEncodingException e) {
@@ -212,7 +225,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
                         stsKeyProvider.getX509Certificate(keystoreConfig.getSignatureKeyAlias()),
                         signatureAlgorithm,
                         instanceState.getConfig().getSaml2Config().getCanonicalizationAlgorithm());
-        return XMLUtils.print(signatureElement.getOwnerDocument().getDocumentElement(), AMSTSConstants.UTF_8_CHARSET_ID);
+        return xmlUtilities.documentToStringConversion(signatureElement.getOwnerDocument().getDocumentElement());
     }
 
     private String getSignatureAlgorithm(SAML2Config sam2Config, PrivateKey privateKey) throws TokenCreationException {
@@ -226,8 +239,5 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                 "Unexpected PrivateKey algorithm encountered in SAML2TokenGenerationImpl: " + privateKey.getAlgorithm());
-
-
     }
-
 }

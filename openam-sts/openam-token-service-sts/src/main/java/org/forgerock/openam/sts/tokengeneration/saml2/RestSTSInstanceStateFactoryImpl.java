@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 
@@ -32,7 +33,7 @@ public class RestSTSInstanceStateFactoryImpl implements RestSTSInstanceStateFact
         this.keyProviderFactory = keyProviderFactory;
     }
 
-    public RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config) {
+    public RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config) throws TokenCreationException {
         return new RestSTSInstanceState(config, keyProviderFactory.createSTSKeyProvider(config.getKeystoreConfig()));
     }
 }

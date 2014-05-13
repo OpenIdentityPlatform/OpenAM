@@ -18,29 +18,42 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 
 import static org.testng.Assert.assertTrue;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditionsProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
 import org.testng.annotations.Test;
 
 public class StatementProviderImplTest {
+    class MyModule extends AbstractModule {
+        @Override
+        protected void configure() {
+            bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);
+            bind(StatementProvider.class).to(StatementProviderImpl.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+        }
+    }
+
     @Test
     public void testCustomProvider() throws TokenCreationException {
         SAML2Config config = SAML2Config.builder()
-                            .authenticationContext("fauxAuthenticationContext")
                             .customConditionsProviderClassName("org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditionsProvider")
                             .build();
-        StatementProvider statementProvider = new StatementProviderImpl();
+        StatementProvider statementProvider = Guice.createInjector(new MyModule()).getInstance(StatementProvider.class);
         assertTrue(statementProvider.getConditionsProvider(config) instanceof DefaultConditionsProvider);
     }
 
     @Test(expectedExceptions = TokenCreationException.class)
     public void testSpeciousProvider() throws TokenCreationException {
         SAML2Config config = SAML2Config.builder()
-                .authenticationContext("fauxAuthenticationContext")
                 .customConditionsProviderClassName("faux_class_name")
                 .build();
-        StatementProvider statementProvider = new StatementProviderImpl();
+        StatementProvider statementProvider = Guice.createInjector(new MyModule()).getInstance(StatementProvider.class);
         statementProvider.getConditionsProvider(config);
     }
 }

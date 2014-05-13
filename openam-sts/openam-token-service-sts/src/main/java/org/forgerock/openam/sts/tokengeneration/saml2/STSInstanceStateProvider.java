@@ -17,6 +17,8 @@
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
 
+import org.forgerock.openam.sts.TokenCreationException;
+
 /**
  * Defines concern related to obtaining the STSInstanceConfig state corresponding to the sts instance identifier.
  * Allows a single token-generation-service to generate STS-instance-specific tokens.
@@ -24,5 +26,5 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
  * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
  */
 public interface STSInstanceStateProvider<T> {
-    T getSTSInstanceState(String instanceId);
+    T getSTSInstanceState(String instanceId) throws TokenCreationException;
 }

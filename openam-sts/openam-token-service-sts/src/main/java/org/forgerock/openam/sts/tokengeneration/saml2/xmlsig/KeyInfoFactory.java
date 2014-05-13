@@ -16,67 +16,24 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
-import com.sun.identity.shared.xml.XMLUtils;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.message.WSSecEncryptedKey;
-
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.keys.content.X509Data;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.security.cert.X509Certificate;
 
 /**
- * This class provides methods to generate santuario KeyInfo instances corresponding to symmetric and public keys.
- * TODO: all this needs to be tested and validated. Also look at SAML2Token.createKeyInfo. This class is currently
- * not used, and was intended for use in creating the KeyInfo elements associated with HoK subject confirmations. Issuing
- * HoK assertions will happen in the next sprint, and these issues, and the fate of this class, will be resolved.
+ * This interface defines the concern around obtaining the KeyInfo element in the SubjectConfirmationData
+ * element for SAML2 assertions issued with HolderOfKey SubjectConfirmation
  */
-public class KeyInfoFactory {
-    /*
-    Passed to XMLUtils.getSafeDocumentBuilder to get a non-validating parser
+public interface KeyInfoFactory {
+    /**
+     *
+     * @param recipientCert The cert, passed in the invocation to the TokenGenerationService, for which KeyInfo will
+     *                      be generated for inclusion in the SubjectConfirmationData for HoK assertions.
+     * @return The KeyInfo Element
+     * @throws ParserConfigurationException
+     * @throws XMLSecurityException
      */
-    private static final boolean NON_VALIDATING_PARSER = false;
-    public KeyInfo generateSymmetricKeyInfo(
-                                        X509Certificate recipientCert,
-                                        byte[] secret,
-                                        int keyIdentifierType,
-                                        String symmetricEncryptionAlgorithm,
-                                        String keyWrapAlgorithm,
-                                        Crypto encryptionCrypto) throws ParserConfigurationException, WSSecurityException {
-
-        Document doc = XMLUtils.getSafeDocumentBuilder(NON_VALIDATING_PARSER).newDocument();
-        WSSecEncryptedKey encrKey = new WSSecEncryptedKey();
-        encrKey.setKeyIdentifierType(keyIdentifierType);
-        encrKey.setEphemeralKey(secret);
-        encrKey.setSymmetricEncAlgorithm(symmetricEncryptionAlgorithm);
-        encrKey.setUseThisCert(recipientCert);
-        encrKey.setKeyEncAlgo(keyWrapAlgorithm);
-        encrKey.prepare(doc, encryptionCrypto);
-        Element encryptedKeyElement = encrKey.getEncryptedKeyElement();
-
-        Element keyInfoElement =
-                doc.createElementNS(
-                        WSConstants.SIG_NS, WSConstants.SIG_PREFIX + ":" + WSConstants.KEYINFO_LN
-                );
-        keyInfoElement.setAttributeNS(
-                WSConstants.XMLNS_NS, "xmlns:" + WSConstants.SIG_PREFIX, WSConstants.SIG_NS
-        );
-        keyInfoElement.appendChild(encryptedKeyElement);
-
-        return new KeyInfo(doc);
-    }
-
-    public KeyInfo generatePublicKeyInfo(X509Certificate recipientCert) throws ParserConfigurationException, XMLSecurityException {
-        X509Data x509Data = new X509Data(XMLUtils.getSafeDocumentBuilder(NON_VALIDATING_PARSER).newDocument());
-        x509Data.addCertificate(recipientCert);
-        KeyInfo keyInfo = new KeyInfo(XMLUtils.getSafeDocumentBuilder(NON_VALIDATING_PARSER).newDocument());
-        keyInfo.add(x509Data);
-        return keyInfo;
-    }
+    public Element generatePublicKeyInfo(X509Certificate recipientCert) throws ParserConfigurationException, XMLSecurityException;
 }

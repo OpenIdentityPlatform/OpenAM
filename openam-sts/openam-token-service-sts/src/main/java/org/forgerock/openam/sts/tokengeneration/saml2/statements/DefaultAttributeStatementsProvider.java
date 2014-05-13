@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.AttributeStatement;
 import com.sun.identity.saml2.common.SAML2Exception;
 import org.forgerock.json.resource.ResourceException;
@@ -25,12 +26,11 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider
- * TODO: do we really need to generate multiple AttributeStatements? What does the IDP/SP SAML gen do? IDPSSOUtil only provides a single
- * AttributeStatement - perhaps I should do the same...
  */
 public class DefaultAttributeStatementsProvider implements AttributeStatementsProvider {
     /**
@@ -40,7 +40,12 @@ public class DefaultAttributeStatementsProvider implements AttributeStatementsPr
     public List<AttributeStatement> get(SSOToken ssoToken, SAML2Config saml2Config, AttributeMapper mapper) throws TokenCreationException {
         AttributeStatement attributeStatement = AssertionFactory.getInstance().createAttributeStatement();
         try {
-            attributeStatement.setAttribute(mapper.getAttributes(ssoToken, saml2Config.getAttributeMap()));
+            List<Attribute> attributeList = mapper.getAttributes(ssoToken, saml2Config.getAttributeMap());
+            if (attributeList.isEmpty()) {
+                return Collections.emptyList();
+            } else {
+                attributeStatement.setAttribute(attributeList);
+            }
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught setting attributes in DefaultAttributeStatementsProvider: " + e, e);

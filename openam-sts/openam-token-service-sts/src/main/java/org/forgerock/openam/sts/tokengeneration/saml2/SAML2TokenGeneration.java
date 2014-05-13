@@ -17,9 +17,7 @@
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.saml2.assertion.Assertion;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 
 import java.util.List;
@@ -37,15 +35,10 @@ public interface SAML2TokenGeneration {
      *
      * @param subjectToken The SSOToken authenticating the identity of the subject of the assertion
      * @param stsInstanceState The STS-instance-specific state necessary to generate the assertion
-     * @param subjectConfirmation The subject confirmation method for the issued assertion
-     * @param invocationClaims TODO: the WS-TRUST STS provides for claims to be specified in the invocation - should this be supported?
-     * @param audienceId The ultimate consumer of the assertion.
+     * @param invocationState The parameters with which the TokenGenerationService was invoked.
      * @return The String representation of the assertion
      * @throws TokenCreationException
      */
     String generate(SSOToken subjectToken, STSInstanceState stsInstanceState,
-                       TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation,
-                       List<String> invocationClaims, String audienceId) throws TokenCreationException;
-
-
+                    TokenGenerationServiceInvocationState invocationState) throws TokenCreationException;
 }

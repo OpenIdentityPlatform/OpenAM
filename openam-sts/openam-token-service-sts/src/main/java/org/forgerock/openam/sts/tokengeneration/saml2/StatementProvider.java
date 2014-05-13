@@ -21,6 +21,7 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthenticationStatementsProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthzDecisionStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider;
 
@@ -64,6 +65,15 @@ public interface StatementProvider {
      * @throws TokenCreationException
      */
     AttributeStatementsProvider getAttributeStatementsProvider(SAML2Config saml2Config) throws TokenCreationException;
+
+    /**
+     *
+     * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
+     * @return The AuthzDecisionStatementsProvider instance which will be invoked to obtain the AuthzDecisionStatements included in the generated SAML2
+     * assertion
+     * @throws TokenCreationException
+     */
+    AuthzDecisionStatementsProvider getAuthzDecisionStatementsProvider(SAML2Config saml2Config) throws TokenCreationException;
 
     /**
      *

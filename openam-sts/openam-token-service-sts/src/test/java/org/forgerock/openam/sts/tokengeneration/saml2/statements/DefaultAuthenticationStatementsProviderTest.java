@@ -34,7 +34,7 @@ public class DefaultAuthenticationStatementsProviderTest {
     @Test
     public void testAuthNContext() throws TokenCreationException {
         AuthenticationStatementsProvider provider = new DefaultAuthenticationStatementsProvider();
-        List<AuthnStatement> statements = provider.get(createSAML2Config());
+        List<AuthnStatement> statements = provider.get(createSAML2Config(), AUTHN_CONTEXT);
         assertTrue(AUTHN_CONTEXT.equals(statements.get(0).getAuthnContext().getAuthnContextClassRef()));
     }
 
@@ -45,7 +45,6 @@ public class DefaultAuthenticationStatementsProviderTest {
         List<String> audiences = new ArrayList<String>();
         audiences.add("http://macbook.dirk.internal.forgerock.com:8080/openam/sp");
         return SAML2Config.builder()
-                .authenticationContext(AUTHN_CONTEXT)
                 .attributeMap(attributeMap)
                 .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                 .audiences(audiences)

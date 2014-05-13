@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
+import org.forgerock.openam.sts.TokenCreationException;
+
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
@@ -27,6 +29,6 @@ import java.security.cert.X509Certificate;
  * class' encryption scheme, as these key passwords will be stored in LDAP.
  */
 public interface STSKeyProvider {
-    X509Certificate getX509Certificate(String certAlias);
-    PrivateKey getPrivateKey(String keyAlias, String keyPassword);
+    X509Certificate getX509Certificate(String certAlias) throws TokenCreationException;
+    PrivateKey getPrivateKey(String keyAlias, String keyPassword) throws TokenCreationException;
 }

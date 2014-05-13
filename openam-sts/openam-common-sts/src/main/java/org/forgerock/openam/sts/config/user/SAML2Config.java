@@ -33,7 +33,7 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
- * TODO: document usage, constraints, etc. Ambiguity in the context of setting the customAttributeStatementsProviderClassName
+ * TODO: Ambiguity in the context of setting the customAttributeStatementsProviderClassName
  * and the customAttributeMapperClassName. As it currently stands, the customAttributeStatementsProvider will be passed
  * an instance of the customAttributeMapper if both are specified. The usual case will simply to set the customAttributeMapper,
  * as this allows custom attributes to be set in the AttributeStatement.
@@ -42,7 +42,6 @@ import static org.forgerock.json.fluent.JsonValue.object;
  */
 public class SAML2Config {
     public static class SAML2ConfigBuilder {
-        private String authenticationContext;
         private String nameIdFormat = SAML2Constants.UNSPECIFIED;
         private Map<String, String> attributeMap;
         private long tokenLifetimeInSeconds = 60 * 10; //default token lifetime is 10 minutes
@@ -56,15 +55,10 @@ public class SAML2Config {
         private String customSubjectProviderClassName;
         private String customAuthenticationStatementsProviderClassName;
         private String customAttributeStatementsProviderClassName;
+        private String customAuthzDecisionStatementsProviderClassName;
         private String customAttributeMapperClassName;
         private String canonicalizationAlgorithm = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
         private String signatureAlgorithm;
-
-        public SAML2ConfigBuilder authenticationContext(String authenticationContext) {
-            //TODO - test to see if it matches one of the allowed values?
-            this.authenticationContext = authenticationContext;
-            return this;
-        }
 
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?
@@ -83,7 +77,7 @@ public class SAML2Config {
         }
 
         public SAML2ConfigBuilder audiences(List<String> audiences) {
-            this.audiences = new ArrayList(audiences);
+            this.audiences = new ArrayList<String>(audiences);
             return this;
         }
 
@@ -107,6 +101,11 @@ public class SAML2Config {
             return this;
         }
 
+        public SAML2ConfigBuilder customAuthzDecisionStatementsProviderClassName(String customAuthzDecisionStatementsProviderClassName) {
+            this.customAuthzDecisionStatementsProviderClassName = customAuthzDecisionStatementsProviderClassName;
+            return this;
+        }
+
         public SAML2ConfigBuilder customAttributeMapperClassName(String customAttributeMapperClassName) {
             this.customAttributeMapperClassName = customAttributeMapperClassName;
             return this;
@@ -117,6 +116,13 @@ public class SAML2Config {
             return this;
         }
 
+        /*
+        See comments in SAML2AssertionSigner class about the ultimate validation of the correctness of this specification.
+        One issue with maintaining a static map of valid values is that the xmlsec package allows for the dynamic registration
+        of handlers for new signature specification types. It could make sense to new up an instance of the
+        org.apache.xml.security.algorithms.SignatureAlgorithm class with the specified algorithm, but this is a bit hacky,
+        and requires a Document parameter as well. The allows set of algorithms is probably best handled in documentation.
+         */
         public SAML2ConfigBuilder signatureAlgorithm(String signatureAlgorithm) {
             this.signatureAlgorithm = signatureAlgorithm;
             return this;
@@ -129,7 +135,6 @@ public class SAML2Config {
     /*
     Define the names of fields to aid in json marshalling.
      */
-    private static final String AUTHENTICATION_CONTEXT = "authenticationContext";
     private static final String NAME_ID_FORMAT = "nameIdFormat";
     private static final String ATTRIBUTE_MAP = "attributeMap";
     private static final String TOKEN_LIFETIME = "tokenLifetime";
@@ -138,11 +143,11 @@ public class SAML2Config {
     private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "customSubjectProviderClass";
     private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "customAttributeStatementsProviderClass";
     private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS = "customAuthenticationStatementsProviderClass";
+    private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "customAuthzDecisionStatementsProviderClass";
     private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "customAttributeMapperClass";
     private static final String SIGNATURE_ALGORITHM = "signatureAlgorithm";
     private static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";
 
-    private final String authenticationContext;
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
     private final long tokenLifetimeInSeconds;
@@ -151,13 +156,12 @@ public class SAML2Config {
     private final String customSubjectProviderClassName;
     private final String customAuthenticationStatementsProviderClassName;
     private final String customAttributeStatementsProviderClassName;
+    private final String customAuthzDecisionStatementsProviderClassName;
     private final String customAttributeMapperClassName;
     private final String signatureAlgorithm;
     private final String canonicalizationAlgorithm;
 
     private SAML2Config(SAML2ConfigBuilder builder) {
-        this.authenticationContext = builder.authenticationContext;
-        Reject.ifNull(authenticationContext, "Authentication context cannot be null");
         this.nameIdFormat = builder.nameIdFormat; //not required so don't reject if null
         if (builder.attributeMap != null) {
             this.attributeMap = Collections.unmodifiableMap(builder.attributeMap);
@@ -173,6 +177,7 @@ public class SAML2Config {
         customConditionsProviderClassName = builder.customConditionsProviderClassName;
         customSubjectProviderClassName = builder.customSubjectProviderClassName;
         customAuthenticationStatementsProviderClassName = builder.customAuthenticationStatementsProviderClassName;
+        customAuthzDecisionStatementsProviderClassName = builder.customAuthzDecisionStatementsProviderClassName;
         customAttributeStatementsProviderClassName = builder.customAttributeStatementsProviderClassName;
         customAttributeMapperClassName = builder.customAttributeMapperClassName;
         signatureAlgorithm = builder.signatureAlgorithm;
@@ -187,10 +192,6 @@ public class SAML2Config {
 
     public static SAML2ConfigBuilder builder() {
         return new SAML2ConfigBuilder();
-    }
-
-    public String getAuthenticationContext() {
-        return authenticationContext;
     }
 
     public String getNameIdFormat() {
@@ -229,6 +230,10 @@ public class SAML2Config {
         return customAttributeStatementsProviderClassName;
     }
 
+    public String getCustomAuthzDecisionStatementsProviderClassName() {
+        return customAuthzDecisionStatementsProviderClassName;
+    }
+
     public String getCanonicalizationAlgorithm() {
         return canonicalizationAlgorithm;
     }
@@ -241,7 +246,6 @@ public class SAML2Config {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("SAML2Config instance:").append('\n');
-        sb.append('\t').append("authenticationContext: ").append(authenticationContext).append('\n');
         sb.append('\t').append("nameIDFormat: ").append(nameIdFormat).append('\n');
         sb.append('\t').append("attributeMap: ").append(attributeMap).append('\n');
         sb.append('\t').append("audiences: ").append(audiences).append('\n');
@@ -251,6 +255,7 @@ public class SAML2Config {
         sb.append('\t').append("customAttributeStatementsProviderClassName: ").append(customAttributeStatementsProviderClassName).append('\n');
         sb.append('\t').append("customAttributeMapperClassName: ").append(customAttributeMapperClassName).append('\n');
         sb.append('\t').append("customAuthenticationStatementsProviderClassName: ").append(customAuthenticationStatementsProviderClassName).append('\n');
+        sb.append('\t').append("customAuthzDecisionStatementsProviderClassName: ").append(customAuthzDecisionStatementsProviderClassName).append('\n');
         sb.append('\t').append("signatureAlgorithm: ").append(signatureAlgorithm).append('\n');
         sb.append('\t').append("canonicalizationAlgorithm: ").append(canonicalizationAlgorithm).append('\n');
         return sb.toString();
@@ -260,8 +265,7 @@ public class SAML2Config {
     public boolean equals(Object other) {
         if (other instanceof SAML2Config) {
             SAML2Config otherConfig = (SAML2Config)other;
-            return authenticationContext.equals(otherConfig.getAuthenticationContext()) &&
-                    nameIdFormat.equals(otherConfig.getNameIdFormat()) &&
+            return nameIdFormat.equals(otherConfig.getNameIdFormat()) &&
                     tokenLifetimeInSeconds == otherConfig.tokenLifetimeInSeconds &&
                     attributeMap.equals(otherConfig.attributeMap) &&
                     audiences.equals(otherConfig.audiences) &&
@@ -274,6 +278,9 @@ public class SAML2Config {
                     (customAttributeStatementsProviderClassName != null
                         ? customAttributeStatementsProviderClassName.equals(otherConfig.getCustomAttributeStatementsProviderClassName())
                         : otherConfig.getCustomAttributeStatementsProviderClassName() == null) &&
+                    (customAuthzDecisionStatementsProviderClassName != null
+                            ? customAuthzDecisionStatementsProviderClassName.equals(otherConfig.getCustomAuthzDecisionStatementsProviderClassName())
+                            : otherConfig.getCustomAuthzDecisionStatementsProviderClassName() == null) &&
                     (customAttributeMapperClassName != null
                             ? customAttributeMapperClassName.equals(otherConfig.getCustomAttributeMapperClassName())
                             : otherConfig.getCustomAttributeMapperClassName() == null) &&
@@ -292,11 +299,11 @@ public class SAML2Config {
 
     @Override
     public int hashCode() {
-        return (authenticationContext + nameIdFormat + attributeMap + audiences + canonicalizationAlgorithm + Long.toString(tokenLifetimeInSeconds)).hashCode();
+        return (nameIdFormat + attributeMap + audiences + canonicalizationAlgorithm + Long.toString(tokenLifetimeInSeconds)).hashCode();
     }
 
     public JsonValue toJson() {
-        JsonValue jsonValue = json(object(field(AUTHENTICATION_CONTEXT, authenticationContext),
+        JsonValue jsonValue = json(object(
                 field(NAME_ID_FORMAT, nameIdFormat),
                 field(TOKEN_LIFETIME, tokenLifetimeInSeconds),
                 field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
@@ -304,6 +311,7 @@ public class SAML2Config {
                 field(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS, customAttributeStatementsProviderClassName),
                 field(CUSTOM_ATTRIBUTE_MAPPER_CLASS, customAttributeMapperClassName),
                 field(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, customAuthenticationStatementsProviderClassName),
+                field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
                 field(SIGNATURE_ALGORITHM, signatureAlgorithm),
                 field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm)));
 
@@ -321,14 +329,14 @@ public class SAML2Config {
 
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
         SAML2ConfigBuilder builder = SAML2Config.builder()
-                .authenticationContext(json.get(AUTHENTICATION_CONTEXT).asString())
                 .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
-                .tokenLifetimeInSeconds(json.get(TOKEN_LIFETIME).asLong().longValue())
+                .tokenLifetimeInSeconds(json.get(TOKEN_LIFETIME).asLong())
                 .customConditionsProviderClassName(json.get(CUSTOM_CONDITIONS_PROVIDER_CLASS).asString())
                 .customSubjectProviderClassName(json.get(CUSTOM_SUBJECT_PROVIDER_CLASS).asString())
                 .customAttributeStatementsProviderClassName(json.get(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS).asString())
                 .customAttributeMapperClassName(json.get(CUSTOM_ATTRIBUTE_MAPPER_CLASS).asString())
                 .customAuthenticationStatementsProviderClassName(json.get(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS).asString())
+                .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
                 .signatureAlgorithm(json.get(SIGNATURE_ALGORITHM).asString())
                 .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString());
 

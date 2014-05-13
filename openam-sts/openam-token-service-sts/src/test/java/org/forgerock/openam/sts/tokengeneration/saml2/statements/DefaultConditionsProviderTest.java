@@ -75,7 +75,6 @@ public class DefaultConditionsProviderTest {
             List<String> audiences = new ArrayList<String>();
             audiences.add(AM_SP_AUDIENCE);
             return builder
-                    .authenticationContext("urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport")
                     .attributeMap(attributeMap)
                     .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                     .audiences(audiences)
@@ -83,7 +82,6 @@ public class DefaultConditionsProviderTest {
                     .build();
         } else {
             return builder
-                    .authenticationContext("urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport")
                     .attributeMap(attributeMap)
                     .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                     .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)

@@ -14,14 +14,20 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
+package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 
-import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.saml2.assertion.AuthzDecisionStatement;
+import org.forgerock.openam.sts.config.user.SAML2Config;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Defines concern related to obtaining an instance of the STSKeyProvider class.
+ * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthzDecisionStatementsProvider
  */
-public interface STSKeyProviderFactory {
-    STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException;
+public class DefaultAuthzDecisionStatementsProvider implements AuthzDecisionStatementsProvider{
+    public List<AuthzDecisionStatement> get(SSOToken ssoToken, SAML2Config config) {
+        return Collections.emptyList();
+    }
 }

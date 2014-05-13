@@ -18,12 +18,10 @@ package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
 import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.slf4j.Logger;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +32,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 import static org.testng.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 
 
 public class SAML2AssertionSignerImplTest {
@@ -42,7 +42,7 @@ public class SAML2AssertionSignerImplTest {
     private static final String ASSERTION_ID = "s28cf6b911a0b8df238be3160fe680e1e39bd046e0";
 
     @Test
-    public void testSignatureRoundTrip() throws UnsupportedEncodingException, IOException, TokenCreationException, XMLSecurityException {
+    public void testSignatureRoundTrip() throws Exception {
         //init santuario
         org.apache.xml.security.Init.init();
         STSKeyProvider keyProvider = getKeyProvider();
@@ -59,8 +59,8 @@ public class SAML2AssertionSignerImplTest {
         assertTrue(xmlSignature.checkSignatureValue(xmlSignature.getKeyInfo().getX509Certificate()));
     }
 
-    private STSKeyProvider getKeyProvider() throws UnsupportedEncodingException {
-        return new STSKeyProviderImpl(createKeystoreConfig());
+    private STSKeyProvider getKeyProvider() throws Exception {
+        return new STSKeyProviderImpl(createKeystoreConfig(), mock(Logger.class));
     }
 
     private KeystoreConfig createKeystoreConfig() throws UnsupportedEncodingException {
@@ -79,7 +79,7 @@ public class SAML2AssertionSignerImplTest {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/assert.xml")));
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
             }

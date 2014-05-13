@@ -18,17 +18,20 @@ package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.slf4j.Logger;
 import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 
 import static org.testng.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 
 public class STSKeyProviderImplTest {
 
     @Test
-    public void testCreation() throws UnsupportedEncodingException {
-        STSKeyProvider keyProvider = new STSKeyProviderImpl(createKeystoreConfig());
+    public void testCreation() throws Exception {
+        STSKeyProvider keyProvider = new STSKeyProviderImpl(createKeystoreConfig(), mock(Logger.class));
         assertTrue(keyProvider.getPrivateKey("test", "changeit") != null);
     }
 

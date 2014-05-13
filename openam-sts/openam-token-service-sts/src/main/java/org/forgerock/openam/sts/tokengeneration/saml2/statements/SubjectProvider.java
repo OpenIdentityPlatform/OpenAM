@@ -19,6 +19,8 @@ package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 import com.sun.identity.saml2.assertion.Subject;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
+import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
 import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 
 import java.util.Date;
@@ -35,9 +37,11 @@ public interface SubjectProvider {
      * @param saml2Config The STS-instance specific SAML2 configuration state
      * @param subjectConfirmation The type of subject confirmation
      * @param assertionIssueInstant The issue instant assertion
+     * @param proofTokenState The instance containing the proof token necessary for HoK assertions.
      * @return The to-be-included Subject instance
      * @throws TokenCreationException
      */
     Subject get(String subjectId, String audienceId, SAML2Config saml2Config,
-                TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation, Date assertionIssueInstant) throws TokenCreationException;
+                TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation, Date assertionIssueInstant,
+                ProofTokenState proofTokenState) throws TokenCreationException;
 }

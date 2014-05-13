@@ -28,5 +28,15 @@ import java.util.List;
  * class is specified in the SAML2Config, then the DefaultAttributeStatementsProvider will be used.
  */
 public interface AttributeStatementsProvider {
+    /**
+     *
+     * @param ssoToken The SSOToken corresponding to asserted subject
+     * @param saml2Config The STS-instance-specific SAML2 configurations
+     * @param attributeMapper The AttributeMapper implementation which will map attributes. If the AttributeMapper cannot map
+     *                        any attributes, then an empty list should be returned.
+     * @return The list of AttributeStatement instances containing the mapped attributes, or an empty list, if no attributes could
+     * be mapped.
+     * @throws TokenCreationException
+     */
     List<AttributeStatement> get(SSOToken ssoToken, SAML2Config saml2Config, AttributeMapper attributeMapper) throws TokenCreationException;
 }

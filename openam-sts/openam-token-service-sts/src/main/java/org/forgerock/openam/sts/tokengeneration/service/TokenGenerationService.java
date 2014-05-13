@@ -107,9 +107,7 @@ class TokenGenerationService implements SingletonResourceProvider {
                     assertion = saml2TokenGeneration.generate(
                             subjectToken,
                             restStsInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId()),
-                            invocationState.getSaml2SubjectConfirmation(),
-                            null, //TODO: what about this - invocation specified claims? do I support?
-                            invocationState.getSpAcsUrl());
+                            invocationState);
                     handler.handleResult(json(object(field(ISSUED_TOKEN, assertion))));
                     return;
                 } catch (TokenCreationException e) {

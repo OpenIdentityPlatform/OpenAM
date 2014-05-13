@@ -20,8 +20,11 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.components.crypto.CryptoType;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.slf4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
@@ -34,65 +37,75 @@ import java.util.Properties;
 public class STSKeyProviderImpl implements STSKeyProvider {
     private final Crypto crypto;
     private final KeystoreConfig keystoreConfig;
+    private final Logger logger;
 
     /*
     ctor not guice-injected as instance created by STSInstanceStateImpl
      */
-    public STSKeyProviderImpl(KeystoreConfig keystoreConfig) {
+    public STSKeyProviderImpl(KeystoreConfig keystoreConfig, Logger logger) throws TokenCreationException {
         this.keystoreConfig = keystoreConfig;
+        this.logger = logger;
         crypto = createCrypto();
     }
 
-    //TODO: proper, checked exception, and clarify X509Certificate[] when signing. The CXF-STS just returns [0] - does
-    //this make sense in all cases?
-    public X509Certificate getX509Certificate(String certAlias) {
+    /*
+    Note that there is a semantic impedance between the API exposed by the Crypto interface and signature x509Cert
+    exigencies: the Crytpo.getX509Certificates method returns a X509Certificate[], presumably to support cert chains,
+    whereas signature exigencies only require a single X509Certificate instance. The CXF-STS code follows the convention
+    of simply using the first element in the array, and I will do the same. I will not throw an exception if more than
+    a single X509Certificate is returned for a given alias, but rather log a warning.
+     */
+    public X509Certificate getX509Certificate(String certAlias) throws TokenCreationException {
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(certAlias);
         try {
             X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
             if (certs == null) {
-                throw new IllegalStateException("No certificates pulled from the keystore for alias "
+                throw new TokenCreationException(ResourceException.BAD_REQUEST, "No certificates pulled from the keystore for alias "
                         + certAlias);
             } else if (certs.length > 1) {
-                throw new IllegalStateException("The number of certificates pulled from the keystore for alias "
-                        + certAlias + " is greater than 1: " + certs.length);
+                logger.warn("The number of certificates pulled from " +
+                        "the keystore for alias " + certAlias + " is greater than 1: " + certs.length +
+                        ". Returning the first cert in this array.");
+                return certs[0];
             } else {
                 return certs[0];
             }
         } catch (WSSecurityException e) {
-            throw new IllegalStateException("Exception caught pulling X509 cert from crypto for alias: "
-                    + certAlias + ". Exception: " + e, e);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, "Exception caught pulling X509 cert from " +
+                    "crypto for alias: " + certAlias + ". Exception: " + e, e);
         }
     }
 
-    public PrivateKey getPrivateKey(String keyAlias, String keyPassword) {
+    public PrivateKey getPrivateKey(String keyAlias, String keyPassword) throws TokenCreationException {
         try {
             return crypto.getPrivateKey(keyAlias, keyPassword);
         } catch (WSSecurityException e) {
-            //TODO: proper exception
-            throw new IllegalStateException("Exception pulling private key from crypto for alias " + keyAlias);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, "Exception pulling private key from " +
+                    "crypto for alias " + keyAlias);
         }
     }
 
-    private Crypto createCrypto() {
+    private Crypto createCrypto() throws TokenCreationException {
         try {
             return CryptoFactory.getInstance(getEncryptionProperties());
         } catch (WSSecurityException e) {
-            String message = "Exception caught initializing the CryptoFactory: " + e;
-            throw new IllegalStateException(message);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught initializing the CryptoFactory: " + e);
         }
     }
 
-    private Properties getEncryptionProperties() {
+    private Properties getEncryptionProperties() throws TokenCreationException {
         Properties properties = new Properties();
         properties.put(
                 "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );
-        String keystorePassword  = null;
+        String keystorePassword;
         try {
             keystorePassword = new String(keystoreConfig.getKeystorePassword(), AMSTSConstants.UTF_8_CHARSET_ID);
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("Unsupported string encoding for keystore password: " + e);
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Unsupported string encoding for keystore password: " + e);
         }
         properties.put("org.apache.ws.security.crypto.merlin.keystore.password", keystorePassword);
         properties.put("org.apache.ws.security.crypto.merlin.keystore.file", keystoreConfig.getKeystoreFileName());

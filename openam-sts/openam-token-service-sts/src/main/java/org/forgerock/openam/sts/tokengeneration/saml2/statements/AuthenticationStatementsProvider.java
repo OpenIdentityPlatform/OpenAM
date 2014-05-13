@@ -31,8 +31,9 @@ public interface AuthenticationStatementsProvider {
     /**
      * Invoked to obtain the List of AuthnStatement instances to be included in the generated SAML2 assertion.
      * @param saml2Config The STS-instance-specific SAML2 configurations
+     * @param authnContextClassRef The AuthNContext class ref pulled out of the TokenGenerationServiceInvocationState.
      * @return The list of AuthnStatements
      * @throws TokenCreationException
      */
-    List<AuthnStatement> get(SAML2Config saml2Config) throws TokenCreationException;
+    List<AuthnStatement> get(SAML2Config saml2Config, String authnContextClassRef) throws TokenCreationException;
 }

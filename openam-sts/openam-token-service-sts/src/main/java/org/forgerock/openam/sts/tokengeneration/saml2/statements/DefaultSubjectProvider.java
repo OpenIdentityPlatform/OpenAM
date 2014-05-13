@@ -23,13 +23,18 @@ import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
+import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
+import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
 import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 import org.w3c.dom.Element;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,43 +43,45 @@ import java.util.List;
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider
  */
 public class DefaultSubjectProvider implements SubjectProvider {
-    /**
-     * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider#get(String, String,
-     * org.forgerock.openam.sts.config.user.SAML2Config,
-     * org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation,
-     * java.util.Date)
-     */
-    public Subject get(String subjectId, String audienceId, SAML2Config saml2Config,
+    private final KeyInfoFactory keyInfoFactory;
+
+    public DefaultSubjectProvider(KeyInfoFactory keyInfoFactory) {
+        this.keyInfoFactory = keyInfoFactory;
+    }
+
+    public Subject get(String subjectId, String spAcsUrl, SAML2Config saml2Config,
                        TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation,
-                       Date assertionIssueInstant) throws TokenCreationException {
+                       Date assertionIssueInstant, ProofTokenState proofTokenState) throws TokenCreationException {
         try {
             Subject subject = AssertionFactory.getInstance().createSubject();
             setNameIdentifier(subject, subjectId, saml2Config.getNameIdFormat());
-
             SubjectConfirmation subConfirmation =
                     AssertionFactory.getInstance().createSubjectConfirmation();
-            SubjectConfirmationData confirmationData =
-                    AssertionFactory.getInstance().createSubjectConfirmationData();
-            confirmationData.setRecipient(audienceId);
-            /*
-            see section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf - NotBefore cannot
-            be set, but NotOnOrAfter must be set.
-             */
-            confirmationData.setNotOnOrAfter(new Date(assertionIssueInstant.getTime() +
-                    (saml2Config.getTokenLifetimeInSeconds() * 1000)));
             switch (subjectConfirmation) {
                 case BEARER:
                     subConfirmation.setMethod(SAML2Constants.SUBJECT_CONFIRMATION_METHOD_BEARER);
-                    subConfirmation.setSubjectConfirmationData(confirmationData);
+                     /*
+                    see section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf -
+                    Recipient attribute of SubjectConfirmation element must be set to the Service Provider
+                    ACS url.
+                     */
+                    SubjectConfirmationData bearerConfirmationData =
+                            AssertionFactory.getInstance().createSubjectConfirmationData();
+                    bearerConfirmationData.setRecipient(spAcsUrl);
+                    /*
+                    see section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf - NotBefore cannot
+                    be set, but NotOnOrAfter must be set.
+                     */
+                    bearerConfirmationData.setNotOnOrAfter(new Date(assertionIssueInstant.getTime() +
+                            (saml2Config.getTokenLifetimeInSeconds() * 1000)));
+                    subConfirmation.setSubjectConfirmationData(bearerConfirmationData);
                     break;
                 case SENDER_VOUCHES:
                     subConfirmation.setMethod(SAML2Constants.SUBJECT_CONFIRMATION_METHOD_SENDER_VOUCHES);
-                    subConfirmation.setSubjectConfirmationData(confirmationData);
                     break;
                 case HOLDER_OF_KEY:
                     subConfirmation.setMethod(SAML2Constants.SUBJECT_CONFIRMATION_METHOD_HOLDER_OF_KEY);
-                    addKeyInfoToSubjectConfirmationData(confirmationData);
-                    subConfirmation.setSubjectConfirmationData(confirmationData);
+                    subConfirmation.setSubjectConfirmationData(getHoKSubjectConfirmationData(proofTokenState.getX509Certificate()));
                     break;
                 default:
                     throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
@@ -112,9 +119,26 @@ public class DefaultSubjectProvider implements SubjectProvider {
         return nameID;
     }
 
-    private void addKeyInfoToSubjectConfirmationData(SubjectConfirmationData confirmationData) throws TokenCreationException {
-        Element keyInfoElement = null; //TODO - get from KeyInfoFactory, and snake that into this class...
-        confirmationData.getContent().add(keyInfoElement);
+    private SubjectConfirmationData getHoKSubjectConfirmationData(X509Certificate certificate) throws TokenCreationException {
+        Element keyInfoElement = null;
+        try {
+            keyInfoElement = keyInfoFactory.generatePublicKeyInfo(certificate);
+        } catch (ParserConfigurationException e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught generating KeyInfo for HoK SubjectConfirmation DefaultSubjectProvider: " + e, e);
+        } catch (XMLSecurityException e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught generating KeyInfo for HoK SubjectConfirmation DefaultSubjectProvider: " + e, e);
+        }
+        try {
+            final List<Element> elementList = new ArrayList<Element>();
+            elementList.add(keyInfoElement);
+            final SubjectConfirmationData subjectConfirmationData = AssertionFactory.getInstance().createSubjectConfirmationData();
+            subjectConfirmationData.setContent(elementList);
+            return subjectConfirmationData;
+        } catch (SAML2Exception e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught generating SubjectConfirmationData with HoK KeyInfo element in DefaultSubjectProvider: " + e, e);
+        }
     }
-
 }

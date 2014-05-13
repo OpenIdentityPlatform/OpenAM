@@ -14,14 +14,20 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
+package org.forgerock.openam.sts.tokengeneration.saml2;
 
+import com.iplanet.sso.SSOToken;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 
 /**
- * Defines concern related to obtaining an instance of the STSKeyProvider class.
+ * Interface to represent the concerns of validating an SSOToken and obtaining the corresponding principal name.
  */
-public interface STSKeyProviderFactory {
-    STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException;
+public interface SSOTokenIdentity {
+    /**
+     *
+     * @param subjectToken The SSOToken corresponding to the subject of the assertion
+     * @return The name of the principal associated with this SSOToken
+     * @throws TokenCreationException If the token is invalid or a corresponding identity could not be obtained.
+     */
+    String validateAndGetTokenPrincipal(SSOToken subjectToken) throws TokenCreationException;
 }

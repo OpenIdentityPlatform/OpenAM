@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 
 /**
@@ -23,5 +24,5 @@ import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
  * RestSTSInstanceStateCache to obtain an new instance of the RestSTSInstanceState class.
  */
 public interface RestSTSInstanceStateFactory {
-    RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config);
+    RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config) throws TokenCreationException;
 }

@@ -36,12 +36,12 @@ public class DefaultAuthenticationStatementsProvider implements AuthenticationSt
      * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider#get(com.iplanet.sso.SSOToken,
      * org.forgerock.openam.sts.config.user.SAML2Config, AttributeMapper)
      */
-    public List<AuthnStatement> get(SAML2Config saml2Config) throws TokenCreationException {
+    public List<AuthnStatement> get(SAML2Config saml2Config, String authNContextClassRef) throws TokenCreationException {
         try {
             AuthnStatement authnStatement = AssertionFactory.getInstance().createAuthnStatement();
             authnStatement.setAuthnInstant(new Date());
             AuthnContext authnContext = AssertionFactory.getInstance().createAuthnContext();
-            authnContext.setAuthnContextClassRef(saml2Config.getAuthenticationContext());
+            authnContext.setAuthnContextClassRef(authNContextClassRef);
             authnStatement.setAuthnContext(authnContext);
             ArrayList<AuthnStatement> statements = new ArrayList<AuthnStatement>();
             statements.add(authnStatement);

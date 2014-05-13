@@ -22,18 +22,30 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthenticationStatementsProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.statements.AuthzDecisionStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAttributeStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAuthenticationStatementsProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAuthzDecisionStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditionsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultSubjectProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
+
+import javax.inject.Inject;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.StatementProvider
  */
 public class StatementProviderImpl implements StatementProvider {
+    private final KeyInfoFactory keyInfoFactory;
+
+    @Inject
+    StatementProviderImpl(KeyInfoFactory keyInfoFactory) {
+        this.keyInfoFactory = keyInfoFactory;
+    }
+
     public ConditionsProvider getConditionsProvider(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomConditionsProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
@@ -47,7 +59,7 @@ public class StatementProviderImpl implements StatementProvider {
         if ((customProvider != null) && !customProvider.isEmpty()) {
             return (SubjectProvider)createCustomProviderInstance(customProvider, SubjectProvider.class);
         }
-        return new DefaultSubjectProvider();
+        return new DefaultSubjectProvider(keyInfoFactory);
     }
 
     public AuthenticationStatementsProvider getAuthenticationStatementsProvider(SAML2Config saml2Config) throws TokenCreationException{
@@ -64,6 +76,14 @@ public class StatementProviderImpl implements StatementProvider {
             return (AttributeStatementsProvider) createCustomProviderInstance(customProvider, AttributeStatementsProvider.class);
         }
         return new DefaultAttributeStatementsProvider();
+    }
+
+    public AuthzDecisionStatementsProvider getAuthzDecisionStatementsProvider(SAML2Config saml2Config) throws TokenCreationException {
+        String customProvider = saml2Config.getCustomAuthzDecisionStatementsProviderClassName();
+        if ((customProvider != null) && !customProvider.isEmpty()) {
+            return (AuthzDecisionStatementsProvider) createCustomProviderInstance(customProvider, AuthzDecisionStatementsProvider.class);
+        }
+        return new DefaultAuthzDecisionStatementsProvider();
     }
 
     public AttributeMapper getAttributeMapper(SAML2Config saml2Config) throws TokenCreationException {

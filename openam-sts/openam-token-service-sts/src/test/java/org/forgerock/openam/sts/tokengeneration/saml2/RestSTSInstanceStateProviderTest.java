@@ -22,6 +22,7 @@ import com.google.inject.TypeLiteral;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
@@ -76,7 +77,7 @@ public class RestSTSInstanceStateProviderTest {
     }
 
     @Test
-    public void verifyCaching() {
+    public void verifyCaching() throws TokenCreationException {
         RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig(DEPLOYMENT_URL_ELEMENT);
         when(mockConfigPersister.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT)).thenReturn(instanceConfig);
         when(mockRestSTSInstanceStateFactory.createRestSTSInstanceState(any(RestSTSInstanceConfig.class))).thenReturn(mockRestSTSInstanceState);
@@ -119,7 +120,6 @@ public class RestSTSInstanceStateProviderTest {
         audiences.add("http://host.com:8080/openam/sp");
         SAML2Config saml2Config =
                 SAML2Config.builder()
-                        .authenticationContext("urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport")
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                         .audiences(audiences)

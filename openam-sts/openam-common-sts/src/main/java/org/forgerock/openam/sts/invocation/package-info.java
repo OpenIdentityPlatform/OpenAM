@@ -14,14 +14,8 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
-
-import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
-
 /**
- * Defines concern related to obtaining an instance of the STSKeyProvider class.
+ * This package contains classes related to invocation state common to the TokenGenerationService and/or the REST-STS
+ * and/or the SOAP STS.
  */
-public interface STSKeyProviderFactory {
-    STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException;
-}
+package org.forgerock.openam.sts.invocation;

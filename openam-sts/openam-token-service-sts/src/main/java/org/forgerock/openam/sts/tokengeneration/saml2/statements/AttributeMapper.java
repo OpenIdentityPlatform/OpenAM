@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: if we have multiple AttributeStatements, how does this map to the AttributeMapper? Does each statement have to
- * be identified, or ??. Are multiple AttributeStatements common?
- * Defines the concerns of mapping attributes into SAML2 AttributeStatements.
- *
+ * Defines the concerns of mapping attributes into SAML2 AttributeStatements. The AttributeStatementsProvider implementation
+ * will return a list of AttributeStatements. Only a single AttributeMapper will be provided to the AttributeStatementsProvider,
+ * and the attributeMap specification will be pulled from the SAML2Config associated with the STS instance currently
+ * consuming the TokenGenerationService.
  */
 public interface AttributeMapper {
     /**
@@ -37,8 +37,8 @@ public interface AttributeMapper {
      *                     keys will define the name of the attributes, and the data pulled from the subject's directory entry
      *                     will define the value corresponding to this attribute name. If no state is present corresponding
      *                     to this attribute name, then it will not appear in the AttributeStatement.
-     * @return This list of populated SAML2 Attribute instances.
-     * @throws TokenCreationException if an exception is encountered mapping attributes. TODO: more fine-grained, and action-specific
+     * @return This list of populated SAML2 Attribute instances. If the list is empty, no AttributeStatement should be created.
+     * @throws TokenCreationException if an exception is encountered mapping attributes.
      * exceptions?
      */
     List<Attribute> getAttributes(SSOToken token, Map<String, String> attributeMap) throws TokenCreationException;

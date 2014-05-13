@@ -21,6 +21,8 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
@@ -30,9 +32,13 @@ import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactor
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGenerationImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentity;
+import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentityImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProviderImpl;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
+import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSignerImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
@@ -59,6 +65,9 @@ public class TokenGenerationModule extends AbstractModule {
                 .in(Scopes.SINGLETON);
         bind(RestSTSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
         bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
+        bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);
+        bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+        bind(SSOTokenIdentity.class).to(SSOTokenIdentityImpl.class);
     }
 
     @Provides

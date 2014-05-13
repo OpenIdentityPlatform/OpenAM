@@ -76,7 +76,6 @@ public class DefaultAttributeStatementsProviderTest {
         List<String> audiences = new ArrayList<String>();
         audiences.add("http://host.com:8080/openam/sp");
         return SAML2Config.builder()
-                        .authenticationContext("urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport")
                         .attributeMap(attributeMap)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                         .audiences(audiences)

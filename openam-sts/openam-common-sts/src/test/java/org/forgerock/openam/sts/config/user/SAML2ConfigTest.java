@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SAML2ConfigTest {
-    private static final String AUTH_CONTEXT = "authContext";
     private static final String NAME_ID_FORMAT = "nameidformat";
     private static final long TOKEN_LIFETIME = 60 * 10;
     private static final String CUSTOM_SUBJECT_PROVIDER = "org.foo.MyCustomSubjectProvider";
@@ -34,6 +33,7 @@ public class SAML2ConfigTest {
     private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER = "org.foo.MyCustomAttributeStatementsProvider";
     private static final String CUSTOM_ATTRIBUTE_MAPPER = "org.foo.MyCustomAttributeMapper";
     private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER = "org.foo.MyCustomAuthenticationStatementsProvider";
+    private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER = "org.foo.MyCustomAuthzDecisionStatementsProvider";
     private static final boolean WITH_ATTR_MAP = true;
     private static final boolean WITH_AUDIENCES = true;
     private static final boolean WITH_CUSTOM_PROVIDERS = true;
@@ -90,16 +90,27 @@ public class SAML2ConfigTest {
     }
 
     @Test
+    public void testToString() {
+        //build a bunch of instances and call toString to insure no NPE results
+        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+    }
+
+    @Test
     public void testFieldPersistenceAfterRoundTrip() {
         SAML2Config config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
         SAML2Config reconsitutedConfig = SAML2Config.fromJson(config.toJson());
-        assertTrue(AUTH_CONTEXT.equals(reconsitutedConfig.getAuthenticationContext()));
         assertTrue(NAME_ID_FORMAT.equals(reconsitutedConfig.getNameIdFormat()));
         assertTrue(TOKEN_LIFETIME == reconsitutedConfig.getTokenLifetimeInSeconds());
 
         config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
         reconsitutedConfig = SAML2Config.fromJson(config.toJson());
-        assertTrue(AUTH_CONTEXT.equals(reconsitutedConfig.getAuthenticationContext()));
         assertTrue(NAME_ID_FORMAT.equals(reconsitutedConfig.getNameIdFormat()));
         assertTrue(TOKEN_LIFETIME == reconsitutedConfig.getTokenLifetimeInSeconds());
         assertTrue(CUSTOM_CONDITIONS_PROVIDER.equals(reconsitutedConfig.getCustomConditionsProviderClassName()));
@@ -111,7 +122,6 @@ public class SAML2ConfigTest {
 
     private SAML2Config buildConfig(boolean withAttributeMap, boolean withAudiences, boolean withCustomProviders) {
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder()
-                .authenticationContext(AUTH_CONTEXT)
                 .tokenLifetimeInSeconds(TOKEN_LIFETIME)
                 .nameIdFormat(NAME_ID_FORMAT);
         if (withAttributeMap) {
@@ -132,6 +142,7 @@ public class SAML2ConfigTest {
             builder.customSubjectProviderClassName(CUSTOM_SUBJECT_PROVIDER);
             builder.customAuthenticationStatementsProviderClassName(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER);
             builder.customAttributeStatementsProviderClassName(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER);
+            builder.customAuthzDecisionStatementsProviderClassName(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER);
             builder.customAttributeMapperClassName(CUSTOM_ATTRIBUTE_MAPPER);
         }
         return builder.build();

@@ -67,7 +67,12 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
     }
 
     public void removeSTSInstance(String key) {
-        configStore.remove(key);
+        RestSTSInstanceConfig removedEntry = configStore.remove(key);
+        if (removedEntry == null) {
+            logger.error("In removeSTSInstance, no existing RESTSTSInstanceConfig corresponding to key " + key);
+        } else {
+            logger.info("Removed RestSTSInstanceConfig corresponding to key " + key);
+        }
     }
 
     public RestSTSInstanceConfig getSTSInstanceConfig(String key) {

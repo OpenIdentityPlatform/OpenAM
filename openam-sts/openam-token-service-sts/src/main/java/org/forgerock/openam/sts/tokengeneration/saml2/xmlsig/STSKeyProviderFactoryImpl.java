@@ -16,13 +16,22 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.slf4j.Logger;
+
+import javax.inject.Inject;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory
  */
 public class STSKeyProviderFactoryImpl implements STSKeyProviderFactory {
-    public STSKeyProvider createSTSKeyProvider(KeystoreConfig config) {
-        return new STSKeyProviderImpl(config);
+    private final Logger logger;
+    @Inject
+    STSKeyProviderFactoryImpl(Logger logger) {
+        this.logger = logger;
+    }
+    public STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException {
+        return new STSKeyProviderImpl(config, logger);
     }
 }

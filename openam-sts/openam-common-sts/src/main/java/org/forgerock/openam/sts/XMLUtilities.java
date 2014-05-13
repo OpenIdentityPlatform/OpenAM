@@ -14,14 +14,19 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
+package org.forgerock.openam.sts;
 
-import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
- * Defines concern related to obtaining an instance of the STSKeyProvider class.
+ * Interface to wrap consumption of the openam-shared XMLUtils class so that direct consumption of static methods can
+ * be avoided to facilitate unit testing.
  */
-public interface STSKeyProviderFactory {
-    STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException;
+public interface XMLUtilities {
+    Document stringToDocumentConversion(String inputString);
+    String documentToStringConversion(Node inputNode);
+    Document newSafeDocument(boolean schemaValidation) throws ParserConfigurationException;
 }

@@ -28,13 +28,16 @@ import java.security.cert.X509Certificate;
  *  */
 public interface SAML2AssertionSigner {
     /**
-     * TODO: verification that the algorithm is indeed supported - does the caller do that, or does the implementation of this
-     * interface - and what constitutes the supported list?
      * @param saml2Document The to-be-signed document
      * @param assertionId Used to refer the signature to the enveloping assertion
      * @param signingKey The PrivateKey used to sign the assertion
      * @param certificate The X509Certificate corresponding to the PrivateKey
-     * @param signatureAlgorithm The to-be-used signature algorithm
+     * @param signatureAlgorithm The to-be-used signature algorithm. Ultimately, the set of supported signature algorithms is determined
+     *                           by a hash maintained in the org.apache.xml.security.signature.SignatureAlgorithm class. This interface
+     *                           and corresponding implementation will not validate that the specified signature algorithm is
+     *                           indeed supported, but rather rely on the XMLSecurityException thrown by the SignatureAlgorithm class.
+     *                           Note however, that the SAML2Constants will ultimately originate this value, and this is where any
+     *                           validation may take place.
      * @param canonicalizationAlgorithm The to-be-used canonicalization algorithm
      * @return The Element containing the signature, enveloped in the Element containing the assertion
      * @throws TokenCreationException

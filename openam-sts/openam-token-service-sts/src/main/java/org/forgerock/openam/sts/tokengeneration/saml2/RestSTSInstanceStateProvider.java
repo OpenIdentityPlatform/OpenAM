@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
+import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.slf4j.Logger;
@@ -26,7 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider
  * Caches state pulled from the persistent store for performance.
- * TODO: implement ServiceListener to invalidate cache entry if service updated.
+ * TODO: implement ServiceListener to invalidate cache entry if service updated. This will be done as part of the
+ * work to persist published STS config state to the SMS.
  */
 public class RestSTSInstanceStateProvider implements STSInstanceStateProvider<RestSTSInstanceState> {
     private final ConcurrentHashMap<String, RestSTSInstanceState> cachedRestInstanceConfigState;
@@ -43,11 +45,11 @@ public class RestSTSInstanceStateProvider implements STSInstanceStateProvider<Re
         this.logger = logger;
     }
 
-    public RestSTSInstanceState getSTSInstanceState(String instanceId) {
+    public RestSTSInstanceState getSTSInstanceState(String instanceId) throws TokenCreationException {
         RestSTSInstanceState cachedState = cachedRestInstanceConfigState.get(instanceId);
         if (cachedState == null) {
             RestSTSInstanceState createdState = createSTSInstanceState(instanceId);
-            RestSTSInstanceState concurrentlyCreatedState = null;
+            RestSTSInstanceState concurrentlyCreatedState;
             if ((concurrentlyCreatedState = cachedRestInstanceConfigState.putIfAbsent(instanceId, createdState)) != null) {
                 return concurrentlyCreatedState;
             } else {
@@ -58,7 +60,7 @@ public class RestSTSInstanceStateProvider implements STSInstanceStateProvider<Re
         }
     }
 
-    private RestSTSInstanceState createSTSInstanceState(String instanceId) {
+    private RestSTSInstanceState createSTSInstanceState(String instanceId) throws TokenCreationException {
         logger.debug("Creating STSInstanceState for instanceId: " + instanceId);
         return instanceStateFactory.createRestSTSInstanceState(restStsInstanceConfigPersister.getSTSInstanceConfig(instanceId));
     }

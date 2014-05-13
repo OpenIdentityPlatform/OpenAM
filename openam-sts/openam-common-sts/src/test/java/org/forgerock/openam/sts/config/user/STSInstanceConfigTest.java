@@ -118,7 +118,6 @@ public class STSInstanceConfigTest {
 
         SAML2Config saml2Config =
                 SAML2Config.builder()
-                .authenticationContext("authContext")
                 .nameIdFormat("transient")
                 .tokenLifetimeInSeconds(500000)
                 .build();
