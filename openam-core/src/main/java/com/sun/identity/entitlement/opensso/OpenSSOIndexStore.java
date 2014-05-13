@@ -602,58 +602,10 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         Subject adminSubject = getAdminSubject();
         String realm = getRealm();
 
-        // constraint the search with the resources that the users can read.
-        ApplicationPrivilegeManager apm =
-            ApplicationPrivilegeManager.getInstance(realm, adminSubject);
-        Set<String> applicationNames = apm.getApplications(
-            ApplicationPrivilege.Action.READ);
-        if ((applicationNames == null) || applicationNames.isEmpty()) {
-            return Collections.EMPTY_SET;
-        }
-        
-        Map<String, Set<String>> appNameToResources = 
-            new HashMap<String, Set<String>>();
-        for (String applName : applicationNames) {
-            appNameToResources.put(applName, apm.getResources(applName,
-                ApplicationPrivilege.Action.READ));
-        }
-
         String searchFilters = getSearchFilter(filters, boolAnd);
-        String ldapFilters = "(&" +
-            getResourceSearchFilter(appNameToResources, realm) + searchFilters + ")";
 
-        return dataStore.search(adminSubject, realm, ldapFilters,
+        return dataStore.search(adminSubject, realm, searchFilters,
                 numOfEntries * (2), sortResults, ascendingOrder);
-    }
-
-    /**
-     * Constructs the directory search filter.
-     *
-     * @param map
-     *      Map of applications.
-     * @param realm
-     *      The realm for which the search filter is to be applied.
-     * @return The search filter.
-     * @throws EntitlementException
-     *      Should an underlying error occur during entitlement processing.
-     */
-    private String getResourceSearchFilter(Map<String, Set<String>> map, String realm) 
-        throws EntitlementException {
-        StringBuilder buff = new StringBuilder();
-
-        for (String applName : map.keySet()) {
-            Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, "/", applName);
-            if (appl != null) {
-                for (String res : map.get(applName)) {
-                    ResourceSearchIndexes idx =
-                        appl.getResourceSearchIndex(res, realm);
-                    buff.append(DataStore.getFilter(idx, null, true));
-                }
-            }
-        }
-
-        return "(|" + buff.toString() + ")";
     }
 
     private String getSearchFilter(Set<SearchFilter> filters, boolean boolAnd) {
