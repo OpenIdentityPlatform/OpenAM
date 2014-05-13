@@ -43,6 +43,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.common.HttpURLConnectionManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -297,8 +298,7 @@ public class CDCClientServlet extends HttpServlet {
         // save the go to URL of the agent side to ultimately
         // POST to.
         try {
-            HttpURLConnection connection = 
-                (HttpURLConnection)CDCServletURL.openConnection();
+            HttpURLConnection connection = HttpURLConnectionManager.getConnection(CDCServletURL);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type",
                 "text/html;charset=UTF-8");

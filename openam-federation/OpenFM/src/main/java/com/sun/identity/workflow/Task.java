@@ -27,12 +27,13 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.workflow;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.Constants;
@@ -152,7 +153,7 @@ public abstract class Task
         try {
             StringBuffer content = new StringBuffer();
             URL urlObj = new URL(url);
-            URLConnection conn = urlObj.openConnection();
+            URLConnection conn = HttpURLConnectionManager.getConnection(urlObj);
             if (conn instanceof HttpURLConnection) {
                 HttpURLConnection httpConnection = (HttpURLConnection)conn;
                 httpConnection.setRequestMethod("GET");

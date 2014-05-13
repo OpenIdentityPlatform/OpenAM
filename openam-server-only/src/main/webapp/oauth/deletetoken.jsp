@@ -24,10 +24,12 @@
 
    $Id: deletetoken.jsp,v 1.1 2009/11/20 19:25:15 huacui Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS
 --%>
 
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.sun.identity.common.HttpURLConnectionManager" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -45,7 +47,7 @@
             try {
 
                 java.net.URL url = new java.net.URL(oauth_token);
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                java.net.HttpURLConnection conn = HttpURLConnectionManager.getConnection(url);
                 conn.setRequestMethod("DELETE");
                 conn.connect();
                 int resp = conn.getResponseCode();

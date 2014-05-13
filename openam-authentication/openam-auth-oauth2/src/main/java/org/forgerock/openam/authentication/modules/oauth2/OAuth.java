@@ -1,8 +1,8 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
- * Copyright © 2011 Cybernetica AS. 
+ * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,7 +26,6 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
@@ -34,9 +33,9 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 
@@ -513,10 +512,10 @@ public class OAuth extends AMLoginModule {
 
         OAuthUtil.debugMessage("service url: " + serviceUrl);
         try {
-            InputStream is = null;
+            InputStream is;
             URL urlC = new URL(serviceUrl);
 
-            HttpURLConnection connection = (HttpURLConnection) urlC.openConnection();
+            HttpURLConnection connection = HttpURLConnectionManager.getConnection(urlC);
             connection.setDoOutput(true);
             connection.setRequestMethod("GET");
             connection.connect();
@@ -585,7 +584,7 @@ public class OAuth extends AMLoginModule {
             String query = url.getQuery();
             OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: Query: " + query);
 
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());

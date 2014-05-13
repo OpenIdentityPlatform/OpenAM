@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.iplanet.am.util;
 
@@ -42,6 +42,7 @@ import java.util.Map;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.HttpURLConnectionManager;
 
 public class CLILogin {
 
@@ -194,7 +195,7 @@ public class CLILogin {
     }
 
     private static String getCookie(URL url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
 
         // Get the iPlanetDirectoryPro cookie from the header, strip off
         // the cookie name, domain, and path to get the value, it must be
@@ -213,7 +214,7 @@ public class CLILogin {
 
     private static void authenticate(URL url, String cookie, String userName,
             String passWord) throws IOException, ProtocolException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Cookie", cookie);
@@ -235,7 +236,7 @@ public class CLILogin {
 
     private static String urlAccess(URL url, String cookie, boolean print)
             throws IOException, ProtocolException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
         connection.setDoOutput(true);
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Cookie", cookie);

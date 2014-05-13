@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.diagnostic.plugin.services.common;
 
@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.debug.Debug;
 
 
@@ -130,7 +131,7 @@ public abstract class ClientBase extends ServiceBase implements ClientConstants 
         ArrayList returnList = new ArrayList();
         try {
             serviceURL = new URL(url);
-            urlConnect = (HttpURLConnection)serviceURL.openConnection();
+            urlConnect = HttpURLConnectionManager.getConnection(serviceURL);
             urlConnect.setRequestMethod("POST");
             urlConnect.setDoOutput(true);
             urlConnect.setUseCaches(false);
@@ -189,7 +190,7 @@ public abstract class ClientBase extends ServiceBase implements ClientConstants 
         int nHeaderNumber = 1;
         
         URL url = new URL(urlStr);
-        URLConnection svrConn = url.openConnection();
+        URLConnection svrConn = HttpURLConnectionManager.getConnection(url);
         if (url.getProtocol().equalsIgnoreCase("http")){
             urlConn = (HttpURLConnection)svrConn;
         } else if (url.getProtocol().equalsIgnoreCase("https")) {

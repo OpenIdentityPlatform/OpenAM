@@ -23,10 +23,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeChangeNotifier.java,v 1.5 2010/01/07 00:19:11 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
 
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -229,8 +232,7 @@ public class PrivilegeChangeNotifier {
             try {
                 try {
                     URL urlObj = new URL(url);
-                    HttpURLConnection conn = (HttpURLConnection)
-                        urlObj.openConnection();
+                    HttpURLConnection conn = HttpURLConnectionManager.getConnection(urlObj);
                     conn.setConnectTimeout(HTTP_TIMEOUT);
                     conn.setDoOutput(true);
                     wr = new OutputStreamWriter(

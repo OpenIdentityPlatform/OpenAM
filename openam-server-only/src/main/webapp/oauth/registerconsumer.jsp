@@ -24,10 +24,12 @@
 
    $Id: registerconsumer.jsp,v 1.2 2009/12/15 01:28:22 huacui Exp $
 
+   Portions Copyrighted 2014 ForgeRock AS
 --%>
 
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.sun.identity.common.HttpURLConnectionManager" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -52,7 +54,7 @@
             String regurl = sb.toString();
             try {
                 java.net.URL url = new java.net.URL(regurl);
-                java.net.URLConnection conn = url.openConnection();
+                java.net.URLConnection conn = HttpURLConnectionManager.getConnection(url);
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
                 conn.setUseCaches(false);

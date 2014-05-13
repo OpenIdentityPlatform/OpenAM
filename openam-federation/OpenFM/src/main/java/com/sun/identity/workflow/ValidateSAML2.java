@@ -24,10 +24,12 @@
  *
  * $Id: ValidateSAML2.java,v 1.4 2009/11/20 22:45:57 ggennaro Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.workflow;
 
+import com.sun.identity.common.HttpURLConnectionManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -182,7 +184,7 @@ public class ValidateSAML2 {
         throws WorkflowException {
         try {
             URL url = new URL(strUrl);
-            URLConnection connection = url.openConnection();
+            URLConnection connection = HttpURLConnectionManager.getConnection(url);
             connection.connect();
         } catch (MalformedURLException ex) {
             Object[] params = {strUrl};

@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.diagnostic.plugin.services.common;
 
@@ -60,6 +60,7 @@ import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.diagnostic.base.core.common.ToolConstants;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.security.AdminTokenAction;
@@ -216,7 +217,8 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     protected static boolean isServerRunning(String sName) {
         boolean isSvrRunning = false;
         try {
-            URLConnection uc = new URL(sName).openConnection();
+            URLConnection uc = HttpURLConnectionManager.getConnection(new URL(sName)
+            );
             BufferedReader in = new BufferedReader(new InputStreamReader(
                 uc.getInputStream()));
             isSvrRunning = true;
@@ -241,7 +243,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
     protected static boolean isServerRunning(URL url) {
         boolean isSvrRunning = false;
         try {
-            URLConnection uc = url.openConnection();
+            URLConnection uc = HttpURLConnectionManager.getConnection(url);
             BufferedReader in = new BufferedReader(new InputStreamReader(
                 uc.getInputStream()));
             isSvrRunning = true;
@@ -268,7 +270,7 @@ public abstract class ServiceBase implements ToolConstants, ServiceConstants {
         boolean connect = false;
         try {
             URL u = new URL(svrName);
-            URLConnection  svrConn = u.openConnection();
+            URLConnection  svrConn = HttpURLConnectionManager.getConnection(u);
             if (u.getProtocol().equalsIgnoreCase("http")){
                 HttpURLConnection testConnect =
                     (HttpURLConnection)svrConn;

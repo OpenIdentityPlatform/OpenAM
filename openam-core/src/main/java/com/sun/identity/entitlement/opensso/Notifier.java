@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -34,6 +34,7 @@ package com.sun.identity.entitlement.opensso;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.entitlement.EntitlementThreadPool;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -139,9 +140,8 @@ public class Notifier implements Runnable {
 
         try {
             URL url = new URL(strURL);
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            HttpURLConnection conn = HttpURLConnectionManager.getConnection(url);
             conn.setConnectTimeout(CONN_TIMEOUT);
-            conn.setReadTimeout(CONN_TIMEOUT);
             conn.setDoOutput(true);
             wr = new OutputStreamWriter(
                 conn.getOutputStream());

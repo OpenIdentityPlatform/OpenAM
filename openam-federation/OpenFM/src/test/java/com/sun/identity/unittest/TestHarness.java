@@ -25,9 +25,13 @@
  * $Id: TestHarness.java,v 1.1 2009/08/19 05:41:03 veiming Exp $
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.unittest;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.common.HttpURLConnectionManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -100,7 +104,7 @@ public final class TestHarness {
         
         try {
             URL url = new URL(jsp);
-            URLConnection conn = url.openConnection();
+            URLConnection conn = HttpURLConnectionManager.getConnection(url);
             conn.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(
                 conn.getOutputStream());

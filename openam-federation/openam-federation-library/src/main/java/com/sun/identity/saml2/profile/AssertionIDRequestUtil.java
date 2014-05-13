@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -52,6 +52,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.common.HttpURLConnectionManager;
 import org.w3c.dom.Element;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
@@ -176,7 +177,7 @@ public class AssertionIDRequestUtil {
         }
 
         try {
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            HttpURLConnection conn = HttpURLConnectionManager.getConnection(url);
             conn.setInstanceFollowRedirects(false);
             conn.setUseCaches(false);
             conn.setDoOutput(false);
