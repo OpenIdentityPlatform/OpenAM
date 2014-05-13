@@ -47,7 +47,7 @@
       its components.</para>
 
      <para>You can view a copy of the license at
-      <filename>&lt;server-root>/license.txt</filename>.
+      <filename>&lt;server-root>/legal-notices/license.txt</filename>.
       The default folder location for the licenses is stored at
       <filename>WEB-INF/legal-notices</filename>.
     </para>
