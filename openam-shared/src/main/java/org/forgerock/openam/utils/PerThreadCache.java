@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.utils;
 
+import com.sun.identity.shared.debug.Debug;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ import java.util.Map;
  * @since 12.0.0
  */
 public abstract class PerThreadCache<T, E extends Exception> {
+    private static final Debug DEBUG = Debug.getInstance("amUtil");
     private static final int INITIAL_CACHE_SIZE = 16;
     private static final float CACHE_LOAD_FACTOR = 0.75f;
 
@@ -42,7 +45,13 @@ public abstract class PerThreadCache<T, E extends Exception> {
     private final Map<Long, T> cache = new LinkedHashMap<Long, T>(INITIAL_CACHE_SIZE, CACHE_LOAD_FACTOR, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<Long, T> eldestEntry) {
-            return size() > maxSize;
+            boolean remove = size() > maxSize;
+            if (remove && DEBUG.warningEnabled()) {
+                T value = eldestEntry.getValue();
+                String name = (value == null ? "null" : value.getClass().getName());
+                DEBUG.warning("Cache size limit [" + maxSize + "] exceeded: evicting eldest entry: " + name);
+            }
+            return remove;
         }
     };
 
@@ -57,29 +66,36 @@ public abstract class PerThreadCache<T, E extends Exception> {
 
     /**
      * Fetches an instance of the resource from the cache for the current thread. If no instance has been cached for
-     * this thread, then calls {@link #initialValue()} to create one and then adds it to the cache (as a single atomic
-     * action). If this causes the cache to exceed the configured maximum size then the least recently used (LRU)
+     * this thread, then calls {@link #initialValue()} to create one and then adds it to the cache.
+     * If this causes the cache to exceed the configured maximum size then the least recently used (LRU)
      * entry will be deleted from the cache to preserve the capacity restriction.
      *
      * @return a configured instance from the cache. May be null depending on the initialValue() implementation.
      */
     public final T getInstanceForCurrentThread() throws E {
         final long threadId = Thread.currentThread().getId();
+        T result;
+
+        // Only synchronize around looking up the value and updating it. We do not synchronise while initialising a new
+        // value (cache miss) as this could be expensive and so could cause the lock to be held for a long time,
+        // increasing contention. There is no race condition here as we are keying by unique thread-id.
         synchronized (cache) {
-            T result = cache.get(threadId);
-            if (result == null) {
-                result = initialValue();
+            result = cache.get(threadId);
+        }
+
+        if (result == null) {
+            result = initialValue();
+            synchronized (cache) {
                 cache.put(threadId, result);
             }
-            return result;
         }
+
+        return result;
     }
 
     /**
      * Method will be called to initialise a fresh instance of the underlying resource when one is not found in the
-     * cache. Concrete sub-classes should implement this method as per requirements. Note: this method will be invoked
-     * within a synchronized block on the underlying cache, so should avoid acquiring other locks that may lead to
-     * deadlock or performing blocking operations.
+     * cache. Concrete sub-classes should implement this method as per requirements.
      *
      * @return a fresh instance of the underlying resource.
      * @throws E if the resource instance cannot be created.
