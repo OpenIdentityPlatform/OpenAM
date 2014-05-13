@@ -1307,6 +1307,7 @@ public class SPACSUtils {
         sessionInfoMap.put(SessionProvider.HOST_NAME, clientAddr);
         sessionInfoMap.put(SessionProvider.AUTH_LEVEL, 
             String.valueOf(authLevel));
+        request.setAttribute(SessionProvider.ATTR_MAP, attrMap);
         try {
             session = sessionProvider.createSession(
                 sessionInfoMap, request, response, null);

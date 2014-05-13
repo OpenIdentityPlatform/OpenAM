@@ -24,6 +24,7 @@
  *
  * $Id: SessionProvider.java,v 1.7 2008/06/25 05:47:28 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.plugin.session;
@@ -83,6 +84,12 @@ public interface SessionProvider {
      * the client hostname.
      */
     String HOST_NAME = "HostName";
+
+    /**
+     * The name of the request attribute under which the user attributes shall be stored. This is used by the
+     * Federation authentication module (hosted SP scenario) when dynamic account creation is enabled.
+     */
+    String ATTR_MAP = "org.forgerock.openam.authentication.userAttrMap";
 
     /** 
      * Meaningful only for Service Provider side, the implementation of this
