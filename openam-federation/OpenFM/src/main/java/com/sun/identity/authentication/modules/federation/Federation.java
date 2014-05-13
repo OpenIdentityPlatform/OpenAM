@@ -24,13 +24,13 @@
  *
  * $Id: Federation.java,v 1.3 2009/01/28 05:35:10 ww203982 Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.modules.federation;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.iplanet.sso.SSOToken;
 
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -39,21 +39,18 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.impl.FMSessionProvider;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import java.security.Principal;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.servlet.http.HttpServletRequest;
 
 // import com.sun.identity.shared.ldap.util.DN;
 
@@ -142,7 +139,16 @@ public class Federation extends AMLoginModule {
             throw new AuthLoginException(fmAuthFederation, "NoMatchingSecret",
                                          null);
         }
-        
+
+        HttpServletRequest request = getHttpServletRequest();
+        if (request != null) {
+            Map<String, Set<String>> attrs = (Map<String, Set<String>>) request.getAttribute(SessionProvider.ATTR_MAP);
+            if (attrs != null) {
+                setUserAttributes(attrs);
+                request.removeAttribute(SessionProvider.ATTR_MAP);
+            }
+        }
+
         // TBD: This piece may or may not be needed
         /*
             DN dnObject = new DN(userName);

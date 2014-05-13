@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.plugin.session.impl;
@@ -220,8 +220,7 @@ public class FMSessionProvider implements SessionProvider {
             } else {
                 ac = new AuthContext(realm);
             }
-            ac.login(AuthContext.IndexType.MODULE_INSTANCE,
-                     "Federation");
+            ac.login(AuthContext.IndexType.MODULE_INSTANCE, "Federation", null, null, request, response);
         } catch (AuthLoginException ale) {
             throw new SessionException(ale);
         }
