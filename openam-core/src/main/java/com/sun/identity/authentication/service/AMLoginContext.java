@@ -31,6 +31,7 @@
  */
 package com.sun.identity.authentication.service;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -51,9 +52,11 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
+
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -61,6 +64,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.login.AppConfigurationEntry;
@@ -72,6 +76,7 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
 import com.sun.identity.security.AdminTokenAction;
+
 import java.security.AccessController;
 
 /**
@@ -132,6 +137,9 @@ public class AMLoginContext {
     private static AuthD ad;
     private static Debug debug;
     
+    //OPENAM-3959
+    private static boolean excludeRequiredOrRequisite = false;
+    
     /**
      * Bundle to be used for localized error message. users can be differnt
      * locale. Since we create an  AMLoginContext for each user, we can cache
@@ -161,6 +169,9 @@ public class AMLoginContext {
         if (MonitoringUtil.isRunning()) {
             authImpl = Agent.getAuthSvcMBean();
         }
+        
+        excludeRequiredOrRequisite = 
+            SystemProperties.getAsBoolean(Constants.AUTH_LEVEL_EXCLUDE_REQUIRED_REQUISITE, false); 
     }
 
     /**
@@ -1708,13 +1719,24 @@ public class AMLoginContext {
     /* return the module list
      * this methods gets the configuration list for a given configName
      * retreives all module names which have option REQUIRED , REQUISITE
+     * if org.forgerock.openam.authLevel.excludeRequiredOrRequisite is false
      */
     Set getSuccessModuleSet(String orgDN) {
         
         try {
             Set successModuleSet = loginState.getSuccessModuleSet();
-            moduleSet = 
-                getModuleFromAuthConfiguration(successModuleSet,orgDN);
+            if (excludeRequiredOrRequisite) {
+                if (debug.messageEnabled()) {
+                    debug.message("get success modules excluding REQUIRED or REQUISITE in chain.");
+                }
+                moduleSet = successModuleSet;
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("retrieve all modules names with option REQUIRED or REQUISITE.");
+                }
+                moduleSet = 
+                        getModuleFromAuthConfiguration(successModuleSet,orgDN);
+            }
             
             if (debug.messageEnabled()) {
                 debug.message("ModuleSet is : " + moduleSet);

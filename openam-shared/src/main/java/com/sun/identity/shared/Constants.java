@@ -1313,4 +1313,12 @@ public interface Constants {
      * Size of XML shared SAXParser cache.
      */
     final String XML_SAXPARSER_CACHE_SIZE = "org.forgerock.openam.utils.xml.saxparser.cache.size";
+
+    /**
+     * OPENAM-3959
+     * set true, calculate auth level only with successful login module
+     * and skip the rest of REQUIRED/REQUISITE in chain
+     */
+    public static final String AUTH_LEVEL_EXCLUDE_REQUIRED_REQUISITE
+        = "org.forgerock.openam.authLevel.excludeRequiredOrRequisite";
 }
