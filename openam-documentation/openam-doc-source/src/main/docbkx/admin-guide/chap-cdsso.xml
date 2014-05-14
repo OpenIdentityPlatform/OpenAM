@@ -231,6 +231,36 @@
   </step>
  </procedure>
 
+ <procedure xml:id="access-cdsso-login-ui">
+  <title>To Access the CDSSO Authentication Login</title>
+
+  <para>When a client makes an access request to some protected resource in a cross
+   domain single sign-on (CDSSO) deployment, the policy agent
+   redirects the client to the Cross Domain Controller Servlet (CDCServlet) URL.
+   The CDCServlet determines that the client needs to be authenticated and proxies
+   the request through to an authentication interface, which typically is at <literal>/UI/Login</literal>:
+  </para>
+
+  <screen>http://openam.example.com:8080/openam/UI/Login</screen>
+
+
+  <para>If your application requires access to a specific URL, you can use the
+   <literal>loginURI</literal> parameter to do so.</para>
+
+  <step>
+  <para>For example, you can access the previous authentication UI URL as follows:</para>
+
+   <literallayout class="monospaced">http://openam.example.com:8080/openam/cdcservlet?loginURI=/UI/Login</literallayout>
+  </step>
+
+  <step>
+   <para>If you have another authentication UI deployed at <literal>/openam/Login2</literal>,
+    you can access this URL at: </para>
+
+   <literallayout class="monospaced">http://openam.example.com:8080/openam/cdcservlet?loginURI=/Login2</literallayout>
+  </step>
+ </procedure>
+
  <procedure xml:id="enable-cdsso-cookie-hijacking-protection">
   <title>To Protect Against Cookie Hijacking</title>
 
