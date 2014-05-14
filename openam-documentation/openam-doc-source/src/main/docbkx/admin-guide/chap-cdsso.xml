@@ -241,7 +241,7 @@
    the request through to an authentication interface, which typically is at <literal>/UI/Login</literal>:
   </para>
 
-  <screen>http://openam.example.com:8080/openam/UI/Login</screen>
+  <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login</literallayout>
 
 
   <para>If your application requires access to a specific URL, you can use the
