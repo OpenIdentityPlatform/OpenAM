@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.monitoring.impl;
+package org.forgerock.openam.shared.monitoring;
 
 import java.util.ArrayList;
 import java.util.Comparator;

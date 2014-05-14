@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -77,6 +77,13 @@ import org.forgerock.openam.monitoring.cts.CtsConnectionSuccessRate;
 import org.forgerock.openam.monitoring.cts.CtsMonitoring;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIB;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIBImpl;
+import org.forgerock.openam.monitoring.policy.FORGEROCK_OPENAM_POLICY_MIB;
+import org.forgerock.openam.monitoring.policy.FORGEROCK_OPENAM_POLICY_MIBImpl;
+import org.forgerock.openam.monitoring.policy.PolicyEvaluation;
+import org.forgerock.openam.monitoring.policy.SelfEvaluation;
+import org.forgerock.openam.monitoring.policy.SelfTiming;
+import org.forgerock.openam.monitoring.policy.SubtreeEvaluation;
+import org.forgerock.openam.monitoring.policy.SubtreeTiming;
 
 
 /**
@@ -114,9 +121,11 @@ public class Agent {
     private static ObjectName snmpObjName;
     private static ObjectName sunMibObjName;
     private static ObjectName forgerockCtsMibObjName;
+    private static ObjectName forgerockPolicyMibObjName;
     private static int monHtmlPort;
     private static int monSnmpPort;
     private static int monRmiPort;
+    private static int policyWindow;
     private static String monAuthFilePath;
     private static String ssoProtocol;
     private static String ssoName;
@@ -136,6 +145,7 @@ public class Agent {
     //static mib references
     static SUN_OPENSSO_SERVER_MIBImpl sunMib;
     static FORGEROCK_OPENAM_CTS_MIBImpl forgerockCtsMib;
+    static FORGEROCK_OPENAM_POLICY_MIBImpl forgerockPolicyMib;
 
     private static SSOServerInfo agentSvrInfo;
     private static Map<String, Integer> realm2Index = new HashMap<String, Integer>();  // realm name to index map
@@ -191,6 +201,10 @@ public class Agent {
 
                     if (forgerockCtsMibObjName != null) {
                         server.unregisterMBean(forgerockCtsMibObjName);
+                    }
+
+                    if (forgerockPolicyMibObjName != null) {
+                        server.unregisterMBean(forgerockPolicyMibObjName);
                     }
                 } catch (InstanceNotFoundException ex) {
                     if (debug.warningEnabled()) {
@@ -403,6 +417,7 @@ public class Agent {
         monSnmpPortEnabled = monConfig.monSnmpPortEnabled;
         monRmiPortEnabled = monConfig.monRmiPortEnabled;
         monAuthFilePath = monConfig.monAuthFilePath;
+        policyWindow = monConfig.policyWindow;
         String classMethod = "Agent.startAgent:";
         // OpenSSO server port comes from WebtopNaming.siteAndServerInfo
         String serverPort = agentSvrInfo.serverPort;
@@ -433,6 +448,7 @@ public class Agent {
                     "    htmlEna = " + monHtmlPortEnabled + "\n" +
                     "    snmpEna = " + monSnmpPortEnabled + "\n" +
                     "    rmiEna = " + monRmiPortEnabled + "\n" +
+                    "    policyWindow = " + policyWindow + "\n" +
                     "    serverPort = " + serverPort + "\n"
             );
         }
@@ -491,7 +507,8 @@ public class Agent {
                     "    SNMP Port = " + monSnmpPort +
                     ", enabled = " + monSnmpPortEnabled + "\n" +
                     "    RMI Port = " + monRmiPort +
-                    ", enabled = " + monRmiPortEnabled + "\n");
+                    ", enabled = " + monRmiPortEnabled + "\n" +
+                    "    PolicyWindow size = " + policyWindow + "\n");
         }
 
         /*
@@ -562,6 +579,8 @@ public class Agent {
                     new ObjectName("snmp:class=SUN_OPENSSO_SERVER_MIB");
             forgerockCtsMibObjName =
                     new ObjectName("snmp:class=FORGEROCK_OPENAM_CTS_MIB");
+            forgerockPolicyMibObjName =
+                    new ObjectName("snmp:class=FORGEROCK_OPENAM_POLICY_MIB");
             if (debug.messageEnabled()) {
                 debug.message(classMethod +
                         "Adding SUN_OPENSSO_SERVER_MIB to MBean server " +
@@ -584,6 +603,7 @@ public class Agent {
         try {
             sunMib = new SUN_OPENSSO_SERVER_MIBImpl();
             forgerockCtsMib = new FORGEROCK_OPENAM_CTS_MIBImpl();
+            forgerockPolicyMib = new FORGEROCK_OPENAM_POLICY_MIBImpl();
         } catch (RuntimeException ex) {
             debug.error (classMethod + "Runtime error instantiating MIB", ex);
             return MON_CREATEMIB_PROBLEM;
@@ -595,6 +615,7 @@ public class Agent {
         try {
             server.registerMBean(sunMib, sunMibObjName);
             server.registerMBean(forgerockCtsMib, forgerockCtsMibObjName);
+            server.registerMBean(forgerockPolicyMib, forgerockPolicyMibObjName);
         } catch (RuntimeOperationsException ex) {
             // from registerMBean
             if (debug.warningEnabled()) {
@@ -781,6 +802,7 @@ public class Agent {
                      */
                     sunMib.setSnmpAdaptor(snmpAdaptor);  // throws no exception
                     forgerockCtsMib.setSnmpAdaptor(snmpAdaptor);
+                    forgerockPolicyMib.setSnmpAdaptor(snmpAdaptor);
 
                     monSNMPStarted = true;
                 }
@@ -909,6 +931,15 @@ public class Agent {
     }
 
     /**
+     * Return the size of the policy window to configure.
+     *
+     * @return size of the number of policy samples to use as our history.
+     */
+    protected static int getPolicyWindowSize() {
+        return policyWindow;
+    }
+
+    /**
      *  Return the pointer to the authentication service mbean
      */
     public static SsoServerAuthSvcImpl getAuthSvcMBean() {
@@ -980,6 +1011,26 @@ public class Agent {
      */
     public static SsoServerTopologyImpl getTopologyMBean() {
         return sunMib == null ? null : sunMib.getTopologyGroup();
+    }
+
+    public static SubtreeEvaluation getSubtreeEvaluationMBean() {
+        return forgerockPolicyMib == null ? null : forgerockPolicyMib.getSubtreeEvaluation();
+    }
+
+    public static SubtreeTiming getSubtreeTimingMBean() {
+        return forgerockPolicyMib == null ? null : forgerockPolicyMib.getSubtreeTiming();
+    }
+
+    public static SelfEvaluation getSelfEvaluationMBean() {
+        return forgerockPolicyMib == null ? null : forgerockPolicyMib.getSelfEvaluation();
+    }
+
+    public static PolicyEvaluation getPrivilegeEvaluationMBean() {
+        return forgerockPolicyMib == null ? null : forgerockPolicyMib.getPolicyEvaluation();
+    }
+
+    public static SelfTiming getSelfTimingMBean() {
+        return forgerockPolicyMib == null ? null : forgerockPolicyMib.getSelfTiming();
     }
 
     /**
@@ -1335,52 +1386,6 @@ public class Agent {
         if ((nms != null) && (nms.length > 0)) {
             SsoServerEntitlementSvc esi = sunMib.getEntitlementsGroup();
             if (esi != null) {
-                try {
-                    TableSsoServerEntitlementExecStatsTable etab =
-                            esi.accessSsoServerEntitlementExecStatsTable();
-
-                    for (int i = 0; i < nms.length; i++) {
-                        String str = nms[i];
-                        SsoServerEntitlementExecStatsEntryImpl ssi =
-                                new SsoServerEntitlementExecStatsEntryImpl(sunMib);
-                        ssi.EntitlementNetworkMonitorName = str;
-                        ssi.EntitlementMonitorThruPut = 0L;
-                        ssi.EntitlementMonitorTotalTime = 0L;
-                        ssi.EntitlementNetworkMonitorIndex = Integer.valueOf(i+1);
-
-                        ObjectName sname =
-                                ssi.
-                                        createSsoServerEntitlementExecStatsEntryObjectName(
-                                                server);
-
-                        if (sname == null) {
-                            debug.error(classMethod +
-                                    "Error creating object for Entitlements " +
-                                    "Network Monitor '" + str + "'");
-                            continue;
-                        }
-
-                        try {
-                            etab.addEntry(ssi, sname);
-                            if ((server != null) && (ssi != null)) {
-                                server.registerMBean(ssi, sname);
-                            }
-                        } catch (JMException ex) {
-                            debug.error(classMethod +
-                                    "on Entitlements Network Monitor '" +
-                                    str + "': ", ex);
-                        } catch (SnmpStatusException ex) {
-                            debug.error(classMethod +
-                                    "on Entitlements Network Monitor '" +
-                                    str + "': ", ex);
-                        }
-                    }
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod +
-                            "Can't get Network Monitor Table: " +
-                            ex.getMessage());
-                }
-
                 // now the realm-based policy stats
 
                 try {
@@ -3245,6 +3250,7 @@ public class Agent {
         final ObjectName snmpObjName;
         final ObjectName sunMibObjName;
         final ObjectName forgerockCtsMibObjName;
+        final ObjectName forgerockPolicyMibObjName;
         final ObjectName trapGeneratorObjName;
         int htmlPort = 8082;
         int snmpPort = 11161;
@@ -3347,8 +3353,17 @@ public class Agent {
                     "Adding FORGEROCK_OPENAM_CTS_MIB-MIB to MBean server with name" +
                             "\n    " + forgerockCtsMibObjName);
 
+            forgerockPolicyMibObjName = new ObjectName("snmp:class=FORGEROCK_OPENAM_POLICY_MIB");
+            println(
+                    "Adding FORGEROCK_OPENAM_POLICY_MIB-MIB to MBean server with name" +
+                            "\n    " + forgerockPolicyMibObjName);
+
+
             FORGEROCK_OPENAM_CTS_MIB mib3 = new FORGEROCK_OPENAM_CTS_MIB();
             server.registerMBean(mib3, forgerockCtsMibObjName);
+
+            FORGEROCK_OPENAM_POLICY_MIB mib4 = new FORGEROCK_OPENAM_POLICY_MIB();
+            server.registerMBean(mib4, forgerockPolicyMibObjName);
 
             // Bind the SNMP adaptor to the MIB in order to make the MIB 
             // accessible through the SNMP protocol adaptor.

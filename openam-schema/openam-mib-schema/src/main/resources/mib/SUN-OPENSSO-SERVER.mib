@@ -4,7 +4,7 @@
 --
 
 --
--- Portions Copyrighted 2011-2013 ForgeRock AS
+-- Portions Copyrighted 2011-2014 ForgeRock AS
 --
 
 SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
@@ -2427,66 +2427,6 @@ numCachedReferrals OBJECT-TYPE
     ::= { ssoServerEntitlementSvc 4 }
 
 --
---  SSO Entitlement Execution time and events table
---
-ssoServerEntitlementExecStatsTable OBJECT-TYPE
-    SYNTAX	SEQUENCE OF SsoServerEntitlementExecStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS	current
-    DESCRIPTION
-	     "Cumulative Execution Time And Events Table"
-    ::= { ssoServerEntitlementSvc 5 }
-
-ssoServerEntitlementExecStatsEntry OBJECT-TYPE
-    SYNTAX	SsoServerEntitlementExecStatsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-	      "Entitlements Execution Time and Events"
-    INDEX    { entitlementNetworkMonitorIndex }
-    ::= { ssoServerEntitlementExecStatsTable 1 }
-
-SsoServerEntitlementExecStatsEntry ::= SEQUENCE {
-        entitlementNetworkMonitorIndex	Integer32,
-	entitlementNetworkMonitorName	SnmpAdminString,
-	entitlementMonitorTotalTime	Counter64,
-	entitlementMonitorThruPut	Counter64
-    }
-
-entitlementNetworkMonitorIndex  OBJECT-TYPE
-    SYNTAX      Integer32 (1..2147483647)
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-	    "Entitlement Execution Stat Index"
-    ::= { ssoServerEntitlementExecStatsEntry 1 }
-
-entitlementNetworkMonitorName  OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-	    "Entitlement Item Name"
-    ::= { ssoServerEntitlementExecStatsEntry 2 }
-
-entitlementMonitorTotalTime  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-	    "Total Response Time"
-    ::= { ssoServerEntitlementExecStatsEntry 3 }
-
-
-entitlementMonitorThruPut  OBJECT-TYPE
-    SYNTAX      Counter64
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-	    "Throughput"
-    ::= { ssoServerEntitlementExecStatsEntry 4 }
-
---
 --  SSO Entitlement Policy Statistics table
 --
 ssoServerEntitlementPolicyStatsTable OBJECT-TYPE
@@ -2495,7 +2435,7 @@ ssoServerEntitlementPolicyStatsTable OBJECT-TYPE
     STATUS	current
     DESCRIPTION
 	     "Policy Statistics Table"
-    ::= { ssoServerEntitlementSvc 6 }
+    ::= { ssoServerEntitlementSvc 5 }
 
 ssoServerEntitlementPolicyStatsEntry OBJECT-TYPE
     SYNTAX	SsoServerEntitlementPolicyStatsEntry
@@ -2789,9 +2729,6 @@ numConnReleased OBJECT-TYPE
 	    numReferrals,
 	    numCachedPolicies,
 	    numCachedReferrals,
-	    entitlementNetworkMonitorName,
-	    entitlementMonitorTotalTime,
-	    entitlementMonitorThruPut,
 	    entitlementPolicyStatsRealmName,
 	    entitlementPolicyCaches,
 	    entitlementReferralCaches,

@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.monitoring.impl;
+package org.forgerock.openam.shared.monitoring;
 
 /**
  * Tiny class to allow us to mock out calls to the current time for

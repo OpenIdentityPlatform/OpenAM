@@ -24,16 +24,19 @@
  *
  * $Id: Evaluator.java,v 1.2 2009/09/10 16:35:38 veiming Exp $
  *
- * Portions copyright 2013 ForgeRock AS.
+ * Portions copyright 2013-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.entitlement.util.NetworkMonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.monitoring.EntitlementConfigurationWrapper;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitoringType;
 
 /**
  * The class evaluates entitlement request and provides decisions.
@@ -47,14 +50,9 @@ public class Evaluator {
 
     public static final int DEFAULT_POLICY_EVAL_THREAD = 10;
 
-    // Statistics monitors
-    private static final NetworkMonitor HAS_ENTITLEMENT_MONITOR =
-        NetworkMonitor.getInstance("hasEntitltmentMonitor");
-    private static final NetworkMonitor EVAL_SINGLE_LEVEL_MONITOR =
-        NetworkMonitor.getInstance("evalSingleLevelMonitor");
-    private static final NetworkMonitor EVAL_SUB_TREE_MONITOR =
-        NetworkMonitor.getInstance("evalSubTreeMonitor");
-    
+    private final PolicyMonitor policyMonitor;
+    private final EntitlementConfigurationWrapper configWrapper;
+
     /**
      * Constructor to create an evaluator of default service type.
      *
@@ -62,6 +60,9 @@ public class Evaluator {
      */
     private Evaluator()
         throws EntitlementException {
+        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        configWrapper = new EntitlementConfigurationWrapper();
+
     }
 
     /**
@@ -77,6 +78,8 @@ public class Evaluator {
         throws EntitlementException {
         adminSubject = subject;
         this.applicationName = applicationName;
+        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        configWrapper = new EntitlementConfigurationWrapper();
     }
 
     /**
@@ -89,6 +92,8 @@ public class Evaluator {
     public Evaluator(Subject subject)
         throws EntitlementException {
         adminSubject = subject;
+        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        configWrapper = new EntitlementConfigurationWrapper();
     }
     
     /**
@@ -110,13 +115,11 @@ public class Evaluator {
         Entitlement e,
         Map<String, Set<String>> envParameters
     ) throws EntitlementException {
-        long start = HAS_ENTITLEMENT_MONITOR.start();
 
         PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
         boolean result = evaluator.hasEntitlement(realm,
             adminSubject, subject, applicationName, e, envParameters);
 
-        HAS_ENTITLEMENT_MONITOR.end(start);
         return result;
     }
 
@@ -181,7 +184,8 @@ public class Evaluator {
             Map<String, Set<String>> environment,
             boolean recursive
     ) throws EntitlementException {
-        long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() : EVAL_SINGLE_LEVEL_MONITOR.start();
+
+        long startTime = System.currentTimeMillis();
 
         Application application = ApplicationManager.getApplication(adminSubject, realm, applicationName);
 
@@ -197,10 +201,9 @@ public class Evaluator {
         List<Entitlement> results = evaluator.evaluate(realm, adminSubject, subject,
                 applicationName, resourceName, environment, recursive);
 
-        if (recursive) {
-            EVAL_SUB_TREE_MONITOR.end(start);
-        } else {
-            EVAL_SINGLE_LEVEL_MONITOR.end(start);
+        if (configWrapper.isMonitoringRunning()) {
+            policyMonitor.addEvaluation(System.currentTimeMillis() - startTime, realm, applicationName, resourceName,
+                    subject, recursive ? PolicyMonitoringType.SUBTREE : PolicyMonitoringType.SELF);
         }
 
         return results;

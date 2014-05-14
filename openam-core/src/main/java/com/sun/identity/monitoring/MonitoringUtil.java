@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -58,19 +58,7 @@ public class MonitoringUtil {
     private static boolean isMonAvailable = true;
     private static String [] networkMonitors = {
         "dbLookupPrivileges",
-        "dbLookupReferrals",
-        "privilegeSingleLevelEvaluation",
-        "privilegeSubTreeEvaluation",
-        "hasEntitlementMonitor",
-        "evalSingleLevelMonitor",
-        "evalSubTreeMonitor",
-        "PrivilegeEvaluatorMonitorInit",
-        "PrivilegeEvaluatorMonitorResourceIndex",
-        "PrivilegeEvaluatorMonitorSubjectIndex",
-        "PrivilegeEvaluatorMonitorSearch",
-        "PrivilegeEvaluatorMonitorSearchNext",
-        "PrivilegeEvaluatorMonitorSubmit",
-        "PrivilegeEvaluatorMonitorCombineResults"
+        "dbLookupReferrals"
         };
 
     public static String HTTP_AUTH_FILE = "openam_mon_auth";
@@ -285,7 +273,7 @@ public class MonitoringUtil {
         return ret;
     }
 
-    public static boolean isRunning() {
+    private static void checkInit() {
         if (!initialized) {
             try {
                 Class.forName("com.sun.identity.monitoring.Agent");
@@ -298,7 +286,15 @@ public class MonitoringUtil {
             }
             initialized = true;
         }
-        
+    }
+
+    public static boolean isRunning() {
+        checkInit();
         return isMonAvailable ? Agent.isRunning() : false;
+    }
+
+    public static int getPolicyWindowSize() {
+        checkInit();
+        return isMonAvailable ? Agent.getPolicyWindowSize() : 0;
     }
 }

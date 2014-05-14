@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock Inc
  */
 package com.sun.identity.common;
 
@@ -1130,7 +1130,11 @@ public class ConfigMonitoring {
             boolean snmpEna =
                 Boolean.valueOf(CollectionHelper.getMapAttr(monAttrs,
                     "iplanet-am-monitoring-snmp-enabled")).booleanValue();
-            
+            int policyWindow =
+                    Integer.valueOf(CollectionHelper.getMapAttr(monAttrs,
+                            "iplanet-am-monitoring-policy-window"));
+
+
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "\n" +
                     "     monitoring enabled = " + monEna + "\n" +
@@ -1140,7 +1144,8 @@ public class ConfigMonitoring {
                     "     rmiPort = " + rmiPort + "\n" +
                     "     rmiPort enabled = " + rmiEna + "\n" +
                     "     snmpPort = " + snmpPort + "\n" +
-                    "     snmpPort enabled = " + snmpEna + "\n"
+                    "     snmpPort enabled = " + snmpEna + "\n" +
+                    "     policy eval window size = " + policyWindow + "\n"
                     );
             }
 
@@ -1152,7 +1157,8 @@ public class ConfigMonitoring {
                     rmiPort(rmiPort).
                     monHtmlEnabled(httpEna).
                     monRmiEnabled(rmiEna).
-                    monSnmpEnabled(snmpEna).build();
+                    monSnmpEnabled(snmpEna).
+                    policyWindowSize(policyWindow).build();
 
             int i = Agent.startAgent(sMonInfo);
             if (i != 0) {

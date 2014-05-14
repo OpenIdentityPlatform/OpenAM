@@ -44,6 +44,7 @@ import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.policy.PolicyConfig;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyException;
@@ -65,8 +66,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.security.auth.Subject;
-
-import static org.forgerock.openam.entitlement.utils.EntitlementUtils.*;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplication;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.createApplicationType;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActionSet;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getActions;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAdminToken;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getAttribute;
 
 /**
  *
@@ -1329,5 +1334,19 @@ public class EntitlementService extends EntitlementConfiguration {
         // switching of the Policy Config properties
         Map genericEnv = environment;
         genericEnv.put(PolicyEvaluator.SUN_AM_POLICY_CONFIG, savedPolicyConfig);
+    }
+
+    /**
+     * Whether the overall monitoring framework is enabled and running.
+     *
+     * @return true if monitoring is enabled, false otherwise.
+     */
+    public boolean isMonitoringRunning() {
+        return MonitoringUtil.isRunning();
+    }
+
+    @Override
+    public int getPolicyWindowSize() {
+        return MonitoringUtil.getPolicyWindowSize();
     }
 }

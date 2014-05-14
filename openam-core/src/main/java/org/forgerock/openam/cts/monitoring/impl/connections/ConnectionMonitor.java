@@ -17,8 +17,8 @@
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
 import java.util.concurrent.atomic.AtomicLong;
-import org.forgerock.openam.cts.monitoring.impl.RateTimer;
-import org.forgerock.openam.cts.monitoring.impl.RateWindow;
+import org.forgerock.openam.shared.monitoring.RateTimer;
+import org.forgerock.openam.shared.monitoring.RateWindow;
 
 /**
  * This class maintains a cumulative count and rate for a CTS connections

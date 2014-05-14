@@ -28,7 +28,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2014 ForgeRock AS
 -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
@@ -128,6 +128,15 @@
                     </BooleanValues>
                     <DefaultValues>
                         <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-policy-window"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="100" rangeEnd="1000000"
+                                 i18nKey="a107">
+                    <DefaultValues>
+                        <Value>10000</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>

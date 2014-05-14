@@ -50,7 +50,7 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
      */
     public static final String EXECUTOR_BINDING_NAME = "MONITORING_EXECUTOR";
 
-    private Debug debug;
+    private final Debug debug;
 
     private final TokenOperationsStore tokenOperationsStore;
     private final ExecutorService executorService;

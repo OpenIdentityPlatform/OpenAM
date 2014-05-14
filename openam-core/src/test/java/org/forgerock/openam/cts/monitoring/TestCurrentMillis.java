@@ -13,7 +13,9 @@
 *
 * Copyright 2014 ForgeRock AS.
 */
-package org.forgerock.openam.cts.monitoring.impl;
+package org.forgerock.openam.cts.monitoring;
+
+import org.forgerock.openam.shared.monitoring.RateTimer;
 
 /**
  * Part of test suite for Monitoring system

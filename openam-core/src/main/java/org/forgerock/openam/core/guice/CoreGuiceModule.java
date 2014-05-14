@@ -38,6 +38,12 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -65,19 +71,14 @@ import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -135,6 +136,9 @@ public class CoreGuiceModule extends AbstractModule {
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
+        bind(Debug.class).annotatedWith(Names.named(PolicyMonitor.POLICY_MONITOR_DEBUG))
+                .toInstance(Debug.getInstance(PolicyMonitor.POLICY_MONITOR_DEBUG));
+
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
 
@@ -161,6 +165,9 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
 
+        // Policy Monitoring
+        bind(PolicyMonitor.class).to(PolicyMonitorImpl.class);
+
         /**
          * Session related dependencies.
          */
@@ -185,6 +192,11 @@ public class CoreGuiceModule extends AbstractModule {
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
+    }
+
+    @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
+    ExecutorService getPolicyMonitoringExecutorService(ExecutorServiceFactory esf) {
+        return esf.createThreadPool(5);
     }
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)

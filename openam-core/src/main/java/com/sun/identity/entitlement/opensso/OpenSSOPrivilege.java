@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock Inc
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
@@ -38,7 +38,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.PrivilegeType;
-import com.sun.identity.entitlement.util.NetworkMonitor;
+import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import java.util.ArrayList;
@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -57,14 +59,15 @@ import org.json.JSONObject;
  * 
  */
 public class OpenSSOPrivilege extends Privilege {
-    private static final NetworkMonitor EVAL_SINGLE_LEVEL_MONITOR =
-        NetworkMonitor.getInstance("privilegeSingleLevelEvaluation");
-    private static final NetworkMonitor EVAL_SUB_TREE_MONITOR =
-        NetworkMonitor.getInstance("privilegeSubTreeEvaluation");
+
     private String policyName;
 
+    private final PolicyMonitor policyMonitor;
+
     public OpenSSOPrivilege() {
-       super();
+        super();
+
+        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
     }
 
     @Override
@@ -120,8 +123,9 @@ public class OpenSSOPrivilege extends Privilege {
         Map<String, Set<String>> environment,
         boolean recursive
     ) throws EntitlementException {
-        long start = (recursive) ? EVAL_SUB_TREE_MONITOR.start() :
-            EVAL_SINGLE_LEVEL_MONITOR.start();
+
+        final long startTime = System.currentTimeMillis();
+
         List<Entitlement> results = new ArrayList<Entitlement>();
         Set<ConditionDecision> decisions = new HashSet();
 
@@ -167,10 +171,10 @@ public class OpenSSOPrivilege extends Privilege {
             results.add(e);
         }
 
-        if (recursive) {
-            EVAL_SUB_TREE_MONITOR.end(start);
-        } else {
-            EVAL_SINGLE_LEVEL_MONITOR.end(start);
+        final long duration = System.currentTimeMillis() - startTime;
+
+        if (MonitoringUtil.isRunning()) {
+            policyMonitor.addEvaluation(policyName, duration, realm, applicationName, resourceName, subject);
         }
 
         return results;

@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -313,4 +313,18 @@ public abstract class EntitlementConfiguration {
      * @param environment The Entitlement environment to update with the saved Policy Configuration values.
      */
     public abstract void restoreSavedPolicyConfig(Map<String, Set<String>> environment, Map savedPolicyConfig);
+
+    /**
+     * For letting us know whether or not the Agent monitoring is enabled in core.
+     *
+     * @return true if monitoring is enabled, false otherwise
+     */
+    public abstract boolean isMonitoringRunning();
+
+    /**
+     * Informs us of the size of the policy window set in the configurable options.
+     *
+     * @return the value of the window size as configured.
+     */
+    public abstract int getPolicyWindowSize();
 }

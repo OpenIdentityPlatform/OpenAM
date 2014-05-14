@@ -2,7 +2,7 @@
 <!--
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -76,6 +76,25 @@
                                 <mkdir dir="${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/cts" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true" classpath="${compile_classpath}">
                                     <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/cts&quot; -mc -desc -tp org.forgerock.openam.monitoring.cts &quot;${basedir}/src/main/resources/mib/FORGEROCK-OPENAM-CTS.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;" />
+                                </java>
+                            </target>
+                            <sourceRoot>${project.build.directory}/generated-sources/mib</sourceRoot>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>generate-fr-policy-mib-source</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.plugin.classpath" />
+
+                                <mkdir dir="${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/policy" />
+                                <java classname="com.sun.jdmk.tools.MibGen" fork="true" classpath="${compile_classpath}">
+                                    <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/policy&quot; -mc -desc -tp org.forgerock.openam.monitoring.policy &quot;${basedir}/src/main/resources/mib/FORGEROCK-OPENAM-POLICY.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;" />
                                 </java>
                             </target>
                             <sourceRoot>${project.build.directory}/generated-sources/mib</sourceRoot>

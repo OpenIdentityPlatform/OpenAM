@@ -14,8 +14,10 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.monitoring.impl;
+package org.forgerock.openam.monitoring;
 
+import org.forgerock.openam.shared.monitoring.RateTimer;
+import org.forgerock.openam.shared.monitoring.RateWindow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;

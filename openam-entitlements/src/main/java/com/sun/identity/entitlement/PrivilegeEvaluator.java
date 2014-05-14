@@ -24,16 +24,13 @@
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
  *
- * Portions copyright 2010-2013 ForgeRock, Inc.
+ * Portions copyright 2010-2014 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.IThreadPool;
-import com.sun.identity.entitlement.util.NetworkMonitor;
-
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,8 +41,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.security.auth.Subject;
-import org.forgerock.openam.session.util.AppTokenHandler;
 import org.forgerock.openam.entitlement.PrivilegeEvaluatorContext;
+import org.forgerock.openam.session.util.AppTokenHandler;
 
 /**
  * This class evaluates entitlements of a subject for a given resource
@@ -78,22 +75,6 @@ class PrivilegeEvaluator {
 
     private static IThreadPool threadPool;
     private static boolean isMultiThreaded;
-    
-    // Stats monitor
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_INIT =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorInit");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_RES_INDEX =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorResourceIndex");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_SUB_INDEX =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorSubjectIndex");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_SEARCH =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorSearch");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorSearchNext");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_SUBMIT =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorSubmit");
-    private static final NetworkMonitor PRIVILEGE_EVAL_MONITOR_WAIT =
-        NetworkMonitor.getInstance("PrivilegeEvaluatorMonitorCombineResults");
 
     static {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
@@ -120,7 +101,7 @@ class PrivilegeEvaluator {
     /**
      * Initializes the evaluator.
      *
-     * @param adminSubject Administrator subject which is used for evcaluation.
+     * @param adminSubject Administrator subject which is used fo evcaluation.
      * @param subject Subject to be evaluated.
      * @param realm Realm Name
      * @param applicationName Application Name.
@@ -141,7 +122,6 @@ class PrivilegeEvaluator {
         Map<String, Set<String>> envParameters,
         boolean recursive
     ) throws EntitlementException {
-        long start = PRIVILEGE_EVAL_MONITOR_INIT.start();
         this.adminSubject = adminSubject;
         this.subject = subject;
         this.realm = realm;
@@ -176,7 +156,6 @@ class PrivilegeEvaluator {
             }
         }
 
-        PRIVILEGE_EVAL_MONITOR_INIT.end(start);
     }
 
     private static String getPrincipalId(Subject subject) {
@@ -191,7 +170,7 @@ class PrivilegeEvaluator {
      * Returrns <code>true</code> if the subject has privilege to have the
      * given entitlement.
      *
-     * @param adminSubject Administrator subject which is used for evcaluation.
+     * @param adminSubject Administrator subject which is used for evaluation.
      * @param subject Subject to be evaluated.
      * @param applicationName Application Name.
      * @param entitlement Entitlement to be evaluated.
@@ -214,9 +193,7 @@ class PrivilegeEvaluator {
             entitlement.getActionValues().keySet(), envParameters, false);
         entitlement.setApplicationName(applicationName);
 
-        long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         indexes = entitlement.getResourceSearchIndexes(adminSubject, realm);
-        PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
 
         List<Entitlement> results = evaluate(realm);
         Entitlement result = results.get(0);
@@ -244,7 +221,7 @@ class PrivilegeEvaluator {
      * @param recursive <code>true</code> for sub tree evaluation.
      * @return <code>true</code> if the subject has privilege to have the
      * given entitlement.
-     * @throws com.sun.identity.entitlement. EntitlementException if
+     * @throws com.sun.identity.entitlement.EntitlementException if
      * evaluation fails.
      */
     public List<Entitlement> evaluate(
@@ -256,32 +233,31 @@ class PrivilegeEvaluator {
         Map<String, Set<String>> envParameters,
         boolean recursive
     ) throws EntitlementException {
+
+
         init(adminSubject, subject, realm, applicationName,
             resourceName, null, envParameters, recursive);        
-        long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         indexes = getApplication().getResourceSearchIndex(resourceName, realm);
-        PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
 
         return evaluate(realm);
+
+
+
     }
     
     private List<Entitlement> evaluate(String realm)
         throws EntitlementException {
 
         // Subject index
-        long start = PRIVILEGE_EVAL_MONITOR_SUB_INDEX.start();
         SubjectAttributesManager sam = SubjectAttributesManager.getInstance(
             adminSubject, realm);
-        PRIVILEGE_EVAL_MONITOR_SUB_INDEX.end(start);
-        
+
         // Search for policies
-        start = PRIVILEGE_EVAL_MONITOR_SEARCH.start();
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
             adminSubject, realm);
         Iterator<IPrivilege> i = pis.search(realm, indexes,
             sam.getSubjectSearchFilter(subject, applicationName), recursive);
-        PRIVILEGE_EVAL_MONITOR_SEARCH.end(start);
-        
+
         // Submit the privileges for evaluation
         // First collect tasks to be evaluated locally
         Set<IPrivilege> localPrivileges = new HashSet<IPrivilege>(
@@ -290,7 +266,6 @@ class PrivilegeEvaluator {
 
         int totalCount = 0;
         while (totalCount != tasksPerThread) {
-            start = PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.start();
             if (i.hasNext()) {
                 IPrivilege p = i.next();
                 if (debug.messageEnabled()) {
@@ -300,9 +275,7 @@ class PrivilegeEvaluator {
                 }
                 localPrivileges.add(p);
                 totalCount++;
-                PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.end(start);
             } else {
-                PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.end(start);
                 break;
             }
         }
@@ -314,7 +287,6 @@ class PrivilegeEvaluator {
         Object appToken = AppTokenHandler.getAndClear();
 
         while (true) {
-            start = PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.start();
             if (!i.hasNext()) {
                 break;
             }
@@ -329,27 +301,21 @@ class PrivilegeEvaluator {
                     p.getName(), null);
             }
             privileges.add(p);
-            PRIVILEGE_EVAL_MONITOR_SEARCH_NEXT.end(start);
             totalCount++;
             if ((totalCount % tasksPerThread) == 0) {
-                start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
                 threadPool.submit(new PrivilegeTask(this, privileges,
-                    isMultiThreaded, appToken, ctx));
-                PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
+                        isMultiThreaded, appToken, ctx));
                 privileges.clear();
             }
         }
         if ((privileges != null) && !privileges.isEmpty()) {
-            start = PRIVILEGE_EVAL_MONITOR_SUBMIT.start();
             threadPool.submit(new PrivilegeTask(this, privileges,
-                isMultiThreaded, appToken, ctx));
-            PRIVILEGE_EVAL_MONITOR_SUBMIT.end(start);
+                    isMultiThreaded, appToken, ctx));
         }
         // IPrivilege privileges locally
         (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken, ctx)).run();
 
         // Wait for submitted threads to complete evaluation
-        start = PRIVILEGE_EVAL_MONITOR_WAIT.start();
         if (tasksSubmitted) {
             if (isMultiThreaded) {
                 receiveEvalResults(totalCount);
@@ -367,8 +333,7 @@ class PrivilegeEvaluator {
                 isDone = entitlementCombiner.isDone();
             }
         }
-        PRIVILEGE_EVAL_MONITOR_WAIT.end(start);
-        
+
         if (eException != null) {
             throw eException;
         }

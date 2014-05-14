@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.monitoring;
 
@@ -35,6 +35,7 @@ public class SSOServerMonConfig {
     int htmlPort;
     int snmpPort;
     int rmiPort;
+    int policyWindow;
     boolean monitoringEnabled;
     boolean monHtmlPortEnabled;
     boolean monRmiPortEnabled;
@@ -53,12 +54,14 @@ public class SSOServerMonConfig {
         monRmiPortEnabled = asib.monRmiPortEnabled;
         monSnmpPortEnabled = asib.monSnmpPortEnabled;
         monAuthFilePath = asib.monAuthFilePath;
+        policyWindow = asib.policyWindow;
     }
 
     public static class SSOServerMonInfoBuilder {
         int htmlPort;
         int snmpPort;
         int rmiPort;
+        int policyWindow;
         boolean monitoringEnabled;
         boolean monHtmlPortEnabled;
         boolean monRmiPortEnabled;
@@ -102,6 +105,11 @@ public class SSOServerMonConfig {
         public SSOServerMonInfoBuilder htmlAuthFile (String authFilePath)
         {
             monAuthFilePath = authFilePath;
+            return this;
+        }
+
+        public SSOServerMonInfoBuilder policyWindowSize (int policyWindowSize) {
+            policyWindow = policyWindowSize;
             return this;
         }
 

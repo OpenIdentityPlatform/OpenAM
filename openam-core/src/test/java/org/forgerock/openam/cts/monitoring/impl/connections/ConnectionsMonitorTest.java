@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
-import org.forgerock.openam.cts.monitoring.impl.RateTimer;
-import org.forgerock.openam.cts.monitoring.impl.RateWindow;
-import org.forgerock.openam.cts.monitoring.impl.TestCurrentMillis;
+import org.forgerock.openam.cts.monitoring.TestCurrentMillis;
+import org.forgerock.openam.shared.monitoring.RateTimer;
+import org.forgerock.openam.shared.monitoring.RateWindow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
