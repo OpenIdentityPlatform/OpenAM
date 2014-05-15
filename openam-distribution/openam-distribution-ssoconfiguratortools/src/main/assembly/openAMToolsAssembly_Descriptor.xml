@@ -40,6 +40,13 @@
                 <include>org.forgerock.openam:openam-upgrade-tool</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+            <includes>
+                <include>${forgerock.license.groupId}:${forgerock.license.artifactId}:txt:${forgerock.license.version}</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <!-- Single Files -->
     <fileSets>
@@ -50,7 +57,7 @@
         </fileSet>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
-            <directory>${project.basedir}/../../target/legal-notices</directory>
+            <directory>${project.basedir}/../../license</directory>
             <includes>
                 <include>**/**</include>
             </includes>

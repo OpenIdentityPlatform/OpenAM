@@ -170,6 +170,12 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${forgerock.license.groupId}</groupId>
+            <artifactId>${forgerock.license.artifactId}</artifactId>
+            <version>${forgerock.license.version}</version>
+            <type>txt</type>
+        </dependency>
     </dependencies>
 </project>
 

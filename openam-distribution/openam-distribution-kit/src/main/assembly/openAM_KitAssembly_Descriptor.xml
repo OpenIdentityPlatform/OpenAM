@@ -51,6 +51,13 @@
                 <include>org.forgerock.openam:openam-idpdiscovery-war:war</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+            <includes>
+                <include>${forgerock.license.groupId}:${forgerock.license.artifactId}:txt:${forgerock.license.version}</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <fileSets>
         <fileSet>

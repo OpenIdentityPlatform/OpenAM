@@ -76,5 +76,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-upgrade-tool</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${forgerock.license.groupId}</groupId>
+            <artifactId>${forgerock.license.artifactId}</artifactId>
+            <version>${forgerock.license.version}</version>
+            <type>txt</type>
+        </dependency>
     </dependencies>
 </project>

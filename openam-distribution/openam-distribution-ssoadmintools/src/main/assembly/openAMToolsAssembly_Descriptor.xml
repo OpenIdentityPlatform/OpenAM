@@ -52,14 +52,20 @@
                 <include>javax.servlet:servlet-api</include>
             </includes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+            <includes>
+                <include>${forgerock.license.groupId}:${forgerock.license.artifactId}:txt:${forgerock.license.version}</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
 
     <!-- File Groupings -->
     <fileSets>
-
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
-            <directory>${project.basedir}/../../target/legal-notices</directory>
+            <directory>${project.basedir}/../../license</directory>
             <includes>
                 <include>**/**</include>
             </includes>
