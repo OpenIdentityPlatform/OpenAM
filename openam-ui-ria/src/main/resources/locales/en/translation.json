@@ -39,7 +39,9 @@
                 "securityDataChanged" : "Password was changed",
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
-                "errorFetchingNotifications" : "Error Fetching notifications."
+                "errorFetchingNotifications" : "Error Fetching notifications.",
+                "identityNoSpace" : "Identity names may not have a space <br> character at the beginning or end."
+                
             },
             "AdminMessages" : {
                 "cannotDeleteYourself" : "You can't delete yourself",

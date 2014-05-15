@@ -104,28 +104,6 @@ define("org/forgerock/openam/ui/common/delegates/PolicyDelegate", [
                                         "policyFunction": functions["not-empty"]
                                     }
                                 ],
-                                "name": "givenName"
-                            },
-                            {
-                                "policyRequirements": [
-                                    "REQUIRED"
-                                ],
-                                "policies": [
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "required",
-                                        "policyFunction": functions["required"]
-                                    },
-                                    {
-                                        "policyRequirements": [
-                                            "REQUIRED"
-                                        ],
-                                        "policyId": "not-empty",
-                                        "policyFunction": functions["not-empty"]
-                                    }
-                                ],
                                 "name": "sn"
                             },
                             {

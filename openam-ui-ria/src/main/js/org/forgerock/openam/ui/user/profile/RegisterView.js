@@ -113,10 +113,12 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
 
             },
             error = function(e) {
-                var response = JSON.parse(e.responseText);
+                var responseMessage = JSON.parse(e.responseText).message;
                 _this.$el.find("input[type=submit]").prop('disabled', false);
-                if(response.message.indexOf("ldap exception") > -1) {
+                if (responseMessage.indexOf("ldap exception") > -1) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
+                } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
                 }
             };
 
