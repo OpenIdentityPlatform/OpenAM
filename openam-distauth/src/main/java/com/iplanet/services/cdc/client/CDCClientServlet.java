@@ -24,10 +24,7 @@
  *
  * $Id: CDCClientServlet.java,v 1.6 2009/01/12 18:57:12 madan_ranganath Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.iplanet.services.cdc.client;
@@ -55,10 +52,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import com.sun.identity.shared.Constants;
+import java.util.Set;
 
 /**
  * The <code>CDCClientServlet</code> is the heart of the Cross Domain Single Signon mechanism of OpenAM in the DMZ
@@ -78,7 +75,8 @@ import com.sun.identity.shared.Constants;
  */
 public class CDCClientServlet extends HttpServlet {
     private static final ArrayList adviceParams = new ArrayList();
-    private static HashSet invalidSet = new HashSet();
+    private static final Set<String> INVALID_SET = new HashSet<String>();
+    private static final Set<String> VALID_LOGIN_URIS = new HashSet<String>();
     private static final String LEFT_ANGLE              = "<";
     private static final String RIGHT_ANGLE             = ">";
     private static final String URLENC_RIGHT_ANGLE      = "%3e";
@@ -107,39 +105,7 @@ public class CDCClientServlet extends HttpServlet {
     static Debug debug = Debug.getInstance(DEBUG_FILE_NAME);
 
     static {
-    	adviceParams.add("module");
-    	adviceParams.add("authlevel");
-    	adviceParams.add("role");
-    	adviceParams.add("service");
-    	adviceParams.add("user");
-    	adviceParams.add("realm");
-    	adviceParams.add("org");
-        adviceParams.add("resource");
-    	adviceParams.add("sunamcompositeadvice");
-        String invalidStrings = SystemPropertiesManager.get(
-            Constants.INVALID_GOTO_STRINGS);
-        if (invalidSet.isEmpty()) {
-            debug.message("CDCClientServlet:static block: creating invalidSet");
-            if (invalidStrings == null) {
-                debug.message("CDCClientServlet: invalidStrings is null");
-                invalidSet.add(LEFT_ANGLE);
-                invalidSet.add(RIGHT_ANGLE);
-                invalidSet.add(URLENC_LEFT_ANGLE);
-                invalidSet.add(URLENC_RIGHT_ANGLE);
-                invalidSet.add(JAVASCRIPT);
-                invalidSet.add(URLENC_JAVASCRIPT);
-            } else {
-                if (debug.messageEnabled()) {
-                    debug.message("CDCClientServlet: invalidStrings is: " + invalidStrings);
-                }
-                StringTokenizer st = new StringTokenizer(invalidStrings, DELIM);
-                while (st.hasMoreTokens()) {
-                    invalidSet.add((String)st.nextToken());
-                }
-            }
-        }
-        String urlFromProps = SystemProperties.get(Constants.CDCSERVLET_LOGIN_URL);
-        cdcAuthURI = (urlFromProps != null) ? urlFromProps: AUTHURI;
+        initConfig();
     }
 
     private static SSOTokenManager tokenManager;
@@ -246,20 +212,13 @@ public class CDCClientServlet extends HttpServlet {
                 debug.message("CDCClientServlet:doGetPost():validating goto: " + gotoParameter
                         + " and target: " + targetParameter);
             }
-            for (Iterator it = invalidSet.iterator(); it.hasNext();) {
-                String invalidStr = (String)it.next();
-                if ((gotoParameter != null ) &&
-                    (gotoParameter.toLowerCase().indexOf(invalidStr) != -1 ))
-                {
-                    showError(response, SERVER_ERROR_STR_MATCH + "GOTO parameter has invalid "
-                        +"characters");
+            for (String invalidStr : INVALID_SET) {
+                if (gotoParameter != null && gotoParameter.toLowerCase().contains(invalidStr)) {
+                    showError(response, SERVER_ERROR_STR_MATCH + "GOTO parameter has invalid characters");
                     return;
                 }
-                if ((targetParameter != null ) &&
-                   (targetParameter.toLowerCase().indexOf(invalidStr) != -1 ))
-                {
-                    showError(response, SERVER_ERROR_STR_MATCH + "TARGET parameter has invalid "
-                        +"characters");
+                if (targetParameter != null  && targetParameter.toLowerCase().contains(invalidStr)) {
+                    showError(response, SERVER_ERROR_STR_MATCH + "TARGET parameter has invalid characters");
                     return;
                 }
             }
@@ -571,28 +530,27 @@ public class CDCClientServlet extends HttpServlet {
                     
                 // Construct the login URL
                 String loginURI = request.getParameter(LOGIN_URI);
-                String cdcUrl;
+                String cdcUri;
 
-                if (loginURI != null && !loginURI.equals("")) {
+                if (loginURI != null && !loginURI.isEmpty() && isValidCDCURI(loginURI)) {
                     if (debug.messageEnabled()) {
-                        debug.message("CDCClientServlet.redirectForAuthentication"
-                            +":found " + LOGIN_URI + "=" + loginURI);
+                        debug.message("CDCClientServlet.redirectForAuthentication:found " + LOGIN_URI + "="
+                                + loginURI);
                     }
 
-                    cdcUrl = loginURI;
+                    cdcUri = loginURI;
                 } else {
-                    cdcUrl = cdcAuthURI;
+                    cdcUri = cdcAuthURI;
                 }
 
                 if (debug.messageEnabled()) {
-                    debug.message("CDCClientServlet init redirect URL is" +
-                        "set to= " + cdcUrl);
+                    debug.message("CDCClientServlet.redirectForAuthentication: Login URI is set to = " + cdcUri);
                 }
                            
-                if (cdcUrl.indexOf(QUESTION_MARK) == -1) {
-                    redirectURL.append(cdcUrl).append(QUESTION_MARK);
+                if (cdcUri.indexOf(QUESTION_MARK) == -1) {
+                    redirectURL.append(cdcUri).append(QUESTION_MARK);
                 } else {
-                    redirectURL.append(cdcUrl).append(AMPERSAND);
+                    redirectURL.append(cdcUri).append(AMPERSAND);
                 }
 
                 if (policyAdviceList != null) {
@@ -614,7 +572,7 @@ public class CDCClientServlet extends HttpServlet {
                 redirectURL.append(authURL).append(deployDescriptor)
                     .append(CDCURI).append(QUESTION_MARK)
                     .append(request.getQueryString());
-		//Reset the cookie value to null, to avoid continous loop
+                //Reset the cookie value to null, to avoid continuous loop
                 // when a load balancer is used
                 if (authCookie != null) {
 	            authCookie.setValue("");
@@ -750,5 +708,83 @@ public class CDCClientServlet extends HttpServlet {
         } catch(IOException ioe){
             debug.error("CDCClientServlet.sendAuthnResponse:" + ioe.getMessage());
         }
-    }   
+    }
+
+    /**
+     * Return <code>true</code> if the passed URI is valid compared to the valid set loaded during initialization.
+     *
+     * @param cdcUri The URI to test.
+     * @return <code>true</code> if the URI is considered valid, <code>false</code> otherwise.
+     */
+    private boolean isValidCDCURI(String cdcUri) {
+        int questionMark = cdcUri.indexOf(QUESTION_MARK);
+
+        // We are only interested in the URI part up to any parameters that may be included.
+        if (questionMark != -1) {
+            cdcUri = cdcUri.substring(0, questionMark);
+        }
+
+        // If there is not an exact match for the passed value then it cannot be considered valid
+        boolean result = VALID_LOGIN_URIS.contains(cdcUri);
+
+        if (debug.messageEnabled()) {
+            debug.message("CDCClientServlet.isValidCDCURI: checking if " + cdcUri + " is in validLoginURISet: "
+                    + VALID_LOGIN_URIS + " result:" + result);
+        }
+
+        return result;
+    }
+
+    private static void initConfig() {
+        adviceParams.add("module");
+        adviceParams.add("authlevel");
+        adviceParams.add("role");
+        adviceParams.add("service");
+        adviceParams.add("user");
+        adviceParams.add("realm");
+        adviceParams.add("org");
+        adviceParams.add("resource");
+        adviceParams.add("sunamcompositeadvice");
+        String invalidStrings = SystemPropertiesManager.get(Constants.INVALID_GOTO_STRINGS);
+        if (INVALID_SET.isEmpty()) {
+            debug.message("CDCClientServlet.initConfig: creating invalidSet");
+            if (invalidStrings == null) {
+                debug.message("CDCClientServlet.initConfig: invalidStrings is null");
+                INVALID_SET.add(LEFT_ANGLE);
+                INVALID_SET.add(RIGHT_ANGLE);
+                INVALID_SET.add(URLENC_LEFT_ANGLE);
+                INVALID_SET.add(URLENC_RIGHT_ANGLE);
+                INVALID_SET.add(JAVASCRIPT);
+                INVALID_SET.add(URLENC_JAVASCRIPT);
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("CDCClientServlet.initConfig: invalidStrings is: " + invalidStrings);
+                }
+                StringTokenizer st = new StringTokenizer(invalidStrings, DELIM);
+                while (st.hasMoreTokens()) {
+                    INVALID_SET.add(st.nextToken());
+                }
+            }
+            debug.message("CDCClientServlet.initConfig: created invalidSet " + INVALID_SET);
+        }
+
+        String urlFromProps = SystemProperties.get(Constants.CDCSERVLET_LOGIN_URL);
+        cdcAuthURI = (urlFromProps != null) ? urlFromProps : AUTHURI;
+
+        String validLoginURIStrings = SystemPropertiesManager.get(Constants.VALID_LOGIN_URIS);
+        debug.message("CDCClientServlet.initConfig: creating validLoginURISet");
+        if (validLoginURIStrings == null) {
+            debug.message("CDCClientServlet.initConfig: validLoginURIStrings is null, creating default set");
+            VALID_LOGIN_URIS.add(cdcAuthURI);
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("CDCClientServlet.initConfig: validLoginURIStrings is: " + validLoginURIStrings);
+            }
+            StringTokenizer st = new StringTokenizer(validLoginURIStrings, DELIM);
+            while (st.hasMoreTokens()) {
+                VALID_LOGIN_URIS.add(st.nextToken());
+            }
+        }
+        debug.message("CDCClientServlet.initConfig: created validLoginURISet " + VALID_LOGIN_URIS);
+    }
 }
