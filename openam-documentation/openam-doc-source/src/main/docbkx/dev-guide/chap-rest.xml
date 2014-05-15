@@ -709,6 +709,11 @@ userdetails.attribute.value=6319</computeroutput>
     </para>
 
     <para>
+     Under <literal>/json/conditiontypes</literal> you find a JSON-based API
+     for viewing what types of conditions you can use when defining policies.
+    </para>
+
+    <para>
      See <xref linkend="rest-api-authz-json" /> below.
     </para>
    </listitem>
@@ -1476,6 +1481,12 @@ $ <userinput>curl \
     }
 }
        </programlisting>
+
+       <para>
+        To read a condition description, or to list available conditions,
+        see <xref linkend="rest-api-authz-condition-types" />.
+       </para>
+
       </listitem>
      </varlistentry>
 
@@ -3134,6 +3145,188 @@ $ <userinput>curl \
   "remainingPagedResults" : -1
 }</computeroutput>
      </screen>
+    </section>
+   </section>
+
+   <section xml:id="rest-api-authz-condition-types">
+    <title>Viewing Condition Types</title>
+
+    <para>
+     Condition types describe the JSON representation
+     of conditions that you can use in policy definitions.
+    </para>
+
+    <para>
+     Condition types are server-wide, and do not differ by realm.
+     Hence the URI for the condition types API
+     does not contain a realm component,
+     but is <literal>/json/conditiontypes</literal>.
+    </para>
+
+    <section xml:id="rest-api-authz-condition-types-read">
+     <title>Reading Condition Types</title>
+
+     <para>
+      To read a condition type, perform an HTTP GET
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <para>
+      You can use the query string parameter
+      <literal>_prettyPrint=true</literal> to make the output easier to read.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/conditiontypes/IP</userinput>
+<computeroutput>{
+  "title" : "IP",
+  "config" : {
+    "type" : "object",
+    "properties" : {
+      "startIp" : {
+        "type" : "string"
+      },
+      "endIp" : {
+        "type" : "string"
+      }
+    }
+  }
+}</computeroutput>
+     </screen>
+
+     <para>
+      Notice that the condition type has a title,
+      and a configuration specification.
+      The configuration specification in this case indicates
+      that an IP condition has two properties, "startIp" and "endIp",
+      each of which take a string value.
+      In other words, a concrete IP condition specification
+      is represented in a policy definition as in the following example.
+     </para>
+
+     <programlisting language="java">
+{
+   "type": "IP",
+   "startIp": "127.0.0.1",
+   "endIp": "127.0.0.255"
+}
+     </programlisting>
+
+     <para>
+      The configuration is what differs the most across condition types.
+      The NOT condition, for example, takes a single condition object
+      as the body of its configuration.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/conditiontypes/NOT</userinput>
+<computeroutput>{
+  "title" : "NOT",
+  "config" : {
+    "type" : "object",
+    "properties" : {
+      "condition" : {
+        "type" : "object",
+        "properties" : {
+        }
+      }
+    }
+  }
+}</computeroutput>
+     </screen>
+
+     <para>
+      The concrete NOT condition therefore takes the following form.
+     </para>
+
+     <programlisting language="java">
+{
+    "type": "NOT",
+    "condition": {
+        ...
+    }
+}
+     </programlisting>
+
+     <para>
+      The OR condition takes an array of conditions.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/conditiontypes/OR</userinput>
+<computeroutput>{
+  "title" : "OR",
+  "config" : {
+    "type" : "object",
+    "properties" : {
+      "conditions" : {
+        "type" : "array",
+        "items" : {
+          "type" : "any"
+        }
+      }
+    }
+  }
+}</computeroutput>
+     </screen>
+
+     <para>
+      A corresponding concrete OR condition thus takes the following form.
+     </para>
+
+
+     <programlisting language="java">
+{
+    "type": "OR",
+    "conditions": [
+        {
+            ...
+        },
+        {
+            ...
+        },
+        ...
+    ]
+}
+     </programlisting>
+    </section>
+
+    <section xml:id="rest-api-authz-condition-types-query">
+     <title>Listing Condition Types</title>
+
+     <para>
+      To list all condition types, perform an HTTP GET on the endpoint,
+      setting the query string parameter, <literal>_queryFilter=true</literal>,
+      as in the following example.
+     </para>
+
+     <screen width="83">
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/realm/conditiontypes?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ ... condition types ... ],
+  "resultCount" : 10,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameter
+      <literal>_prettyPrint=true</literal> to make the output easier to read.
+     </para>
     </section>
    </section>
   </section>
