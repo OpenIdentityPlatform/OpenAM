@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mediaobject xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+             xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+             xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+             xmlns:xlink='http://www.w3.org/1999/xlink'
+             xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <imageobject>
+  <imagedata fileref="images/forge-rock-logo-only.png" role="top"/>
+ </imageobject>
+</mediaobject>
