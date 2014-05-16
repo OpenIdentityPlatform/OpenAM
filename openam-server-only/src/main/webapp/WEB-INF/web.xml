@@ -1235,4 +1235,84 @@
         <res-sharing-scope>Shareable</res-sharing-scope>
     </resource-ref>
     -->
+
+    <!-- To configure CORS Support, please see the documentation and use the
+        following lines as template configuration information.
+
+    <filter>
+        <filter-name>CORSFilter</filter-name>
+        <filter-class>org.forgerock.openam.cors.CORSFilter</filter-class>
+
+        <init-param>
+            <description>
+                Accepted Methods - (Required) -
+                A list of HTTP methods for which to accept CORS requests
+            </description>
+            <param-name>methods</param-name>
+            <param-value>POST,PUT</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Accepted Origins - (Required) -
+                A list of origins from which to accept CORS requests
+            </description>
+            <param-name>origins</param-name>
+            <param-value>www.example.net,example.org</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Allow Credentials - (Optional) -
+                Whether to include the allow Vary (Origin)
+                and Access-Control-Allow-Credentials headers
+                in the response [default false]
+            </description>
+            <param-name>allowCredentials</param-name>
+            <param-value>true</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Allowed Headers - (Optional) -
+                A list of HTTP headers which if included in the request
+                DO NOT make it abort
+            </description>
+            <param-name>headers</param-name>
+            <param-value>headerOne,headerTwo,headerThree</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Expected Hostname - (Optional) -
+                The name of the host expected in the request Host header
+            </description>
+            <param-name>expectedHostname</param-name>
+            <param-value>http://openam.example.com</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Exposed Headers - (Optional) -
+                The list of headers which the user-agent can expose
+                to its CORS client
+            </description>
+            <param-name>exposeHeaders</param-name>
+            <param-value>exposeHeaderOne,exposeHeaderTwo</param-value>
+        </init-param>
+
+        <init-param>
+            <description>
+                Maximum Cache Age - (Optional) -
+                The maximum time that the CORS client can cache
+                the pre-flight response, in seconds [default 600]
+            </description>
+            <param-name>maxAge</param-name>
+            <param-value>600</param-value>
+        </init-param>
+
+    </filter>
+
+    -->
+
 </web-app>
