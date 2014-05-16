@@ -179,7 +179,7 @@ Agreement (yes/no): [no]:</screen>
     </para>
 
     <para>
-     For instructions on configuration a CREST Policy Filter rule, see
+     For instructions on configuring a CREST Policy Filter rule, see
      <link
       xlink:show="new"
       xlink:href="admin-guide#define-crest-policy-rules"
