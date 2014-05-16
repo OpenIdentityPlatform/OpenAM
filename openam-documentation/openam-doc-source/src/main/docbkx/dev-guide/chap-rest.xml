@@ -3332,7 +3332,7 @@ $ <userinput>curl \
   </section>
 
   <section xml:id="rest-api-authz-legacy">
-   <title>Authorization (Legacy)</title>
+   <title>Authorization (Legacy API)</title>
 
    <para>You can call on OpenAM to decide whether to authorize access to a
    protected resource based on a valid token. Of course, you must percent
@@ -3356,7 +3356,7 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
    <literal>boolean=false</literal>.</para>
 
    <section xml:id="rest-api-policy-decisions">
-    <title>Requesting Policy Decisions</title>
+    <title>Requesting Policy Decisions (Legacy API)</title>
 
     <para>OpenAM provides additional REST APIs for requesting policy
     decisions.</para>
@@ -3578,28 +3578,27 @@ $ <userinput>curl \
     </screen>
 
    </section>
-  </section>
 
-  <section xml:id="rest-api-policy-management">
-   <title>Managing Policies</title>
+   <section xml:id="rest-api-policy-management">
+    <title>Managing Policies (Legacy API)</title>
 
-   <para>OpenAM exposes a REST API through the
-   <literal>/ws/1/entitlement/privilege</literal> endpoint under the
-   deployment URI. The API lets you create, read, update, delete, and query
-   policies.</para>
+    <para>OpenAM exposes a REST API through the
+    <literal>/ws/1/entitlement/privilege</literal> endpoint under the
+    deployment URI. The API lets you create, read, update, delete, and query
+    policies.</para>
 
-   <para>Authentication for these interfaces uses cookies, so if your
-   application is not running in a browser, first authenticate as described in
-   <xref linkend="rest-api-auth" />.</para>
+    <para>Authentication for these interfaces uses cookies, so if your
+    application is not running in a browser, first authenticate as described in
+    <xref linkend="rest-api-auth" />.</para>
 
-   <section xml:id="rest-api-policy-management-create">
-    <title>Creating Policies</title>
+    <section xml:id="rest-api-policy-management-create">
+     <title>Creating Policies (Legacy API)</title>
 
-    <para>You create a policy by using an HTTP POST of the JSON representation
-    to the endpoint. You must URL encode the JSON before passing it to
-    OpenAM.</para>
+     <para>You create a policy by using an HTTP POST of the JSON representation
+     to the endpoint. You must URL encode the JSON before passing it to
+     OpenAM.</para>
 
-    <screen>
+     <screen>
 $ <userinput>cat entitlement.json</userinput>
 <computeroutput>{
     "name": "Example HTTP",
@@ -3663,19 +3662,19 @@ $ <userinput>curl \
  --data-urlencode "privilege.json@entitlement2.json" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege</userinput>
 <computeroutput>{"statusCode":201,"body":"Created","statusMessage":"Created"}</computeroutput>
-    </screen>
-   </section>
+     </screen>
+    </section>
 
-   <section xml:id="rest-api-policy-management-read">
-    <title>Reading Policies</title>
+    <section xml:id="rest-api-policy-management-read">
+     <title>Reading Policies (Legacy API)</title>
 
-    <para>To read a policy, use an HTTP GET on the endpoint followed by
-    the URL-encoded name of the policy.</para>
+     <para>To read a policy, use an HTTP GET on the endpoint followed by
+     the URL-encoded name of the policy.</para>
 
-    <para>Notice that the "state" is returned as a long string, and so is not
-    shown here in full.</para>
+     <para>Notice that the "state" is returned as a long string, and so is not
+     shown here in full.</para>
 
-    <screen width="81">
+     <screen width="81">
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -3733,16 +3732,16 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-    </screen>
-   </section>
+     </screen>
+    </section>
 
-   <section xml:id="rest-api-policy-management-update">
-    <title>Updating Policies</title>
+    <section xml:id="rest-api-policy-management-update">
+     <title>Updating Policies (Legacy API)</title>
 
-    <para>To update a policy, use an HTTP PUT on the endpoint followed by the
-    URL-encoded name of the policy.</para>
+     <para>To update a policy, use an HTTP PUT on the endpoint followed by the
+     URL-encoded name of the policy.</para>
 
-    <screen width="81">
+     <screen width="81">
 $ <userinput>cat update.json</userinput>
 <computeroutput>{
     "name": "Example HTTP",
@@ -3774,30 +3773,30 @@ $ <userinput>curl \
  --data-urlencode "privilege.json@update.json" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTP</userinput>
 <computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
-    </screen>
-   </section>
+     </screen>
+    </section>
 
-   <section xml:id="rest-api-policy-management-delete">
-    <title>Deleting Policies</title>
+    <section xml:id="rest-api-policy-management-delete">
+     <title>Deleting Policies</title>
 
-    <para>To delete a policy, use an HTTP DELETE on the endpoint followed by
-    the URL-encoded name of the policy.</para>
+     <para>To delete a policy, use an HTTP DELETE on the endpoint followed by
+     the URL-encoded name of the policy.</para>
 
-    <screen width="81">
+     <screen width="81">
 $ <userinput>curl \
  --request DELETE \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
  https://openam.example.com:8443/openam/ws/1/entitlement/privilege/Example%20HTTPS</userinput>
 <computeroutput>{"statusCode":200,"body":"OK","statusMessage":"OK"}</computeroutput>
-    </screen>
-   </section>
+     </screen>
+    </section>
 
-   <section xml:id="rest-api-policy-management-query">
-    <title>Querying Policies</title>
+    <section xml:id="rest-api-policy-management-query">
+     <title>Querying Policies</title>
 
-    <para>To get the names of policies, use an HTTP GET on the endpoint.</para>
+     <para>To get the names of policies, use an HTTP GET on the endpoint.</para>
 
-    <screen>
+     <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -3812,12 +3811,12 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-    </screen>
+     </screen>
 
-    <para>You can pass a filter query parameter to get only policies
-    that match the filter. Make sure you URL encode the filter value.</para>
+     <para>You can pass a filter query parameter to get only policies
+     that match the filter. Make sure you URL encode the filter value.</para>
 
-    <screen>
+     <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -3832,7 +3831,8 @@ $ <userinput>curl \
     },
     "statusMessage": "OK"
 }</computeroutput>
-    </screen>
+     </screen>
+    </section>
    </section>
   </section>
  </section>
