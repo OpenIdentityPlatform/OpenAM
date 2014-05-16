@@ -41,9 +41,9 @@
 
     function validateDefaultAdminPasswords() {
         var link = "?actionLink=checkPasswords";
-        var cValue = "confirm=" + $('defaultAdminConfirm').value;
-        var aValue = "&password=" + $('defaultAdminPassword').value;        
-        var oValue = "&otherPassword=" + $('defaultAgentPassword').value;
+        var cValue = "confirm=" + encodeURIComponent($('defaultAdminConfirm').value);
+        var aValue = "&password=" + encodeURIComponent($('defaultAdminPassword').value);
+        var oValue = "&otherPassword=" + encodeURIComponent($('defaultAgentPassword').value);
         var type = "&type=admin";
         ie7fix++;
         AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,
@@ -74,9 +74,9 @@
  
     function validateDefaultAgentPasswords() {
         var link = "?actionLink=checkPasswords";
-        var cValue = "confirm=" + $('defaultAgentConfirm').value;
-        var aValue = "&password=" + $('defaultAgentPassword').value;
-        var oValue = "&otherPassword=" + $('defaultAdminPassword').value;
+        var cValue = "confirm=" + encodeURIComponent($('defaultAgentConfirm').value);
+        var aValue = "&password=" + encodeURIComponent($('defaultAgentPassword').value);
+        var oValue = "&otherPassword=" + encodeURIComponent($('defaultAdminPassword').value);
         var type = "&type=agent";
         ie7fix++;
         AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,

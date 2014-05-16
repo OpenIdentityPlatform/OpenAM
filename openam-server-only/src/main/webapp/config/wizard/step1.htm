@@ -13,8 +13,8 @@
         
     function validateAdminPasswords() {        
         var link = "?actionLink=checkPasswords";
-        var cValue = "confirm=" + $('adminConfirm').value;
-        var aValue = "&password=" + $('adminPassword').value;  
+        var cValue = "confirm=" + encodeURIComponent($('adminConfirm').value);
+        var aValue = "&password=" + encodeURIComponent($('adminPassword').value);
         var oValue = "&otherPassword=x";
         var type = "&type=admin";
         ie7fix++;

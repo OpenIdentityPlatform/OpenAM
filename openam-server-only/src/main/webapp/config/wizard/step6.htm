@@ -13,9 +13,9 @@
         
     function validateAgentPasswords() {        
         var link = "?actionLink=checkPasswords";        
-        var cValue = "confirm=" + $('agentConfirm').value;
-        var aValue = "&password=" + $('agentPassword').value;  
-        var oValue = "&otherPassword=" + $('adminConfirm').value;
+        var cValue = "confirm=" + encodeURIComponent($('agentConfirm').value);
+        var aValue = "&password=" + encodeURIComponent($('agentPassword').value);
+        var oValue = "&otherPassword=" + encodeURIComponent($('adminConfirm').value);
         var type = "&type=agent";
         ie7fix++;
         AjaxUtils.doPost(null, "$context$path" + link + "&ie7fix=" + ie7fix,

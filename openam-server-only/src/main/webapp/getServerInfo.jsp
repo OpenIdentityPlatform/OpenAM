@@ -24,9 +24,8 @@
 
    $Id: getServerInfo.jsp,v 1.6 2008/09/04 00:34:01 rajeevangal Exp $
 
+   Portions Copyrighted 2010-2014 ForgeRock AS
 --%>
-
-<%-- Portions Copyrighted 2010-2013 ForgeRock Inc --%>
 
 <%@ page
 import="com.iplanet.am.util.SystemProperties,
@@ -50,7 +49,6 @@ import="com.iplanet.am.util.SystemProperties,
         javax.security.auth.callback.PasswordCallback"
 %>
 <%
-   String method = request.getMethod();
    if ("POST".equals(request.getMethod()) != true) {
        response.sendError(405);
        return;
@@ -62,9 +60,6 @@ import="com.iplanet.am.util.SystemProperties,
        response.sendError(400);
        return;
    }
-
-   username = URLDecoder.decode(username, "UTF-8");
-   password = URLDecoder.decode(password, "UTF-8");
 
    if ("amadmin".equals(username) == false) {
        response.sendError(401);
