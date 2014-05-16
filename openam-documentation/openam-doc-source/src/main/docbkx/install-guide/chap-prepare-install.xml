@@ -1070,6 +1070,161 @@ $ <userinput>unzip ~/Downloads/${coreDirectoryFile}</userinput>
   </variablelist>
  </section>
 
+ <section xml:id="enable-cors-support">
+  <title>Enabling CORS Support</title>
+
+  <para>
+   Cross-origin resource sharing (CORS) allows requests
+   to be made across domains from user agents.
+   OpenAM supports CORS, but CORS is not configured out of the box.
+  </para>
+
+  <orderedlist>
+   <para>
+    Instead, you must edit the deployment descriptor file
+    before deploying OpenAM.
+    CORS support is implemented as a Servlet filter,
+    and so you add the filter's configuration to the deployment descriptor file.
+   </para>
+
+   <listitem>
+    <para>
+     Unpack the OpenAM .war file.
+    </para>
+
+    <screen>
+$ <userinput>mkdir /tmp/openam</userinput>
+$ <userinput>cd /tmp/openam/</userinput>
+$ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
+    </screen>
+   </listitem>
+
+   <listitem>
+    <para>
+     Edit the deployment descriptor file, <filename>WEB-INF/web.xml</filename>,
+     to add a CORS filter configuration.
+    </para>
+
+    <para>
+     First, add a <literal>&lt;filter-mapping></literal> element
+     to name the filter and to indicate the URL pattern for the filter.
+     The URL pattern matches the endpoints for which to support CORS.
+     The following example adds CORS support for all OpenAM endpoints.
+    </para>
+
+    <programlisting language="xml"><![CDATA[
+<filter-mapping>
+    <filter-name>CORSFilter</filter-name>
+    <url-pattern>/*</url-pattern><!-- CORS support for all endpoints -->
+</filter-mapping>
+]]></programlisting>
+
+    <para>
+     Next, add a <literal>&lt;filter></literal> element
+     to configure the filter.
+     The following excerpt describes and demonstrates
+     all of the required and optional configuration parameters.
+    </para>
+
+    <programlisting language="xml"><![CDATA[
+<filter>
+    <filter-name>CORSFilter</filter-name>
+    <filter-class>org.forgerock.openam.cors.CORSFilter</filter-class>
+    <init-param>
+        <description>
+            Accepted Methods - (Required) -
+            A list of HTTP methods for which to accept CORS requests
+        </description>
+        <param-name>methods</param-name>
+        <param-value>POST,PUT</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Accepted Origins - (Required) -
+            A list of origins from which to accept CORS requests
+        </description>
+        <param-name>origins</param-name>
+        <param-value>www.example.net,example.org</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Allow Credentials - (Optional) -
+            Whether to include the allow Vary (Origin)
+            and Access-Control-Allow-Credentials headers
+            in the response [default false]
+        </description>
+        <param-name>allowCredentials</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Allowed Headers - (Optional) -
+            A list of HTTP headers which if included in the request
+            DO NOT make it abort
+        </description>
+        <param-name>headers</param-name>
+        <param-value>headerOne,headerTwo,headerThree</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Expected Hostname - (Optional) -
+            The name of the host expected in the request Host header
+        </description>
+        <param-name>expectedHostname</param-name>
+        <param-value>http://openam.example.com</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Exposed Headers - (Optional) -
+            The list of headers which the user-agent can expose
+            to its CORS client
+        </description>
+        <param-name>exposeHeaders</param-name>
+        <param-value>exposeHeaderOne,exposeHeaderTwo</param-value>
+    </init-param>
+    <init-param>
+        <description>
+            Maximum Cache Age - (Optional) -
+            The maximum time that the CORS client can cache
+            the pre-flight response, in seconds [default 600]
+        </description>
+        <param-name>maxAge</param-name>
+        <param-value>600</param-value>
+    </init-param>
+</filter>
+]]></programlisting>
+
+    <para>
+     For details on CORS, see the
+     <link
+      xlink:show="new"
+      xlink:href="http://www.w3.org/TR/cors/"
+      ><citetitle>Cross-Origin Resource Sharing</citetitle></link>
+     specification.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Pack up the OpenAM .war file to deploy.
+    </para>
+
+    <screen>
+$ <userinput>jar -cf ../openam.war *</userinput>
+    </screen>
+   </listitem>
+
+   <listitem>
+    <para>Deploy the new .war file.</para>
+
+    <para>
+     In this example the .war file to deploy is
+     <filename>/tmp/openam.war</filename>.
+    </para>
+   </listitem>
+  </orderedlist>
+ </section>
+
  <section xml:id="prepare-apache-tomcat">
   <title>Preparing Apache Tomcat</title>
 

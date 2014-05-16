@@ -128,6 +128,25 @@ Agreement (yes/no): [no]:</screen>
   </listitem>
 
   <listitem>
+   <para><!-- Enhancement: AME-3299 -->
+    <emphasis role="bold">CORS support for OpenAM APIs</emphasis>.
+    OpenAM now supports cross-origin resource sharing (CORS)
+    to allow requests to be made across domains from user agents.
+    Applications in browsers that support CORS
+    can therefore now successfully make calls to an OpenAM server
+    that runs in a different domain from the application.
+   </para>
+
+   <para>
+    Instead, you must configure CORS support in OpenAM's deployment descriptor.
+    For instructions, see <link
+     xlink:href="install-guide#enable-cors-support"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"><citetitle>Authorization</citetitle></link>.
+   </para>
+  </listitem>
+
+  <listitem>
    <para>
     <emphasis role="bold">New REST APIs for policy</emphasis>.
     OpenAM now exposes new common REST APIs for requesting decisions,
