@@ -475,8 +475,7 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resources" />
-                            <Value>http://*</Value>
-                            <Value>https://*</Value>
+                            <Value>*</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
