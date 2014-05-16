@@ -28,6 +28,8 @@
  */
 package com.sun.identity.entitlement;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,9 +62,20 @@ public class Evaluator {
      */
     private Evaluator()
         throws EntitlementException {
-        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        policyMonitor = getPolicyMonitor();
         configWrapper = new EntitlementConfigurationWrapper();
 
+    }
+
+    private PolicyMonitor getPolicyMonitor() {
+        //used as no direct access to SystemProperties
+        boolean serverMode = Boolean.parseBoolean(SystemPropertiesManager.get(Constants.SERVER_MODE));
+
+        if (serverMode) {
+            return InjectorHolder.getInstance(PolicyMonitor.class);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -78,7 +91,7 @@ public class Evaluator {
         throws EntitlementException {
         adminSubject = subject;
         this.applicationName = applicationName;
-        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        policyMonitor = getPolicyMonitor();
         configWrapper = new EntitlementConfigurationWrapper();
     }
 
@@ -92,7 +105,7 @@ public class Evaluator {
     public Evaluator(Subject subject)
         throws EntitlementException {
         adminSubject = subject;
-        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        policyMonitor = getPolicyMonitor();
         configWrapper = new EntitlementConfigurationWrapper();
     }
     

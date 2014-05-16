@@ -26,12 +26,13 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.entitlement.opensso;
 
+import static com.iplanet.am.util.SystemProperties.isServerMode;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
@@ -67,7 +68,11 @@ public class OpenSSOPrivilege extends Privilege {
     public OpenSSOPrivilege() {
         super();
 
-        policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        if (isServerMode()) {
+            policyMonitor = InjectorHolder.getInstance(PolicyMonitor.class);
+        } else {
+            policyMonitor = null;
+        }
     }
 
     @Override
