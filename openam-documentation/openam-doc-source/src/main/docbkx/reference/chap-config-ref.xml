@@ -1273,6 +1273,25 @@
      <literal>iplanet-am-monitoring-snmp-enabled</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Policy evaluation monitoring history size</term>
+    <listitem>
+     <para>
+      Maximum number of policy evaluations on which to base
+      the data exposed through the monitoring system
+     </para>
+
+     <para>
+      Valid range is 100 - 1000000. Default: 10000
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+     <literal>iplanet-am-monitoring-policy-window</literal>
+     </para>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="system-platform">
