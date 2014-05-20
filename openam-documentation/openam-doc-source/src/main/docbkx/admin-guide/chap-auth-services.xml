@@ -1718,10 +1718,93 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     <varlistentry>
      <term>Valid goto URL domains</term>
      <listitem>
-      <para>List external domains to which clients can be redirected after
-      authentication. This attribute requires valid DNS domains that reflect
-      the set policy rules, such as https://website.example.com/* or 
-      https://website.example.com/*?*.</para>
+      <para>
+       List external domains to which clients can be redirected
+       after authentication.
+       This attribute requires valid DNS domains
+       that reflect the policy rules configured,
+       such as <literal>https://website.example.com/*</literal>
+       or <literal>https://website.example.com/*?*</literal>.
+      </para>
+
+      <para>
+       The goto URL patterns in the list specify URLs
+       and can use wildcards.
+       OpenAM then checks that the URLs specified using
+       <literal>goto</literal> or <literal>gotoOnFail</literal>
+       query string parameters in the login URL
+       do match a specified pattern.
+       If not, OpenAM redirects instead to the default post-login URL
+       such as the URL for OpenAM Console or the end user profile page.
+      </para>
+
+      <itemizedlist>
+       <para>
+        When setting valid goto URL domain names follow these rules.
+       </para>
+
+       <listitem>
+        <para>
+         To allow only a single host name to be used
+         when redirecting the user after authentication,
+         specify the host name.
+        </para>
+
+        <para>
+         For example, if you specify
+         <literal>http*://secure.example.com</literal>,
+         then you can redirect only to
+         URLs on <literal>secure.example.com</literal>,
+         not URLs on <literal>www.example.com</literal>.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+         Start the domain name with <literal>*.</literal>
+         to allow all host names in the domain to be used
+         when redirecting the user after authentication.
+        </para>
+
+        <para>
+         For example, to allow redirects to URLs on any hosts in the domain
+         <literal>secure.example.com</literal>,
+         use <literal>http*://*.secure.example.com</literal>.
+        </para>
+
+        <para>
+         Note that <literal>http*://*.secure.example.com</literal>
+         matches URLs on <literal>www.secure.example.com</literal>,
+         and also URLs on <literal>www.subdomain.secure.example.com</literal>.
+        </para>
+
+        <para>
+         Also note that the <literal>*</literal> wildcard in the protocol,
+         <literal>http*://</literal>, matches URLs starting with
+         either <literal>http://</literal> or <literal>https://</literal>.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+         For more specific patterns,
+         use resource names with wildcards as described in the procedure,
+         <link
+          xlink:href="admin-guide#configure-url-policy"
+          xlink:role="http://docbook.org/xlink/role/olink"
+          xlink:show="new"
+         ><citetitle>To Configure a Policy For a Web Site</citetitle></link>.
+        </para>
+
+        <para>
+         For example, to match URLs using secure connections
+         to <literal>www.example.com</literal> on any port,
+         but no URLs with query string parameters,
+         use <literal>https://www.example.com:*/*</literal>.
+        </para>
+       </listitem>
+      </itemizedlist>
+
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-valid-goto-domains</literal></para>
      </listitem>
