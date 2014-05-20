@@ -104,9 +104,6 @@ public class IndexChangeHandler implements SearchResultHandler {
                         observable.notifyObservers(ModificationEventType.DELETE.createEvent(pathIndex, realm));
                         break;
                 }
-
-                // Required attribute has been handled.
-                break;
             }
         }
 
