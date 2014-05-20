@@ -37,7 +37,7 @@
  </indexterm>
 
  <para>
-  This chapter covers setting up session failover (SFO) for an OpenAM site.
+  This chapter covers setting up session failover (SFO).
   Session failover allows another OpenAM server to manage a session
   when the server that initially authenticated the user is down.
   This means the user does not need to log in again,
@@ -61,8 +61,8 @@
  <para>
   Session failover also relies on a shared Core Token Service (CTS)
   to store user session data.
-  The service is shared with other OpenAM servers in the same OpenAM site.
-  When an OpenAM server goes down, other servers in the site
+  The service is shared with other OpenAM servers in the same OpenAM Site.
+  When an OpenAM server goes down, other servers in the Site
   can read user session information from the CTS,
   so the user with a valid session does not have to log in again.
   When the original OpenAM server becomes available again,
@@ -77,11 +77,53 @@
   ><citetitle>Configuring the Core Token Service (CTS)</citetitle></link>.
  </para>
 
+ <para>
+  In deployments with multiple OpenAM Sites,
+  session failover can function across Sites.
+  In order for this to work, all Sites must use
+  the same, global, underlying Core Token Service,
+  which is replicated across all Sites.
+  Then when an entire Site fails or becomes unavailable,
+  OpenAM servers in another Site detect the failure of the Site's load balancer
+  and attempt to recover the user session from the global Core Token Service.
+ </para>
+
+ <para>
+  In the event of a failure,
+  client applications can connect to an OpenAM server in an active data center
+  as shown in <xref linkend="figure-global-cts" />.
+ </para>
+
+ <figure xml:id="figure-global-cts">
+  <title>Core Token Service For Global Session Failover</title>
+
+  <mediaobject xml:id="cts-default-store">
+   <alt>Global CTS</alt>
+   <imageobject>
+       <imagedata fileref="images/global-cts.png" format="PNG" />
+   </imageobject>
+   <textobject>
+       <para>
+        Shows a globally replicated Core Token Service with two data centers
+       </para>
+   </textobject>
+  </mediaobject>
+ </figure>
+
+ <para>
+  For more information on how this is done with OpenDJ directory server,
+  see the OpenDJ documentation on
+  <link
+   xlink:show="new"
+   xlink:href="${opendjDocBase}/admin-guide/#chap-replication"
+  ><citetitle>Managing Data Replication</citetitle></link>.
+ </para>
+
  <procedure xml:id="enable-session-failover">
   <title>To Configure Session Failover After Installation</title>
   
   <para>
-   Session failover requires an OpenAM site configuration
+   Session failover requires an OpenAM Site configuration
    with a Core Token Service.
   </para>
 
@@ -99,7 +141,7 @@
 
   <step>
    <para>
-    In the OpenAM console for one of the servers in the site,
+    In the OpenAM console for one of the servers in the Site,
     under Configuration > Global, click Session.
    </para>
   </step>
@@ -110,7 +152,7 @@
    </para>
 
    <para>
-    If the server is not part of a site,
+    If the server is not part of a Site,
     or if the configuration server does not support the Core Token Service,
     the New button is grayed out.
    </para>

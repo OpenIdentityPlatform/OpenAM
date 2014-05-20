@@ -147,6 +147,25 @@ Agreement (yes/no): [no]:</screen>
   </listitem>
 
   <listitem>
+   <para><!-- Story: AME-2565 -->
+    <emphasis role="bold">Session failover across Sites</emphasis>.
+    OpenAM now allows session failover across OpenAM Sites.
+    In order to take advantage of this capability,
+    you must make sure that the underlying Core Token Service
+    replicates session data across your OpenAM Sites.
+   </para>
+
+   <para>
+    For details on setting up the underlying Core Token Service, see
+    <link
+     xlink:href="install-guide#chap-cts"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Configuring the Core Token Service</citetitle></link>.
+   </para>
+  </listitem>
+
+  <listitem>
    <para>
     <emphasis role="bold">New REST APIs for policy</emphasis>.
     OpenAM now exposes new common REST APIs for requesting decisions,
