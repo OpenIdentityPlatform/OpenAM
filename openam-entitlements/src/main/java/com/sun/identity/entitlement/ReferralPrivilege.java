@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -127,7 +127,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             if (jo.has("lastModifiedBy")) {
                 r.lastModifiedBy = jo.getString("lastModifiedBy");
             }
-            if (jo.has("lastModifiedBy")) {
+            if (jo.has("active")) {
                 r.active = jo.getBoolean("active");
             }
             r.creationDate = JSONUtils.getLong(jo, "creationDate");
