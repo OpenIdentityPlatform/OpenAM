@@ -101,6 +101,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         clone.creationDate = creationDate;
         clone.lastModifiedDate = lastModifiedDate;
         clone.lastModifiedBy = lastModifiedBy;
+        clone.active = active;
         clone.createdBy = createdBy;
 
         if (mapApplNameToResources != null) {
@@ -125,6 +126,9 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             }
             if (jo.has("lastModifiedBy")) {
                 r.lastModifiedBy = jo.getString("lastModifiedBy");
+            }
+            if (jo.has("lastModifiedBy")) {
+                r.active = jo.getBoolean("active");
             }
             r.creationDate = JSONUtils.getLong(jo, "creationDate");
             r.lastModifiedDate = JSONUtils.getLong(jo, "lastModifiedDate");
@@ -365,6 +369,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             jo.put("lastModifiedBy", lastModifiedBy);
             jo.put("creationDate", creationDate);
             jo.put("lastModifiedDate", lastModifiedDate);
+            jo.put("active", active);
 
             jo.put("mapApplNameToResources", mapApplNameToResources);
             if (origMapApplNameToResources != null) {
