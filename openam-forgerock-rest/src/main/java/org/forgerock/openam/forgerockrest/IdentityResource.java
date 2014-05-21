@@ -15,12 +15,14 @@
  */
 package org.forgerock.openam.forgerockrest;
 
-import java.lang.Exception;
-import java.lang.Object;
-import java.lang.String;
-import java.util.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.encode.Hash;
@@ -35,26 +37,15 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
-import com.sun.identity.idsvcs.AccountExpired;
 import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
 import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.InvalidCredentials;
-import com.sun.identity.idsvcs.InvalidPassword;
-import com.sun.identity.idsvcs.LogResponse;
-import com.sun.identity.idsvcs.LogoutResponse;
-import com.sun.identity.idsvcs.MaximumSessionReached;
 import com.sun.identity.idsvcs.NeedMoreCredentials;
 import com.sun.identity.idsvcs.ObjectNotFound;
-import com.sun.identity.idsvcs.OrgInactive;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.idsvcs.UpdateResponse;
-import com.sun.identity.idsvcs.UserDetails;
-import com.sun.identity.idsvcs.UserInactive;
-import com.sun.identity.idsvcs.UserLocked;
-import com.sun.identity.idsvcs.UserNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.sm.ServiceConfig;
@@ -74,6 +65,7 @@ import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.services.RestSecurity;
+import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 
 import javax.security.auth.callback.Callback;
@@ -316,7 +308,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         // Get MailServer Implementation class
         String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
-        MailServerImpl mailServImpl = (MailServerImpl)Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
+        MailServer mailServer = (MailServer) Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
 
         try {
             // Check if subject has not  been included
@@ -340,7 +332,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             message = confirmationLink;
         }
         // Send the emails via the implementation class
-        mailServImpl.sendEmail(to, subject, message);
+        mailServer.sendEmail(to, subject, message);
     }
 
     /**
