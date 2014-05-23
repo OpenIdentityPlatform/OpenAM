@@ -97,7 +97,7 @@
  <figure xml:id="figure-global-cts">
   <title>Core Token Service For Global Session Failover</title>
 
-  <mediaobject xml:id="cts-default-store">
+  <mediaobject>
    <alt>Global CTS</alt>
    <imageobject>
        <imagedata fileref="images/global-cts.png" format="PNG" />
