@@ -33,7 +33,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +59,7 @@ public class RestAuthorizationDispatcherFilterTest {
         initParams.put("groupsAuthzConfigurator", PassthroughAuthzClass.class.getName());
         initParams.put("agentsAuthzConfigurator", PassthroughAuthzClass.class.getName());
         initParams.put("serverInfoAuthzConfigurator", PassthroughAuthzClass.class.getName());
+        initParams.put("sessionAuthzConfigurator", SessionResourceAuthZClass.class.getName());
         INIT_PARAMS = Collections.unmodifiableMap(initParams);
     }
 
@@ -70,7 +70,7 @@ public class RestAuthorizationDispatcherFilterTest {
         restAuthorizationDispatcherFilter = new RestAuthorizationDispatcherFilter(restDispatcher, authZFilter);
     }
 
-    private void initFilter(Map<String, String> initParams) throws ServletException {
+    private void initFilter(Map<String, String> initParams) throws Exception {
         FilterConfig filterConfig = mock(FilterConfig.class);
         for (Map.Entry<String, String> entry : initParams.entrySet()) {
             given(filterConfig.getInitParameter(entry.getKey())).willReturn(entry.getValue());
@@ -86,19 +86,20 @@ public class RestAuthorizationDispatcherFilterTest {
                 {"usersAuthzConfigurator"},
                 {"groupsAuthzConfigurator"},
                 {"agentsAuthzConfigurator"},
-                {"serverInfoAuthzConfigurator"}
+                {"serverInfoAuthzConfigurator"},
+                {"sessionAuthzConfigurator"}
         };
     }
 
     @Test(dataProvider = "configurator", expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionWhenAnAuthZConfiguratorIsNotSet(String missing) throws ServletException {
+    public void shouldThrowServletExceptionWhenAnAuthZConfiguratorIsNotSet(String missing) throws Exception {
         Map<String, String> alteredInitParams = new HashMap<String, String>(INIT_PARAMS);
         alteredInitParams.remove(missing);
         initFilter(alteredInitParams);
     }
 
     @Test(expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionIfRequestIsNotHttpServletRequest() throws ServletException, IOException {
+    public void shouldThrowServletExceptionIfRequestIsNotHttpServletRequest() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -112,7 +113,7 @@ public class RestAuthorizationDispatcherFilterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldSkipAuthorizationIfEndpointNotFound() throws ServletException, IOException, NotFoundException {
+    public void shouldSkipAuthorizationIfEndpointNotFound() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -132,7 +133,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForRealms() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForRealms() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -155,7 +156,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForUsers() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForUsers() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -179,7 +180,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForGroups() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForGroups() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -203,7 +204,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForAgents() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForAgents() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -227,7 +228,7 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     @Test
-    public void shouldFilterAuthorizationForServerInfo() throws ServletException, IOException, NotFoundException {
+    public void shouldFilterAuthorizationForServerInfo() throws Exception {
         //Given
         initFilter(INIT_PARAMS);
 
@@ -247,6 +248,30 @@ public class RestAuthorizationDispatcherFilterTest {
         verify(authZFilter).init(filterConfigCaptor.capture());
         assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
                 PassthroughAuthzClass.class.getName());
+        verify(authZFilter).doFilter(request, response, filterChain);
+    }
+
+    @Test
+    public void shouldFilterAuthorizationForSessions() throws Exception {
+        //Given
+        initFilter(INIT_PARAMS);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        ServletResponse response = mock(ServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/sessions");
+        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+
+        //When
+        restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
+
+        //Then
+        ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
+        verify(authZFilter).init(filterConfigCaptor.capture());
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
+                SessionResourceAuthZClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
 
@@ -276,6 +301,21 @@ public class RestAuthorizationDispatcherFilterTest {
     }
 
     private static final class PassthroughAuthzClass implements AuthorizationConfigurator {
+
+        public AuthorizationFilter getAuthorizationFilter() {
+            return null;
+        }
+
+        public DebugLogger getDebugLogger() {
+            return null;
+        }
+
+        public AuditLogger getAuditLogger() {
+            return null;
+        }
+    }
+
+    private static final class SessionResourceAuthZClass implements AuthorizationConfigurator {
 
         public AuthorizationFilter getAuthorizationFilter() {
             return null;

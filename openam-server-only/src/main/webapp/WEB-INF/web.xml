@@ -117,6 +117,10 @@
             <param-name>serverInfoAuthzConfigurator</param-name>
             <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
         </init-param>
+        <init-param>
+            <param-name>sessionAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.session.SessionResourceAuthZConfigurator</param-value>
+        </init-param>
     </filter>
 
     <!-- filter declaration -->
@@ -158,10 +162,6 @@
     <filter-mapping>
         <filter-name>RestAuthorizationDispatcherFilter</filter-name>
         <url-pattern>/json/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>SessionAuthorizationFilter</filter-name>
-        <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AdminOnlyFilter</filter-name>
