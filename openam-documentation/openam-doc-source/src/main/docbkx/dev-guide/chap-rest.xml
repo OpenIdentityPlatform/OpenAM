@@ -2002,8 +2002,55 @@ $ <userinput>curl \
 
      <para>
       You can use <literal>_pageSize=<replaceable>integer</replaceable></literal>
-      to limit the number of results returned.
+      to limit the number of results returned, as shown in the following example
+      that returns only the first of three policies.
      </para>
+
+     <screen width="99">
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_fields=name\&amp;_pageSize=1</userinput>
+<computeroutput>{
+  "result" : [ {
+    "name" : "My Other Policy"
+  } ],
+  "resultCount" : 1,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : 2
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use <literal>_sortKeys=[+-]<replaceable>field</replaceable>[,<replaceable>field</replaceable>...]</literal>
+      to sort the results returned,
+      where <replaceable>field</replaceable> represents a field
+      in the JSON policy objects returned.
+      Optionally use the <literal>+</literal> prefix to sort in ascending order
+      (the default),
+      or <literal>-</literal> to sort in descending order.
+      The following example sorts the policy objects by their names.
+     </para>
+
+     <screen width="88">
+  $ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_sortKeys=name</userinput>
+  <computeroutput>{
+  "result" : [ {
+    "name" : "Another Example Policy",
+    ...
+  }, {
+    "name" : "My Other Policy",
+    ...
+  }, {
+    "name" : "Sample Policy",
+    ...
+  } ],
+  "resultCount" : 3,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : 0
+}</computeroutput>
+     </screen>
     </section>
    </section>
 
