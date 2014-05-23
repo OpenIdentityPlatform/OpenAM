@@ -113,6 +113,15 @@
                                     <outputDirectory>${project.build.directory}/XUI</outputDirectory>
                                     <includes>**/*</includes>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-ui-policy</artifactId>
+                                    <classifier>www</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/policyEditor</outputDirectory>
+                                    <includes>**/*</includes>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -201,6 +210,14 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>XUI</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.build.directory}/policyEditor/</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>policyEditor</targetPath>
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -400,6 +417,13 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-ui-ria</artifactId>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ui-policy</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>

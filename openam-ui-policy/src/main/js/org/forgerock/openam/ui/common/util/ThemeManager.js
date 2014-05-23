@@ -91,8 +91,7 @@ define("ThemeManager", [
             prom = $.Deferred();
             prom.resolve(conf.globalData.theme);
             return prom;
-        }
-        else{
+        } else {
             return obj.loadThemeConfig().then(function(themeConfig){
                 obj.data = themeConfig;
                 conf.globalData.themeConfig = themeConfig;
@@ -100,28 +99,22 @@ define("ThemeManager", [
 
                 theme = _.reject(obj.data.themes,function(t){return t.name !== themeName;})[0];
                 
-                if(theme.name !== 'default' && theme.path === ''){
+                if (theme.name !== 'default' && theme.path === '') {
                     defaultTheme = _.reject(obj.data.themes,function(t){return t.name !== 'default';})[0];
                     theme = $.extend(true,{}, defaultTheme, theme);
                 }
                 
-                //check to see if the realm has been defined yet
-                //if no realm call obj.getTheme() recursively until realm is defined
-                if(conf.globalData.auth.realm){
-                    return obj.loadThemeCSS(theme).then(function(){
-                        _.each(theme.settings.lessVars, function (value, key) {
-                            newLessVars['@' + key] = value;
-                        });
-                        less.modifyVars(newLessVars);
-                        
-                        conf.globalData.theme = theme;
-                        
-                        return theme;
+                return obj.loadThemeCSS(theme).then(function(){
+                    _.each(theme.settings.lessVars, function (value, key) {
+                        newLessVars['@' + key] = value;
                     });
-                }
-                else{
-                    return obj.getTheme();
-                }
+                    less.modifyVars(newLessVars);
+                    
+                    conf.globalData.theme = theme;
+                    
+                    return theme;
+                });
+
             });
         }
     };

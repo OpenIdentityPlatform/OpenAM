@@ -1,0 +1,13 @@
+{
+  "name": "test_mock",
+  "author": "Jake Feasel <jake.feasel@forgerock.com>",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-watch": "~0.4.0",
+    "grunt-notify": "0.2.4",
+    "grunt-sync": "~0.0.6",
+    "grunt-jslint": "1.1.8",
+    "grunt-contrib-qunit": "~0.4.0"
+  }
+}

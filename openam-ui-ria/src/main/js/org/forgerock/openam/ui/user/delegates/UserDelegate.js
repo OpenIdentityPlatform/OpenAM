@@ -25,7 +25,7 @@
 /*global $, define, _, console */
 
 define("UserDelegate", [
-	"org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -75,7 +75,7 @@ define("UserDelegate", [
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
         obj.serviceCall({
-            url: "/users/?_action=idFromSession",
+            url: "/users?_action=idFromSession",
             data: "{}",
             type: "POST",
             success: function (data) {
@@ -117,7 +117,7 @@ define("UserDelegate", [
         var realm = this.cleanRealm(configuration.globalData.auth.realm);
 
         return obj.serviceCall({
-            url: realm + "/users/?_action=" + action,
+            url: realm + "/users?_action=" + action,
             data: JSON.stringify(postData),
             type: "POST",
             success: function (data) {

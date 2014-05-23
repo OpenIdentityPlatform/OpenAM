@@ -820,6 +820,13 @@
                 <classifier>www</classifier>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-policy</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
 
             <!-- CLI components -->
             <dependency>
