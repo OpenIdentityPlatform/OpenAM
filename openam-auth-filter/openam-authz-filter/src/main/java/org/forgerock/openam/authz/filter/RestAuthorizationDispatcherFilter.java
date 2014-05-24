@@ -53,6 +53,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_APP_AUTHZ_CONFIGURATOR = "applicationsAuthzConfigurator";
     private static final String INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR = "policiesAuthzConfigurator";
     private static final String INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR = "serverInfoAuthzConfigurator";
+    private static final String INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR = "sessionAuthzConfigurator";
 
     private final RestEndpointManager endpointManager;
     private final AuthZFilter authZFilter;
@@ -65,6 +66,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private String applicationsAuthzConfiguratorClassName;
     private String policiesAuthzConfiguratorClassName;
     private String serverInfoAuthzConfiguratorClassName;
+    private String sessionAuthzConfiguratorClassName;
 
     /**
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
@@ -102,18 +104,20 @@ public class RestAuthorizationDispatcherFilter implements Filter {
         policiesAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR);
         serverInfoAuthzConfiguratorClassName =
                 filterConfig.getInitParameter(INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR);
+        sessionAuthzConfiguratorClassName = filterConfig.getInitParameter(INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR);
 
         if (realmsAuthzConfiguratorClassName == null || usersAuthzConfiguratorClassName == null
                 || groupsAuthzConfiguratorClassName == null || agentsAuthzConfiguratorClassName == null
                 || applicationsAuthzConfiguratorClassName == null || policiesAuthzConfiguratorClassName == null
-                || serverInfoAuthzConfiguratorClassName == null) {
+                || serverInfoAuthzConfiguratorClassName == null || sessionAuthzConfiguratorClassName == null) {
             String message = new StringBuilder().append(INIT_PARAM_REALMS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_USERS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_GROUPS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_AGENTS_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_POLICIES_AUTHZ_CONFIGURATOR)
                     .append(", ").append(INIT_PARAM_APP_AUTHZ_CONFIGURATOR)
-                    .append(", and ").append(INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR)
+                    .append(", ").append(INIT_PARAM_SERVER_INFO_AUTHZ_CONFIGURATOR)
+                    .append(", and ").append(INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR)
                     .append(" init params must be set!").toString();
 
             DEBUG.error(message);
@@ -163,6 +167,8 @@ public class RestAuthorizationDispatcherFilter implements Filter {
             authorize(policiesAuthzConfiguratorClassName, request, servletResponse, chain);
         } else if (RestEndpointManager.SERVER_INFO.equalsIgnoreCase(endpoint)) {
             authorize(serverInfoAuthzConfiguratorClassName, request, servletResponse, chain);
+        } else if (RestEndpointManager.SESSIONS.equalsIgnoreCase(endpoint)) {
+            authorize(sessionAuthzConfiguratorClassName, request, servletResponse, chain);
         } else {
             chain.doFilter(servletRequest, servletResponse);
         }
