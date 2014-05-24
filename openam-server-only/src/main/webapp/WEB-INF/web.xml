@@ -132,7 +132,10 @@
             <param-name>policiesAuthzConfigurator</param-name>
             <param-value>org.forgerock.openam.authz.filter.AdminAuthorizationConfigurator</param-value>
         </init-param>
-
+        <init-param>
+            <param-name>serverInfoAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
+        </init-param>
     </filter>
 
     <!-- filter declaration -->
@@ -190,10 +193,6 @@
     <filter-mapping>
         <filter-name>PassThroughAuthorizationModule</filter-name>
         <url-pattern>/json/dashboard/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>PassThroughAuthorizationModule</filter-name>
-        <url-pattern>/json/serverinfo/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>

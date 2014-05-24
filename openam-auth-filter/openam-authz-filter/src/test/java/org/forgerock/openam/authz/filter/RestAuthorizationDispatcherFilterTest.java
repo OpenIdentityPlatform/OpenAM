@@ -13,7 +13,6 @@
  *
  * Copyright 2013-2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.authz.filter;
 
 import org.forgerock.auth.common.AuditLogger;
@@ -32,6 +31,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -39,111 +41,68 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import org.testng.annotations.DataProvider;
 
 public class RestAuthorizationDispatcherFilterTest {
 
     private RestAuthorizationDispatcherFilter restAuthorizationDispatcherFilter;
     private RestEndpointManager endpointManager;
-
     private AuthZFilter authZFilter;
+    private static final Map<String, String> INIT_PARAMS;
 
-    @BeforeMethod
-    public void setUp() {
+    static {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put("realmsAuthzConfigurator", AdminAuthzClass.class.getName());
+        initParams.put("usersAuthzConfigurator", PassthroughAuthzClass.class.getName());
+        initParams.put("groupsAuthzConfigurator", PassthroughAuthzClass.class.getName());
+        initParams.put("agentsAuthzConfigurator", PassthroughAuthzClass.class.getName());
+        initParams.put("applicationsAuthzConfigurator", AdminAuthzClass.class.getName());
+        initParams.put("policiesAuthzConfigurator", AdminAuthzClass.class.getName());
+        initParams.put("serverInfoAuthzConfigurator", PassthroughAuthzClass.class.getName());
+        INIT_PARAMS = Collections.unmodifiableMap(initParams);
+    }
 
+    @BeforeMethod()
+    public void setUpMocks() {
         authZFilter = mock(AuthZFilter.class);
         endpointManager = mock(RestEndpointManager.class);
 
         restAuthorizationDispatcherFilter = new RestAuthorizationDispatcherFilter(endpointManager, authZFilter);
     }
 
-    @Test (expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionWhenRealmsAuthzConfiguratorNotSet() throws ServletException {
-
-        //Given
+    private void initFilter(Map<String, String> initParams) throws ServletException {
         FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        //When
+        for (Map.Entry<String, String> entry : initParams.entrySet()) {
+            given(filterConfig.getInitParameter(entry.getKey())).willReturn(entry.getValue());
+        }
         restAuthorizationDispatcherFilter.init(filterConfig);
 
-        //Then
-        fail();
     }
 
-    @Test (expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionWhenUsersAuthzConfiguratorNotSet() throws ServletException {
-
-        //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        //When
-        restAuthorizationDispatcherFilter.init(filterConfig);
-
-        //Then
-        fail();
+    @DataProvider(name = "configurator")
+    public String[][] getParameters() {
+        return new String[][] {
+                {"realmsAuthzConfigurator"},
+                {"usersAuthzConfigurator"},
+                {"groupsAuthzConfigurator"},
+                {"agentsAuthzConfigurator"},
+                {"applicationsAuthzConfigurator"},
+                {"policiesAuthzConfigurator"},
+                {"serverInfoAuthzConfigurator"}
+        };
     }
 
-    @Test (expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionWhenGroupsAuthzConfiguratorNotSet() throws ServletException {
-
-        //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        //When
-        restAuthorizationDispatcherFilter.init(filterConfig);
-
-        //Then
-        fail();
+    @Test(dataProvider = "configurator", expectedExceptions = ServletException.class)
+    public void shouldThrowServletExceptionWhenAnAuthZConfiguratorIsNotSet(String missing) throws ServletException {
+        Map<String, String> alteredInitParams = new HashMap<String, String>(INIT_PARAMS);
+        alteredInitParams.remove(missing);
+        initFilter(alteredInitParams);
     }
 
-    @Test (expectedExceptions = ServletException.class)
-    public void shouldThrowServletExceptionWhenAgentsAuthzConfiguratorNotSet() throws ServletException {
-
-        //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        //When
-        restAuthorizationDispatcherFilter.init(filterConfig);
-
-        //Then
-        fail();
-    }
-
-    @Test (expectedExceptions = ServletException.class)
+    @Test(expectedExceptions = ServletException.class)
     public void shouldThrowServletExceptionIfRequestIsNotHttpServletRequest() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         ServletRequest request = mock(ServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -151,26 +110,13 @@ public class RestAuthorizationDispatcherFilterTest {
 
         //When
         restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
-
-        //Then
-        fail();
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void shouldSkipAuthorizationIfEndpointNotFound() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -189,18 +135,8 @@ public class RestAuthorizationDispatcherFilterTest {
 
     @Test
     public void shouldFilterAuthorizationForRealms() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -220,18 +156,8 @@ public class RestAuthorizationDispatcherFilterTest {
 
     @Test
     public void shouldFilterAuthorizationForUsers() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -246,24 +172,14 @@ public class RestAuthorizationDispatcherFilterTest {
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
         assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
-                PassthrouhgAuthzClass.class.getName());
+                PassthroughAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
 
     @Test
     public void shouldFilterAuthorizationForGroups() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -278,24 +194,14 @@ public class RestAuthorizationDispatcherFilterTest {
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
         assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
-                PassthrouhgAuthzClass.class.getName());
+                PassthroughAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
 
     @Test
     public void shouldFilterAuthorizationForAgents() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -310,24 +216,36 @@ public class RestAuthorizationDispatcherFilterTest {
         ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
         verify(authZFilter).init(filterConfigCaptor.capture());
         assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
-                PassthrouhgAuthzClass.class.getName());
+                PassthroughAuthzClass.class.getName());
+        verify(authZFilter).doFilter(request, response, filterChain);
+    }
+
+    @Test
+    public void shouldFilterAuthorizationForServerInfo() throws ServletException, IOException {
+        //Given
+        initFilter(INIT_PARAMS);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        ServletResponse response = mock(ServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+        
+        given(endpointManager.findEndpoint(anyString())).willReturn("/serverinfo");
+
+        //When
+        restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
+
+        //Then
+        ArgumentCaptor<FilterConfig> filterConfigCaptor = ArgumentCaptor.forClass(FilterConfig.class);
+        verify(authZFilter).init(filterConfigCaptor.capture());
+        assertEquals(filterConfigCaptor.getValue().getInitParameter("module-configurator-factory-class"),
+                PassthroughAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
     }
 
     @Test
     public void shouldFilterAuthorizationForOtherEndpoints() throws ServletException, IOException {
-
         //Given
-        FilterConfig filterConfig = mock(FilterConfig.class);
-        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
-                .willReturn(PassthrouhgAuthzClass.class.getName());
-
-        restAuthorizationDispatcherFilter.init(filterConfig);
+        initFilter(INIT_PARAMS);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
@@ -346,7 +264,6 @@ public class RestAuthorizationDispatcherFilterTest {
 
     @Test
     public void shouldDestroyFilter() {
-
         //Given
 
         //When
@@ -355,14 +272,14 @@ public class RestAuthorizationDispatcherFilterTest {
         //Then
     }
 
-    static final class AdminAuthzClass implements AuthorizationLoggingConfigurator {
+    private static final class AdminAuthzClass implements AuthorizationLoggingConfigurator {
 
         public AuditLogger<HttpServletRequest> getAuditLogger() {
             return null;
         }
     }
 
-    static final class PassthrouhgAuthzClass implements AuthorizationLoggingConfigurator {
+    private static final class PassthroughAuthzClass implements AuthorizationLoggingConfigurator {
 
         public AuditLogger<HttpServletRequest> getAuditLogger() {
             return null;
