@@ -24,6 +24,7 @@
  *
  * $Id: IdRemoteServicesProviderImpl.java,v 1.3 2008/06/25 05:43:31 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.idm.remote;
@@ -46,7 +47,7 @@ public class IdRemoteServicesProviderImpl implements IdServicesProvider {
     private static final String IDM_CACHE_ENABLED_DISABLED_KEY = 
         "com.sun.identity.idm.cache.enabled";
 
-    private static Debug debug = IdRemoteServicesImpl.getDebug();
+    private static final Debug DEBUG = Debug.getInstance("amIdmClient");
 
     private static boolean cachingEnabled;
 
@@ -78,15 +79,15 @@ public class IdRemoteServicesProviderImpl implements IdServicesProvider {
 
         if (cachingEnabled) {
             idServices = IdRemoteCachedServicesImpl.getInstance();
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesProviderImpl.static{} - "
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesProviderImpl.static{} - "
                         + "Caching Mode: " + cachingEnabled + "Using "
                         + "implementation Class IdRemoteCachedServicesImpl");
             }
         } else {
             idServices = IdRemoteServicesImpl.getInstance();
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesProviderImpl.static{} - "
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesProviderImpl.static{} - "
                         + "Caching Mode: " + cachingEnabled + "Using "
                         + "implementation Class IdRemoteServicesImpl");
             }

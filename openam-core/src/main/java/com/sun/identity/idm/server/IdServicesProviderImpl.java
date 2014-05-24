@@ -45,7 +45,7 @@ public class IdServicesProviderImpl implements IdServicesProvider {
     private static final String IDM_CACHE_ENABLED_DISABLED_KEY = 
         "com.sun.identity.idm.cache.enabled";
 
-    private static Debug debug = IdServicesImpl.getDebug();
+    private static Debug debug = Debug.getInstance("amIdm");
 
     private static boolean cachingEnabled;
 

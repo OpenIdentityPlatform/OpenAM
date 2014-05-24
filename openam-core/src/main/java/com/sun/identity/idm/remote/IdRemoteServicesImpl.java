@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 package com.sun.identity.idm.remote;
 
@@ -72,6 +72,7 @@ public class IdRemoteServicesImpl implements IdServices {
 
     // TODO: Use a different JAX-RPC interface
     protected static final String SDK_SERVICE = "DirectoryManagerIF";
+    protected static final Debug DEBUG = Debug.getInstance("amIdmClient");
 
     public static final String AMSR_RESULTS = "__results";
 
@@ -80,8 +81,6 @@ public class IdRemoteServicesImpl implements IdServices {
     public static final String AMSR_ATTRS = "__attrs";
 
     private SOAPClient client;
-
-    private static Debug debug = Debug.getInstance("amIdmClient");
 
     private static boolean sendRestrictionContext;
 
@@ -97,8 +96,8 @@ public class IdRemoteServicesImpl implements IdServices {
         String euc = SystemProperties.get(Constants.IS_ENABLE_UNIQUE_COOKIE);
         if ((euc != null) && (euc.length() > 0)) {
             sendRestrictionContext = Boolean.valueOf(euc).booleanValue();
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesImpl.<init>: " +
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesImpl.<init>: " +
                     Constants.IS_ENABLE_UNIQUE_COOKIE +
                     " = " +sendRestrictionContext);
             }
@@ -117,16 +116,16 @@ public class IdRemoteServicesImpl implements IdServices {
                     sendRestrictionContext = (version > 9);
                 }
             } catch (NumberFormatException e) {
-                debug.warning("IdRemoteServicesImpl.<init>.", e);
+                DEBUG.warning("IdRemoteServicesImpl.<init>.", e);
             } catch (SSOException e) {
-                debug.warning("IdRemoteServicesImpl.<init>.", e);
+                DEBUG.warning("IdRemoteServicesImpl.<init>.", e);
             } catch (SMSException e) {
-                debug.warning("IdRemoteServicesImpl.<init>.", e);
+                DEBUG.warning("IdRemoteServicesImpl.<init>.", e);
             }
         }
 
-        if (debug.messageEnabled()) {
-            debug.message(
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message(
                 "IdRemoteServicesImpl.<init>: sendRestrictionContext = " +
                     sendRestrictionContext);
        }
@@ -135,13 +134,9 @@ public class IdRemoteServicesImpl implements IdServices {
        client = new SOAPClient(SDK_SERVICE);
    }
 
-    protected static Debug getDebug() {
-        return debug;
-    }
-
     protected static synchronized IdServices getInstance() {
         if (instance == null) {
-            getDebug().message("IdRemoteServicesImpl.getInstance(): "
+            DEBUG.message("IdRemoteServicesImpl.getInstance(): "
                     + "Creating new Instance of IdRemoteServicesImpl()");
             instance = new IdRemoteServicesImpl();
         }
@@ -156,8 +151,8 @@ public class IdRemoteServicesImpl implements IdServices {
         } else if (exception instanceof IdRepoException) { 
             throw (IdRepoException) exception;
         } else {
-            if (debug.errorEnabled()) {
-                getDebug().error(
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error(
                     "IdRemoteServicesImpl.processException(): " +
                     "caught remote/un-known exception - ", exception);
             }
@@ -181,8 +176,8 @@ public class IdRemoteServicesImpl implements IdServices {
      *         else <code>false</code>
      */
     public boolean authenticate(String orgName, Callback[] credentials) {
-        if (getDebug().messageEnabled()) {
-            getDebug().message("IdRemoteServicesImpl.authenticate(): "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdRemoteServicesImpl.authenticate(): "
                     + " Not supported for remote clients");
         }
 
@@ -424,8 +419,8 @@ public class IdRemoteServicesImpl implements IdServices {
         
         Map resultMap = null;
         try {
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesImpl.getServiceAttributes  type="
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesImpl.getServiceAttributes  type="
                     + type + ";  name="  + name + ";  serviceName="
                     + serviceName + ";  attrNames=" + attrNames
                     + ";  amOrgName=" + amOrgName
@@ -451,8 +446,8 @@ public class IdRemoteServicesImpl implements IdServices {
 
         Map resultMap = null;
         try {
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesImpl.getBinaryServiceAttributes  "
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesImpl.getBinaryServiceAttributes  "
                     + "type="+ type + ";  name="  + name + ";  serviceName="
                     + serviceName + ";  attrNames=" + attrNames
                     + ";  amOrgName=" + amOrgName
@@ -466,7 +461,7 @@ public class IdRemoteServicesImpl implements IdServices {
                     Session.getLBCookie(token.getTokenID().toString()), null));
 
         } catch (RemoteException rex) {
-            getDebug().error(
+            DEBUG.error(
                 "IdRemoteServicesImpl.getBinaryServiceAttributes_idrepo: " +
                 "caught exception=", rex);
             throw new IdRepoException(AMSDKBundle.getString("1000"), "1000");
@@ -499,8 +494,8 @@ public class IdRemoteServicesImpl implements IdServices {
         
         Map resultMap = null;
         try {
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesImpl."
                     + "getServiceAttributesAscending type=" + type
                     + ";  name="  + name + ";  serviceName=" + serviceName
                     + ";  attrNames=" + attrNames + ";  amOrgName="
@@ -542,8 +537,8 @@ public class IdRemoteServicesImpl implements IdServices {
             String amOrgName, String amsdkDN) throws IdRepoException,
             SSOException {
         try {
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteServicesImpl.modifyService_idrepo:"
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteServicesImpl.modifyService_idrepo:"
                     + " name =" +  name + ";  type=" + type +
                     ";  serviceName=" + serviceName + ";  stype=" + stype +
                     ";  attrMap=" + attrMap + ";  amOrgName=" + amOrgName +
@@ -771,8 +766,8 @@ public class IdRemoteServicesImpl implements IdServices {
                 answer = new CaseInsensitiveHashSet(set);
             }
         } catch (Exception ex) {
-            if (debug.warningEnabled()) {
-                getDebug().warning(
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning(
                     "IdRemoteServicesImpl.getFullyQualifiedNames_idrepo: " +
                          "caught exception=", ex);
             }

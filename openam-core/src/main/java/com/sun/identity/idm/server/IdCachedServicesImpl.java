@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -105,16 +105,17 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
             if (maxSize < 1) {
                 maxSize = CACHE_MAX_SIZE_INT;
             }
-            if (getDebug().messageEnabled()) {
-                getDebug().message(
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message(
                         "IdCachedServicesImpl.intializeParams() "
                                 + "Caching size set to: " + maxSize);
             }
         } catch (NumberFormatException ne) {
             maxSize = CACHE_MAX_SIZE_INT;
-            getDebug().warning("IdCachedServicesImpl.initializeParams() "
-                    + "- invalid value for cache size specified. Setting "
-                    + "to default value: " + maxSize);
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdCachedServicesImpl.initializeParams() - invalid value for cache size specified. "
+                        + "Setting to default value: " + maxSize);
+            }
         }
     }
 
@@ -144,7 +145,7 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
 
     protected static synchronized IdServices getInstance() {
         if (instance == null) {
-            getDebug().message("IdCachedServicesImpl.getInstance(): "
+            DEBUG.message("IdCachedServicesImpl.getInstance(): "
                     + "Creating new Instance of IdCachedServicesImpl()");
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
             //the instance should be created before acquiring the lock to
@@ -307,8 +308,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
             }
             break;
         }
-        if (getDebug().messageEnabled()) {
-            getDebug().message("IdCachedServicesImpl.dirtyCache(): Cache "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdCachedServicesImpl.dirtyCache(): Cache "
                     + "dirtied because of Event Notification. Parameters - "
                     + "eventType: " + eventType + ", cosType: "
                     + cosType + ", aciChange: " + aciChange
@@ -370,8 +371,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         String principalDN = IdUtils.getUniversalId(tokenId);
 
         // Debug messages
-        if (getDebug().messageEnabled()) {
-            getDebug().message("In IdCachedServicesImpl." +
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("In IdCachedServicesImpl." +
                     "getAttributes(SSOToken, type, name, attrNames, " +
                     "amOrgName, amsdkDN) (" + principalDN + ", " + dn +
                     ", " + attrNames + " ," + amOrgName +
@@ -384,8 +385,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
         // Check in the cache
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
         if (cb == null) { // Entry not present in cache
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdCachedServicesImpl.getAttributes(): "
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getAttributes(): "
                         + "NO entry found in Cachefor key = " + dn
                         + ". Getting all these attributes from DS: "
                         + attrNames);
@@ -412,8 +413,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
             // found in DS
             Set missAttrNames = attributes.getMissingKeys(attrNames);
             if (!missAttrNames.isEmpty()) {
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("IdCachedServicesImpl."
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdCachedServicesImpl."
                             + "getAttributes(): Trying to gett these missing "
                             + "attributes from DS: "
                             + missAttrNames);
@@ -439,8 +440,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                     long li = (long)getSize();
                     monIdRepo.incCacheHits(li);
                 }
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("IdCachedServicesImpl" 
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdCachedServicesImpl"
                             + ".getAttributes(): " + amsdkDN
                             + " found all attributes in Cache.");
                 }
@@ -482,16 +483,16 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                 long li = (long)getSize();
                 monIdRepo.incCacheHits(li);
             }
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdCachedServicesImpl." 
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl."
                     + "getAttributes(): DN: " + dn 
                     + " found all attributes in Cache.");
             }
             attributes = (AMHashMap) cb.getAttributes(principalDN, false);
         } else {
             // Get all the attributes from data store
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdCachedServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl."
                     + "getAttributes(): " + dn
                     + " complete attribute"
                     + " set NOT found in cache. Getting from DS.");
@@ -503,8 +504,8 @@ public class IdCachedServicesImpl extends IdServicesImpl implements
                 idRepoCache.put(dn, cb);
             }
             cb.putAttributes(principalDN, attributes, null, true, false);
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdCachedServicesImpl.getAttributes(): "
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdCachedServicesImpl.getAttributes(): "
                         + "attributes NOT found in cache. Fetched from DS.");
             }
         }
