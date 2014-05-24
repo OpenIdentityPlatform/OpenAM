@@ -26,7 +26,7 @@
 */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.remote;
 
@@ -65,7 +65,7 @@ import com.sun.identity.sm.SMSSchema;
  */
 public class IdRemoteEventListener {
 
-    private static Debug debug;
+    private static final Debug DEBUG = Debug.getInstance("amIdmClient");
     
     private static SOAPClient client;
     
@@ -96,12 +96,6 @@ public class IdRemoteEventListener {
      *
      */
     private IdRemoteEventListener() {
-        
-        // Set debug
-        if (debug == null) {
-            debug = IdRemoteServicesImpl.getDebug();
-        }
-
         // Construct the SOAP Client
         if (client == null) {
             client = new SOAPClient("DirectoryManagerIF");
@@ -127,12 +121,12 @@ public class IdRemoteEventListener {
                     remoteId = result.toString();
                 }
                 if (remoteId != null) {
-                    if (debug.messageEnabled()) {
-                        debug.message("IdRemoteEventListener: registerNotificationURL_idrepo returned ID " + remoteId);
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("IdRemoteEventListener: registerNotificationURL_idrepo returned ID " + remoteId);
                     }
                 } else {
-                    if (debug.messageEnabled()) {
-                        debug.message("IdRemoteEventListener: registerNotificationURL_idrepo returned null ID");
+                    if (DEBUG.messageEnabled()) {
+                        DEBUG.message("IdRemoteEventListener: registerNotificationURL_idrepo returned null ID");
                     }
                 }
                 ShutdownManager shutdownMan = ShutdownManager.getInstance();
@@ -144,18 +138,18 @@ public class IdRemoteEventListener {
                                 try {
                                     if (remoteId != null) {
                                         client.send("deRegisterNotificationURL_idrepo", remoteId, null, null);
-                                        if (debug.messageEnabled()) {
-                                            debug.message("IdRemoteEventListener: deRegisterNotificationURL_idrepo for "
+                                        if (DEBUG.messageEnabled()) {
+                                            DEBUG.message("IdRemoteEventListener: deRegisterNotificationURL_idrepo for "
                                                     + remoteId);
                                         }
                                     } else {
-                                        if (debug.messageEnabled()) {
-                                            debug.message("IdRemoteEventListener: Could not " +
+                                        if (DEBUG.messageEnabled()) {
+                                            DEBUG.message("IdRemoteEventListener: Could not " +
                                                     "deRegisterNotificationURL_idrepo due to null ID");
                                         }
                                     }
                                 } catch (Exception e) {
-                                    debug.error("IdRemoteEventListener: There was a problem calling " +
+                                    DEBUG.error("IdRemoteEventListener: There was a problem calling " +
                                             "deRegisterNotificationURL_idrepo with ID " +  remoteId, e);
                                 }
                             }
@@ -168,15 +162,15 @@ public class IdRemoteEventListener {
                 PLLClient.addNotificationHandler(IDREPO_SERVICE,
                         new IdRepoEventNotificationHandler());
 
-                if (debug.messageEnabled()) {
-                    debug.message("IdRemoteEventListener: Using notification "
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRemoteEventListener: Using notification "
                             + "mechanism for cache updates: "
                             + url.toString());
                 }
             } catch (Exception e) {
                 // Use polling mechanism to update caches
-                if (debug.warningEnabled()) {
-                    debug.warning("IdRemoteEventListener: Registering for "
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("IdRemoteEventListener: Registering for "
                             + "notification via URL failed for " + url 
                             + " Exception: " + e.getMessage()
                             + "\nUsing polling mechanism for updates");
@@ -200,7 +194,7 @@ public class IdRemoteEventListener {
             try {
                 cachePollingInterval = Integer.parseInt(cachePollingTimeStr);            
             } catch (NumberFormatException nfe) {
-                debug.error("IdRemoteEventListener::NotificationRunnable:: "
+                DEBUG.error("IdRemoteEventListener::NotificationRunnable:: "
                         + "Invalid Polling Time: " + cachePollingTimeStr + 
                         " Defaulting to " + DEFAULT_CACHE_POLLING_TIME  + 
                         " minute");
@@ -211,8 +205,8 @@ public class IdRemoteEventListener {
     
     private static void startPollingThreadIfEnabled(int cachePollingInterval) {
         if (cachePollingInterval > 0) {
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteEventListener: Polling mode enabled. " +
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteEventListener: Polling mode enabled. " +
                         "Starting the polling thread..");
             }
             // Run in polling mode
@@ -221,8 +215,8 @@ public class IdRemoteEventListener {
             SystemTimer.getTimer().schedule(nt, new Date((
                 System.currentTimeMillis() / 1000) * 1000));
         } else {
-            if (debug.warningEnabled()) {
-                debug.warning("IdRemoteEventListener: Polling mode DISABLED. " +
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRemoteEventListener: Polling mode DISABLED. " +
                          CACHE_POLLING_TIME_PROPERTY + "=" + 
                          cachePollingInterval);
             }
@@ -264,8 +258,8 @@ public class IdRemoteEventListener {
      * 
      */
     static void sendIdRepoNotification(String nItem) {
-        if (debug.messageEnabled()) {
-            debug.message("IdRemoteEventListener::sendIdRepoNotification: "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdRemoteEventListener::sendIdRepoNotification: "
                     + "Received notification.");
         }
 
@@ -280,13 +274,13 @@ public class IdRemoteEventListener {
                 .getXMLDocument(sb.toString(), false).getDocumentElement(), 
                     false);
             if (attrs == null || attrs.isEmpty()) {
-                if (debug.warningEnabled()) {
-                    debug.warning("IdRemoteEventListener::sendIdRepoNotification: "
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("IdRemoteEventListener::sendIdRepoNotification: "
                             + "Invalid event: " + attrs);
                 }
                 return;
-            } else if (debug.messageEnabled()) {
-                debug.message("IdRemoteEventListener::sendIdRepoNotification "
+            } else if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteEventListener::sendIdRepoNotification "
                         + "Decoded Event: " + attrs);
             }
 
@@ -295,8 +289,8 @@ public class IdRemoteEventListener {
             String method = getAttributeValue(attrs, METHOD);
             if (entityName == null || entityName.length() == 0
                     || method == null || method.length() == 0) {
-                if (debug.warningEnabled()) {
-                    debug.warning("IdRemoteEventListener::sendIdRepoNotification: "
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("IdRemoteEventListener::sendIdRepoNotification: "
                             + "Invalid universalID or method: " + entityName
                             + " method");
                 }
@@ -313,8 +307,8 @@ public class IdRemoteEventListener {
                 DN entityDN = new DN(entityName);
                 realm = entityDN.getParent().getParent().toRFCString();
             }
-            if (debug.messageEnabled()) {
-                debug.message("IdRemoteEventListener::sendIdRepoNotification: " +
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteEventListener::sendIdRepoNotification: " +
                     "modified UUID: " + entityName + " realm: " + realm);
             }
             Map configMap = new HashMap();
@@ -332,8 +326,8 @@ public class IdRemoteEventListener {
                 handleError("invalid method name: " + method);
             }
         } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning("IdRemoteEventListener::sendIdRepoNotification: "
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRemoteEventListener::sendIdRepoNotification: "
                         + "Unable to send notification: " + nItem, e);
             }
         }
@@ -341,7 +335,7 @@ public class IdRemoteEventListener {
 
     static void handleError(String msg) throws Exception {
         // Debug the message and throw an exception
-        debug.error("EventListener::sendNotification: " + msg);
+        DEBUG.error("EventListener::sendNotification: " + msg);
         throw (new Exception(msg));
     }
 
@@ -401,8 +395,8 @@ public class IdRemoteEventListener {
                 Object obj[] = { new Integer(pollingTime) };
                 Set mods = (Set) client.send("objectsChanged_idrepo", obj,
                     null, null);
-                if (debug.messageEnabled()) {
-                    debug.message("IdRemoteEventListener:NotificationRunnable "
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRemoteEventListener:NotificationRunnable "
                         + "retrieved idrepo changes: " + mods);
                 }
                 Iterator items = mods.iterator();
@@ -410,8 +404,8 @@ public class IdRemoteEventListener {
                     sendIdRepoNotification((String) items.next());
                 }
             } catch (Exception ex) {
-                if (debug.warningEnabled()) {
-                    debug.warning("IdRemoteEventListener::" +
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("IdRemoteEventListener::" +
                         "NotificationRunnable:run Exception", ex);
                 }
             }
@@ -429,8 +423,8 @@ public class IdRemoteEventListener {
                 Notification notification = (Notification) notifications
                         .elementAt(i);
                 String content = notification.getContent();
-                if (debug.messageEnabled()) {
-                    debug.message("IdRemoteEventListener:" 
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRemoteEventListener:" 
                             + "IdRepoEventNotificationHandler: "
                             + " received notification: " + content);
                 }

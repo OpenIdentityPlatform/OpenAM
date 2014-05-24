@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.remote;
 
@@ -116,17 +116,18 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             if (maxSize < 1) {
                 maxSize = CACHE_MAX_SIZE_INT;
             }
-            if (getDebug().messageEnabled()) {
-                getDebug().message(
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message(
                         "IdRemoteCachedServicesImpl."
                                 + "intializeParams() Caching size set to: "
                                 + maxSize);
             }
         } catch (NumberFormatException ne) {
             maxSize = CACHE_MAX_SIZE_INT;
-            getDebug().warning("IdRemoteCachedServicesImpl.initializeParams() "
-                    + "- invalid value for cache size specified. Setting "
-                    + "to default value: " + maxSize);
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("IdRemoteCachedServicesImpl.initializeParams() - invalid value for cache size specified."
+                        + " Setting to default value: " + maxSize);
+            }
         }
     }
 
@@ -145,8 +146,10 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
     protected static synchronized IdServices getInstance() {
         if (instance == null) {
-            getDebug().message("IdRemoteCachedServicesImpl.getInstance(): "
-                    + "Creating new Instance of IdRemoteCachedServicesImpl()");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl.getInstance(): Creating new Instance of "
+                        + "IdRemoteCachedServicesImpl()");
+            }
             instance = new IdRemoteCachedServicesImpl();
         }
         return instance;
@@ -281,8 +284,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             }
             break;
         }
-        if (getDebug().messageEnabled()) {
-            getDebug().message("IdRemoteCachedServicesImpl.dirtyCache(): Cache "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("IdRemoteCachedServicesImpl.dirtyCache(): Cache "
                     + "dirtied because of Event Notification. Parameters - "
                     + "eventType: " + eventType + ", cosType: "
                     + cosType + ", aciChange: " + aciChange
@@ -323,8 +326,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
 
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
         if (cb == null) { // Entry not present in cache
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteCachedServicesImpl." +
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl." +
                     "isExist(): NO entry found in Cachefor key = " + dn);
             }
             return super.isExists(token, type, name, amOrgName);
@@ -369,8 +372,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         AMIdentity tokenId = IdUtils.getIdentity(token);
         String principalDN = tokenId.getUniversalId();
         
-        if (getDebug().messageEnabled()) {
-            getDebug().message("In IdRemoteCachedServicesImpl." +
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("In IdRemoteCachedServicesImpl." +
                 "getAttributes(SSOToken type, name, attrNames, " +
                 "amOrgName, amsdkDN) (" + principalDN + ", " + dn +
                 ", " + attrNames + " ," + amOrgName +
@@ -382,8 +385,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
         
         IdCacheBlock cb = (IdCacheBlock) idRepoCache.get(dn);
         if (cb == null) { // Entry not present in cache
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteCachedServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl."
                         + "getAttributes(): NO entry found in Cachefor key = "
                         + dn + ". Getting all these attributes from DS: "
                         + attrNames);
@@ -412,8 +415,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
             // found in DS
             Set missAttrNames = attributes.getMissingKeys(attrNames); 
             if (!missAttrNames.isEmpty()) {
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("IdRemoteCachedServicesImpl."
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRemoteCachedServicesImpl."
                             + "getAttributes(): Trying to gett these missing "
                             + "attributes from DS: "
                             + missAttrNames);
@@ -438,8 +441,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                     long li = (long)getSize();
                     monIdRepo.incCacheHits(li);
                 }
-                if (getDebug().messageEnabled()) {
-                    getDebug().message("IdRemoteCachedServicesImpl." + 
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRemoteCachedServicesImpl." +
                             "getAttributes(): found all attributes in Cache.");
                 }   
             }
@@ -480,16 +483,16 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 long li = (long)getSize();
                 monIdRepo.incCacheHits(li);
             }
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteCachedServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl."
                     + "getAttributes(): found all attributes in "
                     + "Cache.");
             }
             attributes = (AMHashMap) cb.getAttributes(principalDN, false);
         } else {
             // Get the whole set from DS and store it;
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteCachedServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl."
                     + "getAttributes(): complete attribute set NOT "
                     + "found in cache. Getting from DS.");
             }
@@ -500,8 +503,8 @@ public class IdRemoteCachedServicesImpl extends IdRemoteServicesImpl implements
                 idRepoCache.put(dn, cb);
             }
             cb.putAttributes(principalDN, attributes, null, true, false);
-            if (getDebug().messageEnabled()) {
-                getDebug().message("IdRemoteCachedServicesImpl."
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRemoteCachedServicesImpl."
                     + "getAttributes(): attributes NOT found in cache. "
                     + "Fetched from DS.");
             }
