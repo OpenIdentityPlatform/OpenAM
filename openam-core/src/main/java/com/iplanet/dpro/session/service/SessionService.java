@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.iplanet.dpro.session.service;
@@ -1197,8 +1197,9 @@ public class SessionService {
                 }
             }
 
-            sids.add(sid);
-            session.updateForFailover();
+            if (sids.add(sid)) {
+                session.updateForFailover();
+            }
         }
     }
 
