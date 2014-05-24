@@ -32,8 +32,6 @@ import javax.security.auth.Subject;
  * PrivilegeEvaluatorContext} object, which is shared across privilege evaluator threads. It's worthwhile to note, that
  * the context is only shared per a single privilege evaluation, hence different privilege evaluations have different
  * caches.
- *
- * @author Peter Major
  */
 public class CachingEntitlementCondition implements EntitlementCondition {
 
@@ -103,8 +101,9 @@ public class CachingEntitlementCondition implements EntitlementCondition {
 
         //context is shared across evaluator threads, so we can synchronize on it. Different privilege evaluations have
         //different contexts as well.
+        final String state = getState();
         synchronized (context) {
-            ConditionDecision cachedResult = context.getConditionDecisionCache().get(getState());
+            ConditionDecision cachedResult = context.getConditionDecisionCache().get(state);
             if (cachedResult != null) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message(classMethod + "returning cached condition decision");
@@ -114,9 +113,9 @@ public class CachingEntitlementCondition implements EntitlementCondition {
             ConditionDecision result = backingCondition.evaluate(realm, subject, resourceName, environment);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message(classMethod + "caching condition decision \"" + result.isSatisfied()
-                        + "\" for condition: " + getState());
+                        + "\" for condition: " + state);
             }
-            context.getConditionDecisionCache().put(getState(), result);
+            context.getConditionDecisionCache().put(state, result);
             return result;
         }
     }
