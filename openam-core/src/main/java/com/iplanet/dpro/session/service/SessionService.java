@@ -1215,8 +1215,9 @@ public class SessionService {
                 }
             }
 
-            sids.add(sid);
-            session.updateForFailover();
+            if (sids.add(sid)) {
+                session.updateForFailover();
+            }
         }
     }
 
