@@ -28,49 +28,49 @@
  * OF SUCH DAMAGE.
  */
 /**
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.shared.encode;
 
 public class Base64 {
 
-    public static char[] encodeToChar(byte[] sArr, boolean lineSep) {
-        return org.forgerock.util.encode.Base64.encodeToChar(sArr, lineSep);
+    public static byte[] encodeToByte(byte[] bytes, boolean lineSep) {
+        return org.forgerock.util.encode.Base64.encodeToByte(bytes, lineSep);
     }
 
-    public static byte[] decode(char[] sArr) {
-        return org.forgerock.util.encode.Base64.decode(sArr);
+    public static char[] encodeToChar(byte[] bytes, boolean lineSep) {
+        return org.forgerock.util.encode.Base64.encodeToChar(bytes, lineSep);
     }
 
-    public static byte[] decodeFast(char[] sArr) {
-        return org.forgerock.util.encode.Base64.decodeFast(sArr);
+    public static String encode(byte[] bytes, boolean lineSep) {
+        return org.forgerock.util.encode.Base64.encode(bytes, lineSep);
     }
 
-    public static byte[] encodeToByte(byte[] sArr, boolean lineSep) {
-        return org.forgerock.util.encode.Base64.encodeToByte(sArr, lineSep);
+    public static String encode(byte[] bytes) {
+        return org.forgerock.util.encode.Base64.encode(bytes);
     }
 
-    public static byte[] decode(byte[] sArr) {
-        return org.forgerock.util.encode.Base64.decode(sArr);
+    public static byte[] decode(byte[] bytes) {
+        return org.forgerock.util.encode.Base64.decode(bytes);
     }
 
-    public static byte[] decodeFast(byte[] sArr) {
-        return org.forgerock.util.encode.Base64.decodeFast(sArr);
+    public static byte[] decode(char[] encoded) {
+        return org.forgerock.util.encode.Base64.decode(encoded);
     }
 
-    public static String encode(byte[] sArr, boolean lineSep) {
-        return org.forgerock.util.encode.Base64.encode(sArr, lineSep);
+    public static byte[] decode(String encoded) {
+        return org.forgerock.util.encode.Base64.decode(encoded.toCharArray());
     }
 
-    public static String encode(byte[] content) {
-        return org.forgerock.util.encode.Base64.encode(content);
+    public static byte[] decodeFast(byte[] encoded) {
+        return org.forgerock.util.encode.Base64.decodeFast(encoded);
     }
 
-    public static byte[] decode(String str) {
-        return org.forgerock.util.encode.Base64.decode(str);
+    public static byte[] decodeFast(char[] encoded) {
+        return org.forgerock.util.encode.Base64.decodeFast(encoded);
     }
 
-    public static byte[] decodeFast(String s) {
-        return org.forgerock.util.encode.Base64.decodeFast(s);
+    public static byte[] decodeFast(String encoded) {
+        return org.forgerock.util.encode.Base64.decodeFast(encoded.toCharArray());
     }
 }
