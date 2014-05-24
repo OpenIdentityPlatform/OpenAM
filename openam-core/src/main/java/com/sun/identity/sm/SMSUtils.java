@@ -27,15 +27,13 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
-
 package com.sun.identity.sm;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,10 +59,10 @@ public class SMSUtils {
 
     public static final String ORG_SCHEMA = "Organization";
 
-    public static final String ORG_ATTRIBUTE_SCHEMA = 
+    public static final String ORG_ATTRIBUTE_SCHEMA =
         "OrganizationAttributeSchema";
 
-    public static final String ORG_ATTRIBUTE_VALUE_PAIR = 
+    public static final String ORG_ATTRIBUTE_VALUE_PAIR =
         "OrganizationAttributeValuePair";
 
     public static final String ORG_CONFIG = "OrganizationConfiguration";
@@ -103,7 +101,7 @@ public class SMSUtils {
 
     protected static final String SERVICE_HIERARCHY = "serviceHierarchy";
 
-    protected static final String PROPERTIES_VIEW_BEAN_URL = 
+    protected static final String PROPERTIES_VIEW_BEAN_URL =
         "propertiesViewBeanURL";
 
     protected static final String I18N_KEY = "i18nKey";
@@ -134,7 +132,7 @@ public class SMSUtils {
 
     protected static final String PLUGIN_CONFIG = "PluginConfiguration";
 
-    protected static final String PLUGIN_CONFIG_SCHEMA_NAME = 
+    protected static final String PLUGIN_CONFIG_SCHEMA_NAME =
         "pluginSchemaName";
 
     protected static final String PLUGIN_CONFIG_INT_NAME = "interfaceName";
@@ -169,7 +167,7 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_SERVICE_ID = "IsServiceIdentifier";
 
-    protected static final String ATTRIBUTE_RESOURCE_NAME = 
+    protected static final String ATTRIBUTE_RESOURCE_NAME =
         "IsResourceNameAllowed";
 
     protected static final String ATTRIBUTE_STATUS_ATTR = "IsStatusAttribute";
@@ -178,42 +176,42 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_ANY = "any";
 
-    protected static final String ATTRIBUTE_VIEW_BEAN_URL = 
+    protected static final String ATTRIBUTE_VIEW_BEAN_URL =
         "propertiesViewBeanURL";
 
     protected static final String ATTRIBUTE_VALUE = "Value";
 
     protected static final String ATTRIBUTE_DEFAULT_ELEMENT = "DefaultValues";
 
-    protected static final String ATTRIBUTE_DEFAULT_CLASS = 
+    protected static final String ATTRIBUTE_DEFAULT_CLASS =
         "DefaultValuesClassName";
 
     protected static final String CLASS_NAME = "className";
 
-    protected static final String ATTRIBUTE_CHOICE_CLASS = 
+    protected static final String ATTRIBUTE_CHOICE_CLASS =
         "ChoiceValuesClassName";
 
-    protected static final String ATTRIBUTE_CHOICE_VALUES_ELEMENT = 
+    protected static final String ATTRIBUTE_CHOICE_VALUES_ELEMENT =
         "ChoiceValues";
 
-    protected static final String ATTRIBUTE_CHOICE_VALUE_ELEMENT = 
+    protected static final String ATTRIBUTE_CHOICE_VALUE_ELEMENT =
         "ChoiceValue";
 
     protected static final String ATTRIBUTE_COS_QUALIFIER = "cosQualifier";
 
-    protected static final String ATTRIBUTE_BOOLEAN_VALUES_ELEMENT = 
+    protected static final String ATTRIBUTE_BOOLEAN_VALUES_ELEMENT =
         "BooleanValues";
 
-    protected static final String ATTRIBUTE_TRUE_BOOLEAN_ELEMENT = 
+    protected static final String ATTRIBUTE_TRUE_BOOLEAN_ELEMENT =
         "BooleanTrueValue";
 
-    protected static final String ATTRIBUTE_FALSE_BOOLEAN_ELEMENT = 
+    protected static final String ATTRIBUTE_FALSE_BOOLEAN_ELEMENT =
         "BooleanFalseValue";
 
     protected static int counter = 0;
 
     static int getInstanceID() {
-        return (counter++);
+        return counter++;
     }
 
     public static String getUniqueID() {
@@ -221,152 +219,118 @@ public class SMSUtils {
     }
 
     // Performs a deep copy of the Map
-    public static Map copyAttributes(Map attributes) {
+    public static Map<String, Object> copyAttributes(Map<String, Object> attributes) {
         if (attributes == null) {
-            return new HashMap();
+            return new HashMap<String, Object>();
         }
-        HashMap answer = attributes instanceof CaseInsensitiveHashMap ? 
-                new CaseInsensitiveHashMap()
-                : new HashMap();
+        Map<String, Object> answer = attributes instanceof CaseInsensitiveHashMap ?
+                new CaseInsensitiveHashMap(attributes.size()) : new HashMap<String, Object>(attributes.size());
 
         if (attributes.isEmpty()) {
-            return (answer);
+            return answer;
         }
 
-        Iterator items = attributes.keySet().iterator();
-        while (items.hasNext()) {
-            String attrName = (String) items.next();
-            Object o = attributes.get(attrName);
-            if (o != null && o instanceof Set) {
-                Set set = (Set) o;
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            String attrName = entry.getKey();
+            Object value = entry.getValue();
+            if (value instanceof Set) {
+                Set<String> set = (Set<String>) value;
                 if (set.isEmpty()) {
                     if (set == Collections.EMPTY_SET) {
                         answer.put(attrName, Collections.EMPTY_SET);
                     } else {
-                        answer.put(attrName, new HashSet());
+                        answer.put(attrName, new HashSet<String>(0));
                     }
                 } else {
                     // Copy the HashSet
-                    HashSet newSet = new HashSet();
-                    for (Iterator nitems = set.iterator(); nitems.hasNext();) {
-                        newSet.add(nitems.next());
-                    }
-                    answer.put(attrName, new HashSet(newSet));
+                    answer.put(attrName, new HashSet(set));
                 }
             } else {
-                answer.put(attrName, o);
+                answer.put(attrName, value);
             }
         }
-        return (answer);
+        return answer;
     }
 
-    static Map getAttrsFromEntry(SMSEntry entry) {
+    static Map<String, Set<String>> getAttrsFromEntry(SMSEntry entry) {
         if (SMSEntry.debug.messageEnabled()) {
-            SMSEntry.debug.message("SMSUtils: obtains attrs from entry: "
-                    + entry.getDN());
+            SMSEntry.debug.message("SMSUtils: obtains attrs from entry: " + entry.getDN());
         }
-        Map answer = new HashMap();
+        Map<String, Set<String>> answer = new HashMap<String, Set<String>>();
         String[] attrValues = entry.getAttributeValues(SMSEntry.ATTR_KEYVAL);
-        String[] searchableAttrValues = entry
-                .getAttributeValues(SMSEntry.ATTR_XML_KEYVAL);
-        if ((attrValues == null) && (searchableAttrValues == null)) {
-            return (answer);
+        String[] searchableAttrValues = entry.getAttributeValues(SMSEntry.ATTR_XML_KEYVAL);
+        if (attrValues == null && searchableAttrValues == null) {
+            return answer;
         }
 
-        // Parse the attribute values
-        for (int i = 0; attrValues != null && i < attrValues.length; i++) {
-            String sattrvalue = attrValues[i];
-            // Get attribute name and value
-            int index = sattrvalue.indexOf('=');
-            if (index == -1) {
-                // Error in attribute values
-                SMSEntry.debug.error("SMSUtils: Invalid attribute entry: "
-                        + sattrvalue + "\nIn SMSEntry: " + entry);
-                continue;
-            }
-            String attrName = sattrvalue.substring(0, index);
-            String attrValue = null;
-            if (sattrvalue.length() > (index + 1)) {
-                attrValue = sattrvalue.substring(index + 1);
-            }
-            Set values = (Set) answer.get(attrName);
-            if (values == null) {
-                values = new HashSet();
-                answer.put(attrName, values);
-            }
-            if ((attrValue != null) && attrValue.length() != 0) {
-                values.add(attrValue);
-            }
-        }
+        addAttributesToMap(entry, attrValues, answer);
+        addAttributesToMap(entry, searchableAttrValues, answer);
 
-        for (int j = 0; searchableAttrValues != null
-                && j < searchableAttrValues.length; j++) {
-            String searchAttrvalue = searchableAttrValues[j];
-            // Get searchable attribute name and value
-            int indx = searchAttrvalue.indexOf('=');
-            if (indx == -1) {
-                // Error in searchable attribute values
-                SMSEntry.debug.error("SMSUtils: Invalid searchable attribute "
-                        + "entry: " + searchAttrvalue + "\nIn SMSEntry: "
-                        + entry);
-                continue;
-            }
-            String srchAttrName = searchAttrvalue.substring(0, indx);
-            String srchAttrValue = null;
-            if (searchAttrvalue.length() > (indx + 1)) {
-                srchAttrValue = searchAttrvalue.substring(indx + 1);
-            }
-            Set srchValues = (Set) answer.get(srchAttrName);
-            if (srchValues == null) {
-                srchValues = new HashSet();
-                answer.put(srchAttrName, srchValues);
-            }
-            if ((srchAttrValue != null) && srchAttrValue.length() != 0) {
-                srchValues.add(srchAttrValue);
-            }
-        }
-        return (answer);
+        return answer;
     }
 
-    static void setAttributeValuePairs(SMSEntry e, Map attrs,
-            Set searchAttrNames) throws SMSException {
+    private static void addAttributesToMap(SMSEntry entry, String[] attrs, Map<String, Set<String>> attrMap) {
+        if (attrs != null) {
+            for (String attribute : attrs) {
+                // Get attribute name and value
+                int idx = attribute.indexOf('=');
+                if (idx == -1) {
+                    // Error in attribute values
+                    SMSEntry.debug.error("SMSUtils: Invalid attribute entry: " + attribute
+                            + "\nIn SMSEntry: " + entry);
+                    continue;
+                }
+                String attrName = attribute.substring(0, idx);
+                String attrValue = null;
+                if (attribute.length() > idx + 1) {
+                    attrValue = attribute.substring(idx + 1);
+                }
+                Set<String> values = attrMap.get(attrName);
+                if (values == null) {
+                    values = new HashSet<String>();
+                    attrMap.put(attrName, values);
+                }
+                if (attrValue != null && !attrValue.isEmpty()) {
+                    values.add(attrValue);
+                }
+            }
+        }
+    }
+
+    static void setAttributeValuePairs(SMSEntry e, Map<String, Object> attrs, Set<String> searchAttrNames)
+            throws SMSException {
         if (SMSEntry.debug.messageEnabled()) {
-            SMSEntry.debug.message("SMSUtils: setting attrs to entry: "
-                    + e.getDN());
+            SMSEntry.debug.message("SMSUtils: setting attrs to entry: " + e.getDN());
         }
         if (attrs != null) {
-            Set values = new HashSet();
-            Set srchValues = new HashSet();
+            Set<String> values = new HashSet<String>();
+            Set<String> srchValues = new HashSet<String>();
 
-            for (Iterator attrNames = attrs.keySet().iterator();
-                attrNames.hasNext();
-            ) {
-                String attrName = (String) attrNames.next();
-                Object o = attrs.get(attrName);
-                boolean bSearch = !searchAttrNames.isEmpty() &&
-                    searchAttrNames.contains(attrName.toLowerCase());
+            for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+                String attrName = entry.getKey();
+                Object attrValue = entry.getValue();
+                boolean isSearchable = searchAttrNames.contains(attrName.toLowerCase());
 
-                if (o == null) {
+                if (attrValue == null) {
                     // do nothing
-                } else if (o instanceof String) {
-                    if (bSearch) {
-                        srchValues.add(attrName + "=" + (String) o);
+                } else if (attrValue instanceof String) {
+                    if (isSearchable) {
+                        srchValues.add(attrName + "=" + attrValue);
                     } else {
-                        values.add(attrName + "=" + (String) o);
+                        values.add(attrName + "=" + attrValue);
                     }
-                } else if ((o instanceof Set)) {
-                    Set set = (Set)o;
+                } else if (attrValue instanceof Set) {
+                    Set<String> set = (Set<String>) attrValue;
                     if (set.isEmpty()) {
                         // an attribute with no values
-                        if (bSearch) {
+                        if (isSearchable) {
                             srchValues.add(attrName + "=");
                         } else {
                             values.add(attrName + "=");
                         }
                     } else {
-                        for (Iterator i = set.iterator(); i.hasNext(); ) {
-                            String item = (String)i.next();
-                            if (bSearch) {
+                        for (String item : set) {
+                            if (isSearchable) {
                                 srchValues.add(attrName + "=" + item);
                             } else {
                                 values.add(attrName + "=" + item);
@@ -377,159 +341,125 @@ public class SMSUtils {
             }
 
             if (!values.isEmpty()) {
-                e.setAttribute(SMSEntry.ATTR_KEYVAL, (String[]) values
-                        .toArray(new String[values.size()]));
+                e.setAttribute(SMSEntry.ATTR_KEYVAL, values.toArray(new String[values.size()]));
             }
             if (!srchValues.isEmpty()) {
-                e.setAttribute(SMSEntry.ATTR_XML_KEYVAL, (String[]) srchValues
-                        .toArray(new String[srchValues.size()]));
+                e.setAttribute(SMSEntry.ATTR_XML_KEYVAL, srchValues.toArray(new String[srchValues.size()]));
             }
         }
     }
 
-    static void addAttribute(SMSEntry e, String attrName, Set values,
-            Set searchableAttrNames) throws SMSException {
+    static void addAttribute(SMSEntry e, String attrName, Set<String> values, Set<String> searchableAttrNames)
+            throws SMSException {
         if (SMSEntry.debug.messageEnabled()) {
-            SMSEntry.debug.message("SMSUtils: adding attributes to entry: "
-                    + e.getDN());
+            SMSEntry.debug.message("SMSUtils: adding attributes to entry: " + e.getDN());
         }
-        if ((attrName == null) || (values == null)) {
+        if (attrName == null || values == null) {
             return;
         }
 
-        if ((!searchableAttrNames.isEmpty())
-                && (searchableAttrNames.contains(attrName.toLowerCase()))) {
-            for (Iterator vals = values.iterator(); vals.hasNext();) {
-                e.addAttribute(SMSEntry.ATTR_XML_KEYVAL,
-                        (attrName + "=" + (String) vals.next()));
+        if (searchableAttrNames.contains(attrName.toLowerCase())) {
+            for (String value : values) {
+                e.addAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "=" + value);
             }
         } else {
-            for (Iterator vals = values.iterator(); vals.hasNext();) {
-                e.addAttribute(SMSEntry.ATTR_KEYVAL,
-                        (attrName + "=" + (String) vals.next()));
+            for (String value : values) {
+                e.addAttribute(SMSEntry.ATTR_KEYVAL, attrName + "=" + value);
             }
-
         }
     }
 
-    static void removeAttribute(SMSEntry e, String attrName)
-            throws SMSException {
-
+    static void removeAttribute(SMSEntry e, String attrName) throws SMSException {
         String[] attrValues = e.getAttributeValues(SMSEntry.ATTR_KEYVAL);
-        String[] searchableAttrValues = e
-                .getAttributeValues(SMSEntry.ATTR_XML_KEYVAL);
+        String[] searchableAttrValues = e.getAttributeValues(SMSEntry.ATTR_XML_KEYVAL);
 
-        if ((attrValues == null) && (searchableAttrValues == null)) {
+        if (attrValues == null && searchableAttrValues == null) {
             return;
         }
         if (attrValues != null) {
             String matchString = attrName + "=";
-            for (int i = 0; i < attrValues.length; i++) {
-                if (attrValues[i].startsWith(matchString)) {
-                    e.removeAttribute(SMSEntry.ATTR_KEYVAL, attrValues[i]);
+            for (String attrValue : attrValues) {
+                if (attrValue.startsWith(matchString)) {
+                    e.removeAttribute(SMSEntry.ATTR_KEYVAL, attrValue);
                 }
             }
         }
         if (searchableAttrValues != null) {
             String matchStr = attrName + "=";
-            for (int j = 0; j < searchableAttrValues.length; j++) {
-                if (searchableAttrValues[j].startsWith(matchStr)) {
-                    e.removeAttribute(SMSEntry.ATTR_XML_KEYVAL,
-                            searchableAttrValues[j]);
+            for (String searchableAttrValue : searchableAttrValues) {
+                if (searchableAttrValue.startsWith(matchStr)) {
+                    e.removeAttribute(SMSEntry.ATTR_XML_KEYVAL, searchableAttrValue);
                 }
             }
         }
     }
 
-    static void removeAttributeValues(SMSEntry e, String attrName, Set values,
-            Set searchableAttrNames) throws SMSException {
-
-        if ((attrName == null) || (values == null) || values.isEmpty()) {
+    static void removeAttributeValues(SMSEntry e, String attrName, Set<String> values, Set searchableAttrNames)
+            throws SMSException {
+        if (attrName == null || values == null || values.isEmpty()) {
             return;
         }
-        if ((!searchableAttrNames.isEmpty())
-                && (searchableAttrNames.contains(attrName.toLowerCase()))) {
-            for (Iterator items = values.iterator(); items.hasNext();) {
-                String value = (String) items.next();
-                e.removeAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "="
-                        + value);
+        if (searchableAttrNames.contains(attrName.toLowerCase())) {
+            for (String value : values) {
+                e.removeAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "=" + value);
             }
         } else {
-            for (Iterator items = values.iterator(); items.hasNext();) {
-                String value = (String) items.next();
+            for (String value : values) {
                 e.removeAttribute(SMSEntry.ATTR_KEYVAL, attrName + "=" + value);
             }
         }
     }
 
-    static void replaceAttributeValue(SMSEntry entry, String attrName,
-            String oldValue, String newValue, Set searchableAttrNames)
-            throws SMSException {
-        if ((!searchableAttrNames.isEmpty())
-                && (searchableAttrNames.contains(attrName.toLowerCase()))) {
-            entry.removeAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "="
-                    + oldValue);
-            entry.addAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "="
-                    + newValue);
+    static void replaceAttributeValue(SMSEntry entry, String attrName, String oldValue, String newValue,
+            Set<String> searchableAttrNames) throws SMSException {
+        if (searchableAttrNames.contains(attrName.toLowerCase())) {
+            entry.removeAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "=" + oldValue);
+            entry.addAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "=" + newValue);
         } else {
-            entry.removeAttribute(SMSEntry.ATTR_KEYVAL, attrName + "="
-                    + oldValue);
+            entry.removeAttribute(SMSEntry.ATTR_KEYVAL, attrName + "=" + oldValue);
             entry.addAttribute(SMSEntry.ATTR_KEYVAL, attrName + "=" + newValue);
         }
     }
 
-    static void replaceAttributeValues(SMSEntry entry, String attrName,
-            Set oldValues, Set newValues, Set searchableAttrNames)
-            throws SMSException {
+    static void replaceAttributeValues(SMSEntry entry, String attrName, Set<String> oldValues, Set<String> newValues,
+            Set<String> searchableAttrNames) throws SMSException {
         removeAttributeValues(entry, attrName, oldValues, searchableAttrNames);
 
         // Add other values
-        if ((newValues == null) || newValues.isEmpty()) {
+        if (newValues == null || newValues.isEmpty()) {
             return;
         }
-        if ((!searchableAttrNames.isEmpty())
-                && (searchableAttrNames.contains(attrName.toLowerCase()))) {
-            for (Iterator items = newValues.iterator(); items.hasNext();) {
-                String value = (String) items.next();
-                entry.addAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "="
-                        + value);
+        if (searchableAttrNames.contains(attrName.toLowerCase())) {
+            for (String value : newValues) {
+                entry.addAttribute(SMSEntry.ATTR_XML_KEYVAL, attrName + "=" + value);
             }
         } else {
-            for (Iterator items = newValues.iterator(); items.hasNext();) {
-                String value = (String) items.next();
-                entry
-                        .addAttribute(SMSEntry.ATTR_KEYVAL, attrName + "="
-                                + value);
+            for (String value : newValues) {
+                entry.addAttribute(SMSEntry.ATTR_KEYVAL, attrName + "=" + value);
             }
         }
     }
-    
-    static String toAttributeValuePairXML(Map map) {
-        if ((map == null) || map.isEmpty()) {
+
+    static String toAttributeValuePairXML(Map<String, Set<String>> map) {
+        if (map == null || map.isEmpty()) {
             return "";
         }
-        
+
         StringBuilder buff = new StringBuilder();
-        
-        for (Iterator i = map.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry)i.next();
-            buff.append("<").append(SMSUtils.ATTRIBUTE_VALUE_PAIR)
-                .append(">\n");
+
+        for (Map.Entry<String, Set<String>> e : map.entrySet()) {
+            buff.append("<").append(SMSUtils.ATTRIBUTE_VALUE_PAIR).append(">\n");
             buff.append("    <").append(SMSUtils.ATTRIBUTE)
-                .append(" ").append(SMSUtils.NAME).append("=\"")
-                .append(e.getKey()).append("\"/>\n");
-            Set values = (Set)e.getValue();
-            for (Iterator j = values.iterator(); j.hasNext(); ) {
-                buff.append("    <").append(SMSUtils.ATTRIBUTE_VALUE)
-                    .append(">")
-                    .append(SMSSchema.escapeSpecialCharacters((String)j.next()))
-                    .append("</").append(SMSUtils.ATTRIBUTE_VALUE)
-                    .append(">\n");
+                    .append(" ").append(SMSUtils.NAME).append("=\"").append(e.getKey()).append("\"/>\n");
+            Set<String> values = e.getValue();
+            for (String value : values) {
+                buff.append("    <").append(SMSUtils.ATTRIBUTE_VALUE).append(">")
+                        .append(SMSSchema.escapeSpecialCharacters(value))
+                        .append("</").append(SMSUtils.ATTRIBUTE_VALUE).append(">\n");
             }
-            buff.append("</").append(SMSUtils.ATTRIBUTE_VALUE_PAIR)
-                .append(">\n");
+            buff.append("</").append(SMSUtils.ATTRIBUTE_VALUE_PAIR).append(">\n");
         }
-        
+
         return buff.toString();
     }
 }
