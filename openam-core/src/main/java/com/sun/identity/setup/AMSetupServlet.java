@@ -24,9 +24,6 @@
  *
  * $Id: AMSetupServlet.java,v 1.117 2010/01/20 17:01:35 veiming Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
@@ -160,9 +157,9 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 /**
  * This class is the first class to get loaded by the Servlet 
  * container. 
- * It has helper methods to determine the status of Access Manager 
+ * It has helper methods to determine the status of OpenAM
  * configuration when deployed as a single web-application. If 
- * Access Manager is not deployed as single web-application then the 
+ * OpenAM is not deployed as single web-application then the
  * configured status returned is always true.   
  */
 public class AMSetupServlet extends HttpServlet {
@@ -614,7 +611,7 @@ public class AMSetupServlet extends HttpServlet {
     }
         
     /**
-     * The main entry point for configuring Access Manager. The parameters
+     * The main entry point for configuring OpenAM. The parameters
      * are passed from configurator page.
      *
      * @param request Servlet request.
@@ -1416,8 +1413,47 @@ public class AMSetupServlet extends HttpServlet {
                 File newPath = new File(home + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_DIR);
                 File oldPath = new File(home + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_LEGACY_BASE_DIR);
 
-                return (oldPath.exists() && !newPath.exists() ? oldPath.getPath() : newPath.getPath())
-                        + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
+                String fullOldPath = oldPath.getPath() + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
+                String fullNewPath = newPath.getPath() + "/" + SetupConstants.CONFIG_VAR_BOOTSTRAP_BASE_PREFIX + path;
+
+                Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+                String bootstrapLocatorResult;
+                // Simple case where just the old path exists.
+                if (oldPath.exists() && !newPath.exists()) {
+                    bootstrapLocatorResult = fullOldPath;
+                    if (debug.messageEnabled()) {
+                        debug.message("AMSetupServlet.getBootstrapLocator: only old path exists, returning old "
+                                + bootstrapLocatorResult);
+                    }
+                // There is a chance that both new and old path locations exist when newer installations have been done
+                // from scratch but the instance to consider is in the old path, double check for an old config before
+                // returning the new path when finding both.
+                } else if (oldPath.exists() && newPath.exists()) {
+                    // Test if we have a config file in the old path
+                    File testOldPath = new File(fullOldPath);
+                    if (testOldPath.exists()) {
+                        bootstrapLocatorResult = fullOldPath;
+                        if (debug.messageEnabled()) {
+                            debug.message("AMSetupServlet.getBootstrapLocator: both old and new paths exist, found a "
+                                    + "config in the old path, returning old " + bootstrapLocatorResult);
+                        }
+                    } else {
+                        bootstrapLocatorResult = fullNewPath;
+                        if (debug.messageEnabled()) {
+                            debug.message("AMSetupServlet.getBootstrapLocator: both old and new paths exist but did "
+                                    + "not find a config in old path, returning new " + bootstrapLocatorResult);
+                        }
+                    }
+                } else {
+                    bootstrapLocatorResult = fullNewPath;
+                    if (debug.messageEnabled()) {
+                        debug.message("AMSetupServlet.getBootstrapLocator: only new path exists, returning new "
+                                + bootstrapLocatorResult);
+                    }
+                }
+
+                return bootstrapLocatorResult;
+
             } else {
                 throw new ConfiguratorException(
                         "Cannot read the bootstrap path");
@@ -2312,7 +2348,7 @@ public class AMSetupServlet extends HttpServlet {
     /**
      * Creates Identities for WS Security
      *
-     * @param serverURL URL at which Access Manager is configured.
+     * @param serverURL URL at which OpenAM is configured.
      */
     private static void createIdentitiesForWSSecurity(
         String serverURL,
