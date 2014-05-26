@@ -924,7 +924,7 @@ public class AuthUtils extends AuthClientUtils {
             templateFile = ResourceLookup.getFirstExisting(
             ad.getServletContext(),
             fileRoot,locale,orgFilePath,filePath,fileName,
-            templatePath,true);
+            templatePath);
         } catch (Exception e) {
             templateFile = new StringBuffer().append(templatePath)
             .append(fileRoot).append(Constants.FILE_SEPARATOR)

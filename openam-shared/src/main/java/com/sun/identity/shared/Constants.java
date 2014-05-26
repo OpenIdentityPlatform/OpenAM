@@ -1327,4 +1327,10 @@ public interface Constants {
      */
     public static final String XML_TRANSFORMER_FACTORY_CACHE_SIZE =
             "org.forgerock.openam.utils.xml.transformerfactory.cache.size";
+
+    /**
+     * Property to enable/disable resource lookup caching.
+     */
+    public static final String RESOURCE_LOOKUP_CACHE_ENABLED =
+            "org.forgerock.openam.core.resource.lookup.cache.enabled";
 }
