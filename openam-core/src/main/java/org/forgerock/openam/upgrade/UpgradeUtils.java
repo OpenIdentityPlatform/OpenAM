@@ -24,14 +24,10 @@
  *
  * $Id: UpgradeUtils.java,v 1.18 2009/09/30 17:35:24 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade;
 
-//import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.iplanet.am.sdk.AMException;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.shared.ldap.util.DN;
@@ -175,7 +171,8 @@ public class UpgradeUtils {
 
     static SSOToken ssoToken;
     public static Debug debug = Debug.getInstance("amUpgrade");
-    private static boolean loggedVersionDebugMessage = false;
+    private static volatile boolean evaluatedUpgradeVersion = false;
+    private static boolean isVersionNewer = false;
     private static String dsHostName;
     private static int dsPort;
     private static String bindDN = null;
@@ -273,7 +270,14 @@ public class UpgradeUtils {
      * @return true if the war file version is newer than the deployed version
      */
     public static boolean isVersionNewer() {
-        return isVersionNewer(getCurrentVersion(), getWarFileVersion());
+
+        if (!evaluatedUpgradeVersion) {
+            // Cache result to avoid repeated evaluations
+            isVersionNewer = isVersionNewer(getCurrentVersion(), getWarFileVersion());
+            evaluatedUpgradeVersion = true;
+        }
+
+        return isVersionNewer;
     }
 
     protected static boolean isVersionNewer(String currentVersion, String warVersion) {
@@ -301,11 +305,9 @@ public class UpgradeUtils {
             return false;
         }
 
-        if (debug.messageEnabled() && !loggedVersionDebugMessage) {
+        if (debug.messageEnabled()) {
             debug.message("Current version: " + currentVersionDate);
             debug.message("War version: " + warVersionDate);
-            // Just log once to avoid creating a large debug log file when in message mode.
-            loggedVersionDebugMessage = true;
         }
         boolean isBefore = currentVersionDate.before(warVersionDate);
         if (isBefore) {
