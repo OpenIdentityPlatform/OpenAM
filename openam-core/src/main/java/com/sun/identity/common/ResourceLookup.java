@@ -24,17 +24,20 @@
  *
  * $Id: ResourceLookup.java,v 1.7 2009/05/02 22:12:04 kevinserwin Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
-
 package com.sun.identity.common;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.search.FileLookup;
 import com.sun.identity.shared.search.FileLookupException;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.servlet.ServletContext;
 
 /**
@@ -42,12 +45,20 @@ import javax.servlet.ServletContext;
  * performs the equivalent of "fstat" using ServletContext.getResource(), thus
  * increasing web container independence.
  */
-
 public class ResourceLookup {
 
-    private static Hashtable resourceNameCache = null;
+    private static final ConcurrentMap<String, String> RESOURCE_NAME_CACHE;
+    private static final boolean CACHE_ENABLED;
+    private static final Debug DEBUG = Debug.getInstance("amResourceLookup");
 
-    private static Debug debug = Debug.getInstance("amResourceLookup");
+    static {
+        CACHE_ENABLED = SystemProperties.getAsBoolean(Constants.RESOURCE_LOOKUP_CACHE_ENABLED, true);
+        if (CACHE_ENABLED) {
+            RESOURCE_NAME_CACHE = new ConcurrentHashMap<String, String>();
+        } else {
+            RESOURCE_NAME_CACHE = null;
+        }
+    }
 
     /**
      * Returns the first existing resource in the ordered search paths.
@@ -58,18 +69,13 @@ public class ResourceLookup {
      * @param orgFilePath
      * @param clientPath
      * @param filename
-     * @param resourceDir
-     *            (absolute path of template base directory)
-     * @param enableCache
-     *            (boolean on whether to cache previously returned files,
-     *            restart required for changes when false)
+     * @param resourceDir absolute path of template base directory
      * @return <code>String</code> first existing resource in the ordered
      *         search paths.
      */
     public static String getFirstExisting(ServletContext context,
             String fileRoot, String locale, String orgFilePath,
-            String clientPath, String filename, String resourceDir,
-            boolean enableCache) {
+            String clientPath, String filename, String resourceDir) {
         String resourceName = null;
 
         String cacheKey = new StringBuffer(fileRoot).append(":").append(locale)
@@ -77,15 +83,10 @@ public class ResourceLookup {
                 .append(":").append(filename).append(":").append(resourceDir)
                 .toString();
 
-        if (enableCache) {
-            if ((resourceNameCache != null) && (!resourceNameCache.isEmpty())) {
-                resourceName = (String) resourceNameCache.get(cacheKey);
-                if (resourceName != null
-                        && getResourceURL(context, resourceName) != null) {
-                    return resourceName;
-                } else {
-                    resourceNameCache.remove(cacheKey);
-                }
+        if (CACHE_ENABLED) {
+            resourceName = RESOURCE_NAME_CACHE.get(cacheKey);
+            if (resourceName != null) {
+                return resourceName;
             }
         }
 
@@ -96,32 +97,24 @@ public class ResourceLookup {
             File[] orderedPaths = FileLookup.getOrderedPaths(fileRoot, locale,
                     null, orgFilePath, clientPath, filename);
 
-            for (int i = 0; i < orderedPaths.length; i++) {
-                resourceName = resourceDir + Constants.FILE_SEPARATOR +
-                    orderedPaths[i].toString();
+            for (File orderedPath : orderedPaths) {
+                resourceName = resourceDir + Constants.FILE_SEPARATOR + orderedPath.toString();
                 resourceName = resourceName.replaceAll("\\\\", "/");
-                if ((resourceUrl = getResourceURL(context, resourceName))
-                        != null)
-                {
+                if ((resourceUrl = getResourceURL(context, resourceName)) != null) {
                     break;
                 }
             }
         } catch (FileLookupException fe) {
-            debug.message("ResourceLookup.getFirstExisting :", fe);
-        } catch (Exception e) {
-            debug.message("ResourceLookup.getFirstExisting:", e);
+            DEBUG.message("ResourceLookup.getFirstExisting: ", fe);
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("amResourceLookup: resourceURL :" + resourceUrl);
-            debug.message("amResourceLookup: resourceName:" + resourceName);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("amResourceLookup: resourceURL: " + resourceUrl);
+            DEBUG.message("amResourceLookup: resourceName: " + resourceName);
         }
         if (resourceUrl != null) {
-            if (enableCache) {
-                if (resourceNameCache == null) {
-                    resourceNameCache = new Hashtable();
-                }
-                resourceNameCache.put(cacheKey, resourceName);
+            if (CACHE_ENABLED) {
+                RESOURCE_NAME_CACHE.put(cacheKey, resourceName);
             }
         } else {
             resourceName = null;
@@ -131,21 +124,19 @@ public class ResourceLookup {
     }
 
     /* returns the resourceURL for the resource name for the request */
-
-    private static URL getResourceURL(ServletContext context,
-            String resourceName) {
+    private static URL getResourceURL(ServletContext context, String resourceName) {
         URL resourceURL = null;
         try {
-        	if (context != null) {
-            resourceURL = context.getResource(resourceName);
-        	}
-            if (resourceURL == null) {
-                resourceURL = Thread.currentThread().getContextClassLoader()
-                    .getResource(resourceName.substring(1));
-                // remove leading '/' from resourceName
+            if (context != null) {
+                resourceURL = context.getResource(resourceName);
             }
-        } catch (Exception e) {
-            debug.message("Error getting resource  : " + e.getMessage());
+            //Only try to lookup XMLs from the classpath as UI files from JAR files cannot be used by RequestDispatcher
+            if (resourceURL == null && resourceName.endsWith(".xml")) {
+                // remove leading '/' from resourceName
+                resourceURL = Thread.currentThread().getContextClassLoader().getResource(resourceName.substring(1));
+            }
+        } catch (MalformedURLException murle) {
+            DEBUG.message("Error getting resource: " + resourceURL + " cause: " + murle.getMessage());
         }
         return resourceURL;
     }

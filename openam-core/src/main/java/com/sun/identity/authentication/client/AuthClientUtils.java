@@ -2074,7 +2074,7 @@ public class AuthClientUtils {
             templateFile = ResourceLookup.getFirstExisting(
                 servletContext,
                 fileRoot,strlocale,orgFilePath,filePath,fileName,
-                templatePath,true);
+                templatePath);
         } catch (Exception e) {
             templateFile = new StringBuffer().append(templatePath)
             .append(fileRoot).append(Constants.FILE_SEPARATOR)
@@ -2145,14 +2145,14 @@ public class AuthClientUtils {
                 ResourceLookup.getFirstExisting(servletContext,fileRoot,
                 localeName,orgFilePath,
                 filePath,charsetFileName,
-                templatePath,true);
+                templatePath);
         }
         if (resourceName == null) {
             resourceName = ResourceLookup.getFirstExisting(servletContext,
                 fileRoot,localeName,
                 orgFilePath,
                 filePath,filename,
-                templatePath,true);
+                templatePath);
         }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("Resource is.. " + resourceName);
