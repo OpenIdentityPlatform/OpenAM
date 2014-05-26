@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -49,7 +51,7 @@ import javax.security.auth.Subject;
 
 /**
  * This observer will remove all referral and application privileges
- * that have reference to a delete sub realm.
+ * that have reference to a deleted sub realm.
  * 
  */
 public class SubRealmObserver implements ServiceListener, SetupListener {
@@ -98,7 +100,9 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
         String serviceComponent,
         int type
     ) {
-        if (type == ServiceListener.REMOVED) {
+        // Only clear cache and remove referrals if the realm is being removed
+        if (type == ServiceListener.REMOVED &&
+                (serviceComponent == null || serviceComponent.trim().isEmpty() || serviceComponent.equals("/"))) {
             ApplicationManager.clearCache(DNMapper.orgNameToRealmName(orgName));
             try {
                 OpenSSOApplicationPrivilegeManager.removeAllPrivileges(orgName);
