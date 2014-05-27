@@ -15,6 +15,13 @@
  */
 
 /**
- * Contains the classes related to validating tokens.
+ * Contains the classes related to token validation, as defined by the org.apache.cxf.sts.token.validator.TokenValidator
+ * interface. The general model is for org.apache.cxf.sts.token.validator.TokenValidator implementations to delegate
+ * the actual TokenValidation to classes in the wss package via the AuthenticationHandler<T>, where T is the particular
+ * Token type. Things get a bit confusing, as the CXF-STS defines its own TokenValidator interface, which serves to
+ * integrate token validation into the CXF-STS context, but these implementations often delegate to the wss-defined
+ * validator interface, org.apache.ws.security.validate.Validator. Furthermore, integrating token validation into
+ * SecurityPolicy binding enforcement requires the implementation of the org.apache.ws.security.validate.Validator
+ * interface.
  */
 package org.forgerock.openam.sts.token.validator;

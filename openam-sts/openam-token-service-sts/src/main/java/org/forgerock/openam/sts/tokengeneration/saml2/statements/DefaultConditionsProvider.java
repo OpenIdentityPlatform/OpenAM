@@ -23,7 +23,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,10 +36,10 @@ public class DefaultConditionsProvider implements ConditionsProvider {
     /**
      * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider#get(
      * org.forgerock.openam.sts.config.user.SAML2Config, java.util.Date,
-     * org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation)
+     * org.forgerock.openam.sts.token.SAML2SubjectConfirmation)
      */
     public Conditions get(SAML2Config saml2Config, Date issueInstant,
-                          TokenGenerationServiceInvocationState.SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException {
+                          SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException {
         Conditions conditions = AssertionFactory.getInstance().createConditions();
         try {
             conditions.setNotBefore(issueInstant);
@@ -54,7 +54,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
          Section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf specifies that
          Audiences specifying the entity ids of SPs, must be contained in the AudienceRestriction for bearer tokens.
          */
-        if (audiences.isEmpty() && TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.BEARER.equals(saml2SubjectConfirmation)) {
+        if (audiences.isEmpty() && SAML2SubjectConfirmation.BEARER.equals(saml2SubjectConfirmation)) {
             throw new TokenCreationException(ResourceException.BAD_REQUEST, "The audiences field in the SAML2Config is empty, " +
                     "but the BEARER SubjectConfirmation is required. BEARER tokens must include Conditions with " +
                     "AudienceRestrictions specifying the SP entity ids.");
@@ -63,7 +63,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
             try {
                 AudienceRestriction audienceRestriction = AssertionFactory.getInstance().createAudienceRestriction();
                 audienceRestriction.setAudience(audiences);
-                List<AudienceRestriction> audienceRestrictionList = new ArrayList<AudienceRestriction>();
+                List<AudienceRestriction> audienceRestrictionList = new ArrayList<AudienceRestriction>(1);
                 audienceRestrictionList.add(audienceRestriction);
                 conditions.setAudienceRestrictions(audienceRestrictionList);
             } catch (SAML2Exception e) {

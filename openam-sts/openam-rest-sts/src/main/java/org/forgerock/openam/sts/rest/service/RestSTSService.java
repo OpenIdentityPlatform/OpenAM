@@ -18,25 +18,31 @@ package org.forgerock.openam.sts.rest.service;
 
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.SecurityContext;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AMSTSRuntimeException;
-import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.rest.RestSTS;
+import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 import org.slf4j.Logger;
-
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * The CREST entry point into the Rest STS
  */
 public class RestSTSService implements SingletonResourceProvider {
     private static final String TRANSLATE = "translate";
-    private static final String DESIRED_TOKEN_TYPE = "desiredTokenType";
     private final RestSTS restSts;
     private final Logger logger;
 
@@ -53,17 +59,21 @@ public class RestSTSService implements SingletonResourceProvider {
         if (TRANSLATE.equals(request.getAction())) {
             SecurityContext securityContext = context.asContext(SecurityContext.class);
             HttpContext httpContext = context.asContext(HttpContext.class);
-            String desiredTokenType = httpContext.getParameterAsString(DESIRED_TOKEN_TYPE); //TODO: in AMSTSConstants?
-            if (desiredTokenType == null) {
-                handler.handleError(new BadRequestException("The " + DESIRED_TOKEN_TYPE + " query parameter has not been specified."));
+            RestSTSServiceInvocationState invocationState;
+            try {
+                invocationState = RestSTSServiceInvocationState.fromJson(request.getContent());
+            } catch (TokenMarshalException e) {
+                handler.handleError(e);
+                return;
             }
             try {
-                JsonValue result = restSts.translateToken(request.getContent(), desiredTokenType, httpContext, securityContext);
+                JsonValue result = restSts.translateToken(invocationState, httpContext, securityContext);
                 handler.handleResult(result);
             } catch (ResourceException e) {
                 /*
                 This block entered for both TokenValidationException and TokenCreationException instances
                  */
+                logger.error("Exception caught in translateToken call: " + e, e);
                 handler.handleError(e);
             } catch (AMSTSRuntimeException e) {
                 /*
@@ -77,9 +87,12 @@ public class RestSTSService implements SingletonResourceProvider {
                  */
                 logger.error("Unexpected: STSException caught in the RestSTSService: " + e, e);
                 handler.handleError(new InternalServerErrorException(e.getMessage()));
+            } catch (Exception e) {
+                logger.error("Unexpected: Exception caught in the RestSTSService: " + e, e);
+                handler.handleError(new InternalServerErrorException(e.getMessage()));
             }
         } else {
-            handler.handleError(new BadRequestException("_action " + request.getAction() + " is not supported."));
+            handler.handleError(new BadRequestException("The specified _action parameter is not supported."));
         }
     }
 

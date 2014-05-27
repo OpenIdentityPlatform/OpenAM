@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.plugins.DefaultLibraryIDPAttributeMapper;
+import com.sun.identity.saml2.plugins.SAML2PluginsUtils;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
 
@@ -71,13 +72,15 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
 
     /**
      * This method is consulted by the DefaultLibraryIDPAttributeMapper to determine whether to actually look-up keys in
-     * the AttributeMap. Return false from this method to always trigger this lookup.
-     * @param realm ignored
-     * @return false in all cases to trigger attribute lookup on the identity corresponding to the SSOToken
+     * the AttributeMap in the id-repo. User accounts in a given realm can be set to by dynamic or ignored, which means that no id-repo
+     * state exists corresponding to these accounts. The DefaultLibraryIDPAttributeMapper will only consult id-repo state
+     * if this method returns false.
+     * @param realm The realm for which profile state should be looked-up
+     * @return whether the dynamic or ignored profile has been set up for user accounts in this realm
      */
     @Override
     protected boolean isDynamicalOrIgnoredProfile(String realm) {
-        return false;
+        return SAML2PluginsUtils.isDynamicalOrIgnoredProfile(realm);
     }
 
     /**

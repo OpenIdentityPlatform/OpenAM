@@ -33,10 +33,13 @@ public interface AttributeMapper {
     /**
      *
      * @param token  The SSOToken corresponding to the subject whose attributes will be referenced.
-     * @param attributeMap Contains the mapping of saml attributes (Map keys) to local OpenAM LDAP attributes (Map values). The
-     *                     keys will define the name of the attributes, and the data pulled from the subject's directory entry
-     *                     will define the value corresponding to this attribute name. If no state is present corresponding
-     *                     to this attribute name, then it will not appear in the AttributeStatement.
+     * @param attributeMap Contains the mapping of saml attribute names (Map keys) to local OpenAM attributes (Map values) in
+     *                     various stores. The DefaultAttributeMapper looks at profile attributes in various places:
+     *                     LDAP or SQL, depending on data store setup, or in Session properties.
+     *                     The keys will define the name of the attributes included in the Assertion Attribute statements,
+     *                     and the data pulled from the subject's directory entry or session state
+     *                     corresponding to the map value will define the value corresponding to this attribute name.
+     *                     If no state is present corresponding to this attribute value, then it will not appear in the AttributeStatement.
      * @return This list of populated SAML2 Attribute instances. If the list is empty, no AttributeStatement should be created.
      * @throws TokenCreationException if an exception is encountered mapping attributes.
      * exceptions?

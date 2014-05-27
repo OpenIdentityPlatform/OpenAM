@@ -16,28 +16,9 @@
 
 package org.forgerock.openam.sts;
 
-import org.apache.ws.security.WSConstants;
-import org.forgerock.json.resource.ResourceException;
-
 /**
  * This enum represents the types of transformed tokens.
  */
 public enum TokenType {
-    SAML2, USERNAME, OPENAM, OPENIDCONNECT;
-
-    /**
-     * Used to marshal the TokenType to a String recognized by TokenProvider implementations, in particular those
-     * provided in the CXF-STS. Not including USERNAME or OPEN_ID_CONNECT, as neither is not a token type which token transformation
-     * will return.
-     */
-    public static String getProviderParametersTokenType(TokenType tokenType) throws TokenCreationException {
-        if (OPENAM.equals(tokenType)) {
-            return OPENAM.name();
-        } else if (SAML2.equals(tokenType)) {
-            return WSConstants.WSS_SAML2_TOKEN_TYPE;
-        } else {
-            throw new TokenCreationException(ResourceException.BAD_REQUEST,
-                    "The specified tokenType, " + tokenType.name() + ", is unknown.");
-        }
-    }
+    SAML2, USERNAME, OPENAM, OPENIDCONNECT
 }

@@ -24,11 +24,10 @@ import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenValidationException;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -70,7 +69,15 @@ public class TokenTransformImpl implements TokenTransform {
         validatorResponse = tokenValidator.validateToken(validatorParameters);
         if (ReceivedToken.STATE.VALID.equals(validatorResponse.getToken().getState())) {
             providerParameters.setPrincipal(validatorResponse.getPrincipal());
-            return tokenProvider.createToken(providerParameters);
+            try {
+                return tokenProvider.createToken(providerParameters);
+            } catch (AMSTSRuntimeException e) {
+                /*
+                The TokenProvider interface does not allow for checked exceptions. I throw an AMSTSRuntimeException for
+                exceptional conditions. Convert to TokenCreationException.
+                 */
+                throw new TokenCreationException(e.getCode(), e.getMessage(), e);
+            }
         } else {
             String message = "Validation of token of type " + inputTokenType + " failed.";
             logger.error(message);

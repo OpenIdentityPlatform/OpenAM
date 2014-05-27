@@ -143,6 +143,7 @@ public class RestSTSInstanceConfigTest {
                 .amRestAuthNUriElement("/authenticate")
                 .amRestLogoutUriElement("/sessions/?_action=logout")
                 .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
+                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
@@ -185,6 +186,7 @@ public class RestSTSInstanceConfigTest {
                 .amRestAuthNUriElement("/json/authenticate")
                 .amRestLogoutUriElement("/json/sessions/?_action=logout")
                 .amRestIdFromSessionUriElement("/json/users/?_action=idFromSession")
+                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
@@ -234,6 +236,7 @@ public class RestSTSInstanceConfigTest {
                 .amRestAuthNUriElement("/authenticate")
                 .amRestLogoutUriElement("/sessions/?_action=logout")
                 .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
+                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
@@ -255,6 +258,4 @@ public class RestSTSInstanceConfigTest {
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .build();
     }
-
-
 }

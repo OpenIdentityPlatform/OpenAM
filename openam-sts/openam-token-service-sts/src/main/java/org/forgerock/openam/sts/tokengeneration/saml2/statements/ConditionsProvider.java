@@ -19,7 +19,7 @@ package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 import com.sun.identity.saml2.assertion.Conditions;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 import java.util.Date;
 
@@ -38,5 +38,5 @@ public interface ConditionsProvider {
      * @throws TokenCreationException
      */
     Conditions get(SAML2Config saml2Config, Date issueInstant,
-                   TokenGenerationServiceInvocationState.SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException;
+                   SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException;
 }

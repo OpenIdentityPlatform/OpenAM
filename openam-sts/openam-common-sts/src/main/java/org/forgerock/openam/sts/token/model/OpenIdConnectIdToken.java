@@ -16,25 +16,7 @@
 
 package org.forgerock.openam.sts.token.model;
 
-import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.util.Reject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 
 /**
  * This class represents an OpenID Connect ID Token. The tokenValue is the base64Url encoded representation of the
@@ -52,55 +34,6 @@ public class OpenIdConnectIdToken {
 
     public String getTokenValue() {
         return tokenValue;
-    }
-
-    public JsonValue toJson() {
-        return json(object(field(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY, tokenValue)));
-    }
-
-    public static OpenIdConnectIdToken fromJson(JsonValue json) throws TokenMarshalException {
-        try {
-            return new OpenIdConnectIdToken(json.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString());
-        } catch (NullPointerException e) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY +
-                    " not set in json: " + json.toString(), e);
-        }
-    }
-
-    public Element toXmlElement() throws TokenMarshalException {
-        Document document = null;
-        try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException e) {
-            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
-        }
-        Element rootElement = document.createElementNS(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE,
-                AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY);
-        rootElement.setTextContent(tokenValue);
-        return rootElement;
-    }
-
-    public static OpenIdConnectIdToken fromXml(Element element) throws TokenMarshalException {
-        if (AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE.equals(element.getNamespaceURI())) {
-            try {
-                return new OpenIdConnectIdToken(element.getFirstChild().getTextContent());
-            } catch (NullPointerException e) { //thrown by Reject in ctor
-                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                        "Exception caught marshalling from xml: " + e, e);
-            }
-        } else {
-            String tokenString = null;
-            try {
-                Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
-                StreamResult res =  new StreamResult(new ByteArrayOutputStream());
-                transformer.transform(new DOMSource(element), res);
-                tokenString = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());
-            } catch (Exception e) {
-                //swallow exception, as it pertains only to generating the tokenString used in the exception.
-            }
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                    "Not dealing with an OpenID Connect ID Token: "  + tokenString);
-        }
     }
 
     @Override

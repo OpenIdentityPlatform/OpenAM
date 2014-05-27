@@ -16,6 +16,15 @@
 
 
 /**
- * This package contains classes that represent token types not represented in the wss4j or STS domain models.
+ * This package contains classes that represent token types not represented in the wss4j or STS domain models, and the
+ * classes which implement the xml and json marshalling.
+ * These classes which represent tokens can serve as a type specifier for the generic types required in the AuthenticationHandler
+ * and TokenAuthenticationRequestDispatcher. Regarding token marshalling:
+ * tokens validated as part of a token transformation operation need json marshalling, to be specified in a
+ * REST-STS invocation, and xml marshalling, to be transformed into the ReceivedToken (built around a DOM Element)
+ * required by the CXF-STS. If the token type is produced as part of a token transformation, it will require XML marshalling
+ * so that it can take a DOM Element representation required by the TokenProviderResponse, but then be turned into json
+ * so that it can be returned from the REST-STS.
+ *
  */
 package org.forgerock.openam.sts.token.model;

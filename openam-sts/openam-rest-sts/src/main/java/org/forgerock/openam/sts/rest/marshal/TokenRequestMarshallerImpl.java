@@ -22,44 +22,43 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.AttributedString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.PasswordString;
 import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.ws.security.WSConstants;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPrincipal;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
+import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
-import java.io.IOException;
 import java.util.Map;
-
-import org.slf4j.Logger;
 
 /**
  * @see org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller
  */
 public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
-    private final OpenAMSessionIdElementBuilder openAMSessionIdElementBuilder;
-    private final Logger logger;
+    private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
+    private final XmlMarshaller<OpenIdConnectIdToken> openIdConnectXmlMarshaller;
 
     @Inject
-    TokenRequestMarshallerImpl(OpenAMSessionIdElementBuilder openAMSessionIdElementBuilder, Logger logger) {
-        this.openAMSessionIdElementBuilder = openAMSessionIdElementBuilder;
-        this.logger = logger;
+    TokenRequestMarshallerImpl(XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
+                               XmlMarshaller<OpenIdConnectIdToken> openIdConnectXmlMarshaller) {
+        this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
+        this.openIdConnectXmlMarshaller = openIdConnectXmlMarshaller;
     }
 
     @Override
-    public ReceivedToken marshallTokenRequest(JsonValue receivedToken) throws TokenMarshalException {
+    public ReceivedToken marshallInputToken(JsonValue receivedToken) throws TokenMarshalException {
         Map<String,Object> tokenAsMap = receivedToken.asMap();
         String tokenType = (String)tokenAsMap.get(AMSTSConstants.TOKEN_TYPE_KEY);
         if (tokenType == null) {
             String message = "The to-be-translated token does not contain a " + AMSTSConstants.TOKEN_TYPE_KEY +
                     " entry. The token: " + receivedToken;
-            logger.error(message);
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
         if (TokenType.USERNAME.name().equals(tokenType)) {
@@ -77,27 +76,108 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
 
     @Override
     public TokenType getTokenType(JsonValue receivedToken) throws TokenMarshalException {
-        Map<String,Object> responseAsMap = receivedToken.asMap();
-        String tokenType = (String)responseAsMap.get(AMSTSConstants.TOKEN_TYPE_KEY);
-        if (tokenType == null) {
-            String message = "REST authN response does not contain " + AMSTSConstants.TOKEN_TYPE_KEY + " entry. The response map: " + responseAsMap;
-            logger.error(message);
+        JsonValue jsonTokenType = receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY);
+        if (jsonTokenType.isNull() || !jsonTokenType.isString()) {
+            String message = "REST STS invocation does not contain " + AMSTSConstants.TOKEN_TYPE_KEY +
+                    " String entry. The json token: " + receivedToken;
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
-        return TokenType.valueOf(tokenType);
+        try {
+            return TokenType.valueOf(jsonTokenType.asString());
+        } catch (IllegalArgumentException e) {
+            String message = "Error marshalling from " + AMSTSConstants.TOKEN_TYPE_KEY +
+                    " value to token-type enum. The json token: " + receivedToken + " The exception: " + e;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        } catch (NullPointerException e) {
+            String message = "Error marshalling from " + AMSTSConstants.TOKEN_TYPE_KEY +
+                    " value to token-type enum. The json token: " + receivedToken + " The exception: " + e;
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
+        }
+    }
+
+    @Override
+    public SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException {
+        try {
+            SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+            return tokenState.getSubjectConfirmation();
+        } catch (TokenMarshalException e) {
+            /*
+            Try to get the value directly
+             */
+            String subjectConfirmationString = token.get(SAML2TokenState.SUBJECT_CONFIRMATION).asString();
+            try {
+                return Enum.valueOf(SAML2SubjectConfirmation.class, subjectConfirmationString);
+            } catch (IllegalArgumentException iae) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                        "Invalid subjectConfirmation specified in the JsonValue corresponding to SAML2TokenState. " +
+                                "The JsonValue: " + token.toString());
+            } catch (NullPointerException npe) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                        "No subjectConfirmation specified in the JsonValue corresponding to SAML2TokenState. " +
+                                "The JsonValue: " + token.toString());
+            }
+        }
+    }
+
+    @Override
+    public String getServiceProviderAssertionConsumerServiceUrl(JsonValue token) throws TokenMarshalException {
+        try {
+            SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+            return tokenState.getServiceProviderAssertionConsumerServiceUrl();
+        } catch (TokenMarshalException e) {
+            /*
+            Try to get the value directly
+             */
+            JsonValue acsUrl = token.get(SAML2TokenState.SP_ACS_URL);
+            if (acsUrl.isNull()) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                        "No SP Assertion Consumer Service url specified in the JsonValue corresponding to SAML2TokenState. " +
+                                "The JsonValue: " + token.toString());
+            }
+            return acsUrl.asString();
+        }
+    }
+
+    @Override
+    public ProofTokenState getProofTokenState(JsonValue token) throws TokenMarshalException {
+        try {
+            final SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+            final ProofTokenState proofTokenState = tokenState.getProofTokenState();
+            if (proofTokenState ==  null) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
+                        " SAML2TokenState. The JsonValue: " + token);
+            } else {
+                return proofTokenState;
+            }
+        } catch (TokenMarshalException e) {
+            /*
+            Try to get the value directly
+             */
+            final JsonValue jsonProofToken = token.get(SAML2TokenState.PROOF_TOKEN_STATE);
+            if (jsonProofToken.isNull()) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
+                        "No ProofTokenState specified in the JsonValue corresponding to SAML2TokenState. " +
+                                "The JsonValue: " + token.toString());
+            }
+            final ProofTokenState proofTokenState = ProofTokenState.fromJson(jsonProofToken);
+            if (proofTokenState ==  null) {
+                throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
+                        " SAML2TokenState. The JsonValue: " + token);
+            } else {
+                return proofTokenState;
+            }
+        }
     }
 
     private ReceivedToken marshallUsernameToken(Map<String, Object> tokenAsMap) throws TokenMarshalException {
         String tokenUserName = (String)tokenAsMap.get(AMSTSConstants.USERNAME_TOKEN_USERNAME);
         if (tokenUserName == null) {
             String message = "Exception: json representation of UNT does not contain a username field. The representation: " + tokenAsMap;
-            logger.error(message);
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
         String password = (String)tokenAsMap.get(AMSTSConstants.USERNAME_TOKEN_PASSWORD);
         if (password == null) {
             String message = "Exception: json representation of UNT does not contain a password field. The representation: " + tokenAsMap;
-            logger.error(message);
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         }
 
@@ -141,10 +221,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         String sessionId = (String)tokenAsMap.get(AMSTSConstants.AM_SESSION_TOKEN_SESSION_ID);
         if (sessionId == null) {
             String message = "Exception: json representation of AM Session Token does not contain a session_id field. The representation: " + tokenAsMap;
-            logger.error(message);
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         } else {
-            ReceivedToken token = new ReceivedToken(openAMSessionIdElementBuilder.buildOpenAMSessionIdElement(sessionId));
+            ReceivedToken token = new ReceivedToken(amSessionTokenXmlMarshaller.toXml(new OpenAMSessionToken(sessionId)));
             token.setState(ReceivedToken.STATE.NONE);
             token.setUsernameToken(false);
             return token;
@@ -156,10 +235,9 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         if (tokenValue == null) {
             String message = "Exception: json representation of Open ID Connect ID Token does not contain a "
                     + AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY + " field. The representation: " + tokenAsMap;
-            logger.error(message);
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, message);
         } else {
-            ReceivedToken token = new ReceivedToken(new OpenIdConnectIdToken(tokenValue).toXmlElement());
+            ReceivedToken token = new ReceivedToken(openIdConnectXmlMarshaller.toXml(new OpenIdConnectIdToken(tokenValue)));
             token.setState(ReceivedToken.STATE.NONE);
             token.setUsernameToken(false);
             return token;

@@ -25,19 +25,18 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
 import org.apache.xml.security.signature.XMLSignature;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import static org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
@@ -105,7 +104,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         setAttributeStatements(assertion, subjectToken, saml2Config);
         setAuthzDecisionStatements(assertion, subjectToken, saml2Config);
 
-        if (invocationState.getSignAssertion()) {
+        if (saml2Config.signAssertion()) {
             return signAssertion(assertion, stsInstanceState);
         } else {
             try {

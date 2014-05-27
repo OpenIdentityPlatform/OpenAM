@@ -49,7 +49,7 @@ public class StatementProviderImpl implements StatementProvider {
     public ConditionsProvider getConditionsProvider(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomConditionsProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (ConditionsProvider)createCustomProviderInstance(customProvider, ConditionsProvider.class);
+            return createCustomProviderInstance(customProvider, ConditionsProvider.class);
         }
         return new DefaultConditionsProvider();
     }
@@ -57,7 +57,7 @@ public class StatementProviderImpl implements StatementProvider {
     public SubjectProvider getSubjectProvider(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomSubjectProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (SubjectProvider)createCustomProviderInstance(customProvider, SubjectProvider.class);
+            return createCustomProviderInstance(customProvider, SubjectProvider.class);
         }
         return new DefaultSubjectProvider(keyInfoFactory);
     }
@@ -65,7 +65,7 @@ public class StatementProviderImpl implements StatementProvider {
     public AuthenticationStatementsProvider getAuthenticationStatementsProvider(SAML2Config saml2Config) throws TokenCreationException{
         String customProvider = saml2Config.getCustomAuthenticationStatementsProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (AuthenticationStatementsProvider)createCustomProviderInstance(customProvider, AuthenticationStatementsProvider.class);
+            return createCustomProviderInstance(customProvider, AuthenticationStatementsProvider.class);
         }
         return new DefaultAuthenticationStatementsProvider();
     }
@@ -73,7 +73,7 @@ public class StatementProviderImpl implements StatementProvider {
     public AttributeStatementsProvider getAttributeStatementsProvider(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomAttributeStatementsProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (AttributeStatementsProvider) createCustomProviderInstance(customProvider, AttributeStatementsProvider.class);
+            return createCustomProviderInstance(customProvider, AttributeStatementsProvider.class);
         }
         return new DefaultAttributeStatementsProvider();
     }
@@ -81,7 +81,7 @@ public class StatementProviderImpl implements StatementProvider {
     public AuthzDecisionStatementsProvider getAuthzDecisionStatementsProvider(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomAuthzDecisionStatementsProviderClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (AuthzDecisionStatementsProvider) createCustomProviderInstance(customProvider, AuthzDecisionStatementsProvider.class);
+            return createCustomProviderInstance(customProvider, AuthzDecisionStatementsProvider.class);
         }
         return new DefaultAuthzDecisionStatementsProvider();
     }
@@ -89,12 +89,12 @@ public class StatementProviderImpl implements StatementProvider {
     public AttributeMapper getAttributeMapper(SAML2Config saml2Config) throws TokenCreationException {
         String customProvider = saml2Config.getCustomAttributeMapperClassName();
         if ((customProvider != null) && !customProvider.isEmpty()) {
-            return (AttributeMapper) createCustomProviderInstance(customProvider, AttributeMapper.class);
+            return createCustomProviderInstance(customProvider, AttributeMapper.class);
         }
         return new DefaultAttributeMapper(saml2Config.getAttributeMap());
     }
 
-    private Object createCustomProviderInstance(String className, Class<?> desiredClass) throws TokenCreationException {
+    private <T> T createCustomProviderInstance(String className, Class<T> desiredClass) throws TokenCreationException {
         try {
             return Class.forName(className).asSubclass(desiredClass).newInstance();
         } catch (ClassNotFoundException e) {

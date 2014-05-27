@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.X509Data;
@@ -46,16 +47,12 @@ public class KeyInfoFactoryImpl implements KeyInfoFactory {
     }
 
     /*
-    Passed to XMLUtils.getSafeDocumentBuilder to get a non-validating parser
-     */
-    private static final boolean PARSER_VALIDATION = false;
-    /*
     This method modeled after the example here:
     https://svn.apache.org/repos/asf/santuario/xml-security-java/trunk/samples/org/apache/xml/security/samples/keys/CreateKeyInfo.java
      */
     @Override
     public Element generatePublicKeyInfo(X509Certificate recipientCert) throws ParserConfigurationException, XMLSecurityException {
-        Document sharedDocument = xmlUtilities.newSafeDocument(PARSER_VALIDATION);
+        Document sharedDocument = xmlUtilities.newSafeDocument(XMLUtils.isValidating());
         KeyInfo keyInfo = new KeyInfo(sharedDocument);
         sharedDocument.appendChild(keyInfo.getElement());
         X509Data x509Data = new X509Data(sharedDocument);

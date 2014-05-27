@@ -20,7 +20,7 @@ import com.sun.identity.saml2.assertion.AudienceRestriction;
 import com.sun.identity.saml2.assertion.Conditions;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class DefaultConditionsProviderTest {
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
                 conditionsProvider.get(createSAML2Config(WITH_AUDIENCES), issueInstant,
-                        TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.BEARER);
+                        SAML2SubjectConfirmation.BEARER);
         assertTrue(issueInstant.equals(conditions.getNotBefore()));
         assertTrue((issueInstant.getTime() + (TOKEN_LIFETIME_SECONDS * 1000)) == conditions.getNotOnOrAfter().getTime());
         AudienceRestriction audienceRestriction = (AudienceRestriction)conditions.getAudienceRestrictions().get(0);
@@ -53,7 +53,7 @@ public class DefaultConditionsProviderTest {
         Date issueInstant = new Date();
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.get(createSAML2Config(!WITH_AUDIENCES), issueInstant,
-                TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.BEARER);
+                SAML2SubjectConfirmation.BEARER);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class DefaultConditionsProviderTest {
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
                 conditionsProvider.get(createSAML2Config(!WITH_AUDIENCES), issueInstant,
-                        TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.HOLDER_OF_KEY);
+                        SAML2SubjectConfirmation.HOLDER_OF_KEY);
         assertTrue(issueInstant.equals(conditions.getNotBefore()));
         assertTrue((issueInstant.getTime() + (TOKEN_LIFETIME_SECONDS * 1000)) == conditions.getNotOnOrAfter().getTime());
     }

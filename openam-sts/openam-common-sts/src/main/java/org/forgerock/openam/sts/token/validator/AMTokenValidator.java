@@ -16,12 +16,11 @@
 
 package org.forgerock.openam.sts.token.validator;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
-
-import com.sun.identity.shared.xml.XMLUtils;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -42,11 +41,11 @@ import org.slf4j.Logger;
  * of establishing this correlation in OpenAM includes determining that the session id is valid. This class is not in the
  * wss package, and is not implemented via classes in the disp and uri packages because it is not explicitly consuming
  * the OpenAM Rest authN context, but rather consumes a standard OpenAM Rest interface to correlate a session id to a
- * principal.
+ * principal. In other words, the disp and uri packages have to do with dispatching an invocation against the authN module
+ * specified in the AuthTargetMapping state of the published STS instance. Validating an OpenAM session id does not involve
+ * consuming REST authN, but rather consuming a standard OpenAM REST endpoint which will take a session id, and return the
+ * associated principal, and throw an exception if the session id was invalid.
  *
- * TODO: it may make sense to move the actual token validation into the wss abstraction set - i.e. create a
- * TokenAuthenticationRequestDispatcher<TokenClassSpecificToOpenAMSessionId> and the corresponding AuthenticationHandler, and have
- * this class encapsulate that instance, and delegate authN to it.
  */
 public class AMTokenValidator implements TokenValidator {
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;

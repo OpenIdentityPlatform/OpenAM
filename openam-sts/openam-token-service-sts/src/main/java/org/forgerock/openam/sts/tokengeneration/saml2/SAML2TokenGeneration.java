@@ -18,7 +18,7 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 
 import com.iplanet.sso.SSOToken;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 
 import java.util.List;
 

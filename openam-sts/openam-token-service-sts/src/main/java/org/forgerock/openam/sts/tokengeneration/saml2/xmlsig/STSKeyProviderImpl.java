@@ -64,6 +64,13 @@ public class STSKeyProviderImpl implements STSKeyProvider {
                 throw new TokenCreationException(ResourceException.BAD_REQUEST, "No certificates pulled from the keystore for alias "
                         + certAlias);
             } else if (certs.length > 1) {
+                /*
+                TODO: it may be that this warning can be removed - that having a cert chain, also for generating signatures,
+                is nothing to warn about.
+                The CXF-STS happily returns the first element in the chain, without logging a warning. Presumably the first
+                element is the root of the trust chain, and thus the appropriate element to generate a signature with. I
+                need to get more comfortable with this, before (possibly) removing this warning log.
+                 */
                 logger.warn("The number of certificates pulled from " +
                         "the keystore for alias " + certAlias + " is greater than 1: " + certs.length +
                         ". Returning the first cert in this array.");
@@ -97,6 +104,18 @@ public class STSKeyProviderImpl implements STSKeyProvider {
 
     private Properties getEncryptionProperties() throws TokenCreationException {
         Properties properties = new Properties();
+        /*
+        It is not clear whether Merlin could support a hardware security module, nor the correct way of doing so. It is
+        also not clear the customer demand for having STS crypto context stored in a HSM.
+        It may well be that common HSMs are consumed via the KeyStore interface, and thus could integrate into Merlin
+        transparently - i.e. the merlin.keystore.file could be the KeyStore pseudo-file providing access to HSM. It is
+        also possible that this is not the case, and that a good way to support HSM would be to
+        allow customers to specify the value corresponding to the org.apache.ws.security.crypto.provider, so that the
+        CryptoFactory would instantiate the custom Crypto interface providing HSM access.
+
+         If HSM support is required, and HSMs don't expose a KeyStore interface, then it is possible that a custom
+         Crypto interface implementation may be the answer.
+         */
         properties.put(
                 "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );

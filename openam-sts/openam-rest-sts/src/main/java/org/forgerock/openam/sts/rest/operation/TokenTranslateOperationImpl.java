@@ -28,21 +28,30 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.sts.*;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.TokenRequestMarshaller;
 import org.forgerock.openam.sts.rest.marshal.TokenResponseMarshaller;
 import org.forgerock.openam.sts.rest.marshal.WebServiceContextFactory;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.ws.WebServiceContext;
 
-import org.slf4j.Logger;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class defines TokenTranslateOperation implementation, the top-level operation invoked by the REST-STS
@@ -58,7 +67,6 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
     private final TokenStore tokenStore;
     private final WebServiceContextFactory webServiceContextFactory;
     private final Set<TokenTransform> tokenTransforms;
-    private final Logger logger;
 
     @Inject
     TokenTranslateOperationImpl(
@@ -69,14 +77,12 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
                         STSPropertiesMBean stsPropertiesMBean,
                         TokenStore tokenStore,
                         WebServiceContextFactory webServiceContextFactory,
-                        TokenTransformFactory tokenTransformFactory,
-                        Logger logger) throws Exception {
+                        TokenTransformFactory tokenTransformFactory) throws Exception {
         this.tokenRequestMarshaller = tokenRequestMarshaller;
         this.tokenResponseMarshaller = tokenResponseMarshaller;
         this.stsPropertiesMBean = stsPropertiesMBean;
         this.tokenStore = tokenStore;
         this.webServiceContextFactory = webServiceContextFactory;
-        this.logger = logger;
 
         if (supportedTranslations.isEmpty()) {
             throw new IllegalArgumentException("No token transform operations specified.");
@@ -92,64 +98,36 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
     }
 
     @Override
-    public JsonValue translateToken(JsonValue inputToken, String desiredStringTokenType, HttpContext httpContext, SecurityContext securityContext)
-            throws TokenValidationException, TokenCreationException {
-        TokenType desiredTokenType = null;
-        try {
-            desiredTokenType = TokenType.valueOf(desiredStringTokenType);
-        } catch (IllegalArgumentException e) {
-            String message = "The specified desiredTokenType, " + desiredStringTokenType + " is an unknown token type.";
-            logger.warn(message);
-            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
-        } catch (NullPointerException e) {
-            String message = "Must specify a non-null desiredTokenType.";
-            logger.warn(message);
-            throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
-        }
-        TokenType inputTokenType = null;
-        try {
-            inputTokenType = tokenRequestMarshaller.getTokenType(inputToken);
-        } catch (TokenMarshalException e) {
-            String message = "Exception caught obtaining toke type from input token json: " + e.getMessage();
-            logger.warn(message);
-            throw new TokenValidationException(ResourceException.BAD_REQUEST, message, e);
-        }
+    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext, SecurityContext securityContext)
+            throws TokenMarshalException, TokenValidationException, TokenCreationException {
+        TokenType inputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getInputTokenState());
+        TokenType outputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getOutputTokenState());
+
         TokenTransform targetedTransform = null;
         for (TokenTransform transform : tokenTransforms) {
-            if (transform.isTransformSupported(inputTokenType, desiredTokenType)) {
+            if (transform.isTransformSupported(inputTokenType, outputTokenType)) {
                 targetedTransform = transform;
                 break;
             }
         }
         if (targetedTransform == null) {
-            String message = "The desired transformation, from " + inputTokenType + " to " + desiredTokenType +
+            String message = "The desired transformation, from " + inputTokenType + " to " + outputTokenType +
                     ", is not a supported token translation.";
-            logger.warn(message);
             throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
-        ReceivedToken receivedToken = null;
-        try {
-            receivedToken = tokenRequestMarshaller.marshallTokenRequest(inputToken);
-        } catch (TokenMarshalException e) {
-            String message = "Exception caught marshalling token request: " + e.getMessage();
-            logger.warn(message);
-            throw new TokenValidationException(ResourceException.BAD_REQUEST, message, e);
-        }
+        ReceivedToken receivedToken = tokenRequestMarshaller.marshallInputToken(invocationState.getInputTokenState());
         WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(httpContext, securityContext);
         TokenValidatorParameters validatorParameters = buildTokenValidatorParameters(receivedToken, webServiceContext);
-        TokenProviderParameters providerParameters = buildTokenProviderParameters(receivedToken, desiredTokenType, webServiceContext);
+        TokenProviderParameters providerParameters = buildTokenProviderParameters(inputTokenType,
+                invocationState.getInputTokenState(), outputTokenType, invocationState.getOutputTokenState(), webServiceContext);
 
         TokenProviderResponse tokenProviderResponse = targetedTransform.transformToken(validatorParameters, providerParameters);
-        try {
-            return tokenResponseMarshaller.marshalTokenResponse(desiredTokenType, tokenProviderResponse);
-        } catch (TokenMarshalException e) {
-            String message = "Exception caught marshalling created token to string/json: " + e.getMessage();
-            logger.warn(message);
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, message, e);
-        }
+        return tokenResponseMarshaller.marshalTokenResponse(outputTokenType, tokenProviderResponse);
     }
 
-    private TokenValidatorParameters buildTokenValidatorParameters(ReceivedToken receivedToken, WebServiceContext webServiceContext) throws TokenValidationException {
+    private TokenValidatorParameters buildTokenValidatorParameters(
+            ReceivedToken receivedToken, WebServiceContext webServiceContext)
+            throws TokenValidationException {
         TokenRequirements validateRequirements = new TokenRequirements();
         validateRequirements.setValidateTarget(receivedToken);
         TokenValidatorParameters validatorParameters = new TokenValidatorParameters();
@@ -176,25 +154,73 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         return validatorParameters;
     }
 
-    private TokenProviderParameters buildTokenProviderParameters(ReceivedToken receivedToken, TokenType desiredTokenType,
-                                                                 WebServiceContext webServiceContext) throws TokenCreationException {
+    private TokenProviderParameters buildTokenProviderParameters(TokenType inputTokenType,
+                                                                 JsonValue inputToken,
+                                                                 TokenType desiredTokenType,
+                                                                 JsonValue desiredToken,
+                                                                 WebServiceContext webServiceContext)
+                                                throws TokenCreationException, TokenMarshalException {
         TokenProviderParameters providerParameters = new TokenProviderParameters();
         providerParameters.setStsProperties(stsPropertiesMBean);
-        //TODO: does setting the principal make sense here - or should the ProviderParameters principal only be set
-        //using the TokenValidatorResponse following successful validation?
-        providerParameters.setPrincipal(receivedToken.getPrincipal());
         providerParameters.setWebServiceContext(webServiceContext);
         providerParameters.setTokenStore(tokenStore);
         providerParameters.setEncryptionProperties(stsPropertiesMBean.getEncryptionProperties());
 
         /*
-        TODO:
-        defaults for the key and token requirements might be sufficient. Revisit in the future. Might want to have
-        a json blob context and user-plug-in to pull out configurations related to key and token requirements.
+        WS-Trust abstracts the actual specification of the desired token, using the TokenType and KeyType. For a TokenType of
+        SAML2, a KeyType of Bearer indicates a Bearer Assertion; a KeyType of PublicKey indicates a HolderOfKey Assertion
+        with public-key KeyInfo; a KeyType of SymmetricKey indicates a HolderOfKey Assertion with symmetric-key KeyInfo. The
+        OnBehalfOf parameter is used to indicate a SenderVouches Assertion. As such, there is no simple way to indicate
+        the SubjectConfirmation method, as it is specified in the REST invocation, and snake it through the CXF-STS engine,
+        where it could be referenced by the AMSAMLTokenProvider. So I will put this information in the
+        Map<String, Object> included in the TokenProviderParameters.
+
+        Additionally, the AMSAMLTokenProvider needs to specify the AuthnContext passed to the TokenGenerationService. This
+        value will be a function of the validated token type, so this value is placed in the additionalProperties as well.
+
+        If we are dealing with Bearer SubjectConfirmation, the ServiceProvider AssertionConsumerService URL must
+        be provided to the TokenGenerationService so that it may be set as the Recipient attribute of the SubjectConfirmationData,
+        as specified by section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf
+
+        Finally, if we are dealing with HolderOfKey SubjectConfirmation, the ProofTokenState must be included in the request
+        to the TokenGenerationService.
          */
-        KeyRequirements keyRequirements = new KeyRequirements();
+        Map<String, Object> additionalProperties = new HashMap<String, Object>();
+        if (TokenType.SAML2.equals(desiredTokenType)) {
+            final SAML2SubjectConfirmation subjectConfirmation = tokenRequestMarshaller.getSubjectConfirmation(desiredToken);
+            additionalProperties.put(AMSTSConstants.SAML2_SUBJECT_CONFIRMATION_KEY, subjectConfirmation);
+            additionalProperties.put(AMSTSConstants.VALIDATED_TOKEN_TYPE_KEY, inputTokenType);
+            if (SAML2SubjectConfirmation.BEARER.equals(subjectConfirmation)) {
+                final String spAcsUrl = tokenRequestMarshaller.getServiceProviderAssertionConsumerServiceUrl(desiredToken);
+                additionalProperties.put(AMSTSConstants.SP_ACS_URL_KEY, spAcsUrl);
+            }
+            /*
+            The established CXF-STS way to include the x509Certificate specified in the ProofTokenState would be to
+            include it in a ReceivedKey specified in the KeyRequirements specified in the TokenProviderParameters.
+            However, this ProofTokenState ultimately must be POSTed in json format to the TokenGenerationService.
+            If the established CXF-STS procedure is followed, superfluous marshalling from
+            ProofTokenState->X509Certificate->ProofTokenState will be incurred. In this case, the more direct route of
+            including the ProofTokenState directly in the additionalProperties is preferred, not just to avoid the
+            superfluous computation, but in particular because the ProofTokenState and other classes
+            in its package constitute a client-sdk of sorts, and thus encapsulate marshalling in static methods as a convenience.
+            I don't want my back-end code to consume static methods, and thus aim to pass these data objects through the
+            system relatively untouched, aside from being understood by the TokenRequestMarshaller.
+             */
+            if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation)) {
+                ProofTokenState proofTokenState = tokenRequestMarshaller.getProofTokenState(desiredToken);
+                additionalProperties.put(AMSTSConstants.PROOF_TOKEN_STATE_KEY, proofTokenState);
+            }
+            /*
+             Set the inputToken JsonValue in the additionalProperties if we are issuing a SAML2 token so that the
+             AuthnContextMapper can use it to determine the appropriate AuthnContext mapping.
+             */
+            additionalProperties.put(AMSTSConstants.INPUT_TOKEN_STATE_KEY, inputToken);
+        }
+        providerParameters.setAdditionalProperties(additionalProperties);
+
         TokenRequirements tokenRequirements = new TokenRequirements();
-        tokenRequirements.setTokenType(TokenType.getProviderParametersTokenType(desiredTokenType));
+        tokenRequirements.setTokenType(desiredTokenType.name());
+        KeyRequirements keyRequirements = new KeyRequirements();
         providerParameters.setKeyRequirements(keyRequirements);
         providerParameters.setTokenRequirements(tokenRequirements);
 

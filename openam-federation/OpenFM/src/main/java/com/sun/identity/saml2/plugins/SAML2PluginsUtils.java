@@ -48,7 +48,7 @@ public class SAML2PluginsUtils {
      * @return true if dynamical profile creation or ignore profile is enabled,
      * false otherwise.
      */
-    static boolean isDynamicalOrIgnoredProfile(String realm) {
+    public static boolean isDynamicalOrIgnoredProfile(String realm) {
         try {
             OrganizationConfigManager orgConfigMgr = AuthD.getAuth().
                 getOrgConfigManager(realm);

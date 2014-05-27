@@ -20,6 +20,8 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 /**
  * The TokenValidatorParameters passed to the CXF-STS TokenValidator implementations represent the to-be-validated-token
@@ -34,14 +36,40 @@ public interface TokenRequestMarshaller {
      * @return a ReceivedToken instance which has an xml representation of the json token.
      * @throws org.forgerock.openam.sts.TokenMarshalException if the json string cannot be marshalled into a recognized token.
      */
-    ReceivedToken marshallTokenRequest(JsonValue token) throws TokenMarshalException;
+    ReceivedToken marshallInputToken(JsonValue token) throws TokenMarshalException;
 
     /**
-     * Returns the TokenType corresponding to this json token. The json token will specify its token type with
-     * an AMSTSConstants.TOKEN_TYPE_KEY value.
-     * @param token The json token representation
+     * Returns the TokenType corresponding to the JsonValue. The JsonValue will be pulled from the RestSTSServiceInvocationState.
+     * @param token The token definition
      * @return The TokenType represented by the json string.
      * @throws org.forgerock.openam.sts.TokenMarshalException if the TOKEN_TYPE_KEY is missing or unrecognized.
      */
     TokenType getTokenType(JsonValue token) throws TokenMarshalException;
+
+    /**
+     * Returns the SAML2SubjectConfirmation specified in the JsonValue
+     * @param token The JsonValue encoding the state defined in the SAML2TokenState class.
+     * @return The SAML2SubjectConfirmation defined in the json representation of the SAML2TokenState
+     * @throws TokenMarshalException if the SubjectConfirmation cannot be determined - i.e. if the JsonValue does not
+     * correlate to SAML2TokenState.
+     */
+    SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException;
+
+    /**
+     * Returns the ServiceProvider's Assertion Consumer Service URL specified in the SAML2TokenState. Note that this
+     * method should only be called if a Bearer assertion is specified by the SAML2TokenState.
+     * @param token The JsonValue corresponding to the SAML2TokenState
+     * @return The SP ACS URL
+     * @throws TokenMarshalException if the value could not be obtained
+     */
+    String getServiceProviderAssertionConsumerServiceUrl(JsonValue token) throws TokenMarshalException;
+
+    /**
+     * Returns the X509Certificated proof token for HolderOfKey assertions specified in the SAML2TokenState. Note that
+     * this method should only be called if a HolderOfKey assertion is specified by the SAML2TokenState.
+     * @param token The JsonValue corresponding to the SAML2TokenState
+     * @return The SP ACS URL
+     * @throws TokenMarshalException if the value could not be obtained
+     */
+    ProofTokenState getProofTokenState(JsonValue token) throws TokenMarshalException;
 }

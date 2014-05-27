@@ -11,25 +11,22 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.provider;
+package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.w3c.dom.Element;
+import org.testng.annotations.Test;
 
-/**
- * Tokens are always represented as XML elements. This interface defines the functionality to create an XML element
- * encapsulating the OpenAM sessionId.
- *
- * It also defines functionality to go in the other direction - i.e. to go from an OpenAM session id element, and extract
- * the session id. This is needed by the Rest STS.
- *
- * TODO: think about moving this to the model directory.
- */
-public interface OpenAMSessionIdElementBuilder {
-    Element buildOpenAMSessionIdElement(String sessionId) throws TokenMarshalException;
+import static org.testng.Assert.assertEquals;
 
-    String extractOpenAMSessionId(Element element) throws TokenMarshalException;
+public class OpenAMTokenStateTest {
+    private static final String SESSION_ID = "AQIC5wM2LY4SfczNfYrVEX9Z0D3wB3T5TMCX8CFKzQOEi-s";
+
+    @Test
+    public void testJsonRoundTrip() throws TokenMarshalException {
+        OpenAMTokenState tokenState = OpenAMTokenState.builder().sessionId(SESSION_ID).build();
+        assertEquals(tokenState, OpenAMTokenState.fromJson(tokenState.toJson()));
+    }
 }

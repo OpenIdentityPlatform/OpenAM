@@ -24,10 +24,11 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
+import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
@@ -54,7 +55,8 @@ public class TokenOperationFactoryImplTest {
         @Override
         protected void configure() {
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
-            bind(OpenAMSessionIdElementBuilder.class).to(OpenAMSessionIdElementBuilderImpl.class);
+            bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
+
             bind(AuthenticationUriProvider.class)
                     .to(AuthenticationUriProviderImpl.class);
 
@@ -109,8 +111,8 @@ public class TokenOperationFactoryImplTest {
 
         @Provides
         @Inject
-        public AMTokenProvider getAMTokenProvider(ThreadLocalAMTokenCache tokenCache, OpenAMSessionIdElementBuilder builder, org.slf4j.Logger logger) {
-             return new AMTokenProvider(tokenCache, builder, logger);
+        public AMTokenProvider getAMTokenProvider(ThreadLocalAMTokenCache tokenCache, XmlMarshaller<OpenAMSessionToken> marshaller, org.slf4j.Logger logger) {
+             return new AMTokenProvider(tokenCache, marshaller, logger);
         }
 
         @Provides

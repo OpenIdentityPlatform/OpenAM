@@ -14,13 +14,13 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.service;
+package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.util.Reject;
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -32,7 +32,7 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 public class TokenGenerationServiceInvocationState {
-    public enum SAML2SubjectConfirmation {BEARER, SENDER_VOUCHES, HOLDER_OF_KEY}
+//    public enum SAML2SubjectConfirmation {BEARER, SENDER_VOUCHES, HOLDER_OF_KEY}
 
     public static class TokenGenerationServiceInvocationStateBuilder {
         private String ssoTokenString;
@@ -49,10 +49,6 @@ public class TokenGenerationServiceInvocationState {
         private SAML2SubjectConfirmation saml2SubjectConfirmation;
         private AMSTSConstants.STSType stsType = AMSTSConstants.STSType.REST;
         private ProofTokenState proofTokenState;
-        //TODO: think about this -should this be in the SAML2 config instead - if it is not in the SAML2Config, then it has to
-        //be specified in the invocation to the STS. The question is whether a given instance of the STS would want some
-        //assertions signed, and some not.
-        private boolean signAssertion = true;
         /*
         According to section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf:
         Bearer assertions must contain a SubjectConfirmationData element that contains a Recipient attribute which
@@ -106,11 +102,6 @@ public class TokenGenerationServiceInvocationState {
             return this;
         }
 
-        public TokenGenerationServiceInvocationStateBuilder signAssertion(boolean signAssertion) {
-            this.signAssertion = signAssertion;
-            return this;
-        }
-
         public TokenGenerationServiceInvocationState build() {
             return new TokenGenerationServiceInvocationState(this);
         }
@@ -126,7 +117,6 @@ public class TokenGenerationServiceInvocationState {
     private static final String SP_ACS_URL = "spAcsUrl";
     private static final String STS_TYPE = "stsType";
     private static final String PROOF_TOKEN_STATE = "proofTokenState";
-    private static final String SIGN_ASSERTION = "signAssertion";
 
     private final String ssoTokenString;
     private final String authnContextClassRef;
@@ -136,7 +126,6 @@ public class TokenGenerationServiceInvocationState {
     private final String spAcsUrl;
     private final AMSTSConstants.STSType stsType;
     private final ProofTokenState proofTokenState;
-    private final boolean signAssertion;
 
     private TokenGenerationServiceInvocationState(TokenGenerationServiceInvocationStateBuilder builder) {
         this.ssoTokenString = builder.ssoTokenString;
@@ -147,7 +136,6 @@ public class TokenGenerationServiceInvocationState {
         this.spAcsUrl = builder.spAcsUrl; // no reject if null, as is optional, but only for non-bearer tokens
         this.stsType = builder.stsType;
         this.proofTokenState = builder.proofTokenState;//no reject if null, as it is optional
-        this.signAssertion = builder.signAssertion;
         Reject.ifNull(ssoTokenString, "SSO Token String must be set");
         Reject.ifNull(authnContextClassRef, "authNContextClassRef String must be set");
         Reject.ifNull(tokenType, "Token Type must be set");
@@ -201,10 +189,6 @@ public class TokenGenerationServiceInvocationState {
         return proofTokenState;
     }
 
-    public boolean getSignAssertion() {
-        return signAssertion;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -215,7 +199,6 @@ public class TokenGenerationServiceInvocationState {
         sb.append('\t').append("Service Provider ACS URL ").append(spAcsUrl).append('\n');
         sb.append('\t').append("sts type ").append(stsType).append('\n');
         sb.append('\t').append("ProofTokenState ").append(proofTokenState).append('\n');
-        sb.append('\t').append("Sign assertion ").append(signAssertion).append('\n');
         sb.append('\t').append("AuthNContextClassRef ").append(authnContextClassRef).append('\n');
         return sb.toString();
     }
@@ -230,7 +213,6 @@ public class TokenGenerationServiceInvocationState {
                     stsType.equals(otherConfig.getStsType()) &&
                     saml2SubjectConfirmation.equals(otherConfig.getSaml2SubjectConfirmation()) &&
                     authnContextClassRef.equals(otherConfig.getAuthnContextClassRef()) &&
-                    signAssertion == otherConfig.getSignAssertion() &&
                     (spAcsUrl != null ? spAcsUrl.equals(otherConfig.getSpAcsUrl()) : otherConfig.getSpAcsUrl() == null) &&
                     (proofTokenState != null ? proofTokenState.equals(otherConfig.getProofTokenState()) : otherConfig.getProofTokenState() == null);
         }
@@ -250,7 +232,6 @@ public class TokenGenerationServiceInvocationState {
                 field(STS_INSTANCE_ID, stsInstanceId),
                 field(SAML2_SUBJECT_CONFIRMATION, saml2SubjectConfirmation.name()),
                 field(SP_ACS_URL, spAcsUrl),
-                field(SIGN_ASSERTION, signAssertion),
                 field(STS_TYPE, stsType.name())));
         if (proofTokenState != null) {
             jsonValue.add(PROOF_TOKEN_STATE, proofTokenState.toJson());
@@ -258,7 +239,7 @@ public class TokenGenerationServiceInvocationState {
         return jsonValue;
     }
 
-    public static TokenGenerationServiceInvocationState fromJson(JsonValue json) throws IllegalStateException {
+    public static TokenGenerationServiceInvocationState fromJson(JsonValue json) throws TokenMarshalException {
         TokenGenerationServiceInvocationStateBuilder builder =  TokenGenerationServiceInvocationState.builder()
                 .ssoTokenString(json.get(SSO_TOKEN_STRING).asString())
                 .authNContextClassRef(json.get(AUTHN_CONTEXT_CLASS_REF).asString())
@@ -266,15 +247,10 @@ public class TokenGenerationServiceInvocationState {
                 .stsInstanceId(json.get(STS_INSTANCE_ID).asString())
                 .saml2SubjectConfirmation(SAML2SubjectConfirmation.valueOf(SAML2SubjectConfirmation.class, json.get(SAML2_SUBJECT_CONFIRMATION).asString()))
                 .serviceProviderAssertionConsumerServiceUrl(json.get(SP_ACS_URL).asString())
-                .signAssertion(json.get(SIGN_ASSERTION).asBoolean())
                 .stsType(AMSTSConstants.STSType.valueOf(AMSTSConstants.STSType.class, json.get(STS_TYPE).asString()));
         JsonValue proofToken = json.get(PROOF_TOKEN_STATE);
         if (!proofToken.isNull()) {
-            try {
-                builder.proofTokenState(ProofTokenState.fromJson(proofToken));
-            } catch (TokenCreationException e) {
-                throw new IllegalStateException("Exception marshalliong ProofTokenState: " + e);
-            }
+            builder.proofTokenState(ProofTokenState.fromJson(proofToken));
         }
         return builder.build();
     }

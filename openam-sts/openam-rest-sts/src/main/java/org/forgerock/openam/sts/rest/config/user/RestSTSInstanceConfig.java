@@ -17,17 +17,11 @@
 package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.util.Reject;
 
 import java.util.*;
-
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 
 
 /**
@@ -179,6 +173,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
                 .amRestAuthNUriElement(baseConfig.getAMRestAuthNUriElement())
                 .amRestLogoutUriElement(baseConfig.getAMRestLogoutUriElement())
                 .amRestIdFromSessionUriElement(baseConfig.getAMRestIdFromSessionUriElement())
+                .amRestTokenGenerationServiceUriElement(baseConfig.getAmRestTokenGenerationServiceUriElement())
                 .amSessionCookieName(baseConfig.getAMSessionCookieName())
                 .keystoreConfig(baseConfig.getKeystoreConfig())
                 .issuerName(baseConfig.getIssuerName())

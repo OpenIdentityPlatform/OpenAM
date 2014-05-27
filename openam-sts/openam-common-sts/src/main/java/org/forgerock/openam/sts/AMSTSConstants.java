@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.sts;
 
-import org.apache.ws.security.WSConstants;
-
 import javax.xml.namespace.QName;
 
 public class AMSTSConstants {
@@ -88,7 +86,7 @@ public class AMSTSConstants {
     public static final String AM_TOKEN_TYPE = "http://forgerock.org/token/type/OpenAM";
 
     /*
-    The name of the DOM Element used to communicate a OpenAM session identifier in the SecurityToken
+    The name of the DOM Element and json field used to communicate a OpenAM session identifier in the SecurityToken
      */
     public static final String AM_SESSION_ID_ELEMENT_NAME="openamsessionid";
 
@@ -116,6 +114,11 @@ public class AMSTSConstants {
     Used in conjunction with a @Named annotation to inject the AM rest username from session id uri element string.
      */
     public static final String REST_ID_FROM_SESSION_URI_ELEMENT = "am_rest_id_from_session";
+
+    /*
+    Used in conjunction with a @Named annotation to inject the AM rest token generation service uri element string.
+     */
+    public static final String REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT = "am_rest_token_gen_service";
 
     /*
     Used in conjunction with a @Named annotation to inject the url string corresponding to the AM deployment.
@@ -221,4 +224,61 @@ public class AMSTSConstants {
     the token transformation which takes the OIDC token as input.
      */
     public static final String OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY = "oidc_id_token_auth_target_header_key";
+
+    /*
+    This value is used to key the SAML2SubjectConfirmation instance in additionalProperties Map<String, Object> encapsulated
+    in the TokenProviderParameters so that the AMSAMLTokenProvider
+    can determine the type of subject confirmation specified in the REST invocation, avoiding the WS-Trust secret decoder
+    ring of KeyType and OnBehalfOf values to make this determination.
+     */
+    public static final String SAML2_SUBJECT_CONFIRMATION_KEY = "saml2_subject_confirmation_key";
+
+    /*
+    This value is used to key the TokenType instance in additionalProperties Map<String, Object> encapsulated
+    in the TokenProviderParameters so that the AMSAMLTokenProvider can use it to determine the AuthnContext passed to the
+    TokenGenerationService when issuing SAML2 assertions.
+     */
+    public static final String VALIDATED_TOKEN_TYPE_KEY = "validated_token_type_key";
+
+    /*
+    This value is used to key the String instance in additionalProperties Map<String, Object> encapsulated
+    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to the TokenGenerationService when issuing
+    BEARER assertions.
+     */
+    public static final String SP_ACS_URL_KEY = "sp_acs_url_key";
+
+    /*
+    This value is used to key the ProofTokenState instance in additionalProperties Map<String, Object> encapsulated
+    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to the TokenGenerationService when issuing
+    HolderOfKey assertions.
+     */
+    public static final String PROOF_TOKEN_STATE_KEY = "proof_token_state_key";
+
+    /*
+    This value is used to key the JsonValue instance in additionalProperties Map<String, Object> encapsulated
+    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to AuthnContextMapper to obtain the
+    appropriate AuthnContext for the generated SAML2 assertion.
+     */
+    public static final String INPUT_TOKEN_STATE_KEY = "input_token_state_key";
+
+    /*
+    This property is defined to allow end-users to implement a custom implementation of the
+    org.forgerock.openam.sts.rest.token.provider.AuthnContextMapper class. If this property is set, and the specified class
+    can be instantiated, and it implements the AuthnContextMapper, then it will be used to map the AuthnContext value
+    sent to the TokenGenerationService when issuing SAML2 assertions.
+     */
+    public static final String CUSTOM_STS_AUTHN_CONTEXT_MAPPER_PROPERTY = "org.forgerock.openam.sts.rest.custom.AuthnContextMapper";
+
+    /*
+    Used in a @Named annotation to inject the instance id for the STS, as this is required to make invocations to the
+    TokenGenerationService. This state will ultimately be pulled from the STSInstanceConfig.
+     */
+    public static final String STS_INSTANCE_ID = "sts_instance_id";
+
+    /*
+    The JsonValue returned by the TokenGenerationService will have a single entry, keyed by the string below. The value
+    will be the generated token (now just a SAML2 assertion).
+     */
+    public static final String ISSUED_TOKEN = "issued_token";
+
 }

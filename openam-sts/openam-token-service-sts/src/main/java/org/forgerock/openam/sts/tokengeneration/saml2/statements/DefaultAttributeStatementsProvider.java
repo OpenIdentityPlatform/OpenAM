@@ -30,12 +30,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Encrypted attributes are currently not supported.
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider
  */
 public class DefaultAttributeStatementsProvider implements AttributeStatementsProvider {
     /**
      * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeStatementsProvider#get(com.iplanet.sso.SSOToken,
      * org.forgerock.openam.sts.config.user.SAML2Config, AttributeMapper)
+     *
      */
     public List<AttributeStatement> get(SSOToken ssoToken, SAML2Config saml2Config, AttributeMapper mapper) throws TokenCreationException {
         AttributeStatement attributeStatement = AssertionFactory.getInstance().createAttributeStatement();
@@ -50,7 +52,7 @@ public class DefaultAttributeStatementsProvider implements AttributeStatementsPr
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught setting attributes in DefaultAttributeStatementsProvider: " + e, e);
         }
-        List<AttributeStatement> attributeStatements = new ArrayList<AttributeStatement>();
+        List<AttributeStatement> attributeStatements = new ArrayList<AttributeStatement>(1);
         attributeStatements.add(attributeStatement);
         return attributeStatements;
     }

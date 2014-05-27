@@ -25,6 +25,9 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
+import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.AMTokenParserImpl;
@@ -33,7 +36,12 @@ import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
+import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
+import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
@@ -75,6 +83,10 @@ public class TokenTransformFactoryImplTest {
             bind(AuthenticationUriProvider.class)
                     .to(AuthenticationUriProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
+            bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
+            bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+            bind(AuthnContextMapper.class).to(AuthnContextMapperImpl.class);
         }
 
         @Provides
@@ -115,6 +127,17 @@ public class TokenTransformFactoryImplTest {
             return AuthTargetMapping.builder().addMapping(String.class, "index_type", "index_value").build();
         }
 
+        @Provides
+        @Named(AMSTSConstants.STS_INSTANCE_ID)
+        String getInstanceId() {
+            return "cornholio";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
+        String getTokenGenServiceUriElement() {
+            return "/token-gen/issue?_action=issue";
+        }
     }
 
     @BeforeTest

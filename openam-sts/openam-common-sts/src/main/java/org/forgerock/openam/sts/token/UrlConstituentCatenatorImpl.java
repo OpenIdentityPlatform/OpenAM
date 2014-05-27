@@ -21,12 +21,13 @@ package org.forgerock.openam.sts.token;
  */
 public class UrlConstituentCatenatorImpl implements UrlConstituentCatenator {
     private static final String FORWARD_SLASH = "/";
-
+    private static final String QUESTION_MARK = "?";
+    //TODO: varargs here - why just two constituents?
     public String catenateUrlConstituents(String first, String second) {
         if ((first==null) || (second==null)) {
             throw new IllegalArgumentException("Arguments cannot be null.");
         }
-        if (!first.endsWith(FORWARD_SLASH) && !second.startsWith(FORWARD_SLASH)) {
+        if (!first.endsWith(FORWARD_SLASH) && !second.startsWith(FORWARD_SLASH) && !second.startsWith(QUESTION_MARK)) {
             return new StringBuilder(first).append(FORWARD_SLASH).append(second).toString();
         } else if (first.endsWith(FORWARD_SLASH) && second.startsWith(FORWARD_SLASH)) {
             return new StringBuilder(first).append(second.substring(1)).toString();

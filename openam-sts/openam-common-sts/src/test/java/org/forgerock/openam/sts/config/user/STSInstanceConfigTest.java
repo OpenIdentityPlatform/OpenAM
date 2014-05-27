@@ -29,6 +29,7 @@ public class STSInstanceConfigTest {
     private static final String AM_DEPLOYMENT = "am_depl";
     private static final String AUTH = "rest_auth";
     private static final String ID_FROM_SESSION = "id_from_session";
+    private static final String TOKEN_GEN_SERVICE = "token_gen_service";
     private static final String LOGOUT = "logout";
     private static final String COOKIE = "cookie";
     private static final String ISSUER = "cornholio";
@@ -98,6 +99,7 @@ public class STSInstanceConfigTest {
                 .amDeploymentUrl(AM_DEPLOYMENT)
                 .amRestAuthNUriElement(AUTH)
                 .amRestIdFromSessionUriElement(ID_FROM_SESSION)
+                .amRestTokenGenerationServiceUriElement(TOKEN_GEN_SERVICE)
                 .amRestLogoutUriElement(LOGOUT)
                 .amSessionCookieName(COOKIE)
                 .issuerName(ISSUER)
@@ -127,6 +129,7 @@ public class STSInstanceConfigTest {
                 .amDeploymentUrl(AM_DEPLOYMENT)
                 .amRestAuthNUriElement(AUTH)
                 .amRestIdFromSessionUriElement(ID_FROM_SESSION)
+                .amRestTokenGenerationServiceUriElement(TOKEN_GEN_SERVICE)
                 .amRestLogoutUriElement(LOGOUT)
                 .amSessionCookieName(COOKIE)
                 .issuerName(ISSUER)

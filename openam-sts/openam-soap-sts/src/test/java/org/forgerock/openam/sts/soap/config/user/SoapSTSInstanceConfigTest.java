@@ -90,6 +90,7 @@ public class SoapSTSInstanceConfigTest {
                 .amRestAuthNUriElement("/authenticate")
                 .amRestLogoutUriElement("/sessions/?_action=logout")
                 .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
+                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")

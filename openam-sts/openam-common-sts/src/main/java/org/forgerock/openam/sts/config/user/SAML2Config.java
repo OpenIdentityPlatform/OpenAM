@@ -59,6 +59,7 @@ public class SAML2Config {
         private String customAttributeMapperClassName;
         private String canonicalizationAlgorithm = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
         private String signatureAlgorithm;
+        private boolean signAssertion = true;
 
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?
@@ -128,6 +129,12 @@ public class SAML2Config {
             return this;
         }
 
+        public SAML2ConfigBuilder signAssertion(boolean signAssertion) {
+            this.signAssertion = signAssertion;
+            return this;
+        }
+
+
         public SAML2Config build() {
             return new SAML2Config(this);
         }
@@ -147,6 +154,7 @@ public class SAML2Config {
     private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "customAttributeMapperClass";
     private static final String SIGNATURE_ALGORITHM = "signatureAlgorithm";
     private static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";
+    private static final String SIGN_ASSERTION = "signAssertion";
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
@@ -160,6 +168,7 @@ public class SAML2Config {
     private final String customAttributeMapperClassName;
     private final String signatureAlgorithm;
     private final String canonicalizationAlgorithm;
+    private final boolean signAssertion;
 
     private SAML2Config(SAML2ConfigBuilder builder) {
         this.nameIdFormat = builder.nameIdFormat; //not required so don't reject if null
@@ -182,6 +191,8 @@ public class SAML2Config {
         customAttributeMapperClassName = builder.customAttributeMapperClassName;
         signatureAlgorithm = builder.signatureAlgorithm;
         canonicalizationAlgorithm = builder.canonicalizationAlgorithm;
+        this.signAssertion = builder.signAssertion;
+
         Reject.ifNull(canonicalizationAlgorithm, "CanonicalizationAlgorithm must be set.");
         if (!Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS.equals(canonicalizationAlgorithm) && !Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS.equals(canonicalizationAlgorithm)) {
             throw new IllegalArgumentException("Canonicalization algorithm must be set to either " +
@@ -242,6 +253,10 @@ public class SAML2Config {
         return signatureAlgorithm;
     }
 
+    public boolean signAssertion() {
+        return signAssertion;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -258,6 +273,7 @@ public class SAML2Config {
         sb.append('\t').append("customAuthzDecisionStatementsProviderClassName: ").append(customAuthzDecisionStatementsProviderClassName).append('\n');
         sb.append('\t').append("signatureAlgorithm: ").append(signatureAlgorithm).append('\n');
         sb.append('\t').append("canonicalizationAlgorithm: ").append(canonicalizationAlgorithm).append('\n');
+        sb.append('\t').append("Sign assertion ").append(signAssertion).append('\n');
         return sb.toString();
     }
 
@@ -269,6 +285,7 @@ public class SAML2Config {
                     tokenLifetimeInSeconds == otherConfig.tokenLifetimeInSeconds &&
                     attributeMap.equals(otherConfig.attributeMap) &&
                     audiences.equals(otherConfig.audiences) &&
+                    signAssertion == otherConfig.signAssertion() &&
                     (customConditionsProviderClassName != null
                             ? customConditionsProviderClassName.equals(otherConfig.getCustomConditionsProviderClassName())
                             : otherConfig.getCustomConditionsProviderClassName() == null) &&
@@ -313,6 +330,7 @@ public class SAML2Config {
                 field(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, customAuthenticationStatementsProviderClassName),
                 field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
                 field(SIGNATURE_ALGORITHM, signatureAlgorithm),
+                field(SIGN_ASSERTION, signAssertion),
                 field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm)));
 
         JsonValue jsonValueAttributeMap = new JsonValue(new HashMap<String, Object>());
@@ -338,6 +356,7 @@ public class SAML2Config {
                 .customAuthenticationStatementsProviderClassName(json.get(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS).asString())
                 .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
                 .signatureAlgorithm(json.get(SIGNATURE_ALGORITHM).asString())
+                .signAssertion(json.get(SIGN_ASSERTION).asBoolean())
                 .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString());
 
         JsonValue jsonAttributes = json.get(ATTRIBUTE_MAP);

@@ -17,14 +17,15 @@
 package org.forgerock.openam.sts.rest;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
+import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 
 import org.slf4j.Logger;
@@ -35,28 +36,16 @@ import org.slf4j.Logger;
 public class RestSTSImpl implements RestSTS {
     private final TokenTranslateOperation translateOperation;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
-    private final Logger slf4jLogger;
 
     @Inject
-    public RestSTSImpl(TokenTranslateOperation translateOperation, ThreadLocalAMTokenCache threadLocalAMTokenCache, Logger slf4jLogger) {
+    public RestSTSImpl(TokenTranslateOperation translateOperation, ThreadLocalAMTokenCache threadLocalAMTokenCache) {
         this.translateOperation = translateOperation;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
-        this.slf4jLogger = slf4jLogger;
     }
-/*
-    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpServletRequest request)
-            throws TokenValidationException, TokenCreationException {
+    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext, SecurityContext securityContext)
+            throws TokenMarshalException, TokenValidationException, TokenCreationException {
         try {
-            return translateOperation.translateToken(inputToken, desiredTokenType, request);
-        } finally {
-            threadLocalAMTokenCache.clearAMToken();
-        }
-    }
-*/
-    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpContext httpContext, SecurityContext securityContext)
-            throws TokenValidationException, TokenCreationException {
-        try {
-            return translateOperation.translateToken(inputToken, desiredTokenType, httpContext, securityContext);
+            return translateOperation.translateToken(invocationState, httpContext, securityContext);
         } finally {
             threadLocalAMTokenCache.clearAMToken();
         }

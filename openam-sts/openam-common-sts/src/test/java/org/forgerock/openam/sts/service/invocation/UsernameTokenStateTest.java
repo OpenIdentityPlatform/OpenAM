@@ -14,25 +14,31 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.model;
+package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertTrue;
 
+import static org.testng.Assert.assertEquals;
 
-public class OpenIdConnectIdTokenTest {
-    private static final String TOKEN_VALUE = "eyJhb.eyJpc3MiOiJhY2N.SqcfMU-BsrS69tGLIFRq";
+public class UsernameTokenStateTest {
+    private static final String USERNAME = "bobo";
+    private static final String PASSWORD = "dodo";
 
     @Test
     public void testJsonRoundTrip() throws TokenMarshalException {
-        OpenIdConnectIdToken idToken = new OpenIdConnectIdToken(TOKEN_VALUE);
-        assertTrue(idToken.equals(OpenIdConnectIdToken.fromJson(idToken.toJson())));
+        UsernameTokenState untState =
+                UsernameTokenState.builder().username(USERNAME.getBytes()).password(PASSWORD.getBytes()).build();
+        assertEquals(untState, UsernameTokenState.fromJson(untState.toJson()));
     }
 
-    @Test
-    public void testXmlRoundTrip() throws TokenMarshalException {
-        OpenIdConnectIdToken idToken = new OpenIdConnectIdToken(TOKEN_VALUE);
-        assertTrue(idToken.equals(OpenIdConnectIdToken.fromXml(idToken.toXmlElement())));
+    @Test(expectedExceptions = TokenMarshalException.class)
+    public void testNoPassword() throws TokenMarshalException {
+        UsernameTokenState.builder().username(USERNAME.getBytes()).build();
+    }
+
+    @Test(expectedExceptions = TokenMarshalException.class)
+    public void testNoUsername() throws TokenMarshalException {
+        UsernameTokenState.builder().password(PASSWORD.getBytes()).build();
     }
 }

@@ -27,10 +27,10 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -47,6 +47,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
 
 public class DefaultSubjectProviderTest {
+    private static final String KEY_INFO_CONFIRMATION_DATA_TYPE = SAML2Constants.ASSERTION_PREFIX + "KeyInfoConfirmationDataType";
     private static final String AUDIENCE_ID = "http://host.com:8080/openam/Consumer/metaAlias/sp";
     private static final String SUBJECT_ID = "bobo";
     private static final int TOKEN_LIFETIME_SECONDS = 600;
@@ -69,7 +70,7 @@ public class DefaultSubjectProviderTest {
         Date issueInstant = new Date();
         ProofTokenState proof = null; //must be set only when SubjectConfirmation is HoK
         Subject subject = subjectProvider.get(SUBJECT_ID, AUDIENCE_ID, createSAML2Config(),
-                TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.BEARER, issueInstant, proof);
+                SAML2SubjectConfirmation.BEARER, issueInstant, proof);
         assertTrue(SUBJECT_ID.equals(subject.getNameID().getValue()));
         assertTrue(NAME_ID_FORMAT.equals(subject.getNameID().getFormat()));
 
@@ -85,7 +86,7 @@ public class DefaultSubjectProviderTest {
                 new DefaultSubjectProvider(Guice.createInjector(new MyModule()).getInstance(KeyInfoFactory.class));
         Date issueInstant = new Date();
         Subject subject = subjectProvider.get(SUBJECT_ID, AUDIENCE_ID, createSAML2Config(),
-                TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.HOLDER_OF_KEY, issueInstant, getProofState());
+                SAML2SubjectConfirmation.HOLDER_OF_KEY, issueInstant, getProofState());
         assertEquals(SUBJECT_ID, subject.getNameID().getValue());
         assertEquals(NAME_ID_FORMAT, subject.getNameID().getFormat());
 
@@ -93,6 +94,7 @@ public class DefaultSubjectProviderTest {
         assertEquals(SAML2Constants.SUBJECT_CONFIRMATION_METHOD_HOLDER_OF_KEY, subjectConfirmation.getMethod());
         SubjectConfirmationData subjectConfirmationData = subjectConfirmation.getSubjectConfirmationData();
         assertTrue(subjectConfirmationData != null);
+        assertEquals(subjectConfirmationData.getContentType(), KEY_INFO_CONFIRMATION_DATA_TYPE);
         //see if we can go from xml back to class instance.
         AssertionFactory.getInstance().createSubjectConfirmationData(subjectConfirmationData.toXMLString(true, true));
     }
@@ -116,6 +118,6 @@ public class DefaultSubjectProviderTest {
     }
 
     ProofTokenState getProofState() throws Exception {
-        return new ProofTokenState(getCertificate());
+        return ProofTokenState.builder().x509Certificate(getCertificate()).build();
     }
 }

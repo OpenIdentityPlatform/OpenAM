@@ -151,6 +151,10 @@ public class XMLUtils {
         return ATTR_VALUE_PAIR_NODE;
     }
 
+    public static boolean isValidating() {
+        return validating;
+    }
+
     /**
      * Converts the XML document from a String format to DOM Document format.
      * 

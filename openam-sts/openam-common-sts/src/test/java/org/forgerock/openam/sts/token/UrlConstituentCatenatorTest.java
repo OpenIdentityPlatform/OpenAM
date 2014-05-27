@@ -26,6 +26,11 @@ public class UrlConstituentCatenatorTest {
     }
 
     @Test
+    public void testInsertionQuestionMark() {
+        assertTrue("bobo/?dodo".equals(new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "?dodo")));
+    }
+
+    @Test
     public void testRemoval() {
         assertTrue("bobo/dodo".equals(new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "/dodo")));
     }

@@ -21,8 +21,6 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.apache.cxf.sts.token.validator.TokenValidator;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.sts.token.validator.TokenValidatorResponse;
-import org.apache.ws.security.WSSConfig;
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -30,13 +28,13 @@ import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.slf4j.Logger;
 import org.w3c.dom.Element;
 
-import javax.security.auth.callback.CallbackHandler;
 import java.security.Principal;
 
 /**
@@ -45,15 +43,18 @@ import java.security.Principal;
  */
 public class OpenIdConnectIdTokenValidator implements TokenValidator {
     private final AuthenticationHandler<OpenIdConnectIdToken> authenticationHandler;
+    private final XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final Logger logger;
 
     public OpenIdConnectIdTokenValidator(AuthenticationHandler<OpenIdConnectIdToken> authenticationHandler,
+                                         XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller,
                                          ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                          PrincipalFromSession principalFromSession,
                                          Logger logger) {
         this.authenticationHandler = authenticationHandler;
+        this.idTokenXmlMarshaller = idTokenXmlMarshaller;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.logger = logger;
@@ -90,7 +91,7 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
          */
         if (validateTarget.isDOMElement()) {
             try {
-                idToken = OpenIdConnectIdToken.fromXml(((Element)validateTarget.getToken()));
+                idToken = idTokenXmlMarshaller.fromXml((Element)validateTarget.getToken());
             } catch (TokenMarshalException e) {
                 throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
                         "Exception caught marshalling OIDC ID token from XML: " + e, e);

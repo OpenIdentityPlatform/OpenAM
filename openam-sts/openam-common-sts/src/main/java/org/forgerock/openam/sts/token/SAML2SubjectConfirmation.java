@@ -14,8 +14,11 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
+package org.forgerock.openam.sts.token;
+
 /**
- * This package contains classes related to invocation state common to the TokenGenerationService and/or the REST-STS
- * and/or the SOAP STS.
+ * Enum defining the SAML2 SubjectConfirmation values used in the REST-STS and the TokenGenerationService.
  */
-package org.forgerock.openam.sts.invocation;
+public enum SAML2SubjectConfirmation {
+    BEARER, SENDER_VOUCHES, HOLDER_OF_KEY
+}

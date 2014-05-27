@@ -14,13 +14,13 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.invocation;
+package org.forgerock.openam.sts.service.invocation;
 
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenMarshalException;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
@@ -53,13 +53,28 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 public class ProofTokenState {
+    public static class ProofTokenStateBuilder {
+        private X509Certificate certificate;
+
+        public ProofTokenStateBuilder x509Certificate(X509Certificate certificate) {
+            this.certificate = certificate;
+            return this;
+        }
+
+        public ProofTokenState build() throws TokenMarshalException {
+            return new ProofTokenState(this);
+        }
+    }
     private static final String BASE_64_ENCODED_CERTIFICATE = "base64EncodedCertificate";
     private static final String X_509 = "X.509";
 
     private final X509Certificate certificate;
 
-    public ProofTokenState(X509Certificate certificate) throws TokenCreationException {
-        this.certificate = certificate;
+    private ProofTokenState(ProofTokenStateBuilder builder) throws TokenMarshalException {
+        certificate = builder.certificate;
+        if (certificate == null) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "the X509Certificate state must be set.");
+        }
     }
 
     public X509Certificate getX509Certificate() {
@@ -75,17 +90,31 @@ public class ProofTokenState {
         return false;
     }
 
-    public static ProofTokenState fromJson(JsonValue jsonValue) throws TokenCreationException {
+    @Override
+    public int hashCode() {
+        return certificate.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return toJson().toString();
+    }
+
+    public static ProofTokenStateBuilder builder() {
+        return new ProofTokenStateBuilder();
+    }
+
+    public static ProofTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
         final String certString = jsonValue.get(BASE_64_ENCODED_CERTIFICATE).asString();
         try {
             final X509Certificate x509Certificate = (X509Certificate)CertificateFactory.getInstance(X_509).generateCertificate(
                     new ByteArrayInputStream(Base64.decode(certString.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))));
-            return new ProofTokenState(x509Certificate);
+            return ProofTokenState.builder().x509Certificate(x509Certificate).build();
         } catch (CertificateException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST,
                     "Exception caught marshalling from json to X509 cert: " + e, e);
         } catch (UnsupportedEncodingException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR,
                     "Exception caught marshalling from json to X509 cert: " + e, e);
         }
     }

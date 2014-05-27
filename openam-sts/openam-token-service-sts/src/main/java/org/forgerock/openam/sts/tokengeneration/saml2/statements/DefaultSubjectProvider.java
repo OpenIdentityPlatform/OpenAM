@@ -26,11 +26,10 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +42,12 @@ import java.util.List;
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.SubjectProvider
  */
 public class DefaultSubjectProvider implements SubjectProvider {
+    /*
+    Section 3.1 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf states that the data type of the
+    SubjectConfirmationData, if specified, must be KeyInfoConfirmationDataType, prefixed by the saml assertion prefix. This
+    value is specified here.
+     */
+    private static final String KEY_INFO_CONFIRMATION_DATA_TYPE = SAML2Constants.ASSERTION_PREFIX + "KeyInfoConfirmationDataType";
     private final KeyInfoFactory keyInfoFactory;
 
     public DefaultSubjectProvider(KeyInfoFactory keyInfoFactory) {
@@ -50,7 +55,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     }
 
     public Subject get(String subjectId, String spAcsUrl, SAML2Config saml2Config,
-                       TokenGenerationServiceInvocationState.SAML2SubjectConfirmation subjectConfirmation,
+                       SAML2SubjectConfirmation subjectConfirmation,
                        Date assertionIssueInstant, ProofTokenState proofTokenState) throws TokenCreationException {
         try {
             Subject subject = AssertionFactory.getInstance().createSubject();
@@ -120,7 +125,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
     }
 
     private SubjectConfirmationData getHoKSubjectConfirmationData(X509Certificate certificate) throws TokenCreationException {
-        Element keyInfoElement = null;
+        Element keyInfoElement;
         try {
             keyInfoElement = keyInfoFactory.generatePublicKeyInfo(certificate);
         } catch (ParserConfigurationException e) {
@@ -134,6 +139,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
             final List<Element> elementList = new ArrayList<Element>();
             elementList.add(keyInfoElement);
             final SubjectConfirmationData subjectConfirmationData = AssertionFactory.getInstance().createSubjectConfirmationData();
+            subjectConfirmationData.setContentType(KEY_INFO_CONFIRMATION_DATA_TYPE);
             subjectConfirmationData.setContent(elementList);
             return subjectConfirmationData;
         } catch (SAML2Exception e) {

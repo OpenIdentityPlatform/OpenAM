@@ -14,21 +14,20 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.service;
+package org.forgerock.openam.sts.service.invocation;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import static org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 
 public class TokenGenerationServiceInvocationStateTest {
     private static final String X_509 = "X.509";
@@ -106,7 +105,7 @@ public class TokenGenerationServiceInvocationStateTest {
                 WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
         assertEquals(state, TokenGenerationServiceInvocationState.fromJson(state.toJson()));
 
-        assertEquals(TokenGenerationServiceInvocationState.SAML2SubjectConfirmation.HOLDER_OF_KEY,
+        assertEquals(SAML2SubjectConfirmation.HOLDER_OF_KEY,
                 state.getSaml2SubjectConfirmation());
         assertEquals(SSO_TOKEN_STRING, state.getSsoTokenString());
         assertEquals(TOKEN_TYPE, state.getTokenType());
@@ -158,7 +157,7 @@ public class TokenGenerationServiceInvocationStateTest {
             builder.serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL);
         }
         if (withProofTokenState) {
-            builder.proofTokenState(new ProofTokenState(getCertificate()));
+            builder.proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build());
         }
         return builder.build();
     }

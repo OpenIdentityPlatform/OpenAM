@@ -43,7 +43,7 @@ public class DefaultAuthenticationStatementsProvider implements AuthenticationSt
             AuthnContext authnContext = AssertionFactory.getInstance().createAuthnContext();
             authnContext.setAuthnContextClassRef(authNContextClassRef);
             authnStatement.setAuthnContext(authnContext);
-            ArrayList<AuthnStatement> statements = new ArrayList<AuthnStatement>();
+            ArrayList<AuthnStatement> statements = new ArrayList<AuthnStatement>(1);
             statements.add(authnStatement);
             return statements;
         } catch (SAML2Exception e) {

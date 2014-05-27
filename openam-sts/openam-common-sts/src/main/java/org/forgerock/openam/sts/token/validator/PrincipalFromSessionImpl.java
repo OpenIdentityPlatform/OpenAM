@@ -92,6 +92,10 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
     type of authentication?
      */
     private Principal obtainPrincipalFromSession(String sessionToUsernameUrl, String sessionId) throws TokenValidationException {
+        if ((sessionId == null) || sessionId.isEmpty()) {
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
+                    "the sessionId passed to PrincipalFromSession is null or empty.");
+        }
         logger.debug("sessionToUsernameUrl: " + sessionToUsernameUrl);
         ClientResource resource = new ClientResource(sessionToUsernameUrl);
         resource.setFollowingRedirects(false);
@@ -103,12 +107,15 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         headers.set(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
         headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headers.set(AMSTSConstants.ACCEPT, AMSTSConstants.APPLICATION_JSON);
-        //TODO: this throws the unchecked ResourceException - catch and rethrow as checked exception, or ??
-        Representation representation = resource.post(null);
-        Map<String,Object> responseAsMap = null;
+        Representation representation;
         try {
-            //TODO: do I want to do some buffered reading on the representation, instead of pulling it all into a String via the getText call?
-            //could run into memory issues if the return value is gigantic - but this is not the case for the given call, so...
+            representation = resource.post(null);
+        } catch (org.restlet.resource.ResourceException e) {
+            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught POSTing rest call to " +
+                    "validate OpenAM session: " + e, e);
+        }
+        Map<String,Object> responseAsMap;
+        try {
             responseAsMap = new ObjectMapper().readValue(representation.getText(),
                     new TypeReference<Map<String,Object>>() {});
         } catch (IOException ioe) {

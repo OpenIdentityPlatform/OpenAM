@@ -35,6 +35,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.STSInstanceStateProvider;
@@ -52,8 +53,6 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 class TokenGenerationService implements SingletonResourceProvider {
-    private static final String ISSUED_TOKEN = "issued_token";
-
     private final SAML2TokenGeneration saml2TokenGeneration;
     private final STSInstanceStateProvider<RestSTSInstanceState> restStsInstanceStateProvider;
     private final Logger logger;
@@ -73,7 +72,7 @@ class TokenGenerationService implements SingletonResourceProvider {
 
     public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         if (ISSUE.equals(request.getAction())) {
-            TokenGenerationServiceInvocationState invocationState = null;
+            TokenGenerationServiceInvocationState invocationState;
             try {
                 invocationState = TokenGenerationServiceInvocationState.fromJson(request.getContent());
             } catch (Exception e) {
@@ -86,8 +85,8 @@ class TokenGenerationService implements SingletonResourceProvider {
                 return;
             }
             if (TokenType.SAML2.equals(invocationState.getTokenType())) {
-                SSOToken subjectToken = null;
-                SSOTokenManager tokenManager = null;
+                SSOToken subjectToken;
+                SSOTokenManager tokenManager;
                 try {
                     tokenManager = SSOTokenManager.getInstance();
                     subjectToken = tokenManager.createSSOToken(invocationState.getSsoTokenString());
@@ -102,13 +101,12 @@ class TokenGenerationService implements SingletonResourceProvider {
                     return;
                 }
 
-                String assertion = null;
                 try {
-                    assertion = saml2TokenGeneration.generate(
+                    final String assertion = saml2TokenGeneration.generate(
                             subjectToken,
                             restStsInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId()),
                             invocationState);
-                    handler.handleResult(json(object(field(ISSUED_TOKEN, assertion))));
+                    handler.handleResult(json(object(field(AMSTSConstants.ISSUED_TOKEN, assertion))));
                     return;
                 } catch (TokenCreationException e) {
                     logger.error("Exception caught generating saml2 token: " + e, e);
@@ -126,7 +124,7 @@ class TokenGenerationService implements SingletonResourceProvider {
                 return;
             }
         } else {
-            handler.handleError(new BadRequestException("_action " + request.getAction() + " is not supported."));
+            handler.handleError(new BadRequestException("The specified _action parameter is not supported."));
         }
     }
 

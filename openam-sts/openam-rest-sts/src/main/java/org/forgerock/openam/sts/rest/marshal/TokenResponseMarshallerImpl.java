@@ -20,10 +20,12 @@ import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
 
 import javax.inject.Inject;
 import javax.xml.transform.Transformer;
@@ -43,11 +45,17 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
     private static final String ISSUED_TOKEN = "issued_token";
 
-    private final OpenAMSessionIdElementBuilder elementBuilder;
+    private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
+    private final XmlMarshaller<OpenIdConnectIdToken> openIdConnectTokenXmlMarshaller;
+    private final JsonMarshaller<OpenIdConnectIdToken> openIdConnectTokenJsonMarshaller;
 
     @Inject
-    TokenResponseMarshallerImpl(OpenAMSessionIdElementBuilder elementBuilder) {
-        this.elementBuilder = elementBuilder;
+    TokenResponseMarshallerImpl(XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
+                                XmlMarshaller<OpenIdConnectIdToken> openIdConnectTokenXmlMarshaller,
+                                JsonMarshaller<OpenIdConnectIdToken> openIdConnectTokenJsonMarshaller) {
+        this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
+        this.openIdConnectTokenXmlMarshaller = openIdConnectTokenXmlMarshaller;
+        this.openIdConnectTokenJsonMarshaller = openIdConnectTokenJsonMarshaller;
     }
 
     @Override
@@ -69,9 +77,12 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
                         "Could not marshall saml2 token to string: " + e.getMessage(), e);
             }
         } else if (TokenType.OPENAM.equals(desiredTokenType)) {
-            return json(object(field(ISSUED_TOKEN, elementBuilder.extractOpenAMSessionId(tokenProviderResponse.getToken()))));
+            final OpenAMSessionToken token = amSessionTokenXmlMarshaller.fromXml(tokenProviderResponse.getToken());
+            return json(object(field(ISSUED_TOKEN, token.getSessionId())));
+
         } else if (TokenType.OPENIDCONNECT.equals(desiredTokenType)) {
-            return OpenIdConnectIdToken.fromXml(tokenProviderResponse.getToken()).toJson();
+            OpenIdConnectIdToken idToken = openIdConnectTokenXmlMarshaller.fromXml(tokenProviderResponse.getToken());
+            return openIdConnectTokenJsonMarshaller.toJson(idToken);
         } else {
             throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "Unexpected token type,  "
                     + desiredTokenType + " passed to marshallTokenResponse");

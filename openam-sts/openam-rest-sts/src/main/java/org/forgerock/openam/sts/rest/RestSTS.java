@@ -20,9 +20,9 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
-
-import javax.servlet.http.HttpServletRequest;
+import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 
 /**
  * This is the top-level interface invoked directly by the REST-STS resource. Each of the methods defined in this interface
@@ -33,31 +33,16 @@ import javax.servlet.http.HttpServletRequest;
 public interface RestSTS {
     /**
      *
-     * @param inputToken The json representation of the input token
-     * @param desiredTokenType The specification of the desired token type
-     * @param request
-     * @return A json representation of the translated token.
-     * @throws TokenValidationException TokenCreationException If the token translation could not be completed, due to failed token
-     * validation, creation, invalid arguments, etc.
-
-    public JsonValue translateToken(JsonValue inputToken, String desiredTokenType, HttpServletRequest request)
-            throws TokenValidationException, TokenCreationException;
-    */
-
-    /**
-     *
-     * @param inputToken
-     * @param desiredTokenType
-     * @param httpContext
-     * @param securityContext
-     * @return
-     * @throws TokenValidationException
-     * @throws TokenCreationException
+     * @param invocationState An object encapsulating the input and output token state specifications
+     * @param httpContext The HttpContext
+     * @param securityContext The SecurityContex
+     * @return A JsonValue with a 'issued_token' key and the value corresponding to the issued token
+     * @throws TokenValidationException if the input token could not be validated
+     * @throws TokenCreationException if the desired token could not be produced
      */
-    public JsonValue translateToken(JsonValue inputToken,
-                                    String desiredTokenType,
+    public JsonValue translateToken(RestSTSServiceInvocationState invocationState,
                                     HttpContext httpContext,
                                     SecurityContext securityContext)
-                                    throws TokenValidationException, TokenCreationException;
+                                    throws TokenMarshalException, TokenValidationException, TokenCreationException;
 
 }

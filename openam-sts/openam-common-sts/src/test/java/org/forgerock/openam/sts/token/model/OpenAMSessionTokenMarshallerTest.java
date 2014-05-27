@@ -14,23 +14,29 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.provider;
+package org.forgerock.openam.sts.token.model;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenMarshalException;
-import org.slf4j.Logger;
 import org.testng.annotations.Test;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertTrue;
 
+import static org.testng.Assert.assertEquals;
 
-public class OpenAMSessionIdElementBuilderTest {
+public class OpenAMSessionTokenMarshallerTest {
     private static final String SESSION_ID =
             "AQIC5wM2LY4SfcyV6vjt7OmHgqDVcjDHanTaTPjbzsxXWKo.*AAJTSQACMDEAAlNLABQtMzAyMzI5NDAzNTIxODIzMjMyOA..*";
 
     @Test
-    public void testRountripTransformation() throws TokenMarshalException {
-        Logger mockLogger = mock(Logger.class);
-        OpenAMSessionIdElementBuilderImpl builder = new OpenAMSessionIdElementBuilderImpl(mockLogger);
-        assertTrue(SESSION_ID.equals(builder.extractOpenAMSessionId(builder.buildOpenAMSessionIdElement(SESSION_ID))));
+    public void testXmlRountrip() throws TokenMarshalException {
+        OpenAMSessionTokenMarshaller marshaller = new OpenAMSessionTokenMarshaller();
+        assertEquals(SESSION_ID, marshaller.fromXml(marshaller.toXml(new OpenAMSessionToken(SESSION_ID))).getSessionId());
+    }
+
+    @Test
+    public void testJsonRountrip() throws TokenMarshalException {
+        OpenAMSessionTokenMarshaller marshaller = new OpenAMSessionTokenMarshaller();
+        final JsonValue jsonValue = marshaller.toJson(new OpenAMSessionToken(SESSION_ID));
+        final OpenAMSessionToken token = marshaller.fromJson(jsonValue);
+        assertEquals(SESSION_ID, token.getSessionId());
     }
 }

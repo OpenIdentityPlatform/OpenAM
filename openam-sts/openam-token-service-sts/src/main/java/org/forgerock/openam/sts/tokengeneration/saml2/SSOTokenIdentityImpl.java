@@ -35,7 +35,7 @@ public class SSOTokenIdentityImpl implements SSOTokenIdentity {
             if (SSOTokenManager.getInstance().isValidToken(subjectToken)) {
                 return IdUtils.getIdentity(subjectToken).getName();
             } else {
-                throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                throw new TokenCreationException(ResourceException.FORBIDDEN,
                         "SSOToken corresponding to subject identity is invalid.");
             }
         } catch (SSOException e) {

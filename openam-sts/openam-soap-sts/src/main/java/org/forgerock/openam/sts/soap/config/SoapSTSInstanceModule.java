@@ -25,13 +25,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Provider;
 
-import com.google.inject.name.Names;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
-import org.apache.cxf.sts.operation.TokenIssueOperation;
-import org.apache.cxf.sts.operation.TokenRenewOperation;
-import org.apache.cxf.sts.operation.TokenValidateOperation;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider;
 import org.apache.cxf.ws.security.sts.provider.operation.IssueOperation;
@@ -42,16 +39,26 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
+import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.STSCallbackHandler;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
+import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisherImpl;
 import org.forgerock.openam.sts.soap.token.config.*;
 import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
+import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
+import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilder;
-import org.forgerock.openam.sts.token.provider.OpenAMSessionIdElementBuilderImpl;
+import org.forgerock.openam.sts.token.provider.AuthnContextMapper;
+import org.forgerock.openam.sts.token.provider.AuthnContextMapperImpl;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer;
+import org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumerImpl;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
@@ -116,7 +123,10 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind the class that can issue XML Element instances encapsulating an OpenAM session Id.
         Needed by the AMTokenProvider.
          */
-        bind(OpenAMSessionIdElementBuilder.class).to(OpenAMSessionIdElementBuilderImpl.class);
+        bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
+
+        bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
+        bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
 
         //binding all of the Providers of the various sorts of operations
         bind(TokenOperationFactory.class).to(TokenOperationFactoryImpl.class).in(Scopes.SINGLETON);
@@ -129,6 +139,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
         bind(SecurityTokenServiceProvider.class).to(STSEndpoint.class);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
+        bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
+        bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
     }
     /**
      * This method will provide the instance of the STSPropertiesMBean necessary both for the STS proper, and for the
@@ -144,7 +156,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
         stsProperties.setCallbackHandler(new STSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
-        Crypto crypto = null;
+        Crypto crypto;
         try {
             crypto = CryptoFactory.getInstance(getEncryptionProperties());
         } catch (WSSecurityException e) {
@@ -198,7 +210,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
         properties.put(
                 "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
         );
-        String keystorePassword  = null;
+        String keystorePassword;
         try {
             keystorePassword = new String(stsInstanceConfig.getKeystoreConfig().getKeystorePassword(), AMSTSConstants.UTF_8_CHARSET_ID);
         } catch (UnsupportedEncodingException e) {
@@ -280,9 +292,9 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Inject
     AMTokenProvider getAMTokenProviderProvider(/*AMTokenCache tokenCache,*/
                                                ThreadLocalAMTokenCache tokenCache,
-                                               OpenAMSessionIdElementBuilder sessionIdElementBuilder,
+                                               XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
                                                Logger logger) {
-        return new AMTokenProvider(tokenCache, sessionIdElementBuilder, logger);
+        return new AMTokenProvider(tokenCache, amSessionTokenXmlMarshaller, logger);
     }
 
     /*
@@ -324,6 +336,12 @@ public class SoapSTSInstanceModule extends AbstractModule {
     }
 
     @Provides
+    @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
+    String tokenGenerationServiceUriElement() {
+        return stsInstanceConfig.getAmRestTokenGenerationServiceUriElement();
+    }
+
+    @Provides
     @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME)
     String getAMSessionCookieName() {
         return stsInstanceConfig.getAMSessionCookieName();
@@ -333,6 +351,33 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
     String getJsonRoot() {
         return stsInstanceConfig.getJsonRestBase();
+    }
+
+    @Provides
+    @Named(AMSTSConstants.STS_INSTANCE_ID)
+    String getSTSInstanceId() {
+        return stsInstanceConfig.getDeploymentConfig().getUriElement();
+    }
+
+    /*
+    Allows for a custom AuthnContextMapper to be plugged-in. This AuthnContextMapper provides a
+    SAML2 AuthnContext class ref value given an input token and input token type.
+     */
+    @Provides
+    @Inject
+    AuthnContextMapper getAuthnContextMapper(Logger logger) {
+        String customMapperClassName = SystemPropertiesManager.get(AMSTSConstants.CUSTOM_STS_AUTHN_CONTEXT_MAPPER_PROPERTY);
+        if (customMapperClassName == null) {
+            return new AuthnContextMapperImpl(logger);
+        } else {
+            try {
+                return Class.forName(customMapperClassName).asSubclass(AuthnContextMapper.class).newInstance();
+            } catch (Exception e) {
+                logger.error("Exception caught implementing custom AuthnContextMapper class " + customMapperClassName
+                        + "; Returning default AuthnContextMapperImpl. The exception: " + e);
+                return new AuthnContextMapperImpl(logger);
+            }
+        }
     }
 
     @Provides

@@ -15,8 +15,8 @@
  */
 
 package org.forgerock.openam.sts.config.user;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
@@ -37,92 +37,99 @@ public class SAML2ConfigTest {
     private static final boolean WITH_ATTR_MAP = true;
     private static final boolean WITH_AUDIENCES = true;
     private static final boolean WITH_CUSTOM_PROVIDERS = true;
+    private static final boolean SIGN_ASSERTION = true;
 
     @Test
     public void testEquals() {
-        SAML2Config config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        SAML2Config config2 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertTrue(config1.equals(config2));
+        SAML2Config config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        SAML2Config config2 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(config1, config2);
 
-        config1 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
-        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
-        assertTrue(config1.equals(config2));
+        config1 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        assertEquals(config1, config2);
 
-        config1 = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        config2 = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertTrue(config1.equals(config2));
+        config1 = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        config2 = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(config1, config2);
 
-        config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertFalse(config1.equals(config2));
+        config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        assertNotEquals(config1, config2);
 
-        config1 = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertFalse(config1.equals(config2));
+        config1 = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        config2 = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertNotEquals(config1, config2);
 
-        config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        config2 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
-        assertFalse(config1.equals(config2));
+        config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        config2 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertNotEquals(config1, config2);
+
+        config1 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        config2 = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertNotEquals(config1, config2);
     }
 
     @Test
     public void testJsonRoundTrip1() {
-        SAML2Config config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
-        assertTrue(config.equals(SAML2Config.fromJson(config.toJson())));
+        SAML2Config config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(config, SAML2Config.fromJson(config.toJson()));
     }
 
     @Test
     public void testJsonRoundTrip2() {
-        SAML2Config config = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertTrue(config.equals(SAML2Config.fromJson(config.toJson())));
+        SAML2Config config = buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(config, SAML2Config.fromJson(config.toJson()));
     }
 
     @Test
     public void testJsonRoundTrip3() {
-        SAML2Config config = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
-        assertTrue(config.equals(SAML2Config.fromJson(config.toJson())));
+        SAML2Config config = buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        assertEquals(config, SAML2Config.fromJson(config.toJson()));
     }
 
     @Test
     public void testJsonRoundTrip4() {
-        SAML2Config config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
-        assertTrue(config.equals(SAML2Config.fromJson(config.toJson())));
+        SAML2Config config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        assertEquals(config, SAML2Config.fromJson(config.toJson()));
     }
 
     @Test
     public void testToString() {
         //build a bunch of instances and call toString to insure no NPE results
-        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS).toString();
-        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS).toString();
+        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION).toString();
+        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION).toString();
+        buildConfig(WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION).toString();
+        buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION).toString();
+        buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION).toString();
+        buildConfig(!WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION).toString();
     }
 
     @Test
     public void testFieldPersistenceAfterRoundTrip() {
-        SAML2Config config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS);
+        SAML2Config config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
         SAML2Config reconsitutedConfig = SAML2Config.fromJson(config.toJson());
-        assertTrue(NAME_ID_FORMAT.equals(reconsitutedConfig.getNameIdFormat()));
-        assertTrue(TOKEN_LIFETIME == reconsitutedConfig.getTokenLifetimeInSeconds());
+        assertEquals(NAME_ID_FORMAT, reconsitutedConfig.getNameIdFormat());
+        assertEquals(TOKEN_LIFETIME, reconsitutedConfig.getTokenLifetimeInSeconds());
 
-        config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS);
+        config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
         reconsitutedConfig = SAML2Config.fromJson(config.toJson());
-        assertTrue(NAME_ID_FORMAT.equals(reconsitutedConfig.getNameIdFormat()));
-        assertTrue(TOKEN_LIFETIME == reconsitutedConfig.getTokenLifetimeInSeconds());
-        assertTrue(CUSTOM_CONDITIONS_PROVIDER.equals(reconsitutedConfig.getCustomConditionsProviderClassName()));
-        assertTrue(CUSTOM_SUBJECT_PROVIDER.equals(reconsitutedConfig.getCustomSubjectProviderClassName()));
-        assertTrue(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER.equals(reconsitutedConfig.getCustomAuthenticationStatementsProviderClassName()));
-        assertTrue(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER.equals(reconsitutedConfig.getCustomAttributeStatementsProviderClassName()));
-        assertTrue(CUSTOM_ATTRIBUTE_MAPPER.equals(reconsitutedConfig.getCustomAttributeMapperClassName()));
+        assertEquals(SIGN_ASSERTION, reconsitutedConfig.signAssertion());
+        assertEquals(NAME_ID_FORMAT, reconsitutedConfig.getNameIdFormat());
+        assertEquals(TOKEN_LIFETIME, reconsitutedConfig.getTokenLifetimeInSeconds());
+        assertEquals(CUSTOM_CONDITIONS_PROVIDER, reconsitutedConfig.getCustomConditionsProviderClassName());
+        assertEquals(CUSTOM_SUBJECT_PROVIDER, reconsitutedConfig.getCustomSubjectProviderClassName());
+        assertEquals(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER, reconsitutedConfig.getCustomAuthenticationStatementsProviderClassName());
+        assertEquals(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER, reconsitutedConfig.getCustomAttributeStatementsProviderClassName());
+        assertEquals(CUSTOM_ATTRIBUTE_MAPPER, reconsitutedConfig.getCustomAttributeMapperClassName());
     }
 
-    private SAML2Config buildConfig(boolean withAttributeMap, boolean withAudiences, boolean withCustomProviders) {
+    private SAML2Config buildConfig(boolean withAttributeMap, boolean withAudiences, boolean withCustomProviders, boolean signAssertion) {
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder()
                 .tokenLifetimeInSeconds(TOKEN_LIFETIME)
+                .signAssertion(signAssertion)
                 .nameIdFormat(NAME_ID_FORMAT);
         if (withAttributeMap) {
             Map<String, String> attrMap = new HashMap<String, String>();

@@ -30,10 +30,11 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.invocation.ProofTokenState;
+import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
+import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAttributeStatementsProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAuthenticationStatementsProvider;
@@ -46,7 +47,7 @@ import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigne
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSignerImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState;
+import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
@@ -62,7 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.forgerock.openam.sts.tokengeneration.service.TokenGenerationServiceInvocationState.SAML2SubjectConfirmation;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -145,42 +145,42 @@ public class SAML2TokenGenerationImplTest {
 
     @Test
     public void testBearerIssue() throws Exception {
-        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(),
-                getTokenGenerationInvocationState(SAML2SubjectConfirmation.BEARER, SIGN_ASSERTION));
+        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(SIGN_ASSERTION),
+                getTokenGenerationInvocationState(SAML2SubjectConfirmation.BEARER));
         assertTrue(assertion.contains(BEARER));
         assertTrue(assertion.contains(SIGNATURE));
     }
 
     @Test
     public void testSenderVouchesIssue() throws Exception {
-        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(),
-                getTokenGenerationInvocationState(SAML2SubjectConfirmation.SENDER_VOUCHES, SIGN_ASSERTION));
+        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(SIGN_ASSERTION),
+                getTokenGenerationInvocationState(SAML2SubjectConfirmation.SENDER_VOUCHES));
         assertTrue(assertion.contains(SENDER_VOUCHES));
         assertTrue(assertion.contains(SIGNATURE));
     }
 
     @Test
     public void testHolderOfKeyIssue() throws Exception {
-        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(),
-                getTokenGenerationInvocationState(SAML2SubjectConfirmation.HOLDER_OF_KEY, SIGN_ASSERTION));
+        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(SIGN_ASSERTION),
+                getTokenGenerationInvocationState(SAML2SubjectConfirmation.HOLDER_OF_KEY));
         assertTrue(assertion.contains(HOLDER_OF_KEY));
         assertTrue(assertion.contains(SIGNATURE));
     }
 
     @Test
     public void testSignatureOmission() throws Exception {
-        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(),
-                getTokenGenerationInvocationState(SAML2SubjectConfirmation.BEARER, !SIGN_ASSERTION));
+        String assertion = saml2TokenGeneration.generate(mock(SSOToken.class), getSTSInstanceState(!SIGN_ASSERTION),
+                getTokenGenerationInvocationState(SAML2SubjectConfirmation.BEARER));
         assertTrue(assertion.contains(BEARER));
         assertTrue(!assertion.contains(SIGNATURE));
     }
 
-    private STSInstanceState getSTSInstanceState() throws Exception {
-        return restSTSInstanceStateFactory.createRestSTSInstanceState(getRestSTSInstanceConfig());
+    private STSInstanceState getSTSInstanceState(boolean signAssertion) throws Exception {
+        return restSTSInstanceStateFactory.createRestSTSInstanceState(getRestSTSInstanceConfig(signAssertion));
     }
 
     private TokenGenerationServiceInvocationState getTokenGenerationInvocationState(
-            SAML2SubjectConfirmation subjectConfirmation, boolean signAssertion) throws Exception {
+            SAML2SubjectConfirmation subjectConfirmation) throws Exception {
         return TokenGenerationServiceInvocationState.builder()
                 .ssoTokenString(SSO_TOKEN_STRING)
                 .authNContextClassRef(AUTHN_CONTEXT)
@@ -188,8 +188,7 @@ public class SAML2TokenGenerationImplTest {
                 .stsInstanceId(STS_INSTANCE_ID)
                 .saml2SubjectConfirmation(subjectConfirmation)
                 .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
-                .proofTokenState(new ProofTokenState(getCertificate()))
-                .signAssertion(signAssertion)
+                .proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build())
                 .build();
 
     }
@@ -198,7 +197,7 @@ public class SAML2TokenGenerationImplTest {
         return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(getClass().getResourceAsStream("/cert.jks"));
     }
 
-    private RestSTSInstanceConfig getRestSTSInstanceConfig() throws UnsupportedEncodingException {
+    private RestSTSInstanceConfig getRestSTSInstanceConfig(boolean signAssertion) throws UnsupportedEncodingException {
         Map<String, Object> context = new HashMap<String, Object>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
@@ -235,6 +234,7 @@ public class SAML2TokenGenerationImplTest {
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
                         .audiences(audiences)
+                        .signAssertion(signAssertion)
                         .build();
 
         return RestSTSInstanceConfig.builder()
@@ -244,6 +244,7 @@ public class SAML2TokenGenerationImplTest {
                 .amRestAuthNUriElement("/authenticate")
                 .amRestLogoutUriElement("/sessions/?_action=logout")
                 .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
+                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
                 .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)

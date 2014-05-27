@@ -14,9 +14,8 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.invocation;
+package org.forgerock.openam.sts.service.invocation;
 
-import org.forgerock.openam.sts.TokenCreationException;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -30,8 +29,8 @@ public class ProofTokenStateTest {
     private static final String X_509 = "X.509";
 
     @Test
-    public void testJsonRoundTrip() throws IOException, CertificateException, TokenCreationException {
-        ProofTokenState proofTokenState = new ProofTokenState(getCertificate());
+    public void testJsonRoundTrip() throws Exception {
+        ProofTokenState proofTokenState = ProofTokenState.builder().x509Certificate(getCertificate()).build();
         assertEquals(proofTokenState, ProofTokenState.fromJson(proofTokenState.toJson()));
     }
 
