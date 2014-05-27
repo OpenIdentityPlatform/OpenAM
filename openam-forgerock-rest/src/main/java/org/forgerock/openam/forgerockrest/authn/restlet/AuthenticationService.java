@@ -21,6 +21,9 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.fluent.JsonValue.json;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
@@ -147,7 +150,10 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             return handleCallbackException(e);
         } catch (RestAuthException e) {
             DEBUG.error("Rest Authentication Exception", e);
-            throw new ResourceException(e.getStatusCode(), e);
+            //todo: org.forgerock.json.resource.ResourceException.UNAUTHORIZED for 401 when we're commons 3.0
+            throw new ResourceException(
+                    org.forgerock.json.resource.ResourceException.getException(401, e.getMessage())
+                            .setDetail(json(object(field("failureUrl", e.getFailureUrl())))));
         } catch (Exception e) {
             DEBUG.error("Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);

@@ -48,9 +48,16 @@ public class RestStatusService extends StatusService {
     public Representation getRepresentation(Status status, Request request, Response response) {
 
         final JsonValue jsonResponse;
+
         if (status.getThrowable() != null && status.getThrowable().getMessage() != null) {
-            jsonResponse =
-                    ResourceException.getException(status.getCode(), status.getThrowable().getMessage()).toJsonValue();
+
+            //by checking resourceException explicitly, we can include the Details segment in the response
+            if (status.getThrowable() instanceof ResourceException) {
+                jsonResponse = ((ResourceException) status.getThrowable()).toJsonValue();
+            } else {
+                jsonResponse = ResourceException.getException(status.getCode(), status.getThrowable().getMessage()).toJsonValue();
+            }
+
         } else if (status.getDescription() != null) {
             jsonResponse =
                     ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();

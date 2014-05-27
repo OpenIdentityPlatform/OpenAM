@@ -16,17 +16,19 @@
 
 package org.forgerock.openam.rest.service;
 
+import java.io.IOException;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+import org.forgerock.json.resource.ResourceException;
+import static org.mockito.Mockito.mock;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertTrue;
 
 public class RestStatusServiceTest {
 
@@ -50,5 +52,23 @@ public class RestStatusServiceTest {
 
         //Then
         assertTrue(representation.getText().contains("\"code\":400"));
+    }
+
+    @Test
+    public void shouldReturnThrowableJsonValueIfResourceException() throws IOException {
+
+        //Given
+        Request request = mock(Request.class);
+        Response response = mock(Response.class);
+        ResourceException exception = ResourceException.getException(401);
+        exception.setDetail(json(object(field("bing", "bong"))));
+        Status status = new Status(exception.getCode(), exception);
+
+        //When
+        Representation representation = restStatusService.getRepresentation(status, request, response);
+
+        //Then
+        assertTrue(representation.getText().contains("\"bing\":\"bong\""));
+
     }
 }

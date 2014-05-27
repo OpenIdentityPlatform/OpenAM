@@ -80,4 +80,13 @@ public class RestAuthException extends Exception {
     public int getStatusCode() {
         return statusCode;
     }
+
+    /**
+     * Gets the failure URL.
+     *
+     * @return The failure URL.
+     */
+    public String getFailureUrl() {
+        return failureUrl;
+    }
 }
