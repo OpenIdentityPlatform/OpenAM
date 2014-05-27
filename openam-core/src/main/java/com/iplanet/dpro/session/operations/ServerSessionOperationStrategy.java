@@ -17,14 +17,11 @@ package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.operations.strategies.CTSOperations;
-import com.iplanet.dpro.session.operations.strategies.LocalOperations;
-import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
+import com.iplanet.dpro.session.monitoring.SessionOperationsBuilder;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -52,9 +49,9 @@ import javax.inject.Named;
 public class ServerSessionOperationStrategy implements SessionOperationStrategy {
     private final SessionService service;
 
-    private final LocalOperations local;
-    private final RemoteOperations remote;
-    private final CTSOperations cts;
+    private final SessionOperations local;
+    private final SessionOperations remote;
+    private final SessionOperations cts;
     private final WebtopNamingQuery queryUtils;
     private final Debug debug;
 
@@ -62,26 +59,24 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * Guice initialised constructor.
      *
      * @param service Required for local server decisions.
-     * @param local Required strategy.
-     * @param remote Required strategy.
-     * @param cts Required strategy.
+     * @param opsBuilder Required to generate appropriate operations
      * @param queryUtils Required for Server availability decisions.
      * @param debug Required for logging.
      */
     @Inject
     public ServerSessionOperationStrategy(SessionService service,
-                                          LocalOperations local,
-                                          RemoteOperations remote,
-                                          CTSOperations cts,
+                                          SessionOperationsBuilder opsBuilder,
                                           WebtopNamingQuery queryUtils,
                                           @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
+
         this.service = service;
-        this.local = local;
-        this.remote = remote;
-        this.cts = cts;
+        this.local = opsBuilder.createMonitoredLocalOperations();
+        this.remote = opsBuilder.createMonitoredRemoteOperations();
+        this.cts = opsBuilder.createMonitoredCTSOperations();
         this.queryUtils = queryUtils;
         this.debug = debug;
     }
+
 
     /**
      * Based on the Session, determine the appropriate SessionOperations strategy to select.

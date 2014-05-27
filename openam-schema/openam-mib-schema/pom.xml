@@ -86,6 +86,25 @@
                     </execution>
 
                     <execution>
+                        <id>generate-fr-session-mib-source</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <target>
+                                <property name="compile_classpath" refid="maven.plugin.classpath" />
+
+                                <mkdir dir="${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/session" />
+                                <java classname="com.sun.jdmk.tools.MibGen" fork="true" classpath="${compile_classpath}">
+                                    <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/org/forgerock/openam/monitoring/session&quot; -mc -desc -tp org.forgerock.openam.monitoring.session &quot;${basedir}/src/main/resources/mib/FORGEROCK-OPENAM-SESSION.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;" />
+                                </java>
+                            </target>
+                            <sourceRoot>${project.build.directory}/generated-sources/mib</sourceRoot>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
                         <id>generate-fr-policy-mib-source</id>
                         <phase>generate-sources</phase>
                         <configuration>

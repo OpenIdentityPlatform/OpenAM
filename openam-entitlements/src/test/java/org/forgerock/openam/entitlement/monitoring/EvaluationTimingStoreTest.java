@@ -39,7 +39,7 @@ public class EvaluationTimingStoreTest {
         //given
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
 
         //then
         assertEquals(avg, 0);
@@ -55,7 +55,7 @@ public class EvaluationTimingStoreTest {
         }
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
         long slowest = testTimingStore.getSlowestEvaluationDuration();
 
         //then
@@ -73,7 +73,7 @@ public class EvaluationTimingStoreTest {
         testTimingStore.addTiming(50, null, null, null, null);
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
         long slowest = testTimingStore.getSlowestEvaluationDuration();
 
         //then
@@ -88,7 +88,7 @@ public class EvaluationTimingStoreTest {
         testTimingStore.addTiming(100, null, null, null, null);
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
         long slowest = testTimingStore.getSlowestEvaluationDuration();
 
         //then
@@ -103,7 +103,7 @@ public class EvaluationTimingStoreTest {
         testTimingStore.addTiming(0, null, null, null, null);
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
         long slowest = testTimingStore.getSlowestEvaluationDuration();
 
         //then
@@ -117,7 +117,7 @@ public class EvaluationTimingStoreTest {
         testTimingStore.addTiming(100, null, null, null, null);
 
         //when
-        long avg = testTimingStore.getAverageEvaluationTime();
+        long avg = testTimingStore.getDurationAverage();
         long slowest = testTimingStore.getSlowestEvaluationDuration();
 
         //then

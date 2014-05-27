@@ -20,6 +20,7 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.ServerSessionOperationStrategy;
 import com.iplanet.dpro.session.operations.SessionOperationStrategy;
 import com.iplanet.dpro.session.service.SessionConstants;
@@ -71,8 +72,8 @@ import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
-import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
+import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.Config;
@@ -201,6 +202,11 @@ public class CoreGuiceModule extends AbstractModule {
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
+        return esf.createThreadPool(5);
+    }
+
+    @Provides @Inject @Named(SessionMonitoringStore.EXECUTOR_BINDING_NAME)
+    ExecutorService getSessionMonitoringExecutorService(ExecutorServiceFactory esf) {
         return esf.createThreadPool(5);
     }
 

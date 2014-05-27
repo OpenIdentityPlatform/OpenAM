@@ -18,21 +18,21 @@ package com.iplanet.dpro.session.operations;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.monitoring.SessionOperationsBuilder;
 import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class ServerSessionOperationStrategyTest {
 
@@ -40,6 +40,7 @@ public class ServerSessionOperationStrategyTest {
     private SessionService mockSessionService;
     private LocalOperations mockLocal;
     private RemoteOperations mockRemote;
+    private SessionOperationsBuilder mockOpsBuilder;
     private CTSOperations mockCTS;
     private WebtopNamingQuery mockNamingQuery;
     private Session mockSession;
@@ -54,12 +55,15 @@ public class ServerSessionOperationStrategyTest {
         mockLocal = mock(LocalOperations.class);
         mockRemote = mock(RemoteOperations.class);
         mockCTS = mock(CTSOperations.class);
+        mockOpsBuilder = mock(SessionOperationsBuilder.class);
+
+        given(mockOpsBuilder.createMonitoredCTSOperations()).willReturn(mockCTS);
+        given(mockOpsBuilder.createMonitoredLocalOperations()).willReturn(mockLocal);
+        given(mockOpsBuilder.createMonitoredRemoteOperations()).willReturn(mockRemote);
 
         strategy = new ServerSessionOperationStrategy(
                 mockSessionService,
-                mockLocal,
-                mockRemote,
-                mockCTS,
+                mockOpsBuilder,
                 mockNamingQuery,
                 mock(Debug.class));
 

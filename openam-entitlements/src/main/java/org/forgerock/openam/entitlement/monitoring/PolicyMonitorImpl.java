@@ -202,9 +202,9 @@ public class PolicyMonitorImpl implements PolicyMonitor {
     @Override
     public long getAverageEvaluationTime(PolicyMonitoringType monitoringType) {
         if (monitoringType == PolicyMonitoringType.SUBTREE) {
-            return subtreeEvaluationTimingStore.getAverageEvaluationTime();
+            return subtreeEvaluationTimingStore.getDurationAverage();
         } else {
-            return selfEvaluationTimingStore.getAverageEvaluationTime();
+            return selfEvaluationTimingStore.getDurationAverage();
         }
     }
 

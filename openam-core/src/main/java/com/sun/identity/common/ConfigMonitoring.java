@@ -1133,7 +1133,9 @@ public class ConfigMonitoring {
             int policyWindow =
                     Integer.valueOf(CollectionHelper.getMapAttr(monAttrs,
                             "iplanet-am-monitoring-policy-window"));
-
+            int sessionWindow =
+                    Integer.valueOf(CollectionHelper.getMapAttr(monAttrs,
+                            "iplanet-am-monitoring-session-window"));
 
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "\n" +
@@ -1145,7 +1147,8 @@ public class ConfigMonitoring {
                     "     rmiPort enabled = " + rmiEna + "\n" +
                     "     snmpPort = " + snmpPort + "\n" +
                     "     snmpPort enabled = " + snmpEna + "\n" +
-                    "     policy eval window size = " + policyWindow + "\n"
+                    "     policy eval window size = " + policyWindow + "\n" +
+                    "     session eval window size = " + sessionWindow + "\n"
                     );
             }
 
@@ -1158,7 +1161,8 @@ public class ConfigMonitoring {
                     monHtmlEnabled(httpEna).
                     monRmiEnabled(rmiEna).
                     monSnmpEnabled(snmpEna).
-                    policyWindowSize(policyWindow).build();
+                    policyWindowSize(policyWindow).
+                    sessionWindowSize(sessionWindow).build();
 
             int i = Agent.startAgent(sMonInfo);
             if (i != 0) {

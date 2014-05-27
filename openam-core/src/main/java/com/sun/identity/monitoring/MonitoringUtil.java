@@ -297,4 +297,9 @@ public class MonitoringUtil {
         checkInit();
         return isMonAvailable ? Agent.getPolicyWindowSize() : 0;
     }
+
+    public static int getSessionWindowSize() {
+        checkInit();
+        return isMonAvailable ? Agent.getSessionWindowSize() : 0;
+    }
 }

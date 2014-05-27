@@ -84,6 +84,11 @@ import org.forgerock.openam.monitoring.policy.SelfEvaluation;
 import org.forgerock.openam.monitoring.policy.SelfTiming;
 import org.forgerock.openam.monitoring.policy.SubtreeEvaluation;
 import org.forgerock.openam.monitoring.policy.SubtreeTiming;
+import org.forgerock.openam.monitoring.session.CtsSessions;
+import org.forgerock.openam.monitoring.session.FORGEROCK_OPENAM_SESSION_MIB;
+import org.forgerock.openam.monitoring.session.FORGEROCK_OPENAM_SESSION_MIBImpl;
+import org.forgerock.openam.monitoring.session.InternalSessions;
+import org.forgerock.openam.monitoring.session.RemoteSessions;
 
 
 /**
@@ -122,10 +127,12 @@ public class Agent {
     private static ObjectName sunMibObjName;
     private static ObjectName forgerockCtsMibObjName;
     private static ObjectName forgerockPolicyMibObjName;
+    private static ObjectName forgerockSessionMibObjName;
     private static int monHtmlPort;
     private static int monSnmpPort;
     private static int monRmiPort;
     private static int policyWindow;
+    private static int sessionWindow;
     private static String monAuthFilePath;
     private static String ssoProtocol;
     private static String ssoName;
@@ -146,6 +153,7 @@ public class Agent {
     static SUN_OPENSSO_SERVER_MIBImpl sunMib;
     static FORGEROCK_OPENAM_CTS_MIBImpl forgerockCtsMib;
     static FORGEROCK_OPENAM_POLICY_MIBImpl forgerockPolicyMib;
+    static FORGEROCK_OPENAM_SESSION_MIBImpl forgerockSessionMib;
 
     private static SSOServerInfo agentSvrInfo;
     private static Map<String, Integer> realm2Index = new HashMap<String, Integer>();  // realm name to index map
@@ -205,6 +213,10 @@ public class Agent {
 
                     if (forgerockPolicyMibObjName != null) {
                         server.unregisterMBean(forgerockPolicyMibObjName);
+                    }
+
+                    if (forgerockSessionMibObjName != null) {
+                        server.unregisterMBean(forgerockSessionMibObjName);
                     }
                 } catch (InstanceNotFoundException ex) {
                     if (debug.warningEnabled()) {
@@ -418,6 +430,7 @@ public class Agent {
         monRmiPortEnabled = monConfig.monRmiPortEnabled;
         monAuthFilePath = monConfig.monAuthFilePath;
         policyWindow = monConfig.policyWindow;
+        sessionWindow = monConfig.sessionWindow;
         String classMethod = "Agent.startAgent:";
         // OpenSSO server port comes from WebtopNaming.siteAndServerInfo
         String serverPort = agentSvrInfo.serverPort;
@@ -449,6 +462,7 @@ public class Agent {
                     "    snmpEna = " + monSnmpPortEnabled + "\n" +
                     "    rmiEna = " + monRmiPortEnabled + "\n" +
                     "    policyWindow = " + policyWindow + "\n" +
+                    "    sessionWindow = " + sessionWindow + "\n" +
                     "    serverPort = " + serverPort + "\n"
             );
         }
@@ -508,6 +522,7 @@ public class Agent {
                     ", enabled = " + monSnmpPortEnabled + "\n" +
                     "    RMI Port = " + monRmiPort +
                     ", enabled = " + monRmiPortEnabled + "\n" +
+                    "    SessionWindow size = " + sessionWindow + "\n" +
                     "    PolicyWindow size = " + policyWindow + "\n");
         }
 
@@ -581,6 +596,8 @@ public class Agent {
                     new ObjectName("snmp:class=FORGEROCK_OPENAM_CTS_MIB");
             forgerockPolicyMibObjName =
                     new ObjectName("snmp:class=FORGEROCK_OPENAM_POLICY_MIB");
+            forgerockSessionMibObjName =
+                    new ObjectName("snmp:class=FORGEROCK_OPENAM_SESSION_MIB");
             if (debug.messageEnabled()) {
                 debug.message(classMethod +
                         "Adding SUN_OPENSSO_SERVER_MIB to MBean server " +
@@ -604,6 +621,7 @@ public class Agent {
             sunMib = new SUN_OPENSSO_SERVER_MIBImpl();
             forgerockCtsMib = new FORGEROCK_OPENAM_CTS_MIBImpl();
             forgerockPolicyMib = new FORGEROCK_OPENAM_POLICY_MIBImpl();
+            forgerockSessionMib = new FORGEROCK_OPENAM_SESSION_MIBImpl();
         } catch (RuntimeException ex) {
             debug.error (classMethod + "Runtime error instantiating MIB", ex);
             return MON_CREATEMIB_PROBLEM;
@@ -616,6 +634,7 @@ public class Agent {
             server.registerMBean(sunMib, sunMibObjName);
             server.registerMBean(forgerockCtsMib, forgerockCtsMibObjName);
             server.registerMBean(forgerockPolicyMib, forgerockPolicyMibObjName);
+            server.registerMBean(forgerockSessionMib, forgerockSessionMibObjName);
         } catch (RuntimeOperationsException ex) {
             // from registerMBean
             if (debug.warningEnabled()) {
@@ -803,6 +822,7 @@ public class Agent {
                     sunMib.setSnmpAdaptor(snmpAdaptor);  // throws no exception
                     forgerockCtsMib.setSnmpAdaptor(snmpAdaptor);
                     forgerockPolicyMib.setSnmpAdaptor(snmpAdaptor);
+                    forgerockSessionMib.setSnmpAdaptor(snmpAdaptor);
 
                     monSNMPStarted = true;
                 }
@@ -940,6 +960,15 @@ public class Agent {
     }
 
     /**
+     * Return the size of the session window to configure.
+     *
+     * @return size of the number of session samples to use as our history.
+     */
+    protected static int getSessionWindowSize() {
+        return sessionWindow;
+    }
+
+    /**
      *  Return the pointer to the authentication service mbean
      */
     public static SsoServerAuthSvcImpl getAuthSvcMBean() {
@@ -1031,6 +1060,18 @@ public class Agent {
 
     public static SelfTiming getSelfTimingMBean() {
         return forgerockPolicyMib == null ? null : forgerockPolicyMib.getSelfTiming();
+    }
+
+    public static InternalSessions getInternalSessionsMBean() {
+        return forgerockSessionMib == null ? null : forgerockSessionMib.getInternalSessions();
+    }
+
+    public static CtsSessions getCtsSessionsMBean() {
+        return forgerockSessionMib == null ? null : forgerockSessionMib.getCtsSessions();
+    }
+
+    public static RemoteSessions getRemoteSessionsMBean() {
+        return forgerockSessionMib == null ? null : forgerockSessionMib.getRemoteSessions();
     }
 
     /**
@@ -3251,6 +3292,7 @@ public class Agent {
         final ObjectName sunMibObjName;
         final ObjectName forgerockCtsMibObjName;
         final ObjectName forgerockPolicyMibObjName;
+        final ObjectName forgerockSessionMibObjName;
         final ObjectName trapGeneratorObjName;
         int htmlPort = 8082;
         int snmpPort = 11161;
@@ -3358,12 +3400,20 @@ public class Agent {
                     "Adding FORGEROCK_OPENAM_POLICY_MIB-MIB to MBean server with name" +
                             "\n    " + forgerockPolicyMibObjName);
 
+            forgerockSessionMibObjName = new ObjectName("snmp:class=FORGEROCK_OPENAM_SESSION_MIB");
+            println(
+                    "Adding FORGEROCK_OPENAM_SESSION_MIB-MIB to MBean server with name" +
+                            "\n    " + forgerockSessionMibObjName);
+
 
             FORGEROCK_OPENAM_CTS_MIB mib3 = new FORGEROCK_OPENAM_CTS_MIB();
             server.registerMBean(mib3, forgerockCtsMibObjName);
 
             FORGEROCK_OPENAM_POLICY_MIB mib4 = new FORGEROCK_OPENAM_POLICY_MIB();
             server.registerMBean(mib4, forgerockPolicyMibObjName);
+
+            FORGEROCK_OPENAM_SESSION_MIB mib5 = new FORGEROCK_OPENAM_SESSION_MIB();
+            server.registerMBean(mib5, forgerockSessionMibObjName);
 
             // Bind the SNMP adaptor to the MIB in order to make the MIB 
             // accessible through the SNMP protocol adaptor.

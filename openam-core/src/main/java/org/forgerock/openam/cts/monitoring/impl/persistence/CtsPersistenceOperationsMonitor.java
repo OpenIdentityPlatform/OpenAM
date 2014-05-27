@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-14 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -40,6 +40,19 @@ public class CtsPersistenceOperationsMonitor {
     @Inject
     public CtsPersistenceOperationsMonitor(CtsPersistenceOperationsDelegate delegate) {
         this.delegate = delegate;
+    }
+
+    /**
+     * Returns the total number of current tokens in the CTS.
+     *
+     * @return a positive long which is the total number of tokens
+     * @throws CoreTokenException if there are problems communicating with the persistence store
+     */
+    public Long getTotalCount() throws CoreTokenException {
+
+        Collection<Entry> results = delegate.getTokenEntries();
+        return (long) results.size();
+
     }
 
     /**

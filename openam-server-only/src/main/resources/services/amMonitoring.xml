@@ -139,6 +139,15 @@
                         <Value>10000</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-monitoring-session-window"
+                                 type="single"
+                                 syntax="number_range"
+                                 rangeStart="100" rangeEnd="1000000"
+                                 i18nKey="a108">
+                    <DefaultValues>
+                        <Value>10000</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Global>
         </Schema>
     </Service>

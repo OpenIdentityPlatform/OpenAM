@@ -32,18 +32,16 @@
 package com.sun.identity.monitoring;
 
 public class SSOServerMonConfig {
-    int htmlPort;
-    int snmpPort;
-    int rmiPort;
-    int policyWindow;
-    boolean monitoringEnabled;
-    boolean monHtmlPortEnabled;
-    boolean monRmiPortEnabled;
-    boolean monSnmpPortEnabled;
-    String monAuthFilePath;
-
-    public SSOServerMonConfig() {
-    }
+    final int htmlPort;
+    final int snmpPort;
+    final int rmiPort;
+    final int policyWindow;
+    final int sessionWindow;
+    final boolean monitoringEnabled;
+    final boolean monHtmlPortEnabled;
+    final boolean monRmiPortEnabled;
+    final boolean monSnmpPortEnabled;
+    final String monAuthFilePath;
 
     private SSOServerMonConfig (SSOServerMonInfoBuilder asib) {
         htmlPort = asib.htmlPort;
@@ -55,6 +53,7 @@ public class SSOServerMonConfig {
         monSnmpPortEnabled = asib.monSnmpPortEnabled;
         monAuthFilePath = asib.monAuthFilePath;
         policyWindow = asib.policyWindow;
+        sessionWindow = asib.sessionWindow;
     }
 
     public static class SSOServerMonInfoBuilder {
@@ -62,6 +61,7 @@ public class SSOServerMonConfig {
         int snmpPort;
         int rmiPort;
         int policyWindow;
+        int sessionWindow;
         boolean monitoringEnabled;
         boolean monHtmlPortEnabled;
         boolean monRmiPortEnabled;
@@ -112,6 +112,12 @@ public class SSOServerMonConfig {
             policyWindow = policyWindowSize;
             return this;
         }
+
+        public SSOServerMonInfoBuilder sessionWindowSize (int sessionWindowSize) {
+            sessionWindow = sessionWindowSize;
+            return this;
+        }
+
 
         public SSOServerMonConfig build() {
             return new SSOServerMonConfig (this);

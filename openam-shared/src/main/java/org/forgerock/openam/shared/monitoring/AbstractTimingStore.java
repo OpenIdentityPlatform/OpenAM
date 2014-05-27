@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * An abstract store for holding a set of {@link TimingEntry}s. The maximum size of the store
+ * is set on creation. The store internally uses a synchronizedList, which verifies the size of the collection
+ * isn't greater than the maximum upon insertion, and removes the oldest entry if it is.
+ * Read operations are not synchronized.
+ */
 public abstract class AbstractTimingStore {
 
     protected final int maxEntries;
@@ -43,6 +49,27 @@ public abstract class AbstractTimingStore {
         }
 
     });
+
+    /**
+     * Getter for the average length of time events recorded in the duration store have taken.
+     *
+     * @return a long representation of the average length of time in ms.
+     */
+    public long getDurationAverage() {
+
+        if (durationStore.size() == 0) {
+            return 0L;
+        }
+
+        long current = 0L;
+
+        for(TimingEntry te : durationStore) {
+            current += te.getDuration();
+        }
+
+        return current / durationStore.size();
+
+    }
 
     /**
      * Returns a string representation of the slowest performing policy evaluation.
@@ -83,7 +110,7 @@ public abstract class AbstractTimingStore {
      *
      * @return the slowest {@link TimingEntry} in the durationStore, or null.
      */
-    private synchronized TimingEntry getSlowest() {
+    private TimingEntry getSlowest() {
 
         if (durationStore == null || durationStore.size() == 0) {
             return null;

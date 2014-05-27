@@ -17,7 +17,6 @@ package org.forgerock.openam.entitlement.monitoring;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
-import org.forgerock.openam.shared.monitoring.TimingEntry;
 
 /**
  * Store for containing the information useful to monitoring timings of policy evaluations.
@@ -27,31 +26,6 @@ public class EvaluationTimingStore extends AbstractPolicyTimingStore {
     @Inject
     public EvaluationTimingStore(EntitlementConfigurationWrapper wrapper) {
         super(wrapper);
-    }
-
-    /**
-     * Getter for the average length of time a policy evaluation takes in the system.
-     *
-     * @return a long representation of the average length of time in ms.
-     */
-    public long getAverageEvaluationTime() {
-
-        if (durationStore.size() == 0) {
-            return 0l;
-        }
-
-        long current = 0l;
-
-        synchronized(durationStore) {
-
-            for(TimingEntry te : durationStore) {
-                current += te.getDuration();
-            }
-
-            return current / durationStore.size();
-
-        }
-
     }
 
     /**

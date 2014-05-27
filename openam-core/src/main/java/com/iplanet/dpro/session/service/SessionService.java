@@ -93,17 +93,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import org.forgerock.openam.cts.CTSPersistentStore;
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.session.service.SessionTimeoutHandler;
-
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -140,6 +129,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import javax.servlet.http.HttpSession;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 /**
  * This class represents a Session Service
@@ -967,6 +966,25 @@ public class SessionService {
 
         InternalSession is = (InternalSession) sessionTable.get(sid);
         return is;
+    }
+
+    /**
+     * Quick access to the total size of the remoteSessionSet.
+     *
+     * @return the size of the sessionTable
+     */
+    public int getRemoteSessionCount() {
+        return remoteSessionSet.size();
+    }
+
+    /**
+     * Quick access to the total size of the sessionTable (internal sessions), including
+     * both invalid and valid tokens in the count, as well as 'hidden' sessions used by OpenAM itself.
+     *
+     * @return the size of the sessionTable
+     */
+    public int getInternalSessionCount() {
+        return sessionTable.size();
     }
 
     /**
@@ -3616,4 +3634,7 @@ public class SessionService {
         }
 
     }
+
 }
+
+
