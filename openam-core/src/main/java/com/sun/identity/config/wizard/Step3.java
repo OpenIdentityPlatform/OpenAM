@@ -24,10 +24,7 @@
  *
  * $Id: Step3.java,v 1.39 2009/12/17 17:43:39 goodearth Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010-2012] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.config.wizard;
@@ -42,7 +39,6 @@ import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.SetupConstants;
 import java.util.Map;
 import java.net.InetAddress;
-import java.io.IOException;
 import java.net.UnknownHostException;
 
 import com.sun.identity.shared.Constants;
@@ -376,39 +372,27 @@ public class Step3 extends LDAPStoreWizardPage {
         return false;
     } 
 
-    
-   public boolean validateConfigStoreHost() {
-       String host = toString("configStoreHost");
+    public boolean validateConfigStoreHost() {
+        String host = toString("configStoreHost");
 
-       if (host == null) {
-           writeToResponse(
-                getLocalizedString("missing.required.field"));
-           setPath(null);
-           return false;
-       } else {
-           getContext().setSessionAttribute(
-               "configStoreHost", host);
-       }
+        if (host == null) {
+            writeToResponse(getLocalizedString("missing.required.field"));
+            setPath(null);
+            return false;
+        } else {
+            getContext().setSessionAttribute("configStoreHost", host);
+        }
 
-       try {
-           InetAddress address = InetAddress.getByName(host);
-           if (address.isReachable(300)) {
-               writeToResponse("ok");
-           } else {
-               writeToResponse(getLocalizedString("contact.host.failed"));
-           }
-       } catch (UnknownHostException uhe) {
-           writeToResponse(getLocalizedString("contact.host.unknown"));
-       } catch (IOException ioe) {
-           writeToResponse(getLocalizedString("contact.host.unreachable"));
-       } catch (NullPointerException ne) {
-           writeToResponse(getLocalizedString("contact.host.failed"));           
-       }
-       setPath(null);
-       return false;
-   }
-   
-   
+        try {
+            InetAddress.getByName(host);
+            writeToResponse("ok");
+        } catch (UnknownHostException uhe) {
+            writeToResponse(getLocalizedString("contact.host.unknown"));
+        }
+        setPath(null);
+        return false;
+    }
+
     /*
      * a call is made to the OpenAM url entered in the browser. If
      * the OpenAM server
