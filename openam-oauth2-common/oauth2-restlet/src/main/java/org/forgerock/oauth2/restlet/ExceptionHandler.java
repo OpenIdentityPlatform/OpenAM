@@ -24,6 +24,8 @@ import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.routing.Redirector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -38,6 +40,7 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
  * @since 12.0.0
  */
 public class ExceptionHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger("OAuth2Provider");
 
     private OAuth2Representation representation;
 
@@ -113,8 +116,7 @@ public class ExceptionHandler {
     /**
      * Handles general OAuth2 exceptions from Restlet endpoints.
      * <br/>
-     * If the throwable is not a OAuth2RestletException then it will be wrapped as a ServerException and the method
-     * will be recursively called.
+     * If the throwable is not a OAuth2RestletException then it will be wrapped as a ServerException.
      * <br/>
      * If the throwable is a OAuth2RestletException then it will be set on the response as a Json representation.
      *
@@ -122,17 +124,26 @@ public class ExceptionHandler {
      * @param response The Restlet response.
      */
     public void handle(Throwable throwable, Response response) {
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error("Unhandled exception: " + throwable, throwable);
+        }
+
+        final OAuth2RestletException exception = toOAuth2RestletException(throwable);
+        response.setStatus(exception.getStatus());
+        response.setEntity(new JacksonRepresentation<Map>(exception.asMap()));
+    }
+
+    private OAuth2RestletException toOAuth2RestletException(Throwable throwable) {
         if (throwable instanceof OAuth2RestletException) {
-            final OAuth2RestletException e = (OAuth2RestletException) throwable;
-            response.setStatus(e.getStatus());
-            response.setEntity(new JacksonRepresentation<Map>(e.asMap()));
+            return (OAuth2RestletException) throwable;
         } else if (throwable.getCause() instanceof OAuth2RestletException) {
-            final OAuth2RestletException e = (OAuth2RestletException) throwable.getCause();
-            response.setStatus(e.getStatus());
-            response.setEntity(new JacksonRepresentation<Map>(e.asMap()));
+            return (OAuth2RestletException) throwable.getCause();
         } else {
             final ServerException serverException = new ServerException(throwable);
-            handle(serverException, response);
+            final OAuth2RestletException oauthException =
+                    new OAuth2RestletException(serverException.getStatusCode(), serverException.getError(),
+                            serverException.getMessage(), null);
+            return oauthException;
         }
     }
 }

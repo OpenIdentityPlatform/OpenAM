@@ -29,6 +29,7 @@ import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.restlet.Request;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Status;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
@@ -80,7 +81,8 @@ public class ConnectClientRegistration extends ServerResource {
     public Representation createClient(Representation entity) throws OAuth2RestletException {
 
         final OAuth2Request request = requestFactory.create(getRequest());
-        final String accessToken = getRequest().getChallengeResponse().getRawValue();
+        final ChallengeResponse authHeader = getRequest().getChallengeResponse();
+        final String accessToken = authHeader != null ? authHeader.getRawValue() : null;
 
         try {
             final String deploymentUrl = getRequest().getHostRef().toString() + "/"

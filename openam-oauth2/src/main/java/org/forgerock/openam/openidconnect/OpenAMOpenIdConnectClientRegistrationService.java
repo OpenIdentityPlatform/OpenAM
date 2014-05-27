@@ -16,10 +16,12 @@
 
 package org.forgerock.openam.openidconnect;
 
+import com.iplanet.am.util.SystemProperties;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -68,6 +70,13 @@ import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeName
 @Singleton
 public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConnectClientRegistrationService {
 
+    /**
+     * System property to control whether open dynamic registration (without an access token) is allowed or not.
+     * Defaults to false (not allowed).
+     */
+    public static final String ALLOW_OPEN_DYNAMIC_REGISTRATION_PROPERTY =
+            "org.forgerock.openam.openidconnect.allow.open.dynamic.registration";
+
     private static final String ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT = "HS256";
     private static final String DEFAULT_APPLICATION_TYPE = "web";
 
@@ -99,10 +108,12 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      * {@inheritDoc}
      */
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
-            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException {
+            throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException {
 
-        if (!tokenVerifier.verify(request)) {
-            throw new ServerException("Access Token not valid");
+        if (!isOpenDynamicRegistrationAllowed()) {
+            if (!tokenVerifier.verify(request)) {
+                throw new AccessDeniedException("Access Token not valid");
+            }
         }
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
@@ -252,6 +263,13 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
 
         clientDAO.create(client, request);
 
+        // Ensure client registrations are logged so that in an open dymamic registration environment, the admins can
+        // have some visibility on who is registering clients.
+        if (logger.isInfoEnabled()) {
+            logger.info("Registered OpenID Connect client: " + client.getClientID()
+                    + ", name=" + client.getClientName() + ", type=" + client.getClientType());
+        }
+
         Map<String, Object> response = client.asMap();
 
         response.put(REGISTRATION_CLIENT_URI,
@@ -284,6 +302,21 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
         }
         return false;
+    }
+
+    /**
+     * Determines whether open dynamic client registration without an Access Token is allowed. As per the OpenID Connect
+     * Dynamic Client Registration 1.0 spec, section 3:
+     * <blockquote>
+     *     To support open Dynamic Registration, the Client Registration Endpoint SHOULD accept registration requests
+     *     without OAuth 2.0 Access Tokens.
+     * </blockquote>
+     * @see <a href="http://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration">
+     *     OpenID Connect Dynamic Client Registration 1.0, Section 3</a>
+     * @return true if registration is allowed without an access token.
+     */
+    private boolean isOpenDynamicRegistrationAllowed() {
+        return SystemProperties.getAsBoolean(ALLOW_OPEN_DYNAMIC_REGISTRATION_PROPERTY, false);
     }
 
     /**
