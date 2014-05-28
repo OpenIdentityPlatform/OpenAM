@@ -16,11 +16,13 @@
 
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.fest.assertions.Condition;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.Mock;
@@ -31,21 +33,21 @@ import org.testng.annotations.Test;
 import javax.security.auth.Subject;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 /**
- * Unit test for {@link JsonPolicyRequest}.
+ * Unit test for {@link PolicyRequest}.
  *
  * @since 12.0.0
  */
-public class JsonPolicyRequestTest {
+public class PolicyRequestTest {
 
     @Mock
     private SubjectContext subjectContext;
@@ -64,41 +66,40 @@ public class JsonPolicyRequestTest {
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullContext() throws EntitlementException {
-        new JsonPolicyRequest.Builder(null, actionRequest);
+        MockRequest.getRequest(null, actionRequest);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullRequest() throws EntitlementException {
         ServerContext context = buildContextStructure("/abc");
-        new JsonPolicyRequest.Builder(context, null);
+        MockRequest.getRequest(context, null);
     }
 
     @Test
     public void shouldConstructPolicyRequest() throws EntitlementException {
-        given(subjectContext.getCallerSubject()).willReturn(restSubject);
-
+        // Given...
         Map<String, List<String>> env = new HashMap<String, List<String>>();
         env.put("test", Arrays.asList("123", "456"));
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("subject", "some-value");
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
         properties.put("application", "some-application");
         properties.put("environment", env);
 
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(subjectContext.getCallerSubject()).willReturn(restSubject);
         given(subjectContext.getSubject("some-value")).willReturn(policySubject);
 
+        // When...
         ServerContext context = buildContextStructure("/abc");
-        JsonPolicyRequest.Builder builder = new JsonPolicyRequest.Builder(context, actionRequest);
-        JsonPolicyRequest request = builder.build();
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
+        // Then...
         assertThat(request).isNotNull();
         assertThat(request.getRestSubject()).isEqualTo(restSubject);
         assertThat(request.getPolicySubject()).isEqualTo(policySubject);
         assertThat(request.getRealm()).isEqualTo("/abc");
         assertThat(request.getApplication()).isEqualTo("some-application");
-        assertThat(request.getResources()).containsOnly("resource1", "resource2");
         assertThat(request.getEnvironment()).is(new EnvMapCondition(env));
 
         verify(subjectContext).getCallerSubject();
@@ -109,40 +110,43 @@ public class JsonPolicyRequestTest {
 
     @Test(expectedExceptions = EntitlementException.class)
     public void shouldRejectInvalidRestSubject() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(null);
 
+        // When...
         ServerContext context = buildContextStructure("/abc");
-        new JsonPolicyRequest.Builder(context, actionRequest);
+        MockRequest.getRequest(context, actionRequest);
     }
 
     @Test(expectedExceptions = EntitlementException.class)
     public void shouldRejectInvalidPolicySubject() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("subject", "some-value");
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
 
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
         given(subjectContext.getSubject("some-value")).willReturn(null);
 
+        // When...
         ServerContext context = buildContextStructure("/abc");
-        new JsonPolicyRequest.Builder(context, actionRequest);
+        MockRequest.getRequest(context, actionRequest);
     }
 
     @Test
     public void shouldDefaultToAdminSubject() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
-
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
+        // When...
         ServerContext context = buildContextStructure("/abc");
-        JsonPolicyRequest.Builder builder = new JsonPolicyRequest.Builder(context, actionRequest);
-        JsonPolicyRequest request = builder.build();
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
+        // Then...
         assertThat(request).isNotNull();
         assertThat(request.getRestSubject()).isEqualTo(restSubject);
         assertThat(request.getPolicySubject()).isEqualTo(restSubject);
@@ -152,45 +156,19 @@ public class JsonPolicyRequestTest {
         verifyNoMoreInteractions(subjectContext, actionRequest);
     }
 
-    @Test(expectedExceptions = EntitlementException.class)
-    public void shouldRejectNullResources() throws EntitlementException {
-        given(subjectContext.getCallerSubject()).willReturn(restSubject);
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
-        given(subjectContext.getSubject("some-value")).willReturn(policySubject);
-
-        ServerContext context = buildContextStructure("/abc");
-        new JsonPolicyRequest.Builder(context, actionRequest);
-    }
-
-    @Test(expectedExceptions = EntitlementException.class)
-    public void shouldRejectEmptyResources() throws EntitlementException {
-        given(subjectContext.getCallerSubject()).willReturn(restSubject);
-
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("resources", Collections.<String>emptyList());
-
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
-        given(subjectContext.getSubject("some-value")).willReturn(policySubject);
-
-        ServerContext context = buildContextStructure("/abc");
-        new JsonPolicyRequest.Builder(context, actionRequest);
-    }
-
     @Test
     public void shouldDefaultToApplication() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
-
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
+        // When...
         ServerContext context = buildContextStructure("/abc");
-        JsonPolicyRequest.Builder builder = new JsonPolicyRequest.Builder(context, actionRequest);
-        JsonPolicyRequest request = builder.build();
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
+        // Then...
         assertThat(request).isNotNull();
         assertThat(request.getApplication()).isEqualTo("iPlanetAMWebAgentService");
 
@@ -201,17 +179,17 @@ public class JsonPolicyRequestTest {
 
     @Test
     public void shouldDefaultToRealm() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
-
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
+        // When...
         ServerContext context = buildContextStructure("");
-        JsonPolicyRequest.Builder builder = new JsonPolicyRequest.Builder(context, actionRequest);
-        JsonPolicyRequest request = builder.build();
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
+        // Then...
         assertThat(request).isNotNull();
         assertThat(request.getRealm()).isEqualTo("/");
 
@@ -222,17 +200,17 @@ public class JsonPolicyRequestTest {
 
     @Test
     public void shouldDefaultToEmptyEnvironment() throws EntitlementException {
+        // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("resources", Arrays.asList("resource1", "resource2"));
-
         given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
 
+        // When...
         ServerContext context = buildContextStructure("");
-        JsonPolicyRequest.Builder builder = new JsonPolicyRequest.Builder(context, actionRequest);
-        JsonPolicyRequest request = builder.build();
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
+        // Then...
         assertThat(request).isNotNull();
         assertThat(request.getEnvironment()).isNotNull();
         assertThat(request.getEnvironment()).isEmpty();
@@ -316,6 +294,38 @@ public class JsonPolicyRequestTest {
             }
 
             return true;
+        }
+
+    }
+
+    /**
+     * Concrete mock implementation of {@link PolicyRequest} for the aid of testing.
+     */
+    private static final class MockRequest extends PolicyRequest {
+
+        private MockRequest(MockBuilder builder) {
+            super(builder);
+        }
+
+        @Override
+        public List<Entitlement> dispatch(PolicyEvaluator evaluator) throws EntitlementException {
+            throw new UnsupportedOperationException("Not required for this test");
+        }
+
+        private static final class MockBuilder extends PolicyRequestBuilder<PolicyRequest> {
+
+            MockBuilder(ServerContext context, ActionRequest request) throws EntitlementException {
+                super(context, request);
+            }
+
+            @Override
+            PolicyRequest build() {
+                return new MockRequest(this);
+            }
+        }
+
+        public static PolicyRequest getRequest(ServerContext context, ActionRequest request) throws EntitlementException {
+            return new MockBuilder(context, request).build();
         }
 
     }

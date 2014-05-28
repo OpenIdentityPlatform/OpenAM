@@ -18,11 +18,11 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
 
-import javax.security.auth.Subject;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Attempts to evaluate and provide authorisation decisions based on policy requests.
@@ -32,23 +32,44 @@ import java.util.Set;
 public interface PolicyEvaluator {
 
     /**
-     * Given the various parts that make up a policy request, provides a set of policy decisions.
+     * Given a batch policy request, provides a set of policy
+     * decisions that correspond to each resource definition.
      *
-     * @param realm
-     *         the realm of which the policy resides
-     * @param subject
-     *         the subject requesting access to the set of resources
-     * @param resourceNames
-     *         the set of resources under protection
-     * @param environment
-     *         environment attributes
+     * @param request
+     *         a non-null batch request
      *
      * @return list of corresponding policy decisions
      *
      * @throws EntitlementException
      *         should an error occur during the evaluation process
      */
-    public List<Entitlement> evaluate(final String realm, final Subject subject, final Set<String> resourceNames,
-                                      final Map<String, Set<String>> environment) throws EntitlementException;
+    public List<Entitlement> evaluateBatch(final BatchPolicyRequest request) throws EntitlementException;
+
+    /**
+     * Given a tree policy request, provides a set of policy decisions for each
+     * defined policy that matches the single resource definition and below.
+     *
+     * @param request
+     *         a non-null tree request
+     *
+     * @return list of policy decisions
+     *
+     * @throws EntitlementException
+     *         should an error occur during the evaluation process
+     */
+    public List<Entitlement> evaluateTree(final TreePolicyRequest request) throws EntitlementException;
+
+    /**
+     * Given a generic policy request, routes the request to the appropriate evaluation method.
+     *
+     * @param request
+     *         a non-null policy request
+     *
+     * @return list of policy decisions appropriate for the request type
+     *
+     * @throws EntitlementException
+     *         should an error occur during the evaluation process
+     */
+    public List<Entitlement> routePolicyRequest(final PolicyRequest request) throws EntitlementException;
 
 }

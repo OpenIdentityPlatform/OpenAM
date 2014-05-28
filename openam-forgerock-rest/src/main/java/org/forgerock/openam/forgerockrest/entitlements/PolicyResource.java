@@ -37,7 +37,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.util.Reject;
 
@@ -48,7 +48,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
-import static org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPolicyRequest.Builder;
 
 /**
  * REST endpoint for policy/entitlements management and evaluation.
@@ -58,8 +57,6 @@ import static org.forgerock.openam.forgerockrest.entitlements.model.json.JsonPol
 public final class PolicyResource implements CollectionResourceProvider {
 
     private static final Debug DEBUG = Debug.getInstance("amPolicy");
-
-    private final static String EVAL_ACTION = "evaluate";
 
     /**
      * Parser for converting between JSON and concrete entitlements policy instances.
@@ -75,14 +72,17 @@ public final class PolicyResource implements CollectionResourceProvider {
     private final ResourceErrorHandler<EntitlementException> resourceErrorHandler;
 
     private final PolicyEvaluatorFactory factory;
+    private final PolicyRequestFactory requestFactory;
 
     @Inject
     public PolicyResource(final PolicyEvaluatorFactory factory,
+                          final PolicyRequestFactory requestFactory,
                           final PolicyParser parser,
                           final PolicyStoreProvider provider,
                           final ResourceErrorHandler<EntitlementException> handler) {
-        Reject.ifNull(factory, parser, provider, handler);
+        Reject.ifNull(factory, requestFactory, parser, provider, handler);
         this.factory = factory;
+        this.requestFactory = requestFactory;
         this.policyParser = parser;
         this.policyStoreProvider = provider;
         this.resourceErrorHandler = handler;
@@ -92,47 +92,45 @@ public final class PolicyResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        final String action = request.getAction();
+    public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler) {
+        final String actionString = actionRequest.getAction();
+        final PolicyAction action = PolicyAction.getAction(actionString);
 
-        if (EVAL_ACTION.equals(action)) {
-            try {
-                final JsonPolicyRequest policyRequest = new Builder(context, request).build();
-                handler.handleResult(evaluateRequest(policyRequest));
-                return;
-            } catch (EntitlementException eE) {
-                DEBUG.error("Error evaluating policy request", eE);
-                handler.handleError(resourceErrorHandler.handleError(request, eE));
-                return;
-            }
+        if (!PolicyAction.isEvaluateAction(action)) {
+            final String errorMsg = "Action '" + actionString + "' not implemented for this resource";
+            final NotSupportedException nsE = new NotSupportedException(errorMsg);
+            DEBUG.error(errorMsg, nsE);
+            handler.handleError(nsE);
+            return;
         }
 
-        final String errorMsg = "Action '" + action + "' not implemented for this resource";
-        final NotSupportedException nsE = new NotSupportedException(errorMsg);
-        DEBUG.error(errorMsg, nsE);
-        handler.handleError(nsE);
-    }
+        try {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Rendering policy request for action " + actionString);
+            }
 
-    /**
-     * Evaluates the given policy request and returns a json decision.
-     *
-     * @param request
-     *         a non-null policy request
-     *
-     * @return a json representation of the decision
-     *
-     * @throws EntitlementException
-     *         in the event of a failure during the evaluation process
-     */
-    private JsonValue evaluateRequest(final JsonPolicyRequest request) throws EntitlementException {
-        DEBUG.message("Evaluating policy request");
+            final PolicyRequest request = requestFactory.buildRequest(action, context, actionRequest);
+            final PolicyEvaluator evaluator = factory.getEvaluator(request.getRestSubject(), request.getApplication());
 
-        final PolicyEvaluator evaluator = factory.getEvaluator(request.getRestSubject(), request.getApplication());
+            if (DEBUG.messageEnabled()) {
+                final StringBuilder builder = new StringBuilder();
+                builder.append("Evaluating policy request for action ");
+                builder.append(actionString);
+                builder.append(" under realm ");
+                builder.append(request.getRealm());
+                builder.append(" within the application context ");
+                builder.append(request.getApplication());
+                DEBUG.message(builder.toString());
+            }
 
-        final List<Entitlement> entitlements = evaluator.evaluate(
-                request.getRealm(), request.getPolicySubject(), request.getResources(), request.getEnvironment());
+            final List<Entitlement> entitlements = evaluator.routePolicyRequest(request);
+            handler.handleResult(policyParser.printEntitlements(entitlements));
 
-        return policyParser.printEntitlements(entitlements);
+        } catch (final EntitlementException eE) {
+            DEBUG.error("Error evaluating policy request", eE);
+            handler.handleError(resourceErrorHandler.handleError(actionRequest, eE));
+            return;
+        }
     }
 
     /**

@@ -17,10 +17,12 @@
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
 import com.sun.identity.entitlement.ApplicationTypeManager;
+import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.utils.CollectionUtils;
@@ -37,31 +39,24 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Embodies all the properties that make up a policy request.
+ * Basic policy request that captures the common attributes for all policy requests.
  *
  * @since 12.0.0
  */
-public final class JsonPolicyRequest {
+public abstract class PolicyRequest {
 
+    // Used to map a list to a set.
     private final static ListToSetMapper LIST_TO_SET_MAPPER = new ListToSetMapper();
-
-    private final static String ROOT_REALM = "/";
-    private final static String RESOURCES = "resources";
-    private final static String APPLICATION = "application";
-    private final static String ENVIRONMENT = "environment";
-    private final static String SUBJECT = "subject";
 
     private final Subject restSubject;
     private final Subject policySubject;
-    private final Set<String> resources;
     private final String application;
     private final String realm;
     private final Map<String, Set<String>> environment;
 
-    private JsonPolicyRequest(final Builder builder) {
+    PolicyRequest(final PolicyRequestBuilder<?> builder) {
         restSubject = builder.restSubject;
         policySubject = builder.policySubject;
-        resources = builder.resources;
         application = builder.application;
         realm = builder.realm;
         environment = builder.environment;
@@ -73,10 +68,6 @@ public final class JsonPolicyRequest {
 
     public Subject getPolicySubject() {
         return policySubject;
-    }
-
-    public Set<String> getResources() {
-        return resources;
     }
 
     public String getApplication() {
@@ -92,34 +83,67 @@ public final class JsonPolicyRequest {
     }
 
     /**
-     * Given the CREST context and request, draws out the
-     * required properties and builds a policy request from it.
+     * Given the policy evaluator dispatch oneself as one knows best.
+     *
+     * @param evaluator
+     *         the non-null policy evaluator
+     *
+     * @return a list of policy decisions retrieved from the evaluator
+     *
+     * @throws EntitlementException
+     *         should dispatch and evaluation fail
      */
-    public static final class Builder {
+    public abstract List<Entitlement> dispatch(PolicyEvaluator evaluator) throws EntitlementException;
 
-        private Subject restSubject;
-        private Subject policySubject;
-        private Set<String> resources;
-        private String application;
-        private String realm;
-        private Map<String, Set<String>> environment;
+    /**
+     * Policy request builder used to assist with the construction of policy requests and to bring some separation.
+     *
+     * @param <T>
+     *         the concrete request type this builder makes
+     */
+    static abstract class PolicyRequestBuilder<T extends PolicyRequest> {
 
-        public Builder(final ServerContext context, final ActionRequest request) throws EntitlementException {
+        private final static String ROOT_REALM = "/";
+        private final static String APPLICATION = "application";
+        private final static String ENVIRONMENT = "environment";
+        private final static String SUBJECT = "subject";
+
+        private final Subject restSubject;
+        private final Subject policySubject;
+        private final String application;
+        private final String realm;
+        private final Map<String, Set<String>> environment;
+
+        /**
+         * Standard builder constructor.
+         *
+         * @param context
+         *         non-null context
+         * @param request
+         *         non-null request
+         *
+         * @throws EntitlementException
+         *         should the request construction fail
+         */
+        PolicyRequestBuilder(final ServerContext context, final ActionRequest request) throws EntitlementException {
             Reject.ifNull(context, request);
 
             final SubjectContext subjectContext = context.asContext(SubjectContext.class);
             final RealmContext realmContext = context.asContext(RealmContext.class);
-            setRestSubject(subjectContext);
-            setRealm(realmContext);
+            Reject.ifNull(subjectContext, realmContext);
+
+            restSubject = getRestSubject(subjectContext);
 
             final JsonValue jsonValue = request.getContent();
-            setPolicySubject(jsonValue, subjectContext);
-            setResources(jsonValue);
-            setApplication(jsonValue);
-            setEnvironment(jsonValue);
+            Reject.ifNull(jsonValue);
+
+            policySubject = getPolicySubject(subjectContext, jsonValue, restSubject);
+            application = getApplication(jsonValue);
+            realm = getRealm(realmContext);
+            environment = getEnvironment(jsonValue);
         }
 
-        private void setRestSubject(final SubjectContext context) throws EntitlementException {
+        private Subject getRestSubject(final SubjectContext context) throws EntitlementException {
             final Subject restSubject = context.getCallerSubject();
 
             if (restSubject == null) {
@@ -127,10 +151,11 @@ public final class JsonPolicyRequest {
                 throw new EntitlementException(EntitlementException.PERMISSION_DENIED);
             }
 
-            this.restSubject = restSubject;
+            return restSubject;
         }
 
-        private void setPolicySubject(final JsonValue value, final SubjectContext context) throws EntitlementException {
+        private Subject getPolicySubject(final SubjectContext context, final JsonValue value,
+                                         final Subject defaultSubject) throws EntitlementException {
             if (value.isDefined(SUBJECT)) {
                 final String tokenId = value.get(SUBJECT).asString();
                 final Subject policySubject = context.getSubject(tokenId);
@@ -140,47 +165,37 @@ public final class JsonPolicyRequest {
                     throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{SUBJECT});
                 }
 
-                this.policySubject = policySubject;
-            } else {
-                // If no subject has been specified default to the REST subject.
-                this.policySubject = restSubject;
-            }
-        }
-
-        private void setResources(final JsonValue value) throws EntitlementException {
-            final List<String> resources = value.get(RESOURCES).asList(String.class);
-
-            if (resources == null || resources.isEmpty()) {
-                // Protected resources are required.
-                throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{RESOURCES});
+                return policySubject;
             }
 
-            this.resources = new HashSet<String>(resources);
+            // If no subject has been specified default to the REST subject.
+            return defaultSubject;
         }
 
-        private void setRealm(final RealmContext context) {
-            this.realm = StringUtils.ifNullOrEmpty(context.getRealm(), ROOT_REALM);
+        private String getApplication(final JsonValue value) {
+            return value.get(APPLICATION).defaultTo(ApplicationTypeManager.URL_APPLICATION_TYPE_NAME).asString();
         }
 
-        private void setApplication(final JsonValue value) {
-            application = value.get(APPLICATION)
-                    .defaultTo(ApplicationTypeManager.URL_APPLICATION_TYPE_NAME).asString();
+        private String getRealm(final RealmContext context) {
+            return StringUtils.ifNullOrEmpty(context.getRealm(), ROOT_REALM);
         }
 
-        private void setEnvironment(final JsonValue value) {
+        private Map<String, Set<String>> getEnvironment(final JsonValue value) {
             final Map<String, List<String>> environment = value.get(ENVIRONMENT).asMapOfList(String.class);
-            this.environment = (environment != null) ?
-                    CollectionUtils.transformMap(environment, LIST_TO_SET_MAPPER) : new HashMap<String, Set<String>>();
+            return (environment != null) ?
+                    CollectionUtils.transformMap(environment, LIST_TO_SET_MAPPER) :
+                    new HashMap<String, Set<String>>();
         }
 
-        public JsonPolicyRequest build() {
-            return new JsonPolicyRequest(this);
-        }
+        /**
+         * @return a concrete policy request instance
+         */
+        abstract T build();
 
     }
 
     /**
-     * Mapper function used to transform a list of strings too a set of strings.
+     * Mapper function used to transform a list of strings to a set of strings.
      */
     private final static class ListToSetMapper implements Function<List<String>, Set<String>, NeverThrowsException> {
 

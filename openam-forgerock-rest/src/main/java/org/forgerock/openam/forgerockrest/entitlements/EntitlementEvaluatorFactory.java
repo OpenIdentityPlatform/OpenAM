@@ -19,11 +19,12 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Evaluator;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.BatchPolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.PolicyRequest;
+import org.forgerock.openam.forgerockrest.entitlements.model.json.TreePolicyRequest;
 
 import javax.security.auth.Subject;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Factory delivers up evaluators that call into the entitlements evaluator.
@@ -39,11 +40,13 @@ public class EntitlementEvaluatorFactory implements PolicyEvaluatorFactory {
 
     /**
      * Wraps the passed entitlement evaluator, delegating calls appropriately.
-     * <p />
+     * <p/>
      * The purpose of this wrapper is to decouple hard dependencies to
      * the entitlement evaluator as it has various resource constraints.
      */
     private static final class EntitlementEvaluatorWrapper implements PolicyEvaluator {
+
+        private static final boolean TREE_EVALUATION = true;
 
         private final Evaluator evaluator;
 
@@ -52,9 +55,21 @@ public class EntitlementEvaluatorFactory implements PolicyEvaluatorFactory {
         }
 
         @Override
-        public List<Entitlement> evaluate(final String realm, final Subject subject, final Set<String> resourceNames,
-                                          final Map<String, Set<String>> environment) throws EntitlementException {
-            return evaluator.evaluate(realm, subject, resourceNames, environment);
+        public List<Entitlement> evaluateBatch(final BatchPolicyRequest request) throws EntitlementException {
+            return evaluator.evaluate(request.getRealm(), request.getPolicySubject(),
+                    request.getResources(), request.getEnvironment());
+        }
+
+        @Override
+        public List<Entitlement> evaluateTree(final TreePolicyRequest request) throws EntitlementException {
+            return evaluator.evaluate(request.getRealm(), request.getPolicySubject(),
+                    request.getResource(), request.getEnvironment(), TREE_EVALUATION);
+        }
+
+        @Override
+        public List<Entitlement> routePolicyRequest(final PolicyRequest request) throws EntitlementException {
+            // Delegate to the request to dispatch itself appropriately.
+            return request.dispatch(this);
         }
 
     }

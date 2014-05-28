@@ -72,6 +72,9 @@ public class PolicyResourceTest {
     @Mock
     private PolicyEvaluatorFactory mockFactory;
 
+    @Mock
+    private PolicyRequestFactory requestFactory;
+
     private PolicyResource policyResource;
 
     @BeforeClass
@@ -93,22 +96,27 @@ public class PolicyResourceTest {
         // Use a real error handler as this is a core part of the functionality we are testing and doesn't need to be mocked
         resourceErrorHandler = new EntitlementsResourceErrorHandler(ForgerockRestGuiceModule.getEntitlementsErrorHandlers());
 
-        policyResource = new PolicyResource(mockFactory, mockParser, mockStoreProvider, resourceErrorHandler);
+        policyResource = new PolicyResource(mockFactory, requestFactory, mockParser, mockStoreProvider, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullParser() {
-        new PolicyResource(mockFactory, null, mockStoreProvider, resourceErrorHandler);
+        new PolicyResource(mockFactory, requestFactory, null, mockStoreProvider, resourceErrorHandler);
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void shouldRejectNullRequestFactory() {
+        new PolicyResource(mockFactory, null, mockParser, mockStoreProvider, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullStoreProvider() {
-        new PolicyResource(mockFactory, mockParser, null, resourceErrorHandler);
+        new PolicyResource(mockFactory, requestFactory, mockParser, null, resourceErrorHandler);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullErrorHandler() {
-        new PolicyResource(mockFactory, mockParser, mockStoreProvider, null);
+        new PolicyResource(mockFactory, requestFactory, mockParser, mockStoreProvider, null);
     }
 
     @Test
