@@ -117,6 +117,9 @@
         </plugins>
         <resources>
             <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
                 <directory>${basedir}/../openam-core/src/main/resources</directory>
                 <includes>
                     <include>BasicClientTypesManager.properties</include>
