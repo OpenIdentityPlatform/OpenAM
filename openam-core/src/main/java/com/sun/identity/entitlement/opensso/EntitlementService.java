@@ -151,7 +151,10 @@ public class EntitlementService extends EntitlementConfiguration {
                     SERVICE_NAME, token);
                 AttributeSchema as = smgr.getGlobalSchema().getAttributeSchema(
                     attrName);
-                return as.getDefaultValues();
+
+                if (as != null) {
+                    return as.getDefaultValues();
+                }
             } else {
                 PrivilegeManager.debug.error(
                     "EntitlementService.getAttributeValues: " +
