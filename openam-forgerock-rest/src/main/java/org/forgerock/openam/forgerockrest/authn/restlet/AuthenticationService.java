@@ -151,9 +151,15 @@ public class AuthenticationService extends ServerResource implements ServiceProv
         } catch (RestAuthException e) {
             DEBUG.error("Rest Authentication Exception", e);
             //todo: org.forgerock.json.resource.ResourceException.UNAUTHORIZED for 401 when we're commons 3.0
-            throw new ResourceException(
-                    org.forgerock.json.resource.ResourceException.getException(401, e.getMessage())
-                            .setDetail(json(object(field("failureUrl", e.getFailureUrl())))));
+            org.forgerock.json.resource.ResourceException cause =
+                    org.forgerock.json.resource.ResourceException.getException(401, e.getMessage());
+
+            if (e.getFailureUrl() != null) {
+                cause.setDetail(json(object(field("failureUrl", e.getFailureUrl()))));
+            }
+
+            throw new ResourceException(401, cause);
+
         } catch (Exception e) {
             DEBUG.error("Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
