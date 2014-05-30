@@ -5,6 +5,6 @@
              xmlns:xlink='http://www.w3.org/1999/xlink'
              xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <imageobject>
-  <imagedata fileref="images/forge-rock-logo-only.png" role="top"/>
+  <imagedata fileref="images/forgerock-openam-logo.png" role="top"/>
  </imageobject>
 </mediaobject>

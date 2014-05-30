@@ -30,7 +30,9 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM Java EE Policy Agent <?eval ${agentsDocTargetVersion}?> Reference</title>
+  <xinclude:include href="../shared/mediaobject-fr-logo.xml" />
+  <title>OpenAM Java EE Policy Agent Reference Guide</title>
+  <subtitle>Version ${agentsDocTargetVersion}</subtitle>
   <abstract>
    <para>Guide to installing OpenAM Java EE policy agents. OpenAM provides open source
    Authentication, Authorization, Entitlement and Federation software.</para>
@@ -42,20 +44,24 @@
   <authorgroup>
    <author>
     <personname>
-     <firstname>Mark</firstname><surname>Craig</surname>
+     <firstname>Mark </firstname><surname>Craig</surname>
     </personname>
    </author>
    <author>
     <personname>
-     <firstname>Vanessa</firstname><surname>Richie</surname>
+     <firstname>Mike </firstname><surname>Jang</surname>
     </personname>
    </author>
    <author>
     <personname>
-     <firstname>Mike</firstname><surname>Jang</surname>
+     <firstname>Vanessa </firstname><surname>Richie</surname>
     </personname>
+
+    <xinclude:include href="../shared/affiliation-fr.xml"/>
+
    </author>
   </authorgroup>
+
   <xinclude:include href="../legal.xml" />
   <date>${publicationDate}</date>
   <pubdate>${publicationDate}</pubdate>

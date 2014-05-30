@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<affiliation xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+             xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+             xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+             xmlns:xlink='http://www.w3.org/1999/xlink'
+             xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+   <orgname>ForgeRock, Inc.</orgname>
+   <address>
+    <street>33 New Montgomery St.</street>
+    <otheraddr>Suite 1500</otheraddr>
+    <city>San Francisco</city>, <state>CA</state> <postcode>94105</postcode>
+    <country>USA</country>
+    <phone>+1 415-523-0772</phone>
+    <uri>www.forgerock.com</uri>
+   </address>
+</affiliation>
