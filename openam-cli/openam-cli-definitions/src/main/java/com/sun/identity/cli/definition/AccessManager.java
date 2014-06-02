@@ -2981,7 +2981,7 @@ public class AccessManager {
         webSupport="true",
         mandatoryOptions={
             "realm|e|s|Name of realm.",
-            "xmlfile|X|s|Name of file that contains policy XACML definition."},
+            "xmlfile|X|s|File that contains the policy XACML definition. In the console, paste the XML into the text field instead."},
         optionAliases={},
         macro="authentication",
         optionalOptions={},
