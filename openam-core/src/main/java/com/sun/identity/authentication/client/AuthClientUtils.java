@@ -24,10 +24,7 @@
  *
  * $Id: AuthClientUtils.java,v 1.40 2010/01/22 03:31:01 222713 Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.client;
 
@@ -2163,8 +2160,8 @@ public class AuthClientUtils {
     /* constructs the filePath parameter for FileLookUp
      * filePath = indexName (service name) + clientPath (eg. html).
      */
-    public static String getFilePath(HttpServletRequest request,
-        AuthContext.IndexType indexType, String indexName) {
+    public static String getFilePath(HttpServletRequest request, AuthContext.IndexType indexType, String indexName) {
+
         String filePath = getFilePath(getClientType(request));
         String serviceName = null;
         StringBuilder filePathBuffer = new StringBuilder();
@@ -2172,23 +2169,21 @@ public class AuthClientUtils {
         // as part of the filePath since  service can have
         // have different auth template
 
-        if ((indexType != null) &&
-            (indexType.equals(AuthContext.IndexType.SERVICE))) {
+        if (AuthContext.IndexType.SERVICE.equals(indexType)) {
             serviceName = indexName;
         }
 
-        if ((filePath == null) && (serviceName == null)) {
-            return (null);
+        if (filePath == null && serviceName == null) {
+            return null;
         }
 
-        if ((filePath != null) && (filePath.length() > 0)) {
-            filePathBuffer.append(Constants.FILE_SEPARATOR)
-            .append(filePath);
+        if (filePath != null && !filePath.isEmpty()) {
+            filePathBuffer.append(Constants.FILE_SEPARATOR).append(filePath);
         }
 
-        if ((serviceName != null) && (serviceName.length() >0)) {
-            filePathBuffer.append(Constants.FILE_SEPARATOR)
-            .append(serviceName);
+        if (serviceName != null && !serviceName.isEmpty()) {
+            // To avoid issues with case-sensitive filesystems, always use the lowercase version of the serviceName
+            filePathBuffer.append(Constants.FILE_SEPARATOR).append(serviceName.toLowerCase());
         }
 
         String newFilePath = filePathBuffer.toString();
@@ -2196,7 +2191,7 @@ public class AuthClientUtils {
             utilDebug.message("FilePath is.. :" + newFilePath);
         }
 
-        return (newFilePath);
+        return newFilePath;
     }
 
     /* retrieves the org path to search resource
