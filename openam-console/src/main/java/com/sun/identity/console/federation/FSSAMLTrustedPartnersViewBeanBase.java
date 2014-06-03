@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.RequestManager;
@@ -300,6 +304,8 @@ public abstract class FSSAMLTrustedPartnersViewBeanBase
     throws AMConsoleException {
         String errorMessage = null;
         Set attributeNames = getAttributeNames();
+        //Remove the password confirm from the attributes
+        attributeNames.remove(SAMLConstants.AUTH_PASSWORD + SAMLPropertyTemplate.CONFIRM_SUFFIX);
         Map values = new HashMap(map.size() *2);
         
         for (Iterator iter = attributeNames.iterator(); iter.hasNext(); ) {
