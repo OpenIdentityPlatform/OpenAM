@@ -24,6 +24,7 @@
  *
  * $Id: AssertionIDRequestUtil.java,v 1.8 2009/06/12 22:21:40 mallas Exp $
  *
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 /*
@@ -51,7 +52,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import com.sun.identity.common.HttpURLConnectionManager;
 import org.w3c.dom.Element;
 
@@ -63,7 +65,6 @@ import com.sun.identity.saml2.assertion.AssertionIDRef;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
@@ -432,20 +433,18 @@ public class AssertionIDRequestUtil {
 
             Assertion assertion = (Assertion)IDPCache.assertionByIDCache.get(
                 assertionID);
-            if ((assertion == null) && (SAML2Utils.isSAML2FailOverEnabled())) {
+            if ((assertion == null) && (SAML2FailoverUtils.isSAML2FailoverEnabled())) {
                 if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message("AssertionIDRequestUtil." +
-                        "processAssertionIDRequest: " +
-                        "reading assertion from DB. ID = " + assertionID);
+                    SAML2Utils.debug.message("AssertionIDRequestUtil.processAssertionIDRequest: " +
+                        "reading assertion from the SAML2 Token Repository using assertionID:" + assertionID);
                 }
                 String assertionStr = null;
                 try {
-                    assertionStr =
-                    (String) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID);
-                } catch(StoreException se) {
-                    SAML2Utils.debug.error("AssertionIDRequestUtil." +
-                            "processAssertionIDRequest: " +
-                            "reading assertion from Repository. ID = " + assertionID + ", Operation has Failed!",se);
+                    assertionStr = (String) SAML2FailoverUtils.retrieveSAML2Token(assertionID);
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error("AssertionIDRequestUtil.processAssertionIDRequest: " +
+                         "There was a problem reading assertion from the SAML2 Token Repository using assertionID:"
+                            + assertionID, se);
                 }
                 if (assertionStr != null) {
                     assertion = AssertionFactory.getInstance().createAssertion(

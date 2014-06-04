@@ -26,7 +26,6 @@
  */
 package com.sun.identity.saml2.common;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.cot.COTException;
@@ -99,6 +98,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.owasp.esapi.ESAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -275,23 +275,7 @@ public class SAML2Utils extends SAML2SDKUtils {
       
     static AssertionFactory af = AssertionFactory.getInstance();
     private static SecureRandom randomGenerator = new SecureRandom();
-    
-    /**
-     * Checks whether SAML2 fail over flag is or off.
-     * @return true if SAML2 fail over flag is on. Otherwise, 
-     *     return false.
-     */ 
-    public static boolean isSAML2FailOverEnabled() {
-        boolean failOver = false; 
-        String enableFailOver =  (String) SAML2ConfigService.getAttribute(
-            SAML2ConfigService.SAML2_FAILOVER_ATTR);
-        if ((enableFailOver != null) && 
-            enableFailOver.equalsIgnoreCase("true")) {
-            failOver = true; 
-        }
-        return failOver;      
-    } 
-    
+
     /**
      * Verifies single sign on <code>Response</code> and returns information
      * to SAML2 auth module for further processing. This method is used by
@@ -334,13 +318,12 @@ public class SAML2Utils extends SAML2SDKUtils {
         if (inRespToResp != null && inRespToResp.length() != 0) {
             reqInfo = (AuthnRequestInfo)SPCache.requestHash.get(inRespToResp);
             if (reqInfo == null) {
-                if (SAML2Utils.isSAML2FailOverEnabled()) {
+                if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                     // Attempt to read AuthnRequestInfoCopy from SAML2 repository
                     AuthnRequestInfoCopy reqInfoCopy = null;
                     try {
-                         reqInfoCopy =
-                            (AuthnRequestInfoCopy) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(inRespToResp);
-                    } catch(StoreException se) {
+                         reqInfoCopy = (AuthnRequestInfoCopy) SAML2FailoverUtils.retrieveSAML2Token(inRespToResp);
+                    } catch(SAML2TokenRepositoryException se) {
                         debug.error(method + "AuthnRequestInfoCopy"
                                 + " unable to retrieve from SAML2 repository for inResponseTo: " + inRespToResp);
                     }
@@ -363,7 +346,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                                 "invalidInResponseToInResponse"));
                     }
                 } else {
-                    // !SAML2Utils.isSAML2FailOverEnabled()
+                    // !SAML2Utils.isSAML2FailoverEnabled()
                     debug.error(method + "InResponseTo attribute in Response"
                         + " is invalid: " + inRespToResp + ", SAML2 failover is disabled");
                     String[] data = {respID};
@@ -617,8 +600,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                         spConfig,
                         assertionID); 
                         
-                if (!(((Boolean) bearerMap.get(
-                        SAML2Constants.IS_BEARER)).booleanValue())) {
+                if (!((Boolean) bearerMap.get(SAML2Constants.IS_BEARER)).booleanValue()) {
                     continue;
                 }
                 
@@ -628,15 +610,14 @@ public class SAML2Utils extends SAML2SDKUtils {
                     foundAssertion = true; 
                 } 
                
-                if ((!foundAssertion) && SAML2Utils.isSAML2FailOverEnabled()) {
+                if ((!foundAssertion) && SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                     try {
-                        if ((SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID)) != null) {
+                        if (SAML2FailoverUtils.retrieveSAML2Token(assertionID) != null) {
                             foundAssertion = true; 
                         }    
-                    } catch(Exception ae) {
+                    } catch(SAML2TokenRepositoryException e) {
                         if (debug.messageEnabled()) {
-                            debug.message("Session not found in " +
-                            "AMTokenSAML2Repository.");
+                            debug.message("Session not found in AMTokenSAML2Repository.", e);
                         }        
                     }
                 }    

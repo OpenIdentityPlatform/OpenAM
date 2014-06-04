@@ -47,10 +47,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <com.sun.identity.saml.xmlsig.keystore>${project.build.testOutputDirectory}/keystore.jks</com.sun.identity.saml.xmlsig.keystore>
-                        <com.sun.identity.saml.xmlsig.storetype>JKS</com.sun.identity.saml.xmlsig.storetype>
-                        <com.sun.identity.saml.xmlsig.storepass>${project.build.testOutputDirectory}/keystorepass</com.sun.identity.saml.xmlsig.storepass>
-                        <com.sun.identity.saml.xmlsig.keypass>${project.build.testOutputDirectory}/keystorepass</com.sun.identity.saml.xmlsig.keypass>
+                        <com.sun.identity.systemconfiguration>com.sun.identity.configuration.FedLibSystemProperties</com.sun.identity.systemconfiguration>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -84,6 +81,12 @@
                 </configuration>
             </plugin>
         </plugins>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -149,8 +152,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-guice-core</artifactId>
         </dependency>
 
         <dependency>
@@ -174,8 +177,33 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
         </dependency>
 
         <dependency>
@@ -190,6 +218,11 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc-api</artifactId>
         </dependency>
@@ -200,6 +233,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+        </dependency>
+        
+        <dependency>
             <groupId>external</groupId>
             <artifactId>esapiport</artifactId>
         </dependency>
@@ -208,13 +246,21 @@
             <groupId>external</groupId>
             <artifactId>webservices-rt</artifactId>
         </dependency>
+        
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idpdiscovery</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <classifier>no_aop</classifier>
         </dependency>
     </dependencies>
 </project>

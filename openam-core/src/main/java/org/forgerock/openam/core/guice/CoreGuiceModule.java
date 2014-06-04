@@ -34,6 +34,7 @@ import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
@@ -46,6 +47,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
@@ -53,7 +55,9 @@ import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.adapters.SAMLAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.cts.impl.MonitoredCoreTokenAdapter;
@@ -74,6 +78,7 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
 import org.forgerock.openam.shared.concurrency.LockFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.Config;
@@ -169,6 +174,9 @@ public class CoreGuiceModule extends AbstractModule {
         // Policy Monitoring
         bind(PolicyMonitor.class).to(PolicyMonitorImpl.class);
 
+        // SAML2 token repository dependencies
+        bind(new TypeLiteral<TokenAdapter<SAMLToken>>(){}).to(SAMLAdapter.class);
+
         /**
          * Session related dependencies.
          */
@@ -223,6 +231,30 @@ public class CoreGuiceModule extends AbstractModule {
     @Provides @Singleton @Named(CoreTokenConstants.CTS_LOCK_FACTORY)
     LockFactory<String> getCTSLockFactory() {
         return new LockFactory<String>();
+    }
+
+    @Provides @Singleton
+    SAML2TokenRepository getSAML2TokenRepository() {
+
+        final String DEFAULT_REPOSITORY_CLASS =
+                "org.forgerock.openam.cts.impl.SAML2CTSPersistentStore";
+
+        final String REPOSITORY_CLASS_PROPERTY =
+                "com.sun.identity.saml2.plugins.SAML2RepositoryImpl";
+
+        final String CTS_SAML2_REPOSITORY_CLASS_NAME =
+                SystemPropertiesManager.get(REPOSITORY_CLASS_PROPERTY, DEFAULT_REPOSITORY_CLASS);
+
+        SAML2TokenRepository result;
+        try {
+            // Use Guice to create class to get all of its dependency goodness
+            result = InjectorHolder.getInstance(
+            Class.forName(CTS_SAML2_REPOSITORY_CLASS_NAME).asSubclass(SAML2TokenRepository.class));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return result;
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

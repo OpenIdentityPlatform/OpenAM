@@ -24,7 +24,7 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -50,7 +50,6 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.common.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,7 +72,6 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.EncryptedAttribute;
 
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
@@ -105,6 +103,7 @@ import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.utils.ClientUtils;
 
 import java.security.PrivateKey;
@@ -1448,17 +1447,16 @@ public class SPACSUtils {
         if (respInfo.getProfileBinding().equals(SAML2Constants.HTTP_POST)) {
             SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
             try {
-                if (SAML2Utils.isSAML2FailOverEnabled()) {
-                    SAML2RepositoryFactory.getInstance().saveSAML2Token(
+                if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                    SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(
                             assertionID,
                             SAML2Constants.ONETIME,
-                            ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue() / 1000,
-                            null);
+                            ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue() / 1000);
                 }
-            } catch (StoreException se) {
-                SAML2Utils.debug.error(classMethod + "DB error!", se);
-            } catch (SAML2Exception e) {
-                SAML2Utils.debug.error(classMethod + "DB error!", e); 
+            } catch (SAML2TokenRepositoryException se) {
+                SAML2Utils.debug.error(classMethod +
+                        "There was a problem saving the assertionID to the SAML2 Token Repository for assertionID:"
+                        + assertionID, se);
             }
         }
         respInfo.setAssertion(authnAssertion);
@@ -1730,37 +1728,33 @@ public class SPACSUtils {
 
             if (cache != null) {
                 relayStateUrl = (String)cache.getObject();
-            } else if (SAML2Utils.isSAML2FailOverEnabled()) {
+            } else if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                // The key is this way to make it unique compared to when
+                // the same key is used to store a copy of the AuthnRequestInfo
+                String key = relayStateID + relayStateID;
                 try {
                     // Try and retrieve the value from the SAML2 repository
-                    // The key is this way to make it unique compared to when
-                    // the same key is used to store a copy of the AuthnRequestInfo
-                    String relayState = (String) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(relayStateID + relayStateID);
+                    String relayState = (String) SAML2FailoverUtils.retrieveSAML2Token(key);
                     if (relayState != null) {
                         // Get back the relayState
                         relayStateUrl = relayState;
                         if (SAML2Utils.debug.messageEnabled()) {
                             SAML2Utils.debug.message("SPACUtils.getRelayState: relayState"
-                                + " retrieved from SAML2 repository for relayStateID: " + relayStateID);
+                                + " retrieved from SAML2 repository for key: " + key);
                         }
                     }
-                } catch (StoreException se) {
-                    SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
-                            + relayStateID, se);
-                } catch (SAML2Exception ex) {                    
-                    SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
-                            + relayStateID, ex);                    
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for key "
+                            + key, se);
                 }
             } else {
-                // !SAML2Utils.isSAML2FailOverEnabled()
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("SPACUtils.getRelayState: relayState"
                         + " is null for relayStateID: " + relayStateID + ", SAML2 failover is disabled");
                 }
             }
             
-            if ((relayStateUrl == null) || (relayStateUrl.trim().length() == 0)
-            ) {
+            if (relayStateUrl == null || relayStateUrl.trim().length() == 0) {
                 relayStateUrl = relayStateID;
             }
         }

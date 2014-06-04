@@ -24,10 +24,7 @@
  *
  * $Id: IDPArtifactResolution.java,v 1.13 2009/11/20 21:41:16 exu Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2012-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2012-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -54,9 +51,10 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import org.w3c.dom.Element;
 
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
@@ -64,7 +62,6 @@ import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
@@ -358,7 +355,7 @@ public class IDPArtifactResolution {
             (Response)IDPCache.responsesByArtifacts.remove(artStr);
         String remoteArtURL = null;
 
-        boolean saml2FailoverEnabled = SAML2Utils.isSAML2FailOverEnabled();
+        boolean saml2FailoverEnabled = SAML2FailoverUtils.isSAML2FailoverEnabled();
 
         if (res == null) {
             // in LB case, artifact may reside on the other server.
@@ -422,21 +419,21 @@ public class IDPArtifactResolution {
             }
 
             if (saml2FailoverEnabled) {
-                // Check the Persistent DB store
+                // Check the SAML2 Token Repository
                 try {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message("Artifact=" + artStr);
                     }
-                    String tmp = (String) SAML2RepositoryFactory.getInstance()
-                            .retrieveSAML2Token(artStr);
+                    String tmp = (String) SAML2FailoverUtils.retrieveSAML2Token(artStr);
                     res = ProtocolFactory.getInstance().createResponse(tmp);
                 } catch (SAML2Exception e) {
-                    SAML2Utils.debug.error(classMethod + " DB ERROR!!!", e);
+                    SAML2Utils.debug.error(classMethod + " SAML2 ERROR!!!", e);
                     return SAML2Utils.createSOAPFault(
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
-                } catch (StoreException se) {
-                    SAML2Utils.debug.error(classMethod + " CTS Repository ERROR!!!", se);
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error(classMethod + " There was a problem reading the response "
+                            + "from the SAML2 Token Repository using artStr:" + artStr, se);
                     return SAML2Utils.createSOAPFault(
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
@@ -450,15 +447,14 @@ public class IDPArtifactResolution {
                             : "UnableToFindResponse", null);
         }
 
-        // Remove Response from persistent DB
+        // Remove Response from SAML2 Token Repository
         try {
             if (saml2FailoverEnabled) {
-                SAML2RepositoryFactory.getInstance().deleteSAML2Token(artStr);
+                SAML2FailoverUtils.deleteSAML2Token(artStr);
             }
-        } catch (SAML2Exception e) {
-            SAML2Utils.debug.error(classMethod + " Error deleting the SAML object from the repository", e);
-        } catch (StoreException e) {
-            SAML2Utils.debug.error(classMethod + " Error deleting the SAML object from the CTS Repository", e);
+        } catch (SAML2TokenRepositoryException e) {
+            SAML2Utils.debug.error(classMethod + 
+                    " Error deleting the response from the SAML2 Token Repository using artStr:" + artStr, e);
         }
 
         Map props = new HashMap();
@@ -577,7 +573,7 @@ public class IDPArtifactResolution {
             if (values.length == 1) {
             res.setHeader(header.getName(), header.getValue());
             } else {
-            StringBuffer concat = new StringBuffer();
+            StringBuilder concat = new StringBuilder();
             int i = 0;
             while (i < values.length) {
                 if (i != 0) {

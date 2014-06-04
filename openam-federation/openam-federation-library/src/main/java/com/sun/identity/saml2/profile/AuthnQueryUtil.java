@@ -41,8 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.w3c.dom.Element;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
@@ -234,21 +234,21 @@ public class AuthnQueryUtil {
         List assertions = null;
         String cacheKey = userID.toLowerCase();
         AssertionFactory assertionFactory = AssertionFactory.getInstance();
-        if (SAML2Utils.isSAML2FailOverEnabled()) {
+        if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("AuthnQueryUtil.processAuthnQuery: " +
                     "getting user assertions from DB. user = " + cacheKey);
             }
             List list = null;
             try {
-                list = SAML2RepositoryFactory.getInstance().retrieveSAML2TokenWithSecondaryKey(cacheKey);
-            } catch(StoreException se) {
+                list = SAML2FailoverUtils.retrieveSAML2TokensWithSecondaryKey(cacheKey);
+            } catch(SAML2TokenRepositoryException se) {
                 SAML2Utils.debug.error("AuthnQueryUtil.processAuthnQuery: " +
-                        "Unable to obtain user assertions from CTS Repository. user = " + cacheKey+", "+se.getMessage(),se);
+                        "Unable to obtain user assertions from CTS Repository. user = " + cacheKey, se);
             }
-            if ((list != null) && (!list.isEmpty())) {
+            if (list != null && !list.isEmpty()) {
                 assertions = new ArrayList();
-                for(Iterator iter = list.iterator(); iter.hasNext(); ) {
+                for (Iterator iter = list.iterator(); iter.hasNext(); ) {
                     String assertionStr = (String)iter.next();
                     assertions.add(assertionFactory.createAssertion(
                         assertionStr));

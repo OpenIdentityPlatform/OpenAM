@@ -24,13 +24,12 @@
  *
  * $Id: IDPSSOUtil.java,v 1.56 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.saml2.profile;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.common.*;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.DateUtils;
@@ -59,7 +58,6 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPResponse;
 import com.sun.identity.saml2.idpdiscovery.IDPDiscoveryConstants;
@@ -95,6 +93,7 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -137,7 +136,7 @@ public class IDPSSOUtil {
             metaManager = new SAML2MetaManager();
             cotManager = new CircleOfTrustManager();
         } catch (COTException ce) {
-            SAML2Utils.debug.error("Error retreiving circle of trust");
+            SAML2Utils.debug.error("Error retrieving circle of trust");
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("Error retrieving metadata", sme);
         }
@@ -872,15 +871,15 @@ public class IDPSSOUtil {
                     "Unable to add session listener.");
             }
 		} else {
-            if ((idpSession == null) &&
-                    (SAML2Utils.isSAML2FailOverEnabled())) {
-                // Read from DataBase
+            if (idpSession == null && SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                // Read from SAML2 Token Repository
                 IDPSessionCopy idpSessionCopy = null;
                 try {
-                    idpSessionCopy = (IDPSessionCopy)
-                            SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
-                } catch (StoreException se) {
-                    SAML2Utils.debug.error("Unable to obtain the IDPSessionCopy from the CTS Repository: " + se.getMessage(), se);
+                    idpSessionCopy = (IDPSessionCopy) SAML2FailoverUtils.retrieveSAML2Token(sessionIndex);
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error(classMethod +
+                            "Unable to obtain IDPSessionCopy from the SAML2 Token Repository for sessionIndex:"
+                            + sessionIndex, se);
                 }
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
@@ -891,7 +890,7 @@ public class IDPSSOUtil {
                         SAML2Utils.bundle.getString("IDPSessionIsNULL"));
                 }
             } else if ((idpSession == null) &&
-                    (!SAML2Utils.isSAML2FailOverEnabled())) {
+                    (!SAML2FailoverUtils.isSAML2FailoverEnabled())) {
                 SAML2Utils.debug.error("IDPSession is null; SAML2 failover" +
                         "is disabled");
                 throw new SAML2Exception(
@@ -1019,41 +1018,34 @@ public class IDPSSOUtil {
             }
 
             IDPCache.assertionByIDCache.put(assertionID, assertion);
-            if (SAML2Utils.isSAML2FailOverEnabled()) {
+            if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                 try {
-                    SAML2RepositoryFactory.getInstance().saveSAML2Token(assertionID,
+                    SAML2FailoverUtils.saveSAML2Token(assertionID, cacheKey,
                             assertion.toXMLString(true, true),
-                            conditions.getNotOnOrAfter().getTime() / 1000,
-                            cacheKey);
+                            conditions.getNotOnOrAfter().getTime() / 1000);
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message(classMethod +
-                                "saving assertion to DB. ID = " + assertionID);
+                                "Saving Assertion to SAML2 Token Repository. ID = " + assertionID);
                     }
-                } catch (StoreException se) {
-                    SAML2Utils.debug.error("Unable to save the Assertion to the CTS Repository: " + se.getMessage(), se);
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error(classMethod + "Unable to save Assertion to the SAML2 Token Repository", se);
                 }
             }
         }
-        //  Save to persistent datastore 
+        //  Save to SAML2 Token Repository
         try {
-            long sessionExpireTime = System.currentTimeMillis() / 1000 +
-                    (sessionProvider.getTimeLeft(session));
-            if (SAML2Utils.isSAML2FailOverEnabled()) {
-                SAML2RepositoryFactory.getInstance().saveSAML2Token(sessionIndex,
-                        new IDPSessionCopy(idpSession), sessionExpireTime, null);
+            if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + (sessionProvider.getTimeLeft(session));
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(sessionIndex, new IDPSessionCopy(idpSession), sessionExpireTime);
             }
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("SAVE IDPSession!");
+                SAML2Utils.debug.message(classMethod + "SAVE IDPSession!");
             }
-        } catch (SAML2Exception e) {
-            SAML2Utils.debug.error(classMethod + "DB error!");
         } catch (SessionException se) {
-            SAML2Utils.debug.error(classMethod +
-                    "Unable to get left-time from the session.", se);
-            throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("invalidSSOToken"));
-        } catch (StoreException se) {
-            SAML2Utils.debug.error("Unable to save the IDPSession to the CTS Repository: "+se.getMessage(),se);
+            SAML2Utils.debug.error(classMethod + "Unable to get left-time from the session.", se);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("invalidSSOToken"));
+        } catch (SAML2TokenRepositoryException se) {
+            SAML2Utils.debug.error(classMethod + "Unable to save IDPSession to the SAML2 Token Repository", se);
         }
         return assertion;
     }
@@ -2165,15 +2157,16 @@ public class IDPSSOUtil {
         String artStr = art.getArtifactValue();
         try {
             IDPCache.responsesByArtifacts.put(artStr, res);
-            if (SAML2Utils.isSAML2FailOverEnabled()) {
-                long expireTime = getValidTimeofResponse(
-                        realm, idpEntityID, res);
-                SAML2RepositoryFactory.getInstance().saveSAML2Token(
-                        artStr, res.toXMLString(true, true), expireTime / 1000,
-                        null);
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message(classMethod +
-                            "Save Response to DB!");
+            if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                try {
+                    long expireTime = getValidTimeofResponse(realm, idpEntityID, res) / 1000;
+                    SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(artStr, res.toXMLString(true, true), expireTime);
+                    if (SAML2Utils.debug.messageEnabled()) {
+                        SAML2Utils.debug.message(classMethod + "Saved Response to SAML2 Token Repository using key "
+                                + artStr);
+                    }
+                } catch (SAML2TokenRepositoryException se) {
+                    SAML2Utils.debug.error(classMethod + "Unable to save Response to the SAML2 Token Repository", se);
                 }
             }
 
@@ -2218,8 +2211,6 @@ public class IDPSSOUtil {
         } catch (IOException ioe) {
             SAML2Utils.debug.error(classMethod +
                     "Unable to send redirect: ", ioe);
-        } catch (Exception e) {
-            SAML2Utils.debug.error(classMethod + "DB Error!", e);
         }
     }
 

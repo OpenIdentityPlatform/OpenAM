@@ -24,14 +24,14 @@
  *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
@@ -77,9 +77,9 @@ import javax.xml.soap.SOAPException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.w3c.dom.Element;
 
 /**
@@ -284,17 +284,17 @@ public class IDPProxyUtil {
         synchronized(SPCache.requestHash) {
             SPCache.requestHash.put(requestID, reqInfo);
         }
-        if (SAML2Utils.isSAML2FailOverEnabled()) {
+        if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
             try {
                 // sessionExpireTime is counted in seconds
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
-                SAML2RepositoryFactory.getInstance().saveSAML2Token(requestID,
-                        new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+                SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(requestID, new AuthnRequestInfoCopy(reqInfo), sessionExpireTime);
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
                 }
-            } catch(StoreException se) {
-                SAML2Utils.debug.error(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID + ", has failed!",se);
+            } catch(SAML2TokenRepositoryException se) {
+                SAML2Utils.debug.error(classMethod + " SAVE AuthnRequestInfoCopy for requestID "
+                        + requestID + ", failed!", se);
             }
         }
     }
