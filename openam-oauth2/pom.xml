@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+  ~ Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -39,6 +39,10 @@
     <description>OpenAM OAuth2 integration</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openid-connect-core</artifactId>
