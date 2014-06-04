@@ -564,26 +564,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                             "Login failure, current session destroyed!");
                     } else if (ac.getStatus()==AuthContext.Status.SUCCESS) {
                         response.setHeader("X-AuthErrorCode", "0");
-                        if (ac.getLoginState().getForceFlag()) {
-                            if (loginDebug.messageEnabled()) {
-                                loginDebug.message("Forced Auth Succeed."
-                                    + "Restoring updated session");
-                            }
-                            clearCookieAndDestroySession(ac);
-                            ac.getLoginState().setSession(oldSession);
-                            ac.getLoginState().setSid(oldSession.getID());
-                        } else {
-                            if (AuthUtils.isCookieSupported(ac)) {
+                        if (AuthUtils.isCookieSupported(ac)) {
+                            if (!ac.getLoginState().getForceFlag()) {
                                 setCookie();
-                                clearCookie(AuthUtils.getAuthCookieName());
                             }
-                            if (SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE) &&
-                                    oldSession != null) {
-                                loginDebug.message(
-                                    "Destroy existing/old valid session");
-                                AuthD authD = AuthD.getAuth();
-                                authD.destroySession(oldSession.getID());
-                            }
+                            clearCookie(AuthUtils.getAuthCookieName());
                         }
                     }
                     

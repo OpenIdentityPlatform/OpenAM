@@ -1187,6 +1187,12 @@ public class LoginState {
 
             //destroying the authentication session
             AuthD.getSS().destroyInternalSession(oldSessId);
+
+            // Cleanup any other sessions after session upgrade/force auth
+            if (oldSession != null) {
+                cleanupSessionAfterUpgrade();
+            }
+
             if ((modulesInSession) && (loginContext != null)) {
                 session.setObject(ISAuthConstants.LOGIN_CONTEXT,
                 loginContext);
@@ -1203,7 +1209,29 @@ public class LoginState {
             throw new AuthException("sessionActivationFailed", null);
         }
     }
-    
+
+
+    /**
+     * Cleans up sessions after successful session upgrade/force auth. In the case of session upgrade
+     * then the old session is deleted. For force auth, the new session is deleted and the old session
+     * set as current. Centralises logic that was previous included directly in LoginViewBean for both the
+     * UI and DAS.
+     */
+    private void cleanupSessionAfterUpgrade() {
+        if (forceAuth) {
+            if (debug.messageEnabled()) {
+                debug.message("Forced Auth Succeeded. Restoring updated session");
+            }
+            destroySession();
+            setSession(oldSession);
+            setSid(oldSession.getID());
+        } else if (SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
+            debug.message("Destroy existing/old valid session");
+            AuthD authD = AuthD.getAuth();
+            authD.destroySession(oldSession.getID());
+        }
+    }
+
     /**
      * Populates session with properties.
      *
