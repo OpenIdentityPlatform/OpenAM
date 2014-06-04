@@ -267,6 +267,9 @@
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
+        <!-- OpenAM Scripting -->
+        <module>openam-scripting</module>
+
         <!-- OpenAM Entitlement Module (XACML 3)-->
         <module>openam-entitlements</module>
 
