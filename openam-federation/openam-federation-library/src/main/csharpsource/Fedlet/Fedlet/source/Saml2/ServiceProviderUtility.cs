@@ -185,7 +185,8 @@ namespace Sun.Identity.Saml2
                             this.ServiceProvider.SigningCertificateAlias,
                             artifactResolveXml,
                             artifactResolve.Id,
-                            true);
+                            true,
+                            this.ServiceProvider);
                     }
                 }
 
@@ -535,7 +536,8 @@ namespace Sun.Identity.Saml2
                         this.ServiceProvider.SigningCertificateAlias,
                         authnRequestXml,
                         authnRequest.Id,
-                        true);
+                        true,
+                        this.ServiceProvider);
                     FedletLogger.Info("Signed AuthnRequest:\r\n" + authnRequestXml.InnerXml);
                 }
             }
@@ -692,7 +694,8 @@ namespace Sun.Identity.Saml2
                         this.ServiceProvider.SigningCertificateAlias,
                         logoutRequestXml,
                         logoutRequest.Id,
-                        true);
+                        true,
+                        this.ServiceProvider);
                 }
             }
 
@@ -848,7 +851,8 @@ namespace Sun.Identity.Saml2
                         this.ServiceProvider.SigningCertificateAlias,
                         logoutResponseXml,
                         logoutResponse.Id,
-                        true);
+                        true,
+                        this.ServiceProvider);
                 }
             }
 
@@ -1125,7 +1129,8 @@ namespace Sun.Identity.Saml2
                             this.ServiceProvider.SigningCertificateAlias,
                             logoutRequestXml,
                             logoutRequest.Id,
-                            true);
+                            true,
+                            this.ServiceProvider);
                     }
                 }
 
@@ -1276,7 +1281,8 @@ namespace Sun.Identity.Saml2
                         this.ServiceProvider.SigningCertificateAlias,
                         logoutResponseXml,
                         logoutResponse.Id,
-                        true);
+                        true,
+                        this.ServiceProvider);
                 }
             }
 
@@ -1413,7 +1419,8 @@ namespace Sun.Identity.Saml2
                          this.ServiceProvider.AttributeQuerySigningCertificateAlias,
                          attrQueryRequestXml,
                          attrQueryRequest.Id,
-                         true);
+                         true,
+                         this.ServiceProvider);
                 }
 
                 string soapMessage = Saml2Utils.CreateSoapMessage(attrQueryRequestXml.InnerXml);

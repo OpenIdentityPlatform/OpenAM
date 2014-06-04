@@ -469,6 +469,48 @@ namespace Sun.Identity.Saml2
                 return false;
             }
         }
+
+        /// <summary>
+        /// Obtain the Signature Transform method.
+        /// </summary>
+        /// <returns>Signature Transform method as defined in the extended metadata for the SAML signature.</returns>
+        public string SignatureTransformMethod
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='signatureTransformMethod']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath.ToString(), this.extendedMetadataNsMgr);
+
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Obtain the Canonicalization method for XML signature.
+        /// </summary>
+        /// <returns>Canonicalization method as defined in the extended metadata for the SAML signature.</returns>
+        public string CanonicalizationMethod
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:IDPSSOConfig/mdx:Attribute[@name='signatureCanonicalizationMethod']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath.ToString(), this.extendedMetadataNsMgr);
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+
+                return null;
+            }
+        }
+        
         #endregion
 
         #region Methods
@@ -633,7 +675,7 @@ namespace Sun.Identity.Saml2
                 descriptorId.Value = Saml2Utils.GenerateId();
                 entityDescriptorNode.Attributes.Append(descriptorId);
 
-                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true);
+                Saml2Utils.SignXml(this.SigningCertificateAlias, exportableXml, descriptorId.Value, true, this);
             }
 
             return exportableXml.InnerXml;

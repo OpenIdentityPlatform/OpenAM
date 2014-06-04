@@ -404,8 +404,12 @@ namespace Sun.Identity.Saml2
         /// <param name="includePublicKey">
         /// Flag to determine whether to include the public key in the 
         /// signed xml.
+        /// </param>       
+        /// <param name="serviceProviderInstance">
+        /// ServiceProvider instance for retreaving Signature transform 
+        /// and canonicalization method
         /// </param>
-        public static void SignXml(string certFriendlyName, IXPathNavigable xmlDoc, string targetReferenceId, bool includePublicKey)
+        public static void SignXml(string certFriendlyName, IXPathNavigable xmlDoc, string targetReferenceId, bool includePublicKey, ServiceProvider serviceProviderInstance)
         {
             if (string.IsNullOrEmpty(certFriendlyName))
             {
@@ -442,9 +446,32 @@ namespace Sun.Identity.Saml2
             Reference reference = new Reference();
             reference.Uri = "#" + targetReferenceId;
 
-            XmlDsigEnvelopedSignatureTransform envelopSigTransform = new XmlDsigEnvelopedSignatureTransform();
-            reference.AddTransform(envelopSigTransform);
+            //Read the transform type and canonicalization method from sp-extended.xml
+            string transformType = serviceProviderInstance.SignatureTransformMethod;
+            string canonicalizationMethodType = serviceProviderInstance.CanonicalizationMethod;
+            Transform sigTransform;
 
+            //Implement the gathered data
+            switch(transformType){
+                case "XmlDsigExcC14NTransform":
+                    sigTransform = new XmlDsigExcC14NTransform();
+                    break;
+                case "XmlDsigExcC14NWithCommentsTransform":
+                    sigTransform = new XmlDsigExcC14NWithCommentsTransform();
+                    break;    
+                default: 
+                    sigTransform = new XmlDsigEnvelopedSignatureTransform();
+                    break;
+            }
+
+            if (canonicalizationMethodType != null && 
+                    (canonicalizationMethodType == SignedXml.XmlDsigExcC14NTransformUrl 
+                    || canonicalizationMethodType == SignedXml.XmlDsigExcC14NWithCommentsTransformUrl))
+                    {
+                        signedXml.Signature.SignedInfo.CanonicalizationMethod = canonicalizationMethodType;
+                    }
+            
+            reference.AddTransform(sigTransform);
             signedXml.AddReference(reference);
             signedXml.ComputeSignature();
 
