@@ -682,7 +682,7 @@ userdetails.attribute.value=6319</computeroutput>
  </section>
  
  <section xml:id="rest-api-authz">
-  <title>Authorization</title>
+  <title>Authorization &amp; Policy Management</title>
   <indexterm>
    <primary>Policy</primary>
    <secondary>REST API</secondary>
@@ -762,10 +762,11 @@ userdetails.attribute.value=6319</computeroutput>
     <para>
      To request a decision for specific resources,
      see <xref linkend="rest-api-authz-policy-decision-concrete" />.
-     <!-- Pending AME-3196
+    </para>
+
+    <para>
      To request decisions for a resource and all resources beneath it,
-     see <xref linkend="rest-api-authz-policy-decision-multiple" />.
-     -->
+     see <xref linkend="rest-api-authz-policy-decision-subtree" />.
     </para>
 
    <section xml:id="rest-api-authz-policy-decision-concrete">
@@ -1033,20 +1034,283 @@ $ <userinput>curl \
     </para>
    </section>
 
-    <!-- Pending AME-3196
-    <section xml:id="rest-api-authz-policy-decision-subtree">
-     <title>Requesting Policy Decisions For a Tree of Resources</title>
+   <section xml:id="rest-api-authz-policy-decision-subtree">
+    <title>Requesting Policy Decisions For a Tree of Resources</title>
 
+    <para>
+     This section shows how you can request policy decisions over REST
+     for a resource and all other resources in the subtree beneath it.
+    </para>
+
+    <para>
+     To request policy decisions for a tree of resources,
+     perform an HTTP POST using the evaluation action to the appropriate path
+     under the URI where OpenAM is deployed,
+     <literal>/json[/<replaceable>realm</replaceable>]/policies?_action=evaluateTree</literal>,
+     where <replaceable>realm</replaceable> optionally specifies the realm.
+     The payload for the HTTP POST is a JSON object that specifies
+     at least the root resource, and takes the following form.
+    </para>
+
+    <programlisting language="java">
+{
+    "resource": "resource string",
+    "application": "optional, defaults to iPlanetAMWebAgentService",
+    "subject": "optional subject SSOToken",
+    "environment": {
+        "optional key1": [
+            "value",
+            "another value",
+            ...
+        ],
+        "optional key2": [
+            "value",
+            "another value",
+            ...
+        ],
+        ...
+    }
+}
+    </programlisting>
+
+    <variablelist>
      <para>
-      This section shows how you can request policy decisions over REST
-      for a resource and all other resources in the subtree beneath it.
+      The values for the fields shown above are explained below.
      </para>
 
+     <varlistentry>
+      <term><literal>"resource"</literal></term>
+      <listitem>
+       <para>
+        This required field specifies the root resource
+        for the decisions to return.
+       </para>
+
+       <para>
+        For example, when using the default application,
+        <literal>"iPlanetAMWebAgentService"</literal>,
+        you can request decisions for resource URLs.
+       </para>
+
+       <programlisting language="java">
+{
+    "resource": "http://www.example.com/"
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"application"</literal></term>
+      <listitem>
+       <para>
+        This optional field holds the name of the application,
+        and defaults to <literal>"iPlanetAMWebAgentService"</literal>
+        if not specified.
+       </para>
+
+       <para>
+        For more on available applications,
+        see <xref linkend="rest-api-authz-applications" />.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"subject"</literal></term>
+      <listitem>
+       <para>
+        This optional field holds the token ID of the subject,
+        returned for example on successful authentication.
+        See <xref linkend="rest-api-auth" />.
+       </para>
+
+       <para>
+        If you do not specify the token ID,
+        OpenAM uses the token ID of the subject making the request.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"environment"</literal></term>
+      <listitem>
+       <para>
+        This optional field holds a map of keys to lists of values.
+       </para>
+
+       <para>
+        If you do not specify the environment, the default is an empty map.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>
+     The example below requests policy decisions
+     for <literal>http://www.example.com/</literal>.
+     The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+     for a user who has access to perform the operation,
+     and the subject takes the SSO token of the user
+     who wants to access a resource.
+    </para>
+
+    <programlisting language="java">
+$ <userinput>curl \
+ --request POST \
+ --header "iPlanetDirectoryPro: AQIC5...NDU1*" \
+ --header "Content-Type: application/json" \
+ --data '{
+    "resource": "http://www.example.com/",
+    "subject": "AQIC5...zE4*"
+ }' \
+ https://openam.example.com:8443/openam/json/realm/policies?_action=evaluateTree</userinput>
+<computeroutput>[ {
+  "resource" : "http://www.example.com:80/",
+  "actions" : {
+    "GET" : true,
+    "OPTIONS" : true,
+    "HEAD" : true
+  },
+  "attributes" : {
+  },
+  "advices" : {
+  }
+}, {
+  "resource" : "http://www.example.com:80/*",
+  "actions" : {
+    "POST" : false,
+    "PATCH" : false,
+    "GET" : true,
+    "DELETE" : true,
+    "OPTIONS" : true,
+    "HEAD" : true,
+    "PUT" : true
+  },
+  "attributes" : {
+    "myStaticAttr" : [ "myStaticValue" ]
+  },
+  "advices" : {
+  }
+}, {
+  "resource" : "http://www.example.com:80/*?*",
+  "actions" : {
+    "POST" : false,
+    "PATCH" : false,
+    "GET" : false,
+    "DELETE" : false,
+    "OPTIONS" : true,
+    "HEAD" : false,
+    "PUT" : false
+  },
+  "attributes" : {
+  },
+  "advices" : {
+    "AuthLevelConditionAdvice" : [ "/:3" ]
+  }
+} ]</computeroutput>
+    </programlisting>
+
+    <para>
+     Notice that OpenAM returns decisions not only for the specified resource,
+     but also for matching resource names
+     in the tree whose root is the specified resource.
+    </para>
+
+    <variablelist>
      <para>
-      TODO
+      In the JSON list of decisions returned for each resource,
+      OpenAM includes a these fields.
      </para>
-    </section>
-    -->
+
+     <varlistentry>
+      <term><literal>"resource"</literal></term>
+      <listitem>
+       <para>
+        A resource name whose root is the resource specified in the request
+       </para>
+
+       <para>
+        Notice that the resources are normalized.
+        In the example, the request does not explicitly specify port 80,
+        but the response does show the port number.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"actions"</literal></term>
+      <listitem>
+       <para>
+        A map of action name keys
+        to Boolean values that indicate whether
+        the action is allowed (<literal>true</literal>)
+        or denied (<literal>false</literal>)
+        for the specified resource
+       </para>
+
+       <para>
+        In the example, for matching resources with a query string
+        only HTTP OPTIONS is allowed according to the policies configured.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"attributes"</literal></term>
+      <listitem>
+       <para>
+        A map of attribute names to their values,
+        if any resource attributes are returned
+        according to applicable policies
+       </para>
+
+       <para>
+        In the example, the policy that applies
+        to <literal>http://www.example.com:80/*</literal>
+        causes a static attribute to be returned.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>"advices"</literal></term>
+      <listitem>
+       <para>
+        A map of advice names to their values,
+        if any advice is returned according to applicable policies
+       </para>
+
+       <para>
+        The <literal>"advices"</literal> field can provide hints
+        regarding what OpenAM needs to take the authorization decision.
+       </para>
+
+       <para>
+        In the example, the policy that applies
+        to resources with a query string
+        requests that the subject be authenticated
+        at an authentication level of at least 3.
+       </para>
+
+       <programlisting language="java">
+{
+    "advices": {
+        "AuthLevelConditionAdvice": [ "/:3" ]
+    }
+}
+       </programlisting>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>
+     You can use the query string parameters
+     <literal>_prettyPrint=true</literal> to make the output easier to read,
+     and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
+     to limit the fields returned in the output.
+    </para>
+   </section>
   </section>
 
   <section xml:id="rest-api-authz-policies">

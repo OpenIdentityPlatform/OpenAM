@@ -293,7 +293,7 @@
 
        <row>
         <entry>/identity/authorize</entry>
-        <entry>/json/policies?_action=evaluate<!--, /json/policies?_evaluateTree--></entry>
+        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
        </row>
 
        <row>
@@ -324,7 +324,7 @@
        <row>
         <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
         /ws/1/entitlement/entitlement, /ws/1/entitlement/entitlements</entry>
-        <entry>/json/policies?_action=evaluate<!--, /json/policies?_evaluateTree--></entry>
+        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
        </row>
 
        <row>
