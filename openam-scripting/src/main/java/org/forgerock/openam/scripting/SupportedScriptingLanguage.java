@@ -14,36 +14,28 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.scripting.guice;
+package org.forgerock.openam.scripting;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.scripting.ScriptEvaluator;
-import org.forgerock.openam.scripting.StandardScriptEvaluator;
-
-import javax.inject.Singleton;
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Guice configuration for OpenAM scripting-related components.
+ * Standard scripting languages supported by OpenAM.
+ *
+ * @since 12.0.0
  */
-@GuiceModule
-public class ScriptingGuiceModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
-
-        bind(ScriptEvaluator.class).to(StandardScriptEvaluator.class);
-
-    }
+public enum SupportedScriptingLanguage implements ScriptingLanguage {
 
     /**
-     * JSR 223 script engine manager singleton.
+     * Javascript/ECMAScript support based on the Rhino engine.
      */
-    @Provides @Singleton
-    ScriptEngineManager getScriptEngineManager() {
-        return new ScriptEngineManager();
+    JAVASCRIPT {
+        /**
+         * {@inheritDoc}
+         */
+        public ScriptEngine getScriptEngine(final ScriptEngineManager scriptEngineManager) {
+            return scriptEngineManager.getEngineByName("javascript");
+        }
     }
 
 }

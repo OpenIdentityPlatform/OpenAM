@@ -16,5 +16,7 @@
 
 /**
  * Common scripting-related components for use in scripted OpenAM modules (e.g., scripted authentication modules).
+ *
+ * @since 12.0.0
  */
 package org.forgerock.openam.scripting;

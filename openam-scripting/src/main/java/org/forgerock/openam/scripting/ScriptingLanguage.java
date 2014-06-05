@@ -14,36 +14,24 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.scripting.guice;
+package org.forgerock.openam.scripting;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.scripting.ScriptEvaluator;
-import org.forgerock.openam.scripting.StandardScriptEvaluator;
-
-import javax.inject.Singleton;
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 /**
- * Guice configuration for OpenAM scripting-related components.
+ * Pluggable interface for adding support for particular scripting languages. Provides a single point to get hold of
+ * script engines, validation objects, and so on.
+ *
+ * @since 12.0.0
  */
-@GuiceModule
-public class ScriptingGuiceModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
-
-        bind(ScriptEvaluator.class).to(StandardScriptEvaluator.class);
-
-    }
+public interface ScriptingLanguage {
 
     /**
-     * JSR 223 script engine manager singleton.
+     * Gets a script engine for evaluating scripts in this scripting language.
+     *
+     * @param scriptEngineManager the JSR 223 script engine manager to use to retrieve the script engine.
+     * @return the JSR 223 scripting engine for this language.
      */
-    @Provides @Singleton
-    ScriptEngineManager getScriptEngineManager() {
-        return new ScriptEngineManager();
-    }
-
+    ScriptEngine getScriptEngine(ScriptEngineManager scriptEngineManager);
 }
