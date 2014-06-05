@@ -88,6 +88,30 @@
   <itemizedlist>
    <listitem>
     <para>
+     TODO: Update for 11.0.2
+    </para>
+   </listitem>
+
+   <listitem>
+     <para>
+      <emphasis role="bold">Quicker UI Customization</emphasis>.
+      While customizing the UI, you can set the advanced server property,
+      <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,
+      to <literal>false</literal> to allow OpenAM immediately to pick up changes
+      to the files as you customize them
+      (<link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3989"
+      >OPENAM-3989</link>).
+      You can set advanced server properties in OpenAM Console under
+      Configuration > Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
+      For production servers, leave this set to the default, <literal>true</literal>.
+     </para>
+   </listitem>
+
+<!-- The following were listed in 11.0.1 notes.
+   <listitem>
+    <para>
      OpenAM REST API now allows logout with a restricted token
      (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3484"
             xlink:show="new">OPENAM-3484</link>).
@@ -160,6 +184,7 @@
             xlink:show="new">OPENAM-1749</link>).
     </para>
    </listitem>
+-->
   </itemizedlist>
  </section>
  
