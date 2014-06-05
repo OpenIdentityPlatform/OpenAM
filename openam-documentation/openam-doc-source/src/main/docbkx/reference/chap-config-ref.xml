@@ -5219,6 +5219,37 @@
     </listitem>
    </varlistentry>
 
+
+   <varlistentry>
+    <term><literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal></term>
+    <listitem>
+     <para>
+      Controls whether the results of resource file lookup should be cached.
+     </para>
+
+     <para>
+      While you are customizing the UI as described in
+      <link
+       xlink:href="install-guide#update-classic-ui"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       xlink:show="new"
+      ><citetitle>Updating the Classic UI</citetitle></link>,
+      set this property to <literal>false</literal>
+      to allow OpenAM immediately to pick up changes
+      to the files as you customize them.
+     </para>
+
+     <para>
+      Reset this to the default, <literal>true</literal>,
+      when using OpenAM in production.
+     </para>
+
+     <para>
+      Default: <literal>true</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>securidHelper.ports</literal></term>
     <listitem>

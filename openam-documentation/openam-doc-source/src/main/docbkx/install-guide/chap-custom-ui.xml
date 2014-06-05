@@ -70,6 +70,21 @@
  to modify images for your deployment, you can maintain the sizes to avoid
  having to customize page layout extensively.</para>
 
+ <para>
+  While customizing the UI, you can set the advanced server property,
+  <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,
+  to <literal>false</literal> to allow OpenAM immediately to pick up changes
+  to the files as you customize them.
+  This includes both the XML callback files for authentication modules
+  used both by the classic UI and also by the XUI,
+  and the JSP files used by the classic UI.
+  You can set advanced server properties in OpenAM Console under
+  Configuration > Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
+  Before using OpenAM in production, set
+  <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>
+  back to the default setting, <literal>true</literal>.
+ </para>
+
  <section xml:id="update-classic-ui">
      <title>Updating the Classic UI</title>
 

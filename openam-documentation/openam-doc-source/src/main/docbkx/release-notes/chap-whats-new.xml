@@ -234,6 +234,23 @@ Agreement (yes/no): [no]:</screen>
 
   <listitem>
     <para>
+     <emphasis role="bold">Quicker UI Customization</emphasis>.
+     While customizing the UI, you can set the advanced server property,
+     <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,
+     to <literal>false</literal> to allow OpenAM immediately to pick up changes
+     to the files as you customize them
+     (<link
+       xlink:show="new"
+       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3989"
+      >OPENAM-3989</link>).
+     You can set advanced server properties in OpenAM Console under
+     Configuration > Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
+     For production servers, leave this set to the default, <literal>true</literal>.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
      <emphasis role="bold">Policy Support for Common HTTP Operations</emphasis>.
      OpenAM policies now let you allow and deny not only HTTP GET and HTTP POST,
      but also HTTP DELETE, HEAD, OPTIONS, PATCH, and PUT
