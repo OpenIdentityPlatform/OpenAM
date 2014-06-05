@@ -251,6 +251,26 @@ Agreement (yes/no): [no]:</screen>
 
   <listitem>
     <para>
+     <emphasis role="bold">OpenID Connect Registration Without an Access Token</emphasis>.
+     OpenAM can now be configured to let OpenID Connect clients
+     register dynamically without having to provide an access token
+     (<link
+       xlink:show="new"
+       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3604"
+      >OPENAM-3604</link>).
+     For details, see the documentation on the advanced server property,
+     <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
+     in the <citetitle>OpenAM Reference</citetitle> section,
+     <link
+      xlink:show="new"
+      xlink:href="reference#servers-advanced-configuration"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Servers > Advanced</citetitle></link>.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
      <emphasis role="bold">Policy Support for Common HTTP Operations</emphasis>.
      OpenAM policies now let you allow and deny not only HTTP GET and HTTP POST,
      but also HTTP DELETE, HEAD, OPTIONS, PATCH, and PUT

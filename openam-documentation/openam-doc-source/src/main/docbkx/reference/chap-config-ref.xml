@@ -5251,6 +5251,25 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal></term>
+    <listitem>
+     <para>
+      Controls whether OpenID Connect clients can register dynamically
+      without providing an access token.
+     </para>
+
+     <para>
+      If you set this to <literal>true</literal> in production,
+      take care to limit or throttle dynamic client registrations.
+     </para>
+
+     <para>
+      Default: <literal>false</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>securidHelper.ports</literal></term>
     <listitem>
      <para>Port on which SecurID daemon listens.</para>

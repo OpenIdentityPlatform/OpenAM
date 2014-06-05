@@ -131,6 +131,21 @@
    statically, as for other OAuth 2.0 clients, and also dynamically as specified
    by OpenID Connect. To allow dynamic registration, you register an initial
    client that other clients can use to get access tokens for registration.</para>
+
+   <para>
+    You can also enable OpenID Connect clients to register dynamically
+    without having to provide an access token.
+    For details, see the documentation on the advanced server property,
+    <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
+    in the <citetitle>OpenAM Reference</citetitle> section,
+    <link
+     xlink:show="new"
+     xlink:href="reference#servers-advanced-configuration"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Servers > Advanced</citetitle></link>.
+    Take care to limit or throttle dynamic client registration
+    if you enable this capability on production systems.
+   </para>
   </section>
 
   <section xml:id="openam-openid-session-management">
@@ -342,6 +357,18 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
    <xref linkend="register-openid-connect-client-static" />. Other clients can
    then use that client to obtain the access token needed to perform dynamic
    registration.</para>
+
+   <tip>
+    <para>
+     As described in <xref linkend="openam-openid-client-registration" />,
+     You can allow clients to register without having an access token
+     by setting the advanced server property,
+     <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
+     to <literal>true</literal>.
+     When using that setting in production systems,
+     take care to limit or throttle dynamic client registration.
+    </para>
+   </tip>
 
    <para>On successful registration, OpenAM responds with information including
    an access token to allow the client subsequently to read and edit its
