@@ -537,33 +537,101 @@ string=amlbcookie</computeroutput>
  </section>
 
  <section xml:id="rest-api-tokens">
-  <title>Token Validation, Attribute Retrieval</title>
+  <title>Token Validation</title>
 
-  <!-- Pending replacement
-  <para>Interface Stability: <link xlink:show="new"
-  xlink:href="admin-guide#interface-stability"
-  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
+  <indexterm>
+   <primary>Token validation</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
 
-  <para>You check whether a token is valid as follows.</para>
+  <para>
+   OpenAM provides REST APIs for validating SSO tokens.
+  </para>
 
-  <screen>
+  <itemizedlist>
+   <listitem>
+    <para>
+     Under <literal>/json/sessions</literal>
+     you find the newer JSON-based API.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-token-validation" /> below.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Under <literal>/identity/isTokenValid</literal>
+     you find the backwards compatible, legacy APIs.
+    </para>
+
+    <para>
+     See <xref linkend="rest-api-tokens-legacy" /> below.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-token-validation">
+   <title>Token Validation</title>
+
+   <para>
+    To check over REST whether a token is valid,
+    perform an HTTP POST
+    to the resource URL,
+    <literal>/json/sessions/<replaceable>tokenId</replaceable></literal>,
+    using the <literal>validate</literal> action
+    as shown in the following example.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
+<computeroutput>{"valid":true,"uid":"demo","realm":"/realm"}</computeroutput>
+   </screen>
+
+   <para>
+    An invalid token returns only information about the validity.
+   </para>
+
+   <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ http://openam.example.com:8080/openam/json/sessions/AQIC5...?_action=validate</userinput>
+<computeroutput>{"valid":false}</computeroutput>
+   </screen>
+  </section>
+
+  <section xml:id="rest-api-tokens-legacy">
+   <title>Token Validation, Attribute Retrieval (Legacy API)</title>
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+   <para>You check whether a token is valid as follows.</para>
+
+   <screen>
 $ <userinput>curl \
  --request POST \
  --data "tokenid=AQIC5w...*AAJTSQACMDE.*" \
  https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
 <computeroutput>boolean=true</computeroutput>
-  </screen>
-  
-  <para>An invalid token returns <literal>boolean=false</literal>.</para>
-  
-  <screen>
+   </screen>
+
+   <para>An invalid token returns <literal>boolean=false</literal>.</para>
+
+   <screen>
 $ <userinput>curl \
  --request POST \
  --data "tokenid=INVALID" \
  https://openam.example.com:8443/openam/identity/isTokenValid</userinput>
 <computeroutput>boolean=false</computeroutput>
-  </screen>
-  
+   </screen>
+
   <para>With a valid token, you can retrieve attributes about the subject.
   OpenAM returns a series of <replaceable>name</replaceable>,
   <replaceable>value</replaceable> pairs.</para>
@@ -571,11 +639,6 @@ $ <userinput>curl \
   <para>The newer API for retrieving user information is demonstrated in
   <xref linkend="rest-api-read-identity" />. What follows describes the
   legacy API.</para>
-  
-  <indexterm>
-   <primary>User data</primary>
-   <secondary>REST access</secondary>
-  </indexterm>
 
   <screen>
 $ <userinput>curl \
@@ -609,11 +672,11 @@ userdetails.attribute.value=inetOrgPerson
 userdetails.attribute.value=krbprincipalaux
 userdetails.attribute.value=krbTicketPolicyAux
 userdetails.attribute.value=top</computeroutput>
-  </screen>
-  
-  <para>You can specify attributes to limit what you retrieve.</para>
-  
-  <screen>
+   </screen>
+
+   <para>You can specify attributes to limit what you retrieve.</para>
+
+   <screen>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
 subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
 &amp;attributenames=mail\
@@ -624,13 +687,13 @@ userdetails.attribute.name=uid
 userdetails.attribute.value=bjensen
 userdetails.attribute.name=mail
 userdetails.attribute.value=bjensen@example.com</computeroutput>
-  </screen>
+   </screen>
 
-  <para>When retrieving attributes, you can refresh the session thus setting
-  the idle time to 0, by adding the boolean parameter
-  <literal>refresh=true</literal> to the query string.</para>
-  
-  <screen>
+   <para>When retrieving attributes, you can refresh the session thus setting
+   the idle time to 0, by adding the boolean parameter
+   <literal>refresh=true</literal> to the query string.</para>
+
+   <screen>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
 subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
 &amp;attributenames=cn\
@@ -640,25 +703,25 @@ subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
 userdetails.attribute.name=cn
 userdetails.attribute.value=Babs Jensen
 userdetails.attribute.value=Barbara Jensen</computeroutput>
-  </screen>
+   </screen>
 
-  <para>
-   You can specify the following attributes to retrieve information
-   about the user's session time limits and current session:
-   <literal>maxsessiontime</literal> (maximum length of a session),
-   <literal>maxidletime</literal> (maximum idle time allowed during a session),
-   <literal>idletime</literal> (actual idle time during the current session),
-   <literal>timeleft</literal> (actual time left in session).
-   The unit for maximum times is minutes.
-   The unit for actual times is seconds.
-  </para>
+   <para>
+    You can specify the following attributes to retrieve information
+    about the user's session time limits and current session:
+    <literal>maxsessiontime</literal> (maximum length of a session),
+    <literal>maxidletime</literal> (maximum idle time allowed during a session),
+    <literal>idletime</literal> (actual idle time during the current session),
+    <literal>timeleft</literal> (actual time left in session).
+    The unit for maximum times is minutes.
+    The unit for actual times is seconds.
+   </para>
 
-  <para>
-   Also use the parameter <literal>refresh=false</literal>
-   to avoid changing the <literal>idletime</literal> with your request.
-  </para>
+   <para>
+    Also use the parameter <literal>refresh=false</literal>
+    to avoid changing the <literal>idletime</literal> with your request.
+   </para>
 
-  <screen>
+   <screen>
 $ <userinput>curl \
 --data "subjectid=AQIC5w....*AAJTSQACMDE.*\
  &amp;attributenames=idletime\
@@ -677,10 +740,11 @@ userdetails.attribute.name=idletime
 userdetails.attribute.value=664
 userdetails.attribute.name=timeleft
 userdetails.attribute.value=6319</computeroutput>
-   </screen>
+  </screen>
 
+  </section>
  </section>
- 
+
  <section xml:id="rest-api-authz">
   <title>Authorization &amp; Policy Management</title>
   <indexterm>

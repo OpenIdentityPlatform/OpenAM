@@ -234,8 +234,8 @@
      <member>/identity/authorize</member>
      <member>/identity/create</member>
      <member>/identity/delete</member>
-     <!-- Pending replacement <member>/identity/isTokenValid</member>
-     <member>/identity/log</member> -->
+     <member>/identity/isTokenValid</member>
+     <!-- Pending replacement <member>/identity/log</member> -->
      <member>/identity/logout</member>
      <member>/identity/read</member>
      <member>/identity/search</member>
@@ -302,12 +302,10 @@
         <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
        </row>
 
-       <!--
        <row>
         <entry>/identity/isTokenValid</entry>
-        <entry>Pending replacement</entry>
+        <entry>/json/sessions/<replaceable>tokenId</replaceable>?_action=validate</entry>
        </row>
-       -->
 
        <!--
        <row>
