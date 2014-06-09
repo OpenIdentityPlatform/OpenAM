@@ -56,6 +56,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -94,6 +95,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
     private static final String agentGroupNode = "agentgroup";
     private static final String instancesNode = "ou=Instances,";
     private static final String hashAlgStr = "{SHA-1}";
+    private static final String oauth2Attribute = "com.forgerock.openam.oauth2provider.clientType";
 
     IdRepoListener repoListener = null;
 
@@ -240,7 +242,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         }
         try {
             Set vals = (Set) attrMap.get("userpassword");
-            if (vals != null) {
+            if ((vals != null) && !AgentConfiguration.AGENT_TYPE_OAUTH2.equals(agentType)) {
                 Set hashedVals = new HashSet();
                 Iterator it = vals.iterator();
                 while (it.hasNext()) {
@@ -1046,7 +1048,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             }
 
             Set vals = (Set) attributes.get("userpassword");
-            if (vals != null) {
+            if (vals != null && !AgentConfiguration.AGENT_TYPE_OAUTH2.equals(aCfg.getSchemaID())) {
                 Set hashedVals = new HashSet();
                 Iterator it = vals.iterator();
                 while (it.hasNext()) {
@@ -1324,6 +1326,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
         // Obtain user name and password from credentials and compare
         // with the ones from the agent profile to authorize the agent.
         String username = null;
+        String unhashedPassword = null;
         String password = null;
         for (int i = 0; i < credentials.length; i++) {
             if (credentials[i] instanceof NameCallback) {
@@ -1336,8 +1339,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 char[] passwd = ((PasswordCallback) credentials[i])
                         .getPassword();
                 if (passwd != null) {
-                    password = new String(passwd);
-                    password = hashAlgStr + Hash.hash(password);
+                    unhashedPassword = new String(passwd);
+                    password = hashAlgStr + Hash.hash(unhashedPassword);
                     if (debug.messageEnabled()) {
                         debug.message("AgentsRepo.authenticate() passwd "
                             + "present");
@@ -1346,7 +1349,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             }
         }
         if (username == null || (username.length() == 0) || 
-            password == null) {
+            password == null || unhashedPassword == null) {
             Object args[] = { NAME };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "221", args);
         }
@@ -1365,6 +1368,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             }
             Set pSet = new HashSet(2);
             pSet.add("userpassword");
+            pSet.add(oauth2Attribute);
             Map ansMap = new HashMap();
             String userPwd = null;
             ansMap = getAttributes(adminToken, IdType.AGENTONLY, 
@@ -1372,7 +1376,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             Set userPwdSet = (Set) ansMap.get("userpassword"); 
             if ((userPwdSet != null) && (!userPwdSet.isEmpty())) {
                 userPwd = (String) userPwdSet.iterator().next();
-                if (!(answer = password.equals(userPwd))) {
+                if (!(answer = password.equals(userPwd)) && !(answer = oauth2PasswordMatch(ansMap, unhashedPassword, userPwd))) {
                     throw (new InvalidPasswordException("invalid password",
                         userid));
                 }
@@ -1388,6 +1392,10 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             }
         }
         return (answer);
+    }
+
+    private boolean oauth2PasswordMatch(Map attributeMap, String unhashedPassword, String userPassword) {
+        return attributeMap.keySet().contains(oauth2Attribute) && unhashedPassword.equals(userPassword);
     }
 
     /*
