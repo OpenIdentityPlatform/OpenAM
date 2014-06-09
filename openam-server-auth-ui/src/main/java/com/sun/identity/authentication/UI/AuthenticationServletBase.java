@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012, 2014 ForgeRock AS
  */
 package com.sun.identity.authentication.UI;
 
@@ -111,14 +111,11 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
     {
         ViewBeanManager viewBeanManager = requestContext.getViewBeanManager();
         AuthExceptionViewBean vb = (AuthExceptionViewBean) 
-            viewBeanManager.getViewBean(
-            com.sun.identity.authentication.UI.AuthExceptionViewBean.class);
-        if (exDebug.messageEnabled()) {
-            exDebug.message("AuthenticationServletBase.onUncaughtException:"
-                , e);
-        }
+                viewBeanManager.getViewBean(
+                com.sun.identity.authentication.UI.AuthExceptionViewBean.class);
+        exDebug.error("AuthenticationServletBase.onUncaughtException:", e);
         vb.forwardTo(requestContext);
-    }
+     }
 
     @Override
     protected void onPageSessionDeserializationException(
