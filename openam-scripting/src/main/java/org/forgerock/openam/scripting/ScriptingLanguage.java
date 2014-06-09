@@ -34,11 +34,4 @@ public interface ScriptingLanguage {
      * @return the JSR 223 scripting engine for this language.
      */
     ScriptEngine getScriptEngine(ScriptEngineManager scriptEngineManager);
-
-    /**
-     * Gets a script validator for validating scripts in this scripting language.
-     *
-     * @return the validator for this scripting language.
-     */
-    ScriptValidator getScriptValidator();
 }

@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.scripting;
 
-import org.forgerock.guice.core.InjectorHolder;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -37,13 +35,6 @@ public enum SupportedScriptingLanguage implements ScriptingLanguage {
          */
         public ScriptEngine getScriptEngine(final ScriptEngineManager scriptEngineManager) {
             return scriptEngineManager.getEngineByName("javascript");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public ScriptValidator getScriptValidator() {
-            return InjectorHolder.getInstance(ScriptValidator.class);
         }
     }
 
