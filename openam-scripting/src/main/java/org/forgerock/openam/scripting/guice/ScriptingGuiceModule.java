@@ -19,7 +19,9 @@ package org.forgerock.openam.scripting.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.forgerock.guice.core.GuiceModule;
+import org.forgerock.openam.scripting.StandardScriptValidator;
 import org.forgerock.openam.scripting.ScriptEvaluator;
+import org.forgerock.openam.scripting.ScriptValidator;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
 
 import javax.inject.Singleton;
@@ -35,6 +37,7 @@ public class ScriptingGuiceModule extends AbstractModule {
     protected void configure() {
 
         bind(ScriptEvaluator.class).to(StandardScriptEvaluator.class);
+        bind(ScriptValidator.class).to(StandardScriptValidator.class);
 
     }
 

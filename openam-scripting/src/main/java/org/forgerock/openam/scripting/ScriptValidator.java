@@ -16,35 +16,22 @@
 
 package org.forgerock.openam.scripting;
 
-import org.forgerock.guice.core.InjectorHolder;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import java.util.List;
 
 /**
- * Standard scripting languages supported by OpenAM.
+ * Common component for Validating scripts in one of the supported scripting languages.
  *
  * @since 12.0.0
  */
-public enum SupportedScriptingLanguage implements ScriptingLanguage {
+public interface ScriptValidator {
 
     /**
-     * Javascript/ECMAScript support based on the Rhino engine.
+     * Validate the given script for the particular language rules and produces a list of
+     * {@link ScriptError} instances if any validation errors occurred.
+     * @param script the script that needs to be validated.
+     * @return a list of validation errors if validation failed and an empty list if validation passed.
+     * @throws java.lang.NullPointerException if script is empty.
      */
-    JAVASCRIPT {
-        /**
-         * {@inheritDoc}
-         */
-        public ScriptEngine getScriptEngine(final ScriptEngineManager scriptEngineManager) {
-            return scriptEngineManager.getEngineByName("javascript");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public ScriptValidator getScriptValidator() {
-            return InjectorHolder.getInstance(ScriptValidator.class);
-        }
-    }
+    List<ScriptError> validateScript(ScriptObject script);
 
 }
