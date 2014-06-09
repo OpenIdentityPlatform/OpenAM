@@ -52,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.mail.MessagingException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -130,6 +131,8 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String CURRENTPASSWORD = "currentpassword";
 
     private final MailServerLoader mailServerLoader;
+
+    private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
 
     /**
      * Creates a backend
@@ -498,7 +501,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         RealmContext realmContext = context.asContext(RealmContext.class);
         final String realm = realmContext.getRealm();
-        RestSecurity restSecurity = new RestSecurity(realm);
+        RestSecurity restSecurity = getRestSecurity(realm);
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
@@ -1326,7 +1329,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             } else {
                 // Handle attribute change when password is required
                 // Get restSecurity for this realm
-                RestSecurity restSecurity = new RestSecurity(realm);
+                RestSecurity restSecurity = getRestSecurity(realm);
                 // Make sure user is not admin and check to see if we are requiring a password to change any attributes
                 Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
                 if (protectedUserAttributes != null && !isAdmin(context)) {
@@ -1440,5 +1443,24 @@ public final class IdentityResource implements CollectionResourceProvider {
         private String getTokenID() {
             return tokenID;
         }
+    }
+
+    /**
+     * Retrieve cached realm's RestSecurity instance 
+     **/
+    private RestSecurity getRestSecurity(String realm) {
+        RestSecurity restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+        if (restSecurity == null) {
+            synchronized(REALM_REST_SECURITY_MAP) {
+                restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+                if (restSecurity == null) {
+                    restSecurity = new RestSecurity(realm);
+                    REALM_REST_SECURITY_MAP.put(realm, restSecurity);
+                }
+            }
+        } else {
+            restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+        }
+        return restSecurity;
     }
 }
