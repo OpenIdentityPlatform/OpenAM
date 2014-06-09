@@ -1839,8 +1839,7 @@ $ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinp
    </orderedlist>
 
    <orderedlist>
-       <para>By default, WebLogic uses its own classes if a class exists in both the parent and child classloaders.
-           To use OpenAM with its own classes,
+       <para>On WebLogic 11g,
            create a WebLogic deployment descriptor file <literal>weblogic.xml</literal>
            and place it in the <literal>/WEB-INF</literal> directory.
            The descriptor file maps resources defined for OpenAM.
@@ -1854,14 +1853,17 @@ $ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinp
      http://xmlns.oracle.com/weblogic/weblogic-web-app/1.3/weblogic-web-app.xsd">
         &lt;context-root>/openam&lt;/context-root>
         &lt;container-descriptor>
-           &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
+           &lt;prefer-web-inf-classes>false&lt;/prefer-web-inf-classes>
+           &lt;prefer-application-packages>
+             &lt;package-name>org.apache.commons.lang.*&lt;/package-name>
+           &lt;/prefer-application-packages>
         &lt;/container-descriptor>
   &lt;/weblogic-web-app></programlisting>
    </listitem>
 
    <listitem>
     <para>
-     Start WebLogic server.
+     Start the WebLogic server.
     </para>
    </listitem>
   </orderedlist>
