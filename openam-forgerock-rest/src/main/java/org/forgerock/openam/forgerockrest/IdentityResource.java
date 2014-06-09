@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.encode.Hash;
@@ -112,7 +113,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         idSvcsAttrList = new ArrayList();
         idSvcsAttrList.add(new Attribute("objecttype", userval));
         idSvcsAttrList.add(new Attribute("realm", realmval));
-        restSecurity = new RestSecurity(realm);
+        restSecurity = getRestSecurity(realm);
     }
 
     // Constructor used for testing...
@@ -128,6 +129,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
     }
+
+    private static final Map<String, RestSecurity> REALM_REST_SECURITY_MAP = new ConcurrentHashMap<String, RestSecurity>();
 
     /**
      * Gets the user id from the session provided in the server context
@@ -1237,5 +1240,23 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Retrieve cached realm's RestSecurity instance
+     **/
+    private RestSecurity getRestSecurity(String realm) {
+        RestSecurity restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+        if (restSecurity == null) {
+            synchronized(REALM_REST_SECURITY_MAP) {
+                restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+                if (restSecurity == null) {
+                    restSecurity = new RestSecurity(realm);
+                    REALM_REST_SECURITY_MAP.put(realm, restSecurity);
+                }
+            }
+        } else {
+            restSecurity = REALM_REST_SECURITY_MAP.get(realm);
+        }
+        return restSecurity;
+    }
 
 }
