@@ -268,4 +268,48 @@ public class AccessTokenServiceImplTest {
         verify(accessToken).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
     }
+
+    /**
+     * OPENAM-3997 - ensure that when the setting to generate new refresh tokens is enabled that the new refresh
+     * token id is returned rather than the old one.
+     */
+    @Test
+    public void shouldReturnNewRefreshTokenIdWhenRefreshing() throws Exception {
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        RefreshToken refreshToken = mock(RefreshToken.class);
+        RefreshToken newRefreshToken = mock(RefreshToken.class);
+        Set<String> validatedScope = new HashSet<String>();
+        AccessToken accessToken = mock(AccessToken.class);
+        String newRefreshTokenId = "NEW_REFRESH_TOKEN_ID";
+
+        given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(refreshToken.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
+                anySetOf(String.class), eq(request))).willReturn(validatedScope);
+
+        given(providerSettings.issueRefreshTokensOnRefreshingToken()).willReturn(true);
+        given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
+                eq(request))).willReturn(newRefreshToken);
+        given(newRefreshToken.getTokenId()).willReturn(newRefreshTokenId);
+
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyString(), anySetOf(String.class), eq(newRefreshToken), anyString(), eq(request)))
+                .willReturn(accessToken);
+
+        //When
+        AccessToken actualAccessToken = accessTokenService.refreshToken(request);
+
+        //Then
+        verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
+        verify(accessToken, never()).addExtraData(eq("scope"), anyString());
+        verify(accessToken).addExtraData("refresh_token", newRefreshTokenId);
+        assertEquals(actualAccessToken, accessToken);
+
+    }
 }

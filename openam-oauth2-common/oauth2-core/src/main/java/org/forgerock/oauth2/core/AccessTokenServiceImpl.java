@@ -142,7 +142,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 newRefreshToken == null ? refreshToken : newRefreshToken, null, request);
 
         if (newRefreshToken != null) {
-            accessToken.addExtraData("refresh_token", refreshToken.getTokenId());
+            accessToken.addExtraData("refresh_token", newRefreshToken.getTokenId());
         }
 
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
