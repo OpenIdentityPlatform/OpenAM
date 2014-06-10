@@ -1253,8 +1253,6 @@ public final class IdentityResource implements CollectionResourceProvider {
                     REALM_REST_SECURITY_MAP.put(realm, restSecurity);
                 }
             }
-        } else {
-            restSecurity = REALM_REST_SECURITY_MAP.get(realm);
         }
         return restSecurity;
     }
