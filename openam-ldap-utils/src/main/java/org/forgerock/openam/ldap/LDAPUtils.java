@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.ldap;
 
@@ -66,7 +66,6 @@ public class LDAPUtils {
     private static final String LDAP_SCOPE_SUB = "SCOPE_SUB";
     private static final Map<String, SearchScope> scopes;
     private static final Debug DEBUG = Debug.getInstance("LDAPUtils");
-    private static final int DEFAULT_HEARTBEAT_TIMEOUT_MS = 500;
 
     static {
         Map<String, SearchScope> mappings = new HashMap<String, SearchScope>(3);
@@ -222,8 +221,7 @@ public class LDAPUtils {
         ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
         if (heartBeatInterval > 0) {
             TimeUnit unit = TimeUnit.valueOf(heartBeatTimeUnit.toUpperCase());
-            cf = Connections.newHeartBeatConnectionFactory(cf, unit.toMillis(heartBeatInterval),
-                    DEFAULT_HEARTBEAT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            cf = Connections.newHeartBeatConnectionFactory(cf, unit.toSeconds(heartBeatInterval), TimeUnit.SECONDS);
         }
         if (username != null) {
             cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
