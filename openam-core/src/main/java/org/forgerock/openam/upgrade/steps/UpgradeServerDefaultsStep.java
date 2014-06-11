@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,47 +10,46 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
-import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_CONFIG;
-import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_ID;
-
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
-
+import javax.inject.Inject;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.upgrade.ServerUpgrade;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 
-import javax.inject.Inject;
+import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_CONFIG;
+import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_ID;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
 /**
  * Detects changes made to default server properties and upgrades them if required.
- *
- * @author Peter Major
  */
 @UpgradeStepInfo(dependsOn = "*")
 public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
 
+    private static final String VALID_SERVER_CONFIG_PROPERTIES = "/validserverconfig.properties";
     private static final String NEW_ATTRS = "%NEW_ATTRS%";
     private static final String MOD_ATTRS = "%MOD_ATTRS%";
     private static final String DEL_ATTRS = "%DEL_ATTRS%";
-    private Map<String, String> existingValues;
+    private Map<String, String> existingDefaults;
     private Map<String, String> addedAttrs;
     private Map<String, String> modifiedAttrs;
     private Set<String> deletedAttrs;
-    private Map<String, String> upgradedValues;
 
     @Inject
     public UpgradeServerDefaultsStep(final PrivilegedAction<SSOToken> adminTokenAction,
@@ -68,37 +65,36 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     @Override
     public void initialize() throws UpgradeException {
         try {
-            existingValues = new HashMap(ServerConfiguration.getServerInstance(getAdminToken(),
+            existingDefaults = new HashMap(ServerConfiguration.getServerInstance(getAdminToken(),
                     ServerConfiguration.DEFAULT_SERVER_CONFIG));
-            Map<String, String> newValues = ServerConfiguration.getNewServerDefaults(getAdminToken());
+            Map<String, String> newDefaults = ServerConfiguration.getNewServerDefaults(getAdminToken());
+
+            Properties validProperties = new Properties();
+            validProperties.load(getClass().getResourceAsStream(VALID_SERVER_CONFIG_PROPERTIES));
+            Map<String, String> validServerProperties = new HashMap(validProperties);
+
             Set<String> attrsToUpgrade = ServerUpgrade.getAttrsToUpgrade();
-            addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
-            modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues, attrsToUpgrade);
-            deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
-            upgradedValues = new HashMap<String, String>(existingValues);
-
-            for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
-                upgradedValues.put(newAttr.getKey(), newAttr.getValue());
-            }
-
-            for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
-                upgradedValues.put(modAttr.getKey(), modAttr.getValue());
-            }
-
-            for (String deletedAttr : deletedAttrs) {
-                upgradedValues.remove(deletedAttr);
-            }
+            addedAttrs = calculateAddedServerDefaults(newDefaults, existingDefaults);
+            modifiedAttrs = calculateModifiedServerDefaults(newDefaults, existingDefaults, attrsToUpgrade);
+            deletedAttrs = calculateDeletedServerDefaults(existingDefaults, validServerProperties);
         } catch (Exception ex) {
             throw new UpgradeException(ex);
         }
     }
 
-    private static Map<String, String> calculateAddedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
+    /**
+     * Finds newly added default server properties.
+     *
+     * @param newDefaults The default server properties defined in the new version.
+     * @param existingDefaults The default server properties defined in the current version.
+     * @return The newly added properties.
+     */
+    protected Map<String, String> calculateAddedServerDefaults(Map<String, String> newDefaults,
+            Map<String, String> existingDefaults) {
         Map<String, String> addedValues = new HashMap<String, String>();
 
-        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
-            if (!(existingValues.containsKey(newAttr.getKey()))) {
+        for (Map.Entry<String, String> newAttr : newDefaults.entrySet()) {
+            if (!existingDefaults.containsKey(newAttr.getKey())) {
                 addedValues.put(newAttr.getKey(), newAttr.getValue());
             }
         }
@@ -107,38 +103,45 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     }
 
     /**
-     * Only include in the list of modified attributes those that are listed in
-     * the serverupgrade.properites file; otherwise existing properties that
-     * have been locally modified will be over-written.
+     * Only include in the list of modified attributes those that are listed in the serverupgrade.properites file;
+     * otherwise existing properties that have been locally modified would be over-written.
      *
-     * @param newValues
-     * @param existingValues
-     * @return modified key value pairs
+     * @param newDefaults The default server properties defined in the new version.
+     * @param existingDefaults The default server properties defined in the current version.
+     * @param attrToModify Attributes that should be checked for modification.
+     * @return Modified key value pairs.
      */
-    private static Map<String, String> calculateModifiedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrToModify) {
+    protected Map<String, String> calculateModifiedServerDefaults(Map<String, String> newDefaults,
+            Map<String, String> existingDefaults, Set<String> attrToModify) {
         Map<String, String> modifiedValues = new HashMap<String, String>();
 
-        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
-            if (attrToModify.contains(newAttr.getKey())) {
-                if (existingValues.containsKey(newAttr.getKey())) {
-                    if (!(existingValues.get(newAttr.getKey()).equals(newAttr.getValue()))) {
-                        modifiedValues.put(newAttr.getKey(), newAttr.getValue());
-                    }
-                }
+        for (String attrName : attrToModify) {
+            String newAttr = newDefaults.get(attrName);
+            String existingAttr = existingDefaults.get(attrName);
+            if (newAttr != null && existingAttr != null && !newAttr.equals(existingAttr)) {
+                modifiedValues.put(attrName, newAttr);
             }
         }
 
         return modifiedValues;
     }
 
-    private static Set<String> calculateDeletedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
+    /**
+     * Finds deleted attributes by comparing the currently defined properties against the new valid server properties.
+     * By comparing against the valid server properties we can ensure that manually defined custom properties will not
+     * be removed.
+     *
+     * @param existingDefaults The currently defined default server properties.
+     * @param validServerProperties The valid server properties defined in validserverconfig.properties.
+     * @return The attributenames that are no longer valid.
+     */
+    protected Set<String> calculateDeletedServerDefaults(Map<String, String> existingDefaults,
+            Map<String, String> validServerProperties) {
         Set<String> deletedValues = new HashSet<String>();
 
-        for (Map.Entry<String, String> existingAttr : existingValues.entrySet()) {
-            if (!(newValues.containsKey(existingAttr.getKey()))) {
-                deletedValues.add(existingAttr.getKey());
+        for (String existingAttr : existingDefaults.keySet()) {
+            if (!validServerProperties.containsKey(existingAttr)) {
+                deletedValues.add(existingAttr);
             }
         }
 
@@ -149,6 +152,11 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     public void perform() throws UpgradeException {
         try {
             UpgradeProgress.reportStart("upgrade.platformupdate");
+            Map<String, String> upgradedValues = new HashMap<String, String>(existingDefaults);
+            upgradedValues.putAll(addedAttrs);
+            upgradedValues.putAll(modifiedAttrs);
+            upgradedValues.keySet().removeAll(deletedAttrs);
+
             ServerConfiguration.upgradeServerInstance(getAdminToken(), DEFAULT_SERVER_CONFIG, DEFAULT_SERVER_ID,
                     upgradedValues);
             UpgradeProgress.reportEnd("upgrade.success");
@@ -208,7 +216,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
                 sb.append(modAttr.getKey()).append(delimiter);
                 sb.append(INDENT).append(BUNDLE.getString("upgrade.old")).append(' ');
                 sb.append(BUNDLE.getString("upgrade.value")).append(": ");
-                sb.append(existingValues.get(modAttr.getKey())).append(delimiter);
+                sb.append(existingDefaults.get(modAttr.getKey())).append(delimiter);
                 sb.append(INDENT).append(BUNDLE.getString("upgrade.new")).append(' ');
                 sb.append(BUNDLE.getString("upgrade.value")).append(": ");
                 sb.append(modAttr.getValue()).append(delimiter);
