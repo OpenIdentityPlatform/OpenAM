@@ -1292,6 +1292,25 @@
      </para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Session monitoring history size</term>
+    <listitem>
+     <para>
+      Maximum number of sessions on which to base
+      the data exposed through the monitoring system
+     </para>
+
+     <para>
+      Valid range is 100 - 1000000. Default: 10000
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+     <literal>iplanet-am-monitoring-session-window</literal>
+     </para>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="system-platform">

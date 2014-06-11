@@ -311,6 +311,11 @@ $ <userinput>ssoadm \
   <section xml:id="snmp-policy-evaluation">
    <title>SNMP Monitoring For Policy Evaluation</title>
 
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>Policy evaluation</secondary>
+   </indexterm>
+
    <para>
     You can monitor policy evaluation performance over SNMP.
     OpenAM records statistics for up to
@@ -605,6 +610,354 @@ $ <userinput>ssoadm \
        <entry>
         <para>
          <literal>SnmpAdminString</literal>
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+
+  <section xml:id="snmp-sessions">
+   <title>SNMP Monitoring For Sessions</title>
+
+   <indexterm>
+    <primary>Monitoring</primary>
+    <secondary>Sessions</secondary>
+   </indexterm>
+
+   <para>
+    You can monitor session statistics over SNMP.
+    OpenAM records statistics for up to
+    a configurable number of recent sessions.
+    (You can configure the number in OpenAM Console
+    under Configuration > System > Monitoring.
+    For details, see the system configuration reference section,
+    <link
+     xlink:href="reference#system-monitoring"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+     ><citetitle>Monitoring</citetitle></link>.)
+   </para>
+
+   <para>
+    Interface Stability:
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#interface-stability"
+     xlink:role="http://docbook.org/xlink/role/olink">Evolving</link>
+   </para>
+
+   <para>
+    As described in <xref linkend="cts-monitor-commands" />,
+    SNMP uses OIDs defined in a Management Information Base (MIB) file
+    that specifies the statistics OpenAM keeps for policy evaluation operations,
+    <link
+     xlink:show="new"
+     xlink:href="https://svn.forgerock.org/openam/trunk/openam/openam-schema/openam-mib-schema/src/main/resources/mib/FORGEROCK-OPENAM-SESSION.mib"
+     ><filename>FORGEROCK-OPENAM-SESSION.mib</filename></link>.
+    Adapt the examples in <xref linkend="cts-monitor-commands" />
+    to read monitoring statistics about sessions on the command line.
+   </para>
+
+   <para>
+    When monitoring is active, OpenAM records statistics about
+    both the numbers of internal, remote, and CTS sessions,
+    and also the times taken to process sessions.
+   </para>
+
+   <para>
+    The statistics are all read-only.
+    The base OID for session statistics is
+    <literal>enterprises.36733.1.2.777</literal>.
+    Times are expressed in nanoseconds rather than milliseconds,
+    as many operations take less than one millisecond.
+    The following table describes the values that you can read.
+   </para>
+
+   <table xml:id="snmp-sessions-oids">
+    <title>OIDs Used in SNMP Monitoring For Sessions</title>
+
+    <tgroup cols="3">
+     <colspec colnum="1" colwidth="2*"/>
+     <colspec colnum="2" colwidth="2*"/>
+     <colspec colnum="3" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>OID</entry>
+       <entry>Description</entry>
+       <entry>Syntax</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.1.1</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Total number of current internal sessions
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.1.2</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to refresh an internal session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.1.3</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to logout an internal session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.1.4</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to destroy an internal session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.1.5</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to set a property on an internal session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.2.1</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Total number of current remote sessions
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.2.2</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to refresh a remote session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.2.3</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to logout a remote session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.2.4</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to destroy a remote session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.2.5</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to set a property on a remote session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.3.1</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Total number of sessions currently in the Core Token Service (CTS)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.3.2</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to refresh a CTS session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.3.3</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to logout a CTS session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.3.4</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to destroy a CTS session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
+        </para>
+       </entry>
+      </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>enterprises.36733.1.2.777.3.5</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Average time it takes to set a property on a CTS session
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>Counter64</literal>
         </para>
        </entry>
       </row>
