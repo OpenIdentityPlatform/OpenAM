@@ -840,30 +840,25 @@ public class AuthContext extends Object implements java.io.Serializable {
         }
     }
 
-    private void runRemoteLogin(IndexType indexType, String indexName,
-        String[] params, boolean pCookie, Map envMap, String locale,
-        HttpServletRequest req, HttpServletResponse res)
-        throws AuthLoginException {
+    private void runRemoteLogin(IndexType indexType, String indexName, String[] params, boolean pCookie, Map envMap,
+            String locale, HttpServletRequest req, HttpServletResponse res) throws AuthLoginException {
         try {
-            String xmlString = null;
+            String xmlString;
             // remote auth
             StringBuilder request = new StringBuilder(100);
-            String[] authHandles = new String[1];
-            authHandles[0] = getAuthHandle();
-            if ((ssoTokenID != null) && (authHandles[0].equals("0"))) {
+            String authHandle = getAuthHandle();
+            if (ssoTokenID != null && "0".equals(authHandle)) {
                 if (authDebug.messageEnabled()) {
-                    authDebug.message("AuthContext.runRemoteLogin: Found"
-                        + " SSOTokenID " + ssoTokenID);
+                    authDebug.message("AuthContext.runRemoteLogin: Found SSOTokenID " + ssoTokenID);
                 }
-                authHandles[0] = ssoTokenID;
+                authHandle = ssoTokenID;
             }
 
-            request.append(MessageFormat.format(
-                AuthXMLTags.XML_REQUEST_PREFIX, (Object[])authHandles));
+            request.append(MessageFormat.format(AuthXMLTags.XML_REQUEST_PREFIX, authHandle));
             if (appSSOToken != null) {
                 request.append(AuthXMLTags.APPSSOTOKEN_BEGIN);
-                request.append(appSSOToken.getTokenID().toString()).
-                    append(AuthXMLTags.APPSSOTOKEN_END);
+                request.append(appSSOToken.getTokenID().toString());
+                request.append(AuthXMLTags.APPSSOTOKEN_END);
             }
             request.append(AuthXMLTags.LOGIN_BEGIN);
 
@@ -882,7 +877,7 @@ public class AuthContext extends Object implements java.io.Serializable {
                     .append(XMLUtils.escapeSpecialCharacters(hostName))
                     .append(AuthXMLTags.QUOTE);
                 }
-                if ((locale != null) && (locale.length() > 0)) {
+                if (locale != null && !locale.isEmpty()) {
                         request.append(AuthXMLTags.SPACE)
                         .append(AuthXMLTags.LOCALE)
                         .append(AuthXMLTags.EQUAL)
@@ -919,22 +914,21 @@ public class AuthContext extends Object implements java.io.Serializable {
                 } else if (indexType == IndexType.LEVEL) {
                     request.append(AuthXMLTags.INDEX_TYPE_LEVEL_ATTR);
                 } else if (indexType == IndexType.COMPOSITE_ADVICE) {
-                    request.append(
-                        AuthXMLTags.INDEX_TYPE_COMPOSITE_ADVICE_ATTR);
+                    request.append(AuthXMLTags.INDEX_TYPE_COMPOSITE_ADVICE_ATTR);
                 } else if (indexType == IndexType.RESOURCE) {
                     request.append(AuthXMLTags.INDEX_TYPE_RESOURCE);
                 }
                 request.append(AuthXMLTags.QUOTE)
                     .append(AuthXMLTags.ELEMENT_END)
                     .append(AuthXMLTags.INDEX_NAME_BEGIN)
-                    .append(indexName)
+                    .append(XMLUtils.escapeSpecialCharacters(indexName))
                     .append(AuthXMLTags.INDEX_NAME_END)
                     .append(AuthXMLTags.INDEX_TYPE_PAIR_END);
             }
 
             if (locale != null && locale.length() > 0) {
                 request.append(AuthXMLTags.LOCALE_BEGIN);
-                request.append(locale);
+                request.append(XMLUtils.escapeSpecialCharacters(locale));
                 request.append(AuthXMLTags.LOCALE_END);
             }
 
@@ -944,29 +938,25 @@ public class AuthContext extends Object implements java.io.Serializable {
                     if (i != 0 ) {
                         paramString.append(ISAuthConstants.PIPE_SEPARATOR);
                     }
-                    paramString.append(params[i]);
+                    paramString.append(XMLUtils.escapeSpecialCharacters(params[i]));
                 }
                 request.append(AuthXMLTags.PARAMS_BEGIN)
                     .append(paramString.toString())
                     .append(AuthXMLTags.PARAMS_END);
             }
-            if ((envMap != null) && !envMap.isEmpty()) {
+            if (envMap != null && !envMap.isEmpty()) {
                 StringBuilder envString = new StringBuilder();
-                Iterator keys = envMap.keySet().iterator();
-                while (keys.hasNext()) {
+                for (Map.Entry<String, Set<String>> entry : ((Map<String, Set<String>>) envMap).entrySet()) {
                     // convert Map to XMLString as follows:
                     // <EnvValue>keyname|value1|value2|...</EnvValue>
-                    String keyName = (String) keys.next();
-                    Set values = (Set) envMap.get(keyName);
-                    if ((values != null) && !values.isEmpty()) {
-                        envString.append(AuthXMLTags.ENV_AV_BEGIN).append(
-                             AuthClientUtils.escapePipe(keyName));
-                        Iterator iter = values.iterator();
-                        while (iter.hasNext()) {
+                    String keyName = entry.getKey();
+                    Set<String> values = entry.getValue();
+                    if (values != null && !values.isEmpty()) {
+                        envString.append(AuthXMLTags.ENV_AV_BEGIN)
+                                .append(AuthClientUtils.escapePipe(XMLUtils.escapeSpecialCharacters(keyName)));
+                        for (String value : values) {
                             envString.append(ISAuthConstants.PIPE_SEPARATOR)
-                                .append(AuthClientUtils.escapePipe(
-                                    XMLUtils.escapeSpecialCharacters(
-                                    (String) iter.next())));
+                                    .append(AuthClientUtils.escapePipe(XMLUtils.escapeSpecialCharacters(value)));
                         }
                         envString.append(AuthXMLTags.ENV_AV_END);
                     }

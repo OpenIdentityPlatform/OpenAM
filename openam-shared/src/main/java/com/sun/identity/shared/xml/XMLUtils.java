@@ -790,38 +790,22 @@ public class XMLUtils {
     }
 
     /**
-     * Replaces XML special character <code>&</code>, <code>&lt;</code>,
-     * <code>&gt;</code>, <code>"</code>, <code>'</code> with
-     * corresponding entity references.
-     * 
-     * @return String with the special characters replaced with entity
-     *         references.
+     * Removes invalid XML characters from the input text and then replaces XML special character <code>&</code>,
+     * <code>&lt;</code>, <code>&gt;</code>, <code>"</code>, <code>'</code> with corresponding entity references.
+     *
+     * @param text The input that needs to be escaped. May be null.
+     * @return String with the special characters replaced with entity references. May be null.
      */
     public static String escapeSpecialCharacters(String text) {
-
-        String escapedText = text;
-        StringBuffer sb = null;
-        int len = 0;
-        if (text != null) {
-            len = text.length();
+        text = removeInvalidXMLChars(text);
+        if (text == null || text.isEmpty()) {
+            return text;
         }
+        final StringBuilder sb = new StringBuilder(text.length());
 
-        int i = 0;
-        boolean specialCharacterFound = false;
-        for (; i < len; i++) {
+        for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            if (c == '&' || c == '<' || c == '>' || c == '\'' || c == '\"'
-                    || c == '\n' || c == '\r') {
-                specialCharacterFound = true;
-                break;
-            }
-        }
-        if (specialCharacterFound) {
-            sb = new StringBuffer();
-            sb.append(text.substring(0, i));
-            for (; i < len; i++) {
-                char c = text.charAt(i);
-                switch (c) {
+            switch (c) {
                 case '&':
                     sb.append("&amp;");
                     break;
@@ -845,12 +829,9 @@ public class XMLUtils {
                     break;
                 default:
                     sb.append(c);
-                }
             }
-            escapedText = sb.toString();
         }
-
-        return escapedText;
+        return sb.toString();
     }
 
     private static boolean invalidXMLCharExists(String st) {
@@ -863,12 +844,11 @@ public class XMLUtils {
      * @param text the text to cleanse.
      * @return cleansed text or the original string if it is null or empty
      */
-    public static String removeInvalidXMLChars(String text){
-    	if (text == null || text.length() == 0) {
-    		return text;
-    	}
-    	String modifiedText = text.replaceAll(INVALID_XML_CHARACTERS, "");    	
-    	return modifiedText;
+    public static String removeInvalidXMLChars(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        return text.replaceAll(INVALID_XML_CHARACTERS, "");
     }
 
     public static Set encodeAttributeSet(Set set, Debug debug) {
