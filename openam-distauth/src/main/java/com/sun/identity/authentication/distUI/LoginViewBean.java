@@ -86,7 +86,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.authentication.service.protocol.RemoteCookie;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
@@ -749,17 +748,17 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
     private void parseUserCredentials() {
 
-        Enumeration keys = reqDataHash.keys();
+        Enumeration<String> keys = reqDataHash.keys();
     	
         while (keys.hasMoreElements()) {
-            String key = (String)keys.nextElement();
+            String key = keys.nextElement();
             if (key.startsWith(TOKEN)) {
                 if(credentials == null) {
                     tokenType = TOKEN;
-                    credentials = new ArrayList();
+                    credentials = new ArrayList<Integer>();
                 }
                 try {
-   	            credentials.add(new Integer(key.substring(TOKEN.length())));
+                    credentials.add(Integer.valueOf(key.substring(TOKEN.length())));
                 } catch (NumberFormatException nfe) {
                     if (loginDebug.messageEnabled()) {
                      loginDebug.message("Parsing error " +  nfe.getMessage());
@@ -771,15 +770,14 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         if (credentials == null) {
             keys = reqDataHash.keys();
             while (keys.hasMoreElements()) {
-                String key = (String)keys.nextElement();
+                String key = keys.nextElement();
                 if (key.startsWith(TOKEN_OLD)) {
                     if(credentials == null) {
                         tokenType = TOKEN_OLD;
-                        credentials = new ArrayList();
+                        credentials = new ArrayList<Integer>();
                     }
                     try {
-                        credentials.add(
-                              new Integer(key.substring(TOKEN_OLD.length())));
+                        credentials.add(Integer.valueOf(key.substring(TOKEN_OLD.length())));
                     } catch (NumberFormatException nfe) {
                         if (loginDebug.messageEnabled()) {
                            loginDebug.message("Parsing error " +  
@@ -805,9 +803,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 userCredentials = new String[credentials.size()];
                 
                 for (int c = 0; c < userCredentials.length; c++) {
-                    userCredentials[c] = XMLUtils.escapeSpecialCharacters(
-							(String)reqDataHash.get(
-                            tokenType + ((Integer)credentials.get(c)).toString()));
+                    userCredentials[c] = reqDataHash.get(tokenType + credentials.get(c));
                 }
             }
         }
@@ -1027,11 +1023,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 }
                 if (callbacks[i] instanceof NameCallback) {
                     NameCallback nc = (NameCallback) callbacks[i];
-                    tmp = (String)reqDataHash.get(TOKEN
-                    + Integer.toString(i));
+                    tmp = reqDataHash.get(TOKEN + Integer.toString(i));
                     if (tmp == null) {
-                        tmp = (String)reqDataHash.get(TOKEN_OLD
-                        + Integer.toString(i));
+                        tmp = reqDataHash.get(TOKEN_OLD + Integer.toString(i));
                     }
                     if ((bAuthLevel) || (tmp==null)) {
                         tmp = "";
@@ -1039,11 +1033,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     nc.setName(tmp.trim());
                 } else if (callbacks[i] instanceof PasswordCallback) {
                     PasswordCallback pc = (PasswordCallback) callbacks[i];
-                    tmp = (String)reqDataHash.get(TOKEN
-                    + Integer.toString(i));
+                    tmp = reqDataHash.get(TOKEN + Integer.toString(i));
                     if (tmp == null) {
-                        tmp = (String)reqDataHash.get(TOKEN_OLD
-                        + Integer.toString(i));
+                        tmp = reqDataHash.get(TOKEN_OLD + Integer.toString(i));
                     }
                     if (tmp==null) {
                         tmp = "";
@@ -1051,11 +1043,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     pc.setPassword(tmp.toCharArray());
                 } else if (callbacks[i] instanceof ChoiceCallback) {
                     ChoiceCallback cc = (ChoiceCallback) callbacks[i];
-                    choice = (String)reqDataHash.get(TOKEN
-                    + Integer.toString(i));
+                    choice = reqDataHash.get(TOKEN + Integer.toString(i));
                     if (choice == null) {
-                        choice = (String)reqDataHash.get(TOKEN_OLD
-                        + Integer.toString(i));
+                        choice = reqDataHash.get(TOKEN_OLD + Integer.toString(i));
                     }
                     if (choice==null) {
                         choice = "0";
@@ -1109,9 +1099,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     ConfirmationCallback conc =
                     (ConfirmationCallback) callbacks[i];
                     buttonOptions = conc.getOptions();
-                    tmp = (String)reqDataHash.get(BUTTON);
+                    tmp = reqDataHash.get(BUTTON);
                     if (tmp == null) {
-                        tmp = (String)reqDataHash.get(BUTTON_OLD);
+                        tmp = reqDataHash.get(BUTTON_OLD);
                     }
                     if (tmp == null) {
                         tmp = "";
@@ -1460,23 +1450,20 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     // Method to prepare 'login' method parameters from request object data
     protected void prepareLoginParams() {
         loginDebug.message("begin prepareLoginParams");
-        String reqModule = (String) reqDataHash.get("module");
-        if ( reqDataHash.get("user") != null ) {
+        String reqModule = reqDataHash.get("module");
+        if (reqDataHash.get("user") != null) {
             indexType = AuthContext.IndexType.USER;
-            indexName = (String)reqDataHash.get("user");
-        } else if ( reqDataHash.get("role") != null ) {
+            indexName = reqDataHash.get("user");
+        } else if (reqDataHash.get("role") != null) {
             indexType = AuthContext.IndexType.ROLE;
-            indexName = (String)reqDataHash.get("role");
-	        } else if ( reqDataHash.get("service") != null &&
-	                reqDataHash.get(Constants.COMPOSITE_ADVICE) == null) {
+            indexName = reqDataHash.get("role");
+        } else if (reqDataHash.get("service") != null && reqDataHash.get(Constants.COMPOSITE_ADVICE) == null) {
             indexType = AuthContext.IndexType.SERVICE;
-            indexName = (String)reqDataHash.get("service");
-        } else if ( (reqModule != null) && 
-            (reqModule.length() != 0) && 
-            (!reqModule.equalsIgnoreCase("null")) ) {
+            indexName = reqDataHash.get("service");
+        } else if (reqModule != null && !reqModule.isEmpty() && !reqModule.equalsIgnoreCase("null")) {
             indexType = AuthContext.IndexType.MODULE_INSTANCE;
-            String encoded = (String) reqDataHash.get("encoded");
-            String new_org = (String) reqDataHash.get("new_org");
+            String encoded = reqDataHash.get("encoded");
+            String new_org = reqDataHash.get("new_org");
             if ((new_org != null && new_org.equals("true")) &&
                 (encoded != null && encoded.equals("true"))){
                 indexName = AuthClientUtils.getBase64DecodedValue(reqModule);
@@ -1489,18 +1476,17 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     onePageLogin = true;
                 }
             }
-        } else if ( reqDataHash.get("authlevel") != null ) {
+        } else if (reqDataHash.get("authlevel") != null) {
             indexType = AuthContext.IndexType.LEVEL;
-            indexName = (String)reqDataHash.get("authlevel");
-        } else if ( reqDataHash.get(Constants.COMPOSITE_ADVICE) != null ) {
+            indexName = reqDataHash.get("authlevel");
+        } else if (reqDataHash.get(Constants.COMPOSITE_ADVICE) != null) {
             indexType = AuthContext.IndexType.COMPOSITE_ADVICE;
-            indexName = (String)reqDataHash.get(Constants.COMPOSITE_ADVICE);
+            indexName = reqDataHash.get(Constants.COMPOSITE_ADVICE);
             indexName = URLEncDec.decode(indexName);            
-        } else if (((reqDataHash.get(ISAuthConstants.IP_RESOURCE_ENV_PARAM)
-            != null) && "true".equalsIgnoreCase((String) reqDataHash.get(
-                 ISAuthConstants.IP_RESOURCE_ENV_PARAM)))||
-            ((reqDataHash.get(ISAuthConstants.IP_RESOURCE_ENV_PARAM) == null) &&
-              (reqDataHash.get(ISAuthConstants.RESOURCE_URL_PARAM) != null))) {
+        } else if ((reqDataHash.get(ISAuthConstants.IP_RESOURCE_ENV_PARAM) != null
+                && "true".equalsIgnoreCase(reqDataHash.get(ISAuthConstants.IP_RESOURCE_ENV_PARAM)))
+                || (reqDataHash.get(ISAuthConstants.IP_RESOURCE_ENV_PARAM) == null
+                && reqDataHash.get(ISAuthConstants.RESOURCE_URL_PARAM) != null)) {
             indexType = AuthContext.IndexType.RESOURCE;
             indexName = AuthClientUtils.getResourceURL(request);
             envMap = AuthClientUtils.getEnvMap(request);
@@ -1576,9 +1562,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             // if new Org is different from the old Org
             if (!(DNUtils.normalizeDN(newOrgName))
             .equals(DNUtils.normalizeDN(orgName))) {
-                String strButton = (String)reqDataHash.get(BUTTON);
+                String strButton = reqDataHash.get(BUTTON);
                 if (strButton == null) {
-                    strButton = (String)reqDataHash.get(BUTTON_OLD);
+                    strButton = reqDataHash.get(BUTTON_OLD);
                 }
                 if (loginDebug.messageEnabled()) {
                     loginDebug.message("Submit with button : " + strButton);
@@ -2183,7 +2169,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     AuthContext ac = null;
     SSOToken ssoToken = null;
     boolean newRequest = false;
-    private Hashtable reqDataHash = new Hashtable();
+    private Hashtable<String, String> reqDataHash = new Hashtable<String, String>();
     private static String LOGINURL = "";
     private String loginURL = "";
     private static final String LOGOUTCOOKIEVAULE = "LOGOUT";
@@ -2221,7 +2207,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     public String gotoUrl = "";
     /** Goto url for login failure */
     public String gotoOnFailUrl = "";
-    ArrayList credentials = null;
+    List<Integer> credentials = null;
     String tokenType = null;
     public String[] userCredentials = null; 
     private boolean cookieTimeToLiveEnabled = false;
