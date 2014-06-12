@@ -400,6 +400,19 @@ $ <userinput>curl \
     </varlistentry>
    </variablelist>
 
+   <para>
+    You can use the query string parameter,
+    <literal>sessionUpgrade=<replaceable>tokenId</replaceable></literal>,
+    to request session upgrade.
+    For an explanation of session upgrade,
+    see the <citetitle>Administration Guide</citetitle> section on,
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#session-upgrade"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Authentication Levels &amp; Session Upgrade</citetitle></link>.
+   </para>
+
    <itemizedlist>
     <para>OpenAM uses the following callback types depending on the
     authentication module in use.</para>
