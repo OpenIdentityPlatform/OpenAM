@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -22,13 +22,10 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.jaspi.runtime.HttpServletCallbackHandler;
 import org.forgerock.jaspi.runtime.HttpServletMessageInfo;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
@@ -37,7 +34,6 @@ import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
