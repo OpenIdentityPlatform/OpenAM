@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock Inc.
  */
 
 package com.sun.identity.authentication.jaas;
@@ -42,7 +42,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.security.auth.login.*;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.*;
@@ -71,7 +70,7 @@ public class LoginContext {
     private boolean subjectProvided = false;
     private boolean loginSucceeded = false;
     private CallbackHandler callbackHandler;
-    private Map<String,Object> state = new ConcurrentHashMap<String,Object>();
+    private Map state = new HashMap();
     private ModuleInfo[] moduleStack;
     boolean success = false;
 
