@@ -26,15 +26,9 @@
  *
  */
 
-/*
- * Portions Copyrighted 2014 ForgeRock AS
- */
-
 package com.sun.identity.authentication.internal;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.StringTokenizer;
 
 import javax.security.auth.callback.Callback;
@@ -56,7 +50,7 @@ public class LoginContext {
 
     private LoginModule module;
 
-    private Map<String,Object> sharedState = new ConcurrentHashMap<String,Object>();
+    private HashMap sharedState = new HashMap();
 
     public final static String LDAP_AUTH_URL = "ldap://";
 
