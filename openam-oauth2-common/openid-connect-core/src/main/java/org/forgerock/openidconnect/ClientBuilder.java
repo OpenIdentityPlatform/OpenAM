@@ -41,6 +41,7 @@ public class ClientBuilder {
     private String applicationType;
     private String clientSecret;
     private List<String> responseTypes;
+    private List<String> contacts;
 
     /**
      * Sets the client id of the OAuth2Client.
@@ -174,6 +175,16 @@ public class ClientBuilder {
     }
 
     /**
+     *
+     * @param contacts The contact information for the clients
+     * @return
+     */
+    public ClientBuilder setContacts(List<String> contacts) {
+        this.contacts = contacts;
+        return this;
+    }
+
+    /**
      * Sets the application type of the OAuth2Client.
      *
      * @param applicationType The application type.
@@ -211,6 +222,6 @@ public class ClientBuilder {
     public Client createClient() {
         return new Client(clientID, clientType, redirectionURIs, allowedGrantScopes, defaultGrantScopes, displayName,
                 displayDescription, clientName, subjectType, idTokenSignedResponseAlgorithm, postLogoutRedirectionURI,
-                accessToken, clientSessionURI,applicationType, clientSecret, responseTypes);
+                accessToken, clientSessionURI,applicationType, clientSecret, responseTypes, contacts);
     }
 }

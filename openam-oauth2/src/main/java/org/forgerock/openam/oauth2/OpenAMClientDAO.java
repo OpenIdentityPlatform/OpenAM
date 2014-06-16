@@ -269,6 +269,10 @@ public class OpenAMClientDAO implements ClientDAO {
             clientAttributeMap.put(OAuth2Constants.OAuth2Client.RESPONSE_TYPES, formatSet(client.getResponseTypes()));
         }
 
+        if (client.getContacts() != null) {
+            clientAttributeMap.put(OAuth2Constants.OAuth2Client.CONTACTS, formatSet(client.getContacts()));
+        }
+
         //add the standard agent stuff
         temp = new HashSet<String>();
         temp.add(OAUTH2_CLIENT);

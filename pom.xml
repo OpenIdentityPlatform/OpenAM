@@ -808,6 +808,11 @@
                 <artifactId>openam-slf4j</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-scripting</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- New RIA Client UI -->
             <dependency>

@@ -51,6 +51,7 @@ import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeName
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SESSION_URI;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CONTACTS;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DEFAULT_SCOPES;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME;
 import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.ID_TOKEN_SIGNED_RESPONSE_ALG;
@@ -252,6 +253,10 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
                 List<String> defaultResponseTypes = new ArrayList<String>();
                 defaultResponseTypes.add("code");
                 clientBuilder.setResponseTypes(defaultResponseTypes);
+            }
+
+            if (input.get(CONTACTS.getType()).asList() != null) {
+                clientBuilder.setContacts(input.get(CONTACTS.getType()).asList(String.class));
             }
 
         } catch (JsonValueException e) {

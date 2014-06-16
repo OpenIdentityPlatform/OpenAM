@@ -176,7 +176,6 @@
                           <Value>[6]=code token id_token</Value>
                       </DefaultValues>
                   </AttributeSchema>
-              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.contacts"
                           type="list"
@@ -187,6 +186,7 @@
                           <Value>[0]=</Value>
                       </DefaultValues>
                   </AttributeSchema>
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.logoURI"
                           type="single"

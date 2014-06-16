@@ -634,7 +634,6 @@
             <groupId>org.forgerock.commons</groupId>
         </dependency>
 
-
         <!-- Oauth2 dependencies -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

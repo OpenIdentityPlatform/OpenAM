@@ -201,8 +201,7 @@ public class Client extends JsonValue {
 
     /**
      * Creates a OAuth2Client.
-     * 
-     * @param clientID The client id of the client.
+     *  @param clientID The client id of the client.
      * @param clientType The client type of the client.
      * @param redirectionURIs The redirection uris of the client.
      * @param allowedGrantScopes The allowed scopes of the client.
@@ -218,12 +217,13 @@ public class Client extends JsonValue {
      * @param applicationType The application type of the client.
      * @param clientSecret The client secret of the client.
      * @param responseTypes the response types of the client.
+     * @param contacts The contact information for the client (can be null).
      */
     public Client(String clientID, String clientType, List<String> redirectionURIs, List<String> allowedGrantScopes,
-            List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
-            String clientName, String subjectType, String idTokenSignedResponseAlgorithm, 
-            String postLogoutRedirectionURI, String accessToken, String clientSessionURI, String applicationType,
-            String clientSecret, List<String> responseTypes) {
+                  List<String> defaultGrantScopes, List<String> displayName, List<String> displayDescription,
+                  String clientName, String subjectType, String idTokenSignedResponseAlgorithm,
+                  String postLogoutRedirectionURI, String accessToken, String clientSessionURI, String applicationType,
+                  String clientSecret, List<String> responseTypes, List<String> contacts) {
         super(new HashMap<String, Object>());
         setAccessToken(accessToken);
         setAllowedGrantScopes(allowedGrantScopes);
@@ -241,7 +241,7 @@ public class Client extends JsonValue {
         setApplicationType(applicationType);
         setClientSecret(clientSecret);
         setResponseTypes(responseTypes);
-
+        setContacts(contacts);
     }
 
     /**
@@ -630,6 +630,32 @@ public class Client extends JsonValue {
     public void setResponseTypes(List<String> responseTypes) {
         if (responseTypes != null && !responseTypes.isEmpty()) {
             put(OAuth2Constants.ShortClientAttributeNames.RESPONSE_TYPES.getType(), responseTypes);
+        }
+    }
+
+    /**
+     * Gets the contacts. If the contacts value is {@code null}, {@code null} will be returned.
+     *
+     * @return A {@code Set} of contacts
+     */
+    public Set<String> getContacts() {
+        List<String> contacts = get(OAuth2Constants.ShortClientAttributeNames.CONTACTS.getType())
+                .asList(String.class);
+        if (contacts != null) {
+            return new HashSet<String>(contacts);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the contacts of the OAuth2Client.
+     *
+     * @param contacts The contacts.
+     */
+    public void setContacts(List<String> contacts) {
+        if (contacts != null && !contacts.isEmpty()) {
+            put(OAuth2Constants.ShortClientAttributeNames.CONTACTS.getType(), contacts);
         }
     }
 }

@@ -49,8 +49,8 @@ public class ClientStore {
                 null,
                 null,
                 "cangetin",
-                Arrays.asList(new String[]{"code", "id_token", "token"})
-        ));
+                Arrays.asList(new String[]{"code", "id_token", "token"}),
+                null));
     }
 
     public void create(Client client) {
