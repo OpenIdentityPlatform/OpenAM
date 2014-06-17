@@ -24,11 +24,16 @@
  *
  * $Id: NotConditionTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
-import com.sun.identity.unittest.UnittestLog;
-
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 
@@ -52,8 +57,54 @@ public class NotConditionTest {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        new AndConditionTest().testConstruction();
-        UnittestLog.flush(new Date().toString());
+
+    @Test (expectedExceptions = IllegalArgumentException.class)
+    public void testSingleSubject() {
+        //given
+        Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
+
+        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
+        IPCondition ip2 = new IPCondition("192.168.0.5", "192.168.0.6");
+
+        conditions.add(ip);
+        conditions.add(ip2);
+
+        NotCondition myNotCondition = new NotCondition();
+
+        //when
+        myNotCondition.setEConditions(conditions);
+
+        //then -- expect error
+
     }
+
+    @Test
+    public void testSingleSubjectEnforced() {
+        //given
+        Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
+        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
+        conditions.add(ip);
+        NotCondition myNotCondition = new NotCondition();
+
+        //when
+        myNotCondition.setEConditions(conditions);
+
+        //then
+        assertTrue(myNotCondition.getECondition().equals(ip));
+
+    }
+
+    @Test
+    public void testSingleSubjectEnforcedRetrieval() {
+        //given
+        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
+        NotCondition myNotCondition = new NotCondition(ip);
+
+        //when
+        myNotCondition.setECondition(ip);
+
+        //then
+        assertTrue(myNotCondition.getEConditions().iterator().next().equals(ip));
+    }
+
 }

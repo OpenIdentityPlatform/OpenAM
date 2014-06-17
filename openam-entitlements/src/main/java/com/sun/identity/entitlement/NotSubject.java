@@ -24,6 +24,11 @@
  *
  * $Id: NotSubject.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.Collections;
@@ -32,16 +37,25 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.json.JSONObject;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.util.Reject;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This class wrapped on an Entitlement Subject object to provide boolean
  * NOT.
+ *
  * Membership of <code>NotSubject</code> is satisfied in the user is not a
  * member of the nested <code>EntitlementSubject</code>.
+ *
+ * We @JsonIgnore getESubjects and setESubjects (NOTE the 's' on the end) so that
+ * we don't indicate via JSON schema exposed that we take multiple subject types.
+ *
+ * We extend LogicalSubject but ensure that we are only allowing a single
+ * {@link EntitlementSubject} to be referenced by this class.
  */
-public class NotSubject implements EntitlementSubject {
+public class NotSubject extends LogicalSubject {
     private EntitlementSubject eSubject;
     private String pSubjectName;
 
@@ -75,6 +89,7 @@ public class NotSubject implements EntitlementSubject {
      * Sets state of the object
      * @param state State of the object encoded as string
      */
+    @Override
     public void setState(String state) {
         try {
             JSONObject jo = new JSONObject(state);
@@ -104,6 +119,7 @@ public class NotSubject implements EntitlementSubject {
      *
      * @return state of the object encoded as string.
      */
+    @Override
     public String getState() {
         return toString();
     }
@@ -146,6 +162,19 @@ public class NotSubject implements EntitlementSubject {
     }
 
     /**
+     * Sets the nested EntitlementSubject(s)
+     * @param eSubjects the nested EntitlementSubject(s)
+     */
+    @Override
+    @JsonIgnore
+    public void setESubjects(Set<EntitlementSubject> eSubjects) {
+
+        Reject.ifTrue(eSubjects.size() > 1 || eSubjects.size() < 1);
+
+        eSubject = eSubjects.iterator().next();
+    }
+
+    /**
      * Returns nested EntitlementSubject.
      *
      * @return nested EntitlementSubject.
@@ -155,11 +184,26 @@ public class NotSubject implements EntitlementSubject {
     }
 
     /**
+     * Returns the nested EntitlementSubject(s)
+     * @return  the nested EntitlementSubject(s)
+     */
+    @Override
+    @JsonIgnore
+    public Set<EntitlementSubject> getESubjects() {
+        if (eSubject == null) {
+            return null;
+        }
+
+        return Collections.singleton(eSubject);
+    }
+
+    /**
      * Sets OpenSSO policy Subject name
      * @param pSubjectName subject name as used in OpenSSO policy,
      * this is releavant only when NotrESubject was created from
      * OpenSSO policy Subject
      */
+    @Override
     public void setPSubjectName(String pSubjectName) {
         this.pSubjectName = pSubjectName;
     }
@@ -170,6 +214,7 @@ public class NotSubject implements EntitlementSubject {
      * this is releavant only when NotrESubject was created from
      * OpenSSO policy Subject
      */
+    @Override
     public String getPSubjectName() {
         return pSubjectName;
     }
@@ -179,6 +224,7 @@ public class NotSubject implements EntitlementSubject {
      * @return JSONObject mapping of the object
      * @throws org.json.JSONException if can not map to JSONObject
      */
+    @Override
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
         jo.put("pSubjectName", pSubjectName);
@@ -266,6 +312,7 @@ public class NotSubject implements EntitlementSubject {
      *
      * @return search index attributes.
      */
+    @Override
     public Map<String, Set<String>> getSearchIndexAttributes() {
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>();
@@ -279,6 +326,7 @@ public class NotSubject implements EntitlementSubject {
      *
      * @return required attribute names.
      */
+    @Override
     public Set<String> getRequiredAttributeNames() {
         return (Collections.EMPTY_SET);
     }
@@ -288,7 +336,9 @@ public class NotSubject implements EntitlementSubject {
      *
      * @return <code>true</code> is this subject is an identity object.
      */
+    @Override
     public boolean isIdentity() {
         return (eSubject != null) ? eSubject.isIdentity() : false;
     }
+
 }

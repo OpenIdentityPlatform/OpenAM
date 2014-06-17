@@ -18,6 +18,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.ConditionDecision;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import java.util.Set;
@@ -54,11 +55,14 @@ public class ConditionTypesResourceTest {
     Debug mockDebug = mock(Debug.class);
 
     private final String TEST_CONDITION_WITH_NAME = "testConditionWithName";
+    private final String TEST_LOGICAL_CONDITION = "testLogicalCondition";
+
 
     @BeforeMethod
     public void setUp() {
 
         mockRegistry.registerConditionType(TEST_CONDITION_WITH_NAME, TestConditionTypeWithName.class);
+        mockRegistry.registerConditionType(TEST_LOGICAL_CONDITION, TestLogicalConditionTypeWithName.class);
 
         testResource = new ConditionTypesResource(mockDebug, mockRegistry);
     }
@@ -131,7 +135,7 @@ public class ConditionTypesResourceTest {
         testResource.queryCollection(mockServerContext, mockRequest, mockHandler);
 
         //then
-        verify(mockHandler, times(1)).handleResource(any(Resource.class));
+        verify(mockHandler, times(2)).handleResource(any(Resource.class));
         verify(mockHandler, times(1)).handleResult(any(QueryResult.class));
     }
 
@@ -161,14 +165,93 @@ public class ConditionTypesResourceTest {
         Map result = captor.getValue().getContent().asMap();
         assertThat(result.containsKey("title")).isTrue();
         assertThat(result.containsKey("config")).isTrue();
+        assertThat(result.containsKey("logical")).isTrue();
         assertThat(result.get("title")).isEqualTo(TEST_CONDITION_WITH_NAME);
+        assertThat(result.get("logical")).isEqualTo(false);
         assertThat(result.get("config")).isInstanceOf(JsonSchema.class);
         JsonSchema resultSchema = (JsonSchema) result.get("config");
         assertThat(resultSchema.toString().equals("{\"type\":\"object\",\"properties\":{}}")).isTrue();
     }
 
+    @Test
+    public void testSuccessfulJsonificationAndLogicalIsCorrect() throws JsonMappingException {
+        //given
+        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
+        ServerContext mockServerContext = new ServerContext(realmContext);
+
+        Subject mockSubject = new Subject();
+        given(mockSubjectContext.getCallerSubject()).willReturn(mockSubject);
+
+        ReadRequest mockRequest = mock(ReadRequest.class);
+        ResultHandler mockHandler = mock(ResultHandler.class);
+        JsonSchema mockSchema = mock(JsonSchema.class);
+
+        given(mockMapper.generateJsonSchema((Class<?>) any(Class.class))).willReturn(mockSchema);
+
+        //when
+        testResource.readInstance(mockServerContext, TEST_LOGICAL_CONDITION, mockRequest, mockHandler);
+
+        //then
+        ArgumentCaptor<Resource> captor = ArgumentCaptor.forClass(Resource.class);
+        verify(mockHandler, times(1)).handleResult(captor.capture());
+
+        Map result = captor.getValue().getContent().asMap();
+        assertThat(result.containsKey("logical")).isTrue();
+        assertThat(result.get("logical")).isEqualTo(true);
+    }
+
     /**
      * Test condition type:
+     *
+     * IS logical.
+     *
+     * JSON Schema without removal of 'name' attribute: {"type":"object","properties":{"name":{"type":"string"}}}
+     * JSON Schema with removal of 'name' attribute: "{"type":"object","properties":{}}"
+     */
+
+    private class TestLogicalConditionTypeWithName extends LogicalCondition {
+
+        private String name;
+
+        @Override
+        public void setDisplayType(String displayType) {
+            return;
+        }
+
+        @Override
+        public String getDisplayType() {
+            return null;
+        }
+
+        @Override
+        public void init(Map<String, Set<String>> parameters) {
+        }
+
+        @Override
+        public void setState(String state) {
+        }
+
+        @Override
+        public String getState() {
+            return null;
+        }
+
+        @Override
+        public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
+                                          Map<String, Set<String>> environment) throws EntitlementException {
+            return null;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    /**
+     * Test condition type:
+     *
+     * NOT logical.
      *
      * JSON Schema without removal of 'name' attribute: {"type":"object","properties":{"name":{"type":"string"}}}
      * JSON Schema with removal of 'name' attribute: "{"type":"object","properties":{}}"

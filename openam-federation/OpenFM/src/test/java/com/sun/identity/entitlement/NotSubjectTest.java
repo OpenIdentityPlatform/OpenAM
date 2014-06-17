@@ -24,9 +24,16 @@
  *
  * $Id: NotSubjectTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
-
+import java.util.HashSet;
+import java.util.Set;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 public class NotSubjectTest {
@@ -47,5 +54,57 @@ public class NotSubjectTest {
                     + "does not equal NotSubject with getState()");
 
         }
+    }
+
+    @Test (expectedExceptions = IllegalArgumentException.class)
+    public void testSingleSubject() {
+        //given
+        Set<EntitlementSubject> subjects = new HashSet<EntitlementSubject>();
+
+        AnyUserSubject aus = new AnyUserSubject();
+        AnyUserSubject aus2 = new AnyUserSubject();
+
+        subjects.add(aus);
+        subjects.add(aus2);
+
+        NotSubject myNotSubject = new NotSubject();
+
+        //when
+        myNotSubject.setESubjects(subjects);
+
+        //then -- expect error
+
+    }
+
+    @Test
+    public void testSingleSubjectEnforced() {
+        //given
+        Set<EntitlementSubject> subjects = new HashSet<EntitlementSubject>();
+
+        AnyUserSubject aus = new AnyUserSubject();
+
+        subjects.add(aus);
+
+        NotSubject myNotSubject = new NotSubject();
+
+        //when
+        myNotSubject.setESubjects(subjects);
+
+        //then
+        assertTrue(myNotSubject.getESubject().equals(aus));
+
+    }
+
+    @Test
+    public void testSingleSubjectEnforcedRetrieval() {
+        //given
+        AnyUserSubject aus = new AnyUserSubject();
+        NotSubject myNotSubject = new NotSubject();
+
+        //when
+        myNotSubject.setESubject(aus);
+
+        //then
+        assertTrue(myNotSubject.getESubjects().iterator().next().equals(aus));
     }
 }

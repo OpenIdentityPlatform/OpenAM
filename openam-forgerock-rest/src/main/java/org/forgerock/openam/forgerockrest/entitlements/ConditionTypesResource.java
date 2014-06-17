@@ -17,11 +17,13 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.google.inject.name.Named;
 import com.sun.identity.entitlement.EntitlementCondition;
+import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
 import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 import org.codehaus.jackson.JsonNode;
@@ -51,7 +53,7 @@ import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlemen
 import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**
- * Allows for CREST-handling of stored {@link com.sun.identity.policy.interfaces.Condition}s.
+ * Allows for CREST-handling of stored {@link EntitlementCondition}s.
  *
  * These are unmodfiable - even by an administrator. As such this
  * endpoint only supports the READ and QUERY operations.
@@ -60,6 +62,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_CONFIG = "config";
+    private final static String JSON_OBJ_LOGICAL = "logical";
 
     private final static ObjectMapper mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
     private final Debug debug;
@@ -88,7 +91,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
+                               ResultHandler<JsonValue> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -104,7 +108,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
+    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
+                               ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -112,7 +117,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
+    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
+                              ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -128,20 +134,22 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             return;
         }
 
-        final Set<String> conditionTypeNames;
+        final Set<String> conditionTypeNames = new TreeSet<String>();
         List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
 
-        conditionTypeNames = entitlementRegistry.getConditionsShortNames();
+        conditionTypeNames.addAll(entitlementRegistry.getConditionsShortNames());
 
         for (String conditionTypeName : conditionTypeNames) {
-            final Class<? extends EntitlementCondition> conditionClass = entitlementRegistry.getConditionType(conditionTypeName);
+            final Class<? extends EntitlementCondition> conditionClass =
+                    entitlementRegistry.getConditionType(conditionTypeName);
 
             if (conditionClass == null) {
                 debug.error("Listed condition short name not found: " + conditionTypeName);
                 continue;
             }
 
-            final JsonValue json = jsonify(conditionClass, conditionTypeName);
+            final JsonValue json = jsonify(conditionClass, conditionTypeName,
+                    LogicalCondition.class.isAssignableFrom(conditionClass));
 
             if (json != null) {
                 conditionTypes.add(json);
@@ -170,7 +178,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
         //paginate
         if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ? String.valueOf(totalSize) : String.valueOf(offset + pageSize);
+            final String lastIndex = offset + pageSize > totalSize ?
+                    String.valueOf(totalSize) : String.valueOf(offset + pageSize);
             handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
         } else {
             handler.handleResult(new QueryResult(null, -1));
@@ -203,7 +212,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
+    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
+                             ResultHandler<Resource> handler) {
 
         final Subject mySubject = getSubject(context, handler);
 
@@ -219,7 +229,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             return;
         }
 
-        final JsonValue json = jsonify(conditionClass, resourceId);
+        final JsonValue json = jsonify(conditionClass, resourceId,
+                LogicalCondition.class.isAssignableFrom(conditionClass));
 
         final Resource resource = new Resource(resourceId, "0", json);
         handler.handleResult(resource);
@@ -229,7 +240,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
+    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
+                               ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -242,7 +254,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * @param resourceId The ID of the resource to return
      * @return A JsonValue containing the schema of the EntitlementCondition
      */
-    protected JsonValue jsonify(Class<? extends EntitlementCondition> conditionClass, String resourceId) {
+    protected JsonValue jsonify(Class<? extends EntitlementCondition> conditionClass, String resourceId,
+                                boolean logical) {
         try {
 
             final JsonSchema schema = mapper.generateJsonSchema(conditionClass);
@@ -257,6 +270,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
             return JsonValue.json(JsonValue.object(
                     JsonValue.field(JSON_OBJ_TITLE, resourceId),
+                    JsonValue.field(JSON_OBJ_LOGICAL, logical),
                     JsonValue.field(JSON_OBJ_CONFIG, schema)));
 
         } catch (JsonMappingException e) {

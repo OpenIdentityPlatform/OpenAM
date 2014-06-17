@@ -24,22 +24,35 @@
  *
  * $Id: NotCondition.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.json.JSONObject;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.forgerock.util.Reject;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This class wrapped on an Entitlement Condition object to provide boolean
  * NOT.
  * Membership of <code>NotCondition</code> is satisfied in the user is not a
  * member of the nested <code>EntitlementCondition</code>.
+ *
+ * We @JsonIgnore getEConditions and setEConditions (NOTE the 's' on the end) so that
+ * we don't indicate via JSON schema exposed that we take multiple condition types.
+ *
+ * We extend LogicalCondition but ensure that we are only allowing a single
+ * {@link EntitlementCondition} to be referenced by this class.
  */
-public class NotCondition extends EntitlementConditionAdaptor {
+public class NotCondition extends LogicalCondition {
     private EntitlementCondition eCondition;
     private String pConditionName;
 
@@ -79,6 +92,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
      *
      * @param state State of the object encoded as string
      */
+    @Override
     public void setState(String state) {
         try {
             JSONObject jo = new JSONObject(state);
@@ -109,6 +123,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
      *
      * @return state of the object encoded as string.
      */
+    @Override
     public String getState() {
         return toString();
     }
@@ -125,6 +140,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
      * <code>EntitlementCondition</code> evaluation
      * @throws EntitlementException if error occurs.
      */
+    @Override
     public ConditionDecision evaluate(
         String realm,
         Subject subject,
@@ -159,11 +175,40 @@ public class NotCondition extends EntitlementConditionAdaptor {
     }
 
     /**
+     * Sets the nested <code>EntitlementCondition</code>(s).
+     *
+     * @param eConditions the nested <code>EntitlementCondition</code>(s)
+     */
+    @Override
+    @JsonIgnore
+    public void setEConditions(Set<EntitlementCondition> eConditions) {
+        Reject.ifTrue(eConditions.size() > 1 || eConditions.size() < 1);
+
+        eCondition = eConditions.iterator().next();
+    }
+
+    /**
+     * Returns the nested <code>EntitlementCondition</code>(s).
+     *
+     * @return the nested <code>EntitlementCondition</code>(s).
+     */
+    @Override
+    @JsonIgnore
+    public Set<EntitlementCondition> getEConditions() {
+        if (eCondition == null) {
+            return null;
+        }
+
+        return Collections.singleton(eCondition);
+    }
+
+    /**
      * Sets OpenSSO policy Condition name
      * @param pConditionName subject name as used in OpenSSO policy,
      * this is releavant only when UserECondition was created from
      * OpenSSO policy Condition
      */
+    @Override
     public void setPConditionName(String pConditionName) {
         this.pConditionName = pConditionName;
     }
@@ -174,6 +219,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
      * this is releavant only when UserECondition was created from
      * OpenSSO policy Condition
      */
+    @Override
     public String getPConditionName() {
         return pConditionName;
     }
@@ -183,6 +229,7 @@ public class NotCondition extends EntitlementConditionAdaptor {
      * @return JSONObject mapping of the object
      * @throws org.json.JSONException if can not map to JSONObject
      */
+    @Override
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jo = new JSONObject();
         toJSONObject(jo);
