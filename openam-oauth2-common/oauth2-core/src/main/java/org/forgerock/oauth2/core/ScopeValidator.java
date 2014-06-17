@@ -29,6 +29,7 @@ import java.util.Set;
  * endpoints as well.
  *
  * @since 12.0.0
+ * @supported.all.api
  */
 public interface ScopeValidator {
 

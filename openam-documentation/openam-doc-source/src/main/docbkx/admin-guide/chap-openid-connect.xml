@@ -167,6 +167,14 @@
   as an OpenID Connect 1.0 Provider. To do so, make sure that the Response Type
   Plugins list includes at least the default plugin classes.</para>
 
+  <para>
+   Custom plugins should implement the
+   <link
+    xlink:href="${javadocBase}?org/forgerock/oauth2/core/ResponseTypeHandler.html"
+    xlink:show="new"
+   ><literal>ResponseTypeHandler</literal></link> interface.
+  </para>
+
   <para>See <link xlink:href="admin-guide#configure-oauth2-authz"
   xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"
   ><citetitle>Configuring the OAuth 2.0 Authorization Service</citetitle></link>

@@ -54,96 +54,149 @@
  </para>
 
  <para>
-  You can change this behavior by writing your own scopes plugin.
-  This chapter shows how to write a custom OAuth 2.0 scopes plugin
+  You can change this behavior by writing your own scope validator plugin.
+  This chapter shows how to write a custom OAuth 2.0 scope validator plugin
   for use in an OAuth 2.0 provider (authorization server) configuration.
  </para>
 
  <section xml:id="design-oauth2-scopes-plugin">
-  <title>Designing an OAuth 2.0 Scopes Plugin</title>
+  <title>Designing an OAuth 2.0 Scope Validator Plugin</title>
 
   <para>
-   A scopes plugin implements the
-   <literal>org.forgerock.oauth2.core.Scope</literal> interface.
+   A scope validator plugin implements the
+   <literal>org.forgerock.oauth2.core.ScopeValidator</literal> interface.
    As described in the API specification, the
-   <link xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
-   xlink:show="new"><literal>Scope</literal> interface</link> has seven methods
-   that your plugin overrides.
+   <link
+    xlink:href="${javadocBase}?org/forgerock/oauth2/core/ScopeValidator.html"
+    xlink:show="new"
+    ><literal>ScopeValidator</literal> interface</link>
+   has several methods that your plugin overrides.
   </para>
-
-  <programlisting language="java"
-  >/** Set values for scopes returned when token information is requested. */
-public Map evaluateScope(CoreToken token);
-
-/** Called before the authorize end point returns a response. */
-public Map extraDataToReturnForAuthorizeEndpoint(
-        Map parameters,
-        Map tokens);
-
-/** Called before the access_token end point returns a response. */
-public Map extraDataToReturnForTokenEndpoint(
-        Map parameters,
-        CoreToken token);
-
-/** Get user profile attribute values based on the scope values in the token. */
-public Map getUserInfo(CoreToken token);
-
-/** Called on token creation, and called when token scope is requested. */
-public Set scopeRequestedForAccessToken(
-        Set requestedScope,
-        Set availableScopes,
-        Set defaultScopes);
-
-/** Called on request to refresh an access token. */
-public Set scopeRequestedForRefreshToken(
-        Set requestedScope,
-        Set availableScopes,
-        Set allScopes,
-        Set defaultScopes);
-
-/** Called to determine the scopes to appear on the authorization page. */
-public Set scopeToPresentOnAuthorizationPage(
-        Set requestedScope,
-        Set availableScopes,
-        Set defaultScopes);</programlisting>
 
   <para>
-   The following example plugin sets whether <literal>read</literal>
-   and <literal>write</literal> permissions were granted.
+   The following example plugin sets whether
+   <literal>read</literal> and <literal>write</literal> permissions were granted.
   </para>
 
-  <!-- See also org.forgerock.openam.oauth2.provider.impl.ScopeImpl.java -->
-  <programlisting language="java"
-  >package org.forgerock.openam.examples;
+  <programlisting language="java">
+package org.forgerock.openam.examples;
+
+import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.ScopeValidator;
+import org.forgerock.oauth2.core.Token;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.oauth2.core.CoreToken;
-import org.forgerock.oauth2.core.Scope;
-
 /**
- * Custom scope providers implement the
- * {@link org.forgerock.oauth2.core.Scope} interface.
+ * Custom scope validators implement the
+ * {@link org.forgerock.oauth2.core.ScopeValidator} interface.
  *
- * This custom scope implementation does not support OpenID Connect 1.0,
- * and implements the default mechanisms for the three {@code scope*} methods.
+ * &lt;p>
+ * This example sets read and write permissions according to the scopes set.
+ * &lt;/p>
  *
- * This custom scope plugin instead implements simple versions
- * of {@link #evaluateScope(org.forgerock.oauth2.core.CoreToken)}
- * and of {@link #getUserInfo(org.forgerock.oauth2.core.CoreToken)}.
+ * &lt;ul>
  *
- * The {@code evaluateScope} method populates scope values returned in the
- * JSON with the token information.
+ * &lt;li>
+ * The {@code validateAuthorizationScope} method
+ * adds default scopes, or any allowed scopes provided.
+ * &lt;/li>
  *
- * The {@code getUserInfo} method populates scope values and the user ID
- * returned in the JSON.
+ * &lt;li>
+ * The {@code validateAccessTokenScope} method
+ * adds default scopes, or any allowed scopes provided.
+ * &lt;/li>
+ *
+ * &lt;li>
+ * The {@code validateRefreshTokenScope} method
+ * adds the scopes from the access token,
+ * or any requested scopes provided that are also in the access token scopes.
+ * &lt;/li>
+ *
+ * &lt;li>
+ * The {@code getUserInfo} method
+ * populates scope values and sets the resource owner ID to return.
+ * &lt;/li>
+ *
+ * &lt;li>
+ * The {@code evaluateScope} method
+ * populates scope values to return.
+ * &lt;/li>
+ *
+ * &lt;li>
+ * The {@code additionalDataToReturnFromAuthorizeEndpoint} method
+ * returns no additional data (an empty Map).
+ * &lt;/li>
+ *
+ * &lt;li>
+ * The {@code additionalDataToReturnFromTokenEndpoint} method
+ * adds no additional data.
+ * &lt;/li>
+ *
+ * &lt;/ul>
  */
-public class CustomScope implements Scope {
+public class CustomScopeValidator implements ScopeValidator {
+    @Override
+    public Set&lt;String> validateAuthorizationScope(
+            ClientRegistration clientRegistration,
+            Set&lt;String> scope) {
+        if (scope == null || scope.isEmpty()) {
+            return clientRegistration.getDefaultScopes();
+        }
 
-    private Map&lt;String,Object> mapScopes(CoreToken token) {
+        Set&lt;String> scopes = new HashSet&lt;String>(
+                clientRegistration.getAllowedScopes());
+        scopes.retainAll(scope);
+        return scopes;
+    }
+
+    @Override
+    public Set&lt;String> validateAccessTokenScope(
+            ClientRegistration clientRegistration,
+            Set&lt;String> scope,
+            OAuth2Request request) {
+        if (scope == null || scope.isEmpty()) {
+            return clientRegistration.getDefaultScopes();
+        }
+
+        Set&lt;String> scopes = new HashSet&lt;String>(
+                clientRegistration.getAllowedScopes());
+        scopes.retainAll(scope);
+        return scopes;
+    }
+
+    @Override
+    public Set&lt;String> validateRefreshTokenScope(
+            ClientRegistration clientRegistration,
+            Set&lt;String> requestedScope,
+            Set&lt;String> tokenScope,
+            OAuth2Request request) {
+        if (requestedScope == null || requestedScope.isEmpty()) {
+            return tokenScope;
+        }
+
+        Set&lt;String> scopes = new HashSet&lt;String>(tokenScope);
+        scopes.retainAll(requestedScope);
+        return scopes;
+    }
+
+    /**
+     * Set read and write permissions according to scope.
+     *
+     * @param token The access token presented for validation.
+     * @return The map of read and write permissions,
+     *         with permissions set to {@code true} or {@code false},
+     *         as appropriate.
+     */
+    private Map&lt;String,Object> mapScopes(AccessToken token) {
         Set&lt;String> scopes = token.getScope();
         Map&lt;String, Object> map = new HashMap&lt;String, Object>();
         final String[] permissions = {"read", "write"};
@@ -159,82 +212,47 @@ public class CustomScope implements Scope {
     }
 
     @Override
-    public Map&lt;String, Object> evaluateScope(CoreToken token) {
-        return mapScopes(token);
-    }
-
-    @Override
-    public Map&lt;String, String> extraDataToReturnForAuthorizeEndpoint(
-            Map parameters,
-            Map tokens) {
-        return new HashMap&lt;String, String>(); // No special handling
-    }
-
-    @Override
-    public Map&lt;String, Object> extraDataToReturnForTokenEndpoint(
-            Map parameters,
-            CoreToken token) {
-        return new HashMap&lt;String, Object>(); // No special handling
-    }
-
-    @Override
-    public Map&lt;String, Object> getUserInfo(CoreToken token) {
+    public Map&lt;String, Object> getUserInfo(
+            AccessToken token,
+            OAuth2Request request)
+            throws UnauthorizedClientException {
         Map&lt;String, Object> response = mapScopes(token);
-        response.put("sub", token.getUserID());
+        response.put("sub", token.getResourceOwnerId());
         return response;
     }
 
     @Override
-    public Set&lt;String> scopeToPresentOnAuthorizationPage(
-            Set&lt;String> requestedScope,
-            Set&lt;String> availableScopes,
-            Set&lt;String> defaultScopes) {
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return defaultScopes;
-        }
-
-        Set&lt;String> scopes = new HashSet&lt;String>(availableScopes);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    public Map&lt;String, Object> evaluateScope(AccessToken token) {
+        return mapScopes(token);
     }
 
     @Override
-    public Set&lt;String> scopeRequestedForAccessToken(
-            Set&lt;String> requestedScope,
-            Set&lt;String> availableScopes,
-            Set&lt;String> defaultScopes) {
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return defaultScopes;
-        }
-
-        Set&lt;String> scopes = new HashSet&lt;String>(availableScopes);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    public Map&lt;String, String> additionalDataToReturnFromAuthorizeEndpoint(
+            Map&lt;String, Token> tokens,
+            OAuth2Request request) {
+        return new HashMap&lt;String, String>(); // No special handling
     }
 
     @Override
-    public Set&lt;String> scopeRequestedForRefreshToken(
-            Set&lt;String> requestedScope,
-            Set&lt;String> availableScopes,
-            Set&lt;String> allScopes,
-            Set&lt;String> defaultScopes) {
-        if (requestedScope == null || requestedScope.isEmpty()) {
-            return availableScopes;
-        }
-
-        Set&lt;String> scopes = new HashSet&lt;String>(availableScopes);
-        scopes.retainAll(requestedScope);
-        return scopes;
+    public void additionalDataToReturnFromTokenEndpoint(
+            AccessToken token,
+            OAuth2Request request)
+            throws ServerException, InvalidClientException {
+        // No special handling
     }
-}</programlisting>
+}
+  </programlisting>
  </section>
 
  <section xml:id="build-oauth2-scopes-plugin">
-  <title>Building the OAuth 2.0 Scopes Sample Plugin</title>
+  <title>Building the OAuth 2.0 Scope Validator Sample Plugin</title>
 
   <para>
-   The <link xlink:href="https://github.com/markcraig/openam-scope-sample"
-   xlink:show="new">sample scopes plugin source</link> is available online.
+   The
+   <link
+    xlink:href="https://github.com/markcraig/openam-scope-sample"
+    xlink:show="new">sample scope validator plugin source</link>
+   is available online.
    Get a local clone so that you can try the sample on your system.
    In the sources you find the following files.
   </para>
@@ -248,17 +266,17 @@ public class CustomScope implements Scope {
      </para>
 
      <para>
-      This file specifies how to build the sample OAuth 2.0 scopes plugin,
+      This file specifies how to build the sample scope validator plugin,
       and also specifies its dependencies on OpenAM components.
      </para>
     </listitem>
    </varlistentry>
 
    <varlistentry>
-    <term><filename>src/main/java/org/forgerock/openam/examples/CustomScope.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/CustomScopeValidator.java</filename></term>
     <listitem>
      <para>
-      Core class for the sample OAuth 2.0 scopes plugin
+      Core class for the sample OAuth 2.0 scope validator plugin
      </para>
 
      <para>
@@ -284,7 +302,7 @@ $ <userinput>mvn install</userinput>
 ...
 
 [INFO]
-[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-scope-sample ---
+[INFO] --- maven-jar-plugin:2.3.2:jar (default-jar) @ openam-scope-sample ---
 [INFO] Building jar: .../target/openam-scope-sample-1.0.0-SNAPSHOT.jar
 
 ...
@@ -292,9 +310,9 @@ $ <userinput>mvn install</userinput>
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 10.799s
-[INFO] Finished at: Mon Nov 25 13:43:37 CET 2013
-[INFO] Final Memory: 20M/162M
+[INFO] Total time: 1.827s
+[INFO] Finished at: Tue Jun 03 10:40:31 CEST 2014
+[INFO] Final Memory: 27M/357M
 [INFO] ------------------------------------------------------------------------</computeroutput>
   </screen>
 
@@ -322,7 +340,7 @@ $ <userinput>mvn install</userinput>
    or configure your plugin as the default for new OAuth 2.0 providers.
    In either case, you need the class name of your plugin.
    The class name for the sample plugin is
-   <literal>org.forgerock.openam.examples.CustomScope</literal>.
+   <literal>org.forgerock.openam.examples.CustomScopeValidator</literal>.
   </para>
 
   <itemizedlist>
@@ -370,7 +388,7 @@ $ <userinput>curl \
     "scope": "read",
     "expires_in": 59,
     "token_type": "Bearer",
-    "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
+    "access_token": "c8860442-daba-4af0-a1d9-b607c03e5a0b"
 }</computeroutput>
 
 $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
@@ -379,12 +397,13 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
     "scope": [
         "read"
     ],
+    "grant_type": "client_credentials",
     "realm": "/",
     "write": false,
     "read": true,
     "token_type": "Bearer",
-    "expires_in": 22,
-    "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
+    "expires_in": 24,
+    "access_token": "c8860442-daba-4af0-a1d9-b607c03e5a0b"
 }</computeroutput>
   </screen>
 

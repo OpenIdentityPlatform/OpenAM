@@ -410,8 +410,17 @@
     <para>If you want to use the default scope implementation, whereby
     scopes are taken to be resource owner profile attribute names, then
     keep the default setting.</para>
-    <para>If you have a custom scope implementation, put it on the OpenAM
-    classpath, and provide the class name as Scope Implementation Class.</para>
+
+    <para>If you have a custom scope validator implementation,
+     put it on the OpenAM classpath,
+     and provide the class name as Scope Implementation Class.
+     For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
+     <link
+      xlink:href="dev-guide#chap-oauth2-scopes"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+      ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
+    </para>
    </step>
    <step>
     <para>Click Create to complete the process.</para>
@@ -429,9 +438,12 @@
    </step>
 
    <step performance="optional">
-    <para>If your provider has plugins for custom response types, add the
-    custom response types and the corresponding plugin class names to the
-    list of Response Type Plugins.</para>
+    <para>
+     If your provider has a custom <literal>ResponseTypeHandler</literal> plugin,
+     put it on the OpenAM classpath,
+     and then add the custom response types and the plugin class names
+     to the list of Response Type Plugins.
+    </para>
    </step>
 
    <step performance="optional">

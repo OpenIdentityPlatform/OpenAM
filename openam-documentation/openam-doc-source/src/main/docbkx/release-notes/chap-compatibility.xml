@@ -352,6 +352,48 @@
     future release in favor of the newer REST services. Older REST services
     will be removed only after replacement REST services are introduced.</para>
    </listitem>
+
+   <listitem>
+    <para>
+     The OAuth 2.0 plugin interface for custom scopes,
+     <link
+      xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
+      xlink:show="new"><literal>Scope</literal></link>
+     is deprecated and likely to be removed in a future release.
+    </para>
+
+    <para>
+     Custom OAuth 2.0 scopes plugins now implement the
+     <link
+      xlink:href="${javadocBase}?org/forgerock/oauth2/core/ScopeValidator.html"
+      xlink:show="new"
+      ><literal>ScopeValidator</literal></link> interface instead.
+     For an example, see the <citetitle>Developer's Guide</citetitle> chapter,
+     <link
+      xlink:href="dev-guide#chap-oauth2-scopes"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      xlink:show="new"
+      ><citetitle>Customizing OAuth 2.0 Scope Handling</citetitle></link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The OAuth 2.0 plugin interface for custom response types,
+     <link
+      xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/ResponseType.html"
+      xlink:show="new"><literal>ResponseType</literal></link>
+     is deprecated and likely to be removed in a future release.
+    </para>
+
+    <para>
+     Custom OAuth 2.0 response type plugins now implement the
+     <link
+      xlink:href="${javadocBase}?org/forgerock/oauth2/core/ResponseTypeHandler.html"
+      xlink:show="new"
+      ><literal>ResponseTypeHandler</literal></link> interface instead.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
