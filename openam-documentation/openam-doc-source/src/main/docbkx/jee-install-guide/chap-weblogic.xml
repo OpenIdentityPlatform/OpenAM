@@ -169,14 +169,14 @@ Install log file location:
      <varlistentry>
       <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
       <listitem>
-       <para>Used to bootstrap the J2EE policy agent, allowing the agent to
+       <para>Used to bootstrap the Java EE policy agent, allowing the agent to
        connect to OpenAM and download its configuration</para>
       </listitem>
      </varlistentry>
      <varlistentry>
       <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
       <listitem>
-       <para>Only used if you configured the J2EE policy agent to use local
+       <para>Only used if you configured the Java EE policy agent to use local
        configuration</para>
       </listitem>
      </varlistentry>
@@ -486,7 +486,7 @@ $CLASSPATH</programlisting>
   <para>Shut down the WebLogic server before you uninstall the
     policy agent.</para>
 
-  <para>To remove the J2EE policy agent, use <command>agentadmin
+  <para>To remove the Java EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the WebLogic configuration directory
   location.</para>
   

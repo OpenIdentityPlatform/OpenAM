@@ -174,14 +174,14 @@ Install log file location:
      <varlistentry>
       <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
       <listitem>
-       <para>Used to bootstrap the J2EE policy agent, allowing the agent to
+       <para>Used to bootstrap the Java EE policy agent, allowing the agent to
        connect to OpenAM and download its configuration</para>
       </listitem>
      </varlistentry>
      <varlistentry>
       <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
       <listitem>
-       <para>Only used if you configured the J2EE policy agent to use local
+       <para>Only used if you configured the Java EE policy agent to use local
        configuration</para>
       </listitem>
      </varlistentry>
@@ -292,7 +292,7 @@ $ <userinput>/path/to/glassfish/bin/asadmin stop-domain domain1</userinput>
 Command stop-domain executed successfully.</computeroutput>
   </screen>
   
-  <para>To remove the J2EE policy agent, use <command>agentadmin
+  <para>To remove the Java EE policy agent, use <command>agentadmin
   --uninstall</command>. You must provide the GlassFish configuration directory
   location, and the instance name.</para>
   

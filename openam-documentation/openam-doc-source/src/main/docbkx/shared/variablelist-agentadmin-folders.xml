@@ -46,7 +46,7 @@
 <varlistentry>
  <term><filename>lib</filename></term>
  <listitem>
-  <para>Shared libraries used by the J2EE policy agent</para>
+  <para>Shared libraries used by the Java EE policy agent</para>
  </listitem>
 </varlistentry>
 <varlistentry>

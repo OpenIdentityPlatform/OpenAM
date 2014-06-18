@@ -18,12 +18,14 @@
   the agent configuration locally and configure the agent by changing
   values in the properties file. This section covers centralized configuration,
   indicating the corresponding properties for use in a local configuration
-  file where applicable.<footnote><para>The configuration file syntax is that
-   of a standard Java properties file, though backslash escapes can be used only
-   to wrap long lines. See <link
+  file where applicable.
+
+  <footnote><para>The configuration file syntax is that
+   of a standard Java properties file. See <link
     xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29"
     >java.util.Properties.load</link> for a description of the format. The value
-   of a property specified multiple times is not defined.</para></footnote></para>
+   of a property specified multiple times is not defined.</para></footnote>
+ </para>
 
  <tip>
   <para>To show the agent properties in configuration file format that
@@ -36,7 +38,7 @@
  </tip>
 
  <para>After changing properties specified as "Hot swap: no" you must
-  restart the agent for the changes to take effect.</para>
+  restart the agent's container for the changes to take effect.</para>
 
  <section xml:id="configure-web-pa-global-props">
   <title>Configuring Web Policy Agent Global Properties</title>
@@ -144,7 +146,7 @@
       The slash following the port number is required.</para>
 
      <para>If your agent system also has virtual host names, add URLs with
-      the virtual host names to this list as well. OpenAM checks that
+      the virtual host names to this list as well. OpenAM checks that the
       <literal>goto</literal> URLs match one of the agent root URLs for
       CDSSO.</para>
     </listitem>
@@ -156,8 +158,8 @@
    <varlistentry>
     <term>SSO Only Mode</term>
     <listitem>
-     <para>When enabled, agent only enforces authentication (SSO), but no
-      policies for authorization.</para>
+     <para>When enabled, the agent enforces authentication, so that upon verification
+      of the user's identity, the user receives a session token.</para>
      <para>Property: <literal>com.sun.identity.agents.config.sso.only</literal></para>
     </listitem>
    </varlistentry>
@@ -215,7 +217,7 @@
      <para>The following example used in the local configuration sets the
       log overall level to debug for all messages.</para>
      <literallayout class="monospaced"
-      >com.sun.identity.agents.config.debug.level=all:4</literallayout>
+      >com.sun.identity.agents.config.debug.level=all:5</literallayout>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -753,7 +755,7 @@
      <para>OpenAM login page URL, such as
       <literal>http://openam.example.com:8080/openam/UI/Login</literal>, to
       which the agent redirects incoming users without sufficient credentials
-      so then can authenticate.</para>
+      so that they can authenticate.</para>
      <para>Property: <literal>com.sun.identity.agents.config.login.url</literal></para>
     </listitem>
    </varlistentry>
@@ -894,7 +896,7 @@
    <varlistentry>
     <term>User ID Parameter Type</term>
     <listitem>
-     <para>User ID can be fetched from either SESSION and LDAP attributes.
+     <para>User ID can be fetched from either SESSION or LDAP attributes.
       Default: <literal>SESSION</literal>.</para>
      <para>Property: <literal>com.sun.identity.agents.config.userid.param.type</literal></para>
     </listitem>
@@ -987,9 +989,9 @@
   <variablelist xml:id="web-agent-cookie-processing-properties">
    <title>Cookie Processing properties</title>
    <varlistentry>
-    <term>Encode special chars in Cookies</term>
+    <term>Encode special characters in Cookies</term>
     <listitem>
-     <para>When enabled, encode special chars in cookie by URL encoding.
+     <para>When enabled, encode special characters in cookie by URL encoding.
       This is useful when profile, session, and response attributes contain
       special characters, and the attributes fetch mode is set to
       <literal>HTTP_COOKIE</literal>.</para>
@@ -1106,7 +1108,7 @@
       request URL with path info stripped is
       <literal>http://host/webapp/</literal>, which does not match the
       not enforced list. Thus when this property is enabled, path info is
-      not stripped from teh request URL even if there is a wildcard in the not
+      not stripped from the request URL even if there is a wildcard in the not
       enforced list or policy.</para>
      <para>Make sure therefore when this property is enabled that there is
       nothing following the wildcard in the not enforced list or policy.</para>
@@ -1178,7 +1180,8 @@
     get client IP and host name values from the proxy or load balancer. For
     proxies and load balancer that support providing the client IP and host
     name in HTTP headers, you can use the following properties.</para>
-   <para>When multiple proxies are load balancers sit in the request path,
+
+   <para>When multiple proxies or load balancers sit in the request path,
     the header values can include a comma-separated list of values with the
     first value representing the client, as in
     <literal>client,next-proxy,first-proxy</literal>.</para>
