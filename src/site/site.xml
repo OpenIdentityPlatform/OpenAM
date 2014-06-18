@@ -78,7 +78,7 @@
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
    <item name="Java EE Release Notes" href="./openam-documentation/openam-doc-source/doc/jee-release-notes/index.html" />
-   <item name="Java EE Install Guide" href="./openam-documentation/openam-doc-source/doc/jee-install-guide/index.html" />
+   <item name="Java EE User's Guide" href="./openam-documentation/openam-doc-source/doc/jee-users-guide/index.html" />
    <item name="Java EE Reference" href="./openam-documentation/openam-doc-source/doc/jee-reference/index.html" />
    <item name="Web Release Notes" href="./openam-documentation/openam-doc-source/doc/web-release-notes/index.html" />
    <item name="Web Install Guide" href="./openam-documentation/openam-doc-source/doc/web-install-guide/index.html" />

@@ -105,13 +105,13 @@
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Release-Notes.rtf">RTF</a>,
     <a href="./openam-documentation/openam-doc-source/doc/webhelp/jee-release-notes/index.html">Webhelp</a></dd>
 
-    <dt>Java EE Policy Agent Installation Guide</dt>
-    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Install-Guide.epub">EPUB</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/jee-install-guide/index.html">HTML (single page)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/jee-install-guide/index/index.html">HTML (1 page/chapter)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Install-Guide.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Install-Guide.rtf">RTF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/webhelp/jee-install-guide/index.html">Webhelp</a></dd>
+    <dt>Java EE Policy Agent User's Guide</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Users-Guide.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-users-guide/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-users-guide/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Users-Guide.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Users-Guide.rtf">RTF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/webhelp/jee-users-guide/index.html">Webhelp</a></dd>
 
     <dt>Java EE Policy Agent Reference</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Jee-Reference.epub">EPUB</a>,
