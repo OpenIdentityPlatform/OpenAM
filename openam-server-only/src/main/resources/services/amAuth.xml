@@ -29,7 +29,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011-2013 ForgeRock AS
+    Portions Copyrighted 2011-2014 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -62,7 +62,6 @@
                         <Value>com.sun.identity.authentication.modules.msisdn.MSISDN</Value>
                         <Value>com.sun.identity.authentication.modules.datastore.DataStore</Value>
                         <Value>org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie</Value>
-                        <Value>org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule</Value>
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
                         <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>

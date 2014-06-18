@@ -1,7 +1,7 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright 2011-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,7 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
  */
 
 package org.forgerock.openam.upgrade.helpers;
@@ -42,7 +41,6 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
     private final static String OAUTH2 = "org.forgerock.openam.authentication.modules.oauth2.OAuth";
     private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
-    private final static String DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule";
     private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
     private final static String OPEN_ID_CONNECT = "org.forgerock.openam.authentication.modules.oidc.OpenIdConnect";
 
@@ -67,10 +65,9 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         Set<String> defaultValues = existingAttr.getDefaultValues();
 
         if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2)
-                && defaultValues.contains(OATH) && defaultValues.contains(DEVICE_PRINT)
-                && defaultValues.contains(PERSISTENT_COOKIE)
-                && defaultValues.contains(OPEN_ID_CONNECT)
-                && !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
+                && defaultValues.contains(OATH) && defaultValues.contains(PERSISTENT_COOKIE)
+                && defaultValues.contains(OPEN_ID_CONNECT) && !defaultValues.contains(SAFEWORD)
+                && !defaultValues.contains(UNIX)) {
             // nothing to do
             return null;
         }
@@ -79,7 +76,6 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.add(ADAPTIVE);
         defaultValues.add(OAUTH2);
         defaultValues.add(OATH);
-        defaultValues.add(DEVICE_PRINT);
         defaultValues.add(PERSISTENT_COOKIE);
         defaultValues.add(OPEN_ID_CONNECT);
         defaultValues.remove(SAFEWORD);
