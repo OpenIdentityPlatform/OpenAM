@@ -133,6 +133,7 @@ import java.security.AccessController;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -148,7 +149,9 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -788,6 +791,22 @@ public class AMSetupServlet extends HttpServlet {
             throw new ConfiguratorException("configuration.failed",
                 params, configLocale);
         } finally {
+            installLog.write("\n\nDumping all configuration parameters...\n");
+            installLog.write("\nRequest Parameters:\n");
+            dumpConfigurationProperties(installLog, request.getParameterMap());
+            if (siteMap != null && !siteMap.isEmpty()) {
+                installLog.write("\nSite configuration items:\n");
+                dumpConfigurationProperties(installLog, siteMap);
+            }
+            if (userRepo != null && !userRepo.isEmpty()) {
+                installLog.write("\nExternal user repo configuration items:\n");
+                dumpConfigurationProperties(installLog, userRepo);
+            }
+            if (map != null && !map.isEmpty()) {
+                installLog.write("\nMain configuration items:\n");
+                dumpConfigurationProperties(installLog, map);
+            }
+            installLog.write("\nFinished dumping all configuration parameters\n");
             installLog.close();
             SetupProgress.closeOutputStream();
         }
@@ -801,6 +820,50 @@ public class AMSetupServlet extends HttpServlet {
         }
 
         return isConfiguredFlag;
+    }
+
+    // The list of constants, passwords for example, that should be hashed out if logged.
+    private static final String[] CONFIG_ITEMS_TO_HASH = new String[] {
+            SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD,
+            SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM,
+            SetupConstants.CONFIG_VAR_ADMIN_PWD,
+            SetupConstants.CONFIG_VAR_CONFIRM_ADMIN_PWD,
+            SetupConstants.CONFIG_VAR_DS_MGR_PWD,
+            SetupConstants.CONFIG_VAR_ENCRYPTION_KEY,
+            SetupConstants.ENC_PWD_PROPERTY,
+            SetupConstants.ENCRYPTED_AD_ADMIN_PWD,
+            SetupConstants.ENCRYPTED_ADMIN_PWD,
+            SetupConstants.ENCRYPTED_LDAP_USER_PWD,
+            SetupConstants.ENCRYPTED_SM_DS_PWD,
+            SetupConstants.HASH_ADMIN_PWD,
+            SetupConstants.HASH_LDAP_USER_PWD,
+            SetupConstants.SSHA512_LDAP_USERPWD,
+            SetupConstants.UM_DS_DIRMGRPASSWD,
+            SetupConstants.USERSTORE_PWD,
+            SetupConstants.USER_STORE_LOGIN_PWD
+    };
+
+    // Used to provide a lookup list of items that should be hashed out.
+    private static final List<String> CONFIG_ITEMS_TO_HASH_LIST =
+            new ArrayList<String>(Arrays.asList(CONFIG_ITEMS_TO_HASH));
+
+    /**
+     * Iterate over the supplied properties (sorted by property name) and write them out to the passed install log.
+     * Property values that are in the CONFIG_ITEMS_TO_HASH_LIST will have their value masked.
+     * @param installLog The log to write the properties into
+     * @param properties A non-null set of properties to iterate over and write out to the log
+     */
+    private static void dumpConfigurationProperties(final InstallLog installLog, final Map<String, Object> properties) {
+
+        SortedMap<String, Object> sortedProperties = new TreeMap<String, Object>(String.CASE_INSENSITIVE_ORDER);
+        sortedProperties.putAll(properties);
+        for (String key : sortedProperties.keySet()) {
+            if (CONFIG_ITEMS_TO_HASH_LIST.contains(key)) {
+                installLog.write(key + " = #########" + "\n");
+            } else {
+                installLog.write(key + " = " + sortedProperties.get(key) + "\n");
+            }
+        }
     }
 
     /**
