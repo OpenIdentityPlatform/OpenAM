@@ -240,7 +240,7 @@
             <para>Install the appropriate policy agent, as described in the <link xlink:href="web-install-guide#web-install-guide"
             xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
             Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-            or <link xlink:href="jee-install-guide#jee-install-guide"
+            or <link xlink:href="jee-users-guide#jee-users-guide"
             xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
             Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. 
             This procedure uses an agent URL of <literal>http://app.example.net:80</literal>, 
@@ -259,7 +259,7 @@
                 follow the procedure described in the <link xlink:href="web-install-guide#web-install-guide"
                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
                 Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-                or <link xlink:href="jee-install-guide#jee-install-guide"
+                or <link xlink:href="jee-users-guide#jee-users-guide"
                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
                 Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>.</para>
         </step>

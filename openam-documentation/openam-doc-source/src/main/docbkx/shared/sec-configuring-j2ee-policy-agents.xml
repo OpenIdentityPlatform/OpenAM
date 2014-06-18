@@ -7,21 +7,22 @@
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
- <title>Configuring J2EE Policy Agents</title>
+ <title>Configuring Java EE Policy Agents</title>
  <indexterm>
   <primary>Policy agents</primary>
   <secondary>Configuring</secondary>
  </indexterm>
- <para>When you create a J2EE policy agent profile and install the agent,
+ <para>When you create a Java EE policy agent profile and install the agent,
   you can choose to store the agent configuration centrally and configure
   the agent through OpenAM console. Alternatively, you can choose to store
   the agent configuration locally and configure the agent by changing
   values in the properties file. This section covers centralized configuration,
   indicating the corresponding properties for use in a local configuration
-  file where applicable.<footnote><para>The configuration file syntax is that
-   of a standard Java properties file, though backslash escapes can be used only
-   to wrap long lines. See
-   <link xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29">java.util.Properties.load</link>
+  file where applicable.
+
+  <footnote><para>The configuration file syntax is that
+   of a standard Java properties file. See
+   <link xlink:href="http://download.oracle.com/javase/6/docs/api/java/util/Properties.html#load%28java.io.Reader%29">java.util.Properties.load()</link>
    for a description of the format. The value of a property specified multiple
    times is not defined.</para></footnote></para>
 
@@ -32,25 +33,26 @@
  </tip>
 
  <para>After changing properties specified as "Hot swap: no" you must
-  restart the agent.</para>
+  restart the application server or web server, or the agent's container.</para>
 
  <section xml:id="configure-j2ee-pa-global-props">
-  <title>Configuring J2EE Policy Agent Global Properties</title>
+  <title>Configuring Java EE Policy Agent Global Properties</title>
 
-  <para>This section covers global J2EE agent properties. After creating the
+  <para>This section covers global Java EE agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
-   J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Global.</para>
+   Java EE &gt; <replaceable>Agent Name</replaceable> &gt; Global.</para>
 
   <variablelist xml:id="j2ee-agent-profile-properties">
    <title>Profile properties</title>
    <varlistentry>
     <term>Group</term>
     <listitem>
-     <para>For assigning the agent to a previously configured J2EE agent group
+     <para>For assigning the agent to a previously configured Java EE agent group
       in order to inherit selected properties from the group.</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Password</term>
     <listitem>
@@ -58,12 +60,14 @@
       installing the agent.</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Status</term>
     <listitem>
      <para>Status of the agent configuration.</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Agent Notification URL</term>
     <listitem>
@@ -72,6 +76,7 @@
      <para>Hot swap: no</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Location of Agent Configuration Repository</term>
     <listitem>
@@ -82,6 +87,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.repository.location</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Configuration Reload Interval</term>
     <listitem>
@@ -90,6 +96,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.load.interval</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Agent Configuration Change Notification</term>
     <listitem>
@@ -98,6 +105,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.change.notification.enable</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Agent Root URL for CDSSO</term>
     <listitem>
@@ -131,12 +139,13 @@
       <varlistentry>
        <term><literal>ALL</literal></term>
        <listitem>
-        <para>Enforce both the J2EE policy defined for the web container where
+        <para>Enforce both the Java EE policy defined for the web container where
          the protected application runs, and also OpenAM policies.</para>
         <para>When setting the filter mode to <literal>ALL</literal>, set the
          Map Key, but do not set any Corresponding Map Value.</para>
        </listitem>
       </varlistentry>
+
       <varlistentry>
        <term><literal>J2EE_POLICY</literal></term>
        <listitem>
@@ -144,6 +153,7 @@
          the protected application runs.</para>
        </listitem>
       </varlistentry>
+
       <varlistentry>
        <term><literal>NONE</literal></term>
        <listitem>
@@ -151,16 +161,18 @@
          turn off access management. Not for use in production.</para>
        </listitem>
       </varlistentry>
+
       <varlistentry>
        <term><literal>SSO_ONLY</literal></term>
        <listitem>
         <para>Enforce only authentication, not policies.</para>
        </listitem>
       </varlistentry>
+
       <varlistentry>
        <term><literal>URL_POLICY</literal></term>
        <listitem>
-        <para>Enforce only OpenAM, URL resource based policies.</para>
+        <para>Enforce only URL resource-based policies defined in OpenAM.</para>
         <para>When setting the filter mode to <literal>URL_POLICY</literal>,
          set the Map Key to the application name and the Corresponding Map
          Value to <literal>URL_POLICY</literal>.</para>
@@ -180,6 +192,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.httpsession.binding</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Login Attempt Limit</term>
     <listitem>
@@ -189,6 +202,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.login.attempt.limit</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Custom Response Header</term>
     <listitem>
@@ -199,6 +213,7 @@
       <literal>com.sun.identity.agents.config.response.header[Cache-Control]=no-cache</literal>.</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Redirect Attempt Limit</term>
     <listitem>
@@ -208,6 +223,7 @@
      <para>Property: <literal>com.sun.identity.agents.config.redirect.attempt.limit</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Agent Debug Level</term>
     <listitem>
@@ -343,7 +359,7 @@
  </section>
 
  <section xml:id="configure-j2ee-pa-application-props">
-  <title>Configuring J2EE Policy Agent Application Properties</title>
+  <title>Configuring Java EE policy agent Application Properties</title>
 
   <para>This section covers application J2EE agent properties. After creating
    the agent profile, you access these properties in the OpenAM console under
@@ -602,8 +618,10 @@
     <term>Profile Attribute Map</term>
     <listitem>
      <para>Maps the profile attributes to HTTP headers for the currently
-      authenticated user. Map Keys are LDAP attribute names, and Map Values
-      are HTTP header names.</para>
+      authenticated user. Map Keys are attribute names, and Map Values
+      are HTTP header names. The user profile can be stored in LDAP or any
+      other arbitrary data store.
+     </para>
      <para>To populate the value of profile attribute CN under
       <literal>CUSTOM-Common-Name</literal>: enter CN in the Map Key field,
       and enter <literal>CUSTOM-Common-Name</literal> in the Corresponding
@@ -629,7 +647,7 @@
       <literal>HTTP_HEADER</literal>, response attributes are introduced into
       the cookie or the headers, respectively. When set to
       <literal>REQUEST_ATTRIBUTE</literal>, response attributes are part
-      of the HTTP response.</para>
+      of the HTTP request.</para>
      <para>Property: <literal>com.sun.identity.agents.config.response.attribute.fetch.mode</literal></para>
     </listitem>
    </varlistentry>
@@ -693,7 +711,7 @@
       <literal>HTTP_HEADER</literal>, session attributes are introduced into the
       cookie or the headers, respectively. When set to
       <literal>REQUEST_ATTRIBUTE</literal>, session attributes are part
-      of the HTTP response.</para>
+      of the HTTP request.</para>
      <para>Property: <literal>com.sun.identity.agents.config.session.attribute.fetch.mode</literal></para>
     </listitem>
    </varlistentry>
@@ -722,23 +740,31 @@
 
   <variablelist xml:id="j2ee-agent-privilege-attributes-properties">
    <title>Privilege Attributes Processing properties</title>
+   <para>Privileged attributes are sued when the agent is running in
+    <literal>ALL</literal> or <literal>J2EE_POLICY</literal> filter mode.
+    Privileged attributes contain the list of declarative Java EE roles that the
+    user can have.
+   </para>
+
    <varlistentry>
     <term>Default Privileged Attribute</term>
     <listitem>
-     <para>Specifies the list of privileged attributes granted to all users
-      with a valid OpenAM session, such as
-      <literal>AUTHENTICATED_USERS</literal>.</para>
+     <para>Specifies that every authenticated user
+      with a valid OpenAM session will have the
+      <literal>AUTHENTICATED_USERS</literal> role.</para>
      <para>Property: <literal>com.sun.identity.agents.config.default.privileged.attribute</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Privileged Attribute Type</term>
     <listitem>
-     <para>Specifies the list of privileged attribute types fetched for each
+     <para>Specifies the group and role memberships that will be turned into roles for each
       user.</para>
      <para>Property: <literal>com.sun.identity.agents.config.privileged.attribute.type</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Privileged Attributes To Lower Case</term>
     <listitem>
@@ -747,12 +773,13 @@
      <para>Property: <literal>com.sun.identity.agents.config.privileged.attribute.tolowercase</literal></para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term>Privileged Session Attribute</term>
     <listitem>
-     <para>Specifies the list of session property names, such as
-      <literal>UserToken</literal> which hold privileged attributes for
-      authenticated users.</para>
+     <para>Specifies the list of session property names when an authenticated
+      user's roles are store within a session property.
+     </para>
      <para>Property: <literal>com.sun.identity.agents.config.privileged.session.attribute</literal></para>
     </listitem>
    </varlistentry>
@@ -812,7 +839,7 @@
  </section>
 
  <section xml:id="configure-j2ee-pa-sso-props">
-  <title>Configuring J2EE Policy Agent SSO Properties</title>
+  <title>Configuring Java EE policy agent SSO Properties</title>
 
   <para>This section covers SSO J2EE agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under
@@ -941,7 +968,7 @@
  </section>
 
  <section xml:id="configure-j2ee-pa-services-props">
-  <title>Configuring J2EE Policy Agent OpenAM Services Properties</title>
+  <title>Configuring Java EE policy agent OpenAM Services Properties</title>
 
   <para>This section covers OpenAM services J2EE agent properties. After
    creating the agent profile, you access these properties in the OpenAM console
@@ -957,7 +984,10 @@
      <para>OpenAM login page URL, such as
       <literal>http://openam.example.com:8080/openam/UI/Login</literal>, to
       which the agent redirects incoming users without sufficient credentials
-      so then can authenticate.</para>
+      so that they can authenticate.
+      If CDSSO is enabled, this property is not used, instead the CDCServlet URL
+      will be used.
+     </para>
      <para>Property: <literal>com.sun.identity.agents.config.login.url</literal></para>
     </listitem>
    </varlistentry>
@@ -1109,8 +1139,16 @@
     <listitem>
      <para>Specifies the values, such as <literal>allow</literal> and
       <literal>deny</literal>, that are associated with boolean policy
-      decisions.</para>
-     <para>Default: <literal>iPlanetAMWebAgentService|GET|allow|deny:iPlanetAMWebAgentService|POST|allow|deny</literal></para>
+      decisions. The string is presented below in multiple lines for readability
+      purposes.
+     </para>
+     <para>Default: <literal>iPlanetAMWebAgentService|GET|allow|deny:
+      iPlanetAMWebAgentService|POST|allow|deny:
+      iPlanetAMWebAgentService|PUT|allow|deny:
+      iPlanetAMWebAgentService|DELETE|allow|deny:
+      iPlanetAMWebAgentService|HEAD|allow|deny:
+      iPlanetAMWebAgentService|OPTIONS|allow|deny:
+      iPlanetAMWebAgentService|PATCH|allow|deny</literal></para>
      <para>Property: <literal>com.sun.identity.policy.client.booleanActionValues</literal></para>
      <para>Hot swap: no</para>
     </listitem>
@@ -1129,7 +1167,7 @@
    <varlistentry>
     <term>Policy Client Clock Skew</term>
     <listitem>
-     <para>Time in seconds used adjust time difference between agent system
+     <para>Time in seconds used to adjust time difference between agent system
       and OpenAM. Clock skew in seconds = AgentTime - OpenAMServerTime.</para>
      <para>Default: 10.</para>
      <para>Property: <literal>com.sun.identity.policy.client.clockSkew</literal></para>
@@ -1242,7 +1280,7 @@
  </section>
 
  <section xml:id="configure-j2ee-pa-misc-props">
-  <title>Configuring J2EE Policy Agent Miscellaneous Properties</title>
+  <title>Configuring Java EE policy agent Miscellaneous Properties</title>
 
   <para>This section covers miscellaneous J2EE agent properties. After creating
    the agent profile, you access these properties in the OpenAM console under
@@ -1390,7 +1428,7 @@
  </section>
 
  <section xml:id="configure-j2ee-pa-advanced-props">
-  <title>Configuring J2EE Policy Agent Advanced Properties</title>
+  <title>Configuring Java EE policy agent Advanced Properties</title>
 
   <para>This section covers advanced J2EE agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under
@@ -1403,7 +1441,7 @@
     get client IP and host name values from the proxy or load balancer. For
     proxies and load balancer that support providing the client IP and host
     name in HTTP headers, you can use the following properties.</para>
-   <para>When multiple proxies are load balancers sit in the request path,
+   <para>When multiple proxies or load balancers sit in the request path,
     the header values can include a comma-separated list of values with the
     first value representing the client, as in
     <literal>client,next-proxy,first-proxy</literal>.</para>
@@ -1520,7 +1558,7 @@
     <listitem>
      <para>When enabled, allow programmatic authentication with the JBoss
       container using the WebAuthentication feature. This feature works only with
-      JBoss 4.2.2 to 7 when the <literal>J2EE_POLICY</literal> or
+      certain versions of JBoss when the <literal>J2EE_POLICY</literal> or
       <literal>ALL</literal> filter mode is in use.</para>
      <para>Property: <literal>com.sun.identity.agents.config.jboss.webauth.available</literal></para>
     </listitem>

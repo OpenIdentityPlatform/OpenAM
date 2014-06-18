@@ -57,9 +57,9 @@
  See the <link xlink:show="new" xlink:href="web-install-guide#web-install-guide"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
  Agent Installation Guide</citetitle></link>, or <link xlink:show="new"
- xlink:href="jee-install-guide#jee-install-guide"
+ xlink:href="jee-users-guide#jee-users-guide"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE
- Policy Agent Installation Guide</citetitle></link> for instructions on
+ Policy Agent User's Guide</citetitle></link> for instructions on
  installing OpenAM policy agents in supported web servers and Java EE
  application containers.</para>
 

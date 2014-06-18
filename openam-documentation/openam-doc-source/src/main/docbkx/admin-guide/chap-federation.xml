@@ -3478,10 +3478,10 @@ $ <userinput>ssoadm \
            xlink:show="new"
            xlink:role="http://docbook.org/xlink/role/olink"
      ><citetitle>Web Policy Agent Installation Guide</citetitle></link>
-     and the <link xlink:href="jee-install-guide#jee-install-guide"
+     and the <link xlink:href="jee-users-guide#jee-users-guide"
                    xlink:show="new"
                    xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Java EE Policy Agent Installation Guide</citetitle></link>.
+     ><citetitle>Java EE Policy Agent User's Guide</citetitle></link>.
     </para>
    </step>
 
