@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyright 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.authentication;
 
 import com.iplanet.jato.NavigationException;
@@ -42,20 +46,31 @@ import com.sun.identity.console.base.AMServiceProfileViewBeanBase;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
+import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.web.ui.view.alert.CCAlert;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 public class EditAuthTypeViewBean
     extends AMServiceProfileViewBeanBase
 {
-    public static final String DEFAULT_DISPLAY_URL =
-        "/console/authentication/EditAuthType.jsp";
-
+    public static final String DEFAULT_DISPLAY_URL = "/console/authentication/EditAuthType.jsp";
     public static final String SERVICE_TYPE = "authServiceType";
 
+    private static final String DYNAMIC_VALIDATION = "dynamic_validation";
+    private static final String ATTRIBUTE_NAME = "attrname";
+
     private AuthPropertiesModel authModel = null;
+    private boolean dynamicRequest = false;
+    private Map<String, Set<String>> unpersistedValueMap;
 
     /**
      * Creates a authentication module edit view bean.
@@ -86,18 +101,94 @@ public class EditAuthTypeViewBean
         }
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException
-    {
-        super.beginDisplay(event);
-        String instance = (String)getPageSessionAttribute(SERVICE_TYPE);
+    /**
+     * Checks to see if this is a dynamic validator request, if not execution is passed to the parent.
+     * It will retrieve the validators specified for the attribute, invoke their validate methods
+     * and display the validation messages if any are present.
+     *
+     * @param event Request invocation event.
+     */
+    public void handleDynLinkRequest(RequestInvocationEvent event) {
+        final HttpServletRequest request = event.getRequestContext().getRequest();
+        final String attributeName = request.getParameter(ATTRIBUTE_NAME);
 
-        AuthPropertiesModel model = getAuthModel();
-        if (model != null) {
-            AMPropertySheet ps = (AMPropertySheet)getChild(
-                PROPERTY_ATTRIBUTE);
-            Map map = model.getInstanceValues(instance);
-            ps.setAttributeValues(map, model);
+        if (Boolean.parseBoolean(request.getParameter(DYNAMIC_VALIDATION))) {
+            try {
+                // Store the current attribute values from the UI to render when beginDisplay is called
+                unpersistedValueMap = getUnpersistedValueMap();
+                dynamicRequest = true;
+                final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
+                final List<DynamicAttributeValidator> validatorList = getAuthModel().
+                        getDynamicValidators(instance, attributeName);
+                final StringBuilder messageBuilder = new StringBuilder();
+
+                for (DynamicAttributeValidator validator : validatorList) {
+                    if (!validator.validate(instance, attributeName, unpersistedValueMap)) {
+                        messageBuilder.append(validator.getValidationMessage());
+                        messageBuilder.append("\n");
+                    }
+                }
+
+                if (messageBuilder.length() > 0) {
+                    final String message = messageBuilder.substring(0, messageBuilder.length() - 1);
+                    setInlineAlertMessage(CCAlert.TYPE_WARNING, "message.warning", message);
+                } else {
+                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "message.validation.success");
+                }
+            } catch (AMConsoleException e) {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+            }
+            forwardTo();
+        } else {
+            super.handleDynLinkRequest(event);
+        }
+    }
+
+    /**
+     * Converts the Attribute Value map to a checked map.
+     * @return A checked attribute value map.
+     */
+    private Map<String, Set<String>> getUnpersistedValueMap() {
+        final Map<String, Set<String>> checkedValueMap = new HashMap<String, Set<String>>();
+
+        if (propertySheetModel != null) {
+            final Map uncheckedValueMap = propertySheetModel.getAttributeValueMap();
+            final Iterator<Map.Entry> oldIterator = uncheckedValueMap.entrySet().iterator();
+
+            while (oldIterator.hasNext()) {
+                final Map.Entry entry = oldIterator.next();
+                final Set<String> valueSet = new HashSet<String>();
+                final Object[] objectValues = (Object[]) entry.getValue();
+                final String[] stringValues = Arrays.copyOf(objectValues, objectValues.length, String[].class);
+                Collections.addAll(valueSet, stringValues);
+                checkedValueMap.put((String) entry.getKey(), valueSet);
+            }
+        }
+
+        return checkedValueMap;
+    }
+
+    /**
+     * This will populate the property sheet with attribute values for display. If this is called after
+     * a dynamic request the values that was present on the UI (which might not have been persisted) will be used.
+     * @param event The display event.
+     * @throws ModelControlException
+     */
+    public void beginDisplay(DisplayEvent event) throws ModelControlException {
+        super.beginDisplay(event);
+        final AuthPropertiesModel model = getAuthModel();
+        final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
+        final AMPropertySheet propertySheet = (AMPropertySheet) getChild(PROPERTY_ATTRIBUTE);
+        Map valueMap = unpersistedValueMap;
+
+        if (model != null && propertySheet != null) {
+            // If this is not a dynamic request the UI is set with persisted values
+            if (!dynamicRequest) {
+                valueMap = model.getInstanceValues(instance);
+            }
+            if (valueMap != null) {
+                propertySheet.setAttributeValues(valueMap, model);
+            }
         }
     }
 

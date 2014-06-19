@@ -151,7 +151,7 @@ Unique Declaration name for DOCTYPE tag:
                 orderedlist | maplist | globalmaplist | addremovelist ) #IMPLIED
         syntax ( boolean | string | paragraph | password | encrypted_password | 
                 dn | email | url | numeric | percent | number |
-                decimal_number | number_range | decimal_range | xml | date) "string"
+                decimal_number | number_range | decimal_range | xml | date | script ) "string"
         cosQualifier        ( default | override |
                          operational | merge-schemes )                "default"
         listOrder ( natural | insertion ) "natural"

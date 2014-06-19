@@ -27,11 +27,12 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.authentication.share;
 
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.Base64;
@@ -696,15 +697,20 @@ public class AuthXMLUtils {
             int messageType = 0;
             String msgType = XMLUtils.getNodeAttributeValue(childNode,
             AuthXMLTags.MESSAGE_TYPE);
-            if (msgType.equals("information")) {
-                messageType = TextOutputCallback.INFORMATION;
-            } else if (msgType.equals("error")) {
-                messageType = TextOutputCallback.ERROR;
-            } else if (msgType.equals("warning")) {
-                messageType = TextOutputCallback.WARNING;
+
+            if (msgType.equals("script")) {
+                textOutputCallback = new ScriptTextOutputCallback(value);
+            } else {
+
+                if (msgType.equals("information")) {
+                    messageType = TextOutputCallback.INFORMATION;
+                } else if (msgType.equals("error")) {
+                    messageType = TextOutputCallback.ERROR;
+                } else if (msgType.equals("warning")) {
+                    messageType = TextOutputCallback.WARNING;
+                }
+                textOutputCallback = new TextOutputCallback(messageType, value);
             }
-            textOutputCallback = new TextOutputCallback(messageType, value);
-            
         }
         
         return textOutputCallback;
@@ -1174,11 +1180,13 @@ public class AuthXMLUtils {
                 break;
             case TextOutputCallback.WARNING:
                 xmlString.append("warning");
+            case ScriptTextOutputCallback.SCRIPT:
+                xmlString.append("script");
         }
         xmlString.append(AuthXMLTags.QUOTE)
             .append(AuthXMLTags.ELEMENT_END)
             .append(AuthXMLTags.VALUE_BEGIN)
-            .append(textOutputCallback.getMessage())
+            .append(XMLUtils.escapeSpecialCharacters(textOutputCallback.getMessage()))
             .append(AuthXMLTags.VALUE_END);
         
         xmlString.append(AuthXMLTags.TEXTOUTPUT_CALLBACK_END);

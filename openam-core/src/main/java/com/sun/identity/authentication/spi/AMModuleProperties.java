@@ -27,18 +27,22 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-14 ForgeRock AS
  */
 
 package com.sun.identity.authentication.spi;
 
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.share.AuthXMLTags;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
@@ -49,16 +53,10 @@ import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.authentication.share.AuthXMLTags;
-import com.sun.identity.shared.xml.XMLUtils;
 
 class AMModuleProperties {
     private String moduleName;
@@ -389,18 +387,24 @@ class AMModuleProperties {
                 } else if (nodeName.equals("TextOutputCallback")) {
                         int messageType = TextOutputCallback.ERROR;
                         String s = getAttribute(node, "messageType");
-                        if (s.equals("error")) {
-                            messageType = TextOutputCallback.ERROR;
-                        } else if (s.equals("information")) {
-                            messageType = TextOutputCallback.INFORMATION;
-                        } else if (s.equals("warning")) {
-                            messageType = TextOutputCallback.WARNING;
+                        String value = node.getFirstChild().getNodeValue();
+
+
+                        if (s.equals("script")) {
+                            callbacks[p]  = new ScriptTextOutputCallback(value);
+                        } else {
+                            if (s.equals("error")) {
+                                messageType = TextOutputCallback.ERROR;
+                            } else if (s.equals("warning")) {
+                                messageType = TextOutputCallback.WARNING;
+                            } else { //default to information
+                                messageType = TextOutputCallback.INFORMATION;
+                            }
+
+                            callbacks[p] = new TextOutputCallback(messageType, value);
+
                         }
-                        sub = node.getFirstChild();
-                        sub = sub.getNextSibling().getFirstChild();
-                        String value = sub.getNodeValue();
-                        callbacks[p] = new TextOutputCallback(
-                            messageType, value);
+
                         p++;
                 } else if (nodeName.equals("LanguageCallback")) {
                         for (sub=node.getFirstChild(); sub!=null;

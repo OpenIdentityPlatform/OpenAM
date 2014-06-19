@@ -16,16 +16,19 @@
 
 package org.forgerock.openam.scripting;
 
+import org.codehaus.groovy.control.io.NullWriter;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
 
 /**
  * Evaluates scripts using the standard JSR 223 script engine framework.
@@ -67,9 +70,10 @@ public final class StandardScriptEvaluator implements ScriptEvaluator {
 
         final ScriptEngine engine = getScriptEngineFor(script);
         final Bindings variableBindings = mergeBindings(script.getBindings(), bindings);
+        final ScriptContext context = buildScriptContext(variableBindings);
 
         @SuppressWarnings("unchecked")
-        final T result = (T) engine.eval(script.getScript(), variableBindings);
+        final T result = (T) engine.eval(script.getScript(), context);
 
         return result;
     }
@@ -88,6 +92,7 @@ public final class StandardScriptEvaluator implements ScriptEvaluator {
         return engine;
     }
 
+
     /**
      * Merges all sets of variable bindings into a single scope to use when evaluating the script. Bindings later in
      * the list will override bindings earlier in the list.
@@ -96,12 +101,30 @@ public final class StandardScriptEvaluator implements ScriptEvaluator {
      * @return the merged set of all variable bindings.
      */
     private Bindings mergeBindings(Bindings...allBindings) {
-        final Bindings result = new SimpleBindings();
-        for (Bindings bindings : allBindings) {
-            if (bindings != null) {
-                result.putAll(bindings);
+        Bindings result = new SimpleBindings();
+        for (Bindings scope : allBindings) {
+            if (scope != null) {
+                result = new ChainedBindings(result, scope);
             }
         }
         return result;
+    }
+
+    /**
+     * Build the script context for evaluating a script, using the given set of variables for the engine scope.
+     *
+     * @param engineScope the variable bindings to use for the engine scope.
+     * @return the configured script context.
+     */
+    private ScriptContext buildScriptContext(Bindings engineScope) {
+        final ScriptContext context = new SimpleScriptContext();
+        context.setBindings(engineScope, ScriptContext.ENGINE_SCOPE);
+        context.setBindings(scriptEngineManager.getBindings(), ScriptContext.GLOBAL_SCOPE);
+        // Replace reader/writer instances with null versions
+        context.setReader(null);
+        // Groovy expects these writers to be non-null, so use the Groovy-supplied NullWriter instance
+        context.setWriter(NullWriter.DEFAULT);
+        context.setErrorWriter(NullWriter.DEFAULT);
+        return context;
     }
 }

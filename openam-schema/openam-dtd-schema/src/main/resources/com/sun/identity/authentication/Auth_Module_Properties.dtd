@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-14 ForgeRock AS
 -->
 
 
@@ -65,7 +65,8 @@
     authentication process (in case it is 'true'). -->
 <!ELEMENT       Callbacks       ( NameCallback | PasswordCallback | 
                                 ChoiceCallback | ConfirmationCallback |
-				                HttpCallback | RedirectCallback )* >
+				                HttpCallback | RedirectCallback |
+                                TextOutputCallback )* >
 <!ATTLIST       Callbacks
         length          NMTOKEN                 #REQUIRED
         order           NMTOKEN                 #REQUIRED
@@ -92,8 +93,8 @@
 <!-- PasswordCallback element is used to obtain the password from
     the user. The module sets the Prompt element along with the attribute
     "echoPassword" if the password can be echoed by the client. The attribute
-    "isRequired" tells authentication UI whether the element corresponding to 
-    this callback is a required field or not and attribute "attribute" is the 
+    "isRequired" tells authentication UI whether the element corresponding to
+    this callback is a required field or not and attribute "attribute" is the
     corresponding LDAP attribute for this callback value. -->
 <!ELEMENT       PasswordCallback        ( Prompt ) >
 <!ATTLIST       PasswordCallback
@@ -196,3 +197,9 @@
 <!-- Code element is used in HttpCallback to set the error code in negotiation
      response -->
 <!ELEMENT        HttpErrorCode         ( #PCDATA ) >
+
+<!-- Code element is used in TextOutputCallback to determine the text to
+     set -->
+<!ELEMENT        TextOutputCallback         ( #PCDATA ) >
+<!ATTLIST        TextOutputCallback
+                messageType    ( error | information | warning | script )     "information" >

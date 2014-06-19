@@ -26,7 +26,9 @@
                                                                                 
 --%>
 
-
+<%--
+  Portions Copyrighted 2012-2014 ForgeRock AS
+--%>
 
 
 <html>
@@ -187,6 +189,15 @@ System.out.println("replaygotoURL: " + replaygotoURL);
         <script language="javascript">
             elmCount++;
         </script>
+
+        <jato:content name="textOut">
+            <script language="javascript" type="text/javascript">
+                <!--
+                  <jato:text name="scriptContent" defaultValue="" escape="false"/>
+                -->
+                </script>
+            <div class="TextOutputCallback_<jato:text name="messageType" />"><jato:text name="textContent" defaultValue="" escape="false" /></div>
+        </jato:content>
 
         <jato:content name="textBox">
         <!-- text box display -->

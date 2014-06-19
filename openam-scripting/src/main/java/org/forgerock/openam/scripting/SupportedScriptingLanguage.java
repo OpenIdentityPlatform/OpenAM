@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.scripting;
 
+import org.forgerock.guice.core.InjectorHolder;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -25,7 +27,6 @@ import javax.script.ScriptEngineManager;
  * @since 12.0.0
  */
 public enum SupportedScriptingLanguage implements ScriptingLanguage {
-
     /**
      * Javascript/ECMAScript support based on the Rhino engine.
      */
@@ -34,8 +35,42 @@ public enum SupportedScriptingLanguage implements ScriptingLanguage {
          * {@inheritDoc}
          */
         public ScriptEngine getScriptEngine(final ScriptEngineManager scriptEngineManager) {
-            return scriptEngineManager.getEngineByName("javascript");
+            return scriptEngineManager.getEngineByName(JAVASCRIPT_ENGINE_NAME);
         }
-    }
 
+        /**
+         * {@inheritDoc}
+         */
+        public ScriptValidator getScriptValidator() {
+            return InjectorHolder.getInstance(ScriptValidator.class);
+        }
+    },
+
+    /**
+     * Groovy script support based on the main Groovy distribution.
+     *
+     * @see <a href="http://groovy.codehaus.org">Groovy</a>
+     */
+    GROOVY {
+        public ScriptEngine getScriptEngine(final ScriptEngineManager scriptEngineManager) {
+            return scriptEngineManager.getEngineByName(GROOVY_ENGINE_NAME);
+        }
+
+        public ScriptValidator getScriptValidator() {
+            return InjectorHolder.getInstance(ScriptValidator.class);
+        }
+
+    }
+    ;
+
+    /**
+     * JSR 223 engine name to use for Javascript support. We use a distributed Rhino copy on all
+     * platforms for consistency across JVM versions and vendors.
+     */
+    public static final String JAVASCRIPT_ENGINE_NAME = "rhino";
+
+    /**
+     * JSR 223 engine name for Groovy support.
+     */
+    public static final String GROOVY_ENGINE_NAME = "groovy";
 }

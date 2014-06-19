@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
+
 var origFrmAction = '';
 var tblBtnCounter = new Array();
 
@@ -40,6 +44,19 @@ function submitButton(btn, val) {
     frm.target = 'newwindow';
     origFrmAction = frm.action;
     frm.action += '?attrname=' + val;
+    setTimeout("resetForm()", 1000);
+}
+
+/**
+ * Submit a dynamic validation request for the specific attribute.
+ * @param btn The button from which this request originated.
+ * @param val The name of the attribute for which the validation is needed.
+ */
+function submitValidate(btn, val) {
+    var frm = document.forms[0];
+    frm.target = '';
+    origFrmAction = frm.action;
+    frm.action += '?dynamic_validation=true&attrname=' + val;
     setTimeout("resetForm()", 1000);
 }
 

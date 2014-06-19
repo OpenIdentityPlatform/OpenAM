@@ -1212,6 +1212,12 @@ public class AttributeSchema {
         public static final Syntax XML = new Syntax("xml");
 
         /**
+         * The <code>SCRIPT</code> attribute syntax specifies that the
+         * attribute is of multi-lined text type and more specifically a script.
+         */
+        public static final Syntax SCRIPT = new Syntax("script");
+
+        /**
          * The <code>PASSWORD</code> attribute syntax specifies that the
          * attribute is of password type, will be used by UI to mask the
          * password typed.

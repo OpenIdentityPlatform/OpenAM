@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.property;
@@ -121,8 +121,10 @@ public interface PropertyTemplate {
 
     String COMPONENT_LINK_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCHrefTag\">\n<attribute name=\"onClick\" value=\"openNewWindow();\" /><attribute name=\"queryParams\" value=\"{0}\" /><attribute name=\"target\" value=\"newwindow\" /><cc name=\"{1}\" tagclass=\"com.sun.web.ui.taglib.html.CCStaticTextFieldTag\">\n<attribute name=\"defaultValue\" value=\"{2}\" /></cc>\n";
     String COMPONENT_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"openNewWindow(); submitButton(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
+    String COMPONENT_VALIDATE_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitValidate(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
     String TEXTBOX_SIZE_TAG =
         "<attribute name=\"size\" value=\"{0}\" />\n";
+    String TEXTAREA_SIZE_TAG = "<attribute name=\"cols\" value=\"{0}\" />\n<attribute name=\"rows\" value=\"{1}\" />\n";
     String NON_LOCALIZED_FIELD = "<attribute name=\"localizeDisplayFieldValue\" value=\"false\" />\n";
     String NO_AUTO_SUBMIT = "<attribute name=\"autoSubmit\" value=\"false\" />\n";
 

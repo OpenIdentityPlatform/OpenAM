@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package com.sun.identity.console.base.model;
@@ -517,5 +517,15 @@ public class AMPropertySheetModel
     
     public OptionList getAddRemoveAvailOptions(String name) {
         return (OptionList)addRemoveOptions.get(name);
+    }
+
+    /**
+     * Expose a copy of the attribute value map to View Bean instances.
+     * @return A copy of the current attribute value map.
+     */
+    public Map getAttributeValueMap() {
+        final Map attributeValueMap = new HashMap();
+        attributeValueMap.putAll(getValueMap());
+        return attributeValueMap;
     }
 } 

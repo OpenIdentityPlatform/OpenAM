@@ -32,11 +32,9 @@
  */
 package com.sun.identity.authentication.UI;
 
-import com.sun.identity.authentication.share.RedirectCallbackHandler;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.jato.RequestContext;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
@@ -46,30 +44,31 @@ import com.iplanet.jato.view.event.RequestInvocationEvent;
 import com.iplanet.jato.view.html.ImageField;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.service.AuthD;
-import com.sun.identity.authentication.service.AMAuthErrorCode;
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.service.LoginState;
+import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.ISLocaleContext;
-import com.sun.identity.sm.DNMapper;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-
+import com.sun.identity.sm.DNMapper;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1295,8 +1294,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                         + buttonOptions[selectedIndex]
                         + " & selected button index : " + selectedIndex);
                     }
-                } else if (callbacks[i] instanceof PagePropertiesCallback) {
-                    PagePropertiesCallback ppc = (PagePropertiesCallback) callbacks[i];
                 } else if (callbacks[i] instanceof RedirectCallback) {
                     RedirectCallback rc = (RedirectCallback) callbacks[i];
                     String status = 

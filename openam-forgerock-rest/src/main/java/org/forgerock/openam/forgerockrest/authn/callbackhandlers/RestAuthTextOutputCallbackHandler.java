@@ -24,6 +24,7 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 
 /**
  * Defines methods to convert a TextOutputCallback to a JSON representation.
@@ -63,14 +64,19 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      */
     public JsonValue convertToJson(TextOutputCallback callback, int index) {
 
-        String message = callback.getMessage();
+        //todo replace JSONObject with JsonValue's toString(), when toString() escapes correctly
+        String message = JSONObject.quote(callback.getMessage());
         int messageType = callback.getMessageType();
+
+        if (message.length() >= 2) { //JSONObject.quote cannot return null
+            message = message.substring(1, message.length() - 1);
+        }
 
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
                 .add(createOutputField("message", message))
-                .addLast(createOutputField("messageType", messageType))
+                .addLast(createOutputField("messageType", String.valueOf(messageType)))
                 .build();
 
         return jsonValue;

@@ -27,11 +27,12 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.spi;
 
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -313,6 +314,13 @@ public abstract class AMLoginModule implements LoginModule {
                 extCallbacks.add(copy[i]);
                 if (debug.messageEnabled()) {
                     debug.message("clone #" + i + " is PasswordCallback");
+                }
+            } else if (original[i] instanceof ScriptTextOutputCallback) {
+                copy[i] = new ScriptTextOutputCallback(
+                        ((TextOutputCallback) original[i]).getMessage());
+                extCallbacks.add(copy[i]);
+                if (debug.messageEnabled()) {
+                    debug.message("clone #" + i + " is ScriptTextOutputCallback");
                 }
             } else if (original[i] instanceof TextOutputCallback) {
                 copy[i] = new TextOutputCallback(

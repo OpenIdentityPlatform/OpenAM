@@ -105,6 +105,7 @@ class AttributeValidator {
             return (true);
         if ((syntax.equals(AttributeSchema.Syntax.STRING))
                 || (syntax.equals(AttributeSchema.Syntax.PARAGRAPH))
+                || (syntax.equals(AttributeSchema.Syntax.SCRIPT))
                 || (syntax.equals(AttributeSchema.Syntax.URL))
                 || (syntax.equals(AttributeSchema.Syntax.XML))
                 || (syntax.equals(AttributeSchema.Syntax.BOOLEAN))

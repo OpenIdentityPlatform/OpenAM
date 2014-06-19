@@ -16,22 +16,20 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.forgerock.openam.utils.JsonValueBuilder;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class RestAuthTextOutputCallbackHandlerTest {
 
@@ -102,7 +100,29 @@ public class RestAuthTextOutputCallbackHandlerTest {
         assertNotNull(jsonObject.get("output"));
         assertEquals(2, jsonObject.get("output").size());
         assertEquals("MESSAGE", jsonObject.get("output").get(0).get("value").asString());
-        assertEquals(TextOutputCallback.INFORMATION, (int) jsonObject.get("output").get(1).get("value").asInteger());
+        assertEquals(TextOutputCallback.INFORMATION,
+                Integer.parseInt(jsonObject.get("output").get(1).get("value").asString()));
+        assertEquals(2, jsonObject.size());
+    }
+
+    @Test
+    public void shouldConvertToJsonAndEscapeCharacters() throws RestAuthException {
+
+        //Given
+        TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION,
+                "for (var i = 0; i < 10; i++) { alert(\"alert\"); }");
+
+        //When
+        JsonValue jsonObject = testOutputRestAuthCallbackHandler.convertToJson(textOutputCallback, 1);
+
+        //Then
+        assertEquals("TextOutputCallback", jsonObject.get("type").asString());
+        assertNotNull(jsonObject.get("output"));
+        assertEquals(2, jsonObject.get("output").size());
+        assertEquals("for (var i = 0; i < 10; i++) { alert(\\\"alert\\\"); }",
+                jsonObject.get("output").get(0).get("value").asString());
+        assertEquals(TextOutputCallback.INFORMATION,
+                Integer.parseInt(jsonObject.get("output").get(1).get("value").asString()));
         assertEquals(2, jsonObject.size());
     }
 
@@ -113,8 +133,8 @@ public class RestAuthTextOutputCallbackHandlerTest {
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
         JsonValue jsonTextOutputCallback = JsonValueBuilder.jsonValue()
                 .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
                 .put("type", "TextOutputCallback")
                 .build();
 
@@ -135,8 +155,8 @@ public class RestAuthTextOutputCallbackHandlerTest {
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
         JsonValue jsonTextOutputCallback = JsonValueBuilder.jsonValue()
                 .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
                 .put("type", "PasswordCallback")
                 .build();
 
@@ -155,8 +175,8 @@ public class RestAuthTextOutputCallbackHandlerTest {
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
         JsonValue jsonTextOutputCallback = JsonValueBuilder.jsonValue()
                 .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", "MESSAGE").build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
                 .put("type", "tExtoUtputcallback")
                 .build();
 

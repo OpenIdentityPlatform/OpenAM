@@ -104,11 +104,24 @@
                                 <auth:form name="Login" method="post" defaultCommandChild="DefaultLoginURL">
                                     <jato:tiledView name="tiledCallbacks"
                                                     type="com.sun.identity.authentication.UI.CallBackTiledView">
+
                                         <script language="javascript" type="text/javascript">
                                             <!--
                                             elmCount++;
                                             -->
                                         </script>
+
+                                        <jato:content name="textOut">
+
+                                            <script language="javascript" type="text/javascript">
+                                                <!--
+                                                <jato:text name="scriptContent" defaultValue="" escape="false"/>
+                                                -->
+                                            </script>
+                                            <div class="TextOutputCallback_<jato:text name="messageType" />"><jato:text name="textContent" defaultValue="" escape="false" /></div>
+
+                                        </jato:content>
+
                                         <jato:content name="textBox">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">

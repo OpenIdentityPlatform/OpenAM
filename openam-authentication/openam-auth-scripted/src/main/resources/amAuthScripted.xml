@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    Copyright 2011 Cybernetica AS.
+
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    http://forgerock.org/license/CDDLv1.0.html
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at http://forgerock.org/license/CDDLv1.0.html
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+-->
+<!--
+    Portions Copyrighted 2012-2014 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+    Portions Copyrighted 2013 Nomura Research Institute, Ltd
+-->
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthScriptedService" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedService"
+                i18nFileName="amAuthScripted"
+                revisionNumber="1"
+                i18nKey="iplanet-am-auth-scripted-service-description">
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a500">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a101">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
+                        <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>Java Script</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a102">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-client-script"
+                                 type="single"
+                                 syntax="script"
+                                 validator="no"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-server-script"
+                                 type="single"
+                                 syntax="script"
+                                 validator="ScriptValidator"
+                                 i18nKey="a104">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="ScriptValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.scripted.ScriptValidator</Value>
+                            <Value>com.sun.identity.sm.RequiredValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     i18nKey="a500">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a101">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
+                            <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>Java Script</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a102">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-client-script"
+                                     type="single"
+                                     syntax="script"
+                                     validator="no"
+                                     i18nKey="a103">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-server-script"
+                                     type="single"
+                                     syntax="script"
+                                     validator="ScriptValidator"
+                                     i18nKey="a104">
+                        <DefaultValues>
+                            <Value>
+var START_TIME = 9;  // 9am
+var END_TIME   = 17; // 5pm
+
+logger.message("Starting authentication javascript");
+logger.message("User: " + username);
+
+// Log out current cookies in the request
+if (logger.messageEnabled()) {
+    var cookies = requestData.getHeaders('Cookie');
+    for (cookie in cookies) {
+        logger.message('Cookie: ' + cookies[cookie]);
+    }
+}
+
+var now = new Date();
+logger.message("Current time: " + now.getHours());
+if (now.getHours() &lt; START_TIME || now.getHours() &gt; END_TIME) {
+    logger.error("Login forbidden outside work hours!");
+    authState = FAILED;
+} else {
+    logger.message("Authentication allowed!");
+    authState = SUCCESS;
+}
+                            </Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     i18nKey="a500">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
+

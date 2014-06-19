@@ -27,17 +27,10 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-14 ForgeRock AS
  */
 
 package com.sun.identity.authentication.UI;
-
-import java.util.List;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.ChoiceCallback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 
 import com.iplanet.jato.RequestHandler;
 import com.iplanet.jato.model.DatasetModel;
@@ -48,6 +41,13 @@ import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
+import java.util.List;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.TextOutputCallback;
 
 /**
  * This class contains a set of callbacks for login view bean
@@ -61,6 +61,15 @@ public class CallBackTiledView
     private List<String> infoText = null;
     private Callback curCallback = null;
     private int curTile = 0;
+
+    /** location for possible JavaScript injections */
+    public static final String SCRIPT_CONTENT = "scriptContent";
+
+    /** location for possible text injections */
+    public static final String TEXT_CONTENT = "textContent";
+
+    /** location for messageType information */
+    public static final String MESSAGE_TYPE = "messageType";
 
     /** index of current tile */
     public static final String TXT_INDEX = "txtIndex";
@@ -98,6 +107,9 @@ public class CallBackTiledView
         registerChild(TXT_PROMPT, StaticTextField.class);
         registerChild(TXT_VALUE, StaticTextField.class);
         registerChild(TXT_INFO, StaticTextField.class);
+        registerChild(SCRIPT_CONTENT, StaticTextField.class);
+        registerChild(TEXT_CONTENT, StaticTextField.class);
+        registerChild(MESSAGE_TYPE, StaticTextField.class);
     }
 
 
@@ -123,6 +135,16 @@ public class CallBackTiledView
         if (name.equals(TXT_INFO)) {
             return new StaticTextField(this, TXT_INFO, "");
         }
+        if (name.equals(SCRIPT_CONTENT)) {
+            return new StaticTextField(this, SCRIPT_CONTENT, "");
+        }
+        if (name.equals(TEXT_CONTENT)) {
+            return new StaticTextField(this, TEXT_CONTENT, "");
+        }
+        if (name.equals(MESSAGE_TYPE)) {
+            return new StaticTextField(this, MESSAGE_TYPE, "");
+        }
+
         throw new IllegalArgumentException("Invalid child name ["
             + name + "]");
     }
@@ -172,10 +194,15 @@ public class CallBackTiledView
                 setPasswordCallbackInfo((PasswordCallback) curCallback);
             } else if (curCallback instanceof ChoiceCallback) {
                 setChoiceCallbackInfo((ChoiceCallback) curCallback);
+            } else if (curCallback instanceof TextOutputCallback) {
+                setTextOutputCallbackInfo((TextOutputCallback) curCallback);
             } else {
                 setDisplayFieldValue(TXT_PROMPT, "");
                 setDisplayFieldValue(TXT_VALUE, "");
                 setDisplayFieldValue(TXT_INFO, "");
+                setDisplayFieldValue(SCRIPT_CONTENT, "");
+                setDisplayFieldValue(TEXT_CONTENT, "");
+                setDisplayFieldValue(MESSAGE_TYPE, "");
 
                 CallBackChoiceTiledView tView =
                     (CallBackChoiceTiledView) getChild(TILED_CHOICE);
@@ -205,7 +232,10 @@ public class CallBackTiledView
 
     private void setNameCallbackInfo(NameCallback nc) {
         setDisplayFieldValue(TXT_PROMPT, nc.getPrompt());
-        
+        setDisplayFieldValue(SCRIPT_CONTENT, "");
+        setDisplayFieldValue(TEXT_CONTENT, "");
+        setDisplayFieldValue(MESSAGE_TYPE, "");
+
         String name = nc.getName();
         
         if ((name == null) || (name.equals(""))) {
@@ -222,6 +252,10 @@ public class CallBackTiledView
 
     private void setPasswordCallbackInfo(PasswordCallback pc) {
         setDisplayFieldValue(TXT_PROMPT, pc.getPrompt());
+        setDisplayFieldValue(SCRIPT_CONTENT, "");
+        setDisplayFieldValue(TEXT_CONTENT, "");
+        setDisplayFieldValue(MESSAGE_TYPE, "");
+
         char[] tmp = pc.getPassword();
 
         if (tmp == null) {
@@ -240,10 +274,33 @@ public class CallBackTiledView
         setDisplayFieldValue(TXT_PROMPT, cc.getPrompt());
         setDisplayFieldValue(TXT_VALUE, "");
         setDisplayFieldValue(TXT_INFO, getInfoText());
+        setDisplayFieldValue(MESSAGE_TYPE, "");
+
+        setDisplayFieldValue(SCRIPT_CONTENT, "");
+        setDisplayFieldValue(TEXT_CONTENT, "");
 
         CallBackChoiceTiledView tView =
             (CallBackChoiceTiledView) getChild(TILED_CHOICE);
         tView.setChoices(curTile, cc.getChoices(), cc.getDefaultChoice());
+    }
+
+    private void setTextOutputCallbackInfo(TextOutputCallback textCallback) {
+        if (textCallback.getMessageType() == ScriptTextOutputCallback.SCRIPT) {
+            setDisplayFieldValue(TEXT_CONTENT, "");
+            setDisplayFieldValue(SCRIPT_CONTENT, textCallback.getMessage());
+            setDisplayFieldValue(MESSAGE_TYPE, String.valueOf(textCallback.getMessageType()));
+        } else {
+            setDisplayFieldValue(SCRIPT_CONTENT, "");
+            setDisplayFieldValue(MESSAGE_TYPE, String.valueOf(textCallback.getMessageType()));
+            setDisplayFieldValue(TEXT_CONTENT, textCallback.getMessage());
+        }
+
+        setDisplayFieldValue(TXT_PROMPT, "");
+        setDisplayFieldValue(TXT_VALUE, "");
+        setDisplayFieldValue(TXT_INFO, "");
+
+        CallBackChoiceTiledView tView = (CallBackChoiceTiledView) getChild(TILED_CHOICE);
+        tView.setChoices(curTile, null, 0);
     }
 
     /**
@@ -275,6 +332,16 @@ public class CallBackTiledView
      */
     public boolean beginChoiceDisplay(ChildDisplayEvent event) {
         return (curCallback != null) && (curCallback instanceof ChoiceCallback);
+    }
+
+    /**
+     * begins display of text out field element
+     *
+     * @param event - child display event
+     * @return true if current callback is for text out output
+     */
+    public boolean beginTextOutDisplay(ChildDisplayEvent event) {
+        return (curCallback != null) && (curCallback instanceof TextOutputCallback);
     }
 
     /**

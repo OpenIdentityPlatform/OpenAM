@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.authentication;
 

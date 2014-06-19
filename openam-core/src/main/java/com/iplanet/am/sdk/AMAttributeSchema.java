@@ -206,6 +206,12 @@ public class AMAttributeSchema extends Object {
      */
     public static final int SYNTAX_ENCRYPTED_PASSWORD = 20;
 
+    /**
+     * The <code>SYNTAX_SCRIPT</code> attribute syntax specifies that the
+     * attribute should be a script
+     */
+    public static final int SYNTAX_SCRIPT = 21;
+
     private AttributeSchema attrSchema;
 
     protected AMAttributeSchema(AttributeSchema as) {
@@ -314,6 +320,8 @@ public class AMAttributeSchema extends Object {
             return SYNTAX_XML;
         else if (syntax.equals(AttributeSchema.Syntax.DATE.toString()))
             return SYNTAX_DATE;
+        else if (syntax.equals(AttributeSchema.Syntax.SCRIPT.toString()))
+            return SYNTAX_SCRIPT;
 
         return -1;
     }

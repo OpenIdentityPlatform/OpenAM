@@ -26,11 +26,18 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.samples.authentication;
 
+import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
+import com.sun.identity.authentication.spi.AuthLoginException;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.NameCallback;
@@ -38,9 +45,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
-import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.shared.debug.Debug;
 
 public class Login {
     private String loginIndexName;
@@ -107,6 +111,9 @@ public class Login {
                 break;
             case TextOutputCallback.WARNING:
                 debugMessage("WARNING: " + toc.getMessage());
+                break;
+            case ScriptTextOutputCallback.SCRIPT:
+                debugMessage("SCRIPT: " + toc.getMessage());
                 break;
             default:
                 debugMessage("Unsupported message type: " +

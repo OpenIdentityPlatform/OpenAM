@@ -121,8 +121,8 @@ public class AMDisplayType {
         } else if (syntax.equals(AttributeSchema.Syntax.ENCRYPTED_PASSWORD)) {
             displaySyntax = SYNTAX_ENCRYPTED_PASSWORD;
         } else if (syntax.equals(AttributeSchema.Syntax.PARAGRAPH) ||
-            syntax.equals(AttributeSchema.Syntax.XML)
-        ) {
+                   syntax.equals(AttributeSchema.Syntax.XML) ||
+                   syntax.equals(AttributeSchema.Syntax.SCRIPT)) {
             displaySyntax = SYNTAX_PARAGRAPH;
         }
 

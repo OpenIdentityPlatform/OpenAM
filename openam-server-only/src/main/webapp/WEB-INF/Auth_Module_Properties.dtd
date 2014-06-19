@@ -31,10 +31,10 @@
 -->
 
 
-  
+
 <!-- This DTD defines the data structure that will be used by
      each authentication module to specify its properties.
-     It Provides definitions to initiate, construct and send 
+     It Provides definitions to initiate, construct and send
      required callbacks information to the Authentication UI.
 
      Unique Declaration name for DOCTYPE tag:
@@ -43,7 +43,7 @@
 -->
 
 <!-- ModuleProperties element is used to define properties for each
-    authentication module. Attribute "modulename" defines the name of 
+    authentication module. Attribute "modulename" defines the name of
     the module. e.g. "LDAP". -->
 <!ELEMENT       ModuleProperties ( Callbacks* ) >
 <!ATTLIST       ModuleProperties
@@ -51,40 +51,41 @@
         moduleName            CDATA           #REQUIRED
 >
 
-<!-- Callbacks element is used to request module requirements based on 
+<!-- Callbacks element is used to request module requirements based on
     module properties. The authentication module constructs the
     callback objects which contains the information to be collected by
-    the authentication UI/client program. The client program collects the 
-    credentials (by prompting the user) and returns the callback objects 
+    the authentication UI/client program. The client program collects the
+    credentials (by prompting the user) and returns the callback objects
     with the required data. Attribute "length" is the number or length of
     callbacks and attribute "order" is the sequence of the group of callbacks.
     Attribute 'header' is the text header information to be displayed on the UI.
     Attributes "timeout", "template" and "image" define the UI or page level
-    attributes for the UI customization. Attribute "error" defines the 'error 
-    state' i.e. whether authentication framework/module needs to terminate the 
+    attributes for the UI customization. Attribute "error" defines the 'error
+    state' i.e. whether authentication framework/module needs to terminate the
     authentication process (in case it is 'true'). -->
-<!ELEMENT       Callbacks       ( NameCallback | PasswordCallback | 
+<!ELEMENT       Callbacks       ( NameCallback | PasswordCallback |
                                 ChoiceCallback | ConfirmationCallback |
-				                HttpCallback | RedirectCallback )* >
+				                HttpCallback | RedirectCallback |
+                                TextOutputCallback )* >
 <!ATTLIST       Callbacks
         length          NMTOKEN                 #REQUIRED
         order           NMTOKEN                 #REQUIRED
-        timeout         CDATA                   "60"        
-        template        CDATA                   ""    
+        timeout         CDATA                   "60"
+        template        CDATA                   ""
         image           CDATA                   ""
         header          CDATA                   "Authentication"
         error           ( true | false )        "false"
 >
 
 <!-- NameCallback element is used to obtain user name or any data which
-    can be entered by the user. The element Prompt will be used by the module 
+    can be entered by the user. The element Prompt will be used by the module
     to set the prompt to be used by the client to get the name. The attribute
-    "isRequired" tells authentication UI whether the element corresponding to 
-    this callback is a required field or not and attribute "attribute" is the 
+    "isRequired" tells authentication UI whether the element corresponding to
+    this callback is a required field or not and attribute "attribute" is the
     corresponding LDAP attribute for this callback value. -->
 <!ELEMENT       NameCallback    ( Prompt ) >
-<!ATTLIST       NameCallback        
-        isRequired      ( true | false )        "false" 
+<!ATTLIST       NameCallback
+        isRequired      ( true | false )        "false"
         attribute       CDATA                   ""
         infoText        CDATA                   ""
 >
@@ -92,52 +93,52 @@
 <!-- PasswordCallback element is used to obtain the password from
     the user. The module sets the Prompt element along with the attribute
     "echoPassword" if the password can be echoed by the client. The attribute
-    "isRequired" tells authentication UI whether the element corresponding to 
-    this callback is a required field or not and attribute "attribute" is the 
+    "isRequired" tells authentication UI whether the element corresponding to
+    this callback is a required field or not and attribute "attribute" is the
     corresponding LDAP attribute for this callback value. -->
 <!ELEMENT       PasswordCallback        ( Prompt ) >
 <!ATTLIST       PasswordCallback
-        echoPassword    ( true | false )        "false" 
-        isRequired      ( true | false )        "false" 
+        echoPassword    ( true | false )        "false"
+        isRequired      ( true | false )        "false"
         attribute       CDATA                   ""
         infoText        CDATA                   ""
 >
 
 <!-- ChoiceCallback element is used by the authentication module
-    to request the user to choose from the choice values where 
-    "multipleSelectionsAllowed" attribute defines whether the user can 
+    to request the user to choose from the choice values where
+    "multipleSelectionsAllowed" attribute defines whether the user can
     select/choose multiple values or single value from the available choice
-    values. The attribute "isRequired" tells authentication UI whether the 
-    element corresponding to this callback is a required field or not and 
-    attribute "attribute" is the corresponding LDAP attribute for this callback 
+    values. The attribute "isRequired" tells authentication UI whether the
+    element corresponding to this callback is a required field or not and
+    attribute "attribute" is the corresponding LDAP attribute for this callback
     value. -->
 <!ELEMENT       ChoiceCallback          ( Prompt, ChoiceValues ) >
 <!ATTLIST       ChoiceCallback
-        multipleSelectionsAllowed    ( true | false )      "false"  
-        isRequired                   ( true | false )      "false" 
+        multipleSelectionsAllowed    ( true | false )      "false"
+        isRequired                   ( true | false )      "false"
         attribute                    CDATA                 ""
         infoText        CDATA                   ""
 >
 
 <!-- ConfirmationCallback element is used by the module to
-    send 'button' information (for multiple buttons) such as the 'button text' 
-    which needs to be rendered on the UI page and receive the selected button 
+    send 'button' information (for multiple buttons) such as the 'button text'
+    which needs to be rendered on the UI page and receive the selected button
     information from the UI. If there is only one button on the UI page then
     module is not required to send this callback.
     NOTE : Currently we are supporting the use of this callback only to send
-    and receive 'button' information on the UI page. In future, we are planning 
+    and receive 'button' information on the UI page. In future, we are planning
     to support this callback with all its features. -->
 <!ELEMENT       ConfirmationCallback    ( OptionValues ) >
 
-<!-- HttpCallback element is used by the authentication module with Http 
+<!-- HttpCallback element is used by the authentication module with Http
      protocol based handshaking negotiation. -->
 <!ELEMENT        HttpCallback        (HttpHeader, Negotiation, HttpErrorCode)>
 
 
-<!-- RedirectCallback element is used by the authentication module when 
+<!-- RedirectCallback element is used by the authentication module when
      redirect to a particulat URL is required with specific redirect data. -->
-<!ELEMENT	RedirectCallback	( RedirectUrl | RedirectData* | 
-                                          RedirectStatusParam | 
+<!ELEMENT	RedirectCallback	( RedirectUrl | RedirectData* |
+                                          RedirectStatusParam |
                                           RedirectBackUrlCookie ) >
 <!ATTLIST       RedirectCallback
         method      ( get | post )        "get"
@@ -152,13 +153,13 @@
 <!-- RedirectBackUrlCookie element is used in RedirectCallback. -->
 <!ELEMENT	RedirectBackUrlCookie	( #PCDATA ) >
 
-<!-- RedirectData element is used in RedirectCallback as 
+<!-- RedirectData element is used in RedirectCallback as
      Name / Value pair data. -->
 <!ELEMENT	RedirectData	( Name, Value ) >
 
 <!-- Name element will be used by the RedirectCallback to send name/value pair
      as part of the RedirectData element. -->
-<!ELEMENT       Name           ( #PCDATA ) > 
+<!ELEMENT       Name           ( #PCDATA ) >
 
 <!-- Prompt element will be used by the module to request the
     client to display the prompt. -->
@@ -172,7 +173,7 @@
     selected by default when displayed. -->
 <!ELEMENT       ChoiceValue     ( Value ) >
 <!ATTLIST       ChoiceValue
-        isDefault       ( true | false )      "false" 
+        isDefault       ( true | false )      "false"
 >
 
 <!--OptionValues element provides a list/array of 'button' text information
@@ -184,7 +185,7 @@
 
 <!-- Value element will be used by the client to return a value
     provided by the user (or service) back to the server. -->
-<!ELEMENT       Value           ( #PCDATA ) > 
+<!ELEMENT       Value           ( #PCDATA ) >
 
 <!-- HttpHeader element is used in HttpCallback -->
 <!ELEMENT        HttpHeader        ( #PCDATA ) >
@@ -196,3 +197,9 @@
 <!-- Code element is used in HttpCallback to set the error code in negotiation
      response -->
 <!ELEMENT        HttpErrorCode         ( #PCDATA ) >
+
+<!-- Code element is used in TextOutputCallback to determine the text to
+     set -->
+<!ELEMENT        TextOutputCallback         ( #PCDATA ) >
+<!ATTLIST        TextOutputCallback
+        messageType    ( error | information | warning )     "information" >

@@ -36,9 +36,11 @@ package com.sun.identity.console.property;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.text.MessageFormat;
@@ -112,6 +114,7 @@ public abstract class PropertyXMLBuilderBase
             "password");
         mapSyntaxToName.put(AttributeSchema.Syntax.PARAGRAPH, "paragraph");
         mapSyntaxToName.put(AttributeSchema.Syntax.XML, "xml");
+        mapSyntaxToName.put(AttributeSchema.Syntax.SCRIPT, "script");
         mapSyntaxToName.put(AttributeSchema.Syntax.STRING, "string");
         mapSyntaxToName.put(AttributeSchema.Syntax.NUMERIC, "numeric");
         mapSyntaxToName.put(AttributeSchema.Syntax.NUMBER_RANGE,"number_range");
@@ -129,6 +132,9 @@ public abstract class PropertyXMLBuilderBase
     protected String serviceName;
     protected boolean allAttributesReadonly;
     protected String currentRealm;
+
+    private static final String NO_VALIDATOR = "no";
+    private final Set<String> dynamicValidatorsFound = new HashSet<String>();
 
     static String getTagClassName(AttributeSchema as) {
         String tagClassName = null;
@@ -551,6 +557,11 @@ public abstract class PropertyXMLBuilderBase
                         xml.append(NON_LOCALIZED_FIELD);
                         xml.append(NO_AUTO_SUBMIT);
                     } else if (tagClassName.equals(TAGNAME_TEXTAREA)) {
+                        final Map<String, String> sizeMap = getTextAreaSize(as);
+                        if (!sizeMap.isEmpty()) {
+                            Object[] textAreaSize = {sizeMap.get("columns"), sizeMap.get("rows")};
+                            xml.append(MessageFormat.format(TEXTAREA_SIZE_TAG, textAreaSize));
+                        }
                         xml.append(NON_LOCALIZED_FIELD);
                     } else if (tagClassName.equals(TAGNAME_PASSWORD)) {
                         xml.append(NO_AUTO_SUBMIT);
@@ -612,6 +623,28 @@ public abstract class PropertyXMLBuilderBase
         return size;
     }
 
+    /**
+     * This will get the syntax of the attribute and retrieve the desired size for the text area.
+     * The text area rows and columns are set in amProperty.properties and can be configured as required.
+     *
+     * @param as the attribute schema holding the text area properties.
+     * @return a Map with keys "columns" and "rows" as specified in the properties
+     * file or an empty map if nothing was specified.
+     */
+    private Map<String, String> getTextAreaSize(AttributeSchema as) {
+        final Map<String, String> sizeMap = new HashMap<String, String>();
+        final AttributeSchema.Syntax syntax = as.getSyntax();
+        final String valSyntax = (String)mapSyntaxToName.get(syntax);
+        final String columnsKey = "textarea." + valSyntax + ".columns";
+        final String rowsKey = "textarea." + valSyntax + ".rows";
+
+        if (properties.containsKey(columnsKey) && properties.containsKey(rowsKey)) {
+            sizeMap.put("columns", properties.getString(columnsKey));
+            sizeMap.put("rows", properties.getString(rowsKey));
+        }
+        return sizeMap;
+    }
+
     private void appendDateMarker(
         AttributeSchema as,
         StringBuffer xml
@@ -641,6 +674,22 @@ public abstract class PropertyXMLBuilderBase
         addPasswordConfirmLabel(as, xml, serviceBundle, model);
         Object[] param = {name};
         xml.append(MessageFormat.format(COMPONENT_PWD_START_TAG, param));
+        xml.append(COMPONENT_END_TAG);
+        xml.append(PROPERTY_END_TAG);
+    }
+
+    /**
+     * Add a button below the last attribute added.
+     * @param as The attribute that describes this UI element.
+     * @param xml The XML document to add the element to.
+     * @param model The AMModel that stores admin constants.
+     */
+    private void buildDynamicValidationXML(AttributeSchema as, StringBuffer xml, AMModel model) {
+        final String name = getAttributeNameForPropertyXML(as);
+        final String validateString = model.getLocalizedString("label.validate");
+        final Object[] pLink = {"'" + name + "'", validateString};
+        xml.append(PROPERTY_START_TAG);
+        xml.append(MessageFormat.format(COMPONENT_VALIDATE_BUTTON_START_TAG, pLink));
         xml.append(COMPONENT_END_TAG);
         xml.append(PROPERTY_END_TAG);
     }
@@ -1028,10 +1077,62 @@ public abstract class PropertyXMLBuilderBase
                 if (tagClassName.equals(TAGNAME_PASSWORD)) {
                     buildConfirmPasswordXML(as, xml, model, serviceBundle);
                 }
+
+                if (hasDynamicValidator(as)) {
+                    buildDynamicValidationXML(as, xml, model);
+                }
             }
         }
 
         xml.append((section ? SECTION_END_TAG : ""));
+    }
+
+    /**
+     * Investigate all the Attribute schemas to find out if the given schema has a dynamic validator associated with it.
+     * All validation classes with the same name as the one specified for the attribute will be looked up on the
+     * classpath. If any of the classes implement {@link DynamicAttributeValidator} the method will return true.
+     * @param as The attribute for which the validator was defined.
+     * @return True if a validator was found.
+     */
+    private boolean hasDynamicValidator(AttributeSchema as) {
+        final String validatorName = as.getValidator();
+
+        if (validatorName != null && !validatorName.trim().isEmpty()
+                && !NO_VALIDATOR.equalsIgnoreCase(validatorName)
+                && !dynamicValidatorsFound.contains(validatorName)) {
+
+            final List<AttributeSchema> validatorSchemaList = new ArrayList<AttributeSchema>();
+            try {
+                ServiceSchema serviceSchema = svcSchemaManager.getSchema(SchemaType.ORGANIZATION);
+                Iterator ssNames = serviceSchema.getSubSchemaNames().iterator();
+                while (ssNames.hasNext()) {
+                    ServiceSchema subSchema = serviceSchema.getSubSchema((String) ssNames.next());
+                    AttributeSchema validatorSchema = subSchema.getAttributeSchema(validatorName);
+                    if (validatorSchema != null) {
+                        validatorSchemaList.add(validatorSchema);
+                    }
+                }
+            } catch (SMSException smse) {
+                debug.warning("PropertyXMLBuilderBase.hasDynamicValidator " + smse.getMessage());
+            }
+
+            for (AttributeSchema validatorSchema : validatorSchemaList) {
+                final Iterator defaultValueIterator = validatorSchema.getDefaultValues().iterator();
+                while (defaultValueIterator.hasNext()) {
+                    final String javaClassName = (String)defaultValueIterator.next();
+                    try {
+                        final Class clazz = Class.forName(javaClassName);
+                        if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
+                            dynamicValidatorsFound.add(validatorName);
+                            break;
+                        }
+                    } catch(ClassNotFoundException cnfe) {
+                        debug.warning("PropertyXMLBuilderBase.hasDynamicValidator " + cnfe.getMessage());
+                    }
+                }
+            }
+        }
+        return dynamicValidatorsFound.contains(validatorName);
     }
     
     protected void buildSchemaTypeXML(

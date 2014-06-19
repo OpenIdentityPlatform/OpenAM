@@ -26,6 +26,9 @@
 
 --%>
 
+<%--
+    Portions Copyright 2014 ForgeRock AS
+--%>
 
 
 
@@ -46,6 +49,7 @@
     fireDisplayEvents="true">
 
 <cc:form name="EditAuthType" method="post" defaultCommandChild="/button1">
+<script language="javascript" src="../console/js/am.js"></script>
 <script language="javascript">
     function confirmLogout() {
         return confirm("<cc:text name="txtLogout" defaultValue="masthead.logoutMessage" bundleID="amConsole"/>");

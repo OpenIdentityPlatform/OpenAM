@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.scripting;
 
-import org.forgerock.guice.core.InjectorHolder;
+import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -34,18 +34,10 @@ public class StandardScriptEvaluatorTest {
     @BeforeMethod
     public void createTestEvaluator() {
         this.scriptEngineManager = new ScriptEngineManager();
+        // Use our bundled Rhino engine for tests
+        scriptEngineManager.registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME,
+                new RhinoScriptEngineFactory());
         this.testEvaluator = new StandardScriptEvaluator(scriptEngineManager);
-    }
-
-    @Test
-    public void shouldBeConfiguredByGuice() {
-        // Given
-
-        // When
-        ScriptEvaluator evaluator = InjectorHolder.getInstance(ScriptEvaluator.class);
-
-        // Then
-        assertThat(evaluator).isNotNull().isInstanceOf(StandardScriptEvaluator.class);
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -91,7 +83,7 @@ public class StandardScriptEvaluatorTest {
         Number result = testEvaluator.evaluateScript(script, null);
 
         // Then
-        assertThat(result).isEqualTo(12.0);
+        assertThat(result.intValue()).isEqualTo(12);
     }
 
     @Test
@@ -179,6 +171,42 @@ public class StandardScriptEvaluatorTest {
 
     }
 
+    /**
+     * Ensure that binding scopes are passed by reference to the script engine so that any changes made by the script
+     * are reflected in the final state of the bindings passed in.
+     */
+    @Test
+    public void shouldPassBindingsByReference() throws Exception {
+        // Given
+        String varName = "state";
+        Bindings scope = new SimpleBindings();
+        scope.put(varName, "initial");
+        String expected = "expected";
+        ScriptObject script = getJavascript(varName + " = '" + expected + "'");
+
+        // When
+        testEvaluator.evaluateScript(script, scope);
+
+        // Then
+        assertThat(scope.get(varName)).isEqualTo(expected);
+    }
+
+    @Test
+    public void shouldSupportGroovyScripts() throws Exception {
+        // Given
+        String varName = "state";
+        String expected = "expected";
+        ScriptObject groovyScript = getGroovyScript(varName + " = \"" + expected + "\"");
+        Bindings scope = new SimpleBindings();
+        scope.put(varName, "initial");
+
+        // When
+        testEvaluator.evaluateScript(groovyScript, scope);
+
+        // Then
+        assertThat(scope.get(varName)).isEqualTo(expected);
+    }
+
     private ScriptObject getJavascript(String script) {
         return getJavascript(script, null);
     }
@@ -190,4 +218,7 @@ public class StandardScriptEvaluatorTest {
         return new ScriptObject(name, script, language, bindings);
     }
 
+    private ScriptObject getGroovyScript(String script) {
+        return new ScriptObject("groovyTest", script, SupportedScriptingLanguage.GROOVY, null);
+    }
 }

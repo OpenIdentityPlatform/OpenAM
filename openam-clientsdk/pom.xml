@@ -166,6 +166,7 @@
                                 <include>com/sun/identity/authentication/internal/server/AuthSPrincipal*</include>
                                 <include>com/sun/identity/authentication/internal/util/AuthI18n*</include>
                                 <!-- TODO do we really need all the authentication module's principals here? -->
+                                <include>com/sun/identity/authentication/callbacks/ScriptTextOutputCallback*</include>
                                 <include>com/sun/identity/authentication/service/AMAuthErrorCode*</include>
                                 <include>com/sun/identity/authentication/service/AuthException*</include>
                                 <include>com/sun/identity/authentication/service/ConfiguredAuthServices*</include>

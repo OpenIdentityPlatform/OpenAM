@@ -19,6 +19,7 @@ package org.forgerock.openam.scripting;
 import org.forgerock.util.Reject;
 
 import javax.script.Bindings;
+import java.util.List;
 
 /**
  * Representation of a script in some scripting language.
@@ -107,5 +108,16 @@ public final class ScriptObject {
     @Override
     public String toString() {
         return "ScriptObject{name='" + name + '\'' + ", language=" + language + ", bindings=" + bindings + '}';
+    }
+
+    /**
+     * Validate this script for the particular language rules and produces a list of
+     * {@link ScriptError} instances if any validation errors occurred.
+     *
+     * @return a list of validation errors if validation failed and an empty list if validation passed.
+     * @throws java.lang.NullPointerException if script is empty.
+     */
+    public List<ScriptError> validate() {
+        return language.getScriptValidator().validateScript(this);
     }
 }

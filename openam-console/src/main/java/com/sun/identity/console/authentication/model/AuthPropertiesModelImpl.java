@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.console.authentication.model;
 
@@ -35,6 +35,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
+import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
@@ -46,6 +47,7 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -327,6 +329,37 @@ public  class AuthPropertiesModelImpl extends AMModelBase
             debug.warning("AuthPropertiesModelImpl.getInstanceValues", e);
         } 
         return (values == null) ? Collections.EMPTY_MAP : values;
+    }
+
+    /**
+     * Retrieve a list of dynamic validators for a specific attribute. An Authentication Manager
+     * is created and used to get the authentication instance. The instance is then used to get
+     * the validators from the service configuration.
+     *
+     * @param instance The name of the authentication instance.
+     * @param attributeName The name of the attribute for which the validators were specified.
+     * @return A list of {@link com.sun.identity.sm.DynamicAttributeValidator}s associated with the given attribute or
+     * an empty list if none were found.
+     * @throws AMConsoleException If a Service Management related error occurs, the validator class
+     * can not be instantiated or the attribute is null or can not be found.
+     */
+    public List<DynamicAttributeValidator> getDynamicValidators(String instance, String attributeName)
+            throws AMConsoleException {
+
+        final List<DynamicAttributeValidator> dynamicValidatorList;
+        try {
+            final AMAuthenticationManager mgr = new AMAuthenticationManager(getUserSSOToken(), currentRealm);
+            final AMAuthenticationInstance ai = mgr.getAuthenticationInstance(instance);
+            dynamicValidatorList = ai.getServiceConfig().getDynamicValidators(attributeName);
+        } catch (AMConfigurationException e) {
+            debug.warning("AuthPropertiesModelImpl.getDynamicValidators", e);
+            throw new AMConsoleException(getErrorString(e));
+        } catch (SMSException e) {
+            debug.warning("AuthPropertiesModelImpl.getDynamicValidators", e);
+            throw new AMConsoleException(getErrorString(e));
+        }
+
+        return dynamicValidatorList;
     }
 
     public void setInstanceValues(String instance, Map values)

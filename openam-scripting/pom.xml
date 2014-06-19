@@ -43,6 +43,16 @@
             <artifactId>forgerock-util</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.sun.phobos</groupId>
+            <artifactId>phobos-js</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.testng</groupId>

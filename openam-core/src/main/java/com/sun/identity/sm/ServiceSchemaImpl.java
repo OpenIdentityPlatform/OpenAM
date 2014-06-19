@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock Inc
  */
 package com.sun.identity.sm;
 
@@ -39,7 +39,9 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -513,6 +515,51 @@ class ServiceSchemaImpl {
     }
 
     /**
+     * Retrieve a list of dynamic plugin validators for a specific attribute. This method will check if
+     * the validators specified in the Service Configuration file implements the {@link DynamicAttributeValidator}
+     * interface and instantiate the validators.
+     *
+     * @param attributeName The name of the attribute for which the validators were specified.
+     * @return A list of {@link DynamicAttributeValidator}s associated with the given attribute or
+     * an empty list if none were found.
+     * @throws SMSException If the validator class can not be instantiated.
+     * @throws InvalidAttributeNameException If the attribute is null or can not be found.
+     */
+    List<DynamicAttributeValidator> getDynamicPluginValidators(String attributeName) throws SMSException {
+        final AttributeSchemaImpl as = getAttributeSchema(attributeName);
+        if (as == null) {
+            String[] args = { attributeName };
+            throw new InvalidAttributeNameException(
+                    IUMSConstants.UMS_BUNDLE_NAME,
+                    "sms-validation_failed_invalid_name", args);
+        }
+
+        final List<DynamicAttributeValidator> validatorList = new ArrayList<DynamicAttributeValidator>();
+        final String validatorName = as.getValidator();
+        if (validatorName != null) {
+            final AttributeSchemaImpl validatorAttrSchema = getAttributeSchema(validatorName);
+            if (validatorAttrSchema != null) {
+                final Iterator javaClasses = validatorAttrSchema.getDefaultValues().iterator();
+                while (javaClasses.hasNext()) {
+                    final String javaClass = (String) javaClasses.next();
+                    try {
+                        final Class clazz = Class.forName(javaClass);
+                        if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
+                            validatorList.add((DynamicAttributeValidator) clazz.newInstance());
+                        }
+                    } catch (Exception ex) {
+                        debug.error("ServiceSchemaImpl.serverEndAttrValidation", ex);
+                        String args[] = {javaClass};
+                        throw new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                                IUMSConstants.SMS_VALIDATOR_CANNOT_INSTANTIATE_CLASS, args);
+                    }
+                }
+            }
+        }
+        return validatorList;
+    }
+
+    /**
      * Validates the attribute with the validation plugin if a plugin has been
      * registered for this attribute in the service schema.
      * 
@@ -594,9 +641,11 @@ class ServiceSchemaImpl {
     ) throws SMSException {
         try {
             Class clazz = Class.forName(javaClass);
-            ServiceAttributeValidator validator = (ServiceAttributeValidator)
-                clazz.newInstance();
-            validatePlugin(validator, as, attrName, values);
+            if (ServiceAttributeValidator.class.isAssignableFrom(clazz)) {
+                ServiceAttributeValidator validator = (ServiceAttributeValidator)
+                        clazz.newInstance();
+                validatePlugin(validator, as, attrName, values);
+            }
         } catch (InstantiationException ex) {
             debug.error("ServiceSchemaImpl.serverEndAttrValidation", ex);
             String args[] = {javaClass};
