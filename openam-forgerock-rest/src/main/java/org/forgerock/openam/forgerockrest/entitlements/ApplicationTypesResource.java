@@ -63,6 +63,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     /**
      * Guiced-constructor.
      *
+     * @param typeManager from which to locate application types
      * @param debug Debugger to use
      */
     @Inject
@@ -73,7 +74,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
 
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
@@ -81,7 +82,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
@@ -89,7 +90,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
@@ -97,7 +98,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
@@ -105,7 +106,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
@@ -113,7 +114,7 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Unsupported by this endpoint.
      */
     @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {

@@ -22,6 +22,8 @@ import com.sun.identity.entitlement.AnyUserSubject;
 import com.sun.identity.entitlement.AttributeLookupCondition;
 import com.sun.identity.entitlement.AttributeSubject;
 import com.sun.identity.entitlement.DNSNameCondition;
+import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.GroupSubject;
@@ -61,6 +63,8 @@ public final class EntitlementRegistry {
             new ConcurrentHashMap<String, Class<? extends EntitlementSubject>>();
     private final ConcurrentMap<String, Class<? extends ResourceAttribute>> attributes =
             new ConcurrentHashMap<String, Class<? extends ResourceAttribute>>();
+    private final ConcurrentMap<String, Class<? extends EntitlementCombiner>> combiners =
+            new ConcurrentHashMap<String, Class<? extends EntitlementCombiner>>();
 
     /**
      * Lazy initialisation holder for loading and caching module instances. We use lazy loading to reduce startup
@@ -113,6 +117,9 @@ public final class EntitlementRegistry {
         registry.registerAttributeType("User", UserAttributes.class);
         registry.registerAttributeType("Static", StaticAttributes.class);
 
+        // Standard OpenAM Decision Combiners
+        registry.registerDecisionCombiner(DenyOverride.class);
+
         for (EntitlementModule provider : ServiceLoaderHolder.INSTANCE.loader) {
             provider.registerCustomTypes(registry);
         }
@@ -153,6 +160,36 @@ public final class EntitlementRegistry {
      */
     public Class<? extends EntitlementCondition> getConditionType(String name) {
         return conditions.get(name);
+    }
+
+    /**
+     * Registers an entitlement combiner.
+     *
+     * @param type the condition type to register.
+     * @throws NameAlreadyRegisteredException if the short name is already registered.
+     */
+    public void registerDecisionCombiner(Class<? extends EntitlementCombiner> type) {
+        register(type.getSimpleName(), combiners, type);
+    }
+
+    /**
+     * Registers an entitlement combiner with a given name.
+     *
+     * @param type the combiner type to register.
+     * @throws NameAlreadyRegisteredException if the short name is already registered.
+     */
+    public void registerDecisionCombiner(String name, Class<? extends EntitlementCombiner> type) {
+        register(name, combiners, type);
+    }
+
+    /**
+     * Returns the combiner associated with the given short name.
+     *
+     * @param name the short name of the combiner type to get.
+     * @return the associated combiner type or null if no matching combiner type is registered.
+     */
+    public Class<? extends EntitlementCombiner> getCombinerType(String name) {
+        return combiners.get(name);
     }
 
     /**
@@ -321,4 +358,16 @@ public final class EntitlementRegistry {
     public Set<String> getAttributesShortNames() {
         return attributes.keySet();
     }
+
+    /**
+     * Returns all the short names of {@link EntitlementCombiner}s currently registered in
+     * this {@link EntitlementRegistry}.
+     *
+     * @return A set of strings containing all the unqiue EntitlementCombiners registered at point of query.
+     */
+    public Set<String> getCombinersShortNames() {
+        return combiners.keySet();
+    }
+
+
 }

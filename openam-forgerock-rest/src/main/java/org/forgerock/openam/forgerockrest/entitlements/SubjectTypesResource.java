@@ -16,8 +16,8 @@
 package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.google.inject.name.Named;
-import com.sun.identity.entitlement.EntitlementCondition;
-import com.sun.identity.entitlement.LogicalCondition;
+import com.sun.identity.entitlement.EntitlementSubject;
+import com.sun.identity.entitlement.LogicalSubject;
 import com.sun.identity.shared.debug.Debug;
 import static java.lang.Math.max;
 import java.util.ArrayList;
@@ -54,16 +54,18 @@ import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Reject;
 
 /**
- * Allows for CREST-handling of stored {@link EntitlementCondition}s.
+ * Allows for CREST-handling of stored {@link EntitlementSubject}s.
  *
  * These are unmodfiable - even by an administrator. As such this
  * endpoint only supports the READ and QUERY operations.
+ *
+ * @see ConditionTypesResource
  */
-public class ConditionTypesResource implements CollectionResourceProvider {
+public class SubjectTypesResource implements CollectionResourceProvider {
 
     private final static String JSON_OBJ_TITLE = "title";
-    private final static String JSON_OBJ_CONFIG = "config";
     private final static String JSON_OBJ_LOGICAL = "logical";
+    private final static String JSON_OBJ_CONFIG = "config";
 
     private final static ObjectMapper mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
     private final Debug debug;
@@ -73,10 +75,10 @@ public class ConditionTypesResource implements CollectionResourceProvider {
      * Guiced constructor.
      *
      * @param debug Debug instance
-     * @param entitlementRegistry from which to locate condition types. Cannot be null.
+     * @param entitlementRegistry from which to locate subject types. Cannot be null.
      */
     @Inject
-    public ConditionTypesResource(@Named("frRest") Debug debug, EntitlementRegistry entitlementRegistry) {
+    public SubjectTypesResource(@Named("frRest") Debug debug, EntitlementRegistry entitlementRegistry) {
         Reject.ifNull(entitlementRegistry);
 
         this.debug = debug;
@@ -138,9 +140,9 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      *
-     * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition}s to return.
+     * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject}s to return.
      *
-     * Looks up all the names of conditions registered in the system, and then returns each one to the
+     * Looks up all the names of subjects registered in the system, and then returns each one to the
      * result handler having determined its schema and jsonified it.
      */
     @Override
@@ -152,44 +154,44 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             return;
         }
 
-        final Set<String> conditionTypeNames = new TreeSet<String>();
-        List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
+        final Set<String> subjectTypeNames = new TreeSet<String>();
+        List<JsonValue> subjectTypes = new ArrayList<JsonValue>();
 
-        conditionTypeNames.addAll(entitlementRegistry.getConditionsShortNames());
+        subjectTypeNames.addAll(entitlementRegistry.getSubjectsShortNames());
 
-        for (String conditionTypeName : conditionTypeNames) {
-            final Class<? extends EntitlementCondition> conditionClass =
-                    entitlementRegistry.getConditionType(conditionTypeName);
+        for (String subjectTypeName : subjectTypeNames) {
+            final Class<? extends EntitlementSubject> subjectClass =
+                    entitlementRegistry.getSubjectType(subjectTypeName);
 
-            if (conditionClass == null) {
-                debug.error("Listed condition short name not found: " + conditionTypeName);
+            if (subjectClass == null) {
+                debug.error("Listed subject short name not found: " + subjectTypeName);
                 continue;
             }
 
-            final JsonValue json = jsonify(conditionClass, conditionTypeName,
-                    LogicalCondition.class.isAssignableFrom(conditionClass));
+            final JsonValue json = jsonify(subjectClass, subjectTypeName,
+                    LogicalSubject.class.isAssignableFrom(subjectClass));
 
             if (json != null) {
-                conditionTypes.add(json);
+                subjectTypes.add(json);
             }
         }
 
-        int totalSize = conditionTypes.size();
+        int totalSize = subjectTypes.size();
         int pageSize = request.getPageSize();
         int offset = request.getPagedResultsOffset();
 
         if (pageSize > 0) {
-            conditionTypes = conditionTypes.subList(offset, offset + pageSize);
+            subjectTypes = subjectTypes.subList(offset, offset + pageSize);
         }
 
         final JsonPointer jp = new JsonPointer(JSON_OBJ_TITLE);
 
-        for (JsonValue conditionTypeToReturn : conditionTypes) {
+        for (JsonValue subjectTypeToReturn : subjectTypes) {
 
-            final JsonValue resourceId = conditionTypeToReturn.get(jp);
+            final JsonValue resourceId = subjectTypeToReturn.get(jp);
             final String id = resourceId != null ? resourceId.toString() : null;
 
-            final Resource resource = new Resource(id, "0", conditionTypeToReturn);
+            final Resource resource = new Resource(id, "0", subjectTypeToReturn);
 
             handler.handleResource(resource);
         }
@@ -229,7 +231,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      *
-     * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition} to return.
+     * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject} to return.
      */
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
@@ -241,42 +243,42 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             return;
         }
 
-        final Class<? extends EntitlementCondition> conditionClass = entitlementRegistry.getConditionType(resourceId);
+        final Class<? extends EntitlementSubject> subjectClass = entitlementRegistry.getSubjectType(resourceId);
 
-        if (conditionClass == null) {
-            debug.error("Requested condition short name not found: " + resourceId);
+        if (subjectClass == null) {
+            debug.error("Requested subject short name not found: " + resourceId);
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
 
-        final JsonValue json = jsonify(conditionClass, resourceId,
-                LogicalCondition.class.isAssignableFrom(conditionClass));
+        final JsonValue json = jsonify(subjectClass, resourceId,
+                LogicalSubject.class.isAssignableFrom(subjectClass));
 
         final Resource resource = new Resource(resourceId, "0", json);
         handler.handleResult(resource);
     }
 
     /**
-     * Transforms a subclass of {@link EntitlementCondition} in to a JsonSchema representation.
-     * This schema is then combined with the Condition's name (taken as the resourceId) and all this is
+     * Transforms a subclass of {@link EntitlementSubject} in to a JsonSchema representation.
+     * This schema is then combined with the Subject's name (taken as the resourceId) and all this is
      * compiled together into a new {@link JsonValue} object until "title" and "config" fields respectively.
      *
-     * @param conditionClass The class whose schema to produce.
+     * @param subjectClass The class whose schema to produce.
      * @param resourceId The ID of the resource to return
-     * @return A JsonValue containing the schema of the EntitlementCondition
+     * @return A JsonValue containing the schema of the EntitlementSubject
      */
-    private JsonValue jsonify(Class<? extends EntitlementCondition> conditionClass, String resourceId,
+    private JsonValue jsonify(Class<? extends EntitlementSubject> subjectClass, String resourceId,
                                 boolean logical) {
         try {
 
-            final JsonSchema schema = mapper.generateJsonSchema(conditionClass);
+            final JsonSchema schema = mapper.generateJsonSchema(subjectClass);
 
-            //this will remove the 'name' attribute from those conditions which incorporate it unnecessarily
+            //this will remove the 'subjectName' attribute from those subjects which incorporate it unnecessarily
             final JsonNode node = schema.getSchemaNode().get("properties");
 
             if (node instanceof ObjectNode) {
                 final ObjectNode alter = (ObjectNode) node;
-                alter.remove("name");
+                alter.remove("subjectName");
             }
 
             return JsonValue.json(JsonValue.object(
@@ -285,7 +287,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                     JsonValue.field(JSON_OBJ_CONFIG, schema)));
 
         } catch (JsonMappingException e) {
-            debug.error("Error applying jsonification to the Condition class representation.", e);
+            debug.error("Error applying jsonification to the Subject class representation.", e);
             return null;
         }
     }

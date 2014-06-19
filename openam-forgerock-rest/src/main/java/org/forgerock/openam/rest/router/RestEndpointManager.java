@@ -74,6 +74,16 @@ public interface RestEndpointManager {
     String CONDITIONTYPES = "/conditiontypes";
 
     /**
+     * The subjecttype resource endpoint.
+     */
+    String SUBJECTTYPES = "/subjecttypes";
+
+    /**
+     * The decisioncombiners resource endpoint.
+     */
+    String DECISIONCOMBINERS = "decisioncombiners";
+
+    /**
      * The applications resource endpoint.
      */
     String APPLICATIONS = "/applications";

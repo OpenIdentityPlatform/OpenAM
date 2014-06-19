@@ -48,6 +48,7 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeM
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.util.Reject;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -68,10 +69,15 @@ public class ApplicationsResource implements CollectionResourceProvider {
 
     /**
      * @param debug Debug instance
-     * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}
+     * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
+     * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
      */
     public ApplicationsResource(Debug debug, ApplicationManagerWrapper appManager,
                                 ApplicationTypeManagerWrapper appTypeManagerWrapper) {
+
+        Reject.ifNull(appManager);
+        Reject.ifNull(appTypeManagerWrapper);
+
         this.debug = debug;
         this.appManager = appManager;
         this.appTypeManagerWrapper = appTypeManagerWrapper;
