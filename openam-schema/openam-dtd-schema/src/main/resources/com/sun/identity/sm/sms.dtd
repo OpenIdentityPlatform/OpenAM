@@ -25,6 +25,9 @@
    $Id: sms.dtd,v 1.8 2008/09/04 23:59:39 veiming Exp $
   
 -->
+<!--
+    Portions Copyrighted 2014 ForgeRock AS.
+-->
 
 <!-- This DTD defines the data structure that will be used by services to define their configuration information and their management tasks.
 Unique Declaration name for DOCTYPE tag:
@@ -151,6 +154,7 @@ Unique Declaration name for DOCTYPE tag:
                 decimal_number | number_range | decimal_range | xml | date) "string"
         cosQualifier        ( default | override |
                          operational | merge-schemes )                "default"
+        listOrder ( natural | insertion ) "natural"
         rangeStart CDATA #IMPLIED
         rangeEnd CDATA #IMPLIED
         minValue CDATA #IMPLIED

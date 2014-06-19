@@ -25,8 +25,8 @@
  * $Id: XMLUtils.java,v 1.15 2009/10/19 18:19:20 asyhuang Exp $
  *
  */
-/**
- * Portions Copyrighted 2011-2014 ForgeRock AS
+/*
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.shared.xml;
 
@@ -68,6 +68,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -456,7 +457,7 @@ public class XMLUtils {
     }
 
     public static Set getChildNodes(Node parentNode, String childName) {
-        Set retVal = new HashSet();
+        Set retVal = new LinkedHashSet();
         NodeList children = parentNode.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node node = children.item(i);

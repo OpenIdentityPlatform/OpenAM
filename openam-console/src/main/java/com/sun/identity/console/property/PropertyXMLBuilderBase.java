@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2014 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
  */
 
@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -848,6 +849,9 @@ public abstract class PropertyXMLBuilderBase
         ResourceBundle serviceBundle
     ) {
         Set sorted = new TreeSet();
+        if (AttributeSchema.ListOrder.INSERTION.equals(as.getListOrder())) {
+            sorted = new LinkedHashSet();
+        }
         Map tmp = new HashMap(2);
         tmp.put(Constants.ORGANIZATION_NAME, getCurrentRealm());
         String[] choices =  as.getChoiceValues(tmp);

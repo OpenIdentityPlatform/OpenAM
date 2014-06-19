@@ -28,7 +28,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2014 ForgeRock AS
 -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
@@ -463,6 +463,7 @@
                 </AttributeSchema>
                 <AttributeSchema name="sun-am-log-level"
                     type="single_choice"
+                    listOrder="insertion"
                     syntax="string"
                     i18nKey="a130">
                     <ChoiceValues>

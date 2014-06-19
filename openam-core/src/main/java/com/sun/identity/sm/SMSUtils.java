@@ -149,6 +149,8 @@ public class SMSUtils {
 
     protected static final String ATTRIBUTE_UITYPE = "uitype";
 
+    protected static final String ATTRIBUTE_LIST_ORDER = "listOrder";
+
     protected static final String ATTRIBUTE_SYNTAX = "syntax";
 
     protected static final String ATTRIBUTE_DEFAULT = "default";

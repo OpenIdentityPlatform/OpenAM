@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.sm;
@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import org.w3c.dom.Node;
@@ -62,6 +63,8 @@ public class AttributeSchemaImpl {
     private AttributeSchema.Type type;
 
     private AttributeSchema.UIType uitype;
+
+    private AttributeSchema.ListOrder listOrder;
 
     private AttributeSchema.Syntax syntax;
 
@@ -134,6 +137,13 @@ public class AttributeSchemaImpl {
      */
     public AttributeSchema.UIType getUIType() {
         return (uitype);
+    }
+
+    /**
+     * Returns the list order of the attribute, or {@code null} if the list order is not defined.
+     */
+    public AttributeSchema.ListOrder getListOrder() {
+        return listOrder;
     }
 
     /**
@@ -502,6 +512,17 @@ public class AttributeSchemaImpl {
             }
         }
 
+        // Get attribute list order
+        String attrListOrder = XMLUtils.getNodeAttributeValue(n, SMSUtils.ATTRIBUTE_LIST_ORDER);
+        listOrder = null;
+        if (attrListOrder != null) {
+            try {
+                listOrder = AttributeSchema.ListOrder.valueOf(attrListOrder.toUpperCase());
+            } catch (Exception e) {
+                // do nothing, use the default
+            }
+        }
+
         // Get attribute syntax
         String attrSyntax = XMLUtils.getNodeAttributeValue(n,
                 SMSUtils.ATTRIBUTE_SYNTAX);
@@ -572,7 +593,7 @@ public class AttributeSchemaImpl {
                 // If choice class not present, use ChoiceValues element
                 if (choiceObject == null) {
                     // Choice object was not configured or error in obtaining it
-                    choiceValues = new HashMap();
+                    choiceValues = new LinkedHashMap();
                     Iterator cit = XMLUtils.getChildNodes(choiceValueNode,
                             SMSUtils.ATTRIBUTE_CHOICE_VALUE_ELEMENT).iterator();
                     while (cit.hasNext()) {

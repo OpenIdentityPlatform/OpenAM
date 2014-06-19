@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.sm;
 
 import java.security.AccessController;
@@ -130,6 +134,15 @@ public class AttributeSchema {
      */
     public void setType(String type) throws SMSException, SSOException {
         updateXMLDocument(SMSUtils.ATTRIBUTE_TYPE, type);
+    }
+
+    /**
+     * Returns the list order of the attribute.
+     *
+     * @return The list order of the attribute, or {@code null} if the list order is not defined.
+     */
+    public AttributeSchema.ListOrder getListOrder() {
+        return as.getListOrder();
     }
 
     /**
@@ -1027,6 +1040,17 @@ public class AttributeSchema {
         public int hashCode() {
             return attrType.hashCode();
         }
+    }
+
+    /**
+     * This enum {@code ListOrder} defines the list orders of schema attributes and provides constants for these list
+     * orders. These types will mainly be used by the GUI to determine how to display the schema attributes.
+     */
+    public enum ListOrder {
+        /** Orders lists naturally. */
+        NATURAL,
+        /** Orders lists in the order they are entered in LDAP. */
+        INSERTION
     }
 
     /**
