@@ -62,6 +62,26 @@
   based on domain name. Furthermore, use a domain name that contains at least 2
   <literal>.</literal> (dot) characters, such
   <literal>openam.example.com</literal>.</para>
+
+  <important><para>
+   Do not configure a top-level domain as your cookie domain as browsers will
+   reject them.
+   </para>
+   <para>
+   Top-level domains are browser-specific.
+    Some browsers, like Firefox, also consider special domains like Amazon's web
+    service (for example, ap-southeast-2.compute.amazonaws.com) to be a top-level domain.
+   </para>
+   <para>
+    Check the effective top-level domain list at
+    <link xlink:show="new"
+          xlink:href="https://publicsuffix.org/list/effective_tld_names.dat"
+     ><citetitle>https://publicsuffix.org/list/effective_tld_names.dat</citetitle></link>
+    to ensure that you do not set your cookie to a domain in the list.
+  </para>
+
+  </important>
+
  </section>
 
  <section xml:id="prepare-java">
