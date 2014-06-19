@@ -90,7 +90,7 @@ define("UserDelegate", [
 
     obj.updateUser = function(oldUserData, objectParam, successCallback, errorCallback) {
         var headers = {},
-            picked = _.pick(objectParam, ["givenName","sn","mail","postalAddress","telephoneNumber","userpassword"]);
+            picked = _.pick(objectParam, ["givenName","sn","mail","postalAddress","telephoneNumber"]);
 
         if(objectParam._rev) {
             headers["If-Match"] = '"' + objectParam._rev + '"';
@@ -111,6 +111,16 @@ define("UserDelegate", [
             errorsHandlers : { "error": { status: "400" } }
         });
 
+    };
+
+    obj.changePassword = function(oldUserData, postData, successCallback, errorCallback, errorsHandlers) {
+        return this.serviceCall({url: this.getUserResourceName(oldUserData) + "?_action=changePassword",
+            data: JSON.stringify(postData),
+            type: "POST",
+            success: successCallback,
+            error: errorCallback,
+            errorsHandlers: errorsHandlers
+        });
     };
 
     obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {

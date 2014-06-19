@@ -50,6 +50,10 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             "click .dialogContainer": "stop"
         },
 
+        errorsHandlers: {
+            "Bad Request":              { status: "400" }
+        },
+
         formSubmit: function(event) {
             var data = {}, _this = this;
             
@@ -59,7 +63,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                 data.username = form2js("content", '.', false).uid;
                 data.currentpassword = this.$el.find("#currentPassword").val(); 
                 data.userpassword =  this.$el.find("#password").val();
-                this.delegate.updateUser(conf.loggedUser, data, _.bind(function() {
+                this.delegate.changePassword(conf.loggedUser, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
                     _this.close();
                 }, this), function(e) {
@@ -67,7 +71,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
                         eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidOldPassword");
                         _this.close();
                     }
-                });
+                },_this.errorsHandlers);
 
             }
             

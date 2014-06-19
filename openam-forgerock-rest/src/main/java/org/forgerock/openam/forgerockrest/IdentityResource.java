@@ -87,6 +87,10 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
 import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
@@ -851,15 +855,67 @@ public final class IdentityResource implements CollectionResourceProvider {
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
         }
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+
+        String action = request.getAction();
+
+        if ("changePassword".equalsIgnoreCase(action)) {
+
+            RealmContext realmContext = context.asContext(RealmContext.class);
+            final String realm = realmContext.getRealm();
+
+            JsonValue value = request.getContent();
+
+            try {
+                String userPassword = value.get("userpassword").asString();
+                if (userPassword == null || userPassword.isEmpty()) {
+                    throw new BadRequestException("'userpassword' attribute not set in JSON content.");
+                }
+
+                String currentPassword = value.get(CURRENTPASSWORD).asString();
+                if (!checkValidPassword(resourceId, currentPassword.toCharArray(), realm)) {
+                    throw new BadRequestException("Invalid Password");
+                }
+
+                IdentityServicesImpl idsvc = new IdentityServicesImpl();
+                Token admin = new Token();
+                admin.setId(getCookieFromServerContext(context));
+                IdentityDetails identityDetails = jsonValueToIdentityDetails(json(object(
+                        field("username", value.get("username").asString()), field("userpassword", userPassword))),
+                        realm);
+                identityDetails.setName(resourceId);
+                idsvc.update(identityDetails, admin);
+                handler.handleResult(json(object()));
+                return;
+
+            } catch (BadRequestException e) {
+                debug.error("Cannot change password! " + resourceId + ":" + e);
+                handler.handleError(e);
+            } catch (GeneralFailure e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new BadRequestException(e.getMessage(), e));
+            } catch (ObjectNotFound e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new NotFoundException("Resource not found.", e));
+            } catch (NeedMoreCredentials e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new ForbiddenException("Token is not authorized", e));
+            } catch (AccessDenied e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new ForbiddenException(e.getMessage(), e));
+            } catch (TokenExpired e) {
+                debug.error("Cannot change password: " + e.getMessage());
+                handler.handleError(new PermanentException(401, "Unauthorized", null));
+            }
+        } else {
+            handler.handleError(new NotSupportedException(action + " not supported for resource instances"));
+        }
     }
 
     /**
@@ -1309,68 +1365,57 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-            
-            // Handle userpassword change
-            String userpass = jVal.get("userpassword").asString();
-            // Check that the attribute userpassword is in the json object
-            if(userpass != null && !userpass.isEmpty()) {
-                // If so password reset attempt
-                if(checkValidPassword(resourceId, userpass.toCharArray(), realm) || isAdmin(context)) {
-                    // same password as before, update the attributes
-                } else {
-                    // check header to make sure that currentpassword is there check to see if it's correct
-                    String strPass = getPasswordFromHeader(context,CURRENTPASSWORD);
-                    if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
-                        //continue will allow password change
-                    } else{
-                    	throw new BadRequestException("Invalid Password");
-                    }
+
+            // Strips any key matching 'userpassword', ignoring case to ensure password not changed on update.
+            for (String key : jVal.keys()) {
+                if ("userpassword".equalsIgnoreCase(key)) {
+                    jVal.remove(key);
                 }
-            } else {
-                // Handle attribute change when password is required
-                // Get restSecurity for this realm
-                RestSecurity restSecurity = getRestSecurity(realm);
-                // Make sure user is not admin and check to see if we are requiring a password to change any attributes
-                Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
-                if (protectedUserAttributes != null && !isAdmin(context)) {
-                	Boolean hasReauthenticated = false;
-                    for (String protectedAttr : protectedUserAttributes) {
-                    	JsonValue jValAttr = jVal.get(protectedAttr);
-                        if(!jValAttr.isNull()){
-                            // If attribute is not available set newAttr variable to empty string for use in comparison
-                            String newAttr = (jValAttr.isString()) ? jValAttr.asString() : "";
-                            // Get the value of current attribut
-                            String currentAttr = "";
-                            Attribute[] attrs = dtls.getAttributes();
-                            for (Attribute attribute : attrs){
-                                String attributeName = attribute.getName();
-                                if(protectedAttr.equalsIgnoreCase(attributeName)){
-                                    currentAttr = attribute.getValues()[0];
-                                }
+            }
+
+            // Handle attribute change when password is required
+            // Get restSecurity for this realm
+            RestSecurity restSecurity = getRestSecurity(realm);
+            // Make sure user is not admin and check to see if we are requiring a password to change any attributes
+            Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
+            if (protectedUserAttributes != null && !isAdmin(context)) {
+                Boolean hasReauthenticated = false;
+                for (String protectedAttr : protectedUserAttributes) {
+                    JsonValue jValAttr = jVal.get(protectedAttr);
+                    if(!jValAttr.isNull()){
+                        // If attribute is not available set newAttr variable to empty string for use in comparison
+                        String newAttr = (jValAttr.isString()) ? jValAttr.asString() : "";
+                        // Get the value of current attribute
+                        String currentAttr = "";
+                        Attribute[] attrs = dtls.getAttributes();
+                        for (Attribute attribute : attrs){
+                            String attributeName = attribute.getName();
+                            if(protectedAttr.equalsIgnoreCase(attributeName)){
+                                currentAttr = attribute.getValues()[0];
                             }
-                            // Compare newAttr and currentAttr
-                            if (currentAttr.equals(newAttr)){
-                                // attribute has not changed
+                        }
+                        // Compare newAttr and currentAttr
+                        if (currentAttr.equals(newAttr)){
+                            // attribute has not changed
+                        } else {
+                            if(hasReauthenticated){
+                                //already reauthed continue with attr change
                             } else {
-                                if(hasReauthenticated){
-                                    //already reauthed continue with attr change
-                                } else {
-                                    // check header to make sure that password is there then check to see if it's correct
-                                    String strCurrentPass = getPasswordFromHeader(context,CURRENTPASSWORD);
-                                    if(strCurrentPass != null && !strCurrentPass.isEmpty() && checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)){
-                                        //set a boolean value so we know reauth has been done
-                                        hasReauthenticated = true;
-                                        //continue will allow attribute(s) change(s)
-                                    } else{
-                                        throw new BadRequestException("Must provide a valid confirmation password to change protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" + newAttr + "'");
-                                    }
+                                // check header to make sure that password is there then check to see if it's correct
+                                String strCurrentPass = getPasswordFromHeader(context,CURRENTPASSWORD);
+                                if(strCurrentPass != null && !strCurrentPass.isEmpty() && checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)){
+                                    //set a boolean value so we know reauth has been done
+                                    hasReauthenticated = true;
+                                    //continue will allow attribute(s) change(s)
+                                } else{
+                                    throw new BadRequestException("Must provide a valid confirmation password to change protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" + newAttr + "'");
                                 }
                             }
                         }
                     }
                 }
             }
-            
+
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
             // read updated identity back to client
