@@ -44,7 +44,18 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
+            <includes>
+                <include>org.forgerock.commons.ui.libs:jquery-sortable</include>
+            </includes>
+            <outputDirectory>/libs</outputDirectory>
+        </dependencySet>
+        <dependencySet>
             <unpack>true</unpack>
+            <unpackOptions>
+                <excludes>
+                    <exclude>css/styles.less</exclude>
+                </excludes>
+            </unpackOptions>
             <includes>
                 <include>org.forgerock.commons.ui:forgerock-ui-commons</include>
             </includes>

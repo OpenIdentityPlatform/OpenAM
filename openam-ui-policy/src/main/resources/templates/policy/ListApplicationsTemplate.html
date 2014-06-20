@@ -1,0 +1,132 @@
+<table class="filter-sort-grid">
+    <thead>
+    <tr class="header-actions">
+        <th colspan="6">
+            <input type="button" class="button" value="Export"/>
+            <input type="button" class="button" value="Delete Selected"/>
+            <input type="button" id="customizeView" class="button" value="Customize table view"/>
+
+            <div id="customizeColumns" class="customize-view-flyout clearfix">
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="realm" value="Realm"/>
+                    <label for="realm">Realm</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="type" value="Type"/>
+                    <label for="type">Type</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="description" value="Description"/>
+                    <label for="description">Description</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="created" value="Created"/>
+                    <label for="created">Created</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="author" value="Author"/>
+                    <label for="author">Author</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="lastModified" value="Last Modified"/>
+                    <label for="lastModified">Last Modified</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="modifiedBy" value="Modified By"/>
+                    <label for="modifiedBy">Modified By</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="subjectTypes" value="Subject Types"/>
+                    <label for="subjectTypes">Subject Types</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="resources" value="Resources"/>
+                    <label for="resources">Resources</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="conditionTypes" value="Condition Types"/>
+                    <label for="conditionTypes">Condition Types</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="actions" value="Actions"/>
+                    <label for="actions">Actions</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="policies" value="Policies"/>
+                    <label for="policies">Policies</label><br/>
+                </div>
+
+                <div class="customize-item">
+                    <input type="checkbox" name="customizeCols" id="overrideRule" value="Override Rule"/>
+                    <label for="overrideRule">Override Rule</label><br/>
+                </div>
+
+                <input type="button" value="Apply" id="applyViewCustomization" class="apply-customization button">
+            </div>
+        </th>
+    </tr>
+
+    <tr class="header-titles">
+        <th><input type="checkbox"/></th>
+        <th><a href="">Name</a></th>
+        <th><a href="">Realm</a></th>
+        <th><a href="">Type</a></th>
+        <th><a href="">Last Modified</a></th>
+        <th><a href="">Policies</a></th>
+    </tr>
+
+    <tr class="header-filter">
+        <th></th>
+        <th class="ellipsis-col name-col"><input type="text" value="Filter ..."/></th>
+        <th class="ellipsis-col realm-col"><input type="text" value="Filter ..."/></th>
+        <th>
+            <select>
+                <option>All</option>
+                <option>Web Service</option>
+                <option>Web Agent</option>
+                <option>Banking</option>
+            </select>
+        </th>
+        <th>From ... to ...</th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {{#result}}
+    <tr>
+        <td><input type="checkbox"/></td>
+        <td class="ellipsis-col name-col"><a href="#app/{{name}}">{{name}}</a></td>
+        <td class="ellipsis-col realm-col">{{realm}}</td>
+        <td class="ellipsis-col type-col">{{applicationType}}</td>
+        <td>{{date lastModifiedDate}}</td>
+        <td class="policy-col"><a href="#app/{{name}}/policies/">View</a></td>
+    </tr>
+    {{/result}}
+    </tbody>
+
+    <tfoot>
+    <tr class="footer-pagination">
+        <td colspan="6">
+        <span class="items-per-page">
+            Show <input type="text" value="3"/> items per page
+        </span>
+
+        <span class="pagination-controls">
+            &lt;&lt; &lt; 1, 2, 3 &gt; &gt;&gt;
+        </span>
+        </td>
+    </tr>
+    </tfoot>
+</table>

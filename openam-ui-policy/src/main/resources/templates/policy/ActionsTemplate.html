@@ -1,0 +1,28 @@
+<thead>
+<tr class="header-titles">
+    <th><input class="toggle-all-actions" type="checkbox"/></th>
+    <th><a href="">Action</a></th>
+    <th><a href="">Permission</a></th>
+</tr>
+</thead>
+
+<tbody>
+{{#each app.actions}}
+<tr>
+    <td><input class="toggle-action" type="checkbox" {{#if selected}} checked {{/if}} data-action-name="{{action}}" />
+    </td>
+    <td>{{action}}</td>
+    <td>
+        <div class="group-field-row">
+            <input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"
+            {{#if value}} checked {{/if}} />
+            <label for="allow{{@index}}">Allow</label>
+
+            <input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"
+            {{#unless value}} checked {{/unless}} />
+            <label for="deny{{@index}}">Deny</label>
+        </div>
+    </td>
+</tr>
+{{/each}}
+</tbody>

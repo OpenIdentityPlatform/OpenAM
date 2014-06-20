@@ -99,6 +99,9 @@ define("config/AppConfiguration", function () {
                 moduleClass: "org/forgerock/commons/ui/common/util/UIUtils",
                 configuration: {
                     templateUrls: [
+                        "templates/policy/EditSubjectTemplate.html",
+                        "templates/policy/EditEnvironmentTemplate.html",
+                        "templates/policy/OperatorRulesTemplate.html"
                     ]
                 }
             },
@@ -108,6 +111,7 @@ define("config/AppConfiguration", function () {
                     messages: {
                     },
                     loader: [
+                        {"messages": "config/messages/PolicyMessages"},
                         {"messages": "config/messages/CommonMessages"}
                     ]
                 }

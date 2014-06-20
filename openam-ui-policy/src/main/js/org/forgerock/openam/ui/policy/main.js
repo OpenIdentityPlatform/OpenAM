@@ -27,5 +27,22 @@
 define([
     "./login/LoginHelper",
     "./login/SessionDelegate",
-    "./PolicyHomeView"
+
+    "./PolicyDelegate",
+
+    "./ListView",
+
+    "./ManageApplicationsView",
+    "./EditApplicationView",
+
+    "./ManagePoliciesView",
+    "./EditPolicyView",
+
+    "./ManageSubjectsView",
+    "./EditSubjectView",
+
+    "./ManageEnvironmentsView",
+    "./EditEnvironmentView",
+
+    "./OperatorRulesView"
 ]);

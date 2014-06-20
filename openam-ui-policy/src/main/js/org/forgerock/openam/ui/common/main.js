@@ -25,5 +25,6 @@
 /*global define*/
 
 define([
-    "./util/Constants"
+    "./util/Constants",
+    "./components/Accordion"
 ]);

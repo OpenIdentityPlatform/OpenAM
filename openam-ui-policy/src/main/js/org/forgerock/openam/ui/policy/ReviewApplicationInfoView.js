@@ -22,28 +22,26 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/**
+ * @author Eugenia Sergueeva
+ */
+
 /*global window, define, $, form2js, _, js2form, document, console */
 
-define("org/forgerock/openam/ui/policy/PolicyHomeView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function(AbstractView, eventManager, constants, conf) {
-    var PolicyHomeView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
-        template: "templates/policy/PolicyHome.html",
-        events: {},
-        data:{},
+define("org/forgerock/openam/ui/policy/ReviewApplicationInfoView", [
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], function (AbstractView) {
+    var ReviewApplicationInfoView = AbstractView.extend({
+        element: "#reviewInfo",
+        template: "templates/policy/ReviewApplicationStepTemplate.html",
+        noBaseTemplate: true,
 
-        render: function(args, callback) {
-            this.parentRender(function() {
-                if(callback) {
-                    callback();
-                }
-            });
+        render: function (args, callback) {
+            _.extend(this.data, args);
+
+            this.parentRender(callback);
         }
     });
 
-    return new PolicyHomeView();
+    return new ReviewApplicationInfoView();
 });

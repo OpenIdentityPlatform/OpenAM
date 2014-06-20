@@ -1,0 +1,14 @@
+<li class="operator clearfix">
+	<span class='item-button-panel'>
+		<span class="icon-remove tooltips">
+			<span>Deleting will also remove any objects</span>
+		</span>
+	</span>
+	<span>Match</span> 
+	<select>
+		{{#operators}}<option value="{{key}}">{{value}}</option>{{/operators}}
+	</select> 
+	<span>of the following {{numCildren}}</span> 
+	<ol class="dropbox"> </ol>
+</li>
+

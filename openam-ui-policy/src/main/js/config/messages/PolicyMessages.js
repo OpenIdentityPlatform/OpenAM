@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,16 +22,21 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/**
+ * @author Eugenia Sergueeva
+ */
+
 /*global define*/
 
-define("config/main", [
-    "./routes/CommonRoutesConfig",
-    "./routes/PolicyRoutesConfig",
-    "./messages/PolicyMessages",
-    "./messages/CommonMessages",
-    "./validators/CommonValidators",
-    "./AppConfiguration",
-    "./process/CommonConfig",
-    "./process/PolicyConfig",
-    "./errorhandlers/CommonErrorHandlers"
-]);
+define("config/messages/PolicyMessages", [], function () {
+    return {
+        "applicationCreated": {
+            msg: "config.messages.PolicyMessages.applicationCreated",
+            type: "info"
+        },
+        "applicationUpdated": {
+            msg: "config.messages.PolicyMessages.applicationUpdated",
+            type: "info"
+        }
+    };
+});

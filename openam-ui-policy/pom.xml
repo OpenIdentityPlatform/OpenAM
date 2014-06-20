@@ -44,13 +44,19 @@
             <groupId>org.forgerock.commons.ui</groupId>
             <artifactId>forgerock-ui-commons</artifactId>
             <type>zip</type>
-            <version>${forgerock-ui.version}</version>            
+            <version>${forgerock-ui.version}</version>
             <classifier>www</classifier>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.rhino</artifactId>
             <version>1.7R2_3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery-sortable</artifactId>
+            <version>0.9.12</version>
+            <type>js</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
@@ -63,7 +69,7 @@
             <artifactId>qunit</artifactId>
             <version>1.14.0</version>
             <type>js</type>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <build>
@@ -168,4 +174,3 @@
         </plugins>
     </build>
 </project>
-

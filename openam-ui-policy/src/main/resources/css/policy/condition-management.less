@@ -1,0 +1,348 @@
+/* VARIABLES */
+
+@any-color: 	#DDE9FF;
+@all-color: 	#C3DFC5;
+@none-color: 	#E7D1CB;
+@subject-color: #CCC;
+@grabber-image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAFCAYAAABvsz2cAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACNJREFUeNpiZGBg8AViBhYQ8f///3pGIHEGxAExGFAYAAEGABbSDZWLLysMAAAAAElFTkSuQmCC";
+
+
+/* XUI Overrides */
+#content {
+	/*stop dragged items from cropping when they go out of content bounds*/
+	overflow: visible;
+}
+
+#subjectContainer, #environmentContainer{
+	min-height:300px;
+}
+
+/* POLICY */
+body.dragging, 
+body.dragging *{
+	cursor: move !important;
+}
+
+body.editing{
+	#dialog-background{
+		height:auto;
+		opacity:0.5;
+		z-index:500;
+		background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
+	}
+
+	#condition-management ol.condition-management-group li.subject.editing{
+		position: absolute;
+		left: 0;
+		right: 0;
+		z-index: 700;
+		margin: -8px 48px 0;
+	
+		.icon-cog{
+			font-size: 36px;
+		}
+
+		.icon-remove{
+			display:none;
+		}
+
+		&:first-child{
+		 	margin-top: -3px;
+		}
+	}
+}
+
+#condition-management{
+
+	select {
+		width:auto;
+		height:auto;
+		padding:0;
+	}
+
+	label {
+		display: block;
+		float: left;
+		padding: 0 5px 0 0;
+	}
+
+	input[type="text"], textarea, select {
+		border-radius:0;
+		padding:5px;
+		font-size: 13px;
+		text-overflow: ellipsis;
+	}
+
+	ol ol{
+	  padding: 1px;
+	  background: white;
+	  margin: 5px 0 0;
+	  min-height: 8px;
+	}
+
+	#pickup-area{
+		padding:10px 8px;
+		margin:5px;
+		border: 1px solid #ccc;
+		min-height: 120px;
+
+		.pickup {
+
+			li.operator, li.subject, li.environment{
+		 		margin: 10px 0 0; 		
+				cursor: move;
+				box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
+				background-image:url(@grabber-image);
+				&:not(.dragged){
+					position: absolute;
+					left: 55px;
+					right: 55px;
+				}
+
+				span.item-button-panel{
+					display:none;
+				}
+
+		 	}
+
+		}
+
+	}
+
+	span.item-button-panel {
+
+		float:right;
+	  	padding: 8px 3px;
+
+		> span {
+
+			padding: 0 5px;
+			opacity:0.5;
+			transition:opacity 200ms linear;
+
+	    	&:hover{
+	    		opacity:1;
+	    	}
+
+	    	&.tooltips {
+			  	position: relative;
+			  	display: inline;
+
+			  	span {
+				 	position: absolute;
+					width: 0;
+					color: #fff;
+					background-image:-webkit-linear-gradient(top, #555, #000);
+					text-align: center;
+					visibility: hidden;
+					border-radius: 3px;
+					font-size: 13px;
+					padding: 6px 5px 10px;
+					box-shadow: 0px 1px 3px #666;
+					bottom: 25px;
+					transition:bottom 200ms ease-out, opacity 500ms ease-in;
+
+					&:after {
+						content: '';
+						position: absolute;
+						top: 100%;
+						left: 50%;
+						margin-left: -8px;
+						width: 0; height: 0;
+						border-top: 8px solid #000;
+						border-right: 8px solid transparent;
+						border-left: 8px solid transparent;
+					}
+				}
+
+				&:hover span {
+					visibility: visible;
+					opacity: 0.8;
+					bottom: 30px;
+					left: 50%;
+					margin-left: -65px;
+					z-index: 999;
+					width: 120px;
+				}
+			}
+		}
+
+	}
+
+	li.operator > span.item-button-panel{
+	  	padding-top: 0;
+	}
+
+	li.dragged{
+	  	position: absolute;
+	  	top: 0;
+	  	opacity: 0.9;
+	  	z-index: 200;
+	}
+
+	li.dragged.dropped{
+		opacity: 1;
+	}
+
+	ol.dropbox li.dragged{
+		box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
+		background-image:url(@grabber-image);
+	}
+
+	ol.condition-management-group {
+
+		li {
+			display: block;
+		    margin: 5px;
+		    padding: 5px;
+		    border: 1px solid #ccc;
+		    background: 0 0 repeat-y #ddd;
+			transition: background 200ms ease-out 0ms;
+
+			&.subject {
+				/*&.dragged, &.editing {
+				background-color:darken(@subject-color, -30%)}*/
+			}
+
+			&.operator {
+
+				&.any {
+					background-color:@any-color;
+					 > span {color:darken(@any-color, 40%)}
+					 &.dragged {background-color:darken(@any-color, 10%)}
+				}
+
+				&.all {
+					background-color:@all-color;
+					> span {color:darken(@all-color, 40%)}
+					&.dragged {background-color:darken(@all-color, 10%)}
+				} 
+			
+				&.none {
+					background-color:@none-color;
+					> span{ color:darken(@none-color, 40%) }
+					&.dragged {background-color:darken(@none-color, 10%)}
+				}
+			}
+
+			&.placeholder {
+				position: relative;
+				margin: 5px;
+				padding: 0;
+				border: none;
+				height: 10px;
+				background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
+				background-size:100% 100px;
+				box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.5) inset;
+			}
+		}
+
+	} 
+
+	.item-subject-data{
+
+		padding: 7px 5px 0 5px;	
+
+		> div{
+			color: #555;
+			font-size:11px;
+			line-height: 11px;
+			min-width: 150px;
+			border-right: 1px solid #eee;
+			padding-right: 10px;
+			margin-right: 10px;
+			float:left;
+
+			h3{
+				font-weight: bold;
+				font-size: 11px;
+				line-height: 11px;
+				padding-bottom: 5px;
+			}
+
+			span{
+				min-height: 11px;
+				display: block;
+				padding-bottom: 5px;
+			}
+		}
+
+	}
+
+	li.editing .item-subject-data, ol.pickup li:not(.dragged) .item-subject-data{
+		padding: 0;	
+	}
+
+	
+	.field-float-select {
+
+	  	position:relative;
+	  	margin: 5px;
+	  	float:left;
+
+	  	select {
+			clear:left;
+			float:left;
+			padding:5px 20px 5px 5px;
+			-webkit-appearance: none;
+			background: url('../img/sort_both.png') no-repeat right #fff;
+
+			.placeholder {
+				color: #aaa;
+			}
+		}
+	}
+
+
+	.field-float-pattern, .field-float-select {
+
+		label { 
+		  	font-size:11px;
+		  	color:#555;
+		  	transition: all 0.1s linear;
+		  	font-weight:bold;
+		  	padding: 0;
+			line-height: 11px;
+			margin: 0 0 0 5px;
+		}
+
+	}
+
+
+	.field-float-pattern{
+
+		margin-top: 18px;
+		position:relative;
+	  	margin: 5px;
+	  	float:left;
+
+	  	label{
+			position:absolute;
+		  	top:10px;
+		  	opacity:0;
+
+		  	&.showLabel {
+			  	top:0;
+			  	opacity:1;
+			}
+		}
+
+		input{
+
+			margin-top: 13px;
+
+			/* Stop chromes autofill adding yellow backgrounds to datalists */
+			&:-webkit-autofill{
+		    	-webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.1) inset,0 0 0 50px white inset;
+				&:focus {
+					-webkit-box-shadow: 0 0 1px 1px #4481c4,0 0 0 50px white inset;
+				} 
+			} 
+
+			&:read-only{
+				display:none;
+			}
+		}
+	}
+
+}

@@ -1,0 +1,19 @@
+<fieldset class="fieldset">
+    <legend>Add New</legend>
+    <div class="group-field-block">
+        <label class="prop-name" for="urlResource">New URL resource:</label>
+        <select class="prop-val" id="urlResource">
+            {{#each app.resources}}
+            <option value="{{this}}">{{this}}</option>
+            {{/each}}
+        </select>
+    </div>
+
+    <div class="group-field-block">
+        <label class="prop-name">URL resource pattern:</label>
+    <span class="resource-pattern">
+        <input class="resource-url-part" type="text"/>
+    </span>
+    </div>
+    <input type="button" class="button" value="Add" id="addResource"/>
+</fieldset>

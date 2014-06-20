@@ -1,0 +1,189 @@
+<div class="content-bg">
+<h1>Create Applications</h1>
+
+<p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
+    service. This template is then used when policies are created for the service. To create an application, begin
+    with Step 1 and progress through step 7. Modifications can be made after the application has been created.</p>
+
+<form class="form">
+<div class="accordion">
+<a class="accordion-header" href="">Step 1: Define an Application Name and Application Type</a>
+<section class="accordion-step clearfix">
+    <div class="group-field-block">
+        <label class="prop-name" for="appName">Name:</label>
+        <input class="prop-val" id="appName" type="text" value="{{app.name}}" data-field="name"/>
+    </div>
+    <div class="group-field-block">
+        <label class="prop-name" for="appDescription">Description (optional):</label>
+        <textarea class="prop-val" id="appDescription" data-field="description">{{app.description}}</textarea>
+    </div>
+    <hr/>
+    <div class="group-field-block">
+        <label class="prop-name" for="appType">Application Type:</label>
+        {{select appTypes 'appTypes' app.applicationType app.applicationType 'class="prop-val" id="appType"'}}
+
+        <p class="prop-description">Description of selected type</p>
+    </div>
+    <div class="group-field-block">
+        <label class="prop-name" for="realm">Realm</label>
+        <input class="prop-val" id="realm" type="text" value="{{app.realm}}" data-field="realm"/>
+    </div>
+    <input type="button" value="Next" name="nextButton" class="button"/>
+</section>
+
+<a class="accordion-header" href="">Step 2: Add Resources</a>
+<section class="accordion-step clearfix">
+    <div class="column-layout">
+        <div class="column2" id="resourcesList"></div>
+        <div class="column2" id="addNewResource"></div>
+    </div>
+
+    <input type="button" class="button" value="Next" name="nextButton"/>
+</section>
+
+<a class="accordion-header" href="">Step 3: Configure Actions</a>
+<section class="accordion-step clearfix">
+    <table id="actions" class="filter-sort-grid actions-grid"></table>
+    <input type="button" class="button" value="Next" name="nextButton"/>
+</section>
+
+<a class="accordion-header" href="">Step 4: Select Subject Conditions</a>
+<section class="accordion-step clearfix">
+    <p>
+        Select one or more subject conditions. Additionally, choose one or more operators to combine conditions. Selections
+        made here define the available conditions during policy creation.
+    </p>
+
+    <div class="column-layout">
+        <div class="column2 group-field-block">
+            <label>Allowed Subject Conditions:</label>
+
+            <div class="controls-group">
+                <input type="checkbox" id="virtSubj" name="sbjTypes" value="Virtual Subjects"/>
+                <label for="virtSubj">Virtual Subjects</label>
+
+                <input type="checkbox" id="idRepoGroups" name="sbjTypes" value="Identity Repository Groups"/>
+                <label for="idRepoGroups">Identity Repository Groups</label>
+
+                <input type="checkbox" id="attrSubj" name="sbjTypes" value="Attribute Subjects"/>
+                <label for="attrSubj">Attribute Subjects</label>
+
+                <input type="checkbox" id="bankingSubj" name="sbjTypes" value="Banking Subjects"/>
+                <label for="bankingSubj">Banking Subjects</label>
+
+                <input type="checkbox" id="idRepoUsers" name="sbjTypes" value="Identity Repository Users"/>
+                <label for="idRepoUsers">Identity Repository Users</label>
+            </div>
+        </div>
+
+        <div class="column2 group-field-block">
+            <label>Allowed Condition Operators:</label>
+
+            <div class="controls-group">
+                <input type="checkbox" id="sbjAnyOf" name="sbjOps" value="Any of"/>
+                <label for="sbjAnyOf">Any of</label>
+
+                <input type="checkbox" id="sbjAllOf" name="sbjOps" value="All of"/>
+                <label for="sbjAllOf">All of</label>
+
+                <input type="checkbox" id="sbjNot" name="sbjOps" value="Not"/>
+                <label for="sbjNot">Not</label>
+            </div>
+        </div>
+    </div>
+
+    <input type="button" class="button" value="Next" name="nextButton"/>
+</section>
+
+<a class="accordion-header" href="">Step 5: Select Environment Conditions</a>
+<section class="accordion-step clearfix">
+    <p>
+        Select one or more environment conditions. Additionally, choose one or more operators to combine conditions. Selections
+        made here define the available conditions during policy creation.
+    </p>
+
+    <div class="column-layout">
+        <div class="column2 group-field-block">
+            <label>Allowed Environment Conditions:</label>
+
+            <div class="controls-group">
+                <input type="checkbox" id="dateRange" name="condTypes" value="Date Range"/>
+                <label for="dateRange">Date Range</label>
+
+                <input type="checkbox" id="lTransfLimit" name="condTypes" value="Lower Transfer Limit"/>
+                <label for="lTransfLimit">Lower Transfer Limit</label>
+
+                <input type="checkbox" id="timeRange" name="condTypes" value="Time Range"/>
+                <label for="timeRange">Time Range</label>
+
+                <input type="checkbox" id="upTransfLimit" name="condTypes" value="Upper Transfer Limit"/>
+                <label for="upTransfLimit">Upper Transfer Limit</label>
+
+                <input type="checkbox" id="dns" name="condTypes" value="DNS Name"/>
+                <label for="dns">DNS Name</label>
+
+                <input type="checkbox" id="ip" name="condTypes" value="IP Range"/>
+                <label for="ip">IP Range</label>
+
+                <input type="checkbox" id="days" name="condTypes" value="Days of Week"/>
+                <label for="days">Days of Week</label>
+
+                <input type="checkbox" id="timezone" name="condTypes" value="Timezone"/>
+                <label for="timezone">Timezone</label>
+
+                <input type="checkbox" id="anyTransfLimit" name="condTypes" value="Any Transfer Limit"/>
+                <label for="anyTransfLimit">Any Transfer Limit</label>
+
+                <input type="checkbox" id="opensso" name="condTypes" value="OpenSSO Policy Condition"/>
+                <label for="opensso">OpenSSO Policy Condition</label>
+            </div>
+        </div>
+
+        <div class="column2 group-field-block">
+            <label>Allowed Condition Operators:</label>
+
+            <div class="controls-group">
+                <input type="checkbox" id="condAnyOf" name="condOps" value="Any of"/>
+                <label for="condAnyOf">Any of</label>
+
+                <input type="checkbox" id="condAllOf" name="condOps" value="All of"/>
+                <label for="condAllOf">All of</label>
+
+                <input type="checkbox" id="condNot" name="condOps" value="Not"/>
+                <label for="condNot">Not</label>
+            </div>
+        </div>
+    </div>
+
+    <input type="button" class="button" value="Next" name="nextButton"/>
+</section>
+
+<a class="accordion-header" href="">Step 6: Choose Decision Conflict Rule</a>
+<section class="accordion-step clearfix">
+    <p>
+        If a decision for a requested action is boolean, a value of false overrides one of true. For example, when
+        deciding authorization for a URL, deny overrides allow. This is the only decision conflict rule currently
+        supported.
+    </p>
+
+    <div class="group-field-block">
+        <input type="radio" id="conflictRule" value="Deny Override: Allow" checked/>
+        <label for="conflictRule">Deny Override: Allow</label>
+    </div>
+
+    <input type="button" class="button" value="Next" name="nextButton"/>
+</section>
+
+<a class="accordion-header" href="">Step 7: Review Configuration</a>
+<section class="accordion-step clearfix">
+    <p>
+        Review the application configuration and click Finish to save.
+    </p>
+
+    <div class="column-layout" id="reviewInfo"></div>
+
+    <input type="button" class="button" value="Finish" name="submitForm"/>
+</section>
+</div>
+</form>
+</div>

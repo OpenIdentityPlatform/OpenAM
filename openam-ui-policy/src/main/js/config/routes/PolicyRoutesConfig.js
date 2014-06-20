@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,10 +26,28 @@
 
 define("config/routes/PolicyRoutesConfig", function () {
     return {
-        "policyHome": {
-            view: "org/forgerock/openam/ui/policy/PolicyHomeView",
-            url: "home/",
+        "manageApps": {
+            view: "org/forgerock/openam/ui/policy/ManageApplicationsView",
+            url: "apps/",
             role: "ui-admin"
+        },
+        "editApp": {
+            view: "org/forgerock/openam/ui/policy/EditApplicationView",
+            url: /^app\/([A-Za-z0-9:]+)*(\/){0,1}$/,
+            role: "ui-admin",
+            pattern: "app/?"
+        },
+        "managePolicies": {
+            view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
+            url: /^app\/([A-Za-z0-9:]+)*\/policies(\/){0,1}$/,
+            role: "ui-admin",
+            pattern: "app/?/policies/"
+        },
+        "editPolicy": {
+            view: "org/forgerock/openam/ui/policy/EditPolicyView",
+            url: /^app\/([A-Za-z0-9:]+)*\/policy\/([A-Za-z0-9:]+)*(\/){0,1}$/,
+            role: "ui-admin",
+            pattern: "app/?/policy/?"
         }
     };
 });

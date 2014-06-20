@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2014 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,17 +21,17 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-
-/*global define*/
-
-define("config/main", [
-    "./routes/CommonRoutesConfig",
-    "./routes/PolicyRoutesConfig",
-    "./messages/PolicyMessages",
-    "./messages/CommonMessages",
-    "./validators/CommonValidators",
-    "./AppConfiguration",
-    "./process/CommonConfig",
-    "./process/PolicyConfig",
-    "./errorhandlers/CommonErrorHandlers"
-]);
+/* css basic configuration */
+@import "common/config.less";
+/* helpers, functions, columns */
+@import "common/helpers.less";
+/* header, footer, menu, dialogs, messages, popups, basic buttons & links */
+@import "common/layout.less";
+/* specific css used in specific modules */
+@import "common/forms.less";
+/* policies */
+@import "policy/common.less";
+/* rules */
+@import "policy/condition-management.less";
+/* fonts */
+@import "policy/font-iconmoon.less";

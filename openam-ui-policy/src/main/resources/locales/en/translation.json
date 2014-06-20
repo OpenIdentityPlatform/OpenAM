@@ -34,6 +34,10 @@
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
                 "errorFetchingNotifications" : "Error Fetching notifications."
+            },
+            "PolicyMessages": {
+                "applicationCreated": "Application created successfully",
+                "applicationUpdated": "Application updated successfully"
             }
         },
         "AppConfiguration" : {

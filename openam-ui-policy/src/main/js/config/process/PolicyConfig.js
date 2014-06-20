@@ -25,9 +25,9 @@
 /*global define, require, window, _*/
 
 define("config/process/PolicyConfig", [
-    "org/forgerock/commons/ui/common/util/Constants", 
+    "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, eventManager) {
+], function (constants, eventManager) {
     var obj = [
         {
             startEvent: constants.EVENT_HANDLE_DEFAULT_ROUTE,
@@ -35,8 +35,8 @@ define("config/process/PolicyConfig", [
             dependencies: [
                 "org/forgerock/commons/ui/common/main/Router"
             ],
-            processDescription: function(event, router) {
-                router.routeTo(router.configuration.routes.policyHome, {trigger: true});
+            processDescription: function (event, router) {
+                router.routeTo(router.configuration.routes.manageApps, {trigger: true});
             }
         }
     ];

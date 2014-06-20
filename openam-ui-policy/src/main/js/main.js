@@ -34,6 +34,7 @@ require.config({
         form2js: "libs/form2js-1.0",
         spin: "libs/spin-1.2.5-min",
         xdate: "libs/xdate-0.7-min",
+        sortable: "libs/jquery-sortable-0.9.12",
         doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
         handlebars: "libs/handlebars-1.0.rc.1",
         moment: "libs/moment-1.7.2-min",
@@ -68,6 +69,9 @@ require.config({
         handlebars: {
             exports: "handlebars"
         },
+        sortable: {
+            exports: "sortable"
+        },
         i18next: {
             deps: ["handlebars"],
             exports: "i18next"
@@ -93,6 +97,7 @@ require([
     "doTimeout",
     "handlebars",
     "i18next",
+    "sortable",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -101,7 +106,7 @@ require([
     "org/forgerock/openam/ui/policy/main", 
     "ThemeManager",
     "config/main"
-], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n,
+], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, 
             i18nManager, constants, eventManager) {
 
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
