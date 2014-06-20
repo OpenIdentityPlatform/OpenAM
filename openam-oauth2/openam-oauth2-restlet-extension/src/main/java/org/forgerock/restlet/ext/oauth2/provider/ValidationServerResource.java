@@ -202,6 +202,17 @@ public class ValidationServerResource extends ServerResource implements
             OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during token verify", e);
             throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(null, e.getMessage());
         }
+        
+        finally {
+            if (client != null) {
+                try {
+                    client.stop();
+                } catch (Exception e) {
+                    OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred whilst trying to stop" +
+                            " Restlet client", e);
+                }
+            }
+        }      
     }
 
     private String getPluginClass(String realm) throws OAuthProblemException {
