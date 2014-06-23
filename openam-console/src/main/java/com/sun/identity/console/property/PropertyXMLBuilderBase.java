@@ -1103,13 +1103,15 @@ public abstract class PropertyXMLBuilderBase
 
             final List<AttributeSchema> validatorSchemaList = new ArrayList<AttributeSchema>();
             try {
-                ServiceSchema serviceSchema = svcSchemaManager.getSchema(SchemaType.ORGANIZATION);
-                Iterator ssNames = serviceSchema.getSubSchemaNames().iterator();
-                while (ssNames.hasNext()) {
-                    ServiceSchema subSchema = serviceSchema.getSubSchema((String) ssNames.next());
-                    AttributeSchema validatorSchema = subSchema.getAttributeSchema(validatorName);
-                    if (validatorSchema != null) {
-                        validatorSchemaList.add(validatorSchema);
+                final ServiceSchema serviceSchema = svcSchemaManager.getSchema(SchemaType.ORGANIZATION);
+                if (serviceSchema != null) {
+                    final Iterator ssNames = serviceSchema.getSubSchemaNames().iterator();
+                    while (ssNames.hasNext()) {
+                        final ServiceSchema subSchema = serviceSchema.getSubSchema((String) ssNames.next());
+                        final AttributeSchema validatorSchema = subSchema.getAttributeSchema(validatorName);
+                        if (validatorSchema != null) {
+                            validatorSchemaList.add(validatorSchema);
+                        }
                     }
                 }
             } catch (SMSException smse) {
