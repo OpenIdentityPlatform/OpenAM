@@ -474,6 +474,19 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                     setCookie();
                     clearCookieAndDestroySession();
                 }
+                try {
+                    if (ssoToken != null &&
+                            SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
+                        loginDebug.message(
+                            "Destroy existing/old valid session");
+                        manager.destroyToken(ssoToken);
+                    }
+                } catch (Exception e) {
+                    if (loginDebug.messageEnabled()) {
+                        loginDebug.message(
+                            "destroyToken error : " + e.toString());
+                    }
+                }
             } else if (ac.getStatus() == AuthContext.Status.FAILED) {
                 if (loginDebug.messageEnabled()) {
                     loginDebug.message("Destroy Session! for ac : " + ac);
