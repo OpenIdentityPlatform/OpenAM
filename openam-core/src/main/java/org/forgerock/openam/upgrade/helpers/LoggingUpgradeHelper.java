@@ -17,6 +17,7 @@
 package org.forgerock.openam.upgrade.helpers;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
+import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import org.forgerock.openam.upgrade.UpgradeException;
 
@@ -32,7 +33,6 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 public class LoggingUpgradeHelper extends AbstractUpgradeHelper {
 
     private static final String SUN_AM_LOG_LEVEL_ATTR = "sun-am-log-level";
-    private static final String NATURAL_LIST_ORDER = "natural";
 
     /**
      * Constructs a new LoggingUpgradeHelper instance, add configures the logging attributes that are to updated.
@@ -48,8 +48,8 @@ public class LoggingUpgradeHelper extends AbstractUpgradeHelper {
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
 
-        if (SUN_AM_LOG_LEVEL_ATTR.equals(newAttr.getName()) && oldAttr.getDefaultValues().isEmpty()) {
-            updateDefaultValues(newAttr, asSet(NATURAL_LIST_ORDER));
+        if (SUN_AM_LOG_LEVEL_ATTR.equals(newAttr.getName())
+                && !AttributeSchema.ListOrder.INSERTION.equals(oldAttr.getListOrder())) {
             return newAttr;
         }
 
