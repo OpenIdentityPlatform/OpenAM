@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock, Inc.
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.iplanet.services.comm.server;
 
@@ -99,13 +99,12 @@ public class PLLRequestServlet extends HttpServlet {
             throws ServletException, java.io.IOException {
         int length = req.getContentLength();
         if (length == -1) {
+            PLLServer.pllDebug.warning(PLLBundle.getString("unknownLength"));
             throw new ServletException(PLLBundle.getString("unknownLength"));
         }
 
         if (length > maxContentLength) {
-            if (PLLServer.pllDebug.messageEnabled()) {
-                PLLServer.pllDebug.message("content length too large" + length);
-            }
+            PLLServer.pllDebug.error("content length exceeded configured max request size - " + length);
             throw new ServletException(
                 PLLBundle.getString("largeContentLength"));
         }
