@@ -99,6 +99,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
     private final Map<String, Map<PolicyType, Set<String>>> upgradableConfigs =
             new LinkedHashMap<String, Map<PolicyType, Set<String>>>();
     private int policyRuleCount = 0;
+    private boolean upgradeIndexImpls = false;
 
     @Inject
     public UpgradeEntitlementsStep(final PrivilegedAction<SSOToken> adminTokenAction,
@@ -108,7 +109,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
 
     @Override
     public boolean isApplicable() {
-        return !upgradableConfigs.isEmpty();
+        return upgradeIndexImpls || !upgradableConfigs.isEmpty();
     }
 
     @Override
@@ -123,6 +124,9 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
                 DEBUG.message("The entitlements framework is already using the new TreeSearchIndex/TreeSaveIndex"
                         + " implementations");
             } else {
+                // There might not be any policies to upgrade but always update the search and save index
+                // implementation values if they are not already updated.
+                upgradeIndexImpls = true;
                 for (String realm : getRealmNames()) {
                     Map<PolicyType, Set<String>> map = new EnumMap<PolicyType, Set<String>>(PolicyType.class);
                     PolicyManager pm = new PolicyManager(getAdminToken(), realm);
@@ -168,19 +172,22 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
             appType.setAttributes(attrs);
             UpgradeProgress.reportEnd("upgrade.success");
             DEBUG.message("Entitlement service is now using the new TreeSearchIndex/TreeSaveIndex implementations");
-            for (Map.Entry<String, Map<PolicyType, Set<String>>> entry : upgradableConfigs.entrySet()) {
-                String realm = entry.getKey();
-                Map<PolicyType, Set<String>> changes = entry.getValue();
+            if (!upgradableConfigs.isEmpty()) {
+                for (Map.Entry<String, Map<PolicyType, Set<String>>> entry : upgradableConfigs.entrySet()) {
+                    String realm = entry.getKey();
+                    Map<PolicyType, Set<String>> changes = entry.getValue();
 
-                PolicyManager pm = new PolicyManager(getAdminToken(), realm);
-                Set<String> referrals = changes.get(PolicyType.REFERRAL);
-                //we should handle referrals first to ensure the policies have their corresponding policies all set up
-                if (referrals != null) {
-                    upgradeReferrals(pm, referrals);
+                    PolicyManager pm = new PolicyManager(getAdminToken(), realm);
+                    Set<String> referrals = changes.get(PolicyType.REFERRAL);
+                    // We should handle referrals first to ensure the policies have their corresponding policies
+                    //  all set up
+                    if (referrals != null) {
+                        upgradeReferrals(pm, referrals);
+                    }
                 }
+                //the entitlements are upgraded regardless of the realms
+                upgradeEntitlementIndexes();
             }
-            //the entitlements are upgraded regardless of the realms
-            upgradeEntitlementIndexes();
         } catch (Exception ex) {
             UpgradeProgress.reportEnd("upgrade.failed");
             DEBUG.error("An error occurred while upgrading entitlements data", ex);
@@ -347,7 +354,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
             }
             UpgradeProgress.reportEnd("upgrade.entitlement.privilege", policyRuleCount, policyRuleCount);
         } catch (Exception ex) {
-            DEBUG.error("An error occured while upgrading the entitlement indexes", ex);
+            DEBUG.error("An error occurred while upgrading the entitlement indexes", ex);
             throw new UpgradeException(ex);
         } finally {
             IOUtils.closeIfNotNull(conn);
