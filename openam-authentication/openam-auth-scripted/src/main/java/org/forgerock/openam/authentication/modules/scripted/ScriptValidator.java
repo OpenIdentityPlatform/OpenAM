@@ -44,8 +44,11 @@ public class ScriptValidator implements DynamicAttributeValidator {
     private ResourceBundle resourceBundle = null;
     private static final String RESOURCE_BUNDLE_NAME = "amAuthScripted";
     private static final String LANGUAGE_NOT_SUPPORTED = "language-not-supported";
+    private static final String SERVER_SIDE_SCRIPT = "a104";
+    private static final String MODULE_DESCRIPTION = "iplanet-am-auth-scripted-service-description";
     private static final Map<String, ScriptingLanguage> SUPPORTED_LANGUAGES = new HashMap<String, ScriptingLanguage>() {{
         put(Scripted.JAVA_SCRIPT_LABEL, SupportedScriptingLanguage.JAVASCRIPT);
+        put(Scripted.GROOVY_LABEL, SupportedScriptingLanguage.GROOVY);
     }};
 
     /**
@@ -56,17 +59,32 @@ public class ScriptValidator implements DynamicAttributeValidator {
      */
     public boolean validate(String instanceName, String attributeName, Map<String, Set<String>> attributeMap) {
         final String languageName = getAttributeValueAsString(Scripted.SCRIPT_TYPE_ATTR_NAME, attributeMap);
+        final ScriptingLanguage language = SUPPORTED_LANGUAGES.get(languageName);
         boolean validScript;
 
-        if (SUPPORTED_LANGUAGES.containsKey(languageName)) {
-            final ScriptingLanguage language = SUPPORTED_LANGUAGES.get(languageName);
+        if (language != null) {
             final String scriptText = getAttributeValueAsString(attributeName, attributeMap);
             final ScriptObject script = new ScriptObject(instanceName, scriptText, language, null);
             final List<ScriptError> scriptErrorList = script.validate();
             final StringBuilder messageBuilder = new StringBuilder();
 
+            if (!scriptErrorList.isEmpty()) {
+                messageBuilder.append("Error in ");
+                messageBuilder.append(getMessage(SERVER_SIDE_SCRIPT));
+                messageBuilder.append(" for ");
+                messageBuilder.append(getMessage(MODULE_DESCRIPTION));
+                messageBuilder.append(" ");
+                messageBuilder.append(instanceName);
+                messageBuilder.append(":\n");
+            }
+
             for (ScriptError error : scriptErrorList) {
-                messageBuilder.append(error.toString());
+                messageBuilder.append("Line ");
+                messageBuilder.append(error.getLineNumber());
+                messageBuilder.append(", column ");
+                messageBuilder.append(error.getColumnNumber());
+                messageBuilder.append(": ");
+                messageBuilder.append(error.getMessage());
                 messageBuilder.append("\n");
             }
 

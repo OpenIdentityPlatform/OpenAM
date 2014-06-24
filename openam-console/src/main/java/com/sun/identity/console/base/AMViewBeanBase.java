@@ -326,17 +326,30 @@ public abstract class AMViewBeanBase
      * @param type Type of message such as Error, Warning, etc.
      * @param title Title of message.
      * @param message Message.
+     * @param encode Should the message be encoded for HTML.
      */
-    protected void setInlineAlertMessage(
-        String type,
-        String title,
-        String message
-    ) {
-        CCAlertInline alert = (CCAlertInline)getChild(IALERT_COMMON);
-        org.owasp.esapi.Encoder enc = ESAPI.encoder();
+    protected void setInlineAlertMessage(String type, String title, String message, boolean encode) {
+        final CCAlertInline alert = (CCAlertInline)getChild(IALERT_COMMON);
         alert.setType(type);
-        alert.setSummary(enc.encodeForHTML(title));
-        alert.setDetail(enc.encodeForHTML(message));
+        if (encode) {
+            org.owasp.esapi.Encoder enc = ESAPI.encoder();
+            alert.setSummary(enc.encodeForHTML(title));
+            alert.setDetail(enc.encodeForHTML(message));
+        } else {
+            alert.setSummary(title);
+            alert.setDetail(message);
+        }
+    }
+
+    /**
+     * Set inline alert message.
+     *
+     * @param type Type of message such as Error, Warning, etc.
+     * @param title Title of message.
+     * @param message Message.
+     */
+    protected void setInlineAlertMessage(String type, String title, String message) {
+        setInlineAlertMessage(type, title, message, true);
     }
 
     /**

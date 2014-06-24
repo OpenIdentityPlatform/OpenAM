@@ -48,6 +48,9 @@ import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.sm.DynamicAttributeValidator;
 import com.sun.web.ui.view.alert.CCAlert;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,6 +70,7 @@ public class EditAuthTypeViewBean
 
     private static final String DYNAMIC_VALIDATION = "dynamic_validation";
     private static final String ATTRIBUTE_NAME = "attrname";
+    private static final String HTML_BREAK = "<br>";
 
     private AuthPropertiesModel authModel = null;
     private boolean dynamicRequest = false;
@@ -103,8 +107,6 @@ public class EditAuthTypeViewBean
 
     /**
      * Checks to see if this is a dynamic validator request, if not execution is passed to the parent.
-     * It will retrieve the validators specified for the attribute, invoke their validate methods
-     * and display the validation messages if any are present.
      *
      * @param event Request invocation event.
      */
@@ -113,35 +115,54 @@ public class EditAuthTypeViewBean
         final String attributeName = request.getParameter(ATTRIBUTE_NAME);
 
         if (Boolean.parseBoolean(request.getParameter(DYNAMIC_VALIDATION))) {
-            try {
-                // Store the current attribute values from the UI to render when beginDisplay is called
-                unpersistedValueMap = getUnpersistedValueMap();
-                dynamicRequest = true;
-                final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
-                final List<DynamicAttributeValidator> validatorList = getAuthModel().
-                        getDynamicValidators(instance, attributeName);
-                final StringBuilder messageBuilder = new StringBuilder();
-
-                for (DynamicAttributeValidator validator : validatorList) {
-                    if (!validator.validate(instance, attributeName, unpersistedValueMap)) {
-                        messageBuilder.append(validator.getValidationMessage());
-                        messageBuilder.append("\n");
-                    }
-                }
-
-                if (messageBuilder.length() > 0) {
-                    final String message = messageBuilder.substring(0, messageBuilder.length() - 1);
-                    setInlineAlertMessage(CCAlert.TYPE_WARNING, "message.warning", message);
-                } else {
-                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "message.validation.success");
-                }
-            } catch (AMConsoleException e) {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
-            }
-            forwardTo();
+            handleDynamicValidationRequest(attributeName);
         } else {
             super.handleDynLinkRequest(event);
         }
+    }
+
+    /**
+     * Retrieve the validators specified for the attribute, invoke their validate methods
+     * and display the validation messages if any are present.
+     *
+     * @param attributeName The name of the attribute for which the validation should be done.
+     */
+    private void handleDynamicValidationRequest(String attributeName) {
+        try {
+            // Store the current attribute values from the UI to render when beginDisplay is called
+            unpersistedValueMap = getUnpersistedValueMap();
+            dynamicRequest = true;
+            final String instance = (String) getPageSessionAttribute(SERVICE_TYPE);
+            final List<DynamicAttributeValidator> validatorList = getAuthModel().
+                    getDynamicValidators(instance, attributeName);
+            final StringBuilder messageBuilder = new StringBuilder();
+            final Encoder encoder = ESAPI.encoder();
+
+            for (DynamicAttributeValidator validator : validatorList) {
+                if (!validator.validate(instance, attributeName, unpersistedValueMap)) {
+                    final String message = validator.getValidationMessage();
+                    if (message != null) {
+                        final String[] messageLines = validator.getValidationMessage().split("\n");
+                        for (String line : messageLines) {
+                            if (line != null && !line.trim().isEmpty()) {
+                                messageBuilder.append(encoder.encodeForHTML(line));
+                                messageBuilder.append(HTML_BREAK);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (messageBuilder.length() > 0) {
+                final String message = messageBuilder.substring(0, messageBuilder.length() - HTML_BREAK.length());
+                setInlineAlertMessage(CCAlert.TYPE_WARNING, "message.warning", message, false);
+            } else {
+                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "message.validation.success");
+            }
+        } catch (AMConsoleException e) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
+        }
+        forwardTo();
     }
 
     /**

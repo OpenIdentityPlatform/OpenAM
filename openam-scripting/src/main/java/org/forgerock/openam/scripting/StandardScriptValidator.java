@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.scripting;
 
+import org.codehaus.groovy.control.ErrorCollector;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import org.codehaus.groovy.syntax.SyntaxException;
 import org.forgerock.util.Reject;
 import org.mozilla.javascript.EvaluatorException;
 
@@ -56,7 +59,7 @@ public class StandardScriptValidator implements ScriptValidator {
     public List<ScriptError> validateScript(ScriptObject script) {
         Reject.ifNull(script);
         final ScriptEngine scriptEngine = script.getLanguage().getScriptEngine(scriptEngineManager);
-        final ArrayList<ScriptError> scriptErrorList = new ArrayList<ScriptError>();
+        final List<ScriptError> scriptErrorList = new ArrayList<ScriptError>();
 
         if (scriptEngine instanceof Compilable) {
             try {
@@ -64,7 +67,7 @@ public class StandardScriptValidator implements ScriptValidator {
             } catch (ScriptException se) {
                 // In an ideal world we would receive all errors in the script upon compilation,
                 // but for now we can only produce them one at a time.
-                scriptErrorList.add(getScriptError(script, se));
+                scriptErrorList.addAll(getScriptErrors(script, se));
             }
         }
 
@@ -78,22 +81,39 @@ public class StandardScriptValidator implements ScriptValidator {
      * @param se the error thrown by the validation task.
      * @return the converted script error.
      */
-    private ScriptError getScriptError(ScriptObject script, ScriptException se) {
-        final ScriptError error = new ScriptError();
-        error.setScriptName(script.getName());
+    private List<ScriptError> getScriptErrors(ScriptObject script, ScriptException se) {
+        final List<ScriptError> scriptErrorList = new ArrayList<ScriptError>();
+        final Throwable cause = se.getCause();
 
-        // For some reason the JavaScript implementation of JSR 223 does not populate the ScriptException
-        // with the information from the EvaluatorException so we have to check for that here.
-        if (se.getCause() instanceof EvaluatorException) {
-            EvaluatorException ee = (EvaluatorException)se.getCause();
+        // Neither the JavaScript nor the Groovy implementation of JSR 223 populates the ScriptException
+        // with useful information so we have to retrieve it from the cause exception.
+        if (cause instanceof EvaluatorException) {
+            final EvaluatorException ee = (EvaluatorException)cause;
+            final ScriptError error = new ScriptError();
+            error.setScriptName(script.getName());
             error.setMessage(ee.details());
             error.setLineNumber(ee.lineNumber());
             error.setColumnNumber(ee.columnNumber());
+            scriptErrorList.add(error);
+        } else if (cause instanceof MultipleCompilationErrorsException) {
+            ErrorCollector errorCollector = ((MultipleCompilationErrorsException)cause).getErrorCollector();
+            for (int i = 0; i < errorCollector.getErrorCount(); i++) {
+                final SyntaxException syntaxException = errorCollector.getSyntaxError(i);
+                final ScriptError error = new ScriptError();
+                error.setScriptName(script.getName());
+                error.setMessage(syntaxException.getOriginalMessage());
+                error.setLineNumber(syntaxException.getLine());
+                error.setColumnNumber(syntaxException.getStartColumn());
+                scriptErrorList.add(error);
+            }
         } else {
+            final ScriptError error = new ScriptError();
+            error.setScriptName(script.getName());
             error.setMessage(se.getMessage());
             error.setLineNumber(se.getLineNumber());
             error.setColumnNumber(se.getColumnNumber());
+            scriptErrorList.add(error);
         }
-        return error;
+        return scriptErrorList;
     }
 }

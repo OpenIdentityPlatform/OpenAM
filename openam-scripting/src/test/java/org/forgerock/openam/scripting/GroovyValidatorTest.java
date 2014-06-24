@@ -68,6 +68,20 @@ public class GroovyValidatorTest {
         assertThat(errors.size()).isZero();
     }
 
+    @Test
+    public void shouldReportValidationErrorOnCorrectLine() {
+        // Given
+        ScriptObject testScript = getGroovyScript("def valid = 'This line has no errors';\n" +
+                                                  "def randomtext invalid = 'This line contains an error';");
+
+        // When
+        List<ScriptError> errors = testScript.validate();
+
+        // Then
+        assertThat(errors.size()).isEqualTo(1);
+        assertThat(errors.get(0).getLineNumber()).isEqualTo(2);
+    }
+
     // Groovy does not provide any programmatic way to get hold of line numbers short of parsing the error message
 
     private ScriptObject getGroovyScript(String script) {
