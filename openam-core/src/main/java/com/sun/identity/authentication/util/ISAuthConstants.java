@@ -24,10 +24,7 @@
  *
  * $Id: ISAuthConstants.java,v 1.21 2009/11/25 12:05:07 manish_rustagi Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.util;
@@ -688,10 +685,6 @@ public interface ISAuthConstants {
     // Property name for user password attribute
     public static final String ATTR_USER_PASSWORD = "userpassword";
     
-    // Property name for valid go to url domains attribute
-    public static final String AUTH_GOTO_DOMAINS = AUTH_ATTR_PREFIX	 
-        + "valid-goto-domains";    
-
     /**
      * Property name for persistent cookie auth level.
      */

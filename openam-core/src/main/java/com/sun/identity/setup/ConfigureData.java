@@ -24,10 +24,7 @@
  *
  * $Id: ConfigureData.java,v 1.11 2009/05/02 23:05:13 kevinserwin Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.setup;
@@ -59,6 +56,8 @@ import com.sun.identity.shared.ldap.util.DN;
  * Configures product bootstrap data.
  */
 public class ConfigureData {
+
+    private static final String HIDDEN_REALM = "/sunamhiddenrealmdelegationservicepermissions";
     private String baseDir;
     private SSOToken ssoToken;
     private String hostname;
@@ -115,9 +114,9 @@ public class ConfigureData {
         throws SMSException, SSOException, PolicyException, IOException,
             FileNotFoundException
     {
-        createRealm("/sunamhiddenrealmdelegationservicepermissions");
-        createPolicies("/sunamhiddenrealmdelegationservicepermissions",
-            baseDir + "/defaultDelegationPolicies.xml");
+        createRealm(HIDDEN_REALM);
+        createPolicies(HIDDEN_REALM, baseDir + "/defaultDelegationPolicies.xml");
+        createPolicies(HIDDEN_REALM, baseDir + "/validationServiceDelegationPolicy.xml");
     }
 
     private void setRealmAttributes()

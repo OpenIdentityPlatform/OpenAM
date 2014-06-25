@@ -418,7 +418,7 @@
                 <AttributeSchema name="iplanet-am-auth-valid-goto-domains"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="a150">
+                                 i18nKey="">
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-pcookie-auth-level"
                                  type="single"

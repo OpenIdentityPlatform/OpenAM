@@ -24,10 +24,7 @@
  *
  * $Id: LoginViewBean.java,v 1.37 2009/11/11 12:22:32 bhavnab Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.distUI;
@@ -89,6 +86,8 @@ import javax.servlet.http.HttpSession;
 import org.forgerock.openam.authentication.service.protocol.RemoteCookie;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest;
 import org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.ClientUtils;
 
 /**
@@ -687,12 +686,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                  * redirect to 'goto' parameter or SPI hook or default
                  * redirect URL.
                  */
-                redirect_url = gotoUrl;
-
-                if ((gotoUrl == null) || (gotoUrl.length() == 0) ||
-                    (gotoUrl.equalsIgnoreCase("null"))) {
-                    redirect_url = ssoToken.getProperty("successURL");
-                }
+                setSuccessURL(ssoToken.getProperty("Organization"), ssoToken.getProperty("successURL"));
 
                 if (redirect_url == null) {
                     ResultVal = rb.getString("authentication.already.login");
@@ -843,11 +837,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             ResultVal = ErrorMessage;
             // redirect to 'gotoOnFail' parameter or SPI hook
             // or default redirect URL.
-            redirect_url = gotoOnFailUrl;
-            if ((gotoOnFailUrl == null) || (gotoOnFailUrl.length() == 0) ||
-                (gotoOnFailUrl.equalsIgnoreCase("null")) ) {
-                redirect_url = ac.getFailureURL();
-            }
+            setFailureURL();
             return;
         }
         
@@ -873,13 +863,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                      * redirect to 'goto' parameter or SPI hook or default
                      * redirect URL.
                      */
-                    redirect_url = gotoUrl;
-
-                    if ((gotoUrl == null) || (gotoUrl.length() == 0) ||
-                        (gotoUrl.equalsIgnoreCase("null"))
-                    ) {
-                        redirect_url = ac.getSuccessURL();
-                    }
+                    setSuccessURL(ac.getOrganizationName(), ac.getSuccessURL());
 
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
@@ -898,16 +882,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                      * redirect to 'goto' parameter or SPI hook or default
                      * redirect URL.
                      */
-                    redirect_url = gotoOnFailUrl;
-                    if ((gotoOnFailUrl == null) ||
-                    (gotoOnFailUrl.length() == 0) ||
-                    (gotoOnFailUrl.equalsIgnoreCase("null")) ) {
-                        redirect_url = ac.getFailureURL();
-                    }
+                    setFailureURL();
                     if (loginDebug.messageEnabled()) {
-                        loginDebug.message(
-                            "LoginFailedURL in getLoginDisplay : "
-                        + redirect_url);
+                        loginDebug.message("LoginFailedURL in getLoginDisplay : " + redirect_url);
                     }
                     session.invalidate();
                 } else if (ac.getStatus() == AuthContext.Status.RESET) {
@@ -933,12 +910,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
                     session.invalidate();
                 } else {
-                    redirect_url = gotoOnFailUrl;
-                    if ((gotoOnFailUrl == null) ||
-                    (gotoOnFailUrl.length() == 0) ||
-                    (gotoOnFailUrl.equalsIgnoreCase("null")) ) {
-                        redirect_url = ac.getFailureURL();
-                    }
+                    setFailureURL();
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
                             "LoginFailedURL in getLoginDisplay : "
@@ -1215,7 +1187,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         
                         // redirect to 'goto' parameter or SPI hook or default
                         // redirect URL.
-                        redirect_url = gotoUrl;
+                        setSuccessURL(ac.getOrganizationName(), ac.getSuccessURL());
 
                         SSOTokenManager.getInstance().refreshSession(ac.getSSOToken());
                         String successURLFromSession = ac.getSSOToken().getProperty(ISAuthConstants.POST_PROCESS_SUCCESS_URL);
@@ -1224,10 +1196,6 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                             redirect_url = successURLFromSession;
                         }
 
-                        if ((gotoUrl == null) || (gotoUrl.length() == 0) ||
-                        (gotoUrl.equalsIgnoreCase("null")) ) {
-                            redirect_url = ac.getSuccessURL();
-                        }
                         if (loginDebug.messageEnabled()) {
                             loginDebug.message("LoginSuccessURL (in case of " +
                             " successful auth) : " + redirect_url);
@@ -1244,28 +1212,15 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         
                         // redirect to 'goto' parameter or SPI hook or
                         // default redirect URL.
-                        redirect_url = gotoOnFailUrl;
-                        if ((gotoOnFailUrl == null) ||
-                        (gotoOnFailUrl.length() == 0) ||
-                        (gotoOnFailUrl.equalsIgnoreCase("null")) ) {
-                            redirect_url = ac.getFailureURL();
-                        }
+                        setFailureURL();
                         if (loginDebug.messageEnabled()) {
-                            loginDebug.message("LoginFailedURL : "
-                            + redirect_url);
+                            loginDebug.message("LoginFailedURL : " + redirect_url);
                         }
                         session.invalidate();
                     } else {
-                        redirect_url = gotoOnFailUrl;
-                        if ((gotoOnFailUrl == null) ||
-                        (gotoOnFailUrl.length() == 0) ||
-                        (gotoOnFailUrl.equalsIgnoreCase("null")) ) {
-                            redirect_url = ac.getFailureURL();
-                        }
+                        setFailureURL();
                         if (loginDebug.messageEnabled()) {
-                            loginDebug.message(
-                                "LoginFailedURL in getLoginDisplay : "
-                                + redirect_url);
+                            loginDebug.message("LoginFailedURL in getLoginDisplay : "+ redirect_url);
                         }
                         ResultVal = "Unknown status: " + ac.getStatus() + "\n";
                         session.invalidate();
@@ -1900,7 +1855,25 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         }
         return tmpLoginURL;
     }
-    
+
+    private void setRedirectUrl(String orgName, String gotoUrl, String alternateUrl) {
+        if (REDIRECT_URL_VALIDATOR.isRedirectUrlValid(gotoUrl, orgName)) {
+            redirect_url = gotoUrl;
+        }
+
+        if (redirect_url == null || redirect_url.isEmpty() || redirect_url.equalsIgnoreCase("null")) {
+            redirect_url = alternateUrl;
+        }
+    }
+
+    private void setSuccessURL(String orgName, String successUrl) throws Exception {
+        setRedirectUrl(orgName, gotoUrl, successUrl);
+    }
+
+    private void setFailureURL() throws Exception {
+        setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Display cycle events:
     // If the fireDisplayEvents attribute in a display field tag is set to true,
@@ -2213,6 +2186,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     private boolean cookieTimeToLiveEnabled = false;
     private int cookieTimeToLive = 0;
     private boolean remoteRequestResponseProcessed = false;
+    private static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
     /** Default parameter name for old token */
     public static final String TOKEN_OLD = "Login.Token";

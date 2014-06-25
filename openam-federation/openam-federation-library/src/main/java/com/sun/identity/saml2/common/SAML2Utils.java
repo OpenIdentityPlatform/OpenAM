@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.saml2.common;
 
@@ -96,7 +96,6 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.owasp.esapi.ESAPI;
@@ -133,7 +132,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
@@ -155,6 +153,9 @@ import java.util.logging.Level;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor;
+import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor.SAMLEntityInfo;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 /**
  * The <code>SAML2Utils</code> contains utility methods for SAML 2.0
@@ -197,6 +198,9 @@ public class SAML2Utils extends SAML2SDKUtils {
     // Dir server info for CRL entry
     private static boolean checkCertStatus = false;
     private static boolean checkCAStatus = false;
+    private static final RedirectUrlValidator<SAMLEntityInfo> RELAY_STATE_VALIDATOR =
+            new RedirectUrlValidator<SAMLEntityInfo>(new ValidRelayStateExtractor());
+
     static {
         try {
             scf = SOAPConnectionFactory.newInstance();
@@ -4480,57 +4484,6 @@ public class SAML2Utils extends SAML2SDKUtils {
     }
 
     /**
-     * Returns a list of valid Relay State URLs for the hosted entity.
-     * @param realm Realm the IDP/SP is in.
-     * @param entityID IDP/SP entity ID.
-     * @param role IDP/SP Role.
-     * @return <code>List</code> Valid Relay State URLs.
-     */
-    public static List getRelayStateUrlList(String realm,
-        String entityID, String role) throws SAML2Exception {
-
-        try {
-            IDPSSOConfigElement idpConfig = null;
-            SPSSOConfigElement spConfig = null;
-            Map attrs = null;
-
-            if (role.equalsIgnoreCase(SAML2Constants.SP_ROLE)) {
-                spConfig =
-                    saml2MetaManager.getSPSSOConfig(realm, entityID);
-                if (spConfig == null) {
-                    debug.message(
-                        "SAML2Utils.getRelayStateUrlList: spconfig is null");
-                    return null;
-                }
-                attrs = SAML2MetaUtils.getAttributes(spConfig);
-            } else {
-                idpConfig =
-                    saml2MetaManager.getIDPSSOConfig(realm, entityID);
-                if (idpConfig == null) {
-                    debug.message(
-                        "SAML2Utils.getRelayStateUrlList: idpconfig is null");
-                    return null;
-                }
-                attrs = SAML2MetaUtils.getAttributes(idpConfig);
-            }
-
-            if (attrs == null) {
-                debug.message(
-                   "SAML2Utils.getRelayStateUrlList: no extended attrs");
-                return null;
-            }
-
-            List values = (List) attrs.get(SAML2Constants.RELAY_STATE_URL_LIST);
-            if (values != null && values.size() != 0) {
-                return values;
-            }
-        } catch (SAML2MetaException e) {
-            debug.message("get SSOConfig failed:", e);
-        }
-        return null;
-    }
-
-    /**
      * Convenience method to validate a SAML2 relay state (goto) URL, often called from a JSP.
      *
      * @param request Used to help establish the realm and hostEntityID.
@@ -4563,7 +4516,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             try {
                 String hostEntityID = saml2MetaManager.getEntityByMetaAlias(metaAlias);
                 if (hostEntityID != null) {
-                    SAML2Utils.validateRelayStateURL(realm, hostEntityID, relayState, role);
+                    validateRelayStateURL(realm, hostEntityID, relayState, role);
                     result = true;
                 }
             } catch (SAML2Exception e) {
@@ -4601,25 +4554,9 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         // Check for the validity of the RelayState URL.
         if (relayState != null) {
-            URLPatternMatcher patternMatch = new URLPatternMatcher();
-            if (patternMatch != null) {
-                List patternsList = getRelayStateUrlList(orgName,
-                                                         hostEntityId,
-                                                         role);
-                if (patternsList != null) {
-                    try {
-                        if (!patternMatch.match(relayState, patternsList,
-                                 true)) {
-                            throw new SAML2Exception(
-                                     SAML2Utils.bundle.getString(
-                                                      "invalidRelayStateUrl"));
-                         }
-                     } catch (MalformedURLException me) {
-                             throw new SAML2Exception(
-                                 SAML2Utils.bundle.getString(
-                                                      "malformedURLSpecified"));
-                     }
-                }
+            if (!RELAY_STATE_VALIDATOR.isRedirectUrlValid(relayState,
+                    SAMLEntityInfo.from(orgName, hostEntityId, role))) {
+                throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));
             }
         }
     }

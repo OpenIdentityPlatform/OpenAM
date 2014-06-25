@@ -24,15 +24,10 @@
  *
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 import java.util.Map;
@@ -98,7 +93,6 @@ import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
-import com.sun.identity.shared.encode.Base64;
 import java.util.StringTokenizer;
 
 public class AuthUtils extends AuthClientUtils {
@@ -2040,57 +2034,37 @@ public class AuthUtils extends AuthClientUtils {
         String orgDN = authContext.getOrgDN();	 
         return getValidGotoURL(request, orgDN);	 
     }	 
-	 
-    /**	 
-     * Returns valid goto parameter for this request.	 
-     * Validate goto parameter set in the current request, then returns it	 
-     * if valid	 
-     * @param request the HttpServletRequest	 
-     * @param orgDN organization DN	 
-     * @return successURL a String	 
-     */	 
-    public static String getValidGotoURL(HttpServletRequest request,	 
-            String orgDN) {	 
-        String gotoUrl = null;	 
-        if (request != null) {	 
-            gotoUrl = request.getParameter("goto");	 
-        }	 
-	 
-        if ((gotoUrl != null) && (gotoUrl.length() != 0) &&	 
-                (!gotoUrl.equalsIgnoreCase("null")) ) {	 
-            String encoded = request.getParameter("encoded");	 
-            if (encoded != null && encoded.equals("true")) {	 
-                gotoUrl = getBase64DecodedValue(gotoUrl);	 
-            }	 
-	 
-            try {
-                URI uri = new URI(gotoUrl);
-                //relative path doesn't need to be compared
-                //against goto valid domain list
-                if (!uri.isAbsolute()) {
-                    return gotoUrl;
-                }
-            } catch (URISyntaxException urise) {
-                //gotoUrl violates RFC 2396
+
+    /**
+     * Returns valid goto parameter for this request. Validate goto parameter set in the current request, then returns
+     * it if valid.
+     *
+     * @param request The HttpServletRequest.
+     * @param orgDN Organization DN.
+     * @return The validated goto URL.
+     */
+    public static String getValidGotoURL(HttpServletRequest request, String orgDN) {
+        String gotoUrl = null;
+        if (request != null) {
+            gotoUrl = request.getParameter(ISAuthConstants.GOTO_PARAM);
+        }
+
+        if (gotoUrl != null && !gotoUrl.isEmpty() && !gotoUrl.equalsIgnoreCase("null")) {
+            String encoded = request.getParameter("encoded");
+            if (encoded != null && encoded.equals("true")) {
+                gotoUrl = getBase64DecodedValue(gotoUrl);
+            }
+
+            if (!AuthD.getAuth().isGotoUrlValid(gotoUrl, orgDN)) {
                 if (utilDebug.messageEnabled()) {
-                    utilDebug.message("AuthUtils.getValidGotoURL(): Original goto" 
-                        + " URL is " + gotoUrl + " which is invalid", urise);
+                    utilDebug.message("AuthUtils.getValidGotoURL():Original goto URL is " + gotoUrl
+                            + " which is invalid");
                 }
                 return null;
             }
-
-            AuthD authD = AuthD.getAuth();	 
-            if (!authD.isGotoUrlValid(gotoUrl, orgDN)) {
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("AuthUtils.getValidGotoURL():" +
-                        "Original goto URL is " + gotoUrl + " which is " +
-                        "invalid");                   	
-                }            	
-                return null;                
-            }	 
-        }	 
-        return gotoUrl;	 
-    }    
+        }
+        return gotoUrl;
+    }
 
     /**
      * Performs a logout on a given token ensuring the post auth classes are called

@@ -24,16 +24,11 @@
  *
  * $Id: UpgradeException.java,v 1.2 2008/06/25 05:54:11 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
-
 package org.forgerock.openam.upgrade;
 
 import com.sun.identity.shared.locale.L10NMessageImpl;
-
 
 /**
  * This class is an extension point for all Upgrade related exceptions.
@@ -73,7 +68,7 @@ public class UpgradeException extends L10NMessageImpl {
     public UpgradeException(String message) {
         super(message);
     }
-    
+
     /**
      * Constructs an <code>UpgradeException</code> with given
      * <code>Throwable</code>.
@@ -84,5 +79,14 @@ public class UpgradeException extends L10NMessageImpl {
     public UpgradeException(Throwable t) {
         super(t);
     }
-}
 
+    /**
+     * Constructs a new <code>UpgradeException</code> with the given message and init cause.
+     *
+     * @param message The exception message.
+     * @param cause The init cause.
+     */
+    public UpgradeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

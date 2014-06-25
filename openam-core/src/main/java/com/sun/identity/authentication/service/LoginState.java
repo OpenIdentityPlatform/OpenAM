@@ -24,10 +24,7 @@
  *
  * $Id: LoginState.java,v 1.57 2010/01/20 21:30:40 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.service;
 
@@ -454,8 +451,7 @@ public class LoginState {
             propertyUpgrader = new DefaultSessionPropertyUpgrader();
         }
     }
-    
-    
+
     /**
      * Returns servlet request object.
      *
@@ -3707,14 +3703,12 @@ public class LoginState {
             if (encoded != null && encoded.equals("true")) {
                 currentGoto = AuthUtils.getBase64DecodedValue(currentGoto);
             }
-            if (!currentGoto.startsWith("/") &&
-                    !ad.isGotoUrlValid(currentGoto, getOrgDN())) {
+            if (!ad.isGotoUrlValid(currentGoto, getOrgDN())) {
                 if (messageEnabled) {
-                    ad.debug.message("LoginState.getSuccessLoginURL():" +
-                    "Original goto URL is " + currentGoto + " which is " +
-                    "invalid");
+                    ad.debug.message("LoginState.getSuccessLoginURL():Original goto URL is " + currentGoto
+                            + " which is invalid");
                 }
-	            currentGoto = null;                
+                currentGoto = null;
             }
         }
 
@@ -4252,8 +4246,7 @@ public class LoginState {
         
         return;
     }
-    
-    
+
     /**
      * Returns failure login URL.
      *
@@ -4266,7 +4259,7 @@ public class LoginState {
             return postProcessURL;
         }
         if (gotoOnFailURL != null && !gotoOnFailURL.isEmpty()) {
-            if (!gotoOnFailURL.startsWith("/") && !ad.isGotoUrlValid(gotoOnFailURL, getOrgDN())) {
+            if (!ad.isGotoUrlValid(gotoOnFailURL, getOrgDN())) {
                 if (AuthD.debug.messageEnabled()) {
                     AuthD.debug.message("LoginState.getFailureLoginURL(): Original gotoOnFail URL is " + gotoOnFailURL
                             + " which is invalid");
