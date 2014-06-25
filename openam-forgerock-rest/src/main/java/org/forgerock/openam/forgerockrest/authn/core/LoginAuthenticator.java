@@ -125,7 +125,7 @@ public class LoginAuthenticator {
         HttpServletRequest request = loginConfiguration.getHttpRequest();
         AuthIndexType indexType = loginConfiguration.getIndexType();
         String indexValue = loginConfiguration.getIndexValue();
-        AuthContextLocalWrapper authContext = loginProcess.getAuthContext();
+        AuthenticationContext authContext = loginProcess.getAuthContext();
 
         if (indexType != null && indexType.equals(AuthIndexType.RESOURCE)) {
             Map<String, Set<String>> envMap = coreServicesWrapper.getEnvMap(request);

@@ -169,4 +169,37 @@ public interface AuthenticationContext {
      * @return The Failure Login URL.
      */
     String getFailureURL();
+
+
+    /**
+     * Determines whether this authentication is for a session upgrade or not.
+     *
+     * @return true if this is a session upgrade (or force-auth) attempt, otherwise false.
+     */
+    boolean isSessionUpgrade();
+
+    /**
+     * Determines whether this is a "force auth" authentication attempt. Force auth mode is similar to session
+     * upgrade but upgrades the existing session rather than creating a new one.
+     *
+     * @return true if this is a force-auth autentication.
+     */
+    boolean isForceAuth();
+
+    /**
+     * Destroy the session used for this authentication attempt.
+     */
+    void destroySession();
+
+    /**
+     * Restore the old session (if it exists) that existed before this authentication attempt. If no previous
+     * session exists then this method does nothing.
+     */
+    void restoreOldSession();
+
+    /**
+     * Destroy the old session (if one exists) that existed before this authentication attempt. If no previous
+     * session exists (e.g., if this is a fresh authentication) then this method does nothing.
+     */
+    void destroyOldSession();
 }

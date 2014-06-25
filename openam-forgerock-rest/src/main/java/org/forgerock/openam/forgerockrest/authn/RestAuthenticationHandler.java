@@ -25,7 +25,6 @@ import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
@@ -33,6 +32,7 @@ import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
@@ -228,6 +228,7 @@ public class RestAuthenticationHandler {
             }
         }
         case COMPLETE: {
+            loginProcess.cleanup();
 
             if (loginProcess.isSuccessful()) {
                 // send token to client

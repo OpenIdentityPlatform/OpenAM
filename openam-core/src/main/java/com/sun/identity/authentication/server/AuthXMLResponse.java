@@ -437,8 +437,6 @@ public class AuthXMLResponse {
                                     .getSid());
                                 authContext.getLoginState().setSession(
                                     oldSession);
-                                authContext.getLoginState().setSid(oldSession
-                                    .getID());
                                 authContext.getLoginState().setForceAuth(false);
                             } else {
                                 if (SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {

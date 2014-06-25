@@ -2409,8 +2409,6 @@ public class AuthContext extends Object implements java.io.Serializable {
     	
                 }
                 acLocal.getLoginState().setSession(oldSess);
-                acLocal.getLoginState().setSid(oldSess
-                    .getID());
                 acLocal.getLoginState().setForceAuth(false);
                 ssoToken = acLocal.getSSOToken();
                 ssoTokenID = ssoToken.getTokenID().toString();

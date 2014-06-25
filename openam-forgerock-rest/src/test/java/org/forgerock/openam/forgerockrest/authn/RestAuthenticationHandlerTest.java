@@ -411,4 +411,29 @@ public class RestAuthenticationHandlerTest {
         assertEquals(loginConfiguration.getSessionId(), "SESSION_ID");
         assertEquals(loginConfiguration.getSSOTokenId(), "SSO_TOKEN_ID");
     }
+
+    @Test
+    public void shouldCleanupAfterAuthenticationComplete() throws Exception {
+
+        // Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        String module = "LDAP";
+        String existingSesssionId = "session1";
+
+        AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
+
+        LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(true);
+        given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
+
+        given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
+
+        // When
+        restAuthenticationHandler.initiateAuthentication(request, response, "module", module, existingSesssionId);
+
+        // Then
+        verify(loginProcess).cleanup();
+    }
 }

@@ -20,8 +20,9 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
-import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import com.sun.identity.shared.Constants;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,7 +39,7 @@ public class LoginProcessTest {
 
     private LoginAuthenticator loginAuthenticator;
     private LoginConfiguration loginConfiguration;
-    private AuthContextLocalWrapper authContext;
+    private AuthenticationContext authContext;
     private CoreServicesWrapper coreServicesWrapper;
 
     @BeforeMethod
@@ -46,10 +47,15 @@ public class LoginProcessTest {
 
         loginAuthenticator = mock(LoginAuthenticator.class);
         loginConfiguration = mock(LoginConfiguration.class);
-        authContext = mock(AuthContextLocalWrapper.class);
+        authContext = mock(AuthenticationContext.class);
         coreServicesWrapper = mock(CoreServicesWrapper.class);
 
         loginProcess = new LoginProcess(loginAuthenticator, loginConfiguration, authContext, coreServicesWrapper);
+    }
+
+    @AfterMethod
+    public void clearSystemProperty() {
+        System.clearProperty(Constants.DESTROY_SESSION_AFTER_UPGRADE);
     }
 
     @Test
@@ -363,7 +369,7 @@ public class LoginProcessTest {
         //Given
 
         //When
-        AuthContextLocalWrapper authContextLocalWrapper = loginProcess.getAuthContext();
+        AuthenticationContext authContextLocalWrapper = loginProcess.getAuthContext();
 
         //Then
         assertEquals(authContextLocalWrapper, authContext);
@@ -379,5 +385,84 @@ public class LoginProcessTest {
 
         //Then
         assertEquals(loginConfig, loginConfiguration);
+    }
+
+    @Test
+    public void shouldDestroySessionAfterFailedAuthentication() {
+        // Given
+        given(authContext.getStatus()).willReturn(AuthContext.Status.FAILED);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext).destroySession();
+    }
+
+    @Test
+    public void shouldRestoreOldSessionAfterFailedSessionUpgrade() {
+        // Given
+        given(authContext.getStatus()).willReturn(AuthContext.Status.FAILED);
+        given(authContext.isSessionUpgrade()).willReturn(true);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext).restoreOldSession();
+    }
+
+    @Test
+    public void shouldDestroyAnyOldSessionAfterFailedAuth_NotSessionUpgrade() {
+        // Given
+        given(authContext.getStatus()).willReturn(AuthContext.Status.FAILED);
+        given(authContext.isSessionUpgrade()).willReturn(false);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext).destroyOldSession();
+    }
+
+    @Test
+    public void shouldRestoreOldSessionAfterSuccessfulForceAuth() {
+        // Given
+        given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
+        given(authContext.isForceAuth()).willReturn(true);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext).destroySession();
+        verify(authContext).restoreOldSession();
+    }
+
+    @Test
+    public void shouldDestroyOldSessionAfterSessionUpgrade() {
+        // Given
+        System.setProperty(Constants.DESTROY_SESSION_AFTER_UPGRADE, "true");
+        given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
+        given(authContext.isSessionUpgrade()).willReturn(true);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext).destroyOldSession();
+    }
+
+    @Test
+    public void shouldNotDestroyOldSessionIfSystemPropertyNotSet() {
+        // Given
+        given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
+        given(authContext.isSessionUpgrade()).willReturn(true);
+
+        // When
+        loginProcess.cleanup();
+
+        // Then
+        verify(authContext, never()).destroyOldSession();
     }
 }

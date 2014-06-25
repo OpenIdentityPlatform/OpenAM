@@ -548,7 +548,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                                 "Restoring original Session!");
                             if (oldSession != null) {
                                 ac.getLoginState().setSession(oldSession);
-                                ac.getLoginState().setSid(oldSession.getID());
                             }
                         } else {
                             clearCookieAndDestroySession(ac);
@@ -570,7 +569,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                             }
                             clearCookieAndDestroySession(ac);
                             ac.getLoginState().setSession(oldSession);
-                            ac.getLoginState().setSid(oldSession.getID());
                         } else {
                             if (AuthUtils.isCookieSupported(ac)) {
                                 setCookie();
@@ -685,7 +683,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                     clearCookieAndDestroySession(ac);
                     if (oldSession != null) {
                         ac.getLoginState().setSession(oldSession);
-                        ac.getLoginState().setSid(oldSession.getID());
                     }
                 } else {
                     if (AuthUtils.isCookieSupported(ac)) {
@@ -719,7 +716,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                         "Session upgrade - Restoring original Session!");
                     if (oldSession != null) {
                         ac.getLoginState().setSession(oldSession);
-                        ac.getLoginState().setSid(oldSession.getID());
                     }
                     loginDebug.message("Original session restored successful!");
                 } else {
@@ -935,7 +931,6 @@ public class LoginViewBean extends AuthViewBeanBase {
                     " Restoring original Session!");
                     if (oldSession != null) {
                         ac.getLoginState().setSession(oldSession);
-                        ac.getLoginState().setSid(oldSession.getID());
                         String redirect_url = AuthUtils.getSuccessURL(request,ac);
                         if (loginDebug.messageEnabled()) {
                             loginDebug.message(
@@ -1965,7 +1960,6 @@ public class LoginViewBean extends AuthViewBeanBase {
         clearCookieAndDestroySession(ac);
         if (oldSession != null) {
             ac.getLoginState().setSession(oldSession);
-            ac.getLoginState().setSid(oldSession.getID());
         }
         String redirect_url = oldSession.getProperty(ISAuthConstants.
             SUCCESS_URL);

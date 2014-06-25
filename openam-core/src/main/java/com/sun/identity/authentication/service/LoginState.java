@@ -499,6 +499,11 @@ public class LoginState {
      */
     public void setSession(InternalSession sess) {
         this.session = sess;
+        if (sess != null) {
+            this.sid = sess.getID();
+        } else {
+            this.sid = null;
+        }
     }
     
     /**
@@ -1678,10 +1683,6 @@ public class LoginState {
      */
     public SessionID getSid() {
         return sid; 
-    }
-    
-    public void setSid(SessionID aSid) {
-        sid = aSid; 
     }
 
     public boolean getForceFlag() {
@@ -6622,5 +6623,16 @@ public class LoginState {
      */
     public void setUserName(String username) {
         userDN = username;
+    }
+
+    /**
+     * Restores the old session (if one exists). Used in the case of a failed session upgrade or successful force-auth
+     * to restore the original session object. If no old session exists then this method does nothing.
+     */
+    public void restoreOldSession() {
+        if (oldSession != null) {
+            debug.message("Restoring old session");
+            setSession(oldSession);
+        }
     }
 }

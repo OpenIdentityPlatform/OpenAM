@@ -17,9 +17,12 @@
 package org.forgerock.openam.forgerockrest.authn.core.wrappers;
 
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.service.AuthD;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
@@ -194,5 +197,48 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
     @Override
     public String getFailureURL() {
         return authContextLocal.getFailureURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroySession() {
+        AuthUtils.destroySession(authContextLocal);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSessionUpgrade() {
+        return authContextLocal.getLoginState().isSessionUpgrade();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isForceAuth() {
+        return authContextLocal.getLoginState().getForceFlag();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroyOldSession() {
+        InternalSession oldSession = authContextLocal.getLoginState().getOldSession();
+        if (oldSession != null) {
+            AuthD.getAuth().destroySession(oldSession.getID());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void restoreOldSession() {
+        authContextLocal.getLoginState().restoreOldSession();
     }
 }

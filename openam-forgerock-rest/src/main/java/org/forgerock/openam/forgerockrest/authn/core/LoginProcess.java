@@ -16,11 +16,13 @@
 
 package org.forgerock.openam.forgerockrest.authn.core;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
-import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 
 import javax.security.auth.callback.Callback;
@@ -34,10 +36,11 @@ import javax.security.auth.callback.ChoiceCallback;
  * object can be created on a per request basis, as long as the underlying AuthContextLocal is provided.
  */
 public class LoginProcess {
+    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private final LoginAuthenticator loginAuthenticator;
     private final LoginConfiguration loginConfiguration;
-    private final AuthContextLocalWrapper authContext;
+    private final AuthenticationContext authContext;
     private final CoreServicesWrapper coreServicesWrapper;
 
     /**
@@ -49,7 +52,7 @@ public class LoginProcess {
      * @param coreServicesWrapper An instance of the CoreServicesWrapper.
      */
     public LoginProcess(LoginAuthenticator loginAuthenticator, LoginConfiguration loginConfiguration,
-            AuthContextLocalWrapper authContext, CoreServicesWrapper coreServicesWrapper) {
+            AuthenticationContext authContext, CoreServicesWrapper coreServicesWrapper) {
         this.loginAuthenticator = loginAuthenticator;
         this.loginConfiguration = loginConfiguration;
         this.authContext = authContext;
@@ -178,12 +181,16 @@ public class LoginProcess {
         return AuthContext.Status.SUCCESS.equals(authContext.getStatus());
     }
 
+    public boolean isFailed() {
+        return AuthContext.Status.FAILED.equals(authContext.getStatus());
+    }
+
     /**
      * Returns the underlying AuthContextLocal.
      *
      * @return The AuthContextLocal wrapped as a AuthContextLocalWrapper.
      */
-    public AuthContextLocalWrapper getAuthContext() {
+    public AuthenticationContext getAuthContext() {
         return authContext;
     }
 
@@ -194,5 +201,43 @@ public class LoginProcess {
      */
     public LoginConfiguration getLoginConfiguration() {
         return loginConfiguration;
+    }
+
+    /**
+     * Perform any necessary session cleanup after authentication has completed. In the case of successful session
+     * upgrade, this will destroy the original session in favour of the new (upgraded) session. In the case of
+     * force-auth mode, this will destroy the new session in favour of the old (now upgraded) session. In the case of
+     * authentication failure the new session will always be destroyed. For failed session upgrade, the original
+     * session is restored. Otherwise, any existing session is also destroyed on authentication failure.
+     */
+    public void cleanup() {
+
+        if (isFailed()) {
+            // Always destroy the (new) failed session
+            DEBUG.message("Authentication failed - destroying new session");
+            authContext.destroySession();
+
+            if (authContext.isSessionUpgrade()) {
+                DEBUG.message("Session upgrade failed - restoring original session");
+                authContext.restoreOldSession();
+            } else {
+                // Destroy any existing session too
+                authContext.destroyOldSession();
+            }
+
+        } else if (isSuccessful()) {
+
+            if (authContext.isForceAuth()) {
+                DEBUG.message("Force Auth succeeded - restoring updated session.");
+                authContext.destroySession();
+                authContext.restoreOldSession();
+
+            } else if (authContext.isSessionUpgrade()
+                    && SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
+                DEBUG.message("Session upgrade succeeded - destroying old session");
+                authContext.destroyOldSession();
+            }
+
+        }
     }
 }

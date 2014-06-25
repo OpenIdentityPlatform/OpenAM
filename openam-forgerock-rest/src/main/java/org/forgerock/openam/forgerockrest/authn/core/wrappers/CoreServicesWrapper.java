@@ -31,6 +31,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -197,7 +198,7 @@ public class CoreServicesWrapper {
      * @param authContext The AuthContextLocalWrapper.
      * @return The Composite Advice Type.
      */
-    public int getCompositeAdviceType(AuthContextLocalWrapper authContext) {
+    public int getCompositeAdviceType(AuthenticationContext authContext) {
         return AuthUtils.getCompositeAdviceType(authContext.getAuthContext());
     }
 
