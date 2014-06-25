@@ -24,9 +24,6 @@
  *
  * $Id: Session.java,v 1.25 2009/08/14 17:53:35 weisun2 Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
@@ -1928,46 +1925,44 @@ public class Session extends GeneralTaskRunnable {
     private static void validateSessionID(SessionID sid) throws SessionException {
         String siteID = sid.getExtension(SessionID.SITE_ID);
         String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
+        String errorMessage = null;
         if (primaryID == null) {
             //In this case by definition the server is not assigned to a site, so we want to ensure that the
             //SITE_ID points to a server
             if (!WebtopNaming.isServer(siteID)) {
-                if (sessionDebug.warningEnabled()) {
-                    sessionDebug.warning("Invalid session ID: Site ID=" + siteID
-                            + " does not map to an actual server");
-                }
-                throw new SessionException("Invalid session ID, primary ID \"" + siteID + "\" either points"
-                        + " to a non-existent server, or to a site");
+                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" either points to a non-existent server,"
+                        + " or to a site";
+            }
+            String realSiteID = WebtopNaming.getSiteID(siteID);
+            if (errorMessage == null && realSiteID != null && !realSiteID.equals(siteID)) {
+                errorMessage = "Invalid session ID, Site ID \"" + siteID + "\" points to a server, but its "
+                        + "corresponding site ID is not present in the session ID";
             }
         } else {
             //PRIMARY_ID is not null, hence this session belongs to a site, we need to verify that the PRIMARY_ID
             //and the SITE_ID are both correct, and they actually correspond to each other
             if (!WebtopNaming.isServer(primaryID)) {
-                if (sessionDebug.warningEnabled()) {
-                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
-                            + " does not map to an actual server");
-                }
-                throw new SessionException("Invalid session ID, primary ID \"" + siteID + "\" either points"
-                        + " to a non-existent server, or to a site");
+                errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" either points to a non-existent "
+                        + "server, or to a site";
             }
             String realSiteID = WebtopNaming.getSiteID(primaryID);
-            if (realSiteID == null || realSiteID.equals(primaryID)) {
-                //The server from the session doesn't actually belong to a site
-                if (sessionDebug.warningEnabled()) {
-                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
-                            + " is not member of Site ID=" + siteID);
+            if (errorMessage == null) {
+                if (realSiteID == null || realSiteID.equals(primaryID)) {
+                    //The server from the session doesn't actually belong to a site
+                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server isn't member of Site "
+                            + "ID \"" + siteID + "\"";
+                } else if (!realSiteID.equals(siteID)) {
+                    //The server from the session actually belongs to a different site
+                    errorMessage = "Invalid session ID, Primary ID \"" + primaryID + "\" server doesn't belong"
+                            + " to Site ID \"" + siteID + "\"";
                 }
-                throw new SessionException("Invalid session ID, the \"" + primaryID + "\" server doesn't belong to "
-                        + "a site");
-            } else if (!realSiteID.equals(siteID)) {
-                //The server from the session actually belongs to a different site
-                if (sessionDebug.warningEnabled()) {
-                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
-                            + " is not member of Site ID=" + siteID);
-                }
-                throw new SessionException("Invalid session ID, the \"" + primaryID + "\" server doesn't belong to "
-                        + "\"" + siteID + "\" site ID");
             }
+        }
+        if (errorMessage != null) {
+            if (sessionDebug.warningEnabled()) {
+                sessionDebug.warning(errorMessage);
+            }
+            throw new SessionException(errorMessage);
         }
     }
 
