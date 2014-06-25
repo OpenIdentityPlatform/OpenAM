@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
 
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
@@ -45,10 +46,10 @@ public class RestSTSInstanceStateProvider implements STSInstanceStateProvider<Re
         this.logger = logger;
     }
 
-    public RestSTSInstanceState getSTSInstanceState(String instanceId) throws TokenCreationException {
+    public RestSTSInstanceState getSTSInstanceState(String instanceId, String realm) throws TokenCreationException, STSPublishException {
         RestSTSInstanceState cachedState = cachedRestInstanceConfigState.get(instanceId);
         if (cachedState == null) {
-            RestSTSInstanceState createdState = createSTSInstanceState(instanceId);
+            RestSTSInstanceState createdState = createSTSInstanceState(instanceId, realm);
             RestSTSInstanceState concurrentlyCreatedState;
             if ((concurrentlyCreatedState = cachedRestInstanceConfigState.putIfAbsent(instanceId, createdState)) != null) {
                 return concurrentlyCreatedState;
@@ -60,8 +61,8 @@ public class RestSTSInstanceStateProvider implements STSInstanceStateProvider<Re
         }
     }
 
-    private RestSTSInstanceState createSTSInstanceState(String instanceId) throws TokenCreationException {
+    private RestSTSInstanceState createSTSInstanceState(String instanceId, String realm) throws TokenCreationException, STSPublishException {
         logger.debug("Creating STSInstanceState for instanceId: " + instanceId);
-        return instanceStateFactory.createRestSTSInstanceState(restStsInstanceConfigPersister.getSTSInstanceConfig(instanceId));
+        return instanceStateFactory.createRestSTSInstanceState(restStsInstanceConfigPersister.getSTSInstanceConfig(instanceId, realm));
     }
 }

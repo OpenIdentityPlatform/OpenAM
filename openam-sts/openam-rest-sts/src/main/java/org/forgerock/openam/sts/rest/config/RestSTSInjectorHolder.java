@@ -3,17 +3,6 @@ package org.forgerock.openam.sts.rest.config;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
-import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
-import org.forgerock.openam.sts.rest.RestSTS;
-import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
-import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Holds the Injector instance common to all Rest STS instances. Should only be called from contexts
@@ -45,7 +34,9 @@ public enum RestSTSInjectorHolder {
     /**
      * Returns the appropriate instance for the given injection key.
      * Avoid using this method, in favor of having Guice inject your dependencies ahead of time.
-     * Is only called by the RestSTSServiceConnectionFactoryProvider.
+     * Is only called by the RestSTSServiceConnectionFactoryProvider, and by the RestSTSInstanceModule. The
+     * RestSTSInstanceModule uses it to obtain the global url elements which allow each Rest STS instance
+     * to integrate with OpenAM -e.g. /authenticate, /sessions?_action=logout, /users/?_action=idFromSession, etc).
      *
      * @param key The key that defines the class to get.
      * @param <T> The type of class defined by the key.

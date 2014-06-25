@@ -17,8 +17,13 @@
 package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.util.Reject;
 
 import java.util.*;
@@ -81,8 +86,14 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
 
     private final Set<TokenTransformConfig> supportedTokenTranslations;
     private final RestDeploymentConfig deploymentConfig;
-    private static final String DEPLOYMENT_CONFIG = "deploymentConfig";
-    private static final String SUPPORTED_TOKEN_TRANSLATIONS = "supportedTokenTranslations";
+
+    /*
+    Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
+    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
+    SMS persistence.
+     */
+    private static final String DEPLOYMENT_CONFIG = "deployment-config";
+    private static final String SUPPORTED_TOKEN_TRANSLATIONS = "supported-token-transforms";
 
     private RestSTSInstanceConfig(RestSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
@@ -123,6 +134,30 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         return supportedTokenTranslations;
     }
 
+    /**
+     * @return This method will return the sub-path at which the rest STS instance will be deployed (sub-path relative to the
+     * path of the Crest service fronting the STS). This string serves to identify the rest STS instance. This identifier
+     * is passed to the TokenGenerationService so that the TGS can issue instance-specific tokens (i.e. reflecting the
+     * KeystoreConfig and SAML2Config of the associated STS instance). This path is also the most specific element of the
+     * DN identifying the config in the SMS.
+     *
+     * This method will be called to obtain the id under which the RestSTSInstanceConfig state is stored in the SMS, and
+     * the caching of the Route entry added to the Crest Router (needs to be cached to be later removed). Because this
+     * resource will be accessed as a url, it cannot have a trailing slash, as this slash is removed in the http request.
+     */
+    public String getDeploymentSubPath() {
+        String deploymentSubPath = new UrlConstituentCatenatorImpl().catenateUrlConstituents(
+                getDeploymentConfig().getRealm(), getDeploymentConfig().getUriElement());
+        if (deploymentSubPath.endsWith(AMSTSConstants.FORWARD_SLASH)) {
+            return deploymentSubPath.substring(0, deploymentSubPath.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
+        }
+
+        if (deploymentSubPath.startsWith(AMSTSConstants.FORWARD_SLASH)) {
+            deploymentSubPath = deploymentSubPath.substring(1, deploymentSubPath.length());
+        }
+
+        return deploymentSubPath;
+    }
 
     @Override
     public String toString() {
@@ -168,13 +203,7 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
         STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
-                .amJsonRestBase(baseConfig.getJsonRestBase())
                 .amDeploymentUrl(baseConfig.getAMDeploymentUrl())
-                .amRestAuthNUriElement(baseConfig.getAMRestAuthNUriElement())
-                .amRestLogoutUriElement(baseConfig.getAMRestLogoutUriElement())
-                .amRestIdFromSessionUriElement(baseConfig.getAMRestIdFromSessionUriElement())
-                .amRestTokenGenerationServiceUriElement(baseConfig.getAmRestTokenGenerationServiceUriElement())
-                .amSessionCookieName(baseConfig.getAMSessionCookieName())
                 .keystoreConfig(baseConfig.getKeystoreConfig())
                 .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())
@@ -191,5 +220,85 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
         builder.setSupportedTokenTranslations(transformConfigList);
         return builder.build();
+    }
+
+    /*
+    This method will marshal this state into the Map<String>, Set<String>> required for persistence in the SMS. The intent
+    is to leverage the toJson functionality, as a JsonValue is essentially a map, with the following exceptions:
+    1. the non-complex objects are not Set<String>, but rather <String>, and thus must be marshaled to a Set<String>. It seems
+    like I could go through all of the values in the map, and if any entry is simply a String, I could marshal it to a Set<String>
+    2. the complex objects (e.g. deploymentConfig, saml2Config, supportedTokenTranslations, etc) are themselves maps, and
+    thus must be 'flattened' into a single map. This is done by calling each of these encapsulated objects to provide a
+    map representation, and then insert these values into the top-level map.
+     */
+    public Map<String, Set<String>> marshalToAttributeMap() {
+        Map<String, Set<String>> interimMap = MapMarshallUtils.toSmsMap(toJson().asMap());
+        interimMap.remove(DEPLOYMENT_CONFIG);
+        interimMap.putAll(deploymentConfig.marshalToAttributeMap());
+
+        /*
+        Here the values are already contained in a set. I want to remove the referenced complex-object, but
+        then add each of the TokenTransformConfig instances in the supportTokenTranslationsSet to a Set<String>, obtaining
+        a string representation for each TokenTransformConfig instance, and adding it to the Set<String>
+         */
+        interimMap.remove(SUPPORTED_TOKEN_TRANSLATIONS);
+        Set<String> supportedTransforms = new HashSet<String>();
+        interimMap.put(SUPPORTED_TOKEN_TRANSLATIONS, supportedTransforms);
+        for (TokenTransformConfig ttc : supportedTokenTranslations) {
+            supportedTransforms.add(ttc.toSMSString());
+        }
+
+        if (saml2Config != null) {
+            interimMap.remove(SAML2_CONFIG);
+            interimMap.putAll(saml2Config.marshalToAttributeMap());
+        }
+
+        interimMap.remove(KEYSTORE_CONFIG);
+        interimMap.putAll(keystoreConfig.marshalToAttributeMap());
+
+        return interimMap;
+    }
+
+    /*
+    When we are marshaling back from a Map<String, Set<String>>, this Map contains all of the values, also those
+    contributed by encapsulated complex objects. So the structure must be 'un-flattened', where the top-level map
+    is passed to encapsulated complex-objects, so that they may re-constitute themselves, and then the top-level json entry
+    key is set to point at these re-constituted complex objects.
+
+    Not that the marshalToAttributeMap first calls toJson to obtain the map representation, albeit with hierarchical
+    elements, which must be subsequently flattened. The 'flattening' performed by the marshalToAttributeMap must then
+     be 'inverted' by this method, where all complex objects are re-constituted, using the state in the flattened map.
+
+     */
+    public static RestSTSInstanceConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
+        RestDeploymentConfig restDeploymentConfig = RestDeploymentConfig.marshalFromAttributeMap(attributeMap);
+        Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(attributeMap);
+        jsonAttributes.remove(DEPLOYMENT_CONFIG);
+        jsonAttributes.put(DEPLOYMENT_CONFIG, restDeploymentConfig.toJson());
+
+        SAML2Config saml2Config = SAML2Config.marshalFromAttributeMap(attributeMap);
+        if (saml2Config != null) {
+            jsonAttributes.remove(SAML2_CONFIG);
+            jsonAttributes.put(SAML2_CONFIG, saml2Config.toJson());
+        }
+
+        /*
+         The SUPPORTED_TOKEN_TRANSLATIONS are currently each in a String representation in the Set<String> map entry corresponding
+         to the SUPPORTED_TOKEN_TRANSLATIONS key. I need to marshal each back into a TokenTransformConfig instance, and then
+         call toJson on each, and put them in a JsonValue wrapping a list.
+         */
+        ArrayList<JsonValue> jsonTranslationsList = new ArrayList<JsonValue>();
+        JsonValue jsonTranslations = new JsonValue(jsonTranslationsList);
+        jsonAttributes.remove(SUPPORTED_TOKEN_TRANSLATIONS);
+        jsonAttributes.put(SUPPORTED_TOKEN_TRANSLATIONS, jsonTranslations);
+        Set<String> stringTokenTranslations = attributeMap.get(SUPPORTED_TOKEN_TRANSLATIONS);
+        for (String translation : stringTokenTranslations) {
+            jsonTranslationsList.add(TokenTransformConfig.fromSMSString(translation).toJson());
+        }
+
+        jsonAttributes.remove(KEYSTORE_CONFIG);
+        jsonAttributes.put(KEYSTORE_CONFIG, KeystoreConfig.marshalFromAttributeMap(attributeMap).toJson());
+
+        return fromJson(new JsonValue(jsonAttributes));
     }
 }

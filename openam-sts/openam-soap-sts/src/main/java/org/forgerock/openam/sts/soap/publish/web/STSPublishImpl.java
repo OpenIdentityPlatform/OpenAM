@@ -23,7 +23,7 @@ import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.soap.config.SoapSTSInstanceModule;
 import org.forgerock.openam.sts.soap.config.user.DeploymentConfig;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
@@ -32,7 +32,6 @@ import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import java.io.UnsupportedEncodingException;
-import java.security.cert.X509Certificate;
 
 /**
  * This is a web-service which allows for the programmatic publication of STS instances.
@@ -87,7 +86,7 @@ public class STSPublishImpl implements STSPublish {
         if (AMSTSConstants.SYMMETRIC_ENDORSING_CERT_BINDING.equals(bndId)) {
             mapping = AuthTargetMapping
                                         .builder()
-                                        .addMapping(X509Certificate[].class, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
+                                        .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
                                         .build();
         } else {
             mapping = AuthTargetMapping.builder().build();
@@ -119,11 +118,6 @@ public class STSPublishImpl implements STSPublish {
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl(amDeploymentUrl)
-                .amJsonRestBase("/json")
-                .amRestAuthNUriElement("/authenticate")
-                .amRestLogoutUriElement("/sessions/?_action=logout")
-                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
-                .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("OpenAM")
                 .addIssueTokenType(TokenType.SAML2)

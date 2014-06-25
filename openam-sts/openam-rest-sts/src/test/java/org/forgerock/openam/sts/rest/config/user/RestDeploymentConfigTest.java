@@ -16,19 +16,19 @@
 
 package org.forgerock.openam.sts.rest.config.user;
 
+import org.forgerock.openam.sts.TokenType;
+import org.testng.Assert;
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
-import org.apache.ws.security.message.token.UsernameToken;
-import org.forgerock.openam.sts.AuthTargetMapping;
-import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 
 public class RestDeploymentConfigTest {
     @Test
     public void testEquals() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
         RestDeploymentConfig dc1 = RestDeploymentConfig.builder()
                 .realm("a")
@@ -41,14 +41,14 @@ public class RestDeploymentConfigTest {
                 .uriElement("b")
                 .authTargetMapping(atm)
                 .build();
-        assertTrue(dc1.equals(dc2));
-        assertTrue(dc1.hashCode() == dc2.hashCode());
+        assertEquals(dc1, dc2);
+        assertEquals(dc1.hashCode(), dc2.hashCode());
     }
 
     @Test
     public void testNotEquals() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
         RestDeploymentConfig dc1 = RestDeploymentConfig.builder()
                 .realm("a")
@@ -61,17 +61,13 @@ public class RestDeploymentConfigTest {
                 .uriElement("b")
                 .authTargetMapping(atm)
                 .build();
-        assertFalse(dc1.equals(dc2));
-        assertFalse(dc1.hashCode() == dc2.hashCode());
+        assertNotEquals(dc1, dc2);
+        assertNotEquals(dc1.hashCode(), dc2.hashCode());
     }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void testRejectIfNull() {
-        AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
-                .build();
-
-        RestDeploymentConfig dc4 = RestDeploymentConfig.builder()
+        RestDeploymentConfig.builder()
                 .realm("a")
                 .uriElement("b")
                 .build();
@@ -80,13 +76,39 @@ public class RestDeploymentConfigTest {
     @Test
     public void testJsonRoundTrip() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
         RestDeploymentConfig rdc = RestDeploymentConfig.builder()
                 .realm("a")
                 .uriElement("b")
                 .authTargetMapping(atm)
                 .build();
-        assertTrue(rdc.equals(RestDeploymentConfig.fromJson(rdc.toJson())));
+        Assert.assertEquals(rdc, RestDeploymentConfig.fromJson(rdc.toJson()));
+    }
+
+    @Test
+    public void testMapMarshalRoundTrip() {
+        AuthTargetMapping atm = AuthTargetMapping.builder()
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
+                .build();
+        RestDeploymentConfig rdc = RestDeploymentConfig.builder()
+                .realm("a")
+                .uriElement("b")
+                .authTargetMapping(atm)
+                .build();
+
+        assertEquals(rdc, RestDeploymentConfig.marshalFromAttributeMap(rdc.marshalToAttributeMap()));
+
+        atm = AuthTargetMapping.builder()
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
+                .addMapping(TokenType.X509CERT, "module", "x509module")
+                .build();
+        rdc = RestDeploymentConfig.builder()
+                .realm("a")
+                .uriElement("b")
+                .authTargetMapping(atm)
+                .build();
+
+        assertEquals(rdc, RestDeploymentConfig.marshalFromAttributeMap(rdc.marshalToAttributeMap()));
     }
 }

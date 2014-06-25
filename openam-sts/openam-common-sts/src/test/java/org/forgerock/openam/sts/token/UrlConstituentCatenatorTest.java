@@ -17,32 +17,46 @@
 package org.forgerock.openam.sts.token;
 
 import org.testng.annotations.Test;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 
 public class UrlConstituentCatenatorTest {
     @Test
     public void testInsertion() {
-        assertTrue("bobo/dodo".equals(new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo", "dodo")));
+        assertEquals("bobo/dodo", new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo", "dodo"));
     }
 
     @Test
     public void testInsertionQuestionMark() {
-        assertTrue("bobo/?dodo".equals(new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "?dodo")));
+        assertEquals("bobo/?dodo", new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "?dodo"));
     }
 
     @Test
     public void testRemoval() {
-        assertTrue("bobo/dodo".equals(new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "/dodo")));
+        assertEquals("bobo/dodo", new UrlConstituentCatenatorImpl().catenateUrlConstituents("bobo/", "/dodo"));
     }
+
     @Test
     public void testStringBuilderAddition() {
-        assertTrue("bobo/dodo".equals(
-                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("bobo"), "dodo").toString()));
+        assertEquals("bobo/dodo",
+                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("bobo"), "dodo").toString());
     }
+
     @Test
     public void testStringBuilderRemoval() {
-        assertTrue("bobo/dodo".equals(
-                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("bobo/"), "/dodo").toString()));
+        assertEquals("bobo/dodo",
+                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("bobo/"), "/dodo").toString());
+    }
+
+    @Test
+    public void testStringBuilderRemoval2() {
+        assertEquals("/dodo",
+                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("/"), "/dodo").toString());
+    }
+
+    @Test
+    public void testStringBuilderRealmManipulation() {
+        assertEquals("/dodo",
+                new UrlConstituentCatenatorImpl().catentateUrlConstituent(new StringBuilder("/"), "dodo").toString());
     }
 
 }

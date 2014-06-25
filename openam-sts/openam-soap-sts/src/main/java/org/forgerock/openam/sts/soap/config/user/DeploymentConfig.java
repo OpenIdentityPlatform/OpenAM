@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.sts.soap.config.user;
 
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 
 import javax.xml.namespace.QName;
 

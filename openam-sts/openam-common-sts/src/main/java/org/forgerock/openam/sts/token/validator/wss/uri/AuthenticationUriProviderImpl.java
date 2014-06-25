@@ -16,13 +16,11 @@
 
 package org.forgerock.openam.sts.token.validator.wss.uri;
 
-import org.apache.ws.security.handler.RequestData;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +32,6 @@ import java.net.URISyntaxException;
 public class AuthenticationUriProviderImpl implements AuthenticationUriProvider {
     private static final Character QUESTION_MARK = '?';
     private static final Character AMPERSAND = '&';
-    private static final String SLASH = "/";
     private static final String AUTH_INDEX_TYPE_PARAM = "authIndexType=";
     private static final String AUTH_INDEX_VALUE_PARAM = "authIndexValue=";
 

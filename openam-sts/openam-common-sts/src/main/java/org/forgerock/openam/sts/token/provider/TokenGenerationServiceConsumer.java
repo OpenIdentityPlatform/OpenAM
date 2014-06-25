@@ -28,12 +28,13 @@ public interface TokenGenerationServiceConsumer {
      * Invoke the TokenGenerationService to produce a SAML2 Bearer assertion
      * @param ssoTokenString The session id corresponding to the to-be-asserted subject
      * @param stsInstanceId  The instance id of the STS making the invocation
+     * @param realm The realm of the STS making the invocation
      * @param serviceProviderAssertionConsumerServiceUrl Reqired for inclusion in Bearer assertions
      * @param authnContextClassRef The SAML2 AuthnContext class ref to be included in the SAML2 assertion
      * @return The string representation of the issued token.
      * @throws TokenCreationException if the token could not be created.
      */
-    String getSAML2BearerAssertion(String ssoTokenString, String stsInstanceId,
+    String getSAML2BearerAssertion(String ssoTokenString, String stsInstanceId, String realm,
                                    String serviceProviderAssertionConsumerServiceUrl,
                                    String authnContextClassRef) throws TokenCreationException;
 
@@ -42,22 +43,24 @@ public interface TokenGenerationServiceConsumer {
      * Invoke the TokenGenerationService to produce a SAML2 Bearer assertion
      * @param ssoTokenString The session id corresponding to the to-be-asserted subject
      * @param stsInstanceId  The instance id of the STS making the invocation
+     * @param realm The realm of the STS making the invocation
      * @param authnContextClassRef The SAML2 AuthnContext class ref to be included in the SAML2 assertion
      * @return The string representation of the issued token.
      * @throws TokenCreationException if the token could not be created.
      */
-    String getSAML2SenderVouchesAssertion(String ssoTokenString, String stsInstanceId,
+    String getSAML2SenderVouchesAssertion(String ssoTokenString, String stsInstanceId, String realm,
                                           String authnContextClassRef) throws TokenCreationException;
 
     /**
      * Invoke the TokenGenerationService to produce a SAML2 Bearer assertion
      * @param ssoTokenString The session id corresponding to the to-be-asserted subject
      * @param stsInstanceId  The instance id of the STS making the invocation
+     * @param realm The realm of the STS making the invocation
      * @param authnContextClassRef The SAML2 AuthnContext class ref to be included in the SAML2 assertion
      * @param proofTokenState The ProofTokenState used as the proof token in the HoK assertion.
      * @return The string representation of the issued token.
      * @throws TokenCreationException if the token could not be created.
      */
-    String getSAML2HolderOfKeyAssertion(String ssoTokenString, String stsInstanceId,
+    String getSAML2HolderOfKeyAssertion(String ssoTokenString, String stsInstanceId, String realm,
                                         String authnContextClassRef, ProofTokenState proofTokenState) throws TokenCreationException;
 }

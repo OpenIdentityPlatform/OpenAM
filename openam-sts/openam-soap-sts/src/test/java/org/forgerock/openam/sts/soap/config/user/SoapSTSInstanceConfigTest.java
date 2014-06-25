@@ -17,8 +17,7 @@
 package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
-import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.testng.annotations.Test;
 
@@ -86,12 +85,6 @@ public class SoapSTSInstanceConfigTest {
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl(amDeploymentUrl)
-                .amJsonRestBase("/json")
-                .amRestAuthNUriElement("/authenticate")
-                .amRestLogoutUriElement("/sessions/?_action=logout")
-                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
-                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
-                .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();
@@ -118,11 +111,6 @@ public class SoapSTSInstanceConfigTest {
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl("whatever")
-                .amJsonRestBase("/json")
-                .amRestAuthNUriElement("/authenticate")
-                .amRestLogoutUriElement("/sessions/?_action=logout")
-                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
-                .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();

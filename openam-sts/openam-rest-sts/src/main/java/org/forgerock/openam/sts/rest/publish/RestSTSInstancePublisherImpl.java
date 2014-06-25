@@ -16,12 +16,16 @@
 
 package org.forgerock.openam.sts.rest.publish;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
-import org.forgerock.openam.sts.STSInitializationException;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.RestSTS;
+import org.forgerock.openam.sts.rest.config.RestSTSInstanceModule;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.service.RestSTSService;
 import org.slf4j.Logger;
@@ -40,6 +44,9 @@ import java.util.Map;
  * these operations in the case of failure (i.e. removing the route from the router). Because publishing rest-sts instances
  * will occur infrequently, synchronizing both of these actions seemed a better trade-off to insure consistent, non-interleaved
  * mutations of all stateful elements involved with publishing a rest-sts instance.
+ *
+ * TODO: transaction semantics for publish and remove - if one of the mutations throws an exception, take steps to unwind
+ * the other mutations!!!
  */
 public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     private final Router router;
@@ -56,17 +63,18 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     }
 
     /**
-     * Publishes the rest STS instance at the specified relative path
+     * Publishes the rest STS instance at the specified relative path. This method will be invoked when the Rest STS instance
+     * is initially published, and to re-constitute previously-published instances following a server restart.
      * @param instanceConfig The RestSTSInstanceConfig which defined the guice bindings which specify the functionality of
      *                       the RestSTS instance. This RestSTSInstanceConfig will be persisted so that persisted instances
      *                       can be reconstituted in case of a server restart.
      * @param restSTSInstance The RestSTS instance defining the functionality of the rest STS service.
-     * @param subPath the path, relative to the base rest-sts service, to the to-be-exposed rest-sts service.
-     * @throws STSInitializationException thrown in case a rest-sts instance has already been published at the specified
-     * subPath.
+     * @param republish Indicates whether this is an original publish, or a republish following OpenAM restart.
+     * @throws STSPublishException thrown in case a rest-sts instance has already been published at the specified
+     * subPath, or in case other errors prevented a successful publish.
      */
-    @Override
-    public synchronized void publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS restSTSInstance, String subPath) throws STSInitializationException {
+    public synchronized String publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS restSTSInstance,
+                                             boolean republish) throws STSPublishException {
         /*
         Exclude the possibility that a rest-sts instance has already been added at the sub-path.
 
@@ -81,38 +89,83 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         complexities by checking my HashMap if an entry is present, as I need to maintain a reference to all
         published Routes in order to be able to remove them.
          */
-        if (publishedRoutes.containsKey(subPath)) {
-            throw new STSInitializationException(ResourceException.BAD_REQUEST, "A rest-sts instance at sub-path " + subPath + " has already been published.");
+        String deploymentSubPath = instanceConfig.getDeploymentSubPath();
+        if (deploymentSubPath.endsWith(AMSTSConstants.FORWARD_SLASH)) {
+            deploymentSubPath = deploymentSubPath.substring(0, deploymentSubPath.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
         }
-        Route route = router.addRoute(subPath, new RestSTSService(restSTSInstance, logger));
+
+        if (deploymentSubPath.startsWith(AMSTSConstants.FORWARD_SLASH)) {
+            deploymentSubPath = deploymentSubPath.substring(1, deploymentSubPath.length());
+        }
+
+        if (publishedRoutes.containsKey(deploymentSubPath)) {
+            throw new STSPublishException(ResourceException.BAD_REQUEST, "A rest-sts instance at sub-path " +
+                    deploymentSubPath + " has already been published.");
+        }
+        Route route = router.addRoute(deploymentSubPath, new RestSTSService(restSTSInstance, logger));
         /*
         Need to persist the published Route instance as it is necessary for router removal.
          */
-        publishedRoutes.put(subPath, route);
+        publishedRoutes.put(deploymentSubPath, route);
         /*
-        TODO: it is not clear that the deployment config element will be unique across both rest and soap sts instances.
-        Safest will be to generate a uuid in the STSInstanceConfig ctor, and reference this value as an indexed ldap
-        attribute when persisting the STSInstanceConfig to the SMS.
+        If this is a republish (i.e. re-constitute previously-published Rest STS instances following OpenAM restart),
+        then the RestSTSInsanceConfig does not need to be persisted, as it was obtained from the SMS via a GET
+        on the publish service by the RestSTSInstanceRepublishServlet.
          */
-        persistentStore.persistSTSInstance(instanceConfig.getDeploymentConfig().getUriElement(), instanceConfig);
+        if (!republish) {
+            persistentStore.persistSTSInstance(deploymentSubPath, instanceConfig);
+        }
+        return deploymentSubPath;
     }
 
     /**
-     * Removes the published rest-sts instance at the specified subPath.
-     * @param subPath the path, relative to the base rest-sts service, to the to-be-removed service.
-     * @throws IllegalArgumentException if no rest-sts instance has been published at this relative path.
+     * Removes the published rest-sts instance at the specified stsId. Note that when previously-published Rest STS
+     * instances are reconstituted following an OpenAM restart, the publishInstance above will be called, which will
+     * re-constitute the Route state in the Map, state necessary to remove the Route corresponding to the STS instance
+     * from the Crest router. This is important because the Route has a package-private ctor.
+     * @param stsId the path, relative to the base rest-sts service, to the to-be-removed service. Note that this path
+     *              includes the realm.
+     * @param realm The realm of the STS instance
+     * @throws org.forgerock.openam.sts.STSPublishException if the entry in the SMS could not be removed, or if no
+     * Route entry could be found in the Map corresponding to a previously-published instance.
      */
-    @Override
-    public synchronized void removeInstance(String subPath) throws IllegalArgumentException {
-        Route route = publishedRoutes.remove(subPath);
+    public synchronized void removeInstance(String stsId, String realm) throws STSPublishException {
+        Route route = publishedRoutes.remove(stsId);
         if (route == null) {
-            throw new IllegalArgumentException("No published Rest STS instance at path " + subPath);
+            throw new STSPublishException(ResourceException.NOT_FOUND, "No previously published STS instance with id "
+                    + stsId + " in realm " + realm + " found!");
         }
-        persistentStore.removeSTSInstance(subPath);
+        persistentStore.removeSTSInstance(stsId, realm);
         router.removeRoute(route);
     }
 
-    public List<RestSTSInstanceConfig> getPublishedInstances() {
+    public List<RestSTSInstanceConfig> getPublishedInstances() throws STSPublishException{
         return persistentStore.getAllPublishedInstances();
+    }
+
+    public RestSTSInstanceConfig getPublishedInstance(String stsId, String realm) throws STSPublishException {
+        return persistentStore.getSTSInstanceConfig(stsId, realm);
+    }
+
+    public void republishExistingInstances() throws STSPublishException {
+        final List<RestSTSInstanceConfig> publishedInstances = getPublishedInstances();
+        for (RestSTSInstanceConfig instanceConfig : publishedInstances) {
+            Injector instanceInjector;
+            try {
+                instanceInjector = Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
+            } catch (Exception e) {
+                logger.error("Exception caught creating the guice injector in republish corresponding to rest sts " +
+                        "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
+                continue;
+            }
+            try {
+                publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), true);
+                logger.info("Republished Rest STS instance corresponding to config " + instanceConfig.toJson());
+            } catch (STSPublishException e) {
+                logger.error("Exception caught publishing rest sts " +
+                        "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
+                continue;
+            }
+        }
     }
 }

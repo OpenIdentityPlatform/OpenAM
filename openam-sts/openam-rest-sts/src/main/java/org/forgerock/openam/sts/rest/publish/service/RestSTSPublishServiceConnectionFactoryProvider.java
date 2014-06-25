@@ -20,6 +20,7 @@ import com.google.inject.Key;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
 import org.slf4j.Logger;
@@ -28,11 +29,11 @@ import org.slf4j.Logger;
  * Referenced in the web.xml. Returns the ConnectionFactory required by the Crest Rest STS instance publish
  * SingletonResourceProvider.
  */
-public class RestSTSPublishServiceConnectionFactoryProvider{
+public class RestSTSPublishServiceConnectionFactoryProvider {
     public static ConnectionFactory getConnectionFactory() {
         final Router router = new Router();
-        router.addRoute("/publish/",
-                new RestSTSPublishService(RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
+        router.addRoute(RoutingMode.STARTS_WITH, "/publish",
+                new RestSTSPublishServiceRequestHandler(RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
                         RestSTSInjectorHolder.getInstance(Key.get(Logger.class))));
         return Resources.newInternalConnectionFactory(router);
     }

@@ -17,7 +17,6 @@
 package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.util.Reject;
 
@@ -116,10 +115,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
         Reject.ifNull(amDeploymentUrl, "AM deployment url cannot be null");
-        Reject.ifNull(amRestAuthNUriElement, "AM REST authN url element cannot be null");
-        Reject.ifNull(amRestLogoutUriElement, "AM REST logout url element cannot be null");
-        Reject.ifNull(amRestIdFromSessionUriElement, "AM REST id from Session url element cannot be null");
-        Reject.ifNull(amSessionCookieName, "AM session cookie name cannot be null");
 
     }
 
@@ -158,10 +153,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         sb.append('\t').append("renewTokenTypes: ").append(renewTokenTypes).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
         sb.append('\t').append("amDeploymentUrl: ").append(amDeploymentUrl).append('\n');
-        sb.append('\t').append("amRestAuthNUriElement: ").append(amRestAuthNUriElement).append('\n');
-        sb.append('\t').append("amRestLogoutUriElement: ").append(amRestLogoutUriElement).append('\n');
-        sb.append('\t').append("amRestAMTokenValidationUriElement: ").append(amRestIdFromSessionUriElement).append('\n');
-        sb.append('\t').append("amSessionCookieName: ").append(amSessionCookieName).append('\n');
         return sb.toString();
     }
 
@@ -176,11 +167,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                     validateTokenTransformTypes.equals(otherConfig.getValidateTokenTransformTypes())  &&
                     renewTokenTypes.equals(otherConfig.getRenewTokenTypes()) &&
                     deploymentConfig.equals(otherConfig.getDeploymentConfig()) &&
-                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl()) &&
-                    amRestAuthNUriElement.equals(otherConfig.getAMRestAuthNUriElement()) &&
-                    amRestIdFromSessionUriElement.equals(otherConfig.getAMRestIdFromSessionUriElement()) &&
-                    amSessionCookieName.equals(otherConfig.getAMSessionCookieName()) &&
-                    amRestLogoutUriElement.equals(otherConfig.getAMRestLogoutUriElement());
+                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl());
         }
         return false;
     }

@@ -17,9 +17,8 @@
 package org.forgerock.openam.sts.token.validator.wss;
 
 import org.apache.ws.security.handler.RequestData;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.token.AMTokenCache;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;

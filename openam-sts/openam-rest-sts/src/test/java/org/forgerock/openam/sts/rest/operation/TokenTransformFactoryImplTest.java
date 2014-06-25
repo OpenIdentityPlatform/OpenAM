@@ -22,7 +22,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -124,7 +124,7 @@ public class TokenTransformFactoryImplTest {
 
         @Provides
         AuthTargetMapping authTargetMapping() {
-            return AuthTargetMapping.builder().addMapping(String.class, "index_type", "index_value").build();
+            return AuthTargetMapping.builder().addMapping(TokenType.USERNAME, "index_type", "index_value").build();
         }
 
         @Provides

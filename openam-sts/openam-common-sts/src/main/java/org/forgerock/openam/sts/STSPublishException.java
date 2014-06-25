@@ -14,17 +14,19 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2;
+package org.forgerock.openam.sts;
 
-import org.forgerock.openam.sts.STSPublishException;
-import org.forgerock.openam.sts.TokenCreationException;
+import org.forgerock.json.resource.ResourceException;
 
 /**
- * Defines concern related to obtaining the STSInstanceConfig state corresponding to the sts instance identifier.
- * Allows a single token-generation-service to generate STS-instance-specific tokens.
- *
- * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
+ * Exception thrown for actions related to publishing, removing, or reading STS instances.
  */
-public interface STSInstanceStateProvider<T> {
-    T getSTSInstanceState(String instanceId, String realm) throws TokenCreationException, STSPublishException;
+public class STSPublishException extends ResourceException {
+    public STSPublishException(int code, String message) {
+        super(code, message);
+    }
+    public STSPublishException(int code, String message, Throwable cause) {
+        super(code, message, cause);
+    }
+
 }

@@ -43,8 +43,7 @@ public class AMTokenParserImpl implements AMTokenParser {
 
     @Override
     public String getSessionFromAuthNResponse(Representation representation) throws TokenValidationException {
-        //want to test for header response 200? TODO, or is exception thrown whenever non-200 response returned?
-        String responseBody = null;
+        String responseBody;
         try {
             responseBody = representation.getText();
         } catch (IOException e) {

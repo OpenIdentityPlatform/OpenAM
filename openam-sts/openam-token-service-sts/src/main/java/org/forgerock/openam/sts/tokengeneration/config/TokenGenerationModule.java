@@ -21,10 +21,12 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.MapMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
+import org.forgerock.openam.sts.rest.marshal.RestSTSInstanceConfigMapMarshaller;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactory;
@@ -63,6 +65,8 @@ public class TokenGenerationModule extends AbstractModule {
          */
         bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigPersister.class)
                 .in(Scopes.SINGLETON);
+        bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>() {}).to(RestSTSInstanceConfigMapMarshaller.class);
+
         bind(RestSTSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
         bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
         bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);

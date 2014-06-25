@@ -18,10 +18,13 @@ package org.forgerock.openam.sts.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -78,15 +81,18 @@ public class KeystoreConfig {
             return new KeystoreConfig(this);
         }
     }
+
     /*
-    Define the names of fields to aid in json marshalling.
+    Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
+    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
+    SMS persistence.
      */
-    private static final String KEYSTORE_FILE_NAME = "keystoreFileName";
-    private static final String KEYSTORE_PASSWORD = "keystorePassword";
-    private static final String SIGNATURE_KEY_ALIAS = "signatureKeyAlias";
-    private static final String ENCRYPTION_KEY_ALIAS = "encryptionKeyAlias";
-    private static final String SIGNATURE_KEY_PASSWORD = "signatureKeyPassword";
-    private static final String ENCRYPTION_KEY_PASSWORD = "encryptionKeyPassword";
+    private static final String KEYSTORE_FILE_NAME = "keystore-filename";
+    private static final String KEYSTORE_PASSWORD = "keystore-password";
+    private static final String SIGNATURE_KEY_ALIAS = "keystore-signature-key-alias";
+    private static final String ENCRYPTION_KEY_ALIAS = "keystore-encryption-key-alias";
+    private static final String SIGNATURE_KEY_PASSWORD = "keystore-signature-key-password";
+    private static final String ENCRYPTION_KEY_PASSWORD = "keystore-encryption-key-password";
 
     private final String keystoreFileName;
     private final byte[] keystorePassword;
@@ -199,5 +205,13 @@ public class KeystoreConfig {
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("Unsupported encoding when marshalling from String to to byte[]: " + e, e);
         }
+    }
+
+    public Map<String, Set<String>> marshalToAttributeMap() {
+        return MapMarshallUtils.toSmsMap(toJson().asMap());
+    }
+
+    public static KeystoreConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
+        return fromJson(new JsonValue(MapMarshallUtils.toJsonValueMap(attributeMap)));
     }
 }

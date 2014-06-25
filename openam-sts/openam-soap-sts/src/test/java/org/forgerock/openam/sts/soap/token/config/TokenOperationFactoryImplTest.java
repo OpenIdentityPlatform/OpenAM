@@ -21,7 +21,7 @@ import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
@@ -105,7 +105,7 @@ public class TokenOperationFactoryImplTest {
         @Provides
         AuthTargetMapping authTargetMapping() {
             return AuthTargetMapping.builder()
-                    .addMapping(UsernameToken.class, "index_type", "index_value")
+                    .addMapping(TokenType.USERNAME, "index_type", "index_value")
                     .build();
         }
 

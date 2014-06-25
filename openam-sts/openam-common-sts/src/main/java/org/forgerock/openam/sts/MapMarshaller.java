@@ -14,17 +14,15 @@
  * Copyright 2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.tokengeneration.saml2;
+package org.forgerock.openam.sts;
 
-import org.forgerock.openam.sts.STSPublishException;
-import org.forgerock.openam.sts.TokenCreationException;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Defines concern related to obtaining the STSInstanceConfig state corresponding to the sts instance identifier.
- * Allows a single token-generation-service to generate STS-instance-specific tokens.
- *
- * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
+ * Marshals config state to a Map (and back) for SMS persistence.
  */
-public interface STSInstanceStateProvider<T> {
-    T getSTSInstanceState(String instanceId, String realm) throws TokenCreationException, STSPublishException;
+public interface MapMarshaller<T> {
+    Map<String, Set<String>> marshallAttributesToMap(T instance) throws STSPublishException;
+    T marshallFromMapAttributes(Map<String, Set<String>> attributes) throws STSPublishException;
 }

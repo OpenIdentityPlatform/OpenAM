@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.config;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -25,28 +26,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.google.inject.name.Names;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
 
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
-import org.apache.ws.security.WSSecurityException;
-import org.apache.ws.security.components.crypto.Crypto;
-import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.RestSTSImpl;
-import org.forgerock.openam.sts.STSCallbackHandler;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.marshal.*;
@@ -54,7 +50,6 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
 import org.forgerock.openam.sts.token.*;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
@@ -76,8 +71,6 @@ import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -104,6 +97,8 @@ public class RestSTSInstanceModule extends AbstractModule {
         /*
         we want only one instance of the TokenStore shared among all token operations
         Perhaps this should be a provider - i.e. to leverage the ctor that takes a bus instance? TODO:
+        Do I even want to bind a TokenStore - it seems there only to support SecurityContextTokens, and I don't
+        set it in the TokenValidatorParameters or the TokenProviderParameters. This binding is candidate for removal.
          */
         bind(TokenStore.class).to(DefaultInMemoryTokenStore.class).in(Scopes.SINGLETON);
 
@@ -144,8 +139,6 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
         bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
 
-        bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>() {
-        }).to(RestSTSInstanceConfigPersister.class);
         bind(UrlConstituentCatenator.class).to(UrlConstituentCatenatorImpl.class);
 
         bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
@@ -165,7 +158,17 @@ public class RestSTSInstanceModule extends AbstractModule {
     STSPropertiesMBean getSTSProperties(Logger logger) {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
+        /*
+        The STSCallbackHandler is used to obtain the password for the signature and encryption keys for a given key alias.
+        However, because the REST-STS is not issuing SAML2 assertions via the CXF-STS framework, a signature key is not
+        required. In addition, because encryption key support is usually required in the context of enforcing wsdl-resident
+        SecurityPolicy, bindings, which are obviously not present in the REST-STS, the encryption context is not required
+        either.
+        Furthermore, because OpenAM is issuing SAML2 assertions, and performing all of the token validation, the
+        Crypto context does not need to be initialized at all. Retaining this code for the moment in case this support is required for
+        some pending token transformation.
         stsProperties.setCallbackHandler(new STSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
+
         Crypto crypto = null;
         try {
             crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -177,10 +180,10 @@ public class RestSTSInstanceModule extends AbstractModule {
         stsProperties.setSignatureCrypto(crypto);
         stsProperties.setEncryptionCrypto(crypto);
         stsProperties.setSignatureUsername(stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
-
+        */
         return stsProperties;
     }
-
+/*
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -197,7 +200,7 @@ public class RestSTSInstanceModule extends AbstractModule {
         properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
         return properties;
     }
-
+*/
     /*
     Provides the WSSUsernameTokenValidator provider to the TokenOperationProviderImpl
      */
@@ -237,35 +240,84 @@ public class RestSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getAMDeploymentUrl();
     }
 
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
     @Provides
+    @Singleton
     @Named (AMSTSConstants.REST_AUTHN_URI_ELEMENT)
     String restAuthnUriElement() {
-        return stsInstanceConfig.getAMRestAuthNUriElement();
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_AUTHN_URI_ELEMENT)));
     }
 
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
     @Provides
+    @Singleton
     @Named (AMSTSConstants.REST_LOGOUT_URI_ELEMENT)
     String restLogoutUriElement() {
-        return stsInstanceConfig.getAMRestLogoutUriElement();
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_LOGOUT_URI_ELEMENT)));
     }
 
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
     @Provides
+    @Singleton
     @Named (AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)
     String restAMTokenValidationUriElement() {
-        return stsInstanceConfig.getAMRestIdFromSessionUriElement();
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT)));
     }
 
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
     @Provides
+    @Singleton
     @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
     String tokenGenerationServiceUriElement() {
-        return stsInstanceConfig.getAmRestTokenGenerationServiceUriElement();
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)));
     }
 
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
     @Provides
+    @Singleton
     @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME)
     String getAMSessionCookieName() {
-        return stsInstanceConfig.getAMSessionCookieName();
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.AM_SESSION_COOKIE_NAME)));
     }
+
+    /*
+    Reference the RestSTSInjectorHolder, and the bindings made in the RestSTSModule, to obtain the
+    OpenAM uri information which is global to all STS instances.
+    Singleton so it is only called once.
+     */
+    @Provides
+    @Singleton
+    @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
+    String getJsonRoot() {
+        return RestSTSInjectorHolder.getInstance(Key.get(String.class,
+                Names.named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)));
+    }
+
 
     @Provides
     AuthTargetMapping authTargetMapping() {
@@ -278,16 +330,25 @@ public class RestSTSInstanceModule extends AbstractModule {
         return stsInstanceConfig.getSupportedTokenTranslations();
     }
 
-    @Provides
-    @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT)
-    String getJsonRoot() {
-        return stsInstanceConfig.getJsonRestBase();
-    }
-
+    /*
+    This method is used to identify the rest sts instance. This identification is necessary when consuming
+    the TokenGenerationService, as it is used to look-up the sts-instance-specific configuration state
+    (crypto and SAML2 configurations) when issuing tokens for this sts instance. Note that this identifier
+    does not have to be unique across rest and soap sts instances, as each will be represented by a different
+    service-definition xml file and thus will be stored in a different DN by the SMS. The rest-sts will be identified
+    by a combination of the realm, and the uri element within this realm. The uriElement defines the final endpoint, and
+    it will always be deployed at a url which includes the realm.
+    The value returned from RestSTSInstanceConfig#getDeploymentSubPath() will:
+    1. determine the sub-path added to the crest router which will determine the url at which the sts instance is exposed
+    2. be the most discriminating DN element identifying the config state corresponding to the STS instance in the SMS/LDAP
+    3. Because of #2, the same deployment sub-path will be used to identify the rest sts instance when this instance consumes
+    the TokenGenerationService, thereby allowing the TGS to look-up the instance-specific state necessary to produce
+    instance-specific tokens.
+     */
     @Provides
     @Named(AMSTSConstants.STS_INSTANCE_ID)
     String getSTSInstanceId() {
-        return stsInstanceConfig.getDeploymentConfig().getUriElement();
+        return stsInstanceConfig.getDeploymentSubPath();
     }
 
     /*
@@ -297,7 +358,7 @@ public class RestSTSInstanceModule extends AbstractModule {
     @Provides
     @Inject
     AuthnContextMapper getAuthnContextMapper(Logger logger) {
-        String customMapperClassName = SystemPropertiesManager.get(AMSTSConstants.CUSTOM_STS_AUTHN_CONTEXT_MAPPER_PROPERTY);
+        String customMapperClassName = stsInstanceConfig.getSaml2Config().getCustomAuthNContextMapperClassName();
         if (customMapperClassName == null) {
             return new AuthnContextMapperImpl(logger);
         } else {

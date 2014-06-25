@@ -79,6 +79,7 @@ public class TokenTranslateOperationImplTest {
             bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
             bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(new TypeLiteral<JsonMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
 
             bind(TokenTranslateOperation.class).to(TokenTranslateOperationImpl.class);
         }

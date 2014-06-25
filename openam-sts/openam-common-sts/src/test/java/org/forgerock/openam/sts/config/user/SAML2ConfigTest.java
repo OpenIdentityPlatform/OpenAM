@@ -32,6 +32,7 @@ public class SAML2ConfigTest {
     private static final String CUSTOM_CONDITIONS_PROVIDER = "org.foo.MyCustomConditionsProvider";
     private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER = "org.foo.MyCustomAttributeStatementsProvider";
     private static final String CUSTOM_ATTRIBUTE_MAPPER = "org.foo.MyCustomAttributeMapper";
+    private static final String CUSTOM_AUTHN_CONTEXT_MAPPER = "org.foo.MyCustomAuthNContextMapper";
     private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER = "org.foo.MyCustomAuthenticationStatementsProvider";
     private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER = "org.foo.MyCustomAuthzDecisionStatementsProvider";
     private static final boolean WITH_ATTR_MAP = true;
@@ -124,6 +125,22 @@ public class SAML2ConfigTest {
         assertEquals(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER, reconsitutedConfig.getCustomAuthenticationStatementsProviderClassName());
         assertEquals(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER, reconsitutedConfig.getCustomAttributeStatementsProviderClassName());
         assertEquals(CUSTOM_ATTRIBUTE_MAPPER, reconsitutedConfig.getCustomAttributeMapperClassName());
+        assertEquals(CUSTOM_AUTHN_CONTEXT_MAPPER, reconsitutedConfig.getCustomAuthNContextMapperClassName());
+    }
+
+    @Test
+    public void testMapMarshalRoundTrip() {
+        SAML2Config saml2Config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(saml2Config, SAML2Config.marshalFromAttributeMap(saml2Config.marshalToAttributeMap()));
+
+        saml2Config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(saml2Config, SAML2Config.marshalFromAttributeMap(saml2Config.marshalToAttributeMap()));
+
+        saml2Config = buildConfig(WITH_ATTR_MAP, WITH_AUDIENCES, WITH_CUSTOM_PROVIDERS, SIGN_ASSERTION);
+        assertEquals(saml2Config, SAML2Config.marshalFromAttributeMap(saml2Config.marshalToAttributeMap()));
+
+        saml2Config = buildConfig(!WITH_ATTR_MAP, !WITH_AUDIENCES, !WITH_CUSTOM_PROVIDERS, !SIGN_ASSERTION);
+        assertEquals(saml2Config, SAML2Config.marshalFromAttributeMap(saml2Config.marshalToAttributeMap()));
     }
 
     private SAML2Config buildConfig(boolean withAttributeMap, boolean withAudiences, boolean withCustomProviders, boolean signAssertion) {
@@ -151,6 +168,7 @@ public class SAML2ConfigTest {
             builder.customAttributeStatementsProviderClassName(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER);
             builder.customAuthzDecisionStatementsProviderClassName(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER);
             builder.customAttributeMapperClassName(CUSTOM_ATTRIBUTE_MAPPER);
+            builder.customAuthNContextMapperClassName(CUSTOM_AUTHN_CONTEXT_MAPPER);
         }
         return builder.build();
     }

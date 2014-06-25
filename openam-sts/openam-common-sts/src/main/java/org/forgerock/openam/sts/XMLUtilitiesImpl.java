@@ -18,10 +18,13 @@ package org.forgerock.openam.sts;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.json.resource.ResourceException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 
 /**
  * @see org.forgerock.openam.sts.XMLUtilities
@@ -39,5 +42,13 @@ public class XMLUtilitiesImpl implements XMLUtilities {
 
     public Document newSafeDocument(boolean schemaValidation) throws ParserConfigurationException {
         return XMLUtils.getSafeDocumentBuilder(schemaValidation).newDocument();
+    }
+
+    public Transformer getNewTransformer() throws TokenMarshalException {
+        try {
+            return XMLUtils.getTransformerFactory().newTransformer();
+        } catch (TransformerConfigurationException e) {
+            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
+        }
     }
 }

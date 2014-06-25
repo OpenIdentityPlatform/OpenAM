@@ -60,9 +60,9 @@ public class SAML2TokenState {
     /*
     These variables are public so that hand-rolled JsonValues corresponding to SAML2TokenState can be created.
      */
-    public static final String SUBJECT_CONFIRMATION = "subjectConfirmation";
-    public static final String PROOF_TOKEN_STATE = "proofTokenState";
-    public static final String SP_ACS_URL = "serviceProviderAssertionConsumerServiceUrl";
+    public static final String SUBJECT_CONFIRMATION = "subject_confirmation";
+    public static final String PROOF_TOKEN_STATE = "proof_token_state";
+    public static final String SP_ACS_URL = "service_provider_assertion_consumer_service_url";
 
     private final SAML2SubjectConfirmation subjectConfirmation;
     private final ProofTokenState proofTokenState;

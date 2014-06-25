@@ -16,10 +16,9 @@
 
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
-import com.google.inject.Inject;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.restlet.engine.header.Header;
 import org.restlet.representation.Representation;

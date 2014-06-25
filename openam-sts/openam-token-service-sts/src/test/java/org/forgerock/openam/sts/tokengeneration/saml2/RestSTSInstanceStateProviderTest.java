@@ -19,9 +19,9 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.TypeLiteral;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.STSPublishException;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
@@ -30,7 +30,6 @@ import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
 import org.slf4j.Logger;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.when;
 
 public class RestSTSInstanceStateProviderTest {
     private static final String DEPLOYMENT_URL_ELEMENT = "bobo/inst1";
+    private static final String REALM = "/";
     private RestSTSInstanceStateProvider provider;
     private RestSTSInstanceConfigPersister mockConfigPersister;
     private RestSTSInstanceStateFactory mockRestSTSInstanceStateFactory;
@@ -77,21 +77,21 @@ public class RestSTSInstanceStateProviderTest {
     }
 
     @Test
-    public void verifyCaching() throws TokenCreationException {
+    public void verifyCaching() throws TokenCreationException, STSPublishException {
         RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig(DEPLOYMENT_URL_ELEMENT);
-        when(mockConfigPersister.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT)).thenReturn(instanceConfig);
+        when(mockConfigPersister.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(instanceConfig);
         when(mockRestSTSInstanceStateFactory.createRestSTSInstanceState(any(RestSTSInstanceConfig.class))).thenReturn(mockRestSTSInstanceState);
-        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT);
-        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT);
+        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);
+        provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);
         verify(mockRestSTSInstanceStateFactory, times(1)).createRestSTSInstanceState(instanceConfig);
     }
 
     private RestSTSInstanceConfig createSAMLRestInstanceConfig(String urlElement) {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, String> context = new HashMap<String, String>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "service", "ldapService")
-                .addMapping(OpenIdConnectIdToken.class, "module", "oidc", context)
+                .addMapping(TokenType.USERNAME, "service", "ldapService")
+                .addMapping(TokenType.OPENIDCONNECT, "module", "oidc", context)
                 .build();
         RestDeploymentConfig deploymentConfig =
                 RestDeploymentConfig.builder()
@@ -128,12 +128,6 @@ public class RestSTSInstanceStateProviderTest {
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl("http:/host.com:8080/openam")
-                .amJsonRestBase("/json")
-                .amRestAuthNUriElement("/authenticate")
-                .amRestLogoutUriElement("/sessions/?_action=logout")
-                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
-                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
-                .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("http://macbook.dirk.internal.forgerock.com:8080/openam")

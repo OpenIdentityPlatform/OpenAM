@@ -21,9 +21,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.iplanet.sso.SSOToken;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -33,7 +32,6 @@ import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.AttributeMapper;
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultAttributeStatementsProvider;
@@ -198,11 +196,11 @@ public class SAML2TokenGenerationImplTest {
     }
 
     private RestSTSInstanceConfig getRestSTSInstanceConfig(boolean signAssertion) throws UnsupportedEncodingException {
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, String> context = new HashMap<String, String>();
         context.put(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY, "oidc_id_token");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "service", "ldapService")
-                .addMapping(OpenIdConnectIdToken.class, "module", "oidc", context)
+                .addMapping(TokenType.USERNAME, "service", "ldapService")
+                .addMapping(TokenType.OPENIDCONNECT, "module", "oidc", context)
                 .build();
         RestDeploymentConfig deploymentConfig =
                 RestDeploymentConfig.builder()
@@ -240,12 +238,6 @@ public class SAML2TokenGenerationImplTest {
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
                 .amDeploymentUrl("http://host.com:8080/openam")
-                .amJsonRestBase("/json")
-                .amRestAuthNUriElement("/authenticate")
-                .amRestLogoutUriElement("/sessions/?_action=logout")
-                .amRestIdFromSessionUriElement("/users/?_action=idFromSession")
-                .amRestTokenGenerationServiceUriElement("/sts_tokengen/issue?_action=issue")
-                .amSessionCookieName("iPlanetDirectoryPro")
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("idpEntityId")

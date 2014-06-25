@@ -20,6 +20,7 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -53,5 +54,12 @@ public class TokenTransformConfigTest {
 
         TokenTransformConfig ttc4 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         assertTrue(ttc4.equals(TokenTransformConfig.fromJson(ttc4.toJson())));
+    }
+
+    @Test
+    public void testStringRepresentationRoundTrip() {
+        TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+        assertEquals(ttc1, TokenTransformConfig.fromSMSString(ttc1.toSMSString()));
+
     }
 }

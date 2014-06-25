@@ -16,17 +16,21 @@
 
 package org.forgerock.openam.sts.config.user;
 
-import com.sun.identity.saml2.common.SAML2Constants;
+import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -41,8 +45,13 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * TODO: do I want a name-qualifier in addition to a nameIdFormat?
  */
 public class SAML2Config {
+    private static final String BAR = "|";
     public static class SAML2ConfigBuilder {
-        private String nameIdFormat = SAML2Constants.UNSPECIFIED;
+        /*
+        use the ws-security constant, instead of the SAML2Constants defined in openam-federation, as this dependency
+        introduces a dependency on openam-core, which pulls the ws-* dependencies into the soap-sts, which I don't want.
+         */
+        private String nameIdFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
         private Map<String, String> attributeMap;
         private long tokenLifetimeInSeconds = 60 * 10; //default token lifetime is 10 minutes
         /**
@@ -57,6 +66,7 @@ public class SAML2Config {
         private String customAttributeStatementsProviderClassName;
         private String customAuthzDecisionStatementsProviderClassName;
         private String customAttributeMapperClassName;
+        private String customAuthNContextMapperClassName;
         private String canonicalizationAlgorithm = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
         private String signatureAlgorithm;
         private boolean signAssertion = true;
@@ -112,6 +122,11 @@ public class SAML2Config {
             return this;
         }
 
+        public SAML2ConfigBuilder customAuthNContextMapperClassName(String customAuthNContextMapperClassName) {
+            this.customAuthNContextMapperClassName = customAuthNContextMapperClassName;
+            return this;
+        }
+
         public SAML2ConfigBuilder canonicalizationAlgorithm(String canonicalizationAlgorithm) {
             this.canonicalizationAlgorithm = canonicalizationAlgorithm;
             return this;
@@ -122,7 +137,9 @@ public class SAML2Config {
         One issue with maintaining a static map of valid values is that the xmlsec package allows for the dynamic registration
         of handlers for new signature specification types. It could make sense to new up an instance of the
         org.apache.xml.security.algorithms.SignatureAlgorithm class with the specified algorithm, but this is a bit hacky,
-        and requires a Document parameter as well. The allows set of algorithms is probably best handled in documentation.
+        and requires a Document parameter as well. The allowed set of algorithms is probably best handled in documentation.
+        If no algorithm is set, either http://www.w3.org/2000/09/xmldsig#dsa-sha1 or http://www.w3.org/2000/09/xmldsig#rsa-sha1
+        is used, depending upon the type of the private key.
          */
         public SAML2ConfigBuilder signatureAlgorithm(String signatureAlgorithm) {
             this.signatureAlgorithm = signatureAlgorithm;
@@ -139,22 +156,26 @@ public class SAML2Config {
             return new SAML2Config(this);
         }
     }
+
     /*
-    Define the names of fields to aid in json marshalling.
+    Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
+    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
+    SMS persistence.
      */
-    private static final String NAME_ID_FORMAT = "nameIdFormat";
-    private static final String ATTRIBUTE_MAP = "attributeMap";
-    private static final String TOKEN_LIFETIME = "tokenLifetime";
-    private static final String AUDIENCES = "audiences";
-    private static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "customConditionsProviderClass";
-    private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "customSubjectProviderClass";
-    private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "customAttributeStatementsProviderClass";
-    private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS = "customAuthenticationStatementsProviderClass";
-    private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "customAuthzDecisionStatementsProviderClass";
-    private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "customAttributeMapperClass";
-    private static final String SIGNATURE_ALGORITHM = "signatureAlgorithm";
-    private static final String CANONICALIZATION_ALGORITHM = "canonicalizationAlgorithm";
-    private static final String SIGN_ASSERTION = "signAssertion";
+    private static final String NAME_ID_FORMAT = "saml2-name-id-format";
+    private static final String ATTRIBUTE_MAP = "saml2-attribute-map";
+    private static final String TOKEN_LIFETIME = "saml2-token-lifetime-seconds";
+    private static final String AUDIENCES = "saml2-audiences";
+    private static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
+    private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
+    private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "saml2-custom-attribute-statements-provider-class-name";
+    private static final String CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authentication-statements-provider-class-name";
+    private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authz-decision-statements-provider-class-name";
+    private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "saml2-custom-attribute-mapper-class-name";
+    private static final String CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS = "saml2-custom-authn-context-mapper-class-name";
+    private static final String SIGNATURE_ALGORITHM = "saml2-signature-algorithm";
+    private static final String CANONICALIZATION_ALGORITHM = "saml2-canonicalization-algorithm";
+    private static final String SIGN_ASSERTION = "saml2-sign-assertion";
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
@@ -166,6 +187,7 @@ public class SAML2Config {
     private final String customAttributeStatementsProviderClassName;
     private final String customAuthzDecisionStatementsProviderClassName;
     private final String customAttributeMapperClassName;
+    private final String customAuthNContextMapperClassName;
     private final String signatureAlgorithm;
     private final String canonicalizationAlgorithm;
     private final boolean signAssertion;
@@ -189,6 +211,7 @@ public class SAML2Config {
         customAuthzDecisionStatementsProviderClassName = builder.customAuthzDecisionStatementsProviderClassName;
         customAttributeStatementsProviderClassName = builder.customAttributeStatementsProviderClassName;
         customAttributeMapperClassName = builder.customAttributeMapperClassName;
+        customAuthNContextMapperClassName = builder.customAuthNContextMapperClassName;
         signatureAlgorithm = builder.signatureAlgorithm;
         canonicalizationAlgorithm = builder.canonicalizationAlgorithm;
         this.signAssertion = builder.signAssertion;
@@ -237,6 +260,10 @@ public class SAML2Config {
         return customAttributeMapperClassName;
     }
 
+    public String getCustomAuthNContextMapperClassName() {
+        return customAuthNContextMapperClassName;
+    }
+
     public String getCustomAttributeStatementsProviderClassName() {
         return customAttributeStatementsProviderClassName;
     }
@@ -269,6 +296,7 @@ public class SAML2Config {
         sb.append('\t').append("customSubjectProviderClassName: ").append(customSubjectProviderClassName).append('\n');
         sb.append('\t').append("customAttributeStatementsProviderClassName: ").append(customAttributeStatementsProviderClassName).append('\n');
         sb.append('\t').append("customAttributeMapperClassName: ").append(customAttributeMapperClassName).append('\n');
+        sb.append('\t').append("customAuthNContextMapperClassName: ").append(customAuthNContextMapperClassName).append('\n');
         sb.append('\t').append("customAuthenticationStatementsProviderClassName: ").append(customAuthenticationStatementsProviderClassName).append('\n');
         sb.append('\t').append("customAuthzDecisionStatementsProviderClassName: ").append(customAuthzDecisionStatementsProviderClassName).append('\n');
         sb.append('\t').append("signatureAlgorithm: ").append(signatureAlgorithm).append('\n');
@@ -301,6 +329,9 @@ public class SAML2Config {
                     (customAttributeMapperClassName != null
                             ? customAttributeMapperClassName.equals(otherConfig.getCustomAttributeMapperClassName())
                             : otherConfig.getCustomAttributeMapperClassName() == null) &&
+                    (customAuthNContextMapperClassName != null
+                            ? customAuthNContextMapperClassName.equals(otherConfig.getCustomAuthNContextMapperClassName())
+                            : otherConfig.getCustomAuthNContextMapperClassName() == null) &&
                     (customAuthenticationStatementsProviderClassName != null
                         ? customAuthenticationStatementsProviderClassName.equals(otherConfig.getCustomAuthenticationStatementsProviderClassName())
                         : otherConfig.getCustomAuthenticationStatementsProviderClassName() == null) &&
@@ -319,18 +350,24 @@ public class SAML2Config {
         return (nameIdFormat + attributeMap + audiences + canonicalizationAlgorithm + Long.toString(tokenLifetimeInSeconds)).hashCode();
     }
 
+    /*
+    Because toJson will be used to produce the map that will also be used to marshal to the SMS attribute map format, and
+    because the SMS attribute map format represents all values as Set<String>, I need to represent all of the json values
+    as strings as well.
+     */
     public JsonValue toJson() {
         JsonValue jsonValue = json(object(
                 field(NAME_ID_FORMAT, nameIdFormat),
-                field(TOKEN_LIFETIME, tokenLifetimeInSeconds),
+                field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
                 field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
                 field(CUSTOM_SUBJECT_PROVIDER_CLASS, customSubjectProviderClassName),
                 field(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS, customAttributeStatementsProviderClassName),
                 field(CUSTOM_ATTRIBUTE_MAPPER_CLASS, customAttributeMapperClassName),
+                field(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS, customAuthNContextMapperClassName),
                 field(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, customAuthenticationStatementsProviderClassName),
                 field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
                 field(SIGNATURE_ALGORITHM, signatureAlgorithm),
-                field(SIGN_ASSERTION, signAssertion),
+                field(SIGN_ASSERTION, String.valueOf(signAssertion)),
                 field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm)));
 
         JsonValue jsonValueAttributeMap = new JsonValue(new HashMap<String, Object>());
@@ -348,15 +385,18 @@ public class SAML2Config {
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
         SAML2ConfigBuilder builder = SAML2Config.builder()
                 .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
-                .tokenLifetimeInSeconds(json.get(TOKEN_LIFETIME).asLong())
+                //because we have to go to the SMS Map representation, where all values are Set<String>, I need to
+                // pull the value from Json as a string, and then parse out a Long.
+                .tokenLifetimeInSeconds(Long.valueOf(json.get(TOKEN_LIFETIME).asString()))
                 .customConditionsProviderClassName(json.get(CUSTOM_CONDITIONS_PROVIDER_CLASS).asString())
                 .customSubjectProviderClassName(json.get(CUSTOM_SUBJECT_PROVIDER_CLASS).asString())
                 .customAttributeStatementsProviderClassName(json.get(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS).asString())
                 .customAttributeMapperClassName(json.get(CUSTOM_ATTRIBUTE_MAPPER_CLASS).asString())
+                .customAuthNContextMapperClassName(json.get(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS).asString())
                 .customAuthenticationStatementsProviderClassName(json.get(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS).asString())
                 .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
                 .signatureAlgorithm(json.get(SIGNATURE_ALGORITHM).asString())
-                .signAssertion(json.get(SIGN_ASSERTION).asBoolean())
+                .signAssertion(Boolean.valueOf(json.get(SIGN_ASSERTION).asString()))
                 .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString());
 
         JsonValue jsonAttributes = json.get(ATTRIBUTE_MAP);
@@ -384,5 +424,78 @@ public class SAML2Config {
         builder.audiences(toBeSetAudiences);
 
         return builder.build();
+    }
+
+    /*
+    We need to marshal the SAML2Config instance to a Map<String, Object>. The JsonValue of toJson gets us there,
+    except for the complex types for the audiences and attribute map. These need to be marshaled into a Set<String>, and
+    these entries included in the top-level map, replacing the existing complex entries.
+     */
+    public Map<String, Set<String>> marshalToAttributeMap() {
+        Map<String, Object> preMap = toJson().asMap();
+        Map<String, Set<String>> finalMap = MapMarshallUtils.toSmsMap(preMap);
+        Object attributesObject = preMap.get(ATTRIBUTE_MAP);
+        if (attributesObject instanceof Map) {
+            finalMap.remove(ATTRIBUTE_MAP);
+            Set<String> attributeValues = new HashSet<String>();
+            finalMap.put(ATTRIBUTE_MAP, attributeValues);
+            for (Map.Entry<String, String> entry : ((Map<String, String>)attributesObject).entrySet()) {
+                attributeValues.add(entry.getKey() + BAR + entry.getValue());
+            }
+        } else {
+            throw new IllegalStateException("Type corresponding to " + ATTRIBUTE_MAP + " key unexpected. Type: "
+                    + (attributesObject != null ? attributesObject.getClass().getName() :" null"));
+        }
+
+        Object audiencesObject = preMap.get(AUDIENCES);
+        if ((audiencesObject instanceof JsonValue) && ((JsonValue) audiencesObject).isList()) {
+            finalMap.remove(AUDIENCES);
+            Set<String> audienceValues = new HashSet<String>();
+            finalMap.put(AUDIENCES, audienceValues);
+            for (Object obj : ((JsonValue)audiencesObject).asList()) {
+                audienceValues.add(obj.toString());
+            }
+        } else {
+            throw new IllegalStateException("Type corresponding to " + AUDIENCES + " key unexpected. Type: "
+                    + (audiencesObject != null ? audiencesObject.getClass().getName() :" null"));
+        }
+        return finalMap;
+    }
+
+    /*
+    Here we have to modify the ATTRIBUTE_MAP and AUDIENCES entries to match the JsonValue format expected by
+    fromJson, and then call the static fromJson. This method must marshal between the Json representation of a complex
+    object, and the representation expected by the SMS
+     */
+    public static SAML2Config marshalFromAttributeMap(Map<String, Set<String>> smsAttributeMap) {
+        Set<String> attributes = smsAttributeMap.get(ATTRIBUTE_MAP);
+        /*
+        The STSInstanceConfig may not have SAML2Config, if there are no defined token transformations that result
+        in a SAML2 assertion. So if we have null attributes, this means that STSInstanceConfig.marshalFromAttributeMap
+        was called. Note that we cannot check for isEmpty, as this will be the case if SAML2Config has been defined, but
+        simply without any attributes.
+         */
+        if (attributes == null) {
+            return null;
+        }
+        Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(smsAttributeMap);
+        jsonAttributes.remove(ATTRIBUTE_MAP);
+        HashMap<String, Object> jsonAttributeMap = new HashMap<String, Object>();
+        for (String entry : attributes) {
+            StringTokenizer st = new StringTokenizer(entry, BAR);
+            jsonAttributeMap.put(st.nextToken(), st.nextToken());
+        }
+        jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));
+
+        /*
+        AUDIENCES is a Set<String> in the smsAttributeMap, but fromJson expects a List.
+         */
+        jsonAttributes.remove(AUDIENCES);
+        JsonValue jsonAudiences = new JsonValue(new ArrayList<Object>());
+        List<Object> audienceList = jsonAudiences.asList();
+        audienceList.addAll(smsAttributeMap.get(AUDIENCES));
+        jsonAttributes.put(AUDIENCES, jsonAudiences);
+
+        return fromJson(new JsonValue(jsonAttributes));
     }
 }

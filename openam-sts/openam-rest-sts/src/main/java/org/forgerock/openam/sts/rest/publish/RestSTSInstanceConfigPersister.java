@@ -16,74 +16,209 @@
 
 package org.forgerock.openam.sts.rest.publish;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.MapMarshaller;
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @see org.forgerock.openam.sts.publish.STSInstanceConfigPersister
- *
- * It may be that this class will ultimately reference the SMS in OpenAM to persist(remove) the json corresponding to the
- * STSInstanceConfig. For now, the implementation remains empty. And it will likely only persist to the SMS, as the
- * publish service will only be deployed with OpenAM - so I don't have to worry about filesystem persistence for a
- * remote STS deployment. Thus some startup context associated with the REST-STS will simply perform a GET on the
- * REST STS Publish service, which will consult the STSInstancePersister, to pull all of the RestSTSInstanceConfigs out
- * of the SMS.
- *
- * TODO: right now, this class is just implementing an in-memory caching of RestSTSInstanceConfig state. This is just
- * so published Rest STS instances can be referenced by invocations against the token generation service. Soon it will
- * hit the SMS. At that point, some checked-exceptions will be thrown if entries cannot be found, etc.
- *
- * A distinct instance of this class will be bound in the rest-sts and in the token-gen service. Once they both
- * pull state from the SMS, that will be irrelevant, but now that the state is pulled from an in-memory map, this
- * reference has to be static to be visible across both instances. Cheesy, but temporary, to be replaced this class
- * persists to the SMS.
- *
  */
 public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersister<RestSTSInstanceConfig> {
-    private static final ConcurrentHashMap<String, RestSTSInstanceConfig> configStore = new ConcurrentHashMap<String, RestSTSInstanceConfig>();
+    private static final int PRIORITY_ZERO = 0;
+
+    private static final String ROOT_REALM = "/";
+    private final SSOToken adminToken;
+    private final MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller;
     private final Logger logger;
 
     @Inject
-    public RestSTSInstanceConfigPersister(Logger logger)  {
+    RestSTSInstanceConfigPersister(MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller, Logger logger) {
+        this.instanceConfigMapMarshaller = instanceConfigMapMarshaller;
+        adminToken =  AccessController.doPrivileged(AdminTokenAction.getInstance());
         this.logger = logger;
     }
 
-    public void persistSTSInstance(String key, RestSTSInstanceConfig instance) {
+    public synchronized void persistSTSInstance(String stsInstanceId, RestSTSInstanceConfig instance) throws STSPublishException {
+        try {
+            /*
+            Model for code below taken from AMAuthenticationManager.createAuthenticationInstance, as the 'multiple authN module per realm'
+            model applies to the STS, and the AMAuthenticationManager seems to implement the SMS persistence concern of these semantics.
+             */
+            OrganizationConfigManager organizationConfigManager =
+                    new OrganizationConfigManager(adminToken, instance.getDeploymentConfig().getRealm());
+            Map<String, Set<String>> instanceConfigAttributes = instanceConfigMapMarshaller.marshallAttributesToMap(instance);
+
+            if (!organizationConfigManager.getAssignedServices().contains(AMSTSConstants.REST_STS_SERVICE_NAME)) {
+                organizationConfigManager.assignService(AMSTSConstants.REST_STS_SERVICE_NAME, null);
+            }
+            ServiceConfig orgConfig = organizationConfigManager.getServiceConfig(AMSTSConstants.REST_STS_SERVICE_NAME);
+            if (orgConfig == null) {
+                orgConfig = organizationConfigManager.addServiceConfig(AMSTSConstants.REST_STS_SERVICE_NAME, null);
+            }
+            orgConfig.addSubConfig(stsInstanceId, ISAuthConstants.SERVER_SUBSCHEMA,
+                    PRIORITY_ZERO, instanceConfigAttributes);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Persisted sts instance with id " + stsInstanceId + " in realm " + instance.getDeploymentConfig().getRealm());
+            }
+
+        } catch (SMSException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught persisting RestSTSInstanceConfig instance: " + e, e);
+        } catch (SSOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught persisting RestSTSInstanceConfig instance: " + e, e);
+        }
+    }
+
+    public synchronized void removeSTSInstance(String stsInstanceId, String realm) throws STSPublishException {
         /*
-        Not worried about threading issues - this implementation is temporary.
+        Model for code below taken from AMAuthenticationManager.deleteAuthenticationInstance, as the 'multiple authN module per realm'
+        model applies to the STS, and the AMAuthenticationManager seems to implement the SMS persistence concern of these semantics.
          */
-        if (configStore.get(key) != null) {
-            throw new IllegalStateException("RestSTSInstanceConfig for key " + key + " already present!");
+        ServiceConfig baseService;
+        try {
+            baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                baseService.removeSubConfig(stsInstanceId);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("REST STS instance " + stsInstanceId + " in realm " + realm + " removed from persistent store.");
+                }
+            } else {
+                throw new STSPublishException(ResourceException.NOT_FOUND,
+                        "Could not create ServiceConfigManager for realm " + realm +
+                                " in order to remove Rest STS instance with id " + stsInstanceId);
+            }
+        } catch (SMSException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught removing Rest STS instance with id " + stsInstanceId + " from realm "
+                            + realm +". Exception: " + e, e);
+        } catch (SSOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught removing Rest STS instance with id " + stsInstanceId + " from realm "
+                            + realm +". Exception: " + e, e);
         }
-        configStore.put(key, instance);
-        logger.info("Persisted RestSTSInstanceConfig corresponding to key " + key);
     }
 
-    public void removeSTSInstance(String key) {
-        RestSTSInstanceConfig removedEntry = configStore.remove(key);
-        if (removedEntry == null) {
-            logger.error("In removeSTSInstance, no existing RESTSTSInstanceConfig corresponding to key " + key);
-        } else {
-            logger.info("Removed RestSTSInstanceConfig corresponding to key " + key);
+    public RestSTSInstanceConfig getSTSInstanceConfig(String stsInstanceId, String realm) throws STSPublishException {
+        try {
+            /*
+            Model for code below taken from AMAuthenticationManager.getAuthenticationInstance, as the 'multiple authN module per realm'
+            model applies to the STS, and the AMAuthenticationManager seems to implement the SMS persistence concern of these semantics.
+             */
+            ServiceConfig baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                ServiceConfig instanceService = baseService.getSubConfig(stsInstanceId);
+                if (instanceService != null) {
+                    Map<String, Set<String>> instanceAttrs = instanceService.getAttributes();
+                    return RestSTSInstanceConfig.marshalFromAttributeMap(instanceAttrs);
+                } else {
+                    throw new STSPublishException(ResourceException.NOT_FOUND,
+                            "Error reading RestSTSInstanceConfig instance from SMS: no instance state in realm " + realm
+                                    + " corresponding to instance id " + stsInstanceId);
+                }
+            } else {
+                throw new STSPublishException(ResourceException.NOT_FOUND,
+                        "Error reading RestSTSInstanceConfig instance from SMS: no base instance state in realm " + realm);
+            }
+        } catch (SSOException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught reading RestSTSInstanceConfig instance from SMS: " + e, e);
+        } catch (SMSException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught reading RestSTSInstanceConfig instance from SMS: " + e, e);
+        } catch (IllegalStateException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught reading RestSTSInstanceConfig instance from SMS: " + e, e);
         }
     }
 
-    public RestSTSInstanceConfig getSTSInstanceConfig(String key) {
-        RestSTSInstanceConfig config = configStore.get(key);
-        if (config ==  null) {
-            throw new IllegalStateException("No RestSTSInstanceConfig corresponding to key " + key);
+    public List<RestSTSInstanceConfig> getAllPublishedInstances() throws STSPublishException {
+        List<RestSTSInstanceConfig> instances = new ArrayList<RestSTSInstanceConfig>();
+        for (String realm : getAllRealmNames()) {
+            ServiceConfig baseService;
+            try {
+                baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+            } catch (SMSException e) {
+                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
+                        ". Rest STS instances for this realm cannot be returned from getAllPublishedInstances. " +
+                        "Exception: " + e);
+                continue;
+            } catch (SSOException e) {
+                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
+                        ". Rest STS instances for this realm cannot be returned from getAllPublishedInstances. " +
+                        "Exception: " + e);
+                continue;
+            }
+            if (baseService != null) {
+                Set<String> subConfigNames;
+                try {
+                    subConfigNames = baseService.getSubConfigNames();
+                } catch (SMSException e) {
+                    logger.error("Could not get list of RestSTSInstances in realm " + realm + ". Exception: " + e);
+                    continue;
+                }
+                for (String stsInstanceId : subConfigNames) {
+                    ServiceConfig instanceService;
+                    try {
+                        instanceService = baseService.getSubConfig(stsInstanceId);
+                    } catch (SSOException e) {
+                        logger.error("Could not get RestSTSInstance state for id " + stsInstanceId + " in realm " + realm + ". Exception: " + e);
+                        continue;
+                    } catch (SMSException e) {
+                        logger.error("Could not get RestSTSInstance state for id " + stsInstanceId + " in realm " + realm + ". Exception: " + e);
+                        continue;
+                    }
+                    if (instanceService != null) {
+                        Map<String, Set<String>> instanceAttrs = instanceService.getAttributes();
+                        //TODO - if the marshalFromAttributeMap throws a STSPublishException, I should catch it here, log and continue.
+                        instances.add(RestSTSInstanceConfig.marshalFromAttributeMap(instanceAttrs));
+                    } else {
+                        logger.error("Could not obtain the RestSTSInstanceConfig state for instance with id " + stsInstanceId + " in realm " + realm);
+                    }
+                }
+            } else {
+                logger.error("Could not obtain ServiceConfig instance for realm " + realm +
+                        ". Rest STS instances for this realm cannot be returned from getAllPublishedInstances.");
+            }
         }
-        return config;
+        return instances;
     }
 
-    public List<RestSTSInstanceConfig> getAllPublishedInstances() {
-        return Collections.unmodifiableList(new ArrayList<RestSTSInstanceConfig>(configStore.values()));
+    private Set<String> getAllRealmNames() throws STSPublishException {
+        Set<String> realmNames = new HashSet<String>();
+        /*
+        The OrganizationConfigManager#SubOrganizationNames only returns realms under the root realm. The root
+        realm needs to be added separately
+         */
+        realmNames.add(AMSTSConstants.ROOT_REALM);
+        try {
+            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, ROOT_REALM);
+            realmNames.addAll(ocm.getSubOrganizationNames());
+            return realmNames;
+        } catch (SMSException e) {
+            throw new STSPublishException(ResourceException.INTERNAL_ERROR,
+                    "Could not obtain list of realms from the OrganizationConfigManager. " +
+                    "This means list of previously-published rest sts instances cannot be returned. Exception: " + e);
+        }
     }
 }

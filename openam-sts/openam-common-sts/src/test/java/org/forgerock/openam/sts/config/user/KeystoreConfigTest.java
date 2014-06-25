@@ -21,8 +21,8 @@ import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 public class KeystoreConfigTest {
     @Test
@@ -45,8 +45,8 @@ public class KeystoreConfigTest {
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
 
-        assertTrue(kc1.equals(kc2));
-        assertTrue(kc1.hashCode() == kc2.hashCode());
+        assertEquals(kc1, kc2);
+        assertEquals(kc1.hashCode(), kc2.hashCode());
     }
 
     @Test
@@ -67,8 +67,8 @@ public class KeystoreConfigTest {
                 .signatureKeyAlias("e")
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
-        assertFalse(kc1.equals(kc2));
-        assertFalse(kc1.hashCode() == kc2.hashCode());
+        assertNotEquals(kc1, kc2);
+        assertNotEquals(kc1.hashCode(), kc2.hashCode());
 
         KeystoreConfig kc3 = KeystoreConfig.builder()
                 .encryptionKeyAlias("a")
@@ -87,9 +87,9 @@ public class KeystoreConfigTest {
                 .signatureKeyAlias("e")
                 .signatureKeyPassword("ff".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
-        assertFalse(kc3.equals(kc4));
-        assertFalse(kc3.hashCode() == kc4.hashCode());
-        assertFalse(kc3.equals("bobo"));
+        assertNotEquals(kc3, kc4);
+        assertNotEquals(kc3.hashCode(), kc4.hashCode());
+        assertNotEquals(kc3, "bobo");
     }
 
     @Test (expectedExceptions = NullPointerException.class)
@@ -114,8 +114,8 @@ public class KeystoreConfigTest {
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
 
-        assertTrue("b".equals(new String(kc1.getEncryptionKeyPassword())));
-        assertTrue("f".equals(new String(kc1.getSignatureKeyPassword())));
+        assertEquals("b", new String(kc1.getEncryptionKeyPassword()));
+        assertEquals("f", new String(kc1.getSignatureKeyPassword()));
     }
 
     @Test
@@ -128,6 +128,21 @@ public class KeystoreConfigTest {
                 .signatureKeyAlias("e")
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
-        assertTrue(kc1.equals(KeystoreConfig.fromJson(kc1.toJson())));
+        assertEquals(kc1, KeystoreConfig.fromJson(kc1.toJson()));
+    }
+
+    @Test
+    public void testAttributeMappingRoundTrip() throws UnsupportedEncodingException {
+        KeystoreConfig kc1 = KeystoreConfig.builder()
+                .encryptionKeyAlias("a")
+                .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .fileName("c")
+                .password("d".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .signatureKeyAlias("e")
+                .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .build();
+
+        assertEquals(kc1, KeystoreConfig.marshalFromAttributeMap(kc1.marshalToAttributeMap()));
+
     }
 }

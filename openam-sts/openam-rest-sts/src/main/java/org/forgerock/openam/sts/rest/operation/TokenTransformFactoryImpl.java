@@ -173,13 +173,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                         new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
                                 amSessionCookieName, urlConstituentCatenator, logger);
                 return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
-                        threadLocalAMTokenCache, stsInstanceId, xmlUtilities, authnContextMapper, logger);
+                        threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
             } catch (URISyntaxException e) {
                 throw new STSInitializationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
             }
         } else {
             return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, NULL_AM_SESSION_INVALIDATOR,
-                    threadLocalAMTokenCache, stsInstanceId, xmlUtilities, authnContextMapper, logger);
+                    threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
         }
     }
 }

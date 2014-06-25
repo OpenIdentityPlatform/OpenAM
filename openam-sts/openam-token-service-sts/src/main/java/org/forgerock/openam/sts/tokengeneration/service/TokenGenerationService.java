@@ -33,6 +33,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
@@ -104,11 +105,15 @@ class TokenGenerationService implements SingletonResourceProvider {
                 try {
                     final String assertion = saml2TokenGeneration.generate(
                             subjectToken,
-                            restStsInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId()),
+                            restStsInstanceStateProvider.getSTSInstanceState(invocationState.getStsInstanceId(), invocationState.getRealm()),
                             invocationState);
                     handler.handleResult(json(object(field(AMSTSConstants.ISSUED_TOKEN, assertion))));
                     return;
                 } catch (TokenCreationException e) {
+                    logger.error("Exception caught generating saml2 token: " + e, e);
+                    handler.handleError(e);
+                    return;
+                } catch (STSPublishException e) {
                     logger.error("Exception caught generating saml2 token: " + e, e);
                     handler.handleError(e);
                     return;

@@ -85,12 +85,6 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         return sb.toString();
     }
 
-    /*
-    TODO: it may well be that the name of the Principal should not just correspond to the id of the subject whose authentication
-    the session represents, but any given (user configured) attribute that the user wants to pull from this particular principal.
-    And will there always be a id? Obviously if we are authenticating via LDAP, but what if the sessionId corresponds to some other
-    type of authentication?
-     */
     private Principal obtainPrincipalFromSession(String sessionToUsernameUrl, String sessionId) throws TokenValidationException {
         if ((sessionId == null) || sessionId.isEmpty()) {
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR,

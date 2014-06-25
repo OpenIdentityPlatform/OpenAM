@@ -18,7 +18,6 @@ package org.forgerock.openam.sts.token.provider;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AMSTSRuntimeException;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
@@ -54,6 +53,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     public String getSAML2BearerAssertion(String ssoTokenString,
                                           String stsInstanceId,
+                                          String realm,
                                           String serviceProviderAssertionConsumerServiceUrl,
                                           String authnContextClassRef) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
@@ -61,6 +61,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         SAML2SubjectConfirmation.BEARER,
                         authnContextClassRef,
                         stsInstanceId,
+                        realm,
                         ssoTokenString);
         invocationStateBuilder.serviceProviderAssertionConsumerServiceUrl(serviceProviderAssertionConsumerServiceUrl);
         return makeInvocation(invocationStateBuilder.build().toJson().toString());
@@ -68,18 +69,21 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     public String getSAML2SenderVouchesAssertion(String ssoTokenString,
                                                  String stsInstanceId,
+                                                 String realm,
                                                  String authnContextClassRef) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
                 buildCommonSaml2Elements(
                         SAML2SubjectConfirmation.SENDER_VOUCHES,
                         authnContextClassRef,
                         stsInstanceId,
+                        realm,
                         ssoTokenString);
         return makeInvocation(invocationStateBuilder.build().toJson().toString());
     }
 
     public String getSAML2HolderOfKeyAssertion(String ssoTokenString,
                                                String stsInstanceId,
+                                               String realm,
                                                String authnContextClassRef,
                                                ProofTokenState proofTokenState) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
@@ -87,6 +91,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         SAML2SubjectConfirmation.HOLDER_OF_KEY,
                         authnContextClassRef,
                         stsInstanceId,
+                        realm,
                         ssoTokenString);
         invocationStateBuilder.proofTokenState(proofTokenState);
         return makeInvocation(invocationStateBuilder.build().toJson().toString());
@@ -95,6 +100,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
     private TokenGenerationServiceInvocationStateBuilder buildCommonSaml2Elements(SAML2SubjectConfirmation subjectConfirmation,
                                                                                   String authnContextClassRef,
                                                                                   String stsInstanceId,
+                                                                                  String realm,
                                                                                   String ssoTokenString) {
         return TokenGenerationServiceInvocationState.builder()
                 .tokenType(TokenType.SAML2)
@@ -102,6 +108,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                 .authNContextClassRef(authnContextClassRef)
                 .stsType(AMSTSConstants.STSType.REST)
                 .stsInstanceId(stsInstanceId)
+                .realm(realm)
                 .ssoTokenString(ssoTokenString);
     }
 
@@ -124,6 +131,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
             This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
             org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
             for details.
+            TODO: think about using the JsonValueBuilder to avoid new ObjectMapper creation with every invocation.
         */
         Object responseContent;
         try {
@@ -131,13 +139,13 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                     new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(response);
             responseContent = parser.readValueAs(Object.class);
         } catch (IOException e) {
-            throw new AMSTSRuntimeException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "Could not map the response from the TokenGenerationService to a json object. The response: "
                             + response + "; The exception: " + e);
         }
         JsonValue assertionJson = new JsonValue(responseContent).get(AMSTSConstants.ISSUED_TOKEN);
         if (assertionJson.isNull() || !assertionJson.isString()) {
-            throw new AMSTSRuntimeException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+            throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "The json response returned from the TokenGenerationService did not have " +
                             "a non-null string element for the " + AMSTSConstants.ISSUED_TOKEN + " key. The json: "
                             + responseContent.toString());

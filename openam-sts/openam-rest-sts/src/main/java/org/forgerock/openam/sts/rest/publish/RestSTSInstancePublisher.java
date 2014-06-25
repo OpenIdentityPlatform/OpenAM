@@ -16,8 +16,7 @@
 
 package org.forgerock.openam.sts.rest.publish;
 
-import org.forgerock.openam.sts.STSInitializationException;
-import org.forgerock.openam.sts.config.user.STSInstanceConfig;
+import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.rest.RestSTS;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 
@@ -34,13 +33,51 @@ import java.util.List;
  * locally (in the OpenAM .war) or remotely (in their own .war).
  */
 public interface RestSTSInstancePublisher {
-    void publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, String subPath) throws STSInitializationException;
-    void removeInstance(String subPath) throws IllegalArgumentException;
+    /**
+     * Publish the Rest STS instance specified by the instanceConfig parameter. Publishing a Rest STS instance
+     * means persisting it to the SMS and exposing it via CREST.
+     * @param instanceConfig The configuration state for the to-be-published Rest STS instance.
+     * @param instance The RestSTS instance to be exposed
+     * @param republish Determines whether this is an initial publish, or a re-publish. If re-publish, instanceConfig
+     *                  not written to the SMS.
+     * @return the urlElement, including the realm, at which the Rest STS instance has been published. TODO: should this
+     * include the deployment information for the Rest STS service as well? Probably should
+     * @throws STSPublishException
+     */
+    String publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, boolean republish) throws STSPublishException;
+
+    /**
+     * Remove the Rest STS instance from the SMS, and from the CREST router.
+     * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
+     * @param realm The realm in which the Rest STS is to be deployed.
+     *
+     * Note that the subPath and realm constitute the unique identifier for a given Rest STS instance.
+     * @throws STSPublishException
+     */
+    void removeInstance(String stsId, String realm) throws STSPublishException;
 
     /**
      * Called to obtain the configuration elements corresponding to previously-published STS instances.
-     * @return The STSInstanceConfig super-class (RestSTSInstanceConfig or SoapSTSInstanceConfig) instances corresponding
+     * @return The RestSTSInstanceConfig instances corresponding
      * to published STS instances.
+     * @throws STSPublishException if exception encountered obtaining persisted instance state
      */
-    List<RestSTSInstanceConfig> getPublishedInstances();
+    List<RestSTSInstanceConfig> getPublishedInstances() throws STSPublishException;
+
+    /**
+     * Called to return the config state corresponding to a specified Rest STS instance
+     * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
+     * @param realm The realm in which the Rest STS is to be deployed.
+     * @return The RestSTSInstanceConfig corresponding to this published instance
+     * @throws STSPublishException
+     */
+    RestSTSInstanceConfig getPublishedInstance(String stsId, String realm) throws STSPublishException;
+
+    /**
+     * Called by the RestSTSRepublishServlet upon startup to re-publish previously-published Rest STS instances.
+     * @throws STSPublishException if exception encountered obtaining and re-publishing previously published instances.
+     * Note that exception will be thrown only if exception encountered which prevents the re-publishing of all
+     * previously-published instances. Exceptions encountered re-publishing individual instances will only be logged.
+     */
+    void republishExistingInstances() throws STSPublishException;
 }

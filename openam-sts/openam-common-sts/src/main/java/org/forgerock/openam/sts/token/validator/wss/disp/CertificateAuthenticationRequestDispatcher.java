@@ -16,16 +16,12 @@
 
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
-import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import com.google.inject.Inject;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
-import org.restlet.data.Form;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.restlet.data.MediaType;
-import org.restlet.data.Parameter;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;

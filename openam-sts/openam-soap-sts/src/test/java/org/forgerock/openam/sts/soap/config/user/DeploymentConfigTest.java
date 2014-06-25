@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.sts.soap.config.user;
 
-import org.apache.ws.security.message.token.UsernameToken;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
+import org.forgerock.openam.sts.TokenType;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -29,7 +29,7 @@ public class DeploymentConfigTest {
     @Test
     public void testEquals() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
         DeploymentConfig dc1 = DeploymentConfig.builder()
                 .realm("a")
@@ -55,7 +55,7 @@ public class DeploymentConfigTest {
     @Test
     public void testNotEquals() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
         DeploymentConfig dc1 = DeploymentConfig.builder()
                 .realm("a")
@@ -81,7 +81,7 @@ public class DeploymentConfigTest {
     @Test(expectedExceptions = NullPointerException.class)
     public void testRejectIfNull() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
-                .addMapping(UsernameToken.class, "module", "untmodule")
+                .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
 
         DeploymentConfig dc3 = DeploymentConfig.builder()

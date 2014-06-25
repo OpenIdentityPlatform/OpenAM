@@ -57,6 +57,7 @@ public class AMSAMLTokenProvider implements TokenProvider {
     private final AMSessionInvalidator amSessionInvalidator;
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final String stsInstanceId;
+    private final String realm;
     private final XMLUtilities xmlUtilities;
     private final AuthnContextMapper authnContextMapper;
     private final Logger logger;
@@ -68,6 +69,7 @@ public class AMSAMLTokenProvider implements TokenProvider {
                                AMSessionInvalidator amSessionInvalidator,
                                ThreadLocalAMTokenCache threadLocalAMTokenCache,
                                String stsInstanceId,
+                               String realm,
                                XMLUtilities xmlUtilities,
                                AuthnContextMapper authnContextMapper,
                                Logger logger) {
@@ -75,6 +77,7 @@ public class AMSAMLTokenProvider implements TokenProvider {
         this.amSessionInvalidator = amSessionInvalidator;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.stsInstanceId = stsInstanceId;
+        this.realm = realm;
         this.xmlUtilities = xmlUtilities;
         this.authnContextMapper = authnContextMapper;
         this.logger = logger;
@@ -174,10 +177,10 @@ public class AMSAMLTokenProvider implements TokenProvider {
                                     + AMSTSConstants.SP_ACS_URL_KEY);
                 }
                 return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, (String)spAcsUrlObject, authnContextClassRef);
+                        stsInstanceId, realm, (String)spAcsUrlObject, authnContextClassRef);
             case SENDER_VOUCHES:
                 return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, authnContextClassRef);
+                        stsInstanceId, realm, authnContextClassRef);
             case HOLDER_OF_KEY:
                 Object proofTokenStateObject = additionalProperties.get(AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 if (!(proofTokenStateObject instanceof ProofTokenState)) {
@@ -186,7 +189,7 @@ public class AMSAMLTokenProvider implements TokenProvider {
                                     + AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 }
                 return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, authnContextClassRef, (ProofTokenState)proofTokenStateObject);
+                        stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject);
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                 "Unexpected SAML2SubjectConfirmation in AMSAMLTokenProvider: " + subjectConfirmation);

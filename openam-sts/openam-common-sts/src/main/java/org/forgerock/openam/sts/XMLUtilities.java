@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
 
 /**
  * Interface to wrap consumption of the openam-shared XMLUtils class so that direct consumption of static methods can
@@ -29,4 +30,5 @@ public interface XMLUtilities {
     Document stringToDocumentConversion(String inputString);
     String documentToStringConversion(Node inputNode);
     Document newSafeDocument(boolean schemaValidation) throws ParserConfigurationException;
+    public Transformer getNewTransformer() throws TokenMarshalException;
 }

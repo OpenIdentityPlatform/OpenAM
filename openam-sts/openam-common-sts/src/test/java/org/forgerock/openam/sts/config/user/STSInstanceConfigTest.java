@@ -21,29 +21,19 @@ import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 public class STSInstanceConfigTest {
-    private static final String JSON_BASE = "json";
     private static final String AM_DEPLOYMENT = "am_depl";
-    private static final String AUTH = "rest_auth";
-    private static final String ID_FROM_SESSION = "id_from_session";
-    private static final String TOKEN_GEN_SERVICE = "token_gen_service";
-    private static final String LOGOUT = "logout";
-    private static final String COOKIE = "cookie";
     private static final String ISSUER = "cornholio";
     private static final String KEYSTORE = "keystore_stuff";
 
     @Test
     public void testSettings() throws UnsupportedEncodingException {
         STSInstanceConfig instance = buildConfig();
-        assertTrue(JSON_BASE.equals(instance.getJsonRestBase()));
         assertTrue(AM_DEPLOYMENT.equals(instance.getAMDeploymentUrl()));
-        assertTrue(AUTH.equals(instance.getAMRestAuthNUriElement()));
-        assertTrue(ID_FROM_SESSION.equals(instance.getAMRestIdFromSessionUriElement()));
-        assertTrue(LOGOUT.equals(instance.getAMRestLogoutUriElement()));
-        assertTrue(COOKIE.equals(instance.getAMSessionCookieName()));
         assertTrue(ISSUER.equals(instance.getIssuerName()));
     }
 
@@ -83,6 +73,16 @@ public class STSInstanceConfigTest {
         assertFalse(instance1.equals(instance2));
     }
 
+    @Test
+    public void testMapMarshalRoundTrip() throws UnsupportedEncodingException {
+        STSInstanceConfig instance1 = buildConfig();
+        assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
+
+        instance1 = buildConfigWithSaml2Config();
+        assertEquals(instance1, STSInstanceConfig.marshalFromAttributeMap(instance1.marshalToAttributeMap()));
+
+    }
+
     private STSInstanceConfig buildConfig() throws UnsupportedEncodingException {
         KeystoreConfig keystoreConfig =
                 KeystoreConfig.builder()
@@ -95,13 +95,7 @@ public class STSInstanceConfigTest {
                         .build();
 
         return STSInstanceConfig.builder()
-                .amJsonRestBase(JSON_BASE)
                 .amDeploymentUrl(AM_DEPLOYMENT)
-                .amRestAuthNUriElement(AUTH)
-                .amRestIdFromSessionUriElement(ID_FROM_SESSION)
-                .amRestTokenGenerationServiceUriElement(TOKEN_GEN_SERVICE)
-                .amRestLogoutUriElement(LOGOUT)
-                .amSessionCookieName(COOKIE)
                 .issuerName(ISSUER)
                 .keystoreConfig(keystoreConfig)
                 .build();
@@ -125,13 +119,7 @@ public class STSInstanceConfigTest {
                 .build();
 
         return STSInstanceConfig.builder()
-                .amJsonRestBase(JSON_BASE)
                 .amDeploymentUrl(AM_DEPLOYMENT)
-                .amRestAuthNUriElement(AUTH)
-                .amRestIdFromSessionUriElement(ID_FROM_SESSION)
-                .amRestTokenGenerationServiceUriElement(TOKEN_GEN_SERVICE)
-                .amRestLogoutUriElement(LOGOUT)
-                .amSessionCookieName(COOKIE)
                 .issuerName(ISSUER)
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)

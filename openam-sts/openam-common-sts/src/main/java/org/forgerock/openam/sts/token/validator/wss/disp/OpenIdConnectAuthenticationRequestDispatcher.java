@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.restlet.engine.header.Header;

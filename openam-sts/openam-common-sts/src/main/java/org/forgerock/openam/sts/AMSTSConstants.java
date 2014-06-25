@@ -121,6 +121,13 @@ public class AMSTSConstants {
     public static final String REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT = "am_rest_token_gen_service";
 
     /*
+    Used in conjunction with a @Named annotation to provide the uri element corresponding to the Rest STS publish
+    service. Consumed by the RestSTSInstanceReconstitutionServlet to build up the uri necessary to consume this
+    service.
+     */
+    public static final String REST_STS_PUBLISH_SERVICE_URI_ELEMENT = "am_rest_sts_publish_service";
+
+    /*
     Used in conjunction with a @Named annotation to inject the url string corresponding to the AM deployment.
      */
     public static final String AM_DEPLOYMENT_URL = "am_deployment_url";
@@ -197,6 +204,7 @@ public class AMSTSConstants {
 
     public static final String ROOT_REALM = "/";
 
+    public static final String FORWARD_SLASH = "/";
     /*
     Used for marshalling between byte[] and string representations. Does not seem to be defined anywhere in the pre 1.7 JDK.
      */
@@ -281,4 +289,14 @@ public class AMSTSConstants {
      */
     public static final String ISSUED_TOKEN = "issued_token";
 
+    /*
+    The name of the rest sts service, as defined in restSTS.xml. Referenced in the RestSTSInstanceConfigPersister, to
+    write rest sts instance config state to the SMS.
+     */
+    public static final String REST_STS_SERVICE_NAME = "RestSecurityTokenService";
+
+    /*
+    The name of the json field corresponding to the deployment path of a successfully-published Rest STS instance.
+     */
+    public static final String SUCCESSFUL_REST_STS_PUBLISH_URL_ELEMENT = "url_element";
 }

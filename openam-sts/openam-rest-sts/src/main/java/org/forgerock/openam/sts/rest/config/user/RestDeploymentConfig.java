@@ -17,9 +17,13 @@
 package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.sts.AuthTargetMapping;
+import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 
+import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -34,6 +38,15 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 public class RestDeploymentConfig {
+    /*
+    Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
+    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
+    SMS persistence.
+     */
+    private static final String REALM = "deployment-realm";
+    private static final String URI_ELEMENT = "deployment-url-element";
+    public static final String AUTH_TARGET_MAPPINGS = AuthTargetMapping.AUTH_TARGET_MAPPINGS;
+
     public static class RestDeploymentConfigBuilder {
         private String uriElement;
         private String realm = "/"; //default value
@@ -116,15 +129,29 @@ public class RestDeploymentConfig {
     }
 
     public JsonValue toJson() {
-        return json(object(field("uriElement", uriElement), field("realm", realm),
-                field("authTargetMapping", authTargetMapping.toJson())));
+        return json(object(field(URI_ELEMENT, uriElement), field(REALM, realm),
+                field(AuthTargetMapping.AUTH_TARGET_MAPPINGS, authTargetMapping.toJson())));
     }
 
     public static RestDeploymentConfig fromJson(JsonValue json) {
         return RestDeploymentConfig.builder()
-                .authTargetMapping(AuthTargetMapping.fromJson(json.get("authTargetMapping")))
-                .uriElement(json.get("uriElement").asString())
-                .realm(json.get("realm").asString())
+                .authTargetMapping(AuthTargetMapping.fromJson(json.get(AUTH_TARGET_MAPPINGS)))
+                .uriElement(json.get(URI_ELEMENT).asString())
+                .realm(json.get(REALM).asString())
                 .build();
+    }
+
+    public Map<String, Set<String>> marshalToAttributeMap() {
+        Map<String, Set<String>> interimMap = MapMarshallUtils.toSmsMap(toJson().asMap());
+        interimMap.remove(AUTH_TARGET_MAPPINGS);
+        interimMap.putAll(authTargetMapping.marshalToAttributeMap());
+        return interimMap;
+    }
+
+    public static RestDeploymentConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
+        AuthTargetMapping targetMapping = AuthTargetMapping.marshalFromAttributeMap(attributeMap);
+        Map<String, Object> jsonMap = MapMarshallUtils.toJsonValueMap(attributeMap);
+        jsonMap.put(AuthTargetMapping.AUTH_TARGET_MAPPINGS, targetMapping.toJson());
+        return fromJson(new JsonValue(jsonMap));
     }
 }

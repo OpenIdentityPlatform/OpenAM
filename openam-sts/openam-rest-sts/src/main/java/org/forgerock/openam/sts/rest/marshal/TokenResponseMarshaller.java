@@ -32,9 +32,6 @@ import org.forgerock.openam.sts.TokenType;
  * It may be decided that either xml or json can be returned from the REST-STS - if so, the interface will be enhanced with
  * the specification of the returned type.
  *
- * TODO: it probably makes sense to return any token encapsulated in a jws signed by the STS' signing key, and the contents of this
- * jws may well be a jwt, which contains the SAML assertion. These issues will be resolved in a future story. For now,
- * the REST STS will simply return issued tokens as an xml string.
  */
 public interface TokenResponseMarshaller {
     /**

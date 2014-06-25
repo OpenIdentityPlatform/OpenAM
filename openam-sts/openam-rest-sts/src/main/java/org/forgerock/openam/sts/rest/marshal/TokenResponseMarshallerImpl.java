@@ -23,11 +23,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 
 import javax.inject.Inject;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -48,14 +50,17 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
     private final XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller;
     private final XmlMarshaller<OpenIdConnectIdToken> openIdConnectTokenXmlMarshaller;
     private final JsonMarshaller<OpenIdConnectIdToken> openIdConnectTokenJsonMarshaller;
+    private final XMLUtilities xmlUtilities;
 
     @Inject
     TokenResponseMarshallerImpl(XmlMarshaller<OpenAMSessionToken> amSessionTokenXmlMarshaller,
                                 XmlMarshaller<OpenIdConnectIdToken> openIdConnectTokenXmlMarshaller,
-                                JsonMarshaller<OpenIdConnectIdToken> openIdConnectTokenJsonMarshaller) {
+                                JsonMarshaller<OpenIdConnectIdToken> openIdConnectTokenJsonMarshaller,
+                                XMLUtilities xmlUtilities) {
         this.amSessionTokenXmlMarshaller = amSessionTokenXmlMarshaller;
         this.openIdConnectTokenXmlMarshaller = openIdConnectTokenXmlMarshaller;
         this.openIdConnectTokenJsonMarshaller = openIdConnectTokenJsonMarshaller;
+        this.xmlUtilities = xmlUtilities;
     }
 
     @Override
@@ -64,7 +69,11 @@ public class TokenResponseMarshallerImpl implements TokenResponseMarshaller {
         if (TokenType.SAML2.equals(desiredTokenType)) {
             Transformer transformer = null;
             try {
-                transformer = XMLUtils.getTransformerFactory().newTransformer();
+                transformer = xmlUtilities.getNewTransformer();
+                /*
+                Omit the xml declaration header from the assertion
+                 */
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());
                 transformer.transform(new DOMSource(tokenProviderResponse.getToken()), res);
                 String token = new String(((ByteArrayOutputStream)res.getOutputStream()).toByteArray());

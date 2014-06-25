@@ -662,6 +662,18 @@
         </init-param>
     </servlet>
 
+    <!--
+    No servlet-mapping for the rest-sts-republish-servlet, as it simply serves to republish all previously-published
+    rest sts instances upon startup. And the load-on-startup has a high value, because functionality triggered by
+    the init method of the RestSTSInstanceRepublishServlet consumes the SMS, which must be initialized prior to the
+    initialization of the RestSTSInstanceRepublishServlet.
+    -->
+    <servlet>
+        <servlet-name>rest-sts-republish-servlet</servlet-name>
+        <servlet-class>org.forgerock.openam.sts.rest.publish.RestSTSInstanceRepublishServlet</servlet-class>
+        <load-on-startup>40</load-on-startup>
+    </servlet>
+
     <servlet>
         <description>JAX-WS endpoint - sts</description>
         <display-name>sts</display-name>
@@ -1073,15 +1085,15 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rest-sts</servlet-name>
-        <url-pattern>/rest_sts/*</url-pattern>
+        <url-pattern>/rest-sts/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>rest-sts-publish</servlet-name>
-        <url-pattern>/rest_sts_publish/*</url-pattern>
+        <url-pattern>/rest-sts-publish/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>sts-tokengeneration-service</servlet-name>
-        <url-pattern>/sts_tokengen/*</url-pattern>
+        <url-pattern>/sts-tokengen/*</url-pattern>
     </servlet-mapping>
 
     <!-- end of servlet mapping -->
