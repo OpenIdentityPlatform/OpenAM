@@ -67,6 +67,7 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
     private static final String REGISTRATION_CLIENT_URI = "registration_client_uri";
     private static final String ISSUED_AT = "client_id_issued_at";
     private static final String EXPIRES_AT = "client_secret_expires_at";
+    private static final String OPENID_SCOPE = "openid";
 
     private final AccessTokenVerifier tokenVerifier;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
@@ -128,17 +129,27 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
                 clientBuilder.setRedirectionURIs(input.get(REDIRECT_URIS.getType()).asList(String.class));
             }
 
-            if (input.get(SCOPES.getType()).asList() != null) {
-                if (containsCaseInsensitive(providerSettings.getSupportedClaims(), input.get(SCOPES.getType()).asList(String.class))) {
-                    clientBuilder.setAllowedGrantScopes(input.get(SCOPES.getType()).asList(String.class));
+            List<String> scopes = input.get(SCOPES.getType()).asList(String.class);
+            if (scopes != null) {
+                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), scopes)) {
+                    if (!scopes.contains(OPENID_SCOPE)) {
+                        scopes = new ArrayList<String>(scopes);
+                        scopes.add(OPENID_SCOPE);
+                    }
+                    clientBuilder.setAllowedGrantScopes(scopes);
                 } else {
                     throw new InvalidClientMetadata();
                 }
+            } else {
+                scopes = new ArrayList<String>(1);
+                scopes.add(OPENID_SCOPE);
+                clientBuilder.setAllowedGrantScopes(scopes);
             }
 
-            if (input.get(DEFAULT_SCOPES.getType()).asList() != null) {
-                if (containsCaseInsensitive(providerSettings.getSupportedClaims(), input.get(DEFAULT_SCOPES.getType()).asList(String.class))) {
-                    clientBuilder.setDefaultGrantScopes(input.get(DEFAULT_SCOPES.getType()).asList(String.class));
+            List<String> defaultScopes = input.get(DEFAULT_SCOPES.getType()).asList(String.class);
+            if (defaultScopes != null) {
+                if (containsAllCaseInsensitive(providerSettings.getSupportedClaims(), defaultScopes)) {
+                    clientBuilder.setDefaultGrantScopes(defaultScopes);
                 } else {
                     throw new InvalidClientMetadata();
                 }
@@ -201,7 +212,7 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
             }
 
             if (input.get(RESPONSE_TYPES.getType()).asList() != null) {
-                if (containsCaseInsensitive(providerSettings.getAllowedResponseTypes().keySet(), input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
+                if (containsAllCaseInsensitive(providerSettings.getAllowedResponseTypes().keySet(), input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
                     clientBuilder.setResponseTypes(input.get(RESPONSE_TYPES.getType()).asList(String.class));
                 } else {
                     throw new InvalidClientMetadata();
@@ -230,17 +241,20 @@ public class OpenIdConnectClientRegistrationServiceImpl implements OpenIdConnect
         return new JsonValue(response);
     }
 
-    private boolean containsCaseInsensitive(final Set<String> collection, final List<String> values) {
-        final Iterator<String> valuesIterator = values.iterator();
-        while (valuesIterator.hasNext()) {
-            final String value = valuesIterator.next();
-            for (final String string : collection) {
-                if (string.equalsIgnoreCase(value)) {
-                    return true;
+    private boolean containsAllCaseInsensitive(final Set<String> collection, final List<String> values) {
+        for (String value : values) {
+            boolean foundInCollection = false;
+            for (String item : collection) {
+                if (item.equalsIgnoreCase(value)) {
+                    foundInCollection = true;
+                    break;
                 }
             }
+            if (!foundInCollection) {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     private boolean containsCaseInsensitive(final Set<String> collection, final String value) {
