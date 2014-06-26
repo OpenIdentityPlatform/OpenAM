@@ -78,11 +78,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.forgerock.openam.utils.IPRange;
 
 public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterface {
@@ -611,16 +613,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
         HttpServletRequest req = getHttpServletRequest();
         if (req != null) {
-            for (Cookie cookie : req.getCookies()) {
-                if (knownCookieName.equalsIgnoreCase(cookie.getName())) {
-                    if (knownCookieValue != null) {
-                        if (knownCookieValue.equalsIgnoreCase(cookie.getValue())) {
-                            retVal = knownCookieScore;
-                        }
-                    } else {
-                        retVal = knownCookieScore;
-                    }
-                    break;
+            Cookie cookie = CookieUtils.getCookieFromReq(req, knownCookieName);
+            if (cookie != null) {
+                if (knownCookieValue.equalsIgnoreCase(CookieUtils.getCookieValue(cookie))) {
+                    retVal = knownCookieScore;
                 }
             }
         }
@@ -703,13 +699,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
 
             deviceHash = AccessController.doPrivileged(new EncodeAction(Hash.hash(sb.toString())));
 
-            for (Cookie cookie : req.getCookies()) {
-                if (deviceCookieName.equalsIgnoreCase(cookie.getName())) {
+            Cookie cookie = CookieUtils.getCookieFromReq(req, deviceCookieName);
+            if (cookie != null ) {
+                if (debug.messageEnabled()) {
                     debug.message(ADAPTIVE + ".checkRegisteredClient: Found Cookie :" + deviceCookieName);
-                    if (deviceHash.equalsIgnoreCase(cookie.getValue())) {
-                        retVal = deviceCookieScore;
-                    }
-                    break;
+                }
+                if (deviceHash.equalsIgnoreCase(CookieUtils.getCookieValue(cookie))) {
+                    retVal = deviceCookieScore;
                 }
             }
         }
@@ -755,13 +751,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
             HttpServletRequest req = getHttpServletRequest();
 
             if (req != null) {
-                for (Cookie cookie : req.getCookies()) {
-                    if (timeSinceLastLoginAttribute.equalsIgnoreCase(cookie.getName())) {
+                Cookie cookie = CookieUtils.getCookieFromReq(req, timeSinceLastLoginAttribute);
+                if (cookie != null) {
+                    if (debug.messageEnabled()) {
                         debug.message(ADAPTIVE + ".checkLastLogin: Found Cookie :" + timeSinceLastLoginAttribute);
-                        lastLoginEnc = cookie.getValue();
-                        lastLogin = AccessController.doPrivileged(new DecodeAction(lastLoginEnc));
-                        break;
                     }
+                    lastLoginEnc = CookieUtils.getCookieValue(cookie);
+                    lastLogin = AccessController.doPrivileged(new DecodeAction(lastLoginEnc));
                 }
                 if (lastLogin != null) {
                     String[] tokens = lastLogin.split("\\|");
