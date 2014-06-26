@@ -538,7 +538,8 @@ Configuration complete!</computeroutput>
         <literal>false</literal>, which always displays the license acceptance screen.</para>
 
        <screen>
-$ <userinput>java -jar ${ssoconfigJarFile} --file config.properties --acceptLicense</userinput>
+$ <userinput>java -jar ${ssoconfigJarFile} --file config.properties \
+       --acceptLicense</userinput>
        </screen>
    </note>
   </step>

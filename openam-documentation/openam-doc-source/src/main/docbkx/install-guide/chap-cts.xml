@@ -36,35 +36,49 @@
     <primary>Core Token Service</primary>
   </indexterm>
 
-  <para>The Core Token Service (CTS) provides persistent and highly available token storage for a several
-  components within OpenAM, including sessions, as well as OAuth 2.0 and SAML 2.0 tokens. The CTS is set up in
-  a generalized token storage format. That format is always used for OAuth 2.0 tokens. If so configured,
-  it is also used to ensure persistence of session and SAML 2.0 tokens.</para>
+  <para>The Core Token Service (CTS) provides persistent and highly available
+   token storage for a several components within OpenAM, including session,
+   OAuth 2.0, and SAML 2.0 tokens.
+   CTS is set up in a generalized token storage format, which by default is
+   always used for OAuth 2.0 tokens.
+   If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
 
-  <para>The CTS relies on OpenDJ to store and replicate tokens. No other directory service
-  is supported for CTS. By default, the CTS uses the same embedded or external directory service as is
-  configured for OpenAM's configuration data store.</para>
-
-  <para>CTS tokens may change frequently. Other data stored in an OpenDJ server is considerably more static.
-  The relative performance tuning requirements are quite different. If your deployment is large, that may justify
-  going beyond the default configuration. Nevertheless, it is easier to configure CTS if you can stick with
-  the OpenDJ server embedded in an OpenAM installation.</para>
-
-  <para>
-   If you use the OpenDJ service embedded within OpenAM, CTS schema is automatically included.
-   You can choose, however, to manage CTS data in an external instance of OpenDJ.
+  <para>CTS relies on OpenDJ to store and replicate tokens.
+   Only OpenDJ is supported for CTS. No other directory server is supported.
   </para>
 
-  <para>If you choose to set up CTS in an external instance of OpenDJ, you will have to install OpenDJ
-  separately. For more information, see the <link xlink:show="new"
-  xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/"
-  ><citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
+  <para>CTS tokens are volatile and change frequently, while other data stored
+   in an OpenDJ server is considerably more static.
+   Therefore, the performance tuning requirements are quite different for
+   both types of data.
+  </para>
+  <para>The easiest CTS configuration is to run the default configuration
+   option in the installer, which uses an embedded OpenDJ server to store both
+   configuration and CTS tokens and automatically includes the CTS schema.
+   If your deployment requires it, then you can go beyond the default
+   embedded configuration and deploy separate external configuration and CTS
+   stores. External configuration stores supports OpenDJ and DSEE servers. External
+   CTS stores only support OpenDJ.
+  </para>
 
-  <para>Once you have installed OpenDJ on an external server, you can set up schema definitions,
-  specify tokens in a valid LDAP format, configure indexes to allow OpenAM to retrieve tokens,
-  and quite possibly Access Control Instructions (ACIs) to give an appropriate user Create, Read,
-  Update, and Delete (CRUD) privileges. But first, you should configure basic parameters for the CTS token
-  data store in the OpenAM console.</para>
+  <para>If you choose to set up CTS in an external OpenDJ instance, you will
+   have to install OpenDJ separately from OpenAM.
+   For more information, see the
+   <!-- Change this link after AME-3876 is fixed -->
+   <link xlink:show="new"
+         xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/">
+         <citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
+
+  <para>Once you have installed OpenDJ on an external server,
+   you should first configure the basic parameters for the CTS token store in the
+   OpenAM console.
+   After that, you can set up schema definitions,
+   specify tokens in a valid LDAP format, configure indexes to allow OpenAM to retrieve tokens,
+   and possibly Access Control Instructions (ACIs) to give an appropriate user Create, Read,
+   Update, and Delete (CRUD) privileges.
+  </para>
+
+  <para>The procedures to run these tasks are presented in the following sections.</para>
 
   <section xml:id="cts-config">
     <title>CTS Configuration Parameters</title>

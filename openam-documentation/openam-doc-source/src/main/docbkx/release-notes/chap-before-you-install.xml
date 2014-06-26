@@ -85,6 +85,7 @@
  <section xml:id="data-store-requirements">
   <title>Data Store Requirements</title>
 
+
   <itemizedlist>
    <para>This release of OpenAM works with the following CTS data stores.</para>
     <listitem>
@@ -92,7 +93,7 @@
     </listitem>
     <listitem>
      <para>External ForgeRock OpenDJ data store</para>
-     <para>The CTS is supported on OpenDJ versions 2.6.0 and later.</para>
+     <para>The CTS is only supported on OpenDJ versions 2.6.0 and later.</para>
     </listitem>
   </itemizedlist>
 
@@ -113,8 +114,12 @@
     <para>External Oracle Unified Directory 11g or later</para>
    </listitem>
    <listitem>
-    <para>External Oracle Directory Server Enterprise Edition data store,
+    <para>External Oracle Directory Server Enterprise Edition (ODSEE) data store,
     version 6.3 or later</para>
+
+    <important><para>If you use ODSEE as an external configuration store, you
+     must still use OpenDJ for your external CTS store.
+    </para></important>
    </listitem>
   </itemizedlist>
 

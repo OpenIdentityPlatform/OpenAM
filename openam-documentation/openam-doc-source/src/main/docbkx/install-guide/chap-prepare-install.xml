@@ -1994,7 +1994,7 @@ $ <userinput>jar -xf ~/Downloads/openam/${coreWarFile}</userinput>
     <para>Add the JAXP Reference Implementation .jar in
     <filename>WEB-INF/lib/</filename>.</para>
 
-    <screen width="89">
+    <screen>
 $ <userinput>wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar</userinput>
 $ <userinput>mv jaxp-ri-1.4.5.jar WEB-INF/lib/</userinput>
     </screen>
