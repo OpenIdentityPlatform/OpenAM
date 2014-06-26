@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2014 ForgeRock, Inc. All Rights Reserved
+ * Copyright (c) 2012-2014 ForgeRock AS All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -128,10 +128,12 @@ public class CTSPersistentStoreImpl implements CTSPersistentStore {
     @Override
     public Token read(String tokenId) throws CoreTokenException {
         Token token = adapter.read(tokenId);
-        try {
-            strategy.reverse(token);
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
+        if (token != null) {
+            try {
+                strategy.reverse(token);
+            } catch (TokenStrategyFailedException e) {
+                throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
+            }
         }
 
         return token;
