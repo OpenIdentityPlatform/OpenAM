@@ -206,12 +206,9 @@ class SSOTokenImpl implements SSOToken {
         try {
             // The property AuthLevel may contain realm information, e.g. "/:10". If so, strip this out.
             String authLevelFull = SSOSession.getProperty("AuthLevel");
-            int indexOfStartOfIntegerPart = 0;
-            if (authLevelFull.contains(":")) {
-                indexOfStartOfIntegerPart = authLevelFull.lastIndexOf(":") + 1;
-            }
+            int indexOfStartOfIntegerPart = authLevelFull.lastIndexOf(":") + 1;
             String authLevelInteger = authLevelFull.substring(indexOfStartOfIntegerPart);
-            return (new Integer(authLevelInteger)).intValue();
+            return Integer.valueOf(authLevelInteger);
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token authentication level");
             throw new SSOException(e);
