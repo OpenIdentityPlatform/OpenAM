@@ -133,10 +133,13 @@ public class CTSPersistentStore {
      */
     public Token read(String tokenId) throws CoreTokenException {
         Token token = adapter.read(tokenId);
-        try {
-            strategy.reverse(token);
-        } catch (TokenStrategyFailedException e) {
-            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
+
+        if (token != null) {
+            try {
+                strategy.reverse(token);
+            } catch (TokenStrategyFailedException e) {
+                throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
+            } 
         }
 
         return token;

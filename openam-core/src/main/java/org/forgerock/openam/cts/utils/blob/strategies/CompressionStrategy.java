@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -51,7 +51,7 @@ public class CompressionStrategy implements BlobStrategy {
             out.flush();
             out.close();
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new TokenStrategyFailedException(e);
         }
         token.setBlob(bout.toByteArray());
     }
@@ -71,7 +71,7 @@ public class CompressionStrategy implements BlobStrategy {
             IOUtils.copy(inputStream, bout);
             inputStream.close();
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new TokenStrategyFailedException(e);
         }
         token.setBlob(bout.toByteArray());
     }
