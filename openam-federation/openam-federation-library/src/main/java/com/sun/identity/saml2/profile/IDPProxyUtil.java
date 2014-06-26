@@ -77,6 +77,7 @@ import javax.xml.soap.SOAPException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
@@ -143,7 +144,7 @@ public class IDPProxyUtil {
      * @param response HttpServletResponse
      * @param realm Realm
      * @param relayState the Relay State 
-     * @param binding the binding
+     * @param originalBinding The binding used to send the original AuthnRequest.
      * @exception SAML2Exception for any SAML2 failure.
      * @exception IOException if there is a failure in redirection.
      */
@@ -156,7 +157,7 @@ public class IDPProxyUtil {
             HttpServletResponse response,
             String realm,
             String relayState,
-            String binding)
+            String originalBinding)
             throws SAML2Exception, IOException {
         String classMethod = "IDPProxyUtil.sendProxyAuthnRequest: ";
         AuthnRequest newAuthnRequest = getNewAuthnRequest(hostedEntityId, preferredIDP, realm, authnRequest);
@@ -166,50 +167,41 @@ public class IDPProxyUtil {
             spAdapter.preSingleSignOnRequest(hostedEntityId, preferredIDP, realm, request, response, newAuthnRequest);
         }
         if (SAML2Utils.debug.messageEnabled()) {
-            SAML2Utils.debug.message(classMethod +
-                    "New Authentication request:" +
-                    newAuthnRequest.toXMLString());
+            SAML2Utils.debug.message(classMethod + "New Authentication request:" + newAuthnRequest.toXMLString());
         }
         String requestID = newAuthnRequest.getID();
 
         // save the AuthnRequest in the IDPCache so that it can be
         // retrieved later when the user successfully authenticates
-        IDPCache.authnRequestCache.put(requestID,
-                newAuthnRequest);
+        IDPCache.authnRequestCache.put(requestID, newAuthnRequest);
 
         // save the SP descriptor in IDPCache
-        IDPCache.proxySPDescCache.put(requestID,
-                spSSODescriptor);
+        IDPCache.proxySPDescCache.put(requestID, spSSODescriptor);
 
         // save the original AuthnRequest
-        IDPCache.proxySPAuthnReqCache.put(requestID,
-                authnRequest);
+        IDPCache.proxySPAuthnReqCache.put(requestID, authnRequest);
 
         String targetURL = null;
         SPSSODescriptorElement localDescriptor = null;
         SPSSOConfigElement localDescriptorConfig = null;
         IDPSSODescriptorElement idpDescriptor = null;
+        String binding;
         try {
-            idpDescriptor = IDPSSOUtil.metaManager.
-                    getIDPSSODescriptor(realm, preferredIDP);
-            List ssoServiceList =
-                    idpDescriptor.getSingleSignOnService();
-            targetURL = SPSSOFederate.getSSOURL(ssoServiceList, binding);
+            idpDescriptor = IDPSSOUtil.metaManager.getIDPSSODescriptor(realm, preferredIDP);
+            List<SingleSignOnServiceElement> ssoServiceList = idpDescriptor.getSingleSignOnService();
+            SingleSignOnServiceElement endpoint = getMatchingSSOEndpoint(ssoServiceList, originalBinding);
+            if (endpoint == null) {
+                SAML2Utils.debug.error(classMethod + "Single Sign-on service is not found for the proxying IDP.");
+                throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotFoundIDPProxy"));
+            }
+            binding = endpoint.getBinding();
+            targetURL = endpoint.getLocation();
 
-            localDescriptor = IDPSSOUtil.metaManager.
-                    getSPSSODescriptor(realm, hostedEntityId);
-            localDescriptorConfig = IDPSSOUtil.metaManager.
-                    getSPSSOConfig(realm, hostedEntityId);
+            localDescriptor = IDPSSOUtil.metaManager.getSPSSODescriptor(realm, hostedEntityId);
+            localDescriptorConfig = IDPSSOUtil.metaManager.getSPSSOConfig(realm, hostedEntityId);
         } catch (SAML2MetaException e) {
             SAML2Utils.debug.error(classMethod, e);
             throw new SAML2Exception(e.getMessage());
-        }
-
-        if (targetURL == null) {
-            SAML2Utils.debug.error(classMethod + "Single Sign-on service " +
-                    "is not found for the proxying IDP.");
-            throw new SAML2Exception(SAML2Utils.bundle.getString(
-                    "ssoServiceNotFoundIDPProxy"));
         }
 
         boolean signingNeeded = ((idpDescriptor != null) &&
@@ -297,6 +289,25 @@ public class IDPProxyUtil {
                         + requestID + ", failed!", se);
             }
         }
+    }
+
+    private static SingleSignOnServiceElement getMatchingSSOEndpoint(List<SingleSignOnServiceElement> endpoints,
+            String preferredBinding) {
+        SingleSignOnServiceElement preferredEndpoint = null;
+        boolean isFirst = true;
+        for (SingleSignOnServiceElement endpoint : endpoints) {
+            if (isFirst) {
+                //If there is no match, we should use the first endpoint in the list
+                preferredEndpoint = endpoint;
+                isFirst = false;
+            }
+            if (preferredBinding.equals(endpoint.getBinding())) {
+                preferredEndpoint = endpoint;
+                break;
+            }
+        }
+
+        return preferredEndpoint;
     }
 
     /**
