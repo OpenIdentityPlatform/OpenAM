@@ -208,7 +208,6 @@ class SSOTokenImpl implements SSOToken {
             String authLevelFull = SSOSession.getProperty("AuthLevel");
             int indexOfStartOfIntegerPart = authLevelFull.lastIndexOf(":") + 1;
             String authLevelInteger = authLevelFull.substring(indexOfStartOfIntegerPart);
-            
             return Integer.valueOf(authLevelInteger);
         } catch (Exception e) {
             SSOProviderImpl.debug.error("Can't get token authentication level");
