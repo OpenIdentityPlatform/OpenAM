@@ -47,14 +47,12 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
     private static final int PRIORITY_ZERO = 0;
 
     private static final String ROOT_REALM = "/";
-    private final SSOToken adminToken;
     private final MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller;
     private final Logger logger;
 
     @Inject
     RestSTSInstanceConfigPersister(MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller, Logger logger) {
         this.instanceConfigMapMarshaller = instanceConfigMapMarshaller;
-        adminToken =  AccessController.doPrivileged(AdminTokenAction.getInstance());
         this.logger = logger;
     }
 
@@ -65,7 +63,7 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
             model applies to the STS, and the AMAuthenticationManager seems to implement the SMS persistence concern of these semantics.
              */
             OrganizationConfigManager organizationConfigManager =
-                    new OrganizationConfigManager(adminToken, instance.getDeploymentConfig().getRealm());
+                    new OrganizationConfigManager(getAdminToken(), instance.getDeploymentConfig().getRealm());
             Map<String, Set<String>> instanceConfigAttributes = instanceConfigMapMarshaller.marshallAttributesToMap(instance);
 
             if (!organizationConfigManager.getAssignedServices().contains(AMSTSConstants.REST_STS_SERVICE_NAME)) {
@@ -97,7 +95,8 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
          */
         ServiceConfig baseService;
         try {
-            baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+            baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME,
+                    getAdminToken()).getOrganizationConfig(realm, null);
             if (baseService != null) {
                 baseService.removeSubConfig(stsInstanceId);
                 if (logger.isDebugEnabled()) {
@@ -125,7 +124,8 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
             Model for code below taken from AMAuthenticationManager.getAuthenticationInstance, as the 'multiple authN module per realm'
             model applies to the STS, and the AMAuthenticationManager seems to implement the SMS persistence concern of these semantics.
              */
-            ServiceConfig baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+            ServiceConfig baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME,
+                    getAdminToken()).getOrganizationConfig(realm, null);
             if (baseService != null) {
                 ServiceConfig instanceService = baseService.getSubConfig(stsInstanceId);
                 if (instanceService != null) {
@@ -157,7 +157,8 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
         for (String realm : getAllRealmNames()) {
             ServiceConfig baseService;
             try {
-                baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME, adminToken).getOrganizationConfig(realm, null);
+                baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME,
+                        getAdminToken()).getOrganizationConfig(realm, null);
             } catch (SMSException e) {
                 logger.error("Could not obtain ServiceConfig instance for realm " + realm +
                         ". Rest STS instances for this realm cannot be returned from getAllPublishedInstances. " +
@@ -212,7 +213,7 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
          */
         realmNames.add(AMSTSConstants.ROOT_REALM);
         try {
-            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, ROOT_REALM);
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getAdminToken(), ROOT_REALM);
             realmNames.addAll(ocm.getSubOrganizationNames());
             return realmNames;
         } catch (SMSException e) {
@@ -220,5 +221,9 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
                     "Could not obtain list of realms from the OrganizationConfigManager. " +
                     "This means list of previously-published rest sts instances cannot be returned. Exception: " + e);
         }
+    }
+
+    private SSOToken getAdminToken()  {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 }

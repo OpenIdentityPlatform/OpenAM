@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.rest.publish;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.sun.identity.setup.AMSetupServlet;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
@@ -147,24 +148,33 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         return persistentStore.getSTSInstanceConfig(stsId, realm);
     }
 
+    /*
+    This method is only to be called by the RestSTSInstanceRepublishServlet, which calls it only to re-publish
+    previously-published Rest STS instances during OpenAM startup.
+     */
     public void republishExistingInstances() throws STSPublishException {
-        final List<RestSTSInstanceConfig> publishedInstances = getPublishedInstances();
-        for (RestSTSInstanceConfig instanceConfig : publishedInstances) {
-            Injector instanceInjector;
-            try {
-                instanceInjector = Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
-            } catch (Exception e) {
-                logger.error("Exception caught creating the guice injector in republish corresponding to rest sts " +
-                        "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
-                continue;
-            }
-            try {
-                publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), true);
-                logger.info("Republished Rest STS instance corresponding to config " + instanceConfig.toJson());
-            } catch (STSPublishException e) {
-                logger.error("Exception caught publishing rest sts " +
-                        "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
-                continue;
+        /*
+        Do not trigger the republish if OpenAM is being installed or upgraded.
+         */
+        if (AMSetupServlet.isCurrentConfigurationValid()) {
+            final List<RestSTSInstanceConfig> publishedInstances = getPublishedInstances();
+            for (RestSTSInstanceConfig instanceConfig : publishedInstances) {
+                Injector instanceInjector;
+                try {
+                    instanceInjector = Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
+                } catch (Exception e) {
+                    logger.error("Exception caught creating the guice injector in republish corresponding to rest sts " +
+                            "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
+                    continue;
+                }
+                try {
+                    publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), true);
+                    logger.info("Republished Rest STS instance corresponding to config " + instanceConfig.toJson());
+                } catch (STSPublishException e) {
+                    logger.error("Exception caught publishing rest sts " +
+                            "instance: " + instanceConfig.toJson() + ". This instance cannot be republished. Exception: " + e);
+                    continue;
+                }
             }
         }
     }
