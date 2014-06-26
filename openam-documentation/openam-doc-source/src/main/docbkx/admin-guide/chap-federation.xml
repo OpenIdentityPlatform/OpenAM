@@ -2017,14 +2017,24 @@ $ <userinput>ssoadm \
       you would like users redirected to when they encounter an error.</para>
      </step>
 
-     <step>
+     <step xml:id="sf-as-sp-copy-attr-name">
       <para>Copy the attribute name such as <literal>IDPEmail</literal> from
       the OpenAM page to the Attribute Name field on the Salesforce CRM
       page.</para>
      </step>
 
      <step>
-      <para>Leave the NameID Format field empty.</para>
+      <para>
+       Salesforce uses an unspecified <literal>nameid-format</literal> value;
+       therefore, your IdP configuration in OpenAM should reflect this by editing
+       the <literal>nameid-format</literal> value as follows:
+       <screen>
+urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</replaceable>
+       </screen>
+      </para>
+      <para>Here the <replaceable>attribute</replaceable> is the attribute you
+       copied in <xref linkend="sf-as-sp-copy-attr-name"/>.
+      </para>
      </step>
 
      <step>
