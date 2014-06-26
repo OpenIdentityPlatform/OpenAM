@@ -2027,8 +2027,8 @@ $ <userinput>ssoadm \
       <para>
        Salesforce uses an unspecified <literal>nameid-format</literal> value;
        therefore, your IdP configuration in OpenAM should reflect this. In the
-       NameID Value Map, enter the following URN value, which maps a URN to an actual
-       user attribute, and then click <guibutton>Add</guibutton>.
+       NameID Value Map setting, enter the following NameID Format user attribute
+       mapping, and then click <guibutton>Add</guibutton>.
        <screen>
 urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</replaceable>
        </screen>
