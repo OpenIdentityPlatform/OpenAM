@@ -37,7 +37,7 @@
   </indexterm>
 
   <para>The Core Token Service (CTS) provides persistent and highly available
-   token storage for a several components within OpenAM, including session,
+   token storage for several components within OpenAM, including session,
    OAuth 2.0, and SAML 2.0 tokens.
    CTS is set up in a generalized token storage format, which by default is
    always used for OAuth 2.0 tokens.
