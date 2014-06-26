@@ -44,7 +44,7 @@
    If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
 
   <para>CTS relies on OpenDJ to store and replicate tokens.
-   Only OpenDJ is supported for CTS. No other directory server is supported.
+   Currently, only OpenDJ is supported for CTS. No other directory server is supported.
   </para>
 
   <para>CTS tokens are volatile and change frequently, while other data stored
