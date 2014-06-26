@@ -26,7 +26,8 @@
  *
  */
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log.handlers;
 
@@ -84,18 +85,15 @@ public class FileHandler extends java.util.logging.Handler {
     private File files[];
     private boolean headerWritten;
     private int count; // count represent number of history files
-    private int maxFileSize;
+    private long maxFileSize;
     private String location;
     private Formatter formatter;
-    private static SimpleDateFormat simpleDateFormat =
-            new SimpleDateFormat("HHmmss.ddMMyyyy");
-    private Date date;
-    private String currentFileName;
     private String fileName;
     private int recCountLimit;
     private LinkedList recordBuffer;
     private TimeBufferingTask bufferTask;
     private boolean timeBufferingEnabled = false;
+    private boolean rotateEnabled = true;
     private static String headerString = null;
     private SsoServerLoggingSvcImpl logServiceImplForMonitoring = null;
     private SsoServerLoggingHdlrEntryImpl fileLogHandlerForMonitoring = null;
@@ -112,11 +110,12 @@ public class FileHandler extends java.util.logging.Handler {
     private class MeteredStream extends OutputStream {
 
         OutputStream out;
-        int written;
+        String filename = null;
 
-        MeteredStream(OutputStream out, int written) {
-            this.out = out;
-            this.written = written;
+        MeteredStream(File fileName, boolean append) throws IOException {
+            this.filename = fileName.toString();
+            FileOutputStream fout = new FileOutputStream(filename, append);
+            this.out = new BufferedOutputStream(fout);
         }
 
         /**
@@ -127,7 +126,6 @@ public class FileHandler extends java.util.logging.Handler {
          */
         public void write(int b) throws IOException {
             out.write(b);
-            written++;
         }
 
         /**
@@ -138,7 +136,6 @@ public class FileHandler extends java.util.logging.Handler {
          */
         public void write(byte[] b) throws IOException {
             out.write(b);
-            written += b.length;
         }
 
         /**
@@ -152,7 +149,6 @@ public class FileHandler extends java.util.logging.Handler {
         public void write(byte[] b, int offset, int length)
                 throws IOException {
             out.write(b, offset, length);
-            written += length;
         }
 
         /**
@@ -272,9 +268,9 @@ public class FileHandler extends java.util.logging.Handler {
         String strMaxFileSize = lmanager.getProperty(
                 LogConstants.MAX_FILE_SIZE);
         if ((strMaxFileSize == null) || (strMaxFileSize.length() == 0)) {
-            maxFileSize = 0;
+            maxFileSize = 0L;
         } else {
-            maxFileSize = Integer.parseInt(strMaxFileSize);
+            maxFileSize = Long.parseLong(strMaxFileSize);
         }
         location = lmanager.getProperty(LogConstants.LOG_LOCATION);
         if ((location == null) || (location.length() == 0)) {
@@ -293,28 +289,34 @@ public class FileHandler extends java.util.logging.Handler {
                     "Unable to initialize Formatter Class" + e);
         }
 
-        String rotation = lmanager.getProperty(LogConstants.LOGFILE_ROTATION);
-        try {
-            if (rotation != null) {
-                rotationInterval = Integer.parseInt(rotation);
-            }
-        } catch (NumberFormatException nfe) {
-            //if we cannot parse it, then we use the size based rotation
-            rotationInterval = -1;
+        String strRotateEnabled = lmanager.getProperty(LogConstants.ENABLE_ROTATION);
+        if (strRotateEnabled != null && !strRotateEnabled.isEmpty()) {
+            rotateEnabled = Boolean.parseBoolean(strRotateEnabled);
         }
-        if (rotationInterval > 0) {
-            lastRotation = System.currentTimeMillis();
-            rotatingBySize = false;
+        if (rotateEnabled) {
+            String rotation = lmanager.getProperty(LogConstants.LOGFILE_ROTATION);
+            try {
+                if (rotation != null) {
+                    rotationInterval = Integer.parseInt(rotation);
+                }
+            } catch (NumberFormatException nfe) {
+                //if we cannot parse it, then we use the size based rotation
+                rotationInterval = -1;
+            }
+            if (rotationInterval > 0) {
+                lastRotation = System.currentTimeMillis();
+                rotatingBySize = false;
+            }
         }
     }
 
     private void openFiles(String fileName) throws IOException {
-        if (rotatingBySize) {
+        if (rotateEnabled && rotatingBySize) {
             // make sure that we have a valid maxFileSize
             if (maxFileSize < 0) {
                 Debug.error(fileName
                         + ":FileHandler: maxFileSize cannot be negative");
-                maxFileSize = 0;
+                maxFileSize = 0L;
             }
         }
         // make sure that we have a valid history count
@@ -340,13 +342,7 @@ public class FileHandler extends java.util.logging.Handler {
      * Create a file of the name of FileOutputStream.
      */
     private void open(File fileName, boolean append) throws IOException {
-        String filename = fileName.toString();
-        int len = 0;
-        len = (int) fileName.length();
-        FileOutputStream fout = new FileOutputStream(filename, append);
-
-        BufferedOutputStream bout = new BufferedOutputStream(fout);
-        meteredStream = new MeteredStream(bout, len);
+        meteredStream = new MeteredStream(fileName, append);
         setOutputStream(meteredStream);
         checkForHeaderWritten(fileName.toString());
     }
@@ -370,7 +366,7 @@ public class FileHandler extends java.util.logging.Handler {
             Debug.error(fileName +
                     ":FileHandler: could not instantiate Formatter", fie);
         }
-        if (!rotatingBySize) {
+        if (rotateEnabled && !rotatingBySize) {
             fileName = wrapFilename(fileName);
         }
         fileName = location + fileName;
@@ -419,16 +415,14 @@ public class FileHandler extends java.util.logging.Handler {
             } catch (IllegalArgumentException iae) {
                 Debug.error("Date format invalid; " + suffixFormat, iae);
             }
-
-            if (suffixDateFormat != null) {
-                newFileName.append(suffixDateFormat.format(new Date()));
-            }
         }
         if (rotationInterval > 0 && suffixDateFormat == null) {
             //fallback to a default dateformat, so the logfilenames will differ
             suffixDateFormat = new SimpleDateFormat(DEFAULT_LOG_SUFFIX_FORMAT);
         }
-
+        if (suffixDateFormat != null) {
+            newFileName.append(suffixDateFormat.format(new Date()));
+        }
         return newFileName.toString();
 
     }
@@ -568,19 +562,22 @@ public class FileHandler extends java.util.logging.Handler {
     }
 
     private boolean needsRotation(String message) {
-        if (rotatingBySize) {
-            if (message.length() > 0 &&
-                    meteredStream.written + message.length() >= maxFileSize) {
-                return true;
-            }
-        } else {
-            Calendar now = Calendar.getInstance();
-            Calendar then = Calendar.getInstance();
-            then.setTimeInMillis(lastRotation);
+        if (rotateEnabled) {
+            if (rotatingBySize) {
+                if (!message.isEmpty()
+                        && new File(meteredStream.filename).length() >= maxFileSize
+                                - message.length()) {
+                    return true;
+                }
+            } else {
+                Calendar now = Calendar.getInstance();
+                Calendar then = Calendar.getInstance();
+                then.setTimeInMillis(lastRotation);
 
-            then.add(Calendar.MINUTE, rotationInterval);
-            if (now.after(then)) {
-                return true;
+                then.add(Calendar.MINUTE, rotationInterval);
+                if (now.after(then)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -691,14 +688,15 @@ public class FileHandler extends java.util.logging.Handler {
                 if (fis != null) {
                     fis.close();
                 }
-
+            } catch (IOException ex) {
+                Debug.error(fileName + ":FileHandler: copyFile: IOException while closing file", ex);
+            }
+            try {
                 if (fos != null) {
                     fos.close();
                 }
             } catch (IOException ex) {
-                Debug.error(fileName + 
-                    ":FileHandler: copyFile: IOException while closing file",
-                    ex);
+                Debug.error(fileName + ":FileHandler: copyFile: IOException while closing file", ex);
             }
         }
     }
@@ -824,7 +822,7 @@ public class FileHandler extends java.util.logging.Handler {
     private void startTimeBufferingThread() {
         String period = lmanager.getProperty(LogConstants.BUFFER_TIME);
         long interval;
-        if ((period != null) || (period.length() != 0)) {
+        if ((period != null) && (period.length() != 0)) {
             interval = Long.parseLong(period);
         } else {
             interval = LogConstants.BUFFER_TIME_DEFAULT;

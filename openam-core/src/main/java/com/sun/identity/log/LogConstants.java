@@ -26,8 +26,9 @@
  *
  */
 
-/**
- * Portions Copyrighted 2011 ForgeRock AS
+/*
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log;
 
@@ -584,4 +585,9 @@ public class LogConstants {
      * Attribute defining the rotation interval in minutes.
      */
     public static final String LOGFILE_ROTATION = "openam-logging-file-rotation";
+
+    /**
+     * Key name for enable/disable log rotation.
+     */
+    public static final String ENABLE_ROTATION = "openam-logging-file-rotation-enabled";
 }

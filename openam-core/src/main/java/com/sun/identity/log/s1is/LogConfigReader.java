@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.log.s1is;
@@ -225,7 +226,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read password ", e);
         }
         // Database USER
@@ -238,7 +239,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read db user ", e);
         }
         // all Fields
@@ -295,8 +296,21 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(tempBuffer).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read log-field ", e);
+        }
+        // Enable log rotation
+        try {
+            key = LogConstants.ENABLE_ROTATION;
+            value = CollectionHelper.getMapAttr(logAttributes, key);
+            if ((value == null) || (value.length() ==0)) {
+                debug.warning("LogConfigReader: Enable Log Rotation string is null");
+            } else {
+                sbuffer.append(key).append("=")
+                       .append(value).append(LogConstants.CRLF);
+            }
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read enable log rottion ", e);
         }
         // Max file size
         try {
@@ -308,7 +322,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read maxfilesize ", e);
         }
         // log filename prefix
@@ -360,7 +374,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read numhistfiles ", e);
         }
         // archiver  class
@@ -373,7 +387,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read filehandler ", e);
         }
         // file handler class
@@ -387,7 +401,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read filehandler ", e);
         }
         // secure File handler class
@@ -400,9 +414,8 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
-            debug.error("LogConfigReader: Could not read " +
-                "secure filehandler ", e);
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read " + "secure filehandler ", e);
         }
         // db handler class
         try {
@@ -414,7 +427,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read dbhandler ", e);
         }
         // remote handler class
@@ -427,7 +440,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read remotehandler ", e);
         }
         
@@ -441,7 +454,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read elfformatter ", e);
         }
         // secure elf formatter class
@@ -455,7 +468,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read secure formatter ", e);
         }
         
@@ -465,7 +478,7 @@ public class LogConfigReader implements ServiceListener{
             value = CollectionHelper.getMapAttr(logAttributes, key);
             sbuffer.append(key).append("=")
                    .append(value).append(LogConstants.CRLF);
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read dbformatter ", e);
         }
         // db formatter class
@@ -474,7 +487,7 @@ public class LogConfigReader implements ServiceListener{
             value = CollectionHelper.getMapAttr(logAttributes, key);
             sbuffer.append(key).append("=")
                    .append(value).append(LogConstants.CRLF);
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read remoteformatter ", e);
         }
         // authz class
@@ -487,7 +500,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read authz class", e);
         }
 
@@ -567,7 +580,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read logverify period", e);
         }
         // log signing period in seconds
@@ -580,7 +593,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read sign fieldname ", e);
         }
         // file read handler class
@@ -594,9 +607,8 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
-            debug.error("LogConfigReader: Could not read " +
-                "filehandler class ", e);
+        } catch (Exception e) {
+            debug.error("LogConfigReader: Could not read " + "filehandler class ", e);
         }
         // DB read handler class
         try {
@@ -608,9 +620,8 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
-            debug.error("LogConfigReader: could not read DBreadhandler class ",
-                e);
+        } catch (Exception e) {
+            debug.error("LogConfigReader: could not read DBreadhandler class ", e);
         }
         // MAX_RECORDS
         try {
@@ -622,7 +633,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read max-records ", e);
         }
         // FILES_PER_KEYSTORE
@@ -636,7 +647,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader:Could not read files per keystore", e);
         }
         // Token Generating Class
@@ -855,7 +866,7 @@ public class LogConfigReader implements ServiceListener{
                 sbuffer.append(key).append("=")
                        .append(value).append(LogConstants.CRLF);
             }
-        }   catch (Exception e) {
+        } catch (Exception e) {
             debug.error("LogConfigReader: Could not read platform ", e);
         }
         // processing naming attributes

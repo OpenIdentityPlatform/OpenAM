@@ -29,6 +29,7 @@
 -->
 <!--
     Portions Copyrighted 2011-2014 ForgeRock AS
+    Portions Copyrighted 2014 Nomura Research Institute, Ltd
 -->
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
@@ -45,6 +46,18 @@
                     i18nKey="">
                     <DefaultValues>
                         <Value>iplanet-am-logging-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-logging-file-rotation-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a101">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nYes">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nNo">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-logging-max-file-size"
