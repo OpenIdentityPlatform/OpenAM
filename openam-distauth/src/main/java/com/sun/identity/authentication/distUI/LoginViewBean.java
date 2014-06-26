@@ -1356,32 +1356,26 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 }
             }
             
-            Map headers = remoteResponse.getHeaders();
-            Set keys = headers.keySet();
-            
-            it = keys.iterator();
-            
-            while (it.hasNext()) {
-                String name = (String) it.next();
-                Object obj = headers.get(name);
-                
-                if (obj instanceof String) {
-                    response.addHeader(name, (String) obj);
-                } else if (obj instanceof Integer) {
-                    response.addIntHeader(name, ((Integer) obj).intValue());
+            Map<String, Set<Object>> headers = remoteResponse.getHeaders();
+            for (Map.Entry<String, Set<Object>> entry : headers.entrySet()) {
+                String name = entry.getKey();
+                Set<Object> value = entry.getValue();
+                for (Object obj : value) {
+                    if (obj instanceof String) {
+                        response.addHeader(name, (String) obj);
+                    } else if (obj instanceof Integer) {
+                        response.addIntHeader(name, ((Integer) obj).intValue());
+                    } 
                 }
             }
             
-            Map dateHeaders = remoteResponse.getDateHeaders();
-            keys = dateHeaders.keySet();
-            
-            it = keys.iterator();
-            
-            while (it.hasNext()) {
-                String name = (String) it.next();
-                Long date = (Long) headers.get(name);
-       
-                response.addDateHeader(name, date.longValue());
+            Map<String, Set<Long>> dateHeaders = remoteResponse.getDateHeaders();
+            for (Map.Entry<String, Set<Long>> entry : dateHeaders.entrySet()) {
+                String name = entry.getKey();
+                Set<Long> value = entry.getValue();
+                for (Long date : value) {
+                    response.addDateHeader(name, date.longValue());
+                }
             }
 
             // process only once per request
