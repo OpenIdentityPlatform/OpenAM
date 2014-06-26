@@ -17,7 +17,6 @@
 package com.sun.identity.authentication.share;
 
 import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 
@@ -51,11 +50,11 @@ public class RedirectCallbackHandler {
                     + ", RedirectData : " + redirectCallback.getRedirectData());
         }
 
-        String qString = AuthUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
+        String qString = AuthClientUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
 
         // Create Cookie
         try {
-            AuthUtils.setRedirectBackServerCookie(redirectCallback.getRedirectBackUrlCookieName(),
+            AuthClientUtils.setRedirectBackServerCookie(redirectCallback.getRedirectBackUrlCookieName(),
             		loginURL, request, response);
         } catch (Exception e) {
             if (debug.messageEnabled()){
