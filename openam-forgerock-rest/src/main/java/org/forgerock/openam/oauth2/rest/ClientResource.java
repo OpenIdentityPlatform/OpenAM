@@ -51,6 +51,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
@@ -234,11 +235,21 @@ public class ClientResource  implements CollectionResourceProvider {
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(e);
+        } catch (org.forgerock.json.resource.BadRequestException e) {
+            responseVal.put("success", "false");
+            if (auditLogger.isAuditLogEnabled()) {
+                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
+                auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+            }
+            handler.handleError(e);
         }
     }
 
-    private boolean isSingle(String value) {
+    private boolean isSingle(String value) throws org.forgerock.json.resource.BadRequestException {
         AttributeSchema attributeSchema = serviceSchema.getAttributeSchema(value);
+        if (attributeSchema == null) {
+            throw new org.forgerock.json.resource.BadRequestException("Invalid OAuth2 Client attribute, " + value);
+        }
         AttributeSchema.UIType uiType = attributeSchema.getUIType();
         if (uiType != null && (uiType.equals(AttributeSchema.UIType.UNORDEREDLIST) ||
             uiType.equals(AttributeSchema.UIType.ORDEREDLIST))){
