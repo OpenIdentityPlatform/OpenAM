@@ -75,7 +75,7 @@ public class ScriptIdentityRepository {
      * @param attributeName  The attribute name to be set
      * @param attributeValues The new value of the attribute
      */
-    public void setAttributes(String userName, String attributeName, String[] attributeValues) {
+    public void setAttribute(String userName, String attributeName, String[] attributeValues) {
         ScriptedIdentity amIdentity = getIdentity(userName);
         amIdentity.setAttribute(attributeName, attributeValues);
         amIdentity.store();
