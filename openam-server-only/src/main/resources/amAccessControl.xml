@@ -254,6 +254,7 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthConfigViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthInstanceViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.ReorderAuthChainsViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.ScriptUploaderViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMInvalidURLViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.base.AMLoginViewBean" />

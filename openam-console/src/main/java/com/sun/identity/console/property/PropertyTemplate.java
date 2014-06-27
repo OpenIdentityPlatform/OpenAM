@@ -122,6 +122,8 @@ public interface PropertyTemplate {
     String COMPONENT_LINK_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCHrefTag\">\n<attribute name=\"onClick\" value=\"openNewWindow();\" /><attribute name=\"queryParams\" value=\"{0}\" /><attribute name=\"target\" value=\"newwindow\" /><cc name=\"{1}\" tagclass=\"com.sun.web.ui.taglib.html.CCStaticTextFieldTag\">\n<attribute name=\"defaultValue\" value=\"{2}\" /></cc>\n";
     String COMPONENT_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"openNewWindow(); submitButton(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
     String COMPONENT_VALIDATE_BUTTON_START_TAG = "<cc name=\"dynLink\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitValidate(this, {0});\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
+    String COMPONENT_UPLOAD_BUTTON_START_TAG = "<cc name=\"{0}UploadButton\" tagclass=\"com.sun.web.ui.taglib.html.CCButtonTag\">\n<attribute name=\"onClick\" value=\"submitFileUpload(this, ''{0}''); return false;\" /><attribute name=\"defaultValue\" value=\"{1}\" />\n";
+
     String TEXTBOX_SIZE_TAG =
         "<attribute name=\"size\" value=\"{0}\" />\n";
     String TEXTAREA_SIZE_TAG = "<attribute name=\"cols\" value=\"{0}\" />\n<attribute name=\"rows\" value=\"{1}\" />\n";

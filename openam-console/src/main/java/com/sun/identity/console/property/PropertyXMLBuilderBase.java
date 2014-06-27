@@ -134,6 +134,8 @@ public abstract class PropertyXMLBuilderBase
     protected String currentRealm;
 
     private static final String NO_VALIDATOR = "no";
+    private static final String VALIDATE_LABEL = "label.validate";
+    private static final String UPLOAD_LABEL = "label.upload";
     private final Set<String> dynamicValidatorsFound = new HashSet<String>();
 
     static String getTagClassName(AttributeSchema as) {
@@ -481,7 +483,6 @@ public abstract class PropertyXMLBuilderBase
 
             addLabel(as, xml, serviceBundle);
 
-
             if (addremovelist) {
                 xml.append(GROUP_START_TAG).append(PROPERTY_START_TAG);
                 appendAddRemoveListComponent(as, xml, serviceBundle);
@@ -686,12 +687,29 @@ public abstract class PropertyXMLBuilderBase
      */
     private void buildDynamicValidationXML(AttributeSchema as, StringBuffer xml, AMModel model) {
         final String name = getAttributeNameForPropertyXML(as);
-        final String validateString = model.getLocalizedString("label.validate");
+        final String validateString = model.getLocalizedString(VALIDATE_LABEL);
         final Object[] pLink = {"'" + name + "'", validateString};
         xml.append(PROPERTY_START_TAG);
         xml.append(MessageFormat.format(COMPONENT_VALIDATE_BUTTON_START_TAG, pLink));
         xml.append(COMPONENT_END_TAG);
         xml.append(PROPERTY_END_TAG);
+    }
+
+    /**
+     * Adds a file upload button below the last attribute added. This will dynamically upload a file and then paste
+     * the contents back into the field of the previous attribute on the form.
+     *
+     * @param as The attribute that describes this UI element.
+     * @param xml The XML document to add the element to.
+     * @param model The AMModel that stores admin constants.
+     */
+    private void buildFileUploadXML(AttributeSchema as, StringBuffer xml, AMModel model) {
+        final String name = getAttributeNameForPropertyXML(as);
+        final String label = model.getLocalizedString(UPLOAD_LABEL);
+        xml.append(PROPERTY_START_TAG)
+           .append(MessageFormat.format(COMPONENT_UPLOAD_BUTTON_START_TAG, name, label))
+           .append(COMPONENT_END_TAG)
+           .append(PROPERTY_END_TAG);
     }
 
     private void addLabel(
@@ -1076,6 +1094,10 @@ public abstract class PropertyXMLBuilderBase
                                                                                 
                 if (tagClassName.equals(TAGNAME_PASSWORD)) {
                     buildConfirmPasswordXML(as, xml, model, serviceBundle);
+                }
+
+                if (AttributeSchema.Syntax.SCRIPT.equals(as.getSyntax())) {
+                    buildFileUploadXML(as, xml, model);
                 }
 
                 if (hasDynamicValidator(as)) {

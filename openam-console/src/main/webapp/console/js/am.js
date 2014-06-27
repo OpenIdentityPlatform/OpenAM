@@ -30,6 +30,12 @@
  * Portions Copyright 2014 ForgeRock AS
  */
 
+/**
+ * URL of JATO component that handles script upload.
+ * @type {string}
+ */
+var SCRIPT_UPLOAD_URL = "ScriptUploader";
+
 var origFrmAction = '';
 var tblBtnCounter = new Array();
 
@@ -58,6 +64,16 @@ function submitValidate(btn, val) {
     origFrmAction = frm.action;
     frm.action += '?dynamic_validation=true&attrname=' + val;
     setTimeout("resetForm()", 1000);
+}
+
+/**
+ * Submits a dynamic request to upload a file on a property sheet.
+ * @param btn The button from which this request originated.
+ * @param val The name of the attribute for which the validation is needed.
+ */
+function submitFileUpload(btn, val) {
+    var uploadWindow = window.open(SCRIPT_UPLOAD_URL, val, 'height=300,width=650');
+    uploadWindow.focus();
 }
 
 function resetForm() {
