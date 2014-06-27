@@ -259,24 +259,28 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         try {
 
-            if(restSecurity == null){
-                debug.warning("IdentityResource.createRegistrationEmail(): " +
-                        "Rest Security not created. restSecurity = " + restSecurity);
+            if (restSecurity == null) {
+                if (debug.warningEnabled()) {
+                    debug.warning("IdentityResource.createRegistrationEmail(): " +
+                            "Rest Security not created. restSecurity = " + restSecurity);
+                }
                 throw new NotFoundException("Rest Security Service not created" );
             }
-            if(!restSecurity.isSelfRegistration()){
-                debug.warning("IdentityResource.createRegistrationEmail(): Self-Registration set to :"
-                        + restSecurity.isSelfRegistration());
-                throw new NotFoundException("Self Registration is not accessible.");
+            if (!restSecurity.isSelfRegistration()) {
+                if (debug.warningEnabled()) {
+                    debug.warning("IdentityResource.createRegistrationEmail(): Self-Registration set to :"
+                            + restSecurity.isSelfRegistration());
+                }
+                throw new NotSupportedException("Self Registration is not enabled.");
             }
+
             // Get full deployment URL
-            HttpContext header = null;
-            header = context.asContext(HttpContext.class);
+            HttpContext header = context.asContext(HttpContext.class);
             StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
-            if(emailAddress == null || emailAddress.isEmpty()){
+            if (emailAddress == null || emailAddress.isEmpty()) {
                 throw new BadRequestException("Email not provided");
             }
 
@@ -300,7 +304,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
             StringBuilder confURLBuilder = new StringBuilder(100);
-            if(confURL == null || confURL.isEmpty()) {
+            if (confURL == null || confURL.isEmpty()) {
                 confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
             } else {
                 confURLBuilder.append(confURL);
@@ -319,11 +323,14 @@ public final class IdentityResource implements CollectionResourceProvider {
             debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + be.getMessage());
             handler.handleError(be);
-        } catch (NotFoundException nfe){
+        } catch (NotFoundException nfe) {
             debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + nfe.getMessage());
             handler.handleError(nfe);
-        } catch (Exception e){
+        } catch (NotSupportedException nse) {
+            debug.error("IdentityResource.createRegistrationEmail: Operation not enabled " + nse.getMessage());
+            handler.handleError(nse);
+        } catch (Exception e) {
             debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
                     + e.getMessage());
             handler.handleError(new NotFoundException("Email not sent"));
