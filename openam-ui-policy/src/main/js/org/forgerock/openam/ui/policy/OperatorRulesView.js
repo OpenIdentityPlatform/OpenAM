@@ -36,39 +36,80 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function(AbstractView, uiUtils, eventManager, constants, conf) {
     var OperatorRulesView = AbstractView.extend({
-        element: "#pickup-operator",
-        events: {},
-        data: {},  
 
-        render: function(data, callback) {
+        noBaseTemplate: true,
+        events: {
+            'change    li.operator select' : 'onSelect',
+            'onfocus   li.operator select' : 'checkOptions',
+            'mousedown li.operator select' : 'checkOptions',
+
+            'click     .icon-remove' : 'onDelete'
+        },
+        data: {},
+        mode: 'append',
+
+        render: function(data, callback, element, master) {
             this.data = data;
-            this.setElement(this.element);
-        },
-
-        newListItem: function(){
+            this.data.master = master ? master : false;
+            this.setElement(element);
             this.$el.html(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
-            this.$el.find("li.operator").find("select").bind("change", this.onSelect).trigger("change");
-            this.$el.find('.icon-remove').bind("click", this.onDelete); 
+            this.$el.find("li.operator select").trigger("change");
+            if (callback) {callback();}
         },
 
-        clearListItem: function(){
-            //TODO : unbind events first
-            this.$el.empty();
+        rebindElement: function(data, element){
+            this.data = data;
+            this.setElement(element);
+            this.delegateEvents();
         },
 
         onSelect: function(e){
-            
-            var item = $(e.currentTarget).parent(),
-                operator = e.currentTarget.value;
-            item.removeClass('any').removeClass('all').removeClass('none');
-            item.addClass(operator); 
 
-            item.data('operator', operator);
+            var item = $(e.currentTarget).parent(),
+                value = e.currentTarget.value,//$(e.currentTarget)[0].value;
+                data = _.find(this.data.operators, function(obj){
+                    return obj.title === value;
+            });
+
+            _.each(this.data.operators, function(obj){
+                item.removeClass( obj.title.toLowerCase() );
+            });
+
+            // TODO: these values need to come from the data
+            // item.removeClass('or').removeClass('and').removeClass('not');
+
+            item.data('operator',data);
+            item.addClass(value.toLowerCase());
+
         },
 
 
+
+        checkOptions: function(e){
+
+            var parent = $(e.target).parent(),
+                operator = parent.data().operator,
+                dropbox = parent.children('ol.dropbox'),
+                select = dropbox.parent().children('select'),
+                option = null;
+
+            // TODO: first call falls over - need to investigate why.
+            if(operator === undefined){return;}
+
+            if (dropbox.children(':not(.dragged)').length > 1) {
+                _.each(this.data.operators, function(obj){
+                    option = select.find('option[value="'+obj.title+'"]');
+                    option.prop('disabled', obj.config.properties.condition ? true : false);
+                });
+
+            } else {
+                select.children().prop('disabled', false);
+            }
+        },
+
         onDelete: function(e){
-            var item = $(e.currentTarget).closest('li');
+            var item = $(e.currentTarget).closest('li'),
+                self = this;
             //TODO : unbind events
             item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBotttom: 0, opacity:0}, function(){
                 item.remove();
@@ -89,10 +130,10 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
                 dropbox.removeClass('closed');
             }
         }*/
-      
+
 
     });
 
 
-    return new OperatorRulesView();
+    return OperatorRulesView;
 });

@@ -1,8 +1,8 @@
 /* VARIABLES */
 
-@any-color: 	#DDE9FF;
-@all-color: 	#C3DFC5;
-@none-color: 	#E7D1CB;
+@or-color: 		#DDE9FF;
+@and-color: 	#C3DFC5;
+@not-color: 	#E7D1CB;
 @subject-color: #CCC;
 @grabber-image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAFCAYAAABvsz2cAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACNJREFUeNpiZGBg8AViBhYQ8f///3pGIHEGxAExGFAYAAEGABbSDZWLLysMAAAAAElFTkSuQmCC";
 
@@ -18,9 +18,9 @@
 }
 
 /* POLICY */
-body.dragging, 
+body.dragging,
 body.dragging *{
-	cursor: move !important;
+		cursor: move !important;
 }
 
 body.editing{
@@ -37,7 +37,7 @@ body.editing{
 		right: 0;
 		z-index: 700;
 		margin: -8px 48px 0;
-	
+
 		.icon-cog{
 			font-size: 36px;
 		}
@@ -74,7 +74,7 @@ body.editing{
 	}
 
 	ol ol{
-	  padding: 1px;
+		padding: 1px;
 	  background: white;
 	  margin: 5px 0 0;
 	  min-height: 8px;
@@ -86,10 +86,10 @@ body.editing{
 		border: 1px solid #ccc;
 		min-height: 120px;
 
-		.pickup {
+		ol#pickup-item {
 
 			li.operator, li.subject, li.environment{
-		 		margin: 10px 0 0; 		
+		 		margin: 10px 0 0;
 				cursor: move;
 				box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
 				background-image:url(@grabber-image);
@@ -97,6 +97,8 @@ body.editing{
 					position: absolute;
 					left: 55px;
 					right: 55px;
+					/*To stop it appearing over accordion. Overridden later*/
+					display: none;
 				}
 
 				span.item-button-panel{
@@ -206,22 +208,25 @@ body.editing{
 
 			&.operator {
 
-				&.any {
-					background-color:@any-color;
-					 > span {color:darken(@any-color, 40%)}
-					 &.dragged {background-color:darken(@any-color, 10%)}
+				&.or {
+					background-color:@or-color;
+					 > span {color:darken(@or-color, 40%)}
+					 &.dragged {background-color:darken(@or-color, 10%)}
+					 > ol > .placeholder {background-color:darken(@or-color, 20%)}
 				}
 
-				&.all {
-					background-color:@all-color;
-					> span {color:darken(@all-color, 40%)}
-					&.dragged {background-color:darken(@all-color, 10%)}
-				} 
-			
-				&.none {
-					background-color:@none-color;
-					> span{ color:darken(@none-color, 40%) }
-					&.dragged {background-color:darken(@none-color, 10%)}
+				&.and {
+					background-color:@and-color;
+					> span {color:darken(@and-color, 40%)}
+					&.dragged {background-color:darken(@and-color, 10%)}
+					> ol > .placeholder {background-color:darken(@and-color, 20%)}
+				}
+
+				&.not {
+					background-color:@not-color;
+					> span{ color:darken(@not-color, 40%) }
+					&.dragged {background-color:darken(@not-color, 10%)}
+					> ol > .placeholder {background-color:darken(@not-color, 20%)}
 				}
 			}
 
@@ -237,11 +242,11 @@ body.editing{
 			}
 		}
 
-	} 
+	}
 
 	.item-subject-data{
 
-		padding: 7px 5px 0 5px;	
+		padding: 7px 5px 0 5px;
 
 		> div{
 			color: #555;
@@ -269,11 +274,11 @@ body.editing{
 
 	}
 
-	li.editing .item-subject-data, ol.pickup li:not(.dragged) .item-subject-data{
-		padding: 0;	
+	li.editing .item-subject-data, ol#pickup-item li:not(.dragged) .item-subject-data{
+		padding: 0;
 	}
 
-	
+
 	.field-float-select {
 
 	  	position:relative;
@@ -287,7 +292,7 @@ body.editing{
 			-webkit-appearance: none;
 			background: url('../img/sort_both.png') no-repeat right #fff;
 
-			.placeholder {
+			.placeholderText {
 				color: #aaa;
 			}
 		}
@@ -296,7 +301,7 @@ body.editing{
 
 	.field-float-pattern, .field-float-select {
 
-		label { 
+		label {
 		  	font-size:11px;
 		  	color:#555;
 		  	transition: all 0.1s linear;
@@ -336,8 +341,8 @@ body.editing{
 		    	-webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.1) inset,0 0 0 50px white inset;
 				&:focus {
 					-webkit-box-shadow: 0 0 1px 1px #4481c4,0 0 0 50px white inset;
-				} 
-			} 
+				}
+			}
 
 			&:read-only{
 				display:none;
@@ -345,4 +350,14 @@ body.editing{
 		}
 	}
 
+}
+
+/*Overrides for accordion states*/
+section.active-step{
+
+	#condition-management #pickup-area ol#pickup-item li.operator:not(.dragged),
+	#condition-management #pickup-area ol#pickup-item li.subject:not(.dragged),
+	#condition-management #pickup-area ol#pickup-item li.environment:not(.dragged) {
+		display: block;
+	}
 }

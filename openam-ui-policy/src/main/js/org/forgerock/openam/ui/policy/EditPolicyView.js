@@ -43,13 +43,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             'click input[name=nextButton]': 'openNextStep'
         },
         data:{              // Mock data to be replaced later
-            operators: [
-                { key: "all",  value: "ALL"  },
-                { key: "any",  value: "ANY"  },
-                { key: "none", value: "NONE" }
-            ],
             subjects: [
-            { 
+            {
                 type: "Virtual Subject",
                 list: [
                     { name: "iplanet-am-session-get-valid-sessions" },
@@ -61,10 +56,10 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     { name: "iplanet-am-user-federation-info" }
                 ]
             },
-            { 
+            {
                 type: "Attribute Subject",
                 list: [
-                   
+
                     { name: "sunIdentityServerPPCommonNameMN" },
                     { name: "iplanet-am-session-get-valid-sessions" },
                     { name: "sunIdentityServerPPFacadegreetmesound" },
@@ -72,7 +67,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     { name: "iplanet-am-user-admin-start-dn" }
                 ]
             },
-            { 
+            {
                 type: "Identity Repository User",
                 list: [
                     { name: "sunIdentityServerPPInformalName" },
@@ -80,7 +75,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     { name: "sunIdentityServerPPLegalIdentityGender" }
                 ]
             },
-            {  
+            {
                 type: "Identity Repository Group",
                 list: [
                     { name: "iplanet-am-user-password-reset-question-answer" },
@@ -89,12 +84,183 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     { name: "sunIdentityServerPPDemographicsDisplayLanguage" },
                     { name: "iplanet-am-user-federation-info" }
                 ]
-            }
-          ]
-        },
+            }],
 
-           
-        
+
+            "result" :
+            [
+              {
+                "title" : "OR",
+                "logical" : true,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "conditions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "any"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "Time",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "startTime" : {
+                      "type" : "string"
+                    },
+                    "endTime" : {
+                      "type" : "string"
+                    },
+                    "startDay" : {
+                      "type" : "string"
+                    },
+                    "endDay" : {
+                      "type" : "string"
+                    },
+                    "startDate" : {
+                      "type" : "string"
+                    },
+                    "endDate" : {
+                      "type" : "string"
+                    },
+                    "enforcementTimeZone" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "IP",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "startIp" : {
+                      "type" : "string"
+                    },
+                    "endIp" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "StringAttribute",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "attributeName" : {
+                      "type" : "string"
+                    },
+                    "value" : {
+                      "type" : "string"
+                    },
+                    "caseSensitive" : {
+                      "type" : "boolean",
+                      "required" : true
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "Policy",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "className" : {
+                      "type" : "string"
+                    },
+                    "properties" : {
+                      "type" : "object"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "DNSName",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "domainNameMask" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "AttributeLookup",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "key" : {
+                      "type" : "string"
+                    },
+                    "value" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "AND",
+                "logical" : true,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "conditions" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "any"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "NumericAttribute",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "attributeName" : {
+                      "type" : "string"
+                    },
+                    "operator" : {
+                      "type" : "string",
+                      "enum" : [ "LESS_THAN", "LESS_THAN_OR_EQUAL", "EQUAL", "GREATER_THAN_OR_EQUAL", "GREATER_THAN" ]
+                    },
+                    "value" : {
+                      "type" : "number"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "NOT",
+                "logical" : true,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "condition" : {
+                      "type" : "object",
+                      "properties" : {
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+
+        },
 
         render: function (args, callback) {
             var self = this,

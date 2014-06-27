@@ -30,21 +30,20 @@
 
 define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
         "org/forgerock/commons/ui/common/main/AbstractView",
-        "org/forgerock/openam/ui/policy/EditSubjectView",  
+        "org/forgerock/openam/ui/policy/EditSubjectView",
         "org/forgerock/openam/ui/policy/OperatorRulesView",
         "org/forgerock/commons/ui/common/main/EventManager",
         "org/forgerock/commons/ui/common/util/Constants",
         "org/forgerock/commons/ui/common/main/Configuration",
         "org/forgerock/commons/ui/common/util/UIUtils"
-    
-], function(AbstractView, editSubjectView, operatorRules, eventManager, constants, conf, uiUtils ) {
 
+], function(AbstractView, editSubjectView, OperatorRulesView, eventManager, constants, conf, uiUtils ) {
 
     var ManageSubjectsView = AbstractView.extend({
+
         template: "templates/policy/ManageSubjectsTemplate.html",
         noBaseTemplate: true,
         element: "#subjectContainer",
-       
         events: {
             'click  a#addSubject:not(.inactive)':       'addSubject',
             'click  a#addOperator:not(.inactive)':      'addOperator',
@@ -52,34 +51,32 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
         },
 
         buttons:{},
+        data: {},
 
- 
-        render: function(data, elem, type) {
 
-            this.setElement(elem);
+        render: function(data, callback) {
+
+            // TODO: to be replaced with data from REST via delegate or local storage
+            this.data.operators = _.filter(data.result, function(item){ return item.logical === true; });
+            this.setElement(this.element);
+
             this.parentRender(function() {
 
                 this.buttons.clearBtn       = this.$el.find("a#clear");
                 this.buttons.addSubject     = this.$el.find("a#addSubject");
                 this.buttons.addOperator    = this.$el.find("a#addOperator");
-                //this.buttons.addEnvironment = this.$el.find("a#addEnvironment");
 
-                this.initSorting();
+                editSubjectView.render({subjects:data.subjects}, null, this.element + ' #pickup-item');
+                editSubjectView.on(editSubjectView.EDIT_START, _.bind( this.editStart, this));
+                editSubjectView.on(editSubjectView.EDIT_STOP,  _.bind( this.editStop));
 
-                // to be replaced with data from REST via delegate or local storage
-                var operators = _.filter(data.result, function(item){ return item.logical === true; });
-
-                editSubjectView.render({subjects:data.subjects});
-                operatorRules.render({operators:data.operators});
-                //environmentConditions.render(data);
-
-                editSubjectView.on(editSubjectView.constants.EDIT_START, _.bind( this.editStart, this));
-                editSubjectView.on(editSubjectView.constants.EDIT_STOP,  _.bind( this.editStop));
+                var operatorRules = new OperatorRulesView();
+                operatorRules.render(this.data, null, this.$el.find('#dropoff-area'), true );
 
                 this.onClear();
-           
-                this.$el.find(".operator").find("select").on('change', _.bind(operatorRules.onSelect, operatorRules)).trigger("change");
+                this.initSorting();
 
+                if (callback) {callback();}
             });
 
         },
@@ -90,8 +87,8 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 adjustment = {};
 
             this.$el.find("ol#dropbox").sortable({
-                group:'rule-creation-group',
-                exclude:'.item-button-panel, li.editing', 
+                group: self.element + ' rule-creation-group',
+                exclude:'.item-button-panel, li.editing',
                 delay: 100,
 
                 // set item relative to cursor position
@@ -99,7 +96,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                     var offset = item.offset(),
                         pointer = container.rootGroup.pointer;
                     self.adjustment = {
-                        left: pointer.left - offset.left,
+                        left: pointer.left - offset.left + 5,
                         top: pointer.top - offset.top
                     };
 
@@ -107,10 +104,9 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                    if (!container.options.drop) {
 
                         if (item.hasClass('subject')) {
-                            editSubjectView.newListItem(item);    
-                        }  
-                        // else deal with operator specific functionality if there is any
-                        
+                            editSubjectView.newListItem(item);
+                        }
+
                     }
 
                     item.css({
@@ -132,29 +128,58 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 },
 
                 onDrop: function  (item, container, _super, event) {
-                  
-                    var clonedItem, newHeight, animeAttrs, data, jsonString;
-                    clonedItem = $('<li/>').css({height: 0, backgroundColor: 'transparent', borderColor: 'transparent'});
-                    item.before(clonedItem);
-                    newHeight = item.height();
-                    animeAttrs = clonedItem.position();
-                    animeAttrs.width = clonedItem.outerWidth()-20;
-                    item.addClass('dropped');
-                    clonedItem.animate({'height': newHeight }, 200, 'linear');
-                    item.animate( animeAttrs, 400, function  () {
 
-                        clonedItem.detach();
-                        item.removeClass('dropped');
+                    if (container.options.drop) {
+
+                        var clonedItem, newHeight, animeAttrs, data, jsonString, rule = null;
+                        clonedItem = $('<li/>').css({height: 0, backgroundColor: 'transparent', borderColor: 'transparent'});
+                        item.before(clonedItem);
+                        newHeight = item.height();
+                        animeAttrs = clonedItem.position();
+                        animeAttrs.width = clonedItem.outerWidth()-10;
+                        item.addClass('dropped');
+                        clonedItem.animate({'height': newHeight }, 400, 'linear');
+                        item.animate( animeAttrs, 400, function  () {
+
+                            clonedItem.detach();
+                            item.removeClass('dropped');
+
+                            if(item.data().operator){
+                                rule = $.extend( false, item, new OperatorRulesView() );
+                                rule.rebindElement(self.data, '#dropoff-area');
+                            }
+
+                            _super(item, container);
+                            self.logData();
+
+                        });
+
+                    } else {
+                        // TODO: Populate with data
+                        editSubjectView.newEditable();
                         _super(item, container);
-                        
-                    }); 
-                    
+                        self.logData();
+                    }
+
+                },
+
+                isValidTarget: function(item, container){
+
+                    if (container.items.length > 0 &&
+                        container.target.parent().data().operator &&
+                        container.target.parent().data().operator.config.properties.condition
+                    ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+
                 }
 
             });
 
-            this.$el.find("ol.pickup").sortable({
-                group: 'rule-creation-group',
+            this.$el.find("ol#pickup-item").sortable({
+                group: self.element + ' rule-creation-group',
                 drop: false
             });
 
@@ -176,8 +201,8 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
         onClear: function(e) {
             if(e) { e.preventDefault();}
-            editSubjectView.clearEditable();
-            operatorRules.clearListItem();
+            // TODO : need to acutally delete the object, not just the DOM object
+            this.$el.find('#pickup-item').empty();
             this.setInactive(this.buttons.clearBtn, true);
             this.setInactive(this.buttons.addSubject, false);
             this.setInactive(this.buttons.addOperator, false);
@@ -186,8 +211,12 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
         addOperator: function(e) {
             e.preventDefault();
-            editSubjectView.clearEditable();
-            operatorRules.newListItem();
+            // TODO : need to acutally delete the object, not just the DOM object
+            this.$el.find('#pickup-item').empty();
+
+            var operatorRules = new OperatorRulesView();
+            operatorRules.render(this.data, null, this.$el.find('#pickup-item'));
+
             this.setInactive(this.buttons.clearBtn, false);
             this.setInactive(this.buttons.addSubject, false);
             this.setInactive(this.buttons.addOperator, true);
@@ -195,26 +224,23 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
         addSubject: function(e) {
             e.preventDefault();
+            // TODO : need to acutally delete the object, not just the DOM object
+            this.$el.find('#pickup-item').empty();
+
             editSubjectView.newEditable();
-            operatorRules.clearListItem();
             this.setInactive(this.buttons.clearBtn, false);
             this.setInactive(this.buttons.addSubject, true);
             this.setInactive(this.buttons.addOperator, false);
         },
-        
-        getData:function(e){
-            return JSON.stringify($("ol#dropbox").sortable("serialize").get(), null, 4);
-        }/*,
 
-        serialize: function ($parent, $children, parentIsContainer) {
-            var result = $.extend({}, $parent.data());
-            if(parentIsContainer) {
-                return [$children];
-            }
-            else if ($children[0]) {
-                result.children = $children;
-            }
-        }*/
+        logData:function(e){
+            // TODO - serialize data. This is just an example
+            var model = {};
+                model.operator = this.$el.find('#first-rule').data().operator;
+                model.children = this.$el.find('ol#dropbox').sortable("serialize").get();
+            // console.clear();
+            // console.log(JSON.stringify(model, null, 4));
+        }
 
     });
 

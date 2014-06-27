@@ -37,17 +37,15 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 ], function(AbstractView, uiUtils, eventManager, constants, conf) {
 
     var EditEnvironmentView = AbstractView.extend({
-        element: "#pickup-environment",
-        events: {
-            // 'change select#subjectType':  'changeSubjectType'
-            // 'click  #edit-rules-item .icon-cog': 'exitEdit',
-        },
+
+        events: {},
         data:{},
         editItem: null,
 
-        render: function(data) {
-            this.setElement(this.element);
+        render: function(data, callback, element) {
+            this.setElement(element);
             this.data = data;
+            if (callback) {callback();}
         },
 
         clearListItem: function(){
