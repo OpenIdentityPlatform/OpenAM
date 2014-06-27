@@ -622,12 +622,12 @@ public final class IdentityResource implements CollectionResourceProvider {
                 }
             }
             // Check to see if user is Active/Inactive
-            if(!isUserActive(uid)){
+            if (!isUserActive(uid)){
                 throw new ForbiddenException("Request is forbidden for this user");
             }
             // Check if email is provided
-            if(email == null || email.isEmpty()){
-                throw new BadRequestException("No email provided in profile.");
+            if (email == null || email.isEmpty()) {
+                throw new InternalServerErrorException("No email provided in profile.");
             }
 
             // Get full deployment URL
@@ -639,7 +639,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             String message = jVal.get("message").asString();
 
             // Retrieve email registration token life time
-            if(restSecurity == null){
+            if (restSecurity == null){
                 if (debug.warningEnabled()) {
                     debug.warning("Rest Security not created. restSecurity = " + restSecurity);
                 }

@@ -126,9 +126,6 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             var message = "notFoundError", responseMessage = JSON.parse(e.responseText).message;
             switch (e.status) {
                 case 400:
-                    if (responseMessage === 'No email provided in profile.') {
-                        message = "noEmailProvided";
-                    }
                     /* //not required as the XUI does not allow it
                     else if (responseMessage === "Username not provided") {
                         message = "noUserNameProvided"; 
@@ -144,7 +141,11 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 break;
 
                 case 500: //Invalid Server Configuration
-                    message = "internalError"; 
+                    if (responseMessage === 'No email provided in profile.') {
+                        message = "noEmailProvided";
+                    } else {
+                        message = "internalError";
+                    }
                 break;
 
                 case 503: //503 - Forgot password is not accessible. 
