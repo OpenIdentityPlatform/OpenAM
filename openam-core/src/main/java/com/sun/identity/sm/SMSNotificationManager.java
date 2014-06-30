@@ -24,6 +24,7 @@
  *
  * $Id: SMSNotificationManager.java,v 1.14 2009/11/10 21:49:44 hengming Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -124,8 +125,12 @@ public class SMSNotificationManager implements SMSObjectListener {
         // registration for notification is handled by AMSDK code in DataLayer
         // Since configuration change observer is registered, check if status
         // of datastore notification has changed
-        if (cachedEnabled && (enableDataStoreNotification || isClient) &&
-            (previousDataStoreNotification != enableDataStoreNotification)) {
+
+        // If cache is enabled AND (if the SMS Object is the remote implementation OR data store notification wasn't
+        // enabled previously) then we should attempt to register a listener for notifications. The remote SMS
+        // implementation checks if notification is enabled, and if not, it will use polling for detecting changes in
+        // the configuration.
+        if (cachedEnabled && (isClient || (enableDataStoreNotification && !previousDataStoreNotification))) {
             try {
                 object.registerCallbackHandler(this);
                 if (debug.messageEnabled()) {
