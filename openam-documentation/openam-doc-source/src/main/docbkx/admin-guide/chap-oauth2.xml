@@ -925,7 +925,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
    </listitem>
   </orderedlist>
 
-  <example xml:id="protect-web-site-with-oauth2"><?dbfo keep-together="auto"?>
+  <example xml:id="protect-web-site-with-oauth2">
    <title>Web Site Protected With OAuth 2.0</title>
 
    <para>
@@ -952,7 +952,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
      Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
      or <link xlink:href="jee-users-guide#jee-users-guide"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
-     Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+     Agent User's Guide</citetitle></link>
      for instructions on installing a policy agent. This example relies on the
      Apache Tomcat Java EE policy agent, configured to protect resources in
      Apache Tomcat at <literal>http://www.example.com:8080/</literal>.</para>

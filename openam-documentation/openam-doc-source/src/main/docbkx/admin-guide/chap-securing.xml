@@ -89,6 +89,15 @@
     both when the user does not exist, and also when the password is not
     valid.</para>
    </listitem>
+
+   <listitem>
+    <para>Remove the demo user account. For example, if you configure the embedded OpenDJ
+     directory server as a configuration and CTS store, the default demo user
+     account gets created during the installation process. You should
+     remove the user using the OpenAM console under Access Control &gt; / (Top Realm)
+     &gt; Subjects &gt; User.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
