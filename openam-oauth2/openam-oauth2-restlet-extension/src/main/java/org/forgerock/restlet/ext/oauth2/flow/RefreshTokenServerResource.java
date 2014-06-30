@@ -127,7 +127,8 @@ public class RefreshTokenServerResource extends AbstractFlow {
      */
     private CoreToken createRefreshToken(CoreToken refreshToken) {
         return getTokenStore().createRefreshToken(refreshToken.getScope(), OAuth2Utils.getRealm(getRequest()),
-                refreshToken.getUserID(), refreshToken.getClientID(), refreshToken.getRedirectURI());
+                refreshToken.getUserID(), refreshToken.getClientID(), refreshToken.getRedirectURI(),
+                refreshToken.getGrantType());
     }
 
     /**

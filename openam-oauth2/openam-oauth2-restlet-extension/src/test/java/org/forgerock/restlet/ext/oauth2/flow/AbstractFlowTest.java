@@ -217,9 +217,8 @@ public class AbstractFlowTest {
         });
 
         // Mock createRefreshToken
-        when(
-                realm.getTokenStore().createRefreshToken(anySet(), anyString(), anyString(),
-                        anyString(), any(String.class))).then(new Answer<CoreToken>() {
+        when(realm.getTokenStore().createRefreshToken(anySet(), anyString(), anyString(), anyString(),
+                any(String.class), any(String.class))).then(new Answer<CoreToken>() {
             @Override
             public CoreToken answer(InvocationOnMock invocation) throws Throwable {
                 CoreToken token = mock(CoreToken.class);
