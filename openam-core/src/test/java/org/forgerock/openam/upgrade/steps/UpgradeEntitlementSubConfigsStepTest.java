@@ -19,7 +19,7 @@ package org.forgerock.openam.upgrade.steps;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
-import com.sun.identity.entitlement.EntitlementCombiner;
+import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceMatch;
@@ -29,13 +29,6 @@ import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.mockito.ArgumentMatcher;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import org.w3c.dom.Document;
-
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,9 +37,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.mockito.ArgumentMatcher;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
 
 /**
  * Unit test to exercise the behaviour of {@link UpgradeEntitlementSubConfigsStep}.
@@ -57,6 +61,8 @@ public class UpgradeEntitlementSubConfigsStepTest {
             "-------------------------------------------------------%ENTITLEMENT_DATA%-";
     private static final Map<String, Boolean> TYPE_ACTIONS = new HashMap<String, Boolean>();
 
+    private static final String DEFAULT_COMBINER = "DenyOverride";
+
     private UpgradeStep upgradeStep;
 
     private EntitlementConfiguration entitlementService;
@@ -66,6 +72,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
     private ApplicationType type1;
+    private Application app;
 
     static {
         TYPE_ACTIONS.put("CREATE", Boolean.TRUE);
@@ -97,13 +104,31 @@ public class UpgradeEntitlementSubConfigsStepTest {
         connectionFactory = mock(DataLayerConnectionFactory.class);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(
                 entitlementService, adminTokenAction, connectionFactory);
+
+        final HashSet<String> conditions = new HashSet<String>();
+        conditions.add("condition.entry.1");
+        conditions.add("condition.entry.2");
+
+        final HashSet<String> subjects = new HashSet<String>();
+        subjects.add("subject.entry.1");
+        subjects.add("subject.entry.2");
+
+        final HashSet<String> resources = new HashSet<String>();
+        resources.add("http://*");
+        resources.add("https://*");
+
+        app = newApplication("application4", type1);
+        app.setConditions(conditions);
+        app.setSubjects(subjects);
+        app.setResources(resources);
+        app.setEntitlementCombinerName(DEFAULT_COMBINER);
     }
 
     @Test
     public void noNewTypesOrApplications() throws UpgradeException, InstantiationException, IllegalAccessException {
-        // Both application type 4 and application 4 exist, no need to add either.
+        // Both application type 4 and app (application 4) exist, no need to add either.
         mockTypes.add(newType("type4"));
-        mockApplications.add(newApplication("application4", type1));
+        mockApplications.add(app);
 
         when(entitlementService.getApplicationTypes()).thenReturn(mockTypes);
         when(entitlementService.getApplications()).thenReturn(mockApplications);
@@ -118,14 +143,14 @@ public class UpgradeEntitlementSubConfigsStepTest {
         upgradeStep.perform();
 
         verify(entitlementService, atMost(2)).getApplicationTypes();
-        verify(entitlementService).getApplications();
+        verify(entitlementService, times(2)).getApplications();
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
     @Test
     public void newTypeNoNewApplications() throws UpgradeException, EntitlementException {
         // Application 4 already exists, no need to add.
-        mockApplications.add(newApplication("application4", type1));
+        mockApplications.add(app);
 
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.<ApplicationType>emptySet());
         when(entitlementService.getApplications()).thenReturn(mockApplications);
@@ -140,7 +165,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         upgradeStep.perform();
 
         verify(entitlementService, atMost(2)).getApplicationTypes();
-        verify(entitlementService).getApplications();
+        verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
@@ -161,12 +186,13 @@ public class UpgradeEntitlementSubConfigsStepTest {
         assertThat(upgradeStep.getDetailedReport("-")).isEqualTo(
                 DETAILED_REPORT.replace("%ENTITLEMENT_DATA%", "New entitlement applications:-application4-"));
 
+        when(entitlementService.getApplications()).thenReturn(Collections.singleton(app));
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(type1));
         upgradeStep.perform();
 
         verify(entitlementService, atMost(3)).getApplicationTypes();
-        verify(entitlementService).getApplications();
-        verify(entitlementService).storeApplication(argThat(new ApplicationMatch()));
+        verify(entitlementService, atMost(5)).getApplications();
+        verify(entitlementService, times(4)).storeApplication(argThat(new ApplicationMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
@@ -185,12 +211,14 @@ public class UpgradeEntitlementSubConfigsStepTest {
                         "New entitlement application types:-type4-New entitlement applications:-application4-"));
 
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(type1));
+        when(entitlementService.getApplications()).thenReturn(Collections.singleton(app));
+
         upgradeStep.perform();
 
         verify(entitlementService, atMost(3)).getApplicationTypes();
-        verify(entitlementService).getApplications();
+        verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
-        verify(entitlementService).storeApplication(argThat(new ApplicationMatch()));
+        verify(entitlementService, times(4)).storeApplication(argThat(new ApplicationMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
 
@@ -200,7 +228,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         ApplicationType type = newType("type4");
         type.getActions().remove("UPDATE");
         mockTypes.add(type);
-        mockApplications.add(newApplication("application4", type1));
+        mockApplications.add(app);
 
         when(entitlementService.getApplicationTypes()).thenReturn(mockTypes);
         when(entitlementService.getApplications()).thenReturn(mockApplications);
@@ -212,7 +240,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         upgradeStep.perform();
 
         verify(entitlementService, atMost(3)).getApplicationTypes();
-        verify(entitlementService).getApplications();
+        verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
         verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
     }
@@ -232,7 +260,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
                     Arrays.asList("subject.entry.1", "subject.entry.2"), application.getSubjects());
             matches &= collectionMatch(
                     Arrays.asList("condition.entry.1", "condition.entry.2"), application.getConditions());
-            matches &= application.getEntitlementCombiner() instanceof DumbEntitlementCombiner;
+            matches &= application.getEntitlementCombiner() instanceof DenyOverride;
             return matches;
         }
 
@@ -401,19 +429,5 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
     }
 
-    // A basic implementation of {@link EntitlementCombiner}.
-    public static final class DumbEntitlementCombiner extends EntitlementCombiner {
-
-        @Override
-        protected boolean combine(Boolean b1, Boolean b2) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        protected boolean isCompleted() {
-            throw new UnsupportedOperationException();
-        }
-
-    }
 
 }

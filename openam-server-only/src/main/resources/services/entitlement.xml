@@ -479,6 +479,14 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <Value>Attribute</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
@@ -486,12 +494,18 @@
                             <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
                             <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
                             <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
-                            <Value>dateRange</Value>
+                            <Value>Time</Value>
+                            <Value>IP</Value>
+                            <Value>DNSName</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!-- <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
                             <Value>ipRange</Value>
@@ -499,11 +513,12 @@
                             <Value>timezone</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                           <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="crestPolicyService" id="application">
@@ -518,6 +533,14 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <Value>Attribute</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
@@ -525,11 +548,17 @@
                             <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
                             <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
-                            <Value>dateRange</Value>
+                            <Value>Time</Value>
+                            <Value>DNSName</Value>
+                            <Value>IP</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!-- <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
                             <Value>ipRange</Value>
@@ -537,11 +566,12 @@
                             <Value>timezone</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="sunIdentityServerDiscoveryService"
@@ -557,6 +587,14 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <Value>Attribute</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
@@ -564,12 +602,18 @@
                             <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
                             <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
                             <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
-                            <Value>dateRange</Value>
+                            <Value>Time</Value>
+                            <Value>DNSName</Value>
+                            <Value>IP</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!-- <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
                             <Value>ipRange</Value>
@@ -577,11 +621,12 @@
                             <Value>timezone</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="sunIdentityServerLibertyPPService"
@@ -596,6 +641,14 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <Value>Attribute</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
@@ -603,11 +656,18 @@
                             <Value>com.sun.identity.admin.model.AttributeViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
                             <Value>com.sun.identity.admin.model.AndViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
                             <!--<Value>com.sun.identity.admin.model.ActiveSessionTimeCondition</Value>-->
+                            <Value>Time</Value>
+                            <Value>DNSName</Value>
+                            <Value>IP</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
@@ -616,11 +676,12 @@
                             <Value>timezone</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="sunAMDelegationService"
@@ -635,12 +696,16 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>User</Value>
+                            <Value>Group</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="openProvisioning"
@@ -655,7 +720,8 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="paycheck"
@@ -672,24 +738,37 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <Value>AND</Value>
+                            <Value>OR</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
                             <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.AndViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.AndViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
+                            <Value>DNSName</Value>
+                            <Value>IP</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>dnsName</Value>
                             <Value>ipRange</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="calendar"
@@ -707,26 +786,38 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Role</Value>
+                            <Value>Group</Value>
+                            <Value>User</Value>
+                            <Value>OR</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
                             <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
                             <Value>com.sun.identity.admin.model.OrViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
+                            <Value>Time</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>dateRange</Value>
                             <Value>daysOfWeek</Value>
                             <Value>timeRange</Value>
                             <Value>timezone</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="im"
@@ -742,20 +833,29 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>Group</Value>
+                            <Value>Role</Value>
+                            <Value>User</Value>
+                            <!--
                             <Value>com.sun.identity.admin.model.IdRepoGroupViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoRoleViewSubject</Value>
                             <Value>com.sun.identity.admin.model.IdRepoUserViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
+                            <Value>Time</Value>
+                            <Value>DNSName</Value>
+                            <Value>IP</Value>
+                            <!--
                             <Value>daysOfWeek</Value>
                             <Value>dnsName</Value>
-                            <Value>ipRange</Value>
+                            <Value>ipRange</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="sunBank"
@@ -770,12 +870,20 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
+                            <Value>NOT</Value>
                             <Value>com.sun.identity.admin.model.BankingViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
-                            <Value>com.sun.identity.admin.model.NotViewSubject</Value>
+                            <!-- <Value>com.sun.identity.admin.model.VirtualViewSubject</Value>
+                            <Value>com.sun.identity.admin.model.NotViewSubject</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="conditions" />
+                            <Value>NumericAttribute</Value>
+                            <Value>Time</Value>
+                            <Value>IP</Value>
+                            <Value>OR</Value>
+                            <Value>AND</Value>
+                            <Value>NOT</Value>
+                            <!--
                             <Value>upperTransferLimit</Value>
                             <Value>lowerTransferLimit</Value>
                             <Value>anyTransferLimit</Value>
@@ -786,11 +894,12 @@
                             <Value>ipRange</Value>
                             <Value>or</Value>
                             <Value>and</Value>
-                            <Value>not</Value>
+                            <Value>not</Value> -->
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner" />
-                            <Value>com.sun.identity.entitlement.DenyOverride</Value>
+                            <Value>DenyOverride</Value>
+                            <!-- <Value>com.sun.identity.entitlement.DenyOverride</Value> -->
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
 
 /**
  * This is the base class for entitlement combiner. >code>DenyOverride</code>
@@ -379,4 +378,13 @@ public abstract class EntitlementCombiner {
      * @return <code>true</code> if policy decision can also be determined.
      */
     protected abstract boolean isCompleted();
+
+    /**
+     * Returns the name of this class for ease of reference.
+     *
+     * @return The simple name of this instance's class
+     */
+    public String getName() {
+        return getClass().getSimpleName();
+    }
 }

@@ -80,7 +80,7 @@
                         <AttributeValuePair>
                             <Attribute name="entitlementCombiner"/>
                             <Value>
-                                org.forgerock.openam.upgrade.steps.UpgradeEntitlementSubConfigsStepTest$DumbEntitlementCombiner
+                                DenyOverride
                             </Value>
                         </AttributeValuePair>
                     </SubConfiguration>

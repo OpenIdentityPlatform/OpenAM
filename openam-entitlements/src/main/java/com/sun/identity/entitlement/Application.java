@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.util.Reject;
 
 /**
@@ -92,6 +93,7 @@ public class Application implements Cloneable {
     private Set<String> conditions;
     private Set<String> subjects;
     private Set<String> resources;
+
     private Class entitlementCombiner;
     private Class searchIndex;
     private Class saveIndex;
@@ -106,7 +108,41 @@ public class Application implements Cloneable {
     private ISaveIndex saveIndexInstance;
     private ISearchIndex searchIndexInstance;
 
+    private final EntitlementRegistry registry;
+
+    /**
+     * Package-private contructor lets us test. The public default constructor
+     * passes through to here.
+     *
+     * @param registry Used to perform lookups for internal instantiations
+     */
+    Application(EntitlementRegistry registry) {
+        this.registry = registry;
+    }
+
+    /**
+     * Public, default constructor must be used so that derived classes
+     * can still use super().
+     */
     public Application() {
+        this(EntitlementRegistry.load());
+    }
+
+    /**
+     * Constructs an instance.
+     *
+     * @param name Name of Application.
+     * @param applicationType Its application type.
+     */
+    public Application(
+            String realm,
+            String name,
+            ApplicationType applicationType
+    ) {
+        this();
+        this.realm = realm;
+        this.name = name;
+        this.applicationType = applicationType;
     }
 
     /**
@@ -126,23 +162,6 @@ public class Application implements Cloneable {
      */
     public String getRealm() {
         return realm;
-    }
-
-    /**
-     * Constructs an instance.
-     *
-     * @param name Name of Application.
-     * @param applicationType Its application type.
-     */
-    public Application(
-        String realm,
-        String name,
-        ApplicationType applicationType
-    ) {
-        this.realm = realm;
-        this.name = name;
-        this.applicationType = applicationType;
-        setActions(applicationType.getActions());
     }
 
     @Override
@@ -218,6 +237,7 @@ public class Application implements Cloneable {
     public ApplicationType getApplicationType() {
         return applicationType;
     }
+
     /**
      * Returns set of supported condition class names.
      *
@@ -281,7 +301,10 @@ public class Application implements Cloneable {
      */
     public void setActions(Map<String, Boolean> actions) {
         this.actions.clear();
-        this.actions.putAll(actions);
+
+        if (actions != null) {
+            this.actions.putAll(actions);
+        }
     }
 
     /**
@@ -290,6 +313,11 @@ public class Application implements Cloneable {
      * @param conditions Supported condition class names.
      */
     public void setConditions(Set<String> conditions) {
+
+        if (conditions == null) {
+            conditions = new HashSet<String>();
+        }
+
         this.conditions = conditions;
     }
 
@@ -299,6 +327,11 @@ public class Application implements Cloneable {
      * @param subjects Supported subject class names.
      */
     public void setSubjects(Set<String> subjects) {
+
+        if (subjects == null) {
+            subjects = new HashSet<String>();
+        }
+
         this.subjects = subjects;
     }
 
@@ -375,6 +408,16 @@ public class Application implements Cloneable {
      */
     public void setEntitlementCombiner(Class entitlementCombiner) {
         this.entitlementCombiner = entitlementCombiner;
+    }
+
+    /**
+     * Sets entitlement combiner using the {@link EntitlementRegistry} to look up
+     * the appropriate class.
+     *
+     * @param entitlementCombiner name of the entitlement combiner to look up
+     */
+    public void setEntitlementCombinerName(String entitlementCombiner) {
+        this.entitlementCombiner = registry.getCombinerType(entitlementCombiner);
     }
 
     /**

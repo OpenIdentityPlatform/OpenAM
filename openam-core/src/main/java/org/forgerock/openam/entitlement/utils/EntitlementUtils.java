@@ -23,14 +23,25 @@ import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
+import static com.sun.identity.entitlement.opensso.EntitlementService.APPLICATION_CLASSNAME;
+import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_META;
+import static com.sun.identity.entitlement.opensso.EntitlementService.ATTR_NAME_SUBJECT_ATTR_NAMES;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ACTIONS;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_APPLICATION_DESC;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_CONDITIONS;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_ENTITLEMENT_COMBINER;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCES;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_RESOURCE_COMP_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SAVE_INDEX_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SEARCH_INDEX_IMPL;
+import static com.sun.identity.entitlement.opensso.EntitlementService.CONFIG_SUBJECTS;
 import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.sun.identity.entitlement.opensso.EntitlementService.*;
+import org.forgerock.util.Reject;
 
 /**
  * Utility methods for managing entitlements.
@@ -100,7 +111,7 @@ public final class EntitlementUtils {
         }
 
         String entitlementCombiner = getAttribute(data, CONFIG_ENTITLEMENT_COMBINER);
-        Class combiner = getEntitlementCombiner(entitlementCombiner);
+        Class combiner = getEntitlementCombiner(entitlementCombiner, app);
         app.setEntitlementCombiner(combiner);
 
         Set<String> conditionClassNames = data.get(CONFIG_CONDITIONS);
@@ -162,6 +173,50 @@ public final class EntitlementUtils {
     }
 
     /**
+     * Returns the combiner from the provided set of data within the entitlement format.
+     *
+     * @param data The entire set of information about an application. May not be null.
+     * @return A string of the combiners name, or null if the data set is empty.
+     */
+    public static String getCombiner(Map<String, Set<String>> data) {
+        Reject.ifNull(data);
+
+        Set<String> subData = data.get(CONFIG_ENTITLEMENT_COMBINER);
+
+        if (subData == null || subData.isEmpty()) {
+            return null;
+        }
+
+        return subData.iterator().next();
+    }
+
+    /**
+     * Returns the list of subjects from the provided set of data within
+     * the entitlement format.
+     *
+     * @param data The entire set of information about an application
+     * @return A set of Strings representing each of the conditions this application supports
+     */
+    public static Set<String> getSubjects(Map<String, Set<String>> data) {
+        Reject.ifNull(data);
+
+        return data.get(CONFIG_SUBJECTS);
+    }
+
+    /**
+     * Returns the list of conditions from the provided set of data within
+     * the entitlement format.
+     *
+     * @param data The entire set of information about an application
+     * @return A set of Strings representing each of the conditions this application supports
+     */
+    public static Set<String> getConditions(Map<String, Set<String>> data) {
+        Reject.ifNull(data);
+
+        return data.get(CONFIG_CONDITIONS);
+    }
+
+    /**
      * Converts the set of actions in key=value format to an actual map.
      *
      * @param data The set of actions that needs to be converted.
@@ -208,15 +263,40 @@ public final class EntitlementUtils {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 
-    private static Class getEntitlementCombiner(String className) {
-        if (className == null) {
-            return null;
+    /**
+     * Attempts to retrieve the Java Class associated with the name of an entitlement combiner.
+     *
+     * First, we attempt to use the new system, that being the application itself can
+     * look up the name from the {@link org.forgerock.openam.entitlement.EntitlementRegistry} such that
+     * the name is registered in there. This may fail. This step will be skipped if app is null.
+     *
+     * Second, attempts to use the given string to find a class using the provided name.
+     * This is so that older systems which used the canonical name to refer to the class to instantiate
+     * correctly find their class. This may also fail.
+     *
+     * If this fails, we simply return the default: {@link DenyOverride}.
+     *
+     * @param name the name used to reference the combiner. Must not be null.
+     * @param app the application whose entitlement registry will be used to perform the lookup. Can be null.
+     * @return the class represented by the name
+     */
+    private static Class getEntitlementCombiner(String name, Application app) {
+
+        Reject.ifNull(name);
+
+        if (app != null) {
+            app.setEntitlementCombinerName(name);
+            if (app.getEntitlementCombiner() != null) {
+                return app.getEntitlementCombinerClass();
+            }
         }
+
         try {
-            return Class.forName(className);
+            return Class.forName(name);
         } catch (ClassNotFoundException ex) {
             PrivilegeManager.debug.error("EntitlementService.getEntitlementCombiner", ex);
         }
+
         return DenyOverride.class;
     }
 }

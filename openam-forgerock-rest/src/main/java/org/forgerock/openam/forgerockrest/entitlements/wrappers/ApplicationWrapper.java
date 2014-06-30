@@ -27,6 +27,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.Reject;
 
 /**
  * Wrapper for the Jsonification of the Application class.
@@ -109,16 +110,11 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
      * @return True if we set an ApplicationType on this Application
      */
     @JsonIgnore
-    public boolean setApplicationType(Subject mySubject, String applicationTypeName, boolean setDefaultActions) {
+    public boolean setApplicationType(Subject mySubject, String applicationTypeName) {
         final ApplicationType appType = applicationTypeManagerWrapper.getApplicationType(mySubject, applicationTypeName);
 
         if (appType != null) {
             application.setApplicationType(appType);
-
-            if (setDefaultActions) {
-                application.setActions(application.getApplicationType().getActions());
-            }
-
             return true;
         }
 
@@ -132,10 +128,6 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
 
     @JsonProperty("actions")
     public void setActions(Map<String, Boolean> actions) {
-        if (actions == null) {
-            return; //these will be set by the default Actions of the ApplicationType
-        }
-
         application.setActions(actions);
     }
 
@@ -175,25 +167,17 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
     }
 
     @JsonProperty("entitlementCombiner")
-    public void setEntitlementCombiner(String classname) {
-
-        if (classname == null || classname.isEmpty()) {
-            return;
-        }
-
-        try {
-            application.setEntitlementCombiner(Class.forName(classname));
-        } catch (ClassNotFoundException e) {
-            debug.warning("EntitlementCombiner class not found, set to null.");
-        }
+    public void setEntitlementCombiner(String name) {
+        Reject.ifNull(name);
+        application.setEntitlementCombinerName(name);
     }
 
     @JsonProperty("entitlementCombiner")
     public String getEntitlementCombiner() {
-        return application.getEntitlementCombiner().getClass().getCanonicalName();
+        return application.getEntitlementCombiner().getName();
     }
 
-    @JsonProperty("searchIndex")
+    @JsonIgnore
     public void setSearchIndex(String classname) {
 
         if (classname == null || classname.isEmpty()) {
@@ -211,12 +195,12 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
     }
 
-    @JsonProperty("searchIndex")
+    @JsonIgnore
     public String getSearchIndex() {
         return application.getSearchIndex() == null ? null : application.getSearchIndex().getClass().getCanonicalName();
     }
 
-    @JsonProperty("saveIndex")
+    @JsonIgnore
     public void setSaveIndex(String classname) {
 
         if (classname == null || classname.isEmpty()) {
@@ -234,12 +218,12 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
     }
 
-    @JsonProperty("saveIndex")
+    @JsonIgnore
     public String getSaveIndex() {
         return application.getSaveIndex() == null ? null : application.getSaveIndex().getClass().getCanonicalName();
     }
 
-    @JsonProperty("resourceComparator")
+    @JsonIgnore
     public void setResourceComparator(String classname) {
 
         if (classname == null || classname.isEmpty()) {
@@ -257,7 +241,7 @@ public class ApplicationWrapper implements Comparable<ApplicationWrapper> {
         }
     }
 
-    @JsonProperty("resourceComparator")
+    @JsonIgnore
     public String getResourceComparator() {
         return application.getResourceComparator().getClass().getCanonicalName();
     }

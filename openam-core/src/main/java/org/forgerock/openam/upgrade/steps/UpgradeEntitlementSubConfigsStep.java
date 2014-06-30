@@ -19,22 +19,13 @@ package org.forgerock.openam.upgrade.steps;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationType;
+import com.sun.identity.entitlement.DenyOverride;
+import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
+import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
+import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
 import com.sun.identity.sm.SMSUtils;
-import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.inject.Inject;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -45,10 +36,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
+import javax.inject.Inject;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.util.Reject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Upgrade step is responsible for ensuring any new application types and/or applications defined in the
@@ -73,13 +74,21 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_NEW_TYPE_START = "upgrade.entitlement.new.type.start";
     private static final String AUDIT_NEW_APPLICATION_START = "upgrade.entitlement.new.application.start";
     private static final String AUDIT_MODIFIED_TYPE_START = "upgrade.entitlement.modified.type.start";
+    private static final String AUDIT_MODIFIED_SUB_START = "upgrade.entitlement.modified.subjects.start";
+    private static final String AUDIT_MODIFIED_CON_START = "upgrade.entitlement.modified.conditions.start";
+    private static final String AUDIT_MODIFIED_COM_START = "upgrade.entitlement.modified.combiners.start";
     private static final String AUDIT_UPGRADE_SUCCESS = "upgrade.success";
     private static final String AUDIT_UPGRADE_FAIL = "upgrade.failed";
+
+    private static final String DEFAULT_COMBINER_SHORTNAME = DenyOverride.class.getSimpleName();
 
     private final EntitlementConfiguration entitlementService;
     private final List<Node> missingTypes;
     private final List<Node> missingApps;
+    private final Map<String, Set<String>> changedConditions;
+    private final Map<String, Set<String>> changedSubjects;
     private final Map<String, Map<String, Boolean>> missingActions;
+    private final Map<String, String> changedCombiners;
 
     @Inject
     public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
@@ -90,6 +99,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         missingTypes = new ArrayList<Node>();
         missingApps = new ArrayList<Node>();
         missingActions = new HashMap<String, Map<String, Boolean>>();
+        changedConditions = new HashMap<String, Set<String>>();
+        changedSubjects = new HashMap<String, Set<String>>();
+        changedCombiners = new HashMap<String, String>();
     }
 
     @Override
@@ -107,13 +119,94 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
             final Node subConfig = subConfigs.item(idx);
             final String id = getNodeAttributeValue(subConfig, ID);
+            final String name = getNodeAttributeValue(subConfig, NAME);
 
             if (APPLICATION_TYPE.equals(id)) {
-                captureMissingEntry(subConfig, presentTypes, missingTypes);
-                captureMissingActions(subConfig);
+                captureMissingEntry(name, subConfig, presentTypes, missingTypes);
+                captureMissingActions(name, subConfig);
             } else if (APPLICATION.equals(id)) {
-                captureMissingEntry(subConfig, presentApps, missingApps);
+                captureMissingEntry(name, subConfig, presentApps, missingApps);
+
+                //app will be null if application needs to be created (see missing entries)
+                final Application app = getApplication(name);
+
+                captureDifferentSet(app == null ? null : app.getSubjects(),
+                        EntitlementUtils.getSubjects(parseAttributeValuePairTags(subConfig)), changedSubjects, name);
+                captureDifferentSet(app == null ? null : app.getConditions(),
+                        EntitlementUtils.getConditions(parseAttributeValuePairTags(subConfig)),
+                        changedConditions, name);
+
+                final EntitlementCombiner combiner = (app == null ? null : app.getEntitlementCombiner());
+
+                captureDifferentEntitlementCombiner(combiner == null ? null : combiner.getName(),
+                        EntitlementUtils.getCombiner(parseAttributeValuePairTags(subConfig)),
+                        name);
             }
+        }
+    }
+
+    /**
+     * Helper function which passes through to
+     * {@link UpgradeEntitlementSubConfigsStep#captureDifferentString(String, String, String, java.util.Map, String)}
+     * setting the necessary variables for altering the Application's Entitlement Combiner.
+     *
+     * If both old and new name arguments are null, the default DenyOverride will be used.
+     *
+     * @param oldName the old name used to reference the combiner. May be null.
+     * @param newName the new name used to reference the combiner. May be null.
+     * @param appName the name of the application
+     */
+    private void captureDifferentEntitlementCombiner(String oldName, String newName, String appName) {
+        captureDifferentString(oldName, newName, appName, changedCombiners, DEFAULT_COMBINER_SHORTNAME);
+    }
+
+    /**
+     * Adds entries to the passed in map, using the supplied appName as the key. The default value will be
+     * used if both provided old and new names are null. The value inserted will be the newName value if it
+     * differs from the oldName value.
+     *
+     * No changes will be made to the map if the old and new names are equal.
+     *
+     * @param oldName the old String's value. May be null.
+     * @param newName the new String's value. May be null.
+     * @param appName the name of the application which will act as a key in the map. May not be null.
+     * @param map the map to update. May not be null.
+     * @param defaultValue the value to use if both old and new Strings are null. May be null.
+     */
+    private void captureDifferentString(String oldName, String newName, String appName,
+                                        Map<String, String> map, String defaultValue) {
+
+        Reject.ifNull(appName);
+        Reject.ifNull(map);
+
+        if (oldName == null && newName == null) {
+            map.put(appName, defaultValue);
+        } else if (newName != null && !newName.equals(oldName)) {
+            map.put(appName, newName);
+        }
+    }
+
+    /**
+     * Adds entries to the passed in map, using the supplied appName as the key. The value is a new, empty
+     * set if both oldSet and newSet are null, or newSet if the contents of oldSet and newSet differ.
+     *
+     * If the two sets are the same, no entries are added to the map.
+     *
+     * @param oldSet The older set of data. May be null.
+     * @param newSet The newer set of data. May be null.
+     * @param map The map into which to push the appropriate sets. May not be null.
+     * @param appName The key to use when pushing data into the set. May not be null.
+     */
+    private void captureDifferentSet(Set<String> oldSet, Set<String> newSet,
+                                     Map<String, Set<String>> map, String appName) {
+
+        Reject.ifNull(appName);
+        Reject.ifNull(map);
+
+        if (oldSet == null && newSet == null) {
+            map.put(appName, Collections.<String>emptySet());
+        } else if (newSet != null && !newSet.equals(oldSet)) {
+            map.put(appName, newSet);
         }
     }
 
@@ -127,11 +220,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
      * @param missingNodes
      *         the list of nodes missing from the present value set
      */
-    private void captureMissingEntry(
+    private void captureMissingEntry(final String name,
             final Node subConfig, final Set<String> presentValues, final List<Node> missingNodes) {
-
-        final String name = getNodeAttributeValue(subConfig, NAME);
-
         if (!presentValues.contains(name)) {
             DEBUG.message("New entitlement sub-configuration found: " + name);
             missingNodes.add(subConfig);
@@ -142,10 +232,10 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
      * Compares the provided subconfig element's action list against what is currently present in the existing
      * application type definition and captures the missing entries.
      *
+     * @param name The name of the subconfig's element we're interested in
      * @param subConfig The new application type's XML representation.
      */
-    private void captureMissingActions(final Node subConfig) {
-        final String name = getNodeAttributeValue(subConfig, NAME);
+    private void captureMissingActions(final String name, final Node subConfig) {
         ApplicationType applicationType = getType(name);
         if (applicationType != null) {
             Map<String, Boolean> existingActions = applicationType.getActions();
@@ -159,7 +249,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
     @Override
     public boolean isApplicable() {
-        return !missingTypes.isEmpty() || !missingApps.isEmpty() || !missingActions.isEmpty();
+        return !missingTypes.isEmpty() || !missingApps.isEmpty() || !missingActions.isEmpty() ||
+                !changedConditions.isEmpty() || !changedSubjects.isEmpty() || !changedCombiners.isEmpty();
     }
 
     @Override
@@ -173,7 +264,43 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         if (!missingActions.isEmpty()) {
             addMissingActions();
         }
+        if (!changedConditions.isEmpty()) {
+            addChangedConditions();
+        }
+        if (!changedSubjects.isEmpty()) {
+            addChangedSubjects();
+        }
+        if (!changedCombiners.isEmpty()) {
+            addChangedCombiners();
+        }
     }
+
+    /**
+     * Alter EntitlementCombiner references.
+     *
+     * @throws UpgradeException
+     */
+    private void addChangedCombiners() throws UpgradeException {
+        for (final Map.Entry<String, String> entry : changedCombiners.entrySet()) {
+            final String name = entry.getKey();
+            final String combiner = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_COM_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application " + name + " ; setting combiner: " + combiner);
+                }
+                final Application application = getApplication(name);
+                application.setEntitlementCombinerName(combiner);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
+            }
+        }
+    }
+
 
     /**
      * Add missing application types.
@@ -188,7 +315,6 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
             UpgradeProgress.reportStart(AUDIT_NEW_TYPE_START, name);
             keyValueMap.put(NAME, Collections.singleton(name));
-
 
             try {
                 DEBUG.message("Saving new entitlement application type: " + name);
@@ -248,6 +374,60 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     }
 
     /**
+     * Clears the subjects currently associated with an application, then replaces them with
+     * the new set of conditions defined.
+     *
+     * @throws UpgradeException If there was an error while updating the application.
+     */
+    private void addChangedSubjects() throws UpgradeException {
+        for (final Map.Entry<String, Set<String>> entry : changedSubjects.entrySet()) {
+            final String name = entry.getKey();
+            final Set<String> subjects = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_SUB_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application " + name + " ; adding subjects: " + subjects);
+                }
+                final Application application = getApplication(name);
+                application.setSubjects(subjects);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
+            }
+        }
+    }
+
+    /**
+     * Clears the conditions currently associated with an application, then replaces them with
+     * the new set of conditions defined.
+     *
+     * @throws UpgradeException If there was an error while updating the application.
+     */
+    private void addChangedConditions() throws UpgradeException {
+        for (final Map.Entry<String, Set<String>> entry : changedConditions.entrySet()) {
+            final String name = entry.getKey();
+            final Set<String> conditions = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_CON_START, name);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application " + name + " ; adding conditions: " + conditions);
+                }
+                final Application application = getApplication(name);
+                application.setConditions(conditions);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ee) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ee);
+            }
+        }
+    }
+
+    /**
      * Adds the missing actions to their corresponding application type's.
      *
      * @throws UpgradeException If there was an error while updating the application type.
@@ -271,6 +451,24 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
                 throw new UpgradeException(ee);
             }
         }
+    }
+
+    /**
+     * Retrieves the application for the passed application name.
+     *
+     * @param name
+     *         the application name
+     *
+     * @return an instance of Applicationassociated with the name else null if the name is not present
+     */
+    private Application getApplication(String name) {
+        for (final Application app : entitlementService.getApplications()) {
+            if (app.getName().equals(name)) {
+                return app;
+            }
+        }
+
+        return null;
     }
 
     /**

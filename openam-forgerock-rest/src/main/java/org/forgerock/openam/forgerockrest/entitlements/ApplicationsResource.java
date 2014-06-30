@@ -194,8 +194,7 @@ public class ApplicationsResource implements CollectionResourceProvider {
         final JsonValue appTypeValue = jsonValue.get("applicationType");
 
         if (appTypeValue == null || appTypeValue.asString().isEmpty()
-                || !wrapp.setApplicationType(mySubject, appTypeValue.asString(),
-                jsonValue.get("actions").getObject() == null)) {
+                || !wrapp.setApplicationType(mySubject, appTypeValue.asString())) {
             debug.error("Specified Application Type was not available.");
             throw new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
         }
