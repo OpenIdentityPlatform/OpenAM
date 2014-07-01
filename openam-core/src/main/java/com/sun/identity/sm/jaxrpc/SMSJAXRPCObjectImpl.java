@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -50,6 +50,7 @@ import javax.naming.directory.ModificationItem;
 
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.sm.DynamicAttributeValidator;
 import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -465,8 +466,11 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         }
         try {
             Class clazz = Class.forName(validatorClass);
-            ServiceAttributeValidator v = (ServiceAttributeValidator)
-                clazz.newInstance();
+            if (DynamicAttributeValidator.class.isAssignableFrom(clazz)) {
+                debug.message("Ignoring DynamicAttributeValidator");
+                return true;
+            }
+            ServiceAttributeValidator v = (ServiceAttributeValidator) clazz.newInstance();
             return v.validate(values);
         } catch (InstantiationException ex) {
             throw new SMSException("sms-validator_cannot_instantiate_class");

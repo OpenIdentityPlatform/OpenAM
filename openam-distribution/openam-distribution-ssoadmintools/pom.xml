@@ -167,6 +167,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-scripted</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-scripting</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
