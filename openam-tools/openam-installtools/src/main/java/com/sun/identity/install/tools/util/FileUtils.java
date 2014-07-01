@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
  */
 package com.sun.identity.install.tools.util;
 
@@ -469,8 +470,8 @@ public class FileUtils {
                 if (ignoreCase) {
                     String tempLine = new String(line);
                     String tempPattern = new String(pattern);
-                    tempLine.toLowerCase();
-                    tempPattern.toLowerCase();
+                    tempLine = tempLine.toLowerCase();
+                    tempPattern = tempPattern.toLowerCase();
                     if (tempLine.indexOf(tempPattern) >= 0) {
                         matchP = true;
                     }

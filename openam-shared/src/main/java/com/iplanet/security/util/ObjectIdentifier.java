@@ -25,6 +25,10 @@
  * $Id: ObjectIdentifier.java,v 1.2 2008/06/25 05:52:44 qcheng Exp $
  *
  */
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 
 package com.iplanet.security.util;
 
@@ -395,7 +399,7 @@ final public class ObjectIdentifier implements Serializable {
         if (oid == null)
             throw new IOException("empty object identifier");
 
-        oid.trim();
+        oid = oid.trim();
 
         ObjectIdentifier thisOID = (ObjectIdentifier) mOIDs.get(oid);
         if (thisOID != null)

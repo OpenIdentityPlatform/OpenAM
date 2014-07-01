@@ -19,11 +19,15 @@
  *
  * Contributor(s): 
  */
+
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 package com.sun.identity.shared.ldap.client;
 
 import java.util.*;
 import com.sun.identity.shared.ldap.ber.stream.*;
-import java.io.*;
 
 /**
  * This class implements the filter.
@@ -79,7 +83,7 @@ public abstract class JDAPFilter {
      */
     public static JDAPFilter getFilter(String filter) {
         String f = new String(filter);
-        f.trim();
+        f = f.trim();
         if (f.startsWith("(") && f.endsWith(")")) {
             return getFilterComp(f.substring(1,f.length()-1));
         }
@@ -92,7 +96,7 @@ public abstract class JDAPFilter {
      * @return filter
      */
     public static JDAPFilter getFilterComp(String f) {
-        f.trim();
+        f = f.trim();
         if (f.startsWith("&")) {         /* and */
             JDAPFilter filters[] = getFilterList(f.substring(1, f.length()));
             if (filters == null) {
@@ -130,7 +134,7 @@ public abstract class JDAPFilter {
      * @return list of filters
      */
     public static JDAPFilter[] getFilterList(String list) {
-        list.trim();
+        list = list.trim();
 
         int level = 0;
         int start = 0;
@@ -170,7 +174,7 @@ public abstract class JDAPFilter {
      * @return filter
      */
     public static JDAPFilter getFilterItem(String item) {
-        item.trim();
+        item = item.trim();
         int idx = item.indexOf('=');
         if (idx == -1)
             return null;
@@ -184,7 +188,7 @@ public abstract class JDAPFilter {
         }
 
         /* make decision by looking at the type */
-        type.trim();
+        type = type.trim();
         if (type.endsWith("~")) {
             JDAPAVA ava = new
               JDAPAVA(type.substring(0, type.length()-1), value);
@@ -219,13 +223,13 @@ public abstract class JDAPFilter {
         String initial = null;
         if (!value.startsWith("*")) {
             initial = st.nextToken();
-            initial.trim();
+            initial = initial.trim();
         }
         sub.addInitial(initial);
 
         while (st.hasMoreTokens()) {
             String any = st.nextToken();
-            any.trim();
+            any = any.trim();
             if (st.hasMoreTokens()) {
                 sub.addAny(any);
             } else {

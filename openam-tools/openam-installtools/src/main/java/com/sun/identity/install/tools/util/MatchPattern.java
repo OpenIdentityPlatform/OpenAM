@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 package com.sun.identity.install.tools.util;
 
 public class MatchPattern {
@@ -58,8 +62,8 @@ public class MatchPattern {
             } else if (isIgnoreCase()) {
                 String tempLine = new String(lineData);
                 String tempPattern = new String(getPattern());
-                tempLine.toLowerCase();
-                tempPattern.toLowerCase();
+                tempLine = tempLine.toLowerCase();
+                tempPattern = tempPattern.toLowerCase();
                 if (tempLine.indexOf(tempPattern) >= 0) {
                     matchFound = true;
                 }

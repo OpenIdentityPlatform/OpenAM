@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 package com.sun.identity.shared.locale;
 
 import com.sun.identity.shared.Constants;
@@ -395,7 +399,7 @@ public class Locale {
         String dateSyntax = null;
         try {
             dateSyntax = rb.getString(DATE_SYNTAX);
-            dateSyntax.trim();
+            dateSyntax = dateSyntax.trim();
         } catch (Exception ex) {
             debug.error("Locale.parseDateString: Unable to get " + DATE_SYNTAX
                     + ". Locale " + locale);
