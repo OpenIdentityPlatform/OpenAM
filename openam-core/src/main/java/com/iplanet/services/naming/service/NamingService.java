@@ -261,8 +261,14 @@ public class NamingService implements RequestHandler, ServiceListener {
 
             insertLBCookieValues(nametable);
         } catch (Exception ex) {
-            namingDebug.error("Can't get naming table", ex);
-            throw new SMSException(ex.getMessage());
+            String errorMsg = "Can't get naming table";
+            namingDebug.error(errorMsg, ex);
+
+            // Exceptions like NPE won't have any messages
+            if (ex.getMessage() != null) {
+                errorMsg = ex.getMessage();
+            }
+            throw new SMSException(errorMsg);
         }
 
         return nametable;
@@ -435,7 +441,13 @@ public class NamingService implements RequestHandler, ServiceListener {
                         Session.getLBCookie(sessionId));
             }
         } catch (Exception e) {
-            nres.setException(e.getMessage());
+            String errorMsg = "Failed to process naming request";
+            namingDebug.error(errorMsg, e);
+
+            if (e.getMessage() != null) {
+                errorMsg = e.getMessage();
+            }
+            nres.setException(errorMsg);
         }
         // if request version is less than 3.0, need to replace
         // %uri with the actual value
