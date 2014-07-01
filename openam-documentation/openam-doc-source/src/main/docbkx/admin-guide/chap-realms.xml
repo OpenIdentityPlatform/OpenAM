@@ -213,11 +213,15 @@
    <primary>Policy</primary>
    <secondary>Delegating</secondary>
   </indexterm>
-  
+  <indexterm>
+   <primary>Policy</primary>
+   <secondary>Referral</secondary>
+  </indexterm>
+
   <para>
    When you delegate access management for a realm,
    you might want to delegate policy management as well.
-   You delegate policy management by creating a referral.
+   You delegate policy management by creating a referral policy.
   </para>
 
   <para>
@@ -225,6 +229,20 @@
    from / (Top Level Realm) down through sub-realms.
    Each intervening realm also delegates policy management with referrals.
   </para>
+
+  <caution>
+   <para>
+    OpenAM allows you to delete a referral policy
+    even if policies depending on the referral still exist in the target realm.
+   </para>
+
+   <para>
+    Deleting a referral policy that other policies depend on
+    can cause problems during policy evaluation.
+    You must therefore make sure that no policies
+    depend on any referrals that you delete.
+   </para>
+  </caution>
 
   <step>
    <para>

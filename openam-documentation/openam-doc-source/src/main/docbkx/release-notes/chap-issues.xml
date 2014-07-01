@@ -20,15 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-issues'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
 
  <para>OpenAM issues are tracked at <link
@@ -70,6 +70,15 @@
 
   <para>Do not run different versions of OpenAM together in the same OpenAM
   site.</para>
+
+  <para>
+   OpenAM allows you to delete a referral policy
+   even if policies depending on the referral still exist in the target realm.
+   Deleting a referral policy that other policies depend on
+   can cause problems during policy evaluation.
+   You must therefore make sure that no policies
+   depend on any referrals that you delete.
+  </para>
 
   <para>When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
   you must use the Java 7 Development Kit on Windows (due to <link xlink:show="new"
