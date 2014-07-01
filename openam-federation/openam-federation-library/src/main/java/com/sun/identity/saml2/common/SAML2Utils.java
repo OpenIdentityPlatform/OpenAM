@@ -24,6 +24,10 @@
  *
  * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
+
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -140,6 +144,7 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -179,8 +184,6 @@ public class SAML2Utils extends SAML2SDKUtils {
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
     private static String sessionCookieName = SystemPropertiesManager.get(
         Constants.AM_COOKIE_NAME);
-    private static String localURL = server_protocol + "://" + server_host +
-            ":" + server_port + server_uri;
     private static int int_server_port = 0;
     private static final String GET_METHOD = "GET";
     private static final String POST_METHOD = "POST";
@@ -1891,7 +1894,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             String[] values = headers.getHeader(header.getName());
             if (debug.messageEnabled()) {
                 debug.message("SAML2Util.putHeaders: Header name=" +
-                        header.getName() + ", value=" + values);
+                        header.getName() + ", value=" + Arrays.toString(values));
             }
             if (values.length == 1) {
                 res.setHeader(header.getName(), header.getValue());
@@ -3802,7 +3805,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 debug.message(method + 
                      " CRL check is not configured. Just return it is good.");
             }
-            return certgood = true;
+            return certgood;
         }
 
         certgood = 
