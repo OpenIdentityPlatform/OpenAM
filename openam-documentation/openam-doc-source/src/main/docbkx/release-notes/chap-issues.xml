@@ -140,6 +140,15 @@
   <para>Do not run different versions of OpenAM together in the same OpenAM
   site.</para>
 
+  <para>
+   OpenAM allows you to delete a referral policy
+   even if policies depending on the referral still exist in the target realm.
+   Deleting a referral policy that other policies depend on
+   can cause problems during policy evaluation.
+   You must therefore make sure that no policies
+   depend on any referrals that you delete.
+  </para>
+
   <para>When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
   you must use the Java 7 Development Kit on Windows (due to <link xlink:show="new"
   xlink:href="http://bugs.sun.com/view_bug.do?bug_id=6230761">JDK-6230761</link>,
