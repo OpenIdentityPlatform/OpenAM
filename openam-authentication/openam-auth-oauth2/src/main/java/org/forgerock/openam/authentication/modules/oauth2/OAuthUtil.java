@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -27,13 +27,15 @@
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
+
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.servlet.http.Cookie;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuthUtil  {
@@ -41,34 +43,19 @@ public class OAuthUtil  {
     private static Debug debug = Debug.getInstance("amAuth");
 
     public static String findCookie(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        Cookie returnCookie = null;
-        String value = "";
-        if (cookies != null) {
-            for(Cookie cookie : cookies) {
-                if (cookieName.equalsIgnoreCase(cookie.getName())) {
-                    returnCookie = cookie;
-                    value = returnCookie.getValue();
-                    debugMessage("OAuth.findCookie()" + "Cookie "
-                                + cookieName
-                                + " found. "
-                                + "Content is: " + value);
-                    break;
-                }
-            }
+
+        String result = "";
+        String value = CookieUtils.getCookieValueFromReq(request, cookieName);
+        if (value != null) {
+            result = value;
+            debugMessage("OAuthUtil.findCookie()" + "Cookie "
+                        + cookieName
+                        + " found. "
+                        + "Content is: " + value);
         }
-        return value;
+
+        return result;
     }
-    
-    
-    public static Cookie deleteCookie(String strCookieName, String serverName, String strPath) {
-        Cookie cookie = new Cookie(strCookieName, "");
-        cookie.setMaxAge(0);
-        cookie.setDomain(serverName);
-        cookie.setPath(strPath);
-        return cookie;
-    }    
-    
     
     public static String getParamValue(String query, String param) {
 
