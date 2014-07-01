@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.iplanet.services.naming;
 
@@ -1334,8 +1334,8 @@ public class WebtopNaming {
             String plaformURL = (String) it.next();
             URL url = new URL(plaformURL);
             String serverID = getServerID(url.getProtocol(), url.getHost(),
-                Integer.toString(url.getPort()), url.getPath());
-            if (!platformServerIDs.contains(serverID)) {
+                Integer.toString(url.getPort()), url.getPath(), false);
+            if (serverID !=null && !platformServerIDs.contains(serverID)) {
                 platformServerIDs.add(serverID);
             }
         }
