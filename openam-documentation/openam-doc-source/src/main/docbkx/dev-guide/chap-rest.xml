@@ -791,6 +791,17 @@ userdetails.attribute.value=6319</computeroutput>
     </para>
 
     <para>
+     Under <literal>/json/subjecttypes</literal> you find a JSON-based API
+     for viewing what types of subjects you can use when defining policies.
+    </para>
+
+    <para>
+     Under <literal>/json/decisioncombiners</literal> you find a JSON-based API
+     for viewing implementations you can use when defining policies
+     to specify how to combine results when multiple policies apply.
+    </para>
+
+    <para>
      See <xref linkend="rest-api-authz-json" /> below.
     </para>
    </listitem>
@@ -811,17 +822,53 @@ userdetails.attribute.value=6319</computeroutput>
   <section xml:id="rest-api-authz-json">
    <title>Authorization</title>
    
-   <para>
-    This section describes how to request policy decisions
-    and how to manage policies.
-   </para>
+   <itemizedlist>
+    <para>
+     This section covers the following topics.
+    </para>
 
-   <para>
-    It also covers defining applications,
-    which let you constrain policies for a given application context,
-    and view application types,
-    which serve as templates for creating applications.
-   </para>
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-policy-decisions" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-policies" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-applications" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-application-types" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-condition-types" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-subject-types" />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <xref linkend="rest-api-authz-decision-combiners" />
+     </para>
+    </listitem>
+   </itemizedlist>
 
    <section xml:id="rest-api-authz-policy-decisions">
     <title>Requesting Policy Decisions</title>
@@ -1564,7 +1611,7 @@ $ <userinput>curl \
 {
    "subject": {
        "type": "Group",
-       "subjectName": "HR Managers"
+       "id": "id=HR Managers,ou=group,dc=openam,dc=forgerock,dc=org"
    }
 }
         </programlisting>
@@ -1586,7 +1633,7 @@ $ <userinput>curl \
 {
    "subject": {
        "type": "Role",
-       "subjectName": "System Administrators"
+       "id": "id=admins,ou=role,dc=openam,dc=forgerock,dc=org"
    }
 }
         </programlisting>
@@ -1602,7 +1649,7 @@ $ <userinput>curl \
 {
    "subject": {
        "type": "User",
-       "subjectName": "Bob Dobbs"
+       "id": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"
    }
 }
         </programlisting>
@@ -1636,19 +1683,26 @@ $ <userinput>curl \
            {
                "subject": {
                    "type": "User",
-                   "subjectName": "Bob Dobbs"
+                   "id": "id=bob,ou=user,dc=openam,dc=forgerock,dc=org"
                }
            },
            {
                "subject": {
                    "type": "Group",
-                   "subjectName": "HR Managers"
+                   "id": "id=HR Managers,ou=group,dc=openam,dc=forgerock,dc=org"
                }
            }
        ]
    }
 }
       </programlisting>
+
+      <para>
+       To read a subject type description,
+       or to list available subject types,
+       see <xref linkend="rest-api-authz-subject-types" />.
+      </para>
+
      </listitem>
     </varlistentry>
 
@@ -1824,7 +1878,8 @@ $ <userinput>curl \
        </programlisting>
 
        <para>
-        To read a condition description, or to list available conditions,
+        To read a condition type description,
+        or to list available condition types,
         see <xref linkend="rest-api-authz-condition-types" />.
        </para>
 
@@ -2423,7 +2478,7 @@ $ <userinput>curl \
      ...
   },
   "conditions": [
-     "condition class name",
+     "condition type",
      ...
   ],
   "realm": "/realm",
@@ -2431,10 +2486,10 @@ $ <userinput>curl \
   "description": "string describing application",
   "resourceComparator": "resource comparator class name",
   "subjects": [
-     "subject implementation class name",
+     "subject type",
      ...
   ],
-  "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+  "entitlementCombiner": "decision combiner",
   "saveIndex": "save index class name",
   "searchIndex": "search index class name",
   "attributeNames": [
@@ -2507,35 +2562,31 @@ $ <userinput>curl \
       <term><literal>"conditions"</literal></term>
       <listitem>
        <para>
-        Class names of condition implementations allowed
-        in the context of this application
+        Condition types allowed in the context of this application
        </para>
 
        <para>
-        Short names can be used for registered condition implementations.
-       </para>
-
-       <para>
-        The following condition implementations are available.
+        The following condition types are available.
        </para>
 
        <simplelist>
-        <member><literal>"and"</literal></member>
-        <member><literal>"com.sun.identity.entitlement.AttributeLookupCondition"</literal></member>
-        <member><literal>"com.sun.identity.entitlement.CachingEntitlementCondition"</literal></member>
-        <member><literal>"com.sun.identity.entitlement.NumericAttributeCondition"</literal></member>
-        <member><literal>"com.sun.identity.entitlement.PolicyCondition"</literal></member>
-        <member><literal>"com.sun.identity.entitlement.StringAttributeCondition"</literal></member>
-        <member><literal>"dateRange"</literal></member>
-        <member><literal>"daysOfWeek"</literal></member>
-        <member><literal>"dnsName"</literal></member>
-        <member><literal>"ipRange"</literal></member>
-        <member><literal>"not"</literal></member>
-        <member><literal>"or"</literal></member>
-        <member><literal>"timeRange"</literal></member>
-        <member><literal>"timezone"</literal></member>
+        <member><literal>"AND"</literal></member>
+        <member><literal>"AttributeLookup"</literal></member>
+        <member><literal>"DNSName"</literal></member>
+        <member><literal>"IP"</literal></member>
+        <member><literal>"NOT"</literal></member>
+        <member><literal>"NumericAttribute"</literal></member>
+        <member><literal>"OR"</literal></member>
+        <member><literal>"Policy"</literal></member>
+        <member><literal>"StringAttribute"</literal></member>
+        <member><literal>"Time"</literal></member>
        </simplelist>
-      </listitem>
+
+        <para>
+         For more on condition types,
+         see <xref linkend="rest-api-authz-condition-types" />.
+        </para>
+       </listitem>
      </varlistentry>
 
      <varlistentry>
@@ -2590,24 +2641,30 @@ $ <userinput>curl \
       <term><literal>"subjects"</literal></term>
       <listitem>
        <para>
-        Class name of the subject implementation used
-        in the context of this application
+        Subject types allowed in the context of this application
        </para>
 
        <para>
-        The following implementations are available.
+        The following subject types are available.
        </para>
 
        <simplelist>
-        <member><literal>"com.sun.identity.admin.model.AndViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.AttributeViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.IdRepoGroupViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.IdRepoRoleViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.IdRepoUserViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.NotViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.OrViewSubject"</literal></member>
-        <member><literal>"com.sun.identity.admin.model.VirtualViewSubject"</literal></member>
+        <member><literal>"AND"</literal></member>
+        <member><literal>"AnyUser"</literal></member>
+        <member><literal>"Attribute"</literal></member>
+        <member><literal>"Group"</literal></member>
+        <member><literal>"NONE"</literal></member>
+        <member><literal>"NOT"</literal></member>
+        <member><literal>"OR"</literal></member>
+        <member><literal>"Policy"</literal></member>
+        <member><literal>"Role"</literal></member>
+        <member><literal>"User"</literal></member>
        </simplelist>
+
+       <para>
+        For more on subject types,
+        see <xref linkend="rest-api-authz-subject-types" />.
+       </para>
       </listitem>
      </varlistentry>
 
@@ -2615,8 +2672,12 @@ $ <userinput>curl \
       <term><literal>"entitlementCombiner"</literal></term>
       <listitem>
        <para>
-        Class name of the implementation to combine entitlements,
-        such as <literal>"com.sun.identity.entitlement.DenyOverride"</literal>
+        Name of the decision combiner, such as <literal>"DenyOverride"</literal>.
+       </para>
+
+       <para>
+        For more on decision combiners,
+        see <xref linkend="rest-api-authz-decision-combiners" />.
        </para>
       </listitem>
      </varlistentry>
@@ -3575,6 +3636,7 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/realm/conditiontypes/IP</userinput>
 <computeroutput>{
   "title" : "IP",
+  "logical" : false,
   "config" : {
     "type" : "object",
     "properties" : {
@@ -3591,6 +3653,8 @@ $ <userinput>curl \
 
      <para>
       Notice that the condition type has a title,
+      a "logical" field
+      that indicates whether the type is a logical operator or takes a predicate,
       and a configuration specification.
       The configuration specification in this case indicates
       that an IP condition has two properties, "startIp" and "endIp",
@@ -3619,6 +3683,7 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/realm/conditiontypes/NOT</userinput>
 <computeroutput>{
   "title" : "NOT",
+  "logical" : true,
   "config" : {
     "type" : "object",
     "properties" : {
@@ -3655,6 +3720,7 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/json/realm/conditiontypes/OR</userinput>
 <computeroutput>{
   "title" : "OR",
+  "logical" : true,
   "config" : {
     "type" : "object",
     "properties" : {
@@ -3716,6 +3782,202 @@ $ <userinput>curl \
       <literal>_prettyPrint=true</literal> to make the output easier to read.
      </para>
     </section>
+   </section>
+
+   <section xml:id="rest-api-authz-subject-types">
+    <title>Viewing Subject Types</title>
+
+    <para>
+     Subject types describe the JSON representation
+     of subjects that you can use in policy definitions.
+    </para>
+
+    <para>
+     Subject types are server-wide, and do not differ by realm.
+     Hence the URI for the subject types API
+     does not contain a realm component,
+     but is <literal>/json/subjecttypes</literal>.
+    </para>
+
+    <section xml:id="rest-api-authz-subject-types-read">
+     <title>Reading Subject Types</title>
+
+     <para>
+      To read a subject type, perform an HTTP GET
+      specifying the resource name.
+     </para>
+
+     <para>
+      The <literal>iPlanetDirectoryPro</literal> header sets the SSO token
+      for a user who has access to perform the operation.
+     </para>
+
+     <para>
+      You can use the query string parameter
+      <literal>_prettyPrint=true</literal> to make the output easier to read.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/subjecttypes/User</userinput>
+<computeroutput>{
+  "title" : "User",
+  "logical" : false,
+  "config" : {
+    "type" : "object",
+    "properties" : {
+      "id" : {
+        "type" : "string"
+      }
+    }
+  }
+}</computeroutput>
+     </screen>
+
+     <para>
+      Notice that the subject type has a title,
+      a "logical" field
+      that indicates whether the type is a logical operator or takes a predicate,
+      and a configuration specification.
+      The configuration specification in this case indicates
+      that a User subject has one property,
+      an "Id", which takes a string value.
+      In other words, a concrete User subject specification
+      is represented in a policy definition as in the following example.
+     </para>
+
+     <programlisting language="java">
+{
+   "type": "User",
+   "id": "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+}
+     </programlisting>
+
+     <para>
+      The configuration is what differs the most across subject types.
+      The AND condition, for example, takes an array of subject objects
+      as the body of its configuration.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/subjecttypes/AND</userinput>
+<computeroutput>{
+  "title" : "AND",
+  "logical" : true,
+  "config" : {
+    "type" : "object",
+    "properties" : {
+      "subjects" : {
+        "type" : "array",
+        "items" : {
+          "type" : "any"
+        }
+      }
+    }
+  }
+}</computeroutput>
+     </screen>
+
+     <para>
+      The concrete AND subject therefore takes the following form.
+     </para>
+
+     <programlisting language="java">
+{
+    "type": "AND",
+    "subject": [
+      {
+        ...
+      },
+      ...
+    ]
+}
+     </programlisting>
+    </section>
+
+    <section xml:id="rest-api-authz-subject-types-query">
+     <title>Listing Subject Types</title>
+
+     <para>
+      To list all subject types, perform an HTTP GET on the endpoint,
+      setting the query string parameter, <literal>_queryFilter=true</literal>,
+      as in the following example.
+     </para>
+
+     <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/subjecttypes/?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ ... subject types ... ],
+  "resultCount" : 10,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+     </screen>
+
+     <para>
+      You can use the query string parameter
+      <literal>_prettyPrint=true</literal> to make the output easier to read.
+     </para>
+    </section>
+   </section>
+
+   <section xml:id="rest-api-authz-decision-combiners">
+    <title>Viewing Decision Combiners</title>
+
+    <para>
+     Decision combiners describe how to resolve policy decisions
+     when multiple policies apply.
+    </para>
+
+    <para>
+     Decision combiners are server-wide, and do not differ by realm.
+     Hence the URI for the condition types API
+     does not contain a realm component,
+     but is <literal>/json/decisioncombiners</literal>.
+    </para>
+
+    <para>
+     To list all decision combiners, perform an HTTP GET on the endpoint,
+     setting the query string parameter, <literal>_queryFilter=true</literal>,
+     as in the following example.
+    </para>
+
+    <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/decisioncombiners/?_queryFilter=true</userinput>
+<computeroutput>{
+  "result" : [ {
+    "title" : "DenyOverride"
+  } ],
+  "resultCount" : 1,
+  "pagedResultsCookie" : null,
+  "remainingPagedResults" : -1
+}</computeroutput>
+    </screen>
+
+    <para>
+     You can use the query string parameter
+     <literal>_prettyPrint=true</literal> to make the output easier to read.
+    </para>
+
+    <para>
+     To view an individual decision combiner, perform an HTTP GET on its resource.
+    </para>
+
+    <screen>
+$ <userinput>curl \
+ --header "iPlanetDirectoryPro: AQIC5..." \
+ https://openam.example.com:8443/openam/json/decisioncombiners/DenyOverride</userinput>
+<computeroutput>{
+  "title" : "DenyOverride"
+}</computeroutput>
+    </screen>
    </section>
   </section>
 
