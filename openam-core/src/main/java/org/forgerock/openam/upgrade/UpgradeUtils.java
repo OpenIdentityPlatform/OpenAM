@@ -758,80 +758,6 @@ public class UpgradeUtils {
         return existingServiceNames;
     }
 
-    /**
-     * Adds new attribute schema to an existing service.
-     *
-     * @param serviceName the service name.
-     * @param schemaType the schema type.
-     * @param attributeSchemaNode attribute to add
-     * @param adminToken admin SSOToken
-     * @throws UpgradeException if there is an error adding the
-     *         attribute schema.
-     * @supported.api
-     */
-    public static void addAttributeToSchema(
-            String serviceName,
-            String subSchemaName,
-            String schemaType,
-            Node attributeSchemaNode,
-            SSOToken adminToken)
-    throws UpgradeException {
-        String classMethod = "UpgradeUtils:addAttributeToSchema: ";
-
-        if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attributeschema :"
-                    + "for service :" + serviceName);
-        }
-
-        ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
-        ByteArrayInputStream bis = null;
-
-        try {
-            bis = new ByteArrayInputStream(XMLUtils.print(attributeSchemaNode).getBytes());
-            ss.addAttributeSchema(bis);
-        } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot add attribute schema for "
-                    + serviceName, sme);
-            throw new UpgradeException(sme.getMessage());
-        } catch (SSOException ssoe) {
-            debug.error(classMethod + "Invalid SSOToken : ", ssoe);
-            throw new UpgradeException(ssoe.getMessage());
-        }
-    }
-
-    /**
-     * Adds new attribute schema to an existing service.
-     *
-     * @param serviceSchema The underlying service schema.
-     * @param attributeSchemaNode The attribute is add
-     * @throws UpgradeException if there is an error adding the
-     *         attribute schema.
-     * @supported.api
-     */
-    public static void addAttributeToSchema(ServiceSchema serviceSchema,
-            Node attributeSchemaNode)
-    throws UpgradeException {
-        String classMethod = "UpgradeUtils:addAttributeToSchema: ";
-
-        if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attributeschema :"
-                    + "for service :" + serviceSchema.getName());
-        }
-
-        ByteArrayInputStream bis = null;
-
-        try {
-            bis = new ByteArrayInputStream(XMLUtils.print(attributeSchemaNode).getBytes());
-            serviceSchema.addAttributeSchema(bis);
-        } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot add attribute schema for "
-                    + serviceSchema.getName(), sme);
-            throw new UpgradeException(sme.getMessage());
-        } catch (SSOException ssoe) {
-            debug.error(classMethod + "Invalid SSOToken : ", ssoe);
-            throw new UpgradeException(ssoe.getMessage());
-        }
-    }
 
     /**
      * Adds new attribute schema to a sub schema in an existing service.
@@ -894,12 +820,12 @@ public class UpgradeUtils {
                     + "for service :" + serviceName);
         }
 
-        removeAttributeSchema(serviceName, subSchemaName, schemaType, attrName, adminToken);
-        addAttributeToSchema(serviceName,
+        replaceAttributeSchema(serviceName,
                              subSchemaName,
                              schemaType,
-                             attributeSchemaNode,
-                             adminToken);
+                             attrName,
+                             adminToken,
+                             attributeSchemaNode);
     }
 
     public static void modifyAttributeInExistingSchema(ServiceSchema serviceSchema,
@@ -912,8 +838,7 @@ public class UpgradeUtils {
                     + "for service :" + serviceSchema.getName());
         }
 
-        removeAttributeSchema(serviceSchema, attrName);
-        addAttributeToSchema(serviceSchema, attributeSchemaNode);
+        replaceAttributeSchema(serviceSchema, attrName, attributeSchemaNode);
     }
 
     /**
@@ -1043,6 +968,62 @@ public class UpgradeUtils {
     }
 
     /**
+     * Adds new attribute schema to an existing service.
+     *
+     * @param serviceName the service name.
+     * @param schemaType the schema type.
+     * @param attributeSchemaNode attribute to add
+     * @param adminToken admin SSOToken
+     * @throws UpgradeException if there is an error adding the
+     *         attribute schema.
+     * @supported.api
+     */
+    public static void addAttributeToSchema(
+            String serviceName,
+            String subSchemaName,
+            String schemaType,
+            Node attributeSchemaNode,
+            SSOToken adminToken)
+    throws UpgradeException {
+        ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
+        addAttributeToSchema(ss, attributeSchemaNode);
+    }
+
+    /**
+     * Adds new attribute schema to an existing service.
+     *
+     * @param serviceSchema The underlying service schema.
+     * @param attributeSchemaNode The attribute is add
+     * @throws UpgradeException if there is an error adding the
+     *         attribute schema.
+     * @supported.api
+     */
+    public static void addAttributeToSchema(ServiceSchema serviceSchema,
+            Node attributeSchemaNode)
+    throws UpgradeException {
+        String classMethod = "UpgradeUtils:addAttributeToSchema: ";
+
+        if (debug.messageEnabled()) {
+            debug.message(classMethod + "Adding attributeschema :"
+                    + "for service :" + serviceSchema.getName());
+        }
+
+        ByteArrayInputStream bis = null;
+
+        try {
+            bis = new ByteArrayInputStream(XMLUtils.print(attributeSchemaNode).getBytes());
+            serviceSchema.addAttributeSchema(bis);
+        } catch (SMSException sme) {
+            debug.error(classMethod + "Cannot add attribute schema for "
+                    + serviceSchema.getName(), sme);
+            throw new UpgradeException(sme.getMessage());
+        } catch (SSOException ssoe) {
+            debug.error(classMethod + "Invalid SSOToken : ", ssoe);
+            throw new UpgradeException(ssoe.getMessage());
+        }
+    }
+
+    /**
      * Remove an attribute schema from an existing service.
      *
      * @param serviceName the service name.
@@ -1050,7 +1031,7 @@ public class UpgradeUtils {
      * @param schemaType the schema type.
      * @param attributeName attribute to remove
      * @param adminToken admin SSOToken
-     * @throws UpgradeException if there is an error adding the
+     * @throws UpgradeException if there is an error removing the
      *         attribute schema.
      * @supported.api
      */
@@ -1061,33 +1042,16 @@ public class UpgradeUtils {
             String attributeName,
             SSOToken adminToken)
     throws UpgradeException {
-        String classMethod = "UpgradeUtils:removeAttributeSchema: ";
-
-        if (debug.messageEnabled()) {
-            debug.message(classMethod + "Removing attribute :" + attributeName
-                    + " from service :" + serviceName);
-        }
-
         ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
-
-        try {
-            ss.removeAttributeSchema(attributeName);
-        } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot remove attribute schema for "
-                    + serviceName, sme);
-            throw new UpgradeException(sme.getMessage());
-        } catch (SSOException ssoe) {
-            debug.error(classMethod + "Invalid SSOToken : ", ssoe);
-            throw new UpgradeException(ssoe.getMessage());
-        }
+        removeAttributeSchema(ss, attributeName);
     }
 
     /**
      * Removes attribute schema from an existing service.
      *
      * @param serviceSchema The underlying service schema.
-     * @param attributeName The attribute is add
-     * @throws UpgradeException if there is an error adding the
+     * @param attributeName The attribute is remove
+     * @throws UpgradeException if there is an error removing the
      *         attribute schema.
      * @supported.api
      */
@@ -1105,6 +1069,63 @@ public class UpgradeUtils {
             serviceSchema.removeAttributeSchema(attributeName);
         } catch (SMSException sme) {
             debug.error(classMethod + "Cannot remove attribute schema for "
+                    + serviceSchema.getName(), sme);
+            throw new UpgradeException(sme.getMessage());
+        } catch (SSOException ssoe) {
+            debug.error(classMethod + "Invalid SSOToken : ", ssoe);
+            throw new UpgradeException(ssoe.getMessage());
+        }
+    }
+
+    /**
+     * Replace an attribute schema from an existing service with the new one
+     *
+     * @param serviceName the service name.
+     * @param subSchemaName name of the subschema
+     * @param schemaType the schema type.
+     * @param attributeName attribute to update
+     * @param adminToken admin SSOToken
+     * @param attributeSchemaNode The attribute to update
+     * @throws UpgradeException if there is an error updating the
+     *         attribute schema.
+     * @supported.api
+     */
+    public static void replaceAttributeSchema(
+            String serviceName,
+            String subSchemaName,
+            String schemaType,
+            String attributeName,
+            SSOToken adminToken,
+            Node attributeSchemaNode) throws UpgradeException {
+        ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
+        replaceAttributeSchema(ss, attributeName, attributeSchemaNode);
+    }
+
+    /**
+     * Replace an attribute schema from an existing service with the new one
+     *
+     * @param serviceSchema The underlying service schema.
+     * @param attributeName attribute to update
+     * @param attributeSchemaNode The attribute to update
+     * @throws UpgradeException if there is an error updating the
+     *         attribute schema.
+     * @supported.api
+     */
+    public static void replaceAttributeSchema(
+            ServiceSchema serviceSchema,
+            String attributeName,
+            Node attributeSchemaNode) throws UpgradeException {
+        String classMethod = "UpgradeUtils:replaceAttributeSchema: ";
+
+        if (debug.messageEnabled()) {
+            debug.message(classMethod + "Updating attributeschema : " + attributeName
+                    + "from service :" + serviceSchema.getName());
+        }
+
+        try {
+            serviceSchema.replaceAttributeSchema(attributeName, attributeSchemaNode);
+        } catch (SMSException sme) {
+            debug.error(classMethod + "Cannot update attribute schema for "
                     + serviceSchema.getName(), sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
