@@ -4461,6 +4461,40 @@
    Advanced tab for Default Server Settings.</para>
 
    <varlistentry>
+    <term><literal>org.forgerock.openam.cdc.validLoginURIs</literal></term>
+
+    <listitem>
+     <para>
+      This property sets a whitelist of valid login URIs.
+      It is used by the CDCServlet to validate
+      <literal>LoginURI</literal> parameter values.
+     </para>
+
+     <para>
+      Set only the URIs, not the query string parameters.
+      If the actual <literal>LoginURI</literal> parameter value
+      includes query string parameters,
+      then OpenAM strips them off before comparing the URI
+      with the value or values in the whitelist.
+     </para>
+
+     <para>
+      Separate multiple values with a comma, as in the following example:
+      <literal>org.forgerock.openam.cdc.validLoginURIs=/UI/Login,/customLoginURI</literal>.
+     </para>
+
+     <para>
+      Default: <literal>/UI/Login</literal>
+     </para>
+
+     <para>
+
+     </para>
+    </listitem>
+
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>com.iplanet.am.cookie.c66Encode</literal></term>
     <listitem>
      <para>Properly URL encode session tokens.</para>

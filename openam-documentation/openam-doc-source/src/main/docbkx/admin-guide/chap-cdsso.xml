@@ -254,10 +254,61 @@
   </step>
 
   <step>
-   <para>If you have another authentication UI deployed at <literal>/openam/Login2</literal>,
+   <para>If you have another authentication UI deployed at <literal>/openam/customLoginURI</literal>,
     you can access this URL at: </para>
 
-   <literallayout class="monospaced">http://openam.example.com:8080/openam/cdcservlet?loginURI=/Login2</literallayout>
+   <literallayout class="monospaced">http://openam.example.com:8080/openam/cdcservlet?loginURI=/customLoginURI</literallayout>
+
+   <para>
+    In this case, you must also add the custom login URI to the whitelist
+    that is specified by using
+    the <literal>org.forgerock.openam.cdc.validLoginURIs</literal> property.
+   </para>
+
+   <substeps>
+    <step>
+     <para>
+      In OpenAM console, browse to Configuration > Servers and Sites >
+      Default Server Settings > Advanced.
+     </para>
+    </step>
+
+    <step>
+     <para>
+      Add a property with the following settings.
+     </para>
+
+     <itemizedlist>
+      <listitem>
+       <para>
+        Property Name: <literal>org.forgerock.openam.cdc.validLoginURIs</literal>
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Property Value: <literal>/UI/Login,/customLoginURI</literal>
+       </para>
+      </listitem>
+     </itemizedlist>
+    </step>
+
+    <step>
+     <para>
+      Save your changes.
+     </para>
+    </step>
+   </substeps>
+
+   <para>
+    For more information about this property,
+    see the <citetitle>Reference</citetitle> section on advanced properties,
+    <link
+     xlink:show="new"
+     xlink:href="reference#servers-advanced-configuration"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Servers &gt; Advanced</citetitle></link>.
+   </para>
   </step>
  </procedure>
 

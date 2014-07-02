@@ -187,12 +187,25 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
    <para>On successful login, your browser stores an
    <literal>AMDistAuthConfig</literal> cookie that identifies the DAS.</para>
   </step>
+
+  <step xml:id="das-configuration-file">
+   <para>
+    Restrict permissions to the configuration for the DAS
+    under the <filename>$HOME/FAMDistAuth</filename> directory of the user
+    who runs the web container where you deployed the service.
+   </para>
+
+   <para>
+    Configuration file names depend on the path where the DAS is deployed,
+    and end in <filename>AMDistAuthConfig.properties</filename>.
+    For example,
+    if the DAS is deployed under <filename>/path/to/tomcat/webapps/das/</filename>
+    then the configuration file name is
+    <filename>$HOME/FAMDistAuth/_path_to_tomcat_webapps_das_AMDistAuthConfig.properties</filename>.
+   </para>
+  </step>
+
   <step>
-   <para>Restrict permissions to the configuration for the DAS under the
-   <filename>$HOME/FAMDistAuth</filename> directory of the user who runs the
-   web container where you deployed the service.</para>
-   <para>The configuration file name ends in
-   <filename>AMDistAuthConfig.properties</filename>.</para>
    <para>If you deploy multiple DAS servers, you can configure them to forward
    requests to each other based on the <literal>AMDistAuthConfig</literal>
    cookie by setting the <literal>com.sun.identity.distauth.cluster</literal>
@@ -205,15 +218,22 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
   </step>
 
   <step>
-   <para>If your deployment includes multiple OpenAM servers, then edit the
-   DAS configuration file, <filename>$HOME/FAMDistAuth/*AmDistAuthConfig.properties</filename>,
-   to include <literal>X-Forwarded-For</literal> in the list of
-   <link xlink:show="new"
-   xlink:href="reference#openam-retained-http-request-headers"
-   xlink:role="http://docbook.org/xlink/role/olink"><literal
-   >openam.retained.http.request.headers</literal></link>.</para>
+   <para>
+    If your deployment includes multiple OpenAM servers,
+    then edit the DAS configuration file
+    mentioned in <xref linkend="das-configuration-file" />
+    to include <literal>X-Forwarded-For</literal> in the list of
+    <link
+     xlink:show="new"
+     xlink:href="reference#openam-retained-http-request-headers"
+     xlink:role="http://docbook.org/xlink/role/olink"><literal
+    >openam.retained.http.request.headers</literal></link>.
+   </para>
 
-   <para>Example: <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal></para>
+   <para>
+    Example:
+    <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal>
+   </para>
 
    <para>This ensures the authoritative OpenAM authentication server gets
    the client IP address in this header of the forwarded HTTP request. You can
@@ -235,6 +255,31 @@ $ <userinput>cp ~/Downloads/openam/${distauthWarFile} \
 
    <para>You must make sure that the value of the option corresponds to the path
    to the correct <filename>AMDistAuthConfig.properties</filename> file.</para>
+  </step>
+
+  <step>
+   <para>
+    If your deployment uses a custom login URI,
+    then edit the DAS configuration file
+    mentioned in <xref linkend="das-configuration-file" />
+    to add the custom login URI to the whitelist specified
+    by the <literal>org.forgerock.openam.cdc.validLoginURIs</literal> property.
+   </para>
+
+   <para>
+    Example:
+    <literal>org.forgerock.openam.cdc.validLoginURIs=/UI/Login,/customLoginURI</literal>
+   </para>
+
+   <para>
+    For more information about this property,
+    see the <citetitle>Reference</citetitle> section on advanced properties,
+    <link
+     xlink:show="new"
+     xlink:href="reference#servers-advanced-configuration"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Servers &gt; Advanced</citetitle></link>.
+   </para>
   </step>
  </procedure>
 </chapter>

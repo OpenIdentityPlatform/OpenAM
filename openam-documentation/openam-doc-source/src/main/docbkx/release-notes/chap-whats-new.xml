@@ -251,6 +251,31 @@ Agreement (yes/no): [no]:</screen>
 
   <listitem>
     <para>
+     <emphasis role="bold">Whitelist for Custom Login URIs</emphasis>.
+     OpenAM now includes a property that specifies
+     a whitelist for custom login URIs
+     so that the CDCServlet and the Distributed Authentication UI (DAS)
+     can check login URI values against those in the whitelist
+     (<link
+       xlink:show="new"
+       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3918"
+      >OPENAM-3918</link>).
+    </para>
+
+    <para>
+     The property name is <literal>org.forgerock.openam.cdc.validLoginURIs</literal>.
+     For more information about this property,
+     see the <citetitle>Reference</citetitle> section on advanced properties,
+     <link
+      xlink:show="new"
+      xlink:href="reference#servers-advanced-configuration"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Servers &gt; Advanced</citetitle></link>.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
      <emphasis role="bold">OpenID Connect Registration Without an Access Token</emphasis>.
      OpenAM can now be configured to let OpenID Connect clients
      register dynamically without having to provide an access token
