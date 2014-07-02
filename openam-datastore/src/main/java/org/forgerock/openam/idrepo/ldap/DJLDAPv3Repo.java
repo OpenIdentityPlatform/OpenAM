@@ -2046,9 +2046,9 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             if (pSearch == null) {
                 pSearch = new DJLDAPv3PersistentSearch(configMap, createConnectionFactory(username, password, 1));
                 if (dnCacheEnabled) {
-                    pSearch.addListener(idRepoListener, getSupportedTypes());
+                    pSearch.addMovedOrRenamedListener(this);
                 }
-                pSearch.addMovedOrRenamedListener(this);
+                pSearch.addListener(idRepoListener, getSupportedTypes());
                 pSearch.startPSearch();
                 pSearchMap.put(pSearchId, pSearch);
             } else {
