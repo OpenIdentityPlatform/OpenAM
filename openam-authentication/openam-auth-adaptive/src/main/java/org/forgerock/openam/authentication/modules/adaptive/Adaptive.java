@@ -23,6 +23,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013-2014 Nomura Research Institute, Ltd
+ */
 package org.forgerock.openam.authentication.modules.adaptive;
 
 import com.googlecode.ipv6.IPv6Address;
@@ -868,8 +871,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
                 results = searchResults.getSearchResults();
             }
 
-            if (results == null || results.size() != 1) {
-                throw new IdRepoException(ADAPTIVE + ".getIdentity : More than one user found");
+            if (results.isEmpty()) {
+                throw new IdRepoException(ADAPTIVE + ".getIdentity : User "
+                        + uName + " is not found");
+            } else if (results.size() > 1) {
+                throw new IdRepoException(ADAPTIVE
+                        + ".getIdentity : More than one user found for the userName "
+                        + userName);
             }
 
             theID = results.iterator().next();
