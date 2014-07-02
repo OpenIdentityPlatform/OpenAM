@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -40,6 +40,8 @@ public class LDAPConstants {
     public static final String STATUS_ACTIVE = "Active";
     public static final String STATUS_INACTIVE = "Inactive";
     //Data store configuration property names
+    public static final String LDAP_DNCACHE_ENABLED = "sun-idrepo-ldapv3-dncache-enabled";
+    public static final String LDAP_DNCACHE_SIZE = "sun-idrepo-ldapv3-dncache-size";
     public static final String LDAP_SERVER_LIST = "sun-idrepo-ldapv3-config-ldap-server";
     public static final String LDAP_SERVER_USER_NAME = "sun-idrepo-ldapv3-config-authid";
     public static final String LDAP_SERVER_PASSWORD = "sun-idrepo-ldapv3-config-authpw";

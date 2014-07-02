@@ -25,7 +25,6 @@ import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
-import static com.sun.identity.idm.IdRepo.ADDMEMBER;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
@@ -66,7 +65,6 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ErrorResultIOException;
 import org.forgerock.opendj.ldap.Filter;
@@ -97,7 +95,7 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 /**
  * This is an IdRepo implementation that utilizes the LDAP protocol via OpenDJ LDAP SDK to access directory servers.
  */
-public class DJLDAPv3Repo extends IdRepo {
+public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListener {
 
     private static final String CLASS_NAME = DJLDAPv3Repo.class.getName();
     private static final Debug DEBUG = Debug.getInstance("DJLDAPv3Repo");
@@ -163,9 +161,10 @@ public class DJLDAPv3Repo extends IdRepo {
     private Map<String, Map<String, Set<String>>> serviceMap;
     //holds the directory schema
     private volatile Schema schema;
-    //provides a cache for DNs, because an entry tends to be requested in bursts.
-    //TODO should we update the DN cache for psearch results as well?
-    private Cache dnCache = new Cache(1500);
+    //provides a cache for DNs (if enabled), because an entry tends to be requested in bursts.
+    private Cache dnCache;
+    // provides a switch to enable/disable the dnCache
+    private boolean dnCacheEnabled = false;
 
     /**
      * Initializes the IdRepo instance, basically within this method we process
@@ -193,7 +192,10 @@ public class DJLDAPv3Repo extends IdRepo {
                         + ", hostSiteId=" + hostSiteId);
             }
         }
-
+        boolean dnCacheEnabled = CollectionHelper.getBooleanMapAttr(configMap, LDAP_DNCACHE_ENABLED, true);
+        if (dnCacheEnabled) {
+            dnCache = new Cache(CollectionHelper.getIntMapAttr(configParams, LDAP_DNCACHE_SIZE, 1500, DEBUG));
+        }
         ldapServers = LDAPUtils.prioritizeServers(configParams.get(LDAP_SERVER_LIST), hostServerId, hostSiteId);
 
         defaultSizeLimit = CollectionHelper.getIntMapAttr(configParams, LDAP_MAX_RESULTS, 100, DEBUG);
@@ -1203,7 +1205,9 @@ public class DJLDAPv3Repo extends IdRepo {
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
-        dnCache.remove(name + "," + type);
+        if (dnCacheEnabled) {
+            dnCache.remove(generateDNCacheKey(name, type));
+        }
     }
 
     /**
@@ -1825,7 +1829,8 @@ public class DJLDAPv3Repo extends IdRepo {
      * @param serviceName The name of the service, which in case of USER may be null.
      * @param attrNames The name of the service attributes that needs to be queried. In case of USER this may NOT be
      * null. In case of REALM, when null this will return all attributes for the service.
-     * @param isString Whether the attributes needs to be returned in binary or string format.
+     * @param extractor The attribute extractor to use.
+     * @param converter The attribute filter to use.
      * @return The matching service attributes.
      * @throws IdRepoException If there was an error while retrieving the service attributes from the user, or if the
      * identity type was invalid.
@@ -2040,11 +2045,17 @@ public class DJLDAPv3Repo extends IdRepo {
             char[] password = CollectionHelper.getMapAttr(configMap, LDAP_SERVER_PASSWORD, "").toCharArray();
             if (pSearch == null) {
                 pSearch = new DJLDAPv3PersistentSearch(configMap, createConnectionFactory(username, password, 1));
-                pSearch.addListener(idRepoListener, getSupportedTypes());
+                if (dnCacheEnabled) {
+                    pSearch.addListener(idRepoListener, getSupportedTypes());
+                }
+                pSearch.addMovedOrRenamedListener(this);
                 pSearch.startPSearch();
                 pSearchMap.put(pSearchId, pSearch);
             } else {
                 pSearch.addListener(idRepoListener, getSupportedTypes());
+                if (dnCacheEnabled) {
+                    pSearch.addMovedOrRenamedListener(this);
+                }
             }
         }
         return 0;
@@ -2065,6 +2076,7 @@ public class DJLDAPv3Repo extends IdRepo {
             if (pSearch == null) {
                 DEBUG.error("PSearch is already removed, unable to unregister");
             } else {
+                pSearch.removeMovedOrRenamedListener(this);
                 pSearch.removeListener(idRepoListener);
                 if (!pSearch.hasListeners()) {
                     pSearch.stopPSearch();
@@ -2090,6 +2102,24 @@ public class DJLDAPv3Repo extends IdRepo {
         IOUtils.closeIfNotNull(connectionFactory);
         IOUtils.closeIfNotNull(bindConnectionFactory);
         idRepoListener = null;
+    }
+
+    /**
+     * Called if an identity has been renamed or moved within the identity store.
+     * @param previousDN The DN of the identity before the move or rename
+     */
+    public void identityMovedOrRenamed(DN previousDN) {
+
+        if (dnCacheEnabled) {
+            String name = LDAPUtils.getName(previousDN);
+            for (IdType idType : getSupportedTypes()) {
+                String previousId =  generateDNCacheKey(name, idType);
+                Object previousDn = dnCache.remove(previousId);
+                if (DEBUG.messageEnabled() && previousDn != null) {
+                    DEBUG.message("Removed " + previousId + " from DN Cache");
+                }
+            }
+        }
     }
 
     /**
@@ -2234,7 +2264,11 @@ public class DJLDAPv3Repo extends IdRepo {
     }
 
     private String getDN(IdType type, String name, boolean shouldGenerate, String searchAttr) throws IdRepoException {
-        Object cachedDn = dnCache.get(name + "," + type);
+
+        Object cachedDn = null;
+        if (dnCacheEnabled) {
+            cachedDn = dnCache.get(generateDNCacheKey(name, type));
+        }
         if (cachedDn != null) {
             return cachedDn.toString();
         }
@@ -2287,8 +2321,8 @@ public class DJLDAPv3Repo extends IdRepo {
             IOUtils.closeIfNotNull(conn);
         }
 
-        if (!shouldGenerate) {
-            dnCache.put(name + "," + type, dn);
+        if (dnCacheEnabled && !shouldGenerate) {
+            dnCache.put(generateDNCacheKey(name, type), dn);
         }
         return dn;
     }
@@ -2483,5 +2517,9 @@ public class DJLDAPv3Repo extends IdRepo {
             }
             return result;
         }
+    }
+
+    private String generateDNCacheKey(String name, IdType idType) {
+        return name + "," + idType;
     }
 }
