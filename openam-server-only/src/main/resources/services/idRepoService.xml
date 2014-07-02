@@ -28,7 +28,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2012-2013 ForgeRock AS
+   Portions Copyrighted 2012-2014 ForgeRock AS
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -203,11 +203,12 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -700,6 +701,23 @@
                         syntax="xml"
                         i18nKey="">
                     </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <!-- LDAPv3 plugin for sun ds with AM-->
@@ -729,11 +747,12 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -1338,6 +1357,22 @@
                         i18nKey="">
                     </AttributeSchema>
 
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <!-- LDAPv3 plugin for OpenDS-->
@@ -1367,11 +1402,12 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -1836,6 +1872,23 @@
                         syntax="xml"
                         i18nKey="">
                     </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
 
@@ -1866,11 +1919,12 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -2337,6 +2391,23 @@
                         syntax="xml"
                         i18nKey="">
                     </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
 
@@ -2367,14 +2438,15 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
                         <DefaultValues>
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -2825,6 +2897,23 @@
                         syntax="xml"
                         i18nKey="">
                     </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <!-- LDAPv3 plugin for ADAM -->
@@ -2854,14 +2943,15 @@
                             <Value>org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="sunIdRepoAttributeMapping"
+
+                    <AttributeSchema name="sunIdRepoAttributeMapping"
                         type="list"
                         syntax="string"
                         i18nKey="a20131">
                         <DefaultValues>
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
-                     </AttributeSchema>
+                    </AttributeSchema>
 
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
@@ -3309,6 +3399,23 @@
                         syntax="xml"
                         i18nKey="">
                     </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-enabled"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a2062">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sun-idrepo-ldapv3-dncache-size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a2063">
+                        <DefaultValues>
+                            <Value>1500</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                 </SubSchema>
 
                 <SubSchema name= "NetscapeLDAPv3" inheritance = "multiple" i18nKey = "">
@@ -3413,7 +3520,7 @@
                             <Value>ldapv3ADAM</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!-- From here on the list of plugin specific attributes for determing
+                    <!-- From here on the list of plugin specific attributes for determining
                           things like organization relating to this realm, authentication source,
                        user containers, group containers etc etc. -->
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ldap-server"
