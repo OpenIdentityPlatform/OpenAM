@@ -128,6 +128,13 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 var failedStage = requirementList.length;
                 obj.resetProcess();
                 promise.reject(failedStage);
+            },
+            goToFailureUrl = function (errorBody) {
+                if (errorBody.detail && errorBody.detail.failureUrl) {
+                    console.log(errorBody.detail.failureUrl);
+                    window.location.href = errorBody.detail.failureUrl;
+                }
+
             };
 
             obj.serviceCall({
@@ -181,6 +188,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
                         } else {
                             processFailed();
+                            goToFailureUrl(errorBody);
                         }
                     }
                 });
