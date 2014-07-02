@@ -13,11 +13,12 @@
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
-  Copyright 2011-2013 ForgeRock AS. All rights reserved.
+  Copyright 2011-2014 ForgeRock AS. All rights reserved.
 -->
 
 <!--
   Portions Copyrighted 2013 Syntegrity.
+  Portions Copyrighted 2014 Nomura Research Institute, Ltd.
 -->
 
 <!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"  "jar://com/sun/identity/sm/sms.dtd">
@@ -52,14 +53,6 @@
 					i18nKey="a002">
 					<DefaultValues>
 						<Value>5</Value>
-					</DefaultValues>
-				</AttributeSchema>
-
-				<AttributeSchema
-					name="iplanet-am-auth-adaptive-device-print-default-profile-name"
-					type="single" syntax="string" validator="no" i18nKey="a005">
-					<DefaultValues>
-						<Value>default</Value>
 					</DefaultValues>
 				</AttributeSchema>
 
@@ -437,14 +430,6 @@
 						i18nKey="a002">
 						<DefaultValues>
 							<Value>5</Value>
-						</DefaultValues>
-					</AttributeSchema>
-
-					<AttributeSchema
-						name="iplanet-am-auth-adaptive-device-print-default-profile-name"
-						type="single" syntax="string" validator="no" i18nKey="a005">
-						<DefaultValues>
-							<Value>default</Value>
 						</DefaultValues>
 					</AttributeSchema>
 
