@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -495,10 +495,8 @@ class ServiceConfigImpl implements ServiceListener {
 
         // Since entry not in cache, first check if the orgName exists
         if (!SMSEntry.checkIfEntryExists(orgName, token)) {
-            if (debug.warningEnabled()) {
-                debug.warning("ServiceConfigImpl::getInstance called with " +
+            debug.error("ServiceConfigImpl::getInstance called with " +
                     "non existant organization name: " + orgName);
-            }
             // To maintain backward compatibilty return null if orgName
             // is not found. Throwing exception is commented out.
             // Object [] args = { orgName };
@@ -533,6 +531,13 @@ class ServiceConfigImpl implements ServiceListener {
             }
             // Return null if schema is not defined
             if (ss == null) {
+                // SMSEntry shouldn't exist in this case, but if it does, it is most 
+                // likely to be incorrect, hence we remove it from the cache.
+                entry.clear();
+                configImpls.remove(cacheName);
+
+                debug.error("ServiceConfigImpl::getInstance: couldn't find subschema sunConfigId="+subConfigId 
+                        + "\n cached SMS entry=" + sentry);
                 return (null);
             }
         }
