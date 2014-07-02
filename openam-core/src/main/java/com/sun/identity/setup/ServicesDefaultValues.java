@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013-2014 ForgeRock, Inc.
  */
 
 package com.sun.identity.setup;
@@ -156,12 +156,13 @@ public class ServicesDefaultValues {
             }
 
             map.put(SetupConstants.DIT_LOADED, dsConfig.isDITLoaded(ssl));
-            map.put(SetupConstants.DATASTORE_NOTIFICATION, "true");
-            map.put(SetupConstants.DISABLE_PERSISTENT_SEARCH, "aci,um");
-        } else {
-            map.put(SetupConstants.DATASTORE_NOTIFICATION, "false");
-            map.put(SetupConstants.DISABLE_PERSISTENT_SEARCH, "aci,um,sm");
         }
+
+        // Enable data store notifications and switch persistent search on for sms.
+        // This is now done by default for embedded data stores as well as external
+        // to ensure consistent behaviour for refreshing data store cache.
+        map.put(SetupConstants.DATASTORE_NOTIFICATION, "true");
+        map.put(SetupConstants.DISABLE_PERSISTENT_SEARCH, "aci,um");
 
         Map userRepo = (Map)map.get("UserStore");
         String umRootSuffix = null;
