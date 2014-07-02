@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2014 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-whats-new'
@@ -91,6 +91,39 @@
      TODO: Update for 11.0.2
     </para>
    </listitem>
+
+  <listitem>
+    <para>
+     <emphasis role="bold">Whitelist for Custom Login URIs</emphasis>.
+     OpenAM now includes a property that specifies
+     a whitelist for custom login URIs
+     so that the CDCServlet and the Distributed Authentication UI (DAS)
+     can check login URI values against those in the whitelist
+     (<link
+       xlink:show="new"
+       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3918"
+      >OPENAM-3918</link>).
+    </para>
+
+    <para>
+     The property name is <literal>org.forgerock.openam.cdc.validLoginURIs</literal>.
+     If you use custom login URIs in your deployment, add them to the whitelist,
+     separating URIs with commas,
+     setting <literal>org.forgerock.openam.cdc.validLoginURIs</literal>
+     to <literal>/UI/Login,/customLoginURI</literal> for example.
+     You can set this property in OpenAM console under
+     Configuration > Servers and Sites > Default Server Settings > Advanced.
+     The default value is <literal>/UI/Login</literal>.
+    </para>
+
+    <para>
+     The CDCServlet and DAS accept only <literal>loginURI</literal> values
+     that match one of the values in the whitelist.
+     OpenAM strips query strings from <literal>loginURI</literal> values
+     before comparing them with the values in the whitelist,
+     so only include the URIs, not query string parameters.
+    </para>
+  </listitem>
 
    <listitem>
      <para>
