@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.sm;
 
@@ -735,6 +735,21 @@ public class ServiceSchema {
         return (node);
     }
 
+    /**
+     * Removes the attribute schema from this service.
+     * 
+     * @param attrName
+     *            the name of the attribute schema
+     * @throws SMSException
+     *             if an error occurred while performing the operation
+     * @throws SSOException
+     *             if the single sign on token is invalid or expired
+     */
+    public void replaceAttributeSchema(String attrName, Node attributeSchemaNode) throws SSOException,
+            SMSException {
+        replaceChildNode(SMSUtils.SCHEMA_ATTRIBUTE, attrName, attributeSchemaNode);
+    }
+
     private void appendAttributeSchema(NodeList nodes) throws SSOException, SMSException {
         if (nodes == null || nodes.getLength() == 0) {
             throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
@@ -804,7 +819,7 @@ public class ServiceSchema {
     void removeChildNode(String nodeType, String nodeName) throws SSOException,
             SMSException {
         if (debug.messageEnabled()) {
-            debug.message("ServiceSchema::appendChildNode called for: "
+            debug.message("ServiceSchema::removeChildNode called for: "
                     + getServiceName() + "(" + ssm.getVersion() + ") "
                     + componentName);
         }
@@ -816,6 +831,32 @@ public class ServiceSchema {
             if (node != null) {
                 schemaNode.removeChild(node);
                 ssm.replaceSchema(schemaDoc);
+            }
+        }
+    }
+
+    void replaceChildNode(String nodeType, String nodeName, Node attributeSchemaNode) throws SSOException,
+            SMSException {
+        if (debug.messageEnabled()) {
+            debug.message("ServiceSchema::replaceChildNode called for: "
+                    + getServiceName() + "(" + ssm.getVersion() + ") "
+                    + componentName);
+        }
+        Document schemaDoc = ssm.getDocumentCopy();
+        Node schemaNode = getSchemaNode(schemaDoc);
+        if (schemaNode != null) {
+            Node oldNode = XMLUtils.getNamedChildNode(schemaNode, nodeType,
+                    SMSUtils.NAME, nodeName);
+            if (oldNode != null) {
+                Node newNode = schemaDoc.importNode(attributeSchemaNode, true);
+                schemaNode.replaceChild(newNode, oldNode);
+                ssm.replaceSchema(schemaDoc);
+            }
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("ServiceSchema::replaceChildNode failed to retrieve service schema for : "
+                        + getServiceName() + "(" + ssm.getVersion() + ") "
+                        + componentName);
             }
         }
     }
