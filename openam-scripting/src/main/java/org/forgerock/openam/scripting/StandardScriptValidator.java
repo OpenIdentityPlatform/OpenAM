@@ -47,7 +47,7 @@ public class StandardScriptValidator implements ScriptValidator {
      * @throws java.lang.NullPointerException if scriptEngineManager is not specified.
      */
     @Inject
-    public StandardScriptValidator(ScriptEngineManager scriptEngineManager) {
+    public StandardScriptValidator(StandardScriptEngineManager scriptEngineManager) {
         Reject.ifNull(scriptEngineManager);
         this.scriptEngineManager = scriptEngineManager;
     }
