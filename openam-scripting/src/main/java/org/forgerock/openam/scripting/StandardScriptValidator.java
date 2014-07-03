@@ -27,7 +27,7 @@ import org.codehaus.groovy.control.ErrorCollector;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.syntax.SyntaxException;
 import org.forgerock.util.Reject;
-import sun.org.mozilla.javascript.internal.EvaluatorException;
+import org.mozilla.javascript.EvaluatorException;
 
 /**
  * Validates scripts using the standard JSR 223 script engine framework.
