@@ -23,10 +23,9 @@
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
 * $Id: SMSEmbeddedLdapObject.java,v 1.3 2009/10/28 04:24:27 hengming Exp $
+*
+* Portions Copyrighted 2011-2014 ForgeRock AS.
 */
-/*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
- */
 package com.sun.identity.sm.ldap;
 
 import java.text.MessageFormat;
@@ -98,11 +97,9 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
     static int entriesPresentCacheSize = 1000;
     static boolean initializedNotification;
 
-    static Set entriesPresent = Collections.synchronizedSet(
-        new LinkedHashSet());
+    static Set<String> entriesPresent = Collections.synchronizedSet(new LinkedHashSet<String>());
 
-    static Set entriesNotPresent = Collections.synchronizedSet(
-        new LinkedHashSet());
+    static Set<String> entriesNotPresent = Collections.synchronizedSet(new LinkedHashSet<String>());
 
     // Other parameters
     static ResourceBundle bundle;
@@ -576,92 +573,80 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
 
     /**
      * Checks if the provided DN exists. Used by PolicyManager.
+     * @param token Admin token.
+     * @param dn The DN to check.
+     * @return <code>true</code> if the entry exists, <code>false</code> otherwise.
      */
-
-    /**
-     * Checks if the provided DN exists. Used by PolicyManager.
-     */
+    @Override
     public boolean entryExists(SSOToken token, String dn) {
         if (debug.messageEnabled()) {
-            debug.message("SMSEmbeddedLdapObject.entryExists: checking if " +
-                "entry exists: " + dn);
+            debug.message("SMSEmbeddedLdapObject.entryExists: checking if entry exists: " + dn);
         }
-        dn = (new DN(dn)).toRFCString().toLowerCase();
+        dn = new DN(dn).toRFCString().toLowerCase();
         // Check the caches
-        if (SMSNotificationManager.isCacheEnabled() &&
-            entriesPresent.contains(dn)) {
-            if (debug.messageEnabled()) {
-                debug.message("SMSEmbeddedLdapObject.entryExists: " +
-                    "entry present in cache: " + dn);
+        if (SMSNotificationManager.isCacheEnabled()) {
+            if (entriesPresent.contains(dn)) {
+                if (debug.messageEnabled()) {
+                    debug.message("SMSEmbeddedLdapObject.entryExists: entry present in cache: " + dn);
+                }
+                return true;
+            } else if (entriesNotPresent.contains(dn)) {
+                if (debug.messageEnabled()) {
+                    debug.message("SMSEmbeddedLdapObject.entryExists: entry present in not-present-cache: " + dn);
+                }
+                return false;
             }
-            return (true);
-        } else if (SMSNotificationManager.isCacheEnabled() &&
-            entriesNotPresent.contains(dn)) {
-            if (debug.messageEnabled()) {
-                debug.message("SMSEmbeddedLdapObject.entryExists: " + 
-                    "entry present in not-present-cache: " + dn);
-            }
-            return (false);
         }
 
-        // Check if entry exisits
-        boolean entryExists = entryExists(dn);
+        try {
+            // Check if entry exists
+            boolean entryExists = entryExists(dn);
 
-        // Update the cache
-        if (entryExists && SMSNotificationManager.isCacheEnabled()) {
-            initializeNotification();
-            entriesPresent.add(dn);
-            if (entriesPresent.size() > entriesPresentCacheSize) {
-                synchronized (entriesPresent) {
-                    Iterator items = entriesPresent.iterator();
-                    if (items.hasNext()) {
-                        items.next();
-                        items.remove();
+            // Update the cache
+            if (SMSNotificationManager.isCacheEnabled()) {
+                initializeNotification();
+                Set<String> cacheToUpdate = entryExists ? entriesPresent : entriesNotPresent;
+                cacheToUpdate.add(dn);
+                if (cacheToUpdate.size() > entriesPresentCacheSize) {
+                    synchronized (cacheToUpdate) {
+                        if (!cacheToUpdate.isEmpty()) {
+                            cacheToUpdate.remove(cacheToUpdate.iterator().next());
+                        }
                     }
                 }
             }
-        } else if (SMSNotificationManager.isCacheEnabled()) {
-            initializeNotification();
-            entriesNotPresent.add(dn);
-            if (entriesNotPresent.size() > entriesPresentCacheSize) {
-                synchronized (entriesNotPresent) {
-                    Iterator items = entriesNotPresent.iterator();
-                    if (items.hasNext()) {
-                        items.next();
-                        items.remove();
-                    }
-                }
-            }
+
+            return entryExists;
+        } catch (SMSException smse) {
+            return false;
         }
-        return (entryExists);
     }
 
     /**
      * Checks if the provided DN exists.
      */
-    private static boolean entryExists(String dn) {
+    private static boolean entryExists(String dn) throws SMSException {
         try {
-            InternalSearchOperation iso = icConn.processSearch(dn,
-                SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "(objectclass=*)",
-                null);
+            InternalSearchOperation iso = icConn.processSearch(dn, SearchScope.BASE_OBJECT,
+                    DereferencePolicy.NEVER_DEREF_ALIASES, 0, 0, false, "(objectclass=*)", null);
 
             ResultCode resultCode = iso.getResultCode();
             if (resultCode == ResultCode.SUCCESS) {
                 return true;
-            } else {
+            } else if (resultCode == ResultCode.NO_SUCH_OBJECT
+                    || resultCode == ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED) {
                 if (debug.warningEnabled()) {
-                    debug.warning("SMSEmbeddedLdapObject:entryExists: " + dn +
-                        "does not exist. resultCode = " + resultCode);
+                    debug.warning("SMSEmbeddedLdapObject:entryExists: " + dn + " does not exist. resultCode = "
+                            + resultCode);
                 }
                 return false;
+            } else {
+                throw new SMSException("Failed to find entry with DN: " + dn + " LDAP error result: " + resultCode,
+                        IUMSConstants.SMS_LDAP_OPERATION_FAILED);
             }
         } catch (DirectoryException dex) {
-            if (debug.warningEnabled()) {
-                debug.warning("SMSEmbeddedLdapObject:entryExists: " + dn +
-                    "does not exist.", dex);
-            }
-            return false;
+            throw new SMSException("Failed to find entry with DN: " + dn, dex,
+                    IUMSConstants.SMS_LDAP_OPERATION_FAILED);
         }
     }
 
