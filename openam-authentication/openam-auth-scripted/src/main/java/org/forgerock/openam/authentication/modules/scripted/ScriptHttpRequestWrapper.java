@@ -13,7 +13,6 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.authentication.modules.scripted;
 
 import org.forgerock.util.Reject;

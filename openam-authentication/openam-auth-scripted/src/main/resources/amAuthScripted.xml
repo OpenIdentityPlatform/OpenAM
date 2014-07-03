@@ -189,11 +189,10 @@ if (logger.messageEnabled()) {
 
 if (username) {
     // Fetch user information via REST
-    httpClientRequest.uri = "http://localhost:8080/openam/json/users/" + username;
-    httpClientRequest.method = "GET";
-
-    var response = httpClient.perform(httpClientRequest);
-
+    var response = httpClient.get("http://localhost:8080/openam/json/users/" + username,{
+        cookies : [],
+        headers : []
+    });
     // Log out response from REST call
     logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
 }

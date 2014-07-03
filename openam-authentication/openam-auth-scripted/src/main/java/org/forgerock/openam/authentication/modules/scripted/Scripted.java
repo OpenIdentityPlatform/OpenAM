@@ -37,10 +37,11 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.http.client.HttpClient;
-import org.forgerock.http.client.HttpClientFactory;
+import org.forgerock.http.client.RestletHttpClient;
+import org.forgerock.openam.authentication.modules.scripted.http.GroovyHttpClient;
 import org.forgerock.http.client.request.HttpClientRequest;
 import org.forgerock.http.client.request.HttpClientRequestFactory;
+import org.forgerock.openam.authentication.modules.scripted.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
@@ -82,7 +83,6 @@ public class Scripted extends AMLoginModule {
     private static final String FAILED_ATTR_NAME = "FAILED";
     public static final int FAILURE_VALUE = -2;
     public static final String USERNAME_VARIABLE_NAME = "username";
-    public static final String HTTP_CLIENT_REQUEST_VARIABLE_NAME = "httpClientRequest";
     public static final String HTTP_CLIENT_VARIABLE_NAME = "httpClient";
     public static final String LOGGER_VARIABLE_NAME = "logger";
     public static final String IDENTITY_REPOSITORY = "idRepository";
@@ -97,10 +97,8 @@ public class Scripted extends AMLoginModule {
     /** Debug logger instance used by scripts to log error/debug messages. */
     private static final Debug DEBUG = Debug.getInstance("amScript");
 
-    final HttpClientFactory httpClientFactory = InjectorHolder.getInstance(HttpClientFactory.class);
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
-    private HttpClient httpClient;
-    private HttpClientRequest httpClientRequest;
+    private RestletHttpClient httpClient;
     private ScriptIdentityRepository identityRepository;
 
     /**
@@ -116,7 +114,6 @@ public class Scripted extends AMLoginModule {
         serverSideScript = getServerSideScript();
         clientSideScriptEnabled = getClientSideScriptEnabled();
         httpClient = getHttpClient();
-        httpClientRequest = getHttpRequest();
         identityRepository  = getScriptIdentityRepository();
     }
 
@@ -154,7 +151,6 @@ public class Scripted extends AMLoginModule {
                 scriptVariables.put(SUCCESS_ATTR_NAME, SUCCESS_VALUE);
                 scriptVariables.put(FAILED_ATTR_NAME, FAILURE_VALUE);
                 scriptVariables.put(HTTP_CLIENT_VARIABLE_NAME, httpClient);
-                scriptVariables.put(HTTP_CLIENT_REQUEST_VARIABLE_NAME, httpClientRequest);
                 scriptVariables.put(IDENTITY_REPOSITORY, identityRepository);
 
                 try {
@@ -195,9 +191,16 @@ public class Scripted extends AMLoginModule {
         return scriptEvaluator;
     }
 
-    private HttpClient getHttpClient() {
-       return httpClientFactory.createHttpClient();
+    private RestletHttpClient getHttpClient() {
+        SupportedScriptingLanguage scriptType = getScriptType();
 
+        if(scriptType.equals(SupportedScriptingLanguage.JAVASCRIPT)) {
+            return InjectorHolder.getInstance(JavaScriptHttpClient.class);
+        } else if(scriptType.equals(SupportedScriptingLanguage.GROOVY)){
+            return InjectorHolder.getInstance(GroovyHttpClient.class);
+        }
+
+        return null;
     }
 
     private HttpClientRequest getHttpRequest() {

@@ -14,11 +14,10 @@ if (logger.messageEnabled()) {
 
 if (username != null) {
     // Make REST call to the users endpoint if username is set.
-    httpClientRequest.setUri("http://openam.example.com:8080/openam/json/users/" + username)
-    httpClientRequest.setMethod("GET")
-
-    response = httpClient.perform(httpClientRequest)
-
+    response = httpClient.get("http://localhost:8080/openam/json/users/" + username,[
+        cookies : [],
+        headers : []
+    ]);
     // Log out response from users REST call
     logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity())
 }

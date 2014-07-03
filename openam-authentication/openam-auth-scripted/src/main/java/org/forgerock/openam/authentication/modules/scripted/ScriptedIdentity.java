@@ -80,7 +80,7 @@ class ScriptedIdentity {
      */
     public void setAttribute(String attributeName, Object[] attributeValues) {
         Set attributeValuesAsSet = CollectionUtils.asSet(attributeValues);
-        HashMap attributes = new HashMap();
+        HashMap<String, Set> attributes = new HashMap<String, Set>();
         attributes.put(attributeName, attributeValuesAsSet);
 
         try {
@@ -93,7 +93,7 @@ class ScriptedIdentity {
     }
 
     public void addAttribute(String attributeName, String attributeValue) {
-        Set currentAttributeValues = null;
+        Set<String> currentAttributeValues = null;
         try {
             currentAttributeValues = amIdentity.getAttribute(attributeName);
         } catch (IdRepoException e) {
@@ -103,7 +103,7 @@ class ScriptedIdentity {
         }
 
         if(currentAttributeValues == null) {
-            currentAttributeValues = new HashSet();
+            currentAttributeValues = new HashSet<String>();
         }
 
         currentAttributeValues.add(attributeValue);
