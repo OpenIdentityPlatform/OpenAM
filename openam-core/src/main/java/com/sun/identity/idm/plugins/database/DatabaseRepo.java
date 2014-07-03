@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.plugins.database;
 
@@ -49,6 +49,7 @@ import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -594,9 +595,7 @@ public class DatabaseRepo extends IdRepo {
                 createdName = dao.createUser(userIDAttributeName, attrMap);    
         } else {
                 //Name already exists
-                String args[] = { name };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "310",
-                    args);
+                throw IdRepoDuplicateObjectException.nameAlreadyExists(name);
         }
         if (createdName == null) {
             //later, need to throw IdRepoException..need to add proper message to amIdrepo.properties

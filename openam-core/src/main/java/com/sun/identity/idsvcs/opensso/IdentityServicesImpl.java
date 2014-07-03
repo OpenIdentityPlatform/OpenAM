@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -55,6 +55,7 @@ import com.sun.identity.idm.IdSearchOpModifier;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.AccountExpired;
 import com.sun.identity.idsvcs.CreateResponse;
@@ -914,6 +915,9 @@ public class IdentityServicesImpl
                     }
                 }
             }
+        } catch (IdRepoDuplicateObjectException ex) {
+            debug.error("IdentityServicesImpl:create", ex);
+            throw new DuplicateObject(ex.getMessage());
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:create", ex);
             throw new GeneralFailure(ex.getMessage());

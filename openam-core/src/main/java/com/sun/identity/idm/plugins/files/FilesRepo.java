@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.idm.plugins.files;
 
@@ -66,6 +66,7 @@ import com.sun.identity.common.SystemTimer;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -356,9 +357,7 @@ public class FilesRepo extends IdRepo {
                 }
             } else {
                 // throw exception
-                String args[] = { file.getAbsolutePath() };
-                throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "310",
-                    args);
+                throw IdRepoDuplicateObjectException.nameAlreadyExists(file.getAbsolutePath());
             }
         } else {
             Object args[] = { NAME, IdOperation.SERVICE.getName(),

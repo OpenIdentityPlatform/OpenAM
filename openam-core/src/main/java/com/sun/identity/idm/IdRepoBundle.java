@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.idm;
 
 import java.text.MessageFormat;
@@ -40,6 +44,16 @@ public class IdRepoBundle {
     private static Map bundles = new HashMap();
 
     public final static String BUNDLE_NAME = "amIdRepo";
+
+    /**
+     * Resource bundle key for error message template accepting name as single String argument
+     */
+    public static final String NAME_ALREADY_EXISTS = "310";
+    /**
+     * Resource bundle key for error message template accepting name and type as String arguments
+     */
+    public static final String IDENTITY_OF_TYPE_ALREADY_EXISTS = "224";
+
     static {
         profileBundle = com.sun.identity.shared.locale.Locale
                 .getInstallResourceBundle(BUNDLE_NAME);

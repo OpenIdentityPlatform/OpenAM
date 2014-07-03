@@ -19,6 +19,7 @@ import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdRepo;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
@@ -394,6 +395,18 @@ public class GenericRepoTest extends IdRepoTestBase {
         assertThat(returnedAttrs.get("uniqueMember")).containsOnly("uid=demo,ou=people,dc=openam,dc=forgerock,dc=org");
         assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).containsOnly(DEMO_DN);
         assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).contains(TEST1_GROUP_DN);
+    }
+
+    @Test(dependsOnMethods = "groupCreationSuccessful")
+    public void cannotCreateGroupWithSameNameAsExistingGroup() throws Exception {
+        Map<String, Set<String>> attributes = MapHelper.readMap("/config/groups/test1.properties");
+        try {
+            idrepo.create(null, IdType.GROUP, TEST1_GROUP, attributes);
+            fail();
+        } catch (Exception ex) {
+            assertThat(ex).isInstanceOf(IdRepoDuplicateObjectException.class)
+                    .hasMessage(getIdRepoExceptionMessage("310", TEST1_GROUP));
+        }
     }
 
     @Test(dependsOnMethods = "groupCreationSuccessful")

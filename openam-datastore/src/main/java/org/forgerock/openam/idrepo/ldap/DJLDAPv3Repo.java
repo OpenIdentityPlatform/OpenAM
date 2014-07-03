@@ -26,6 +26,7 @@ import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoFatalException;
 import com.sun.identity.idm.IdRepoListener;
@@ -649,7 +650,11 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         } catch (ErrorResultException ere) {
             DEBUG.error("Unable to add a new entry: " + name + " attrMap: "
                     + IdRepoUtils.getAttrMapWithoutPasswordAttrs(attrMap, null), ere);
-            handleErrorResult(ere);
+            if (ResultCode.ENTRY_ALREADY_EXISTS.equals(ere.getResult().getResultCode())) {
+                throw IdRepoDuplicateObjectException.nameAlreadyExists(name);
+            } else {
+                handleErrorResult(ere);
+            }
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -2439,10 +2444,10 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
     private void handleErrorResult(ErrorResultException ere) throws IdRepoException {
         ResultCode resultCode = ere.getResult().getResultCode();
-        if (resultCode.equals(ResultCode.CONSTRAINT_VIOLATION)) {
+        if (ResultCode.CONSTRAINT_VIOLATION.equals(resultCode)) {
             throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "313",
                     new Object[]{CLASS_NAME, resultCode.intValue(), ere.getResult().getDiagnosticMessage()});
-        } else if (resultCode.equals(ResultCode.NO_SUCH_OBJECT)) {
+        } else if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
             throw new IdentityNotFoundException(resultCode, "220", CLASS_NAME, ere.getResult().getDiagnosticMessage());
         } else {
             throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());

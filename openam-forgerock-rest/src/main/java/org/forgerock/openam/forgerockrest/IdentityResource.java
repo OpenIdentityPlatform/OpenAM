@@ -64,6 +64,7 @@ import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.ConflictException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
@@ -1030,7 +1031,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final DuplicateObject duplicateObject) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ": Resource already exists!" + duplicateObject);
-            handler.handleError(new NotFoundException("Resource already exists", duplicateObject));
+            handler.handleError(new ConflictException("Resource already exists", duplicateObject));
         } catch (final TokenExpired tokenExpired) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ":" + tokenExpired);

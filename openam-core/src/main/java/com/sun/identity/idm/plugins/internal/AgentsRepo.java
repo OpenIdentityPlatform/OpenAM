@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.internal;
@@ -61,6 +61,7 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdRepoBundle;
+import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import com.sun.identity.idm.IdRepoUnsupportedOpException;
@@ -272,9 +273,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                     aTypeConfig = orgConfig.getSubConfig(agentName);
                 } else {
                     // Agent already found, throw an exception
-                    Object args[] = { agentName, type.getName() };
-                    throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "224", args));
+                    throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
                 }
             } else if (type.equals(IdType.AGENTGROUP)) {
                 ServiceConfig agentGroupConfig = getAgentGroupConfig(token);
@@ -288,9 +287,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                     aTypeConfig = agentGroupConfig.getSubConfig(agentName);
                 } else {
                     // Agent already found, throw an exception
-                    Object args[] = { agentName, type.getName() };
-                    throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
-                            "224", args));
+                    throw IdRepoDuplicateObjectException.identityOfTypeAlreadyExists(agentName, type.getName());
                 }
             }
         } catch (SMSException smse) {
