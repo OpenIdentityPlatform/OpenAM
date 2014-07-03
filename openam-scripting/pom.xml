@@ -34,6 +34,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-guice-core</artifactId>
         </dependency>

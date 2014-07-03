@@ -41,7 +41,29 @@
                 i18nFileName="amAuthScripted"
                 revisionNumber="1"
                 i18nKey="iplanet-am-auth-scripted-service-description">
-
+            <Global>
+                <AttributeSchema name="iplanet-am-auth-scripted-server-timeout"
+                                 type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a105">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-core-threads"
+                                 type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="2147483647" i18nKey="a106">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-max-threads"
+                                 type="single" syntax="number_range" rangeStart="1"
+                                 rangeEnd="2147483647" i18nKey="a107">
+                    <DefaultValues>
+                        <Value>50</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global>
             <Organization>
                 <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                  type="single"
@@ -49,18 +71,6 @@
                                  i18nKey="a500">
                     <DefaultValues>
                         <Value>1</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-scripted-script-type"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a101">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
-                        <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>Java Script</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
@@ -82,6 +92,18 @@
                                  i18nKey="a103">
                     <DefaultValues>
                         <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a101">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
+                        <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>JavaScript</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -111,18 +133,6 @@
                         <Value>1</Value>
                     </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-scripted-script-type"
-                                     type="single_choice"
-                                     syntax="string"
-                                     i18nKey="a101">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
-                            <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>Java Script</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                      type="single"
                                      syntax="boolean"
@@ -142,6 +152,18 @@
                                      i18nKey="a103">
                         <DefaultValues>
                             <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a101">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
+                            <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>JavaScript</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"

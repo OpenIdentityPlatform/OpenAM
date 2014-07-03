@@ -16,19 +16,18 @@
 
 package org.forgerock.openam.scripting;
 
-import org.codehaus.groovy.control.ErrorCollector;
-import org.codehaus.groovy.control.MultipleCompilationErrorsException;
-import org.codehaus.groovy.syntax.SyntaxException;
-import org.forgerock.util.Reject;
-import org.mozilla.javascript.EvaluatorException;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import javax.script.Compilable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.ArrayList;
-import java.util.List;
+import org.codehaus.groovy.control.ErrorCollector;
+import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import org.codehaus.groovy.syntax.SyntaxException;
+import org.forgerock.util.Reject;
+import sun.org.mozilla.javascript.internal.EvaluatorException;
 
 /**
  * Validates scripts using the standard JSR 223 script engine framework.

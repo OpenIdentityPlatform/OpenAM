@@ -90,10 +90,10 @@ public final class ScriptObject {
 
         final ScriptObject that = (ScriptObject) o;
 
-        return !(bindings != null ? !bindings.equals(that.bindings) : that.bindings != null)
-                && language.equals(that.language)
-                && name.equals(that.name)
-                && script.equals(that.script);
+        return !(bindings != null ? !bindings.equals(that.getBindings()) : that.getBindings() != null)
+                && language.equals(that.getLanguage())
+                && name.equals(that.getName())
+                && script.equals(that.getScript());
     }
 
     @Override

@@ -67,8 +67,11 @@ public class Scripted extends AMLoginModule {
     public static final String SCRIPT_TYPE_ATTR_NAME = ATTR_NAME_PREFIX + "script-type";
     public static final String SERVER_SCRIPT_ATTRIBUTE_NAME = ATTR_NAME_PREFIX + "server-script";
     public static final String SCRIPT_NAME = "server-side-script";
+    public static final String SERVER_SCRIPT_TIMEOUT_NAME = ATTR_NAME_PREFIX + "server-timeout";
+    public static final String SERVER_SCRIPT_CORE_THREAD_NAME = ATTR_NAME_PREFIX + "core-threads";
+    public static final String SERVER_SCRIPT_MAX_THREAD_NAME = ATTR_NAME_PREFIX + "max-threads";
 
-    public static final String JAVA_SCRIPT_LABEL = "Java Script";
+    public static final String JAVA_SCRIPT_LABEL = "JavaScript";
     public static final String GROOVY_LABEL = "Groovy";
     private final static int STATE_BEGIN = 1;
 
@@ -107,6 +110,7 @@ public class Scripted extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
         userName = (String) sharedState.get(getUserKey());
         moduleConfiguration = options;
+
         clientSideScript = getClientSideScript();
         scriptEvaluator = getScriptEvaluator();
         serverSideScript = getServerSideScript();
@@ -157,7 +161,7 @@ public class Scripted extends AMLoginModule {
                     scriptEvaluator.evaluateScript(serverSideScript, scriptVariables);
                 } catch (ScriptException e) {
                     DEBUG.message("Error running server side scripts", e);
-                    throw new AuthLoginException("Error running script");
+                    throw new AuthLoginException("Error running script", e);
                 }
                 
                 state = ((Number) scriptVariables.get(STATE_VARIABLE_NAME)).intValue();
@@ -175,14 +179,20 @@ public class Scripted extends AMLoginModule {
     }
 
     private ScriptObject getServerSideScript() {
-        SupportedScriptingLanguage scriptType = getScriptType();
-        String rawScript = getRawServerSideScript();
-
-        return new ScriptObject(SCRIPT_NAME, rawScript, scriptType, null);
+        return new ScriptObject(SCRIPT_NAME, getRawServerSideScript(), getScriptType(), null);
     }
 
     private ScriptEvaluator getScriptEvaluator() {
-        return InjectorHolder.getInstance(StandardScriptEvaluator.class);
+        final StandardScriptEvaluator scriptEvaluator = InjectorHolder.getInstance(StandardScriptEvaluator.class);
+        scriptEvaluator.getEngineManager().configureTimeout(getServerTimeout());
+
+        try {
+            StandardScriptEvaluator.configureThreadPool(getCoreThreadSize(), getMaxThreadSize());
+        } catch (IllegalStateException ise) {
+            //we ignore this, but written explicitly for your knowledge
+        }
+
+        return scriptEvaluator;
     }
 
     private HttpClient getHttpClient() {
@@ -195,23 +205,18 @@ public class Scripted extends AMLoginModule {
     }
 
     private String getClientSideScript() {
-        String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
+        final String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
+        return clientSideScript == null ? "" : clientSideScript;
+    }
 
-        if(clientSideScript == null) {
-            clientSideScript = "";
-        }
-
-        return clientSideScript;
+    private int getServerTimeout() {
+        final String value = getConfigValue(SERVER_SCRIPT_TIMEOUT_NAME);
+        return value == null || value.isEmpty() ? 0 : Integer.valueOf(value);
     }
 
     private String getRawServerSideScript() {
-        String serverSideScript = getConfigValue(SERVER_SCRIPT_ATTRIBUTE_NAME);
-
-        if (serverSideScript == null) {
-            serverSideScript = "";
-        }
-
-        return serverSideScript;
+        final String serverSideScript = getConfigValue(SERVER_SCRIPT_ATTRIBUTE_NAME);
+        return serverSideScript == null ? "" : serverSideScript;
     }
 
     private String getConfigValue(String attributeName) {
@@ -242,6 +247,16 @@ public class Scripted extends AMLoginModule {
     private boolean getClientSideScriptEnabled() {
         String clientSideScriptEnabled = getConfigValue(CLIENT_SCRIPT_ENABLED_ATTR_NAME);
         return Boolean.parseBoolean(clientSideScriptEnabled);
+    }
+
+    private int getCoreThreadSize() {
+        final String value = getConfigValue(SERVER_SCRIPT_CORE_THREAD_NAME);
+        return value == null || value.isEmpty() ? 1 : Integer.valueOf(value); //defaults to 1
+    }
+
+    private int getMaxThreadSize() {
+        final String value = getConfigValue(SERVER_SCRIPT_MAX_THREAD_NAME);
+        return value == null || value.isEmpty() ? 1 : Integer.valueOf(value); //defaults to 1
     }
 
     /**

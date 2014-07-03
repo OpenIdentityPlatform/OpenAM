@@ -37,6 +37,7 @@ import java.util.Set;
  * scope).
  */
 public final class ChainedBindings implements Bindings {
+
     private final Bindings current;
     private final Bindings parent;
 

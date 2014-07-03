@@ -14,25 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.scripting.guice;
-
-import com.google.inject.AbstractModule;
-import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.scripting.ScriptEvaluator;
-import org.forgerock.openam.scripting.ScriptValidator;
-import org.forgerock.openam.scripting.StandardScriptEvaluator;
-import org.forgerock.openam.scripting.StandardScriptValidator;
-
 /**
- * Guice configuration for OpenAM scripting-related components.
+ * Classes associated with ensuring timeouts perform for all supported script types.
  */
-@GuiceModule
-public class ScriptingGuiceModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
-        bind(ScriptEvaluator.class).to(StandardScriptEvaluator.class);
-        bind(ScriptValidator.class).to(StandardScriptValidator.class);
-    }
-
-}
+package org.forgerock.openam.scripting.timeouts;

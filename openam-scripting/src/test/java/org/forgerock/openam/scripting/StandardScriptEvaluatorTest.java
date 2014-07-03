@@ -17,27 +17,42 @@
 package org.forgerock.openam.scripting;
 
 import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import static org.fest.assertions.Assertions.assertThat;
+import org.forgerock.openam.scripting.timeouts.ContextFactoryWrapper;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 public class StandardScriptEvaluatorTest {
 
     private StandardScriptEvaluator testEvaluator;
-    private ScriptEngineManager scriptEngineManager;
+    private StandardScriptEngineManager scriptEngineManager;
+    private ContextFactoryWrapper factoryWrapper = mock(ContextFactoryWrapper.class);
+    private Future mockFuture = mock(Future.class);
 
     @BeforeMethod
     public void createTestEvaluator() {
-        this.scriptEngineManager = new ScriptEngineManager();
+        scriptEngineManager = new StandardScriptEngineManager(factoryWrapper);
         // Use our bundled Rhino engine for tests
         scriptEngineManager.registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME,
                 new RhinoScriptEngineFactory());
-        this.testEvaluator = new StandardScriptEvaluator(scriptEngineManager);
+        testEvaluator = new StandardScriptEvaluator(scriptEngineManager);
+        try {
+            StandardScriptEvaluator.configureThreadPool(1, 1);
+        } catch (IllegalStateException ise) { //ignore
+
+        }
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -74,10 +89,22 @@ public class StandardScriptEvaluatorTest {
         assertThat(result).isNotNull().isEqualTo(value);
     }
 
+    @Test (expectedExceptions = IllegalStateException.class)
+    public void shouldFailEvaluationOfSimpleScriptBeforeThreadPoolConfigured() throws Exception {
+        // Given
+        ScriptObject script = getGroovyScript("3 * 4");
+        StandardScriptEvaluator myTestEvaluator = new NoThreadStandardScriptEvaluator(scriptEngineManager);
+
+        // When
+        myTestEvaluator.evaluateScript(script, null);
+
+        // Then - exception
+    }
+
     @Test
     public void shouldEvaluateSimpleScripts() throws Exception {
         // Given
-        ScriptObject script = getJavascript("3 * 4");
+        ScriptObject script = getGroovyScript("3 * 4");
 
         // When
         Number result = testEvaluator.evaluateScript(script, null);
@@ -207,6 +234,66 @@ public class StandardScriptEvaluatorTest {
         assertThat(scope.get(varName)).isEqualTo(expected);
     }
 
+    @Test
+    public void shouldStopJavaScriptExecutionWhenTimeoutReached() throws InterruptedException, ExecutionException, TimeoutException, ScriptException {
+        //given
+        mockFuture = mock(Future.class);
+        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
+        ScriptObject loopScript = getJavascript("while(true) { }");
+        myTestEvaluator.getEngineManager().configureTimeout(1);
+
+        //when
+        myTestEvaluator.<Void>evaluateScript(loopScript, null);
+
+        //then
+        verify(mockFuture).get(1000, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void shouldNotStopJavaScriptExecutionWhenNoTimeoutConfigured() throws InterruptedException, ExecutionException, ScriptException {
+        //given
+        mockFuture = mock(Future.class);
+        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
+        ScriptObject loopScript = getJavascript("while(true) { }");
+        myTestEvaluator.getEngineManager().configureTimeout(0);
+
+        //when
+        myTestEvaluator.<Void>evaluateScript(loopScript, null);
+
+        //then
+        verify(mockFuture).get();
+    }
+
+    @Test
+    public void shouldNotStopGroovyScriptExecutionWhenTimeoutReached() throws ExecutionException, InterruptedException, ScriptException {
+        //given
+        mockFuture = mock(Future.class);
+        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
+        ScriptObject loopScript = getGroovyScript("while(true) { }");
+        myTestEvaluator.getEngineManager().configureTimeout(0);
+
+        //when
+        myTestEvaluator.<Void>evaluateScript(loopScript, null);
+
+        //then
+        verify(mockFuture).get();
+    }
+
+    @Test
+    public void shouldStopGroovyScriptExecutionWhenTimeoutReached() throws InterruptedException, ExecutionException, TimeoutException, ScriptException {
+        //given
+        mockFuture = mock(Future.class);
+        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
+        ScriptObject loopScript = getGroovyScript("while(true) { }");
+        myTestEvaluator.getEngineManager().configureTimeout(1);
+
+        //when
+        myTestEvaluator.<Void>evaluateScript(loopScript, null);
+
+        //then
+        verify(mockFuture).get(1000, TimeUnit.MILLISECONDS);
+    }
+
     private ScriptObject getJavascript(String script) {
         return getJavascript(script, null);
     }
@@ -221,4 +308,75 @@ public class StandardScriptEvaluatorTest {
     private ScriptObject getGroovyScript(String script) {
         return new ScriptObject("groovyTest", script, SupportedScriptingLanguage.GROOVY, null);
     }
+
+    // Executor that runs everything in the calling thread without a pool and returns a fake future when submit called
+    private class FakeFutureExecutor extends AbstractExecutorService {
+
+        public <T> java.util.concurrent.Future<T> submit(java.util.concurrent.Callable<T> tCallable) {
+            return mockFuture;
+        }
+
+        private volatile boolean shutdown;
+
+        public void shutdown() {
+            shutdown = true;
+        }
+
+        public List<Runnable> shutdownNow() {
+            return null;
+        }
+
+        public boolean isShutdown() {
+            return shutdown;
+        }
+
+        public boolean isTerminated() {
+            return shutdown;
+        }
+
+        public boolean awaitTermination(long time, TimeUnit unit) throws InterruptedException {
+            return true;
+        }
+
+        public void execute(Runnable runnable) {
+            return;
+        }
+
+    }
+
+    private class FakeFutureStandardScriptEvaluator extends StandardScriptEvaluator {
+
+        /**
+         * Constructs the script evaluator using the given JSR 223 script engine manager instance.
+         *
+         * @param scriptEngineManager the script engine manager to use for creating script engines. May not be null.
+         */
+        public FakeFutureStandardScriptEvaluator(StandardScriptEngineManager scriptEngineManager) {
+            super(scriptEngineManager);
+        }
+
+        @Override
+        ExecutorService getThreadPool() {
+            return new FakeFutureExecutor();
+        }
+    }
+
+    private class NoThreadStandardScriptEvaluator extends StandardScriptEvaluator {
+
+        /**
+         * Constructs the script evaluator using the given JSR 223 script engine manager instance.
+         *
+         * @param scriptEngineManager the script engine manager to use for creating script engines. May not be null.
+         */
+        public NoThreadStandardScriptEvaluator(StandardScriptEngineManager scriptEngineManager) {
+            super(scriptEngineManager);
+        }
+
+        @Override
+        ExecutorService getThreadPool() {
+            return null;
+        }
+    }
+
+
 }
