@@ -96,7 +96,7 @@ public final class EntitlementUtils {
         Application app = ApplicationManager.newApplication(realm, name, applicationType);
 
         Map<String, Boolean> actions = getActions(data); //if the app doesn't come with actions, use applicationType's
-        if (actions == null && actions.isEmpty()) {
+        if (actions == null || actions.isEmpty()) {
             actions = applicationType.getActions();
         }
 
