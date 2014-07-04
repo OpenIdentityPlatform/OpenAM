@@ -196,51 +196,52 @@ public class WindowsDesktopSSO extends AMLoginModule {
                  if (major == GSSException.CREDENTIALS_EXPIRED) {	 
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
-                 try {	 
-                      authenticateToken(kerberosToken);	 
-                      if (debug.messageEnabled()){
-                        debug.message("Authentication succeeded with new cred.");	 
-                            result = ISAuthConstants.LOGIN_SUCCEED;
-                      }
-                  } catch (Exception ee) {	 
-                        debug.error("Authentication failed with new cred.");	 
-                        throw new AuthLoginException(amAuthWindowsDesktopSSO,	 
-                                 "auth", null, ee);	 
-                 }	 
-               } else {	 
-                      debug.error("Authentication failed with GSSException.");	 
-                      throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth",	 
-                               null, e);	 
-               }	 
-             }	 
-        } catch (GSSException e ){
-            int major = e.getMajor();
-            if (major == GSSException.CREDENTIALS_EXPIRED) {
-                debug.message("Credential expired. Re-establish credential...");
-                serviceLogin();
-                    try {
-                    authenticateToken(kerberosToken);
-                    if (debug.messageEnabled()){
-                        debug.message("Authentication succeeded with new cred.");
-                            result = ISAuthConstants.LOGIN_SUCCEED; 
-                    }
-                } catch (Exception ee) {
-                        debug.error("Authentication failed with new cred.");
-                        throw new AuthLoginException(amAuthWindowsDesktopSSO, 
-                        "auth", null, ee);
-                }
-            } else {
-                debug.error("Authentication failed with GSSException.");
-                throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
-                    null, e);
-            }
-        } catch (AuthLoginException e) {
-            throw e;
-        } catch (Exception e) {
-            debug.error("Authentication failed with generic exception.");
-            throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
-                null, e);
-        }
+                 try {   
+                     authenticateToken(kerberosToken);  
+                     if (debug.messageEnabled()){
+                       debug.message("Authentication succeeded with new cred.");    
+                           result = ISAuthConstants.LOGIN_SUCCEED;
+                     }
+                 } catch (Exception ee) {   
+                       debug.error("Authentication failed with new cred.Stack Trace", ee); 
+                       throw new AuthLoginException(amAuthWindowsDesktopSSO,    
+                                "auth", null, ee);  
+                }   
+              } else {  
+                     debug.error("Authentication failed with PrivilegedActionException wrapped GSSException. Stack Trace", e);  
+                     throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth",  
+                              null, e);
+              }     
+            }   
+       } catch (GSSException e1 ){
+           int major = e1.getMajor();
+           if (major == GSSException.CREDENTIALS_EXPIRED) {
+               debug.message("Credential expired. Re-establish credential...");
+               serviceLogin();
+                   try {
+                   authenticateToken(kerberosToken);
+                   if (debug.messageEnabled()){
+                       debug.message("Authentication succeeded with new cred.");
+                           result = ISAuthConstants.LOGIN_SUCCEED; 
+                   }
+               } catch (Exception ee) {
+                       debug.error("Authentication failed with new cred. Stack Trace", ee);
+                       throw new AuthLoginException(amAuthWindowsDesktopSSO, 
+                       "auth", null, ee);
+               }
+           } else {
+               debug.error("Authentication failed with GSSException. Stack Trace", e1);
+               throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
+                   null, e1);
+           }
+       } catch (AuthLoginException e2) {
+           debug.error("Authentication failed with AuthLoginException. Stack Trace", e2);
+           throw e2;
+       } catch (Exception e3) {
+           debug.error("Authentication failed with generic exception. Stack Trace", e3);
+           throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth", 
+               null, e3);
+       }
         return result;
     }
 
