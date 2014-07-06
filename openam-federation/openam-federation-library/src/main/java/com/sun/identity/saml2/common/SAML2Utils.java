@@ -102,6 +102,7 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.utils.IOUtils;
 import org.owasp.esapi.ESAPI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -155,9 +156,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
+
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor;
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor.SAMLEntityInfo;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -1202,37 +1205,32 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @return String the encoded String value or null on error.
      */
     public static String encodeForRedirect(String str) {
-        String classMethod = "encodeForRedirect";
-        int n = str.length();
-        byte[] input = null;
+        String classMethod = "SAML2Utils.encodeForRedirect: ";
+
+        byte[] input;
         try {
             input = str.getBytes("UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            debug.error(
-                    "SAML2Utils.encodeForRedirect: cannot get byte array: ",
-                    uee);
+            debug.error(classMethod + "cannot get byte array: ", uee);
             return null;
         }
-        byte[] output = new byte[n];
-        
+
         Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-        deflater.setInput(input);
-        deflater.finish();
-        int len = deflater.deflate(output);
-        deflater.end();
-        
-        byte[] exact = new byte[len];
-        
-        System.arraycopy(output, 0, exact, 0, len);
-        
-        String base64Str = Base64.encode(exact);
-        
-        String encoded = URLEncDec.encode(base64Str);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(out, deflater);
+        try {
+            deflaterOutputStream.write(input);
+        } catch (IOException e) {
+            debug.error(classMethod + "There was a problem compressing the input", e);
+            return null;
+        } finally {
+            IOUtils.closeIfNotNull(deflaterOutputStream);
+        }
+
+        String encoded = URLEncDec.encode(Base64.encode(out.toByteArray()));
         if (debug.messageEnabled()) {
-            debug.message(classMethod+
-                    "out string length : " + encoded.length());
-            debug.message(classMethod+
-                    "out string is ===>"+encoded+"<===");
+            debug.message(classMethod + "out string length : " + encoded.length());
+            debug.message(classMethod + "out string is ===>" + encoded + "<===");
         }
         
         return encoded;
@@ -1248,54 +1246,65 @@ public class SAML2Utils extends SAML2SDKUtils {
         
         final String classMethod = "SAML2Utils.decodeFromRedirect: ";
         
-        if (str==null || str.length()==0) {
-            debug.error(classMethod+"input is null.");
+        if (str == null || str.isEmpty()) {
+            debug.error(classMethod + "input is null.");
             return null;
         }
         if (debug.messageEnabled()) {
-            debug.message(classMethod+
-                    "input string length : "+str.length());
-            debug.message(classMethod+
-                    "input string is ===>"+str+"<===");
+            debug.message(classMethod + "input string length : " + str.length());
+            debug.message(classMethod + "input string is ===>" + str + "<===");
         }
         byte[] input = Base64.decode(removeNewLineChars(str));
-        if (input==null || input.length==0) {
-            debug.error(classMethod+
-                    "base 64 decoded result is null");
+        if (input == null || input.length == 0) {
+            debug.error(classMethod + "Base64 decoded result is null");
             return null;
         }
-        // Decompress the bytes
-        Inflater inflater = new Inflater(true);
-        inflater.setInput(input);
+
+        // From the Inflater JavaDoc:
+        // Note: When using the 'nowrap' option it is also necessary to provide an extra "dummy" byte as input.
+        // This is required by the ZLIB native library in order to support certain optimizations.
+        byte[] tmp = new byte[input.length + 1];
+        System.arraycopy(input, 0, tmp, 0, input.length);
+        input = tmp;
+
         int bufferLength = 2048;
         try {
-            if ((bufferLen != null) && (!bufferLen.equals(""))) {
+            if (bufferLen != null && !bufferLen.isEmpty()) {
                 bufferLength = Integer.parseInt(bufferLen);
             }
         } catch (NumberFormatException nfe) {
-            debug.error("Unable to parse buffer length.", nfe);
+            debug.error(classMethod + "Unable to parse buffer length.", nfe);
         }
-        byte[] result = new byte[bufferLength];
-        int readBytes = 0;
-        StringBuilder sb = new StringBuilder(300);
+        // Decompress the bytes
+        Inflater inflater = new Inflater(true);
+        InflaterInputStream inflaterInputStream = new InflaterInputStream(new ByteArrayInputStream(input), inflater);
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(bufferLength);
         try {
-            while (!inflater.finished()) {
-                readBytes = inflater.inflate(result);
-                sb.append(new String(result, 0, readBytes, "UTF-8"));
+            int b = inflaterInputStream.read();
+            while (b != -1) {
+                bout.write(b);
+                b = inflaterInputStream.read();
             }
-        } catch (DataFormatException dfe) {
-            debug.error(classMethod + "cannot inflate SAMLRequest: ", dfe);
+        } catch (IOException e) {
+            debug.error(classMethod + "There was a problem reading the compressed input", e);
             return null;
+        } finally {
+            IOUtils.closeIfNotNull(inflaterInputStream);
+        }
+
+        String result;
+        try {
+            result = bout.toString("UTF-8");
         } catch (UnsupportedEncodingException uee) {
             debug.error(classMethod + "cannot convert byte array to string.", uee);
             return null;
         }
-        inflater.end();
 
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Return value: \n" + sb.toString());
+            debug.message(classMethod + "Return value: \n" + result);
         }
-        return sb.toString();
+
+        return result;
     }
     
     /**
