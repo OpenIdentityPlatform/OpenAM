@@ -73,15 +73,14 @@
   <title>Java EE Policy Agent Components</title>
 
   <para>The OpenAM Java EE policy agent is comprised
-   of four main components: the <firstterm>policy agent filter</firstterm>,
+   of five main components: the <firstterm>policy agent filter</firstterm>,
    a container-specific <firstterm>Java Authentication and Authorization Server (JAAS) realm
    implementation</firstterm>, an agent application war file,
-   and an <firstterm>agent installer</firstterm>.</para>
+   <firstterm>agent installer</firstterm>, and client SDK.</para>
   <para>
-   The installer integrates the other three components within the
-   container, after which the components run transparently to the client,
-   connecting to OpenAM through its client SDK for
-   authentication, authorization, session, policy, logging and other services.
+   The installer integrates the other components within the
+   container, after which the components run transparently,
+   connecting to OpenAM through its client SDK.
   </para>
 
   <itemizedlist>
@@ -194,13 +193,13 @@
    convenience.
    Any property change made
    in OpenAM using the console or the <command>ssoadm</command> command-line tool is
-   immediately communicated to the agent cache via a notification.
+   immediately communicated to the agent via a notification.
    Many policy agent properties are hot-swap enabled, allowing the change
    to take effect immediately without a server restart.
   </para>
   <para>Policy agent configuration settings can also be stored locally in a
    Java properties flat-file, such as
-   <filename>Agent_001/config/OpenSSOAgentConfiguration.properties</filename>,
+   <filename>Agent_001/config/${agentsConfigurationFile}</filename>,
    which is created when you install the agent.
    If you implement a local properties file, you must make all
    configuration changes by modifying property values in the file.
@@ -211,7 +210,7 @@
    properties require a container restart. To avoid any configuration errors that
    could take effect immediately, you can lock the properties by setting the
    <literal>com.sun.identity.agents.config.lock.enable</literal> to <literal>true</literal>
-   in the OpenAM bootstrap file, <filename>OpenAMAgentBootstrap.properties</filename>,
+   in the OpenAM bootstrap file, <filename>${agentsBootstrapFile}</filename>,
    and then re-start the container.
   </para>
 
@@ -288,7 +287,7 @@
       Specifies that authorization should be enforced only
       by OpenAM's URL resource-based policies.
       When the filter mode is <literal>URL_POLICY</literal>,
-      no Jave EE policies will be enforced.
+      no Java EE policies will be enforced.
 
       The <literal>URL_POLICY</literal> mode is commonly used
       in production deployments.
@@ -299,7 +298,7 @@
      <para><emphasis role="bold">ALL</emphasis>.
       Specifies that SSO_ONLY, J2EE_POLICY, and URL_POLICY should be
       enforced. This setting ensures that the user gets properly authenticated
-      with a valid session token ID and then authorized through the J2EE container's
+      with a valid session token ID and then authorized through the Java EE container's
       declarative or programmatic security settings and OpenAM's URL-based
       policies to access the web resource.
      </para>
@@ -308,7 +307,7 @@
 
    <para>For more information, see
     <link xlink:show="new"
-          xlink:href="jee-users-guide#chap-agents#j2ee-agent-general-properties"
+          xlink:href="jee-users-guide#j2ee-agent-general-properties"
           xlink:role="http://docbook.org/xlink/role/olink"
      ><citetitle>Configuring J2EE Policy Agent Global Properties</citetitle></link>.
    </para>
@@ -326,13 +325,20 @@
     that grants the user access to resources whose URIs match those in the list.
    </para>
    <para>
-    For example, you can set URI patterns with wildcards in the OpenAM console as follows:</para>
+    For example, you can set URI patterns with wildcards in the OpenAM console
+    using the following patterns:</para>
     <screen>
      /logout.html
      /images/*
      /css/-*-
      /*.jsp?locale=*
     </screen>
+
+    <para>For more information on wildcard usage, see
+    <link xlink:show="new"
+          xlink:href="admin-guide#wildcard-syntax"
+          xlink:role="http://docbook.org/xlink/role/olink">Wildcard Usage</link>.</para>
+
     <para>The Java EE policy agent also supports a Not-Enforced Client IP List, which
       specifies the client IP addresses that can be excluded from authentication
       and authorization. This property is useful to allow administrators access
@@ -448,7 +454,7 @@
     </para>
    </listitem>
    <listitem>
-    <para>The filter redirects the client browser to the OpeAM Authentication
+    <para>The filter redirects the client browser to the OpenAM Authentication
      Service, which displays a login page.</para>
    </listitem>
    <listitem>
@@ -464,21 +470,23 @@
     </para>
    </listitem>
    <listitem>
-    <para>The agent filter checks for the session ID, which is found.</para>
+    <para>The agent filter checks for the session cookie, which is found.</para>
    </listitem>
    <listitem>
-    <para>The session token ID gets validated by OpenAM's Session Service. If not valid,
+    <para>The session cookie gets validated by OpenAM's Session Service. If not valid,
      go back to step 5.</para>
    </listitem>
    <listitem>
-    <para>OpenAM validates the session ID.</para>
+    <para>OpenAM validates the session cookie.</para>
    </listitem>
    <listitem>
     <para>The agent filter authenticates into the container's security realm
      and has the correct roles assigned, the container determines if the
-     user's role has authorization to access the resource. Assume authorization
-     is allowed.
+     user's role has authorization to access the resource.
     </para>
+   </listitem>
+   <listitem>
+    <para>Internal authentication is successful.</para>
    </listitem>
    <listitem>
     <para>The agent filter checks the URL_BASED policy in OpenAM.
@@ -497,12 +505,6 @@
    <listitem>
     <para>Pass through to the web resource.
     </para>
-   </listitem>
-   <listitem>
-    <para>The decision and request is logged.</para>
-   </listitem>
-   <listitem>
-    <para>Pass through to the web resource.</para>
    </listitem>
    <listitem>
     <para>The web resource performs the Java EE security checks.</para>
@@ -538,7 +540,7 @@
    </para>
    <para>For more details, see
     <link xlink:show="new"
-          xlink:href="jee-users-guide#configuring-j2ee-policy-agents"
+          xlink:href="jee-users-guide#chap-j2ee-agents"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Configuring Java EE Policy Agents</citetitle></link>.</para>
   </section>
@@ -564,7 +566,7 @@
    </para>
    <para>For more details, see
     <link xlink:show="new"
-          xlink:href="jee-users-guide#chap-agents.html#j2ee-agent-general-properties"
+          xlink:href="jee-users-guide#j2ee-agent-general-properties"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>General Properties</citetitle></link>.</para>
   </section>
@@ -605,7 +607,7 @@
    </para>
    <para>For more details, see
     <link xlink:show="new"
-          xlink:href="jee-users-guide#chap-agents.html#j2ee-agent-fqdn-properties"
+          xlink:href="jee-users-guide#j2ee-agent-fqdn-properties"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Fully Qualified Domain Name Checking Properties</citetitle></link>.</para>
   </section>
@@ -630,17 +632,23 @@
    </para>
    <para>For more details, see
     <link xlink:show="new"
-          xlink:href="jee-users-guide#chap-agents.html#j2ee-agent-cookie-reset-properties"
+          xlink:href="jee-users-guide#j2ee-agent-cookie-reset-properties"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Cookie Reset Properties</citetitle></link>.</para>
   </section>
 
   <section xml:id="agent-cdsso">
-   <title>Java EE Policy Agent and CDSSO</title>
+   <title>Cross Domain Single Sign-On</title>
    <para>Cross domain single sign-on (CDSSO) allows the Java EE policy agent
-    to handle a validated session cookie between multiple domains.
-    CDSSO is best implemented in an environment where Java EE policy agents
-    protect applications accessible by partners and other trusted parties.
+    to transfer a validated session ID between an OpenAM domain and an application
+    domain using a proprietary OpenAM mechanism.
+    Normally, single sign-on cannot be implemented across domains as the session
+    cookie from one domain (for example, website.com) is not accessible from
+    another domain (for example, website.net).
+   </para>
+   <para>
+    OpenAM's CDSSO solves this cross-domain problem and is best implemented in environments
+    where all the domains are managed ultimately by the same organization.
    </para>
    <para>
     The Java EE policy agent works with an OpenAM component called
@@ -652,12 +660,12 @@
     The policy agent processes the request and extracts the session ID, which is
     again validated by OpenAM. If validation is successful,
     the policy agent sets the cookie in alternate domain. The
-    client can now access a resource in that domain.
+    client can then access a resource in that domain.
    </para>
 
    <para>For more details, see
     <link xlink:show="new"
-          xlink:href="admin-guide#chap-agents.html#chap-cdsso"
+          xlink:href="admin-guide#chap-cdsso"
           xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Configuring Cross Domain Single Sign-On</citetitle></link>.</para>
   </section>

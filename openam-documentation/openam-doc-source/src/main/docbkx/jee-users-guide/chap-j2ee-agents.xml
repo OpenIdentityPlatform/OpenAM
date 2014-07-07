@@ -54,11 +54,12 @@
 
  <xinclude:include href="../shared/sec-kinds-of-agent-profiles.xml" />
 
+ <xinclude:include href="../shared/sec-configure-22-policy-agent.xml" />
+
  <xinclude:include href="../shared/sec-create-agent-profiles.xml" />
 
  <xinclude:include href="../shared/sec-delegate-agent-profile-creation.xml" />
 
- <!-- The following sections is reused in the j2ee policy agent users guide  -->
  <xinclude:include href="../shared/sec-configuring-j2ee-policy-agents.xml" />
 
  <xinclude:include href="../shared/sec-configure-agent-authenticators.xml" />

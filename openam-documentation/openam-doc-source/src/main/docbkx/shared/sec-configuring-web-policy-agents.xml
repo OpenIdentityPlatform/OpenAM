@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
 <section xml:id="configure-web-policy-agent"
          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -449,7 +472,7 @@
   </variablelist>
 
   <variablelist xml:id="web-agent-not-enforced-ip-properties">
-   <title>Not Enforced IP Processing properties</title>
+   <title>Not Enforced IP Processing Properties</title>
    <varlistentry>
     <term>Not Enforced Client IP List</term>
     <listitem>
@@ -492,9 +515,12 @@
          192.168.1.1 to 192.168.4.3 inclusive, use the following setting.</para>
         <literallayout class="monospaced"
          >com.sun.identity.agents.config.notenforced.ip = 192.168.1.1-192.168.4.3</literallayout>
-        <para>The following example shows a range of IPv6 addresses.</para>
+        <para>The following example shows a range of IPv6 addresses. The example
+         is displayed over two lines for formatting purposes.
+        </para>
         <literallayout class="monospaced"
-         >com.sun.identity.agents.config.notenforced.ip = 2001:5c0:9168:0:0:0:0:1-2001:5c0:9168:0:0:0:0:2</literallayout>
+         >com.sun.identity.agents.config.notenforced.ip = \
+    2001:5c0:9168:0:0:0:0:1-2001:5c0:9168:0:0:0:0:2</literallayout>
        </listitem>
       </varlistentry>
      </variablelist>
@@ -991,7 +1017,7 @@
    <varlistentry>
     <term>Encode special characters in Cookies</term>
     <listitem>
-     <para>When enabled, encode special characters in cookie by URL encoding.
+     <para>When enabled, use URL encoding for special characters in cookies.
       This is useful when profile, session, and response attributes contain
       special characters, and the attributes fetch mode is set to
       <literal>HTTP_COOKIE</literal>.</para>
@@ -1062,8 +1088,8 @@
       ./, /., /, ., ,\, %00-%1f, %7f-%ff, %25, %2B, %2C, %7E, .info, use the
       following setting.</para>
 
-     <programlisting language="ini" width="84">com.forgerock.agents.agent.invalid.url.regex= \
-      ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
+     <programlisting language="ini">com.forgerock.agents.agent.invalid.url.regex= \
+     ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
     </listitem>
    </varlistentry>
   </variablelist>

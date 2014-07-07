@@ -31,6 +31,7 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
  <title>About OpenAM Web Policy Agents</title>
 
  <para>OpenAM web policy agents provide light touch integration for web
