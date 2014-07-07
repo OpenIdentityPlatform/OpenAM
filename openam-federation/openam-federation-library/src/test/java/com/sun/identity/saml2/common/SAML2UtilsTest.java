@@ -30,24 +30,22 @@ public class SAML2UtilsTest {
 
         // the max length of each random String to encode
         int maxStringLength = 300;
-        String[] randomStrings = new String[2000];
+        // the number of encode/decode iterations we want to test
+        int randomStringsCount = 3000;
         Random R = new Random();
 
-        // generate the random Strings
-        for (int i = 0; i < randomStrings.length; i++) {
+        int i = 0;
+        while (i < randomStringsCount) {
             int size = R.nextInt(maxStringLength);
             // We don't want any 0 length arrays
             while (size == 0) {
                 size = R.nextInt(maxStringLength);
             }
-            randomStrings[i] = RandomStringUtils.randomAlphanumeric(size);
-        }
-
-        // Exercise the SAML2Utils encode/decode routines
-        for (int i = 0; i < randomStrings.length; i++) {
-            String encoded = SAML2Utils.encodeForRedirect(randomStrings[i]);
+            i++;
+            String randomString = RandomStringUtils.randomAlphanumeric(size);
+            String encoded = SAML2Utils.encodeForRedirect(randomString);
             String decoded = SAML2Utils.decodeFromRedirect(URLEncDec.decode(encoded));
-            Assert.assertEquals(decoded, randomStrings[i]);
+            Assert.assertEquals(decoded, randomString);
         }
     }
 }
