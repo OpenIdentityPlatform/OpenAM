@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock, AS.
+ */
+
 package com.iplanet.am.sdk;
 
 import java.util.Collections;
@@ -500,5 +504,14 @@ public class AMHashMap extends CaseInsensitiveHashMap {
             }
         }
         return copyValues;
+    }
+
+    /**
+     * Checks whether this map contains byte array or string values.
+     *
+     * @return true if the type of values is {@code byte[][]} otherwise false.
+     */
+    public boolean isByteValues() {
+        return byteValues;
     }
 }
