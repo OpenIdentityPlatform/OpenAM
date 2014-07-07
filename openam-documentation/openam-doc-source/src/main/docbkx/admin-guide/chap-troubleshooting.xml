@@ -450,8 +450,9 @@ $ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
         uncomment the following line, and then save your work:
        </para>
 
-       <programlisting language="ini" width="88"
->LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"</programlisting>
+       <programlisting language="ini">
+LOGGING_CONFIG= \
+  "-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"</programlisting>
       </listitem>
 
       <listitem>
@@ -520,7 +521,7 @@ $ <userinput>/path/to/tomcat/bin/startup.sh</userinput>
      <command>ssoadm update-server-cfg</command> command as in the following
      example, which updates the default server configuration:</para>
 
-     <screen width="82">
+     <screen>
 $ <userinput>./ssoadm \
  update-server-cfg \
  --servername default \

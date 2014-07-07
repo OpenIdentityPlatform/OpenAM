@@ -2669,7 +2669,7 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
    </varlistentry>
   </variablelist>
 
-  <example xml:id="example-saml2-sso-slo"><?dbfo keep-together="auto"?>
+  <example xml:id="example-saml2-sso-slo">
    <title>SSO &amp; SLO From the Service Provider</title>
 
    <para>The following URL takes the user from the service provider side to

@@ -29,7 +29,9 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
  <title>Defining Authorization Policies</title>
 
  <para><firstterm>Authorization</firstterm> is determining whether to grant or
@@ -214,16 +216,14 @@
      identifying a resource name to protect.
     </para>
 
-    <itemizedlist>
+    <itemizedlist xml:id="wildcard-syntax">
      <para>
       A Rule can specify an individual URL or resource name to protect.
       Alternatively, a Rule can match URLs or resource names by using wildcards.
      </para>
-
      <listitem>
       <para>
-       The wildcards you can use are
-       <literal>*</literal> and <literal>-*-</literal>.
+       The wildcards you can use are <literal>*</literal> and <literal>-*-</literal>.
       </para>
 
       <para>
@@ -331,7 +331,6 @@
        <literal>https://www.example.com:443/index.html</literal>, and
        <literal>http://www.example.net:8080/index.html</literal>.
       </para>
-
       <para>
        When a port number is not explicitly specified,
        then the default port number is implied.

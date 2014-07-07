@@ -282,7 +282,7 @@ $ <userinput>curl \
   question of redirection, you can test this (output lines folded to make them
   easier to read).</para>
 
-  <informalexample><?dbfo pgwide="1"?>
+  <informalexample>
 
   <screen>
 $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-configuration</userinput>
@@ -316,7 +316,7 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
     "profile"
     ],
     "authorization_endpoint": "https://openam.example.com:8443/openam/oauth2/authorize"
-    }</computeroutput>
+}</computeroutput>
   </screen>
   </informalexample>
  </section>
@@ -496,7 +496,7 @@ $ <userinput>curl \
    </textobject>
   </mediaobject>
 
-  <example xml:id="openid-basic-profile-example"><?dbfo keep-together="auto"?>
+  <section xml:id="openid-basic-profile-example">
    <title>Basic Client Profile Example</title>
 
    <para>OpenID Connect Basic Client Profile 1.0 is designed for web-based
@@ -553,9 +553,9 @@ $ <userinput>curl \
 
    <para>Notice that in addition to the standard payload, the ID token indicates
    the end user's OpenAM realm, in this case <literal>"realm": "/"</literal>.</para>
-  </example>
+  </section>
 
-  <example xml:id="openid-implicit-profile-example"><?dbfo keep-together="auto"?>
+  <section xml:id="openid-implicit-profile-example">
    <title>Implicit Client Profile Example</title>
 
    <para>OpenID Connect Implicit Client Profile 1.0 is designed for relying
@@ -616,7 +616,7 @@ $ <userinput>curl \
 
    <para>As for the Basic Client Profile, the ID Token indicates the end user's
    OpenAM realm in addition to the standard information.</para>
-  </example>
+  </section>
  </section>
 
  <section xml:id="openid-connect-security-considerations">

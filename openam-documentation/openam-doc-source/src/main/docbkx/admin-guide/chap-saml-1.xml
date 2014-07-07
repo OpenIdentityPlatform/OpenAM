@@ -507,8 +507,9 @@
     <screen>
 $ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
 $ <userinput>java \
- -cp ${forgerockUtilLibrary}:${sharedLibrary}:${federationLibrary} \
- com.sun.identity.saml.common.SAMLSiteID https://ap.example.net/openam</userinput>
+ -cp ${forgerockUtilLibrary}:${sharedLibrary}:\
+    ${federationLibrary} com.sun.identity.saml.common.SAMLSiteID \
+    https://ap.example.net/openam</userinput>
 <computeroutput>9BAg4UmVS6IbjccsSj9gAFYGO9Y=</computeroutput>
     </screen>
    </step>
