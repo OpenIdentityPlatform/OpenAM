@@ -146,7 +146,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/test/libs</outputDirectory>
-                            <includeArtifactIds>sinon,qunit</includeArtifactIds>
+                            <includeArtifactIds>sinon,qunit,jquery-sortable</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>

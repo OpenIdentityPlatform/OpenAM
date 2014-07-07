@@ -46,6 +46,11 @@ module.exports = function(grunt) {
                         dest    : '../../target/www'
                     },
                     {
+                        cwd     : '../../target/test/libs',
+                        src     : ['**'],
+                        dest    : '../../target/www/libs'
+                    },
+                    {
                         cwd     : '../main/js',
                         src     : ['**'], 
                         dest    : '../../target/www'

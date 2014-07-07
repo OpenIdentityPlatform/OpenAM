@@ -48,6 +48,10 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
 
             this.parentRender(function () {
                 this.$toggleAll = this.$el.find('.toggle-all-actions');
+
+                if (callback) {
+                    callback();
+                }
             });
         },
 

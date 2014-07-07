@@ -3,7 +3,7 @@
     <div class="group-field-block">
         <label class="prop-name" for="urlResource">New URL resource:</label>
         <select class="prop-val" id="urlResource">
-            {{#each app.resources}}
+            {{#each app.resourcePatterns}}
             <option value="{{this}}">{{this}}</option>
             {{/each}}
         </select>

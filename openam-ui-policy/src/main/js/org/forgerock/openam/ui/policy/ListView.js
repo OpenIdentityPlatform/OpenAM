@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/policy/ListView", [
             "click #customizeView": "toggleCustomizationBlock"
         },
 
-        render: function (args, element, template, callback) {
+        render: function (args, callback, element, template) {
             _.extend(this.data, args);
 
             this.element = element;

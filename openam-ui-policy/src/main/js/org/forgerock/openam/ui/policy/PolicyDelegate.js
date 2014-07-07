@@ -86,9 +86,6 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     };
 
     obj.createApplication = function (data, successCallback, errorCallback) {
-        // TODO: this one is mandatory, hardcoded for now
-        data.entitlementCombiner = "com.sun.identity.entitlement.DenyOverride";
-
         return obj.serviceCall({
             url: "/applications/?_action=create",
             type: "POST",
@@ -102,9 +99,33 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-    obj.getConditionTypes = function (successCallback, errorCallback) {
+    obj.getDecisionCombiners = function (successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/conditiontypes?_queryFilter=true",
+            url: "/decisioncombiners/?_queryId=&_fields=title",
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
+    obj.getEnvironmentConditions = function (successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/conditiontypes?_queryID=&_fields=title,logical",
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
+    obj.getSubjectConditions = function (successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/subjecttypes?_queryID=&_fields=title,logical",
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);

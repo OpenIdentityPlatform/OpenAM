@@ -41,30 +41,23 @@ require([
     "org/forgerock/commons/ui/common/main/EventManager",
     "sinon",
     "../test/tests/mocks/systemInit",
+    "../test/tests/mocks/policyInit",
     "../test/tests/policy"
-], function (constants, eventManager, sinon, systemInit, policyTests) {
+], function (constants, eventManager, sinon, systemInit, policyInit, policyTests) {
 
     var server = sinon.fakeServer.create();
     server.autoRespond = true;
     systemInit(server);
+    policyInit(server);
 
     eventManager.registerListener(constants.EVENT_APP_INTIALIZED, function () {
-    
-
-        QUnit.testDone(function( details ) {
-            server.responses = [];
-        });
-
         $.doTimeout = function (name, time, func) {
             func(); // run the function immediately rather than delayed.
         };
 
         require("ThemeManager").getTheme().then(function () {
-
             QUnit.start();
             policyTests.executeAll(server);
-
         });
-
     });
 });

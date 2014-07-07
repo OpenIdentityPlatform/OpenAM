@@ -1,28 +1,29 @@
 <div class="column2">
     <div class="review-row">
-        <a href="">Name</a> <span>{{app.name}}</span>
+        <a href="">Name</a> <span id="reviewName">{{app.name}}</span>
     </div>
     <div class="review-row">
-        <a href="">Realms</a> <span>{{app.realm}}</span>
+        <a href="">Realms</a> <span id="reviewRealm">{{app.realm}}</span>
     </div>
     <div class="review-row">
-        <a href="">Description</a> <span>{{app.description}}</span>
+        <a href="">Description</a> <span id="reviewDescr">{{app.description}}</span>
     </div>
     <div class="review-row">
-        <a href="">Application Type</a> <span>{{app.applicationType}}</span>
+        <a href="">Application Type</a> <span id="reviewType">{{app.applicationType}}</span>
     </div>
     <div class="review-row">
-        <a href="">Resources</a> <span>{{#each app.resources}} {{this}}<br/>{{/each}}</span>
+        <a href="">Resources</a> <span id="reviewRes">{{#each app.resources}}{{this}}<br/>{{/each}}</span>
     </div>
 </div>
 
 <div class="column2">
     <div class="review-row">
-        <a href="">Subject Conditions</a> <span> </span>
+        <a href="">Subject Conditions</a>
+        <span id="reviewSubj">{{#each app.subjects}} {{this}}<br/> {{/each}} </span>
     </div>
     <div class="review-row">
         <a href="">Actions</a>
-        <span>{{#each app.actions}}
+        <span id="reviewActions">{{#each app.actions}}
                 {{#if selected}}
                     {{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}<br/>
                 {{/if}}
@@ -30,9 +31,10 @@
         </span>
     </div>
     <div class="review-row">
-        <a href="">Environment Conditions</a> <span> </span>
+        <a href="">Environment Conditions</a>
+        <span id="reviewEnv">{{#each app.conditions}} {{this}}<br/> {{/each}} </span>
     </div>
     <div class="review-row">
-        <a href="">Override Rules</a> <span>Deny Override: Allow</span>
+        <a href="">Override Rules</a> <span id="reviewEntComb">{{app.entitlementCombiner}}: Allow</span>
     </div>
 </div>

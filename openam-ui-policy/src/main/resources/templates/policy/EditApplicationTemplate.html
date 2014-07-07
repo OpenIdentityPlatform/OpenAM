@@ -21,12 +21,10 @@
     <div class="group-field-block">
         <label class="prop-name" for="appType">Application Type:</label>
         {{select appTypes 'appTypes' app.applicationType app.applicationType 'class="prop-val" id="appType"'}}
-
-        <p class="prop-description">Description of selected type</p>
     </div>
     <div class="group-field-block">
-        <label class="prop-name" for="realm">Realm</label>
-        <input class="prop-val" id="realm" type="text" value="{{app.realm}}" data-field="realm"/>
+        <label class="prop-name" for="appRealm">Realm</label>
+        <input class="prop-val" id="appRealm" type="text" value="{{app.realm}}" data-field="realm"/>
     </div>
     <input type="button" value="Next" name="nextButton" class="button"/>
 </section>
@@ -57,37 +55,25 @@
     <div class="column-layout">
         <div class="column2 group-field-block">
             <label>Allowed Subject Conditions:</label>
-
             <div class="controls-group">
-                <input type="checkbox" id="virtSubj" name="sbjTypes" value="Virtual Subjects"/>
-                <label for="virtSubj">Virtual Subjects</label>
-
-                <input type="checkbox" id="idRepoGroups" name="sbjTypes" value="Identity Repository Groups"/>
-                <label for="idRepoGroups">Identity Repository Groups</label>
-
-                <input type="checkbox" id="attrSubj" name="sbjTypes" value="Attribute Subjects"/>
-                <label for="attrSubj">Attribute Subjects</label>
-
-                <input type="checkbox" id="bankingSubj" name="sbjTypes" value="Banking Subjects"/>
-                <label for="bankingSubj">Banking Subjects</label>
-
-                <input type="checkbox" id="idRepoUsers" name="sbjTypes" value="Identity Repository Users"/>
-                <label for="idRepoUsers">Identity Repository Users</label>
+                {{#each subjConditions}}
+                    {{#unless logical}}
+                    <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond" id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
+                    <label for="subjCond_{{name}}">{{name}}</label>
+                    {{/unless}}
+                {{/each}}
             </div>
         </div>
 
         <div class="column2 group-field-block">
             <label>Allowed Condition Operators:</label>
-
             <div class="controls-group">
-                <input type="checkbox" id="sbjAnyOf" name="sbjOps" value="Any of"/>
-                <label for="sbjAnyOf">Any of</label>
-
-                <input type="checkbox" id="sbjAllOf" name="sbjOps" value="All of"/>
-                <label for="sbjAllOf">All of</label>
-
-                <input type="checkbox" id="sbjNot" name="sbjOps" value="Not"/>
-                <label for="sbjNot">Not</label>
+                {{#each subjConditions}}
+                    {{#if logical}}
+                    <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond" id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
+                    <label for="subjCond_{{name}}">{{name}}</label>
+                    {{/if}}
+                {{/each}}
             </div>
         </div>
     </div>
@@ -107,50 +93,24 @@
             <label>Allowed Environment Conditions:</label>
 
             <div class="controls-group">
-                <input type="checkbox" id="dateRange" name="condTypes" value="Date Range"/>
-                <label for="dateRange">Date Range</label>
-
-                <input type="checkbox" id="lTransfLimit" name="condTypes" value="Lower Transfer Limit"/>
-                <label for="lTransfLimit">Lower Transfer Limit</label>
-
-                <input type="checkbox" id="timeRange" name="condTypes" value="Time Range"/>
-                <label for="timeRange">Time Range</label>
-
-                <input type="checkbox" id="upTransfLimit" name="condTypes" value="Upper Transfer Limit"/>
-                <label for="upTransfLimit">Upper Transfer Limit</label>
-
-                <input type="checkbox" id="dns" name="condTypes" value="DNS Name"/>
-                <label for="dns">DNS Name</label>
-
-                <input type="checkbox" id="ip" name="condTypes" value="IP Range"/>
-                <label for="ip">IP Range</label>
-
-                <input type="checkbox" id="days" name="condTypes" value="Days of Week"/>
-                <label for="days">Days of Week</label>
-
-                <input type="checkbox" id="timezone" name="condTypes" value="Timezone"/>
-                <label for="timezone">Timezone</label>
-
-                <input type="checkbox" id="anyTransfLimit" name="condTypes" value="Any Transfer Limit"/>
-                <label for="anyTransfLimit">Any Transfer Limit</label>
-
-                <input type="checkbox" id="opensso" name="condTypes" value="OpenSSO Policy Condition"/>
-                <label for="opensso">OpenSSO Policy Condition</label>
+                {{#each envConditions}}
+                    {{#unless logical}}
+                    <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}" value="{{name}}" data-field="conditions"/>
+                    <label for="envCond_{{name}}">{{name}}</label>
+                    {{/unless}}
+                {{/each}}
             </div>
         </div>
 
         <div class="column2 group-field-block">
             <label>Allowed Condition Operators:</label>
-
             <div class="controls-group">
-                <input type="checkbox" id="condAnyOf" name="condOps" value="Any of"/>
-                <label for="condAnyOf">Any of</label>
-
-                <input type="checkbox" id="condAllOf" name="condOps" value="All of"/>
-                <label for="condAllOf">All of</label>
-
-                <input type="checkbox" id="condNot" name="condOps" value="Not"/>
-                <label for="condNot">Not</label>
+                {{#each envConditions}}
+                    {{#if logical}}
+                    <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}" value="{{name}}" data-field="conditions"/>
+                    <label for="envCond_{{name}}">{{name}}</label>
+                    {{/if}}
+                {{/each}}
             </div>
         </div>
     </div>
@@ -167,8 +127,8 @@
     </p>
 
     <div class="group-field-block">
-        <input type="radio" id="conflictRule" value="Deny Override: Allow" checked/>
-        <label for="conflictRule">Deny Override: Allow</label>
+        <input type="radio" id="conflictRule" value="{{app.entitlementCombiner}}" checked/>
+        <label for="conflictRule">{{app.entitlementCombiner}}: Allow</label>
     </div>
 
     <input type="button" class="button" value="Next" name="nextButton"/>

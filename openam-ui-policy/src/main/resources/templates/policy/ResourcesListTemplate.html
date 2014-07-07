@@ -19,36 +19,9 @@
     {{#each app.resources}}
     <tr>
         <td><input type="checkbox" data-resource-index="{{@index}}"/></td>
-        <td>
-            {{this}} <a class="resource-exceptions" href="">Exceptions</a>
-        </td>
+        <td class="res-name">{{this}}</td>
     </tr>
     {{/each}}
-    <!--exceptions will go here-->
-    <!--tr class="nested-row">
-        <td colspan="2">
-            <table class="filter-sort-grid">
-                <thead>
-                <tr class="header-actions">
-                    <th colspan="3">
-                        <input type="button" class="button" value="Delete Selected">
-                    </th>
-                </tr>
-                <tr class="header-titles">
-                    <th><input type="checkbox"/></th>
-                    <th><a href="">Resource</a></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><input type="checkbox"/></td>
-                    <td></td>
-                </tr>
-                </tbody>
-                <tfoot></tfoot>
-            </table>
-        </td>
-    </tr-->
     </tbody>
     <tfoot></tfoot>
 </table>

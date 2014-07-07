@@ -55,26 +55,40 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                 data = self.data,
                 appName = args[0],
                 appTypesPromise = policyDelegate.getApplicationTypes(),
-                conditionTypesPromise = policyDelegate.getConditionTypes(),
+                envConditionsPromise = policyDelegate.getEnvironmentConditions(),
+                subjConditionsPromise = policyDelegate.getSubjectConditions(),
+                decisionCombinersPromise = policyDelegate.getDecisionCombiners(),
                 appPromise = this.getApplication(appName);
 
             this.processApplicationTypes(appTypesPromise);
-            this.processConditionTypes(conditionTypesPromise);
 
-            $.when(appTypesPromise, conditionTypesPromise, appPromise).done(function (appTypes, conditionTypes, app) {
-                if (!data.app.applicationType) {
-                    data.app.applicationType = _.keys(data.appTypes)[0];
-                }
+            $.when(appTypesPromise, envConditionsPromise, subjConditionsPromise, decisionCombinersPromise, appPromise).done(
+                function (appTypes, envConditions, subjConditions, decisionCombiners) {
+                    if (!data.app.applicationType) {
+                        data.app.applicationType = _.keys(data.appTypes)[0];
+                    }
 
-                self.parentRender(function () {
-                    actionsView.render(data);
-                    resourcesListView.render(data);
-                    addNewResourceView.render(data);
-                    reviewInfoView.render(data);
+                    self.processConditions(data, envConditions[0].result, subjConditions[0].result);
 
-                    self.initAccordion();
+                    data.app.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
+
+                    // Available resource patterns are supposed to be defined by the selected application type. For now we
+                    // assume any resource might be created, hence we hard code the '*'.
+                    data.app.resourcePatterns = ['*'];
+
+                    self.parentRender(function () {
+                        actionsView.render(data);
+                        resourcesListView.render(data);
+                        addNewResourceView.render(data);
+                        reviewInfoView.render(data);
+
+                        self.initAccordion();
+
+                        if (callback) {
+                            callback();
+                        }
+                    });
                 });
-            });
         },
 
         /**
@@ -133,17 +147,25 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
             });
         },
 
-        /**
-         * Processes response to form list of available condition types.
-         *
-         * @param conditionTypesPromise service response
-         */
-        //TODO: not used, as the API is not ready
-        processConditionTypes: function (conditionTypesPromise) {
-            var self = this;
-            conditionTypesPromise.done(function (resp) {
-                self.data.conditionTypes = resp.result;
+        getAvailableDecisionCombiner: function (decisionCombiners) {
+            // Only one decision combiner is available in the system.
+            return decisionCombiners[0].result[0].title;
+        },
+
+        processConditions: function (data, envConditions, subjConditions) {
+            data.envConditions = this.populateConditions(data.app.conditions, envConditions);
+            data.subjConditions = this.populateConditions(data.app.subjects, subjConditions);
+        },
+
+        populateConditions: function (selected, available) {
+            var result = [];
+            _.each(available, function (cond) {
+                result.push({
+                    name: cond.title,
+                    logical: cond.logical,
+                    selected: _.contains(selected, cond.title)});
             });
+            return result;
         },
 
         /**
@@ -182,10 +204,21 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
         updateFields: function () {
             var app = this.data.app,
                 dataFields = this.$el.find('[data-field]'),
-                field;
+                dataField;
+
+            app.subjects = [];
+            app.conditions = [];
 
             _.each(dataFields, function (field, key, list) {
-                app[field.getAttribute('data-field')] = field.value;
+                dataField = field.getAttribute('data-field');
+
+                if (field.type === 'checkbox') {
+                    if (field.checked) {
+                        app[dataField].push(field.value);
+                    }
+                } else {
+                    app[dataField] = field.value;
+                }
             });
         },
 
