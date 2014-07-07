@@ -24,7 +24,7 @@
 
    $Id: SA_IDP.jsp,v 1.10 2009/06/24 00:22:44 sean_brydon Exp $
 
-   Portions Copyrighted 2013 ForgeRock AS.
+   Portions Copyrighted 2013-2014 ForgeRock AS.
 --%>
 
 <%@ page language="java" 
@@ -162,15 +162,21 @@ org.owasp.esapi.ESAPI"
         "HTTPParameterValue", 2000, true)){
             sunData = null;
     }
-    String idpAppUrl =  request.getParameter(SecureAttrs.SAE_PARAM_IDPAPPURL);
+
     if (sunData == null) {
         String errStr = errorUrl+"?errorcode=IDP_1&errorstring=Null_sun.data";
-	SAML2Utils.debug.error(errStr);
+	    SAML2Utils.debug.error(errStr);
         String[] data = {errStr};
         SAML2Utils.logError(Level.INFO, LogUtil.SAE_IDP_ERROR_NODATA, 
                    data, token, ipaddr, userid, realm, "SAE", null);
         response.sendRedirect(errStr);
         return;
+    }
+
+    String idpAppUrl =  request.getParameter(SecureAttrs.SAE_PARAM_IDPAPPURL);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpAppUrl, idpAppUrl,
+        "HTTPParameterValue", 2000, true)) {
+        idpAppUrl = null;
     }
 
     boolean metaError = false;

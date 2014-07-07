@@ -24,16 +24,16 @@
  *
  * $Id: Utils.java,v 1.4 2008/11/10 22:57:00 veiming Exp $
  *
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.sae.api;
+
+import org.owasp.esapi.ESAPI;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.util.StringTokenizer;
-import java.util.HashMap;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Enumeration;
@@ -70,13 +70,13 @@ public class Utils
        throws Exception
     {
         if (action.equals("GET")) {
-             StringBuffer buf = null;
+             StringBuilder buf = null;
              if (pmap != null) {
                  // Put it all together in query part of Url
                  String query = queryStringFromMap(pmap);
-                 buf = new StringBuffer();
+                 buf = new StringBuilder();
                  buf.append(redirectUrl);
-                 if (redirectUrl.contains("?") == false) {
+                 if (!redirectUrl.contains("?")) {
                      buf.append("?");
                  } 
                  buf.append(query);
@@ -85,7 +85,6 @@ public class Utils
              if (buf != null)
                  finalRedirectUrl = buf.toString();
              hres.sendRedirect(finalRedirectUrl);
-             return;
         } else {
              String html = formFromMap(redirectUrl, pmap, true);
              out.write(html);
@@ -99,14 +98,14 @@ public class Utils
     public static String queryStringFromRequest(HttpServletRequest request)
     {
         Enumeration en = request.getParameterNames();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         boolean priorparam = false;
         while (en.hasMoreElements()) {
             String name = (String) en.nextElement();
             String val = request.getParameter(name);
             if (priorparam)
                 buf.append("&");
-            buf.append(name+"="+val);
+            buf.append(name).append("=").append(ESAPI.encoder().encodeForHTML(val));
             priorparam = true;
         }
         return buf.toString();
@@ -120,14 +119,14 @@ public class Utils
     public static String queryStringFromMap(Map pmap)
     {
         Iterator iter = pmap.keySet().iterator();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         boolean priorparam = false;
         while (iter.hasNext()) {
             String name = (String) iter.next();
             String val = (String) pmap.get(name);
             if (priorparam)
                 buf.append("&");
-            buf.append(name+"="+java.net.URLEncoder.encode(val));
+            buf.append(name).append("=").append(URLEncoder.encode(val));
             priorparam = true;
         }
         return buf.toString();
@@ -144,19 +143,16 @@ public class Utils
     public static String formFromMap(String redirectUrl,  Map pmap, 
             boolean addAutoSubmit)
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (addAutoSubmit) {
             buf.append("<HTML><HEAD><TITLE>SAE POST</TITLE></HEAD>");
             buf.append("<BODY Onload=\"document.forms[0].submit()\">");
         }
-        buf.append("<FORM id=\"saeform\" METHOD=\"POST\" ACTION=\"" 
-           + redirectUrl + "\">");
-        Iterator iter = pmap.keySet().iterator();
-        while (iter.hasNext()) {
-            String name = (String) iter.next();
+        buf.append("<FORM id=\"saeform\" METHOD=\"POST\" ACTION=\"").append(redirectUrl).append("\">");
+        for (Object name : pmap.keySet()) {
             String val = (String) pmap.get(name);
-            buf.append("<INPUT TYPE=\"HIDDEN\" NAME=\""+name 
-           + "\" " + "VALUE=\"" + val + "\">");
+            buf.append("<INPUT TYPE=\"HIDDEN\" NAME=\"").append(name).append("\" VALUE=\"");
+            buf.append(ESAPI.encoder().encodeForHTML(val)).append("\">");
         }
         buf.append("</FORM>");
         if (addAutoSubmit) {
