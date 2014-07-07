@@ -133,18 +133,28 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             oAuthToken = oAuthTokenStore.read(id);
         } catch (CoreTokenException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id, e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to "
+                    + "id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (oAuthToken == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id);
+            if (OAuth2Utils.DEBUG.messageEnabled()) {
+                OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Unable to find authorization code corresponding"
+                        + " to id: " + id);
+            }
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
 
         CoreToken ac = new CoreToken(id, oAuthToken);
+        if (!OAuth2Constants.Token.OAUTH_CODE_TYPE.equals(ac.getTokenName())) {
+            if (OAuth2Utils.DEBUG.warningEnabled()) {
+                OAuth2Utils.DEBUG.warning("DefaultOAuthTokenStoreImpl::The read token wasn't an access code: " + id);
+            }
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(Request.getCurrent());
+        }
         return ac;
     }
 
@@ -233,18 +243,29 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             oAuthToken = oAuthTokenStore.read(id);
         } catch (CoreTokenException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id, e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: "
+                    + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token in CTS: " + e.getMessage(), null);
         }
 
         if (oAuthToken == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id);
+            if (OAuth2Utils.DEBUG.messageEnabled()) {
+                OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Unable to find access token corresponding to "
+                        + "id: " + id);
+            }
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not read token in CTS", null);
         }
 
         BearerToken accessToken = new BearerToken(id, oAuthToken);
+        if (!OAuth2Constants.Token.OAUTH_ACCESS_TOKEN.equals(accessToken.getTokenName())) {
+            if (OAuth2Utils.DEBUG.warningEnabled()) {
+                OAuth2Utils.DEBUG.warning("DefaultOAuthTokenStoreImpl::The read token wasn't an access token: " + id);
+            }
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(Request.getCurrent());
+        }
+
         return accessToken;
     }
 
@@ -310,18 +331,29 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             oAuthToken = oAuthTokenStore.read(id);
         } catch (CoreTokenException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id, e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to find refresh token corresponding to id: "
+                    + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
         if (oAuthToken == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id);
+            if (OAuth2Utils.DEBUG.messageEnabled()) {
+                OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to "
+                        + "id: " + id);
+            }
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
 
-        BearerToken rt = new BearerToken(id, oAuthToken);
-        return rt;
+        BearerToken refreshToken = new BearerToken(id, oAuthToken);
+        if (!OAuth2Constants.Token.OAUTH_REFRESH_TOKEN.equals(refreshToken.getTokenName())) {
+            if (OAuth2Utils.DEBUG.warningEnabled()) {
+                OAuth2Utils.DEBUG.warning("DefaultOAuthTokenStoreImpl::The read token wasn't a refresh token: " + id);
+            }
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(Request.getCurrent());
+        }
+
+        return refreshToken;
     }
 
     /**
