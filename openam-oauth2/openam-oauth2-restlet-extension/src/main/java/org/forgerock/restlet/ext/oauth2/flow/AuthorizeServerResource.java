@@ -105,13 +105,6 @@ public class AuthorizeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
         }
 
-        //check if client has access to this response type
-        Set<String> clientResponseTypesAllowed = client.getClient().getResponseTypes();
-        if (!clientResponseTypesAllowed.containsAll(OAuth2Utils.stringToSet(responseType))) {
-            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Client does not support " +
-                    "this response type");
-        }
-
         //authenticate the resource owner
         resourceOwner = getAuthenticatedResourceOwner();
 
