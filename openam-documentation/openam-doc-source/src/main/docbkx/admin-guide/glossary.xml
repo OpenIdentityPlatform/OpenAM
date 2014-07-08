@@ -377,11 +377,19 @@
   </glossdef>
  </glossentry>
 
- <glossentry>
+ <glossentry xml:id="def-principal">
   <glossterm>Principal</glossterm>
   <glossdef>
-   <para>Entity that can be authenticated (such as a user, a device, or an
-   application)</para>
+   <para>
+    Represents an entity that has been authenticated
+    (such as a user, a device, or an application),
+    and thus is distinguished from other entities
+   </para>
+
+   <para>
+    When a <xref linkend="def-subject" /> successfully authenticates,
+    OpenAM associates the Subject with the Principal.
+   </para>
   </glossdef>
  </glossentry>
 
@@ -560,10 +568,19 @@
   </glossdef>
  </glossentry>
 
- <glossentry>
+ <glossentry xml:id="def-subject">
   <glossterm>Subject</glossterm>
   <glossdef>
-   <para>Entity that can request access to a resource</para>
+   <para>
+    Entity that requests access to a resource
+   </para>
+
+   <para>
+    When a Subject successfully authenticates,
+    OpenAM associates the Subject with the <xref linkend="def-principal" />
+    that distinguishes it from other subjects.
+    A Subject can be associated with multiple Principals.
+   </para>
   </glossdef>
  </glossentry>
 
