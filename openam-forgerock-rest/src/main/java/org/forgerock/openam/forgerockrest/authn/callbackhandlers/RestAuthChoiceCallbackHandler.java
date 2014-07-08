@@ -19,6 +19,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -104,9 +105,30 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
         }
 
         JsonValue inputField = input.get(0);
-        int selectedIndex = inputField.get("value").asInteger();
+        int selectedIndex = toInteger(inputField.get("value"));
+
         callback.setSelectedIndex(selectedIndex);
 
         return callback;
+    }
+
+    /**
+     * Try to get or parse JsonValue as int.
+     *
+     * @param value JsonValue that should contain a number or String that can be converted to int
+     * @throws org.forgerock.json.fluent.JsonValueException if value doesn't represent an int
+     * @return the int value
+     */
+    private int toInteger(JsonValue value) {
+
+        if (value.isString()) {
+            try {
+                return Integer.parseInt(value.asString());
+            } catch (NumberFormatException ex) {
+                // ignore error and let call to value.asInteger throw a more informative exception
+            }
+        }
+
+        return value.asInteger();
     }
 }

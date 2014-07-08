@@ -17,8 +17,13 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import static org.forgerock.json.fluent.JsonValue.array;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -147,15 +152,21 @@ public class RestAuthChoiceCallbackHandlerTest {
         //Given
         ChoiceCallback choiceCallback = new ChoiceCallback("Select choice:", new String[]{"1", "34", "66", "93"}, 0,
                 true);
-        JsonValue jsonNameCallback = JsonValueBuilder.jsonValue()
-                .array("input")
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 1).build())
-                .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "Select choice:").build())
-                    .add(JsonValueBuilder.jsonValue().put("value", new String[]{"1", "34", "66", "93"}).build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", "0").build())
-                .put("type", "ChoiceCallback")
-                .build();
+        JsonValue jsonNameCallback = json(object(
+                field("input",
+                        array(
+                                object(field("value", 1))
+                        )
+                ),
+                field("output",
+                        array(
+                                object(field("value", "Select choice:")),
+                                object(field("value", array("1", "34", "66", "93"))),
+                                object(field("value", "0"))
+                        )
+                ),
+                field("type", "ChoiceCallback")
+        ));
 
         //When
         ChoiceCallback convertedChoiceCallback = restAuthChoiceCallbackHandler.convertFromJson(choiceCallback,
@@ -175,15 +186,24 @@ public class RestAuthChoiceCallbackHandlerTest {
         //Given
         ChoiceCallback choiceCallback = new ChoiceCallback("Select choice:", new String[]{"1", "34", "66", "93"}, 0,
                 true);
-        JsonValue jsonNameCallback = JsonValueBuilder.jsonValue()
-                .array("input")
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 1).build())
-                .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "Select choice:").build())
-                    .add(JsonValueBuilder.jsonValue().put("value", new String[]{"1", "34", "66", "93"}).build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", "0").build())
-                .put("type", "PasswordCallback")
-                .build();
+        JsonValue jsonNameCallback = json(object(
+                field("input",
+                        array(
+                                object(field("value", 1))
+                        )
+                ),
+                field("output",
+                        array(
+                                object(field("value", "Select choice:")),
+                                object(field("value", array("1", "34", "66", "93"))),
+                                object(field("value", "0"))
+                        )
+                ),
+                field("type", "PasswordCallback")
+        ));
+
+        System.out.println("shouldFailToConvertFromJsonWithInvalidType");
+        System.out.println(jsonNameCallback.toString());
 
         //When
         restAuthChoiceCallbackHandler.convertFromJson(choiceCallback, jsonNameCallback);
@@ -198,15 +218,24 @@ public class RestAuthChoiceCallbackHandlerTest {
         //Given
         ChoiceCallback choiceCallback = new ChoiceCallback("Select choice:", new String[]{"1", "34", "66", "93"}, 0,
                 true);
-        JsonValue jsonNameCallback = JsonValueBuilder.jsonValue()
-                .array("input")
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 1).build())
-                .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "Select choice:").build())
-                    .add(JsonValueBuilder.jsonValue().put("value", new String[]{"1", "34", "66", "93"}).build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", "0").build())
-                .put("type", "choicecallback")
-                .build();
+        JsonValue jsonNameCallback = json(object(
+                field("input",
+                        array(
+                                object(field("value", 1))
+                        )
+                ),
+                field("output",
+                        array(
+                                object(field("value", "Select choice:")),
+                                object(field("value", array("1", "34", "66", "93"))),
+                                object(field("value", "0"))
+                        )
+                ),
+                field("type", "choicecallback")
+        ));
+
+        System.out.println("shouldNotFailToConvertFromJsonWithTypeLowerCase");
+        System.out.println(jsonNameCallback.toString());
 
         //When
         ChoiceCallback convertedChoiceCallback = restAuthChoiceCallbackHandler.convertFromJson(choiceCallback,
@@ -219,4 +248,71 @@ public class RestAuthChoiceCallbackHandlerTest {
         assertEquals(0, convertedChoiceCallback.getDefaultChoice());
         assertEquals(new int[]{1}, convertedChoiceCallback.getSelectedIndexes());
     }
+
+    @Test (expectedExceptions = JsonValueException.class)
+    public void shouldFailToConvertFromJsonWithInvalidValue() throws RestAuthException {
+
+        //Given
+        ChoiceCallback choiceCallback = new ChoiceCallback("Select choice:", new String[]{"A", "B", "C", "D"}, 0,
+                true);
+        JsonValue jsonNameCallback = json(object(
+                field("input",
+                        array(
+                                object(field("value", "A"))
+                        )
+                ),
+                field("output",
+                        array(
+                                object(field("value", "Select choice:")),
+                                object(field("value", array("A", "B", "C", "D"))),
+                                object(field("value", "0"))
+                        )
+                ),
+                field("type", "ChoiceCallback")
+        ));
+
+        System.out.println("shouldFailToConvertFromJsonWithInvalidValue");
+        System.out.println(jsonNameCallback.toString());
+
+        //When
+        restAuthChoiceCallbackHandler.convertFromJson(choiceCallback, jsonNameCallback);
+
+        //Then
+        fail();
+    }
+
+    @Test
+    public void shouldNotFailToConvertFromJsonWithIntValueAsString() throws RestAuthException {
+
+        //Given
+        ChoiceCallback choiceCallback = new ChoiceCallback("Select choice:", new String[]{"1", "34", "66", "93"}, 0,
+                true);
+        JsonValue jsonNameCallback = json(object(
+                field("input",
+                        array(
+                                object(field("value", "1"))
+                        )
+                ),
+                field("output",
+                        array(
+                                object(field("value", "Select choice:")),
+                                object(field("value", array("1", "34", "66", "93"))),
+                                object(field("value", "0"))
+                        )
+                ),
+                field("type", "choicecallback")
+        ));
+
+        //When
+        ChoiceCallback convertedChoiceCallback = restAuthChoiceCallbackHandler.convertFromJson(choiceCallback,
+                jsonNameCallback);
+
+        //Then
+        assertEquals(choiceCallback, convertedChoiceCallback);
+        assertEquals("Select choice:", convertedChoiceCallback.getPrompt());
+        assertEquals(new String[]{"1", "34", "66", "93"}, convertedChoiceCallback.getChoices());
+        assertEquals(0, convertedChoiceCallback.getDefaultChoice());
+        assertEquals(new int[]{1}, convertedChoiceCallback.getSelectedIndexes());
+    }
+
 }
