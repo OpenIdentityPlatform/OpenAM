@@ -177,6 +177,46 @@ Agreement (yes/no): [no]:</screen>
      xlink:show="new"><citetitle>Authorization</citetitle></link>.
    </para>
   </listitem>
+
+  <listitem>
+   <para>
+    <emphasis role="bold">Scripted Authentication Modules</emphasis>.
+    OpenAM now supports scripted authentication modules.
+    A scripted authentication module runs a script to perform authentication,
+    making it easier than ever before to develop custom authentication modules.
+   </para>
+
+   <para>
+    Scripted authentication modules
+    have access to the same data as other modules in the chain,
+    can access user profile data during authentication,
+    can make HTTP calls to external services,
+    and are sandboxed for more secure operation.
+    The scripts are stored in OpenAM configuration data,
+    and so transparently available across OpenAM Sites.
+    Server-side scripts can be written in either Groovy or JavaScript.
+   </para>
+
+   <para>
+    For details on writing authentication module scripts, see the
+    <citetitle>Developer Guide</citetitle> chapter,
+    <link
+     xlink:href="dev-guide#chap-scripted-auth-module"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Scripting Authentication</citetitle></link>.
+   </para>
+
+   <para>
+    For details on configuring scripted authentication modules, see the
+    <citetitle>Administration Guide</citetitle> section on
+    <link
+     xlink:href="admin-guide#scripted-module-conf-hints"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Hints For Scripted Authentication Modules</citetitle></link>.
+   </para>
+  </listitem>
  </itemizedlist>
 
  <itemizedlist>

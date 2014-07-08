@@ -4313,7 +4313,304 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
 
 
   </section>
-  
+
+  <section xml:id="scripted-module-conf-hints">
+   <title>Hints For Scripted Authentication Modules</title>
+
+   <para>
+    This section covers what to configure for scripted authentication modules.
+   </para>
+
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>Scripted authentication</secondary>
+   </indexterm>
+
+   <para>
+    A scripted authentication module runs scripts to authenticate a user.
+    The configuration for the module can hold two scripts,
+    one to include in the web page run on the client user-agent,
+    another to run in OpenAM on the server side.
+   </para>
+
+   <para>
+    The client-side script is intended to retrieve data from the user-agent.
+    This must be in a language the user-agent, such as JavaScript,
+    even if the server-side script is written in Groovy.
+   </para>
+
+   <para>
+    The server-side script is intended to handle authentication.
+   </para>
+
+   <para>
+    Scripts are stored not as files, but instead as OpenAM configuration data.
+    This makes it easy to update a script on one OpenAM server,
+    and then to allow replication to copy it to other servers.
+    You can manage the scripts through OpenAM console,
+    where you can write them in the text boxes provided
+    or upload them from files.
+   </para>
+
+   <para>
+    You can also upload scripts using the <command>ssoadm</command> command.
+    To perform the command-line equivalent of the Upload button in the console,
+    use the <command>ssoadm</command> attributes,
+    <literal>iplanet-am-auth-scripted-client-script-file</literal>
+    or <literal>iplanet-am-auth-scripted-server-script-file</literal>.
+    The following example shows how to create a scripted authentication module,
+    sets up a basic configuration with scripts as strings in the configuration,
+    and then uploads a server-side script file.
+   </para>
+
+   <programlisting language="shell">
+#
+# Create a scripted authentication module.
+#
+ssoadm \
+ create-auth-instance \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --authtype Scripted \
+ --realm / \
+ --name ScriptedModule
+
+#
+# Add basic configuration, including minimal client and server-side scripts.
+#
+ssoadm \
+ update-auth-instance \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --authtype Scripted \
+ --realm / \
+ --name ScriptedModule \
+ --attributevalues \
+    iplanet-am-auth-scripted-auth-level=0 \
+    iplanet-am-auth-scripted-client-script-enabled=false \
+    iplanet-am-auth-scripted-script-type='JavaScript' \
+    iplanet-am-auth-scripted-client-script='alert("Hello");' \
+    iplanet-am-auth-scripted-server-script='authState=SUCCESS;'
+
+#
+# Upload a server-side script from a script file, /tmp/server-side.js.
+#
+ssoadm \
+ update-auth-instance \
+ --adminid amadmin \
+ --password-file /tmp/pwd.txt \
+ --authtype Scripted \
+ --realm / \
+ --name ScriptedModule \
+ --attributevalues \
+    iplanet-am-auth-scripted-server-script-file=/tmp/server-side.js
+   </programlisting>
+
+   <para>
+    If you have multiple separate sets of client-side and server-side scripts,
+    then configure multiple modules, one for each set of scripts.
+   </para>
+
+   <para>
+    For details on writing authentication module scripts, see the
+    <citetitle>Developer Guide</citetitle> chapter,
+    <link
+     xlink:href="dev-guide#chap-scripted-auth-module"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Scripting Authentication</citetitle></link>.
+   </para>
+
+   <para>
+    <command>ssoadm</command> service name:
+    <literal>iPlanetAMAuthScriptedService</literal>
+   </para>
+
+   <variablelist>
+    <para>
+     Use the following settings at the realm level
+     when configuring an individual scripted authentication module,
+     in OpenAM Console under Access Control >
+     <replaceable>Realm Name</replaceable> > Authentication > Module Instances.
+    </para>
+
+    <varlistentry>
+     <term>Server-Side Script Language</term>
+     <listitem>
+      <para>
+       The language of the server-side script.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-script-type</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Client Side Script Enabled</term>
+     <listitem>
+      <para>
+       When selected, include the client-side script in the login page
+       to be executed on the user-agent prior to the server-side script.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-client-script-enabled</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Client Side Script</term>
+     <listitem>
+      <para>
+       The script to include in the login page.
+       This script is run on the user-agent prior to the server-side script.
+      </para>
+
+      <para>
+       This script must be written in a language the user-agent can interpret,
+       such as JavaScript,
+       even if the server-side script is written in Groovy.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-client-script</literal>
+      </para>
+
+      <para>
+       When uploading the script from a file, use the
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-client-script-file</literal>
+      </para>
+    </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Server Side Script</term>
+     <listitem>
+      <para>
+       The script to run in OpenAM after the client-side script has completed.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-server-script</literal>
+      </para>
+
+      <para>
+       When uploading the script from a file, use the
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-server-script-file</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Authentication Level</term>
+     <listitem>
+      <para>
+       Sets the authentication level used to indicate the level of security
+       associated with the scripted authentication module.
+      </para>
+
+      <para>
+       The value can range from 0 to any positive integer.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-auth-level</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <variablelist>
+    <para>
+     Use the following global configuration settings
+     for all scripted authentication modules,
+     in OpenAM Console under Configuration > Authentication > Scripted Module.
+    </para>
+
+    <varlistentry>
+     <term>Server Side Script Timeout</term>
+     <listitem>
+      <para>
+       Sets the maximum execution time to run a single server-side script,
+       in seconds.
+      </para>
+
+      <para>
+       Default: 0 (meaning no timeout)
+      </para>
+
+      <para>
+       If your server-side scripts send external HTTP requests,
+       consider setting an appropriate value for this timeout.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-server-timeout</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Core thread pool size</term>
+     <listitem>
+      <para>
+       Core size for the pool of threads dedicated to running server-side scripts.
+      </para>
+
+      <para>
+       Default: 10
+      </para>
+
+      <para>
+       This setting is not hot-swappable.
+       Instead, you must restart OpenAM or the container in which it runs
+       for the changes to take effect.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-core-threads</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>Maximum thread pool size</term>
+     <listitem>
+      <para>
+       Maximum size for the pool of threads dedicated to running server-side scripts.
+      </para>
+
+      <para>
+       Default: 50
+      </para>
+
+      <para>
+       This setting is not hot-swappable.
+       Instead, you must restart OpenAM or the container in which it runs
+       for the changes to take effect.
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>iplanet-am-auth-scripted-core-threads</literal>
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+
   <section xml:id="securid-module-conf-hints">
    <title>Hints For the SecurID Authentication Module</title>
    <para>The SecurID module lets OpenAM authenticate users with RSA
