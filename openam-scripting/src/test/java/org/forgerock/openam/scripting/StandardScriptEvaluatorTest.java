@@ -16,7 +16,12 @@
 
 package org.forgerock.openam.scripting;
 
-import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutionException;
@@ -24,32 +29,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
+
 import static org.fest.assertions.Assertions.assertThat;
-import org.forgerock.openam.scripting.timeouts.ContextFactoryWrapper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class StandardScriptEvaluatorTest {
 
     private StandardScriptEvaluator testEvaluator;
     private StandardScriptEngineManager scriptEngineManager;
-    private ContextFactoryWrapper factoryWrapper = mock(ContextFactoryWrapper.class);
     private Future mockFuture = mock(Future.class);
 
     @BeforeMethod
     public void createTestEvaluator() {
-        scriptEngineManager = new StandardScriptEngineManager(factoryWrapper);
-        // Use our bundled Rhino engine for tests
-        scriptEngineManager.registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME,
-                new RhinoScriptEngineFactory());
+        scriptEngineManager = new StandardScriptEngineManager();
         testEvaluator = new StandardScriptEvaluator(scriptEngineManager);
         try {
-            StandardScriptEvaluator.configureThreadPool(1, 1);
+            StandardScriptEvaluator.configureThreadPool(10, 10);
         } catch (IllegalStateException ise) { //ignore
 
         }
@@ -292,6 +288,17 @@ public class StandardScriptEvaluatorTest {
 
         //then
         verify(mockFuture).get(1000, TimeUnit.MILLISECONDS);
+    }
+
+    @Test
+    public void shouldSupportJSONParsing() throws Exception {
+        ScriptObject script = getJavascript("var json = JSON.parse(x); json['a']");
+        Bindings scope = new SimpleBindings();
+        scope.put("x", "{\"a\" : 12}");
+
+        Object result = testEvaluator.evaluateScript(script, scope);
+
+        assertThat(result).isEqualTo(12);
     }
 
     private ScriptObject getJavascript(String script) {

@@ -165,8 +165,8 @@
         <log4j.version>1.2.16</log4j.version>
         <mail.version>1.4.5</mail.version>
         <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
-        <phobos-js.version>0.6.2</phobos-js.version>
         <relaxngDatatype.version>20020414</relaxngDatatype.version>
+        <rhino.version>1.7R4</rhino.version>
         <saaj-api.version>1.3.4</saaj-api.version>
         <saaj-impl.version>1.3.19</saaj-impl.version>
         <servlet-api.version>2.5</servlet-api.version>
@@ -1050,11 +1050,11 @@
                 <version>${commons-logging-api.version}</version>
             </dependency>
 
-            <!-- JSR 223 packaged Rhino JS library -->
+            <!-- Mozilla Rhino Javascript engine -->
             <dependency>
-                <groupId>com.sun.phobos</groupId>
-                <artifactId>phobos-js</artifactId>
-                <version>${phobos-js.version}</version>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino</artifactId>
+                <version>${rhino.version}</version>
             </dependency>
 
             <!-- Groovy scripting support -->

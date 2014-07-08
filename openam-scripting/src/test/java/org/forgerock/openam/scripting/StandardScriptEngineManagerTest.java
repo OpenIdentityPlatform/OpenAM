@@ -15,20 +15,14 @@
 */
 package org.forgerock.openam.scripting;
 
-import org.forgerock.openam.scripting.timeouts.ContextFactoryWrapper;
-import org.forgerock.openam.scripting.timeouts.ObservedContextFactory;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import org.testng.annotations.Test;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
 
 public class StandardScriptEngineManagerTest {
 
-    ContextFactoryWrapper mockFactoryWrapper = mock(ContextFactoryWrapper.class);
-    StandardScriptEngineManager testManager = new StandardScriptEngineManager(mockFactoryWrapper);
+    StandardScriptEngineManager testManager = new StandardScriptEngineManager();
 
 
     @Test(expectedExceptions=IllegalArgumentException.class)
@@ -51,7 +45,6 @@ public class StandardScriptEngineManagerTest {
         testManager.configureTimeout(5);
 
         //then
-        verify(mockFactoryWrapper, times(2)).initGlobal(any(ObservedContextFactory.class));
         assertEquals(testManager.getTimeoutSeconds(), 5);
         assertEquals(testManager.getTimeoutMillis(), 5000);
     }

@@ -15,15 +15,15 @@
 */
 package org.forgerock.openam.scripting;
 
-import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
-import java.util.concurrent.TimeUnit;
+import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
+import org.forgerock.openam.scripting.factories.RhinoScriptEngineFactory;
+import org.forgerock.openam.scripting.timeouts.ObservedContextFactory;
+import org.forgerock.util.Reject;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.script.ScriptEngineManager;
-import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
-import org.forgerock.openam.scripting.timeouts.ContextFactoryWrapper;
-import org.forgerock.openam.scripting.timeouts.ObservedContextFactory;
-import org.forgerock.util.Reject;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A singleton implementation of the {@link ScriptEngineManager}, this is augmented to support
@@ -39,16 +39,15 @@ public class StandardScriptEngineManager extends ScriptEngineManager {
 
     private volatile int timeout = DEFAULT_TIMEOUT;
 
-    private final ContextFactoryWrapper contextFactoryWrapper;
-
     /**
      * Constructs and configures the engine manager.
      */
     @Inject
-    public StandardScriptEngineManager(ContextFactoryWrapper contextFactoryWrapper) {
-        this.contextFactoryWrapper = contextFactoryWrapper;
+    public StandardScriptEngineManager() {
+        final RhinoScriptEngineFactory rhino = new RhinoScriptEngineFactory(new ObservedContextFactory(this), null);
+        rhino.setOptimisationLevel(RhinoScriptEngineFactory.INTERPRETED);
 
-        registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME, new RhinoScriptEngineFactory());
+        registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME, rhino);
         registerEngineName(SupportedScriptingLanguage.GROOVY_ENGINE_NAME, new GroovyEngineFactory());
     }
 
@@ -59,11 +58,9 @@ public class StandardScriptEngineManager extends ScriptEngineManager {
      * As the different engines approach this issue in individual ways, we keep a record of the timeout set accessible
      * in this class.
      *
-     * The Rhino engine requires that we set an explicit global context factory which will be used when
-     * generating contexts for the scripts to run in. This factory is passed the timeout in milliseconds via
-     * a reference to this singleton, which in turn is exposed to the authentication module's configuration.
-     * This allows the Rhino engine's timeout to remain up to date with configuration changes without
-     * requiring a restart.
+     * The Rhino engine is configured with a custom ContextFactory
+     * ({@link org.forgerock.openam.scripting.timeouts.ObservedContextFactory}) that has a reference to this script
+     * manager instance. It reads the timeout from here to ensure it always sees the most up-to-date setting.
      *
      * The Groovy engine does not require any further set up past that done in {@link GroovyEngineFactory},
      * but does require that the timeout value is queryable.
@@ -73,14 +70,7 @@ public class StandardScriptEngineManager extends ScriptEngineManager {
     public void configureTimeout(int timeout) {
         Reject.ifTrue(timeout < 0);
 
-        if (this.timeout != timeout) {
-            this.timeout = timeout;
-            try {
-                contextFactoryWrapper.initGlobal(new ObservedContextFactory(this));
-            } catch (IllegalStateException ise) {
-                //swallow this up, we can't set it again here
-            }
-        }
+        this.timeout = timeout;
     }
 
     /**
