@@ -43,180 +43,15 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             'click input[name=nextButton]': 'openNextStep'
         },
         data:{              // Mock data to be replaced later
-            subjects: [
-            {
-                type: "Virtual Subject",
-                list: [
-                    { name: "iplanet-am-session-get-valid-sessions" },
-                    { name: "sunIdentityServerPPFacadegreetmesound" },
-                    { name: "iplanet-am-user-password-reset-question-answer" },
-                    { name: "iplanet-am-user-admin-start-dn" },
-                    { name: "iplanet-am-user-success-url" },
-                    { name: "sunIdentityServerPPDemographicsDisplayLanguage" },
-                    { name: "iplanet-am-user-federation-info" }
-                ]
-            },
-            {
-                type: "Attribute Subject",
-                list: [
-
-                    { name: "sunIdentityServerPPCommonNameMN" },
-                    { name: "iplanet-am-session-get-valid-sessions" },
-                    { name: "sunIdentityServerPPFacadegreetmesound" },
-                    { name: "iplanet-am-user-password-reset-question-answer" },
-                    { name: "iplanet-am-user-admin-start-dn" }
-                ]
-            },
-            {
-                type: "Identity Repository User",
-                list: [
-                    { name: "sunIdentityServerPPInformalName" },
-                    { name: "sunIdentityServerPPFacadeGreetSound" },
-                    { name: "sunIdentityServerPPLegalIdentityGender" }
-                ]
-            },
-            {
-                type: "Identity Repository Group",
-                list: [
-                    { name: "iplanet-am-user-password-reset-question-answer" },
-                    { name: "iplanet-am-user-admin-start-dn" },
-                    { name: "iplanet-am-user-success-url" },
-                    { name: "sunIdentityServerPPDemographicsDisplayLanguage" },
-                    { name: "iplanet-am-user-federation-info" }
-                ]
-            }],
-
-
-            "result" :
-            [
-              {
-                "title" : "OR",
-                "logical" : true,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "conditions" : {
-                      "type" : "array",
-                      "items" : {
-                        "type" : "any"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "Time",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "startTime" : {
-                      "type" : "string"
-                    },
-                    "endTime" : {
-                      "type" : "string"
-                    },
-                    "startDay" : {
-                      "type" : "string"
-                    },
-                    "endDay" : {
-                      "type" : "string"
-                    },
-                    "startDate" : {
-                      "type" : "string"
-                    },
-                    "endDate" : {
-                      "type" : "string"
-                    },
-                    "enforcementTimeZone" : {
-                      "type" : "string"
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "IP",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "startIp" : {
-                      "type" : "string"
-                    },
-                    "endIp" : {
-                      "type" : "string"
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "StringAttribute",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "attributeName" : {
-                      "type" : "string"
-                    },
-                    "value" : {
-                      "type" : "string"
-                    },
-                    "caseSensitive" : {
-                      "type" : "boolean",
-                      "required" : true
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "Policy",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "className" : {
-                      "type" : "string"
-                    },
-                    "properties" : {
-                      "type" : "object"
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "DNSName",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "domainNameMask" : {
-                      "type" : "string"
-                    }
-                  }
-                }
-              },
-              {
-                "title" : "AttributeLookup",
-                "logical" : false,
-                "config" : {
-                  "type" : "object",
-                  "properties" : {
-                    "key" : {
-                      "type" : "string"
-                    },
-                    "value" : {
-                      "type" : "string"
-                    }
-                  }
-                }
-              },
+        
+            "result" : [
               {
                 "title" : "AND",
                 "logical" : true,
                 "config" : {
                   "type" : "object",
                   "properties" : {
-                    "conditions" : {
+                    "subjects" : {
                       "type" : "array",
                       "items" : {
                         "type" : "any"
@@ -226,21 +61,47 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 }
               },
               {
-                "title" : "NumericAttribute",
+                "title" : "AnyUser",
                 "logical" : false,
                 "config" : {
                   "type" : "object",
                   "properties" : {
-                    "attributeName" : {
+                  }
+                }
+              },
+              {
+                "title" : "Attribute",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "value" : {
                       "type" : "string"
                     },
-                    "operator" : {
-                      "type" : "string",
-                      "enum" : [ "LESS_THAN", "LESS_THAN_OR_EQUAL", "EQUAL", "GREATER_THAN_OR_EQUAL", "GREATER_THAN" ]
-                    },
-                    "value" : {
-                      "type" : "number"
+                    "id" : {
+                      "type" : "string"
                     }
+                  }
+                }
+              },
+              {
+                "title" : "Group",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "NONE",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
                   }
                 }
               },
@@ -250,15 +111,74 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 "config" : {
                   "type" : "object",
                   "properties" : {
-                    "condition" : {
+                    "subject" : {
                       "type" : "object",
                       "properties" : {
                       }
                     }
                   }
                 }
+              },
+              {
+                "title" : "OR",
+                "logical" : true,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "subjects" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "any"
+                      }
+                    }
+                  }
+                }
+              }, {
+                "title" : "Policy",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "name" : {
+                      "type" : "string"
+                    },
+                    "className" : {
+                      "type" : "string"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "string"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "Role",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              {
+                "title" : "User",
+                "logical" : false,
+                "config" : {
+                  "type" : "object",
+                  "properties" : {
+                    "id" : {
+                      "type" : "string"
+                    }
+                  }
+                }
               }
-            ]
+        ]
 
         },
 

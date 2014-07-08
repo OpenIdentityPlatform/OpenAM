@@ -56,18 +56,18 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         newListItem: function(){
             this.$el.html(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
             this.$el.find('.icon-remove').bind("click", this.onDelete);
-        },
+        }
 
-        onDelete: function(e){
+        /*onDelete: function(e){
             var item = $(e.currentTarget).closest('li');
             //TODO : unbind events
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBotttom: 0, opacity:0}, function(){
+            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function(){
                 item.remove();
             });
-        }
+        }*/
 
     });
 
 
-    return new EditEnvironmentView();
+    return EditEnvironmentView;
 });

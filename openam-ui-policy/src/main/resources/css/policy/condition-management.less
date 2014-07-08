@@ -86,7 +86,7 @@ body.editing{
 		border: 1px solid #ccc;
 		min-height: 120px;
 
-		ol#pickup-item {
+		ol#pickUpItem {
 
 			li.operator, li.subject, li.environment{
 		 		margin: 10px 0 0;
@@ -122,8 +122,9 @@ body.editing{
 			opacity:0.5;
 			transition:opacity 200ms linear;
 
-	    	&:hover{
+	    	&:hover, &:focus {
 	    		opacity:1;
+				box-shadow: none;
 	    	}
 
 	    	&.tooltips {
@@ -134,6 +135,7 @@ body.editing{
 				 	position: absolute;
 					width: 0;
 					color: #fff;
+					background-color:#000;
 					background-image:-webkit-linear-gradient(top, #555, #000);
 					text-align: center;
 					visibility: hidden;
@@ -157,7 +159,7 @@ body.editing{
 					}
 				}
 
-				&:hover span {
+				&:hover span, &:focus span {
 					visibility: visible;
 					opacity: 0.8;
 					bottom: 30px;
@@ -186,9 +188,12 @@ body.editing{
 		opacity: 1;
 	}
 
-	ol.dropbox li.dragged{
-		box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
+	ol.dropbox li.dragged {
+		box-shadow:1px 2px 1px 0 rgba(0, 0, 0, 0.4);
 		background-image:url(@grabber-image);
+		cursor: move;
+		background-color: #ccc;
+
 	}
 
 	ol.condition-management-group {
@@ -199,34 +204,49 @@ body.editing{
 		    padding: 5px;
 		    border: 1px solid #ccc;
 		    background: 0 0 repeat-y #ddd;
-			transition: background 200ms ease-out 0ms;
-
-			&.subject {
-				/*&.dragged, &.editing {
-				background-color:darken(@subject-color, -30%)}*/
-			}
+			transition: background 200ms ease-out 0ms, box-shadow 100ms linear 0ms,;
 
 			&.operator {
 
 				&.or {
 					background-color:@or-color;
-					 > span {color:darken(@or-color, 40%)}
-					 &.dragged {background-color:darken(@or-color, 10%)}
-					 > ol > .placeholder {background-color:darken(@or-color, 20%)}
+					> span, > select {color:darken(@or-color, 40%)}
+					&.dragged, &:focus {background-color:darken(@or-color, 10%)}
+					> ol > .placeholder {background-color:darken(@or-color, 20%)}
 				}
 
 				&.and {
 					background-color:@and-color;
-					> span {color:darken(@and-color, 40%)}
-					&.dragged {background-color:darken(@and-color, 10%)}
+					> span, > select {color:darken(@and-color, 40%)}
+					&.dragged, &:focus {background-color:darken(@and-color, 10%)}
 					> ol > .placeholder {background-color:darken(@and-color, 20%)}
 				}
 
 				&.not {
 					background-color:@not-color;
-					> span{ color:darken(@not-color, 40%) }
-					&.dragged {background-color:darken(@not-color, 10%)}
+					> span, > select {color:darken(@not-color, 40%) }
+					&.dragged, &:focus {background-color:darken(@not-color, 10%)}
 					> ol > .placeholder {background-color:darken(@not-color, 20%)}
+				}
+
+				&.or,&.and,&.not{
+					cursor: default;
+					&:focus{
+						cursor: move;
+						box-shadow:1px 2px 1px 0 rgba(0, 0, 0, 0.4);
+						background-image:url(@grabber-image);
+					}
+				}
+
+			}
+
+			&.subject{
+				cursor: default;
+				&:focus{
+					cursor: move;
+					box-shadow:1px 2px 1px 0 rgba(0, 0, 0, 0.4);
+					background-image:url(@grabber-image);
+					background-color: #ccc;
 				}
 			}
 
@@ -274,7 +294,7 @@ body.editing{
 
 	}
 
-	li.editing .item-subject-data, ol#pickup-item li:not(.dragged) .item-subject-data{
+	li.editing .item-subject-data, ol#pickUpItem li:not(.dragged) .item-subject-data{
 		padding: 0;
 	}
 
@@ -286,6 +306,7 @@ body.editing{
 	  	float:left;
 
 	  	select {
+			min-width:145px;
 			clear:left;
 			float:left;
 			padding:5px 20px 5px 5px;
@@ -335,6 +356,7 @@ body.editing{
 		input{
 
 			margin-top: 13px;
+			width:150px;
 
 			/* Stop chromes autofill adding yellow backgrounds to datalists */
 			&:-webkit-autofill{
@@ -355,9 +377,9 @@ body.editing{
 /*Overrides for accordion states*/
 section.active-step{
 
-	#condition-management #pickup-area ol#pickup-item li.operator:not(.dragged),
-	#condition-management #pickup-area ol#pickup-item li.subject:not(.dragged),
-	#condition-management #pickup-area ol#pickup-item li.environment:not(.dragged) {
+	#condition-management #pickup-area ol#pickUpItem li.operator:not(.dragged),
+	#condition-management #pickup-area ol#pickUpItem li.subject:not(.dragged),
+	#condition-management #pickup-area ol#pickUpItem li.environment:not(.dragged) {
 		display: block;
 	}
 }

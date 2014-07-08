@@ -39,67 +39,65 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
 
         noBaseTemplate: true,
         events: {
-            'change    li.operator select' : 'onSelect',
-            'onfocus   li.operator select' : 'checkOptions',
-            'mousedown li.operator select' : 'checkOptions',
-
-            'click     .icon-remove' : 'onDelete'
+            'change    select' : 'onSelect',
+            'onfocus   select' : 'checkOptions',
+            'mousedown select' : 'checkOptions',
+            'click     .item-button-panel > .icon-remove' : 'onDelete',
+            'keyup     .item-button-panel > .icon-remove' : 'onDelete'
         },
         data: {},
         mode: 'append',
 
-        render: function(data, callback, element, master) {
-            this.data = data;
-            this.data.master = master ? master : false;
+        render: function (operators, callback, element, itemID) {
+            this.data = $.extend(true, {}, operators);
+            this.data.master = itemID === undefined ? true : false;
+            this.data.itemID = itemID;
             this.setElement(element);
             this.$el.html(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
-            this.$el.find("li.operator select").trigger("change");
+
+            if (itemID !== undefined) {
+                this.setElement('#operator_'+itemID );
+            }
+
+            this.delegateEvents();
+            this.$el.find("select").focus().trigger("change");
+
             if (callback) {callback();}
         },
 
-        rebindElement: function(data, element){
-            this.data = data;
-            this.setElement(element);
+        rebindElement: function() {
             this.delegateEvents();
         },
 
-        onSelect: function(e){
-
+        onSelect: function(e) {
+            e.stopPropagation();
             var item = $(e.currentTarget).parent(),
-                value = e.currentTarget.value,//$(e.currentTarget)[0].value;
-                data = _.find(this.data.operators, function(obj){
+                value = e.currentTarget.value,
+                data = _.find(this.data.operators, function(obj) {
                     return obj.title === value;
-            });
+                });
 
-            _.each(this.data.operators, function(obj){
+            _.each(this.data.operators, function(obj) {
                 item.removeClass( obj.title.toLowerCase() );
             });
 
-            // TODO: these values need to come from the data
-            // item.removeClass('or').removeClass('and').removeClass('not');
-
-            item.data('operator',data);
+            item.data('logical',true);
+            item.data('title',  data.title);
+            item.data('config', data.config);
             item.addClass(value.toLowerCase());
-
         },
 
-
-
-        checkOptions: function(e){
+        checkOptions: function(e) {
 
             var parent = $(e.target).parent(),
-                operator = parent.data().operator,
                 dropbox = parent.children('ol.dropbox'),
                 select = dropbox.parent().children('select'),
                 option = null;
 
-            // TODO: first call falls over - need to investigate why.
-            if(operator === undefined){return;}
-
             if (dropbox.children(':not(.dragged)').length > 1) {
-                _.each(this.data.operators, function(obj){
+                _.each(this.data.operators, function(obj) {
                     option = select.find('option[value="'+obj.title+'"]');
-                    option.prop('disabled', obj.config.properties.condition ? true : false);
+                    option.prop('disabled', ( obj.config.properties.condition || obj.config.properties.subject ) ? true : false);
                 });
 
             } else {
@@ -107,12 +105,11 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
             }
         },
 
-        onDelete: function(e){
-            var item = $(e.currentTarget).closest('li'),
-                self = this;
-            //TODO : unbind events
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBotttom: 0, opacity:0}, function(){
-                item.remove();
+        onDelete: function(e) {
+            e.stopPropagation();
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            this.$el.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function() {
+                this.remove();
             });
         }
 

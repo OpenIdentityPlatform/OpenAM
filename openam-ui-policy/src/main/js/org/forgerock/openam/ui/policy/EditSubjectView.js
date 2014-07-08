@@ -38,146 +38,163 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
     var EditSubjectView = AbstractView.extend({
 
-        events: {},
+        events: {
+            'click .icon-cog' :                   'toggleEditing',
+            'keyup .icon-cog' :                   'toggleEditing',
+            'dblclick' :                          'toggleEditing',
+            'click .icon-remove' :                'onDelete',
+            "keyup .icon-remove" :                'onDelete',
+            'change select#selection' :           'changeSubjectType',
+            'change .field-float-pattern input':  'changeInput'
+        },
+        element:'#pickUpItem',
         data: {},
-        editItem: null,
-        EDIT_START:'editStart',
-        EDIT_STOP: 'editStop',
+        mode:'append',
 
-        render: function(data, callback, element) {
-            this.setElement(element);
-            this.data = data;
+        EDIT_START: 'editStart',
+        EDIT_STOP:  'editStop',
+
+        render: function( subjects, callback, element, itemID, htmlData ) {
+
+            var self = this;
+            this.setElement(this.element);
+
+            this.data = $.extend(true, {}, subjects);
+            this.data.itemID = itemID;
+
+            this.$el.html(uiUtils.fillTemplateWithData("templates/policy/EditSubjectTemplate.html", this.data));
+            this.setElement('#subject_' + itemID );
+            this.delegateEvents();
+
+
+            if (htmlData) {
+                this.$el.data('config',htmlData.config);
+                this.$el.data('title', htmlData.title);
+                this.$el.find('select#selection').val(htmlData.title).trigger('change');
+            }
+
+            this.$el.find('select#selection').focus();
+
             if (callback) {callback();}
         },
 
-        toggleEditing: function(e){
 
-            e.stopPropagation();
+        createListItem: function(subjects, deleteme, item){
 
-            var self = this,
-                item = e.currentTarget === 'li' ? e.currentTarget : $(e.currentTarget).closest('li');
-
-            if (self.editItem.hasClass('editing')) {
-
-                self.newListItem(item);
-                item.removeClass('editing');
-                item.parent().find('li').eq(self.editItem.index()+1).remove();
-                self.trigger(self.EDIT_STOP);
-
-            } else {
-
-                self.newEditable();
-                item.find('.item-subject-data div').each(function(i){
-
-                    var each = self.editItem.find('.data-obj').eq(i);
-                    each.children('input').val($(this).find('span').text());
-                    each.children('select').val($(this).find('span').text());
-
-                    if(i===0){
-                        self.editItem.find('select#subjectType').trigger('change');
-                    }
+            item.focus(); //  Required to trigger changeInput.
+            this.data = subjects;
+            var html = '<div><h3>Subject Type</h3><span>'+(item.data().title || "")+'</span></div>\n';
+            if (item.data().config) {
+                _.map(item.data().config.properties, function(value, key) {
+                    html += '<div><h3>'+key+'</h3><span>'+value+'</span></div>\n';
                 });
-
-                item.before(self.editItem);
-                self.editItem.addClass('editing');
-                self.trigger(self.EDIT_START);
             }
-        },
-
-        newEditable: function(){
-            this.$el.html(uiUtils.fillTemplateWithData("templates/policy/EditSubjectTemplate.html", this.data));
-            this.$el.find('select#subjectType').on('change', _.bind(this.changeSubjectType, this));
-            this.editItem = this.$el.find('.subject');
-            this.editItem.find('.icon-cog').on('click', _.bind(this.toggleEditing, this));
-
-        },
-
-        newListItem: function(item){
-
-            var self = this, html = '', label = '', input = '', itemData = {};
-
-            item.find('.item-subject-data').children('.data-obj').each(function() {
-                label = $(this).children('label');
-                input = $(this).children('input').val() ||  $(this).children('select').val() || '';
-                html += '<div class="'+label.attr('for')+'"><h3>'+label.text()+'</h3><span>'+input+'</span></div>';
-                itemData[label.attr('for')] = [label.text(), input];
-            });
-
-            item.data('subject',itemData);
-
-            //TODO: unbind old events
-
             item.find('.item-subject-data').html(html);
-            item.find('.icon-remove').bind("click", self.onDelete);
-            item.on('dblclick', _.bind(this.toggleEditing, this));
+            this.setElement('#'+item.attr('id') );
+            this.delegateEvents();
+        },
 
+        toggleEditing: function(e){
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            if (this.$el.hasClass('editing') ) {
+                this.$el.removeClass('editing');
+                this.trigger(this.EDIT_STOP, this.$el);
+            } else {
+                this.trigger(this.EDIT_START, this.$el);
+            }
 
+        },
+
+        changeInput: function(e) {
+            var label = $(e.currentTarget).prev('label').text();
+            this.$el.data().config.properties[label] = e.currentTarget.value;
         },
 
         changeSubjectType: function(e) {
+            e.stopPropagation();
 
-            //TODO: Check input is valid from list.
+            //TODO: Check input is valid from list
+            var self         = this,
+                data         = null,
+                html         = '',
+                subjectType  = e.target.value,
+                delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
+                buildHTML    = function(properties) {
+                    var count = 0,
+                        returnVal = '';
+                    _.map(properties, function(value, key) {
+                        if (_.isString(value)) {
+                            returnVal += '\n'+
+                            '<div class="field-float-pattern data-obj">'+
+                                '<label for="selection_' + (count) + '">' + key + '</label>'+
+                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="' + value + '" readonly=true class="placeholderText" />'+
+                            '</div>';
+                        } else if (_.isArray(value)) {
+                            // TODO ... We are assuming for now that items array will contain strings.
+                            returnVal += '\n'+
+                            '<div class="field-float-pattern data-obj">'+
+                                '<label for="selection_' + (count) + '">' + key + '</label>'+
+                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="TODO: Array UI" readonly=true class="placeholderText" />'+
+                            '</div>';
+                        } else if (_.isObject(value)) {
+                            // TODO ...
+                            console.log('TODO...');
+                        }
+                        count++;
+                    });
+                    return returnVal;
+                };
 
-            var type     = e.target.value,
-                typInput = this.editItem.find('#subjectType'),
-                subInput = this.editItem.find('input[name=subjectList]'),
-                valInput = this.editItem.find('input[name=attributeValue]'),
-                dataList = $("#subjectList"),
-                subList  = _.findWhere(this.data.subjects, {type: type}),
-                options, i;
-                subList  = subList ? subList.list : [];
-
-            subInput.prev('label').text(type);
-
-            if (type==='') {
-                typInput.addClass('placeholderText');
-                subInput.prop('placeholder','').val('');
+            if (this.$el.data().config && this.$el.data().title === subjectType) {
+                data = this.$el.data();
             } else {
-                typInput.removeClass('placeholderText');
-                subInput.prop('placeholder','Find ' + type).val('');
+                data =  _.findWhere(this.data.subjects, {title: subjectType}) || {};
             }
 
-            dataList.empty();
+            self.$el.data('config',data.config);
+            self.$el.data('title', data.title);
 
-            if(subList.length) {
-                for(i=0; i<subList.length; i++) {
-                    options = $("<option></option>").attr("value", subList[i].name);
-                    dataList.append(options);
-                }
+            if (data.config) {
+
+                html = buildHTML(data.config.properties);
+
+                this.$el.find('.field-float-pattern input')
+                    .addClass('placeholderText')
+                    .prop('readonly', true)
+                    .prev('label')
+                    .removeClass('showLabel');
+
+                // setTimeout needed to delay transitions.
+                setTimeout( function() {
+                    self.$el.find('.field-float-pattern').remove();
+                    self.$el.find('.field-float-select').after( html );
+
+                    setTimeout( function() {
+
+                        self.$el.find('.field-float-pattern input')
+                            .removeClass('placeholderText')
+                            .prop('readonly', false)
+                            .prev('label')
+                            .addClass('showLabel');
+
+                        }, 10);
+                }, delay);
             }
 
-            switch(type){
-
-                case 'Attribute Subject':
-                    subInput.prop('readonly', false).prev('label').addClass('showLabel');
-                    valInput.prop('readonly', false).prev('label').addClass('showLabel');
-                break;
-
-                case 'Virtual Subject':
-                case 'Identity Repository User':
-                case 'Identity Repository Group':
-                    subInput.prop('readonly', false).prev('label').addClass('showLabel');
-                    valInput.val('').prop('readonly', true).prev('label').removeClass('showLabel');
-                break;
-
-                default:
-                    subInput.val('').prop('readonly', true).prev('label').removeClass('showLabel');
-                    valInput.val('').prop('readonly', true).prev('label').removeClass('showLabel');
-                break;
-
-            }
+            this.delegateEvents();
 
         },
 
-        onDelete: function(e){
-            var item = $(e.currentTarget).closest('li');
-            //TODO : unbind events
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBotttom: 0, opacity:0}, function(){
-                item.remove();
+        onDelete: function(e) {
+            e.stopPropagation();
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var item = $(e.currentTarget).closest('li'), self = this;
+            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function() {
+                self.remove();
             });
         }
 
     });
 
-    return new EditSubjectView();
+    return EditSubjectView;
 });

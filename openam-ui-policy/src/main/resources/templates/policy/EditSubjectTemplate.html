@@ -1,31 +1,20 @@
-<li class="subject clearfix" >
+<li class="subject clearfix" id="subject_{{itemID}}" tabindex="0" >
 
-	<span class="item-button-panel">
-		<span class="icon-cog"></span>
-		<span class="icon-remove"></span>
-	</span>
-
-	<div class="item-subject-data">
+	<div class="item-subject-data float-left">
 
 		<div class="field-float-select data-obj">
-			<label for="subjectType" >Subject Type</label>
-			<select id="subjectType" class=placeholdertext>
+			<label for="selection" >Subject Type</label>
+			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >select...</option>
-				{{#subjects}}<option value="{{type}}">{{type}}</option>{{/subjects}}
+				{{#subjects}}<option value="{{title}}">{{title}}</option>{{/subjects}}
 			</select>
 		</div>
 
-		<div class="field-float-pattern data-obj">
-			<label for="subjectList">Subject</label>
-			<input name="subjectList" type="text" list="subjectList" readonly=true />
-			<datalist id="subjectList"></datalist>
-		</div>
-
-		<div class="field-float-pattern data-obj">
-			<label for="attributeValue">Value</label>
-			<input type="text"  name="attributeValue" placeholder="" readonly=true />
-		</div>
-
 	</div>
+
+	<span class="item-button-panel">
+		<span tabindex="0" class="icon-cog"></span>
+		<span tabindex="0" class="icon-remove"></span>
+	</span>
 
 </li>
