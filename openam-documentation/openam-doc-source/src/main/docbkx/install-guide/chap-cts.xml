@@ -875,11 +875,10 @@ $ <userinput>sudo bin/start-ds</userinput>
         <para>You have successfully configured an external OpenDJ directory server
          and configured OpenAM to use the external CTS store.
          For more CTS configuration options, see
-         <xref linkend="cts-token-size" />.</para>
+         <xref linkend="cts-token-managing" />.</para>
        </step>
       </procedure>
   </section>
-
 
     <!-- Liberally copied from OpenDJ docs -->
 
@@ -996,37 +995,47 @@ $ <userinput>backup \
 
   </section>
 
-  <section xml:id="cts-token-size">
+  <section xml:id="cts-token-managing">
     <title>Managing CTS Tokens</title>
 
-   <para>There are five properties associated with token encryption, compression, and token
-   cleanup frequency. The three that are associated with encryption and compression are disabled by default.
-   The properties are as follows:</para>
+   <para>There are properties associated with token encryption, compression,
+    and token cleanup frequency, which are disabled by default.
+    The properties are as follows:</para>
 
-   <itemizedlist>
-       <listitem>
-           <para><literal>com.sun.identity.session.repository.enableEncryption</literal></para>
-           <para>Supports encryption of CTS tokens.</para>
-       </listitem>
-       <listitem>
-           <para><literal>com.sun.identity.session.repository.enableCompression</literal></para>
-           <para>Enables GZip-based compression of CTS tokens.</para>
-       </listitem>
-       <listitem>
-           <para><literal>com.sun.identity.session.repository.enableAttributeCompression</literal></para>
-           <para>Supports compression over and above the GZip-based compression of CTS tokens.</para>
-       </listitem>
-       <listitem>
-           <para><literal>com.sun.identity.session.repository.cleanupRunPeriod</literal></para>
-           <para>Specifies a minimum CTS token lifetime. If there is no activity in the specified
-           time period, the token is erased. Default: 300 seconds.</para>
-       </listitem>
-       <listitem>
-           <para><literal>com.sun.identity.session.repository.healthCheckRunPeriod</literal></para>
-           <para>Sets a period of time when requests are sent to make sure the current instance of
-           OpenAM is running. Default: 60 seconds.</para>
-       </listitem>
-   </itemizedlist>
+   <variablelist>
+    <varlistentry>
+     <term><literal>com.sun.identity.session.repository.enableEncryption</literal></term>
+     <listitem>
+      <para>Supports encryption of CTS tokens. Default: <literal>false</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>com.sun.identity.session.repository.enableCompression</literal></term>
+     <listitem>
+      <para>Enables GZip-based compression of CTS tokens. Default: <literal>false</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>com.sun.identity.session.repository.enableAttributeCompression</literal></term>
+     <listitem>
+      <para>Supports compression over and above the GZip-based compression of CTS tokens. Default: <literal>false</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>com.sun.identity.session.repository.cleanupRunPeriod</literal></term>
+     <listitem>
+      <para>Specifies a minimum CTS token lifetime. If there is no activity in the specified
+       time period, the token is erased. Default: 300 seconds.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>com.sun.identity.session.repository.healthCheckRunPeriod</literal></term>
+     <listitem>
+      <para>Sets a period of time when requests are sent to make sure the current instance of
+       OpenAM is running. Default: 60 seconds.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
 
    <!-- May be addressed with AME-2540
 
@@ -1036,53 +1045,175 @@ $ <userinput>backup \
 
    -->
 
-   <para>To enable the encryption / compression options, navigate to Configuration &gt; Servers and Sites &gt;
-   Default Server Settings &gt; Advanced. In the Advanced Properties window, you should see these entries
-   in the <literal>Property Name</literal> column with the
-   corresponding value in the <literal>Property Value</literal> column. To enable them, change <literal>false</literal>
-   to <literal>true</literal> in the Property Value column associated with the desired property, and click Save.</para>
+   <para>To enable the encryption / compression options, navigate to Configuration
+    &gt; Servers and Sites &gt; Default Server Settings &gt; Advanced.
+    In the Advanced Properties window, you should see these entries in the
+    <literal>Property Name</literal> column with the corresponding value in the
+    <literal>Property Value</literal> column.
+    To enable them, change <literal>false</literal> to <literal>true</literal>
+    in the Property Value column associated with the desired property, and click Save.</para>
 
-   <note><para>If you are using SFO, or if you are using an external CTS directory, be consistent with these options.
-   If you want to enable compression or encryption, you should enable all three on every instance of OpenAM
-   within a deployment or replication group: <literal>com.sun.identity.session.repository.enableEncryption</literal>,
-   <literal>com.sun.identity.session.repository.enableCompression</literal>, and
-   <literal>com.sun.identity.session.repository.enableAttributeCompression</literal>.</para></note>
+   <note><para>If you want to enable compression or encryption, you must enable the same property
+    on every OpenAM instance within the site, otherwise they will not function
+    correctly together. You must also restart the servers for the changes to take
+    effect.</para></note>
+
+   <warning><para>When encryption or compression properties are changed, all previous
+    tokens in the LDAP store will be un-readable; thus, invalidating any user's
+    sessions. The user will be required to log in again.
+   </para></warning>
+
+  </section>
+
+  <section xml:id="cts-tuning-considerations">
+   <title>CTS Tuning Considerations</title>
+   <para>CTS processes all requests asynchronously in the background, allowing
+    callers (that is, those entities that call CTS) to send subsequent requests
+    without waiting for a previous request to finish processing.
+    The following OpenAM components make CTS requests:</para>
+
+    <orderedlist>
+     <listitem>
+      <para>Session service for session failover</para>
+     </listitem>
+     <listitem>
+      <para>OAuth 2.0 for token persistence</para>
+     </listitem>
+     <listitem>
+      <para>SAML 2.0 for token persistence</para>
+     </listitem>
+     <listitem>
+      <para>REST API for functions like Forgotten passwords</para>
+     </listitem>
+    </orderedlist>
+
+   <para>
+    All create, read, update, delete, query (CRUDQ) requests to CTS are placed
+    into an asynchronous buffer before being handled by an asynchronous processor.
+    This ensures the caller can continue without waiting for CTS to complete processing.
+   </para>
+
+   <para>Once the queue is full, all operations are "blocked" before an operation
+    can be placed on the queue. Once on the queue, the caller can continue as normal.
+   </para>
+
+   <para>
+    CTS is designed to automatically throttle throughput in the event that the buffer
+    fills up with requests.
+    Therefore, if you require a balance between performance versus system memory,
+    OpenAM provides two properties that can be used to tune CTS: queue size and queue timeout.
+   </para>
+
+   <variablelist>
+    <varlistentry>
+     <term><literal>org.forgerock.services.cts.async.queue.size</literal></term>
+     <listitem>
+      <para>
+       Default size: 5000. Determines how many request operations can be buffered
+       before the queue size becomes full, after which the caller will be required
+       to wait for the buffered requests to complete processing. All CRUDQ operations
+       are converted to tasks, which are placed on the queue, ensuring that operations
+       happen in the correct sequence.
+      </para>
+      <!--para>
+       The most effective way to determine the queue size is to profile your system.
+       Considerations such as memory consumption and throughput performance should
+       be taken into account. It is possible to use the SNMP monitoring framework
+       to collect metrics from the CTS to understand its throughput.
+       See appendix zyx for details on how this might be performed.
+      </para>
+      <para>You can use SNMP monitoring to determine the average throughput of the
+       CTS operations as follows:
+       <screen>$ snmpget -c public -v 2c openam.example.com:8085 \
+        enterprises.36733.1.2.999.3.1.2.1 \
+        enterprises.36733.1.2.999.3.1.2.2 \
+        enterprises.36733.1.2.999.3.1.2.3 \
+        enterprises.36733.1.2.999.3.1.2.4 \
+        enterprises.36733.1.2.999.3.1.2.5 | cut -d ' ' -f 4 | awk '{s+=$1}END{print s}'</screen>
+      </para-->
+     </listitem>
+    </varlistentry>
+     <varlistentry>
+      <term><literal>org.forgerock.services.cts.async.queue.timeout</literal></term>
+      <listitem>
+       <para>
+        Default timeout is 120 seconds. Determines how long a caller will wait
+        in the even that the buffer is full.
+        If the timeout expires, the caller receives an error.
+        The timeout property is used in any system configuration where the LDAP
+        server throughput is considerably slower than the OpenAM server, which
+        can result in blocked requests as the backlog increases.
+       </para>
+      </listitem>
+     </varlistentry>
+   </variablelist>
+
+   <para>To set the queue size and timeout properties, navigate to the OpenAM Console:
+    Configuration
+    &gt; Servers and Sites &gt; Default Server Settings
+    &gt; Advanced, and then click Add.
+   </para>
+
+   <!--figure  xml:id="CTS-adv-properties">
+    <title>CTS Advanced Properties</title>
+    <mediaobject>
+     <alt>CTS Advanced properties</alt>
+     <imageobject>
+      <imagedata fileref="images/cts-adv-properties.png" format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>Shows the console page is used to the CTS tunine properties for
+       queue size and timeout.
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure-->
 
   </section>
 
   <section xml:id="cts-general-recommend">
-        <title>General Recommendations for CTS Configuration</title>
+   <title>General Recommendations for CTS Configuration</title>
 
-        <para>When configuring CTS, start with the OpenDJ server embedded with an installation of OpenAM. As
-        it already has required CTS indexes included, that simplifies your tasks.</para>
+   <para>When configuring CTS, start with the OpenDJ server embedded with an
+    installation of OpenAM.
+    As it already has required CTS indexes included, that simplifies your tasks.</para>
 
-        <para>If you are deploying on a single site, and want CTS replication limited to that site, the
-        default configuration store may be sufficient for your particular needs. If your needs go beyond a
-        higher-level performance threshold, you may want to move the CTS token storage to one or more dedicated
-        systems. Alternatively, if you need global replication of session, SAML 2.0, and OAuth 2.0 tokens,
-        that would also justify a move to dedicated systems as it can help to have
-        that extra level of control over how much replication is taking place.</para>
+   <para>If you are deploying on a single site, and want CTS replication limited
+    to that site, the default configuration store may be sufficient for your
+    particular needs.
+    If your needs go beyond a higher-level performance threshold, you may want
+    to move the CTS token storage to one or more dedicated systems.
+    Alternatively, if you need global replication of session, SAML 2.0, and OAuth 2.0 tokens,
+    that would also justify a move to dedicated systems as it can help to have
+    that extra level of control over how much replication is taking place.</para>
 
-        <para>CTS generally cause much more replication traffic than less volatile configuration data.
-        Therefore, in high volume deployments you can move CTS data to dedicated, properly sized
-        directory servers to improve performance. In addition, token compression as discussed in
-        <xref linkend="cts-token-size" />, is disabled by default. When enabled, token compression can reduce
-        load requirements on the network connection between data stores.</para>
+   <para>CTS generally causes much more replication traffic than less volatile
+    configuration data.
+    Therefore, in high volume deployments you can move CTS data to dedicated,
+    properly sized directory servers to improve performance.
+    In addition, token compression as discussed in <xref linkend="cts-token-managing" />,
+    is disabled by default. When enabled, token compression can reduce
+    load requirements on the network connection between data stores.</para>
 
-        <para>While not recommended for high volume deployments, it is possible to use CTS in production within
-        the default internal OpenDJ configuration store. That assumes a small scale deployment with a relatively
-        simple topology.</para>
+   <para>While not recommended for high volume deployments, it is possible
+    to use CTS in production within the default internal OpenDJ configuration store.
+    That assumes a small scale deployment with a relatively simple topology.</para>
 
-        <para>The CTS is configured to work with a single OpenDJ directory server. That is a potential SPOF.
-        To address that issue, set up a load balancer between OpenAM and the OpenDJ directory service used for
-        the CTS. Redundant load balancers are preferred. If one instance of OpenDJ fails, the load balancer would
-        redirect CTS requests to another instance of OpenDJ with a copy of the CTS tokens.</para>
+   <para>The CTS is configured to work with a single OpenDJ directory server.
+    That is a potential single point of failure (SPOF).
+    To address that issue, set up a load balancer between OpenAM and the OpenDJ
+    directory service used for the CTS.
+    Redundant load balancers are preferred.
+    If one instance of OpenDJ fails, the load balancer would redirect CTS requests
+    to another instance of OpenDJ with a copy of the CTS tokens.</para>
 
-        <para>Once configured, the OpenDJ directory service replicates CTS data transmitted from OpenAM servers
-        to connected OpenDJ servers. The amount of replication traffic can be significant, especially if
-        replication proceeds over a WAN. You can limit this replication traffic by separating OpenDJ instances
-        into directory and replication servers.</para>
+   <para>Once configured, the OpenDJ directory service replicates CTS data
+    transmitted from OpenAM servers to connected OpenDJ servers.
+    The amount of replication traffic can be significant, especially if
+    replication proceeds over a WAN.
+    You can limit this replication traffic by separating OpenDJ instances
+    into directory and replication servers.</para>
 
-    </section>
+  </section>
 
 </chapter>
