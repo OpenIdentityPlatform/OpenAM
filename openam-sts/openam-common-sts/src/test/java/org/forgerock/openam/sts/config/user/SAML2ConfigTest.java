@@ -21,7 +21,7 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -149,7 +149,7 @@ public class SAML2ConfigTest {
                 .signAssertion(signAssertion)
                 .nameIdFormat(NAME_ID_FORMAT);
         if (withAttributeMap) {
-            Map<String, String> attrMap = new HashMap<String, String>();
+            Map<String, String> attrMap = new LinkedHashMap<String, String>();
             attrMap.put("saml_attr", "ldap_attr");
             attrMap.put("saml_attr1", "ldap_attr1");
             builder.attributeMap(attrMap);

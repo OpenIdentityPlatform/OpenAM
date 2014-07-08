@@ -25,8 +25,9 @@ import org.forgerock.util.Reject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -437,7 +438,7 @@ public class SAML2Config {
         Object attributesObject = preMap.get(ATTRIBUTE_MAP);
         if (attributesObject instanceof Map) {
             finalMap.remove(ATTRIBUTE_MAP);
-            Set<String> attributeValues = new HashSet<String>();
+            Set<String> attributeValues = new LinkedHashSet<String>();
             finalMap.put(ATTRIBUTE_MAP, attributeValues);
             for (Map.Entry<String, String> entry : ((Map<String, String>)attributesObject).entrySet()) {
                 attributeValues.add(entry.getKey() + BAR + entry.getValue());
@@ -450,7 +451,7 @@ public class SAML2Config {
         Object audiencesObject = preMap.get(AUDIENCES);
         if ((audiencesObject instanceof JsonValue) && ((JsonValue) audiencesObject).isList()) {
             finalMap.remove(AUDIENCES);
-            Set<String> audienceValues = new HashSet<String>();
+            Set<String> audienceValues = new LinkedHashSet<String>();
             finalMap.put(AUDIENCES, audienceValues);
             for (Object obj : ((JsonValue)audiencesObject).asList()) {
                 audienceValues.add(obj.toString());
@@ -480,7 +481,7 @@ public class SAML2Config {
         }
         Map<String, Object> jsonAttributes = MapMarshallUtils.toJsonValueMap(smsAttributeMap);
         jsonAttributes.remove(ATTRIBUTE_MAP);
-        HashMap<String, Object> jsonAttributeMap = new HashMap<String, Object>();
+        Map<String, Object> jsonAttributeMap = new LinkedHashMap<String, Object>();
         for (String entry : attributes) {
             StringTokenizer st = new StringTokenizer(entry, BAR);
             jsonAttributeMap.put(st.nextToken(), st.nextToken());

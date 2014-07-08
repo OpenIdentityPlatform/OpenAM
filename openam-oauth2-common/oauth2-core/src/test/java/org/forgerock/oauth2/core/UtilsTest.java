@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -130,13 +131,13 @@ public class UtilsTest {
     public void shouldJoinScope() {
 
         //Given
-        Set<String> scope = new HashSet<String>();
+        Set<String> scope = new LinkedHashSet<String>();
         scope.add("a");
         scope.add("b");
         scope.add("c");
 
         //When/Then
-        assertEquals(Utils.joinScope(scope), "b c a");
+        assertEquals(Utils.joinScope(scope), "a b c");
     }
 
     @Test
@@ -151,7 +152,7 @@ public class UtilsTest {
 
     @Test
     public void shouldConvertStringToSet() {
-        Set<String> expectedResponseTypes = new HashSet<String>();
+        Set<String> expectedResponseTypes = new LinkedHashSet<String>();
         expectedResponseTypes.add("a");
         expectedResponseTypes.add("b");
         expectedResponseTypes.add("c");
