@@ -42,12 +42,13 @@ public class GroovyHttpClient extends RestletHttpClient {
 
     /**
      * @param uri URI of resource to be accessed
+     * @param body The body of the http request
      * @param requestData Data to be sent during the request
      * @return The response from the REST call
      * @throws UnsupportedEncodingException
      */
-    public HttpClientResponse post(String uri, LinkedHashMap requestData) throws UnsupportedEncodingException {
-        return getHttpClientResponse(uri, null, requestData, "POST");
+    public HttpClientResponse post(String uri, String body, LinkedHashMap requestData) throws UnsupportedEncodingException {
+        return getHttpClientResponse(uri, body, requestData, "POST");
     }
 
 }
