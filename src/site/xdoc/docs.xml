@@ -129,13 +129,13 @@
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Release-Notes.rtf">RTF</a>,
     <a href="./openam-documentation/openam-doc-source/doc/webhelp/web-release-notes/index.html">Webhelp</a></dd>
 
-    <dt>Web Policy Agent Installation Guide</dt>
-    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Install-Guide.epub">EPUB</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/web-install-guide/index.html">HTML (single page)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/web-install-guide/index/index.html">HTML (1 page/chapter)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Install-Guide.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Install-Guide.rtf">RTF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/webhelp/web-install-guide/index.html">Webhelp</a></dd>
+    <dt>Web Policy Agent User's Guide</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Users-Guide.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-users-guide/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-users-guide/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Users-Guide.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Users-Guide.rtf">RTF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/webhelp/web-users-guide/index.html">Webhelp</a></dd>
 
     <dt>Web Policy Agent Reference</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Reference.epub">EPUB</a>,
