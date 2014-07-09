@@ -487,8 +487,8 @@ C:\web_agents\iis7_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</repla
 
       <screen>
 $ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/lib</userinput>
-$ <userinput>java -cp ${forgerockUtilLibrary}:${coreLibrary}:${sharedLibrary} \
- com.sun.identity.common.DESGenKey</userinput>
+$ <userinput>java -cp ${forgerockUtilLibrary}:${coreLibrary}:\
+   ${sharedLibrary} com.sun.identity.common.DESGenKey</userinput>
 <computeroutput>Key ==> sxVoaDRAN0o=</computeroutput>
       </screen>
 
@@ -497,8 +497,8 @@ $ <userinput>java -cp ${forgerockUtilLibrary}:${coreLibrary}:${sharedLibrary} \
 
       <screen>
 C:><userinput>cd path\to\tomcat\webapps\openam\WEB-INF\lib</userinput>
-C:><userinput>java -cp ${forgerockUtilLibrary};${coreLibrary};${sharedLibrary} ^
- com.sun.identity.common.DESGenKey</userinput>
+C:><userinput>java -cp ${forgerockUtilLibrary};${coreLibrary}; ^
+    ${sharedLibrary} com.sun.identity.common.DESGenKey</userinput>
 <computeroutput>Key ==> sxVoaDRAN0o=</computeroutput>
       </screen>
 

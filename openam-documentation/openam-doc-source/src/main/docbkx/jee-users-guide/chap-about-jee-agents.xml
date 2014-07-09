@@ -185,36 +185,7 @@
 
   </section>
 
- <section xml:id="about-j2ee-agent-properties">
-  <title>About Java EE Policy Agent Properties</title>
-  <para>All Java EE policy agent configuration settings can be stored centrally
-   in the OpenAM configuration store, which allows you
-   to configure your policy agents on the OpenAM console for easier management and
-   convenience.
-   Any property change made
-   in OpenAM using the console or the <command>ssoadm</command> command-line tool is
-   immediately communicated to the agent via a notification.
-   Many policy agent properties are hot-swap enabled, allowing the change
-   to take effect immediately without a server restart.
-  </para>
-  <para>Policy agent configuration settings can also be stored locally in a
-   Java properties flat-file, such as
-   <filename>Agent_001/config/${agentsConfigurationFile}</filename>,
-   which is created when you install the agent.
-   If you implement a local properties file, you must make all
-   configuration changes by modifying property values in the file.
-  </para>
-  <para>While the majority of agent properties are hot swap-enabled, there are
-   a number that are not. These non-hot swappable properties are indicated in the
-   OpenAM console or local properties file as such. Any changes to these non-hot swappable
-   properties require a container restart. To avoid any configuration errors that
-   could take effect immediately, you can lock the properties by setting the
-   <literal>com.sun.identity.agents.config.lock.enable</literal> to <literal>true</literal>
-   in the OpenAM bootstrap file, <filename>${agentsBootstrapFile}</filename>,
-   and then re-start the container.
-  </para>
-
- </section>
+ <xinclude:include href="../shared/sec-policy-agent-properties.xml" />
 
  <section xml:id="filter-modes">
    <title>Java EE Agent Filter Modes of Operation</title>
@@ -227,23 +198,6 @@
     filter mode of operation that should be carried out on the intercepted
     inbound request.
    </para>
-
-  <!--figure xml:id="figure-agent-filter-modes" >
-   <title>Java EE Policy Agent Filter Modes</title>
-   <mediaobject >
-    <alt>Java EE Policy Agent Filter Modes</alt>
-    <imageobject>
-     <imagedata fileref="images/agent-filter-modes.png"
-                format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>The Java EE policy agent filter mode determines the operation taken
-      for the inbound client request. For production environments, it is
-      recommended that the filter be set to <literal>ALL</literal>.
-     </para>
-    </textobject>
-   </mediaobject>
-  </figure-->
 
    <para>The filter mode property can be set to one of the following values:</para>
 
@@ -535,7 +489,7 @@
    <para>Specifically, you can configure the type of
     attributes to be fetched and the associated mappings for the attributes
     names used on OpenAM to those values used in the containers. The Java EE
-    policy agents securely fetches the user and session data from the
+    policy agent securely fetches the user and session data from the
     authenticated user as well as policy response attributes.
    </para>
    <para>For more details, see
