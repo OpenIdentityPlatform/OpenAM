@@ -41,7 +41,7 @@ import java.util.*;
 public class RestletHttpClient {
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
 
-    protected HttpClientResponse getHttpClientResponse(String uri, String body, Map requestData, String method) throws UnsupportedEncodingException {
+    protected HttpClientResponse getHttpClientResponse(String uri, String body, Map<String, List<Map<String,String>>> requestData, String method) throws UnsupportedEncodingException {
         HttpClientRequest httpClientRequest = httpClientRequestFactory.createRequest();
 
         httpClientRequest.setMethod(method);
@@ -49,17 +49,17 @@ public class RestletHttpClient {
         httpClientRequest.setEntity(body);
 
         if (requestData != null) {
-            List<HashMap> cookies = (List<HashMap>) requestData.get("cookies");
+            List<Map<String,String>> cookies = requestData.get("cookies");
             if (cookies != null) {
-                for (HashMap cookie : cookies) {
+                for (Map cookie : cookies) {
                     httpClientRequest.addCookie((String) cookie.get("domain"),
                             (String) cookie.get("field"), (String) cookie.get("value"));
                 }
             }
 
-            List<HashMap> headers = (List<HashMap>) requestData.get("headers");
+            List<Map<String,String>> headers = requestData.get("headers");
             if (headers != null) {
-                for (HashMap header : headers) {
+                for (Map header : headers) {
                     httpClientRequest.addQueryParameter((String) header.get("field"),
                             (String) header.get("value"));
                 }
@@ -102,7 +102,7 @@ public class RestletHttpClient {
         return new SimpleHttpClientResponse(statusCode, reasonPhrase, headersMap, messageBody, cookiesMap);
     }
 
-    private org.restlet.Request createRequest(HttpClientRequest httpClientRequest) throws UnsupportedEncodingException {
+    private Request createRequest(HttpClientRequest httpClientRequest) throws UnsupportedEncodingException {
         Request request = new Request();
         request.setMethod(Method.valueOf(httpClientRequest.getMethod()));
         request.setResourceRef(httpClientRequest.getUri());

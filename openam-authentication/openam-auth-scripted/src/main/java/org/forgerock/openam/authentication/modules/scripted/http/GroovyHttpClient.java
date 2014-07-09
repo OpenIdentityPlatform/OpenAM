@@ -23,7 +23,10 @@ import org.forgerock.http.client.RestletHttpClient;
 import org.forgerock.http.client.response.HttpClientResponse;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A HTTP Rest client for Groovy auth module
@@ -36,7 +39,7 @@ public class GroovyHttpClient extends RestletHttpClient {
      * @return The response from the REST call
      * @throws UnsupportedEncodingException
      */
-    public HttpClientResponse get(String uri, LinkedHashMap requestData) throws UnsupportedEncodingException {
+    public HttpClientResponse get(String uri, Map<String, List<Map<String,String>>> requestData) throws UnsupportedEncodingException {
         return getHttpClientResponse(uri, null, requestData, "GET");
     }
 
@@ -47,7 +50,7 @@ public class GroovyHttpClient extends RestletHttpClient {
      * @return The response from the REST call
      * @throws UnsupportedEncodingException
      */
-    public HttpClientResponse post(String uri, String body, LinkedHashMap requestData) throws UnsupportedEncodingException {
+    public HttpClientResponse post(String uri, String body, Map<String, List<Map<String,String>>> requestData) throws UnsupportedEncodingException {
         return getHttpClientResponse(uri, body, requestData, "POST");
     }
 
