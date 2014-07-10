@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,9 +59,9 @@ public class TreeSearchIndexTest {
         ResourceSearchIndexes result = searchIndex.getIndexes("http://www.test.com:80/", "/test-realm");
 
         // Verify the test results
-        assertEquals(Arrays.asList("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
+        assertEquals(asSet("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
         assertEquals(indexes, result.getPathIndexes());
-        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
+        assertEquals(asSet("/"), result.getParentPathIndexes());
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test.com:80/", "/test-realm");
@@ -97,9 +98,9 @@ public class TreeSearchIndexTest {
         parsedIndexes.add("a-b-*-d-e");
         parsedIndexes.add("a-*-c-*-e");
 
-        assertEquals(Arrays.asList("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
+        assertEquals(asSet("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
         assertEquals(parsedIndexes, result.getPathIndexes());
-        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
+        assertEquals(asSet("/"), result.getParentPathIndexes());
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test.com:80/", "/test-realm");
