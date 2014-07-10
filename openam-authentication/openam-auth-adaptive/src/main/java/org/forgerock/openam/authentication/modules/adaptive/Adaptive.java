@@ -985,66 +985,133 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     }
 
     private void initParams(Map options) {
-        adaptiveThreshold = getOptionAsInteger(options, ADAPTIVETHRESHOLD);
+        try {
+            adaptiveThreshold = getOptionAsInteger(options, ADAPTIVETHRESHOLD);
 
-        authFailureCheck = getOptionAsBoolean(options, AUTH_FAILURE_CHECK);
-        authFailureScore = getOptionAsInteger(options, AUTH_FAILURE_SCORE);
-        authFailureInvert = getOptionAsBoolean(options, AUTH_FAILURE_INVERT);
+            authFailureCheck = getOptionAsBoolean(options, AUTH_FAILURE_CHECK);
+            authFailureScore = getOptionAsInteger(options, AUTH_FAILURE_SCORE);
+            authFailureInvert = getOptionAsBoolean(options, AUTH_FAILURE_INVERT);
 
-        IPRangeCheck = getOptionAsBoolean(options, IP_RANGE_CHECK);
-        IPRangeRange = (Set<String>) options.get(IP_RANGE_RANGE);
-        IPRangeScore = getOptionAsInteger(options, IP_RANGE_SCORE);
-        IPRangeInvert = getOptionAsBoolean(options, IP_RANGE_INVERT);
+            IPRangeCheck = getOptionAsBoolean(options, IP_RANGE_CHECK);
+            IPRangeRange = (Set<String>) options.get(IP_RANGE_RANGE);
+            IPRangeScore = getOptionAsInteger(options, IP_RANGE_SCORE);
+            IPRangeInvert = getOptionAsBoolean(options, IP_RANGE_INVERT);
 
-        IPHistoryCheck = getOptionAsBoolean(options, IP_HISTORY_CHECK);
-        IPHistoryCount = getOptionAsInteger(options, IP_HISTORY_COUNT);
-        IPHistoryAttribute = CollectionHelper.getMapAttr(options, IP_HISTORY_ATTRIBUTE);
-        IPHistorySave = getOptionAsBoolean(options, IP_HISTORY_SAVE);
-        IPHistoryScore = getOptionAsInteger(options, IP_HISTORY_SCORE);
-        IPHistoryInvert = getOptionAsBoolean(options, IP_HISTORY_INVERT);
+            IPHistoryCheck = getOptionAsBoolean(options, IP_HISTORY_CHECK);
+            IPHistoryCount = getOptionAsInteger(options, IP_HISTORY_COUNT);
+            IPHistoryAttribute = CollectionHelper.getMapAttr(options, IP_HISTORY_ATTRIBUTE);
+            IPHistorySave = getOptionAsBoolean(options, IP_HISTORY_SAVE);
+            IPHistoryScore = getOptionAsInteger(options, IP_HISTORY_SCORE);
+            IPHistoryInvert = getOptionAsBoolean(options, IP_HISTORY_INVERT);
 
-        knownCookieCheck = getOptionAsBoolean(options, KNOWN_COOKIE_CHECK);
-        knownCookieName = CollectionHelper.getMapAttr(options, KNOWN_COOKIE_NAME);
-        knownCookieValue = CollectionHelper.getMapAttr(options, KNOWN_COOKIE_VALUE);
-        knownCookieSave = getOptionAsBoolean(options, KNOWN_COOKIE_SAVE);
-        knownCookieScore = getOptionAsInteger(options, KNOWN_COOKIE_SCORE);
-        knownCookieInvert = getOptionAsBoolean(options, KNOWN_COOKIE_INVERT);
+            knownCookieCheck = getOptionAsBoolean(options, KNOWN_COOKIE_CHECK);
+            knownCookieName = CollectionHelper.getMapAttr(options, KNOWN_COOKIE_NAME);
+            knownCookieValue = CollectionHelper.getMapAttr(options, KNOWN_COOKIE_VALUE);
+            knownCookieSave = getOptionAsBoolean(options, KNOWN_COOKIE_SAVE);
+            knownCookieScore = getOptionAsInteger(options, KNOWN_COOKIE_SCORE);
+            knownCookieInvert = getOptionAsBoolean(options, KNOWN_COOKIE_INVERT);
 
-        deviceCookieCheck = getOptionAsBoolean(options, DEVICE_COOKIE_CHECK);
-        deviceCookieName = CollectionHelper.getMapAttr(options, DEVICE_COOKIE_NAME);
-        deviceCookieSave = getOptionAsBoolean(options, DEVICE_COOKIE_SAVE);
-        deviceCookieScore = getOptionAsInteger(options, DEVICE_COOKIE_SCORE);
-        deviceCookieInvert = getOptionAsBoolean(options, DEVICE_COOKIE_INVERT);
+            deviceCookieCheck = getOptionAsBoolean(options, DEVICE_COOKIE_CHECK);
+            deviceCookieName = CollectionHelper.getMapAttr(options, DEVICE_COOKIE_NAME);
+            deviceCookieSave = getOptionAsBoolean(options, DEVICE_COOKIE_SAVE);
+            deviceCookieScore = getOptionAsInteger(options, DEVICE_COOKIE_SCORE);
+            deviceCookieInvert = getOptionAsBoolean(options, DEVICE_COOKIE_INVERT);
 
-        //TODO add these to service XML
-        timeOfDayCheck = getOptionAsBoolean(options, TIME_OF_DAY_CHECK);
-        timeOfDayRange = CollectionHelper.getMapAttr(options, TIME_OF_DAY_RANGE);
-        timeOfDayInvert = getOptionAsBoolean(options, TIME_OF_DAY_INVERT);
+            //TODO add these to service XML
+            timeOfDayCheck = getOptionAsBoolean(options, TIME_OF_DAY_CHECK);
+            timeOfDayRange = CollectionHelper.getMapAttr(options, TIME_OF_DAY_RANGE);
+            timeOfDayInvert = getOptionAsBoolean(options, TIME_OF_DAY_INVERT);
 
-        timeSinceLastLoginCheck = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_CHECK);
-        timeSinceLastLoginAttribute = CollectionHelper.getMapAttr(options, TIME_SINCE_LAST_LOGIN_ATTRIBUTE);
-        timeSinceLastLoginValue = getOptionAsInteger(options, TIME_SINCE_LAST_LOGIN_VALUE);
-        timeSinceLastLoginSave = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_SAVE);
-        timeSinceLastLoginScore = getOptionAsInteger(options, TIME_SINCE_LAST_LOGIN_SCORE);
-        timeSinceLastLoginInvert = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_INVERT);
+            timeSinceLastLoginCheck = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_CHECK);
+            timeSinceLastLoginAttribute = CollectionHelper.getMapAttr(options, TIME_SINCE_LAST_LOGIN_ATTRIBUTE);
+            timeSinceLastLoginValue = getOptionAsInteger(options, TIME_SINCE_LAST_LOGIN_VALUE);
+            timeSinceLastLoginSave = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_SAVE);
+            timeSinceLastLoginScore = getOptionAsInteger(options, TIME_SINCE_LAST_LOGIN_SCORE);
+            timeSinceLastLoginInvert = getOptionAsBoolean(options, TIME_SINCE_LAST_LOGIN_INVERT);
 
-        riskAttributeCheck = getOptionAsBoolean(options, RISK_ATTRIBUTE_CHECK);
-        riskAttributeName = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_NAME);
-        riskAttributeValue = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_VALUE);
-        riskAttributeScore = getOptionAsInteger(options, RISK_ATTRIBUTE_SCORE);
-        riskAttributeInvert = getOptionAsBoolean(options, RISK_ATTRIBUTE_INVERT);
+            riskAttributeCheck = getOptionAsBoolean(options, RISK_ATTRIBUTE_CHECK);
+            riskAttributeName = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_NAME);
+            riskAttributeValue = CollectionHelper.getMapAttr(options, RISK_ATTRIBUTE_VALUE);
+            riskAttributeScore = getOptionAsInteger(options, RISK_ATTRIBUTE_SCORE);
+            riskAttributeInvert = getOptionAsBoolean(options, RISK_ATTRIBUTE_INVERT);
 
-        geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
-        geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
-        geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
-        geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
-        geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
+            geoLocationCheck = getOptionAsBoolean(options, GEO_LOCATION_CHECK);
+            geoLocationDatabase = CollectionHelper.getMapAttr(options, GEO_LOCATION_DATABASE);
+            geoLocationValues = CollectionHelper.getMapAttr(options, GEO_LOCATION_VALUES);
+            geoLocationScore = getOptionAsInteger(options, GEO_LOCATION_SCORE);
+            geoLocationInvert = getOptionAsBoolean(options, GEO_LOCATION_INVERT);
 
-        reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
-        reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
-        reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
-        reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
-        reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
+            reqHeaderCheck = getOptionAsBoolean(options, REQ_HEADER_CHECK);
+            reqHeaderName = CollectionHelper.getMapAttr(options, REQ_HEADER_NAME);
+            reqHeaderValue = CollectionHelper.getMapAttr(options, REQ_HEADER_VALUE);
+            reqHeaderScore = getOptionAsInteger(options, REQ_HEADER_SCORE);
+            reqHeaderInvert = getOptionAsBoolean(options, REQ_HEADER_INVERT);
+
+        } catch (Exception e) {
+            debug.error(ADAPTIVE + ".initParams : " + "Unable to initialize parameters : ", e);
+        } finally {
+            if (debug.messageEnabled()) {
+                debug.message("Adaptive Threshold-> " + adaptiveThreshold
+
+                        + "\nAuth Failure Check-> " + authFailureCheck
+                        + "\nAuth Failure Score-> " + authFailureScore
+                        + "\nAuth Failure Invert-> " + authFailureInvert
+
+                        + "\nIP Range Check-> " + IPRangeCheck
+                        + "\nIP Range Range-> " + IPRangeRange
+                        + "\nIP Range Score-> " + IPRangeScore
+                        + "\nIP Range Invert-> " + IPRangeInvert
+
+                        + "\nIP History Check-> " + IPHistoryCheck
+                        + "\nIP History Count-> " + IPHistoryCount
+                        + "\nIP History Attribute-> " + IPHistoryAttribute
+                        + "\nIP History Save-> " + IPHistorySave
+                        + "\nIP History Score-> " + IPHistoryScore
+                        + "\nIP History Invert-> " + IPHistoryInvert
+
+                        + "\nKnown Cookie Check-> " + knownCookieCheck
+                        + "\nKnown Cookie Name-> " + knownCookieName
+                        + "\nKnown Cookie Value-> " + knownCookieValue
+                        + "\nKnown Cookie Save-> " + knownCookieSave
+                        + "\nKnown Cookie Score-> " + knownCookieScore
+                        + "\nKnown Cookie Invert-> " + knownCookieInvert
+
+                        + "\nDevice Cookie Check-> " + deviceCookieCheck
+                        + "\nDevice Cookie Name-> " + deviceCookieName
+                        + "\nDevice Cookie Save-> " + deviceCookieSave
+                        + "\nDevice Cookie Score-> " + deviceCookieScore
+                        + "\nDevice Cookie Invert-> " + deviceCookieInvert
+
+                        + "\nTime Of Day Check-> " + timeOfDayCheck
+                        + "\nTime Of Day Range-> " + timeOfDayRange
+                        + "\nTime Of Day Invert-> " + timeOfDayInvert
+
+                        + "\nTime Since Last Login Check-> " + timeSinceLastLoginCheck
+                        + "\nTime Since Last Login Attribute: " + timeSinceLastLoginAttribute
+                        + "\nTime Since Last Login Value-> " + timeSinceLastLoginValue
+                        + "\nTime Since Last Login Save-> " + timeSinceLastLoginSave
+                        + "\nTime Since Last Login Score-> " + timeSinceLastLoginScore
+                        + "\nTime Since Last Login Invert-> " + timeSinceLastLoginInvert
+
+                        + "\nRisk Attribute Check-> " + riskAttributeCheck
+                        + "\nRisk Attribute Name-> " + riskAttributeName
+                        + "\nRisk Attribute Value-> " + riskAttributeValue
+                        + "\nRisk Attribute Score-> " + riskAttributeScore
+                        + "\nRisk Attribute Invert-> " + riskAttributeInvert
+
+                        + "\nGeoLocation Check-> " + geoLocationCheck
+                        + "\nGeoLocation Database-> " + geoLocationDatabase
+                        + "\nGeoLocation Values-> " + geoLocationValues
+                        + "\nGeoLocation Score-> " + geoLocationScore
+                        + "\nGeoLocation Invert-> " + geoLocationInvert
+
+                        + "\nReq Header Check-> " + reqHeaderCheck
+                        + "\nReq Header Name-> " + reqHeaderName
+                        + "\nReq Header Value-> " + reqHeaderValue
+                        + "\nReq Header Score-> " + reqHeaderScore
+                        + "\nReq Header Invert-> " + reqHeaderInvert);
+            }
+        }
     }
 
     protected boolean getOptionAsBoolean(Map m, String i) {
