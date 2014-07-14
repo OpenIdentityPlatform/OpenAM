@@ -41,6 +41,9 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
     private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
     private final static String OPEN_ID_CONNECT = "org.forgerock.openam.authentication.modules.oidc.OpenIdConnect";
+    private final static String SCRIPTED = "org.forgerock.openam.authentication.modules.scripted.Scripted";
+    private final static String SCRIPTED_DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.ScriptedDevicePrint";
+    private final static String DEVICE_PRINT_PERSIST = "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintPersist";
 
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
@@ -69,8 +72,9 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
 
         if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2)
                 && defaultValues.contains(OATH) && defaultValues.contains(PERSISTENT_COOKIE)
-                && defaultValues.contains(OPEN_ID_CONNECT) && !defaultValues.contains(SAFEWORD)
-                && !defaultValues.contains(UNIX)) {
+                && defaultValues.contains(OPEN_ID_CONNECT) && defaultValues.contains(SCRIPTED)
+                && defaultValues.contains(SCRIPTED_DEVICE_PRINT) && defaultValues.contains(DEVICE_PRINT_PERSIST)
+                && !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
             // nothing to do
             return null;
         }
@@ -81,6 +85,9 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.add(OATH);
         defaultValues.add(PERSISTENT_COOKIE);
         defaultValues.add(OPEN_ID_CONNECT);
+        defaultValues.add(SCRIPTED);
+        defaultValues.add(SCRIPTED_DEVICE_PRINT);
+        defaultValues.add(DEVICE_PRINT_PERSIST);
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
         newAttr = updateDefaultValues(newAttr, defaultValues);

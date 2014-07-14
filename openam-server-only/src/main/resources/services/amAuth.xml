@@ -63,6 +63,8 @@
                         <Value>com.sun.identity.authentication.modules.datastore.DataStore</Value>
                         <Value>org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.Scripted</Value>
+                        <Value>org.forgerock.openam.authentication.modules.deviceprint.ScriptedDevicePrint</Value>
+                        <Value>org.forgerock.openam.authentication.modules.deviceprint.DevicePrintPersist</Value>
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
                         <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>

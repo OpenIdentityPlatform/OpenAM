@@ -35,6 +35,7 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
@@ -52,8 +53,10 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
@@ -74,7 +77,6 @@ public class Scripted extends AMLoginModule {
 
     public static final String JAVA_SCRIPT_LABEL = "JavaScript";
     public static final String GROOVY_LABEL = "Groovy";
-    private final static int STATE_BEGIN = 1;
 
     private final static int STATE_RUN_SCRIPT = 2;
     public static final String STATE_VARIABLE_NAME = "authState";
@@ -100,6 +102,8 @@ public class Scripted extends AMLoginModule {
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
     private RestletHttpClient httpClient;
     private ScriptIdentityRepository identityRepository;
+    private Map<String, Object> sharedStateWrapper;
+    private Map<String, Object> sharedState;
 
     /**
      * {@inheritDoc}
@@ -115,6 +119,8 @@ public class Scripted extends AMLoginModule {
         clientSideScriptEnabled = getClientSideScriptEnabled();
         httpClient = getHttpClient();
         identityRepository  = getScriptIdentityRepository();
+        sharedStateWrapper = new HashMap<String, Object>();
+        this.sharedState = sharedState;
     }
 
     private ScriptIdentityRepository getScriptIdentityRepository() {
@@ -133,7 +139,7 @@ public class Scripted extends AMLoginModule {
 
         switch (state) {
 
-            case STATE_BEGIN:
+            case ISAuthConstants.LOGIN_START:
                 if (!clientSideScriptEnabled || clientSideScript.isEmpty()) {
                     clientSideScript = " ";
                 }
@@ -143,10 +149,13 @@ public class Scripted extends AMLoginModule {
                 return STATE_RUN_SCRIPT;
 
             case STATE_RUN_SCRIPT:
+                NameCallback clientSideScriptOutput = (NameCallback) callbacks[1];
                 Bindings scriptVariables = new SimpleBindings();
                 scriptVariables.put("requestData", getScriptHttpRequestWrapper());
+                scriptVariables.put("clientSideScriptOutput", clientSideScriptOutput.getName());
                 scriptVariables.put(LOGGER_VARIABLE_NAME, DEBUG);
                 scriptVariables.put(STATE_VARIABLE_NAME, state);
+                scriptVariables.put("sharedState", sharedStateWrapper);
                 scriptVariables.put(USERNAME_VARIABLE_NAME, userName);
                 scriptVariables.put(SUCCESS_ATTR_NAME, SUCCESS_VALUE);
                 scriptVariables.put(FAILED_ATTR_NAME, FAILURE_VALUE);
@@ -162,6 +171,7 @@ public class Scripted extends AMLoginModule {
                 
                 state = ((Number) scriptVariables.get(STATE_VARIABLE_NAME)).intValue();
                 userName = (String) scriptVariables.get(USERNAME_VARIABLE_NAME);
+                sharedState.putAll(sharedStateWrapper);
 
                 if (state != SUCCESS_VALUE) {
                     throw new AuthLoginException("Authentication failed");
@@ -209,7 +219,7 @@ public class Scripted extends AMLoginModule {
 
     private String getClientSideScript() {
         final String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
-        return clientSideScript == null ? "" : clientSideScript;
+        return clientSideScript == null ? "" : "(function(output){\r\n" + clientSideScript + "\r\n})(document.forms[0].elements[1]);";
     }
 
     private int getServerTimeout() {

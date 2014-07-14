@@ -64,6 +64,7 @@
         <module>deviceprint</module>
         <module>openam-auth-oidc</module>
         <module>openam-auth-scripted</module>
+        <module>openam-auth-scripted-deviceprint</module>
     </modules>
 
     <dependencies>

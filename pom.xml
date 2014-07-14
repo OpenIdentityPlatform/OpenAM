@@ -565,6 +565,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-scripted-deviceprint</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-membership</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1734,6 +1739,12 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.8.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>1.6.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
