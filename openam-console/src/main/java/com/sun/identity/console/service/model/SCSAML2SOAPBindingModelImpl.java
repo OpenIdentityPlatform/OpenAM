@@ -26,6 +26,11 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
+
 package com.sun.identity.console.service.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -95,8 +100,23 @@ public class SCSAML2SOAPBindingModelImpl
             TBL_REQUEST_HANDLER_LIST_XML);
     }
     
-    private static String TBL_REQUEST_HANDLER_LIST_XML =
-        "<property span=\"true\"><cc name=\"sunSAML2RequestHandlerList\" tagclass=\"com.sun.web.ui.taglib.table.CCActionTableTag\" > <attribute name=\"title\" value=\"soapBinding.service.table.requestHandlerList.name\" /><attribute name=\"empty\" value=\"soapBinding.service.table.requestHandlerList.noentries\" /><attribute name=\"showPaginationControls\" value=\"false\" /><attribute name=\"selectionType\" value=\"multiple\" /><attribute name=\"selectionJavascript\" value=\"toggleTblButtonState('SCSAML2SOAPBinding', 'SCSAML2SOAPBinding.RequestHandlerList', 'requestHandlerListCount', 'SCSAML2SOAPBinding.tblRequestHandlerListButtonDelete', this)\" /><attribute name=\"showAdvancedSortingIcon\" value=\"false\" /><attribute name=\"showLowerActions\" value=\"false\" /><attribute name=\"showPaginationControls\" value=\"false\" /><attribute name=\"showPaginationIcon\" value=\"false\" /><attribute name=\"showSelectionIcons\" value=\"true\" /><attribute name=\"showSelectionSortIcon\" value=\"false\" /><attribute name=\"showSortingRow\" value=\"true\" /></cc></property>";
-    
+    private static String TBL_REQUEST_HANDLER_LIST_XML = 
+            "<property span=\"true\"><cc name=\"sunSAML2RequestHandlerList\" "
+            + "tagclass=\"com.sun.web.ui.taglib.table.CCActionTableTag\" >"
+            + "<attribute name=\"title\" value=\"soapBinding.service.table.requestHandlerList.name\" />"
+            + "<attribute name=\"empty\" value=\"soapBinding.service.table.requestHandlerList.noentries\" />"
+            + "<attribute name=\"showPaginationControls\" value=\"false\" />"
+            + "<attribute name=\"selectionType\" value=\"multiple\" />"
+            + "<attribute name=\"selectionJavascript\" value=\"toggleTblButtonState('SCSAML2SOAPBinding', "
+            + "'SCSAML2SOAPBinding.sunSAML2RequestHandlerList', 'requestHandlerListCount', "
+            + "'SCSAML2SOAPBinding.tblRequestHandlerListButtonDelete', this)\" />"
+            + "<attribute name=\"showAdvancedSortingIcon\" value=\"false\" />"
+            + "<attribute name=\"showLowerActions\" value=\"false\" />"
+            + "<attribute name=\"showPaginationControls\" value=\"false\" />"
+            + "<attribute name=\"showPaginationIcon\" value=\"false\" />"
+            + "<attribute name=\"showSelectionIcons\" value=\"true\" />"
+            + "<attribute name=\"showSelectionSortIcon\" value=\"false\" />"
+            + "<attribute name=\"showSortingRow\" value=\"true\" />"
+            + "</cc></property>";
     
 }
