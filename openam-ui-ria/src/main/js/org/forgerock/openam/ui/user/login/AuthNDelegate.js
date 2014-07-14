@@ -187,7 +187,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                                .fail(processFailed);
 
                         } else {
-                            if (errorBody.message == "User Account Locked"){
+                            if (errorBody.message === "User Account Locked"){
                                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginFailureLockout");
                             } else {
                                 processFailed();
