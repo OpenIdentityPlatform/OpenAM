@@ -190,6 +190,14 @@
      >To Indicate Progress During SSO</citetitle></link>.
     </para>
    </listitem>
+
+   <listitem>
+    <para>
+     When running OpenAM on WebLogic 11g, you must add a WebLogic-specific
+     descriptor file, <filename>WEB-INF/weblogic.xml</filename> in the .war
+     before deployment.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
