@@ -9,6 +9,7 @@
         "messages" : {
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
+                "loginFailureLockout" : "This user is not active. Contact your system administrator.",
                 "serviceUnavailable" : "Service unavailable",
                 "unknown" : "Unknown error. Please contact your Administrator",
                 "loggedIn" : "You have been successfully logged in.",
