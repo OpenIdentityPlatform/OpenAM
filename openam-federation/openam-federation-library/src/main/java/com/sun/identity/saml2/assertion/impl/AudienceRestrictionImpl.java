@@ -24,9 +24,8 @@
  *
  * $Id: AudienceRestrictionImpl.java,v 1.2 2008/06/25 05:47:42 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
-
-
 package com.sun.identity.saml2.assertion.impl;
 
 import org.w3c.dom.Document;
@@ -50,7 +49,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 public class AudienceRestrictionImpl 
     extends ConditionAbstractImpl implements AudienceRestriction {
 
-    private List audiences = new ArrayList();
+    private List<String> audiences = new ArrayList<String>(1);
     private boolean isMutable = true;
 
     public static String AUDIENCE_RESTRICTION_ELEMENT = "AudienceRestriction";
@@ -144,8 +143,7 @@ public class AudienceRestrictionImpl
                 String childName = child.getLocalName();
                 if (childName != null) {
                     if (childName.equals(AUDIENCE_ELEMENT)) {
-                        audiences.add(
-                            XMLUtils.getElementValue((Element)child));
+                        audiences.add(XMLUtils.getElementValue((Element)child));
                         hasAudience = true;
                     } else {
                         SAML2SDKUtils.debug.error(
@@ -172,7 +170,7 @@ public class AudienceRestrictionImpl
      *
      * @return a list of <code>String</code> represented audiences
      */
-    public List getAudience() {
+    public List<String> getAudience() {
         return audiences;
     }
 
@@ -201,7 +199,7 @@ public class AudienceRestrictionImpl
      */
     public String toXMLString(boolean includeNSPrefix, boolean declareNS)
         throws SAML2Exception {
-        StringBuffer sb = new StringBuffer(2000);
+        StringBuilder sb = new StringBuilder(2000);
         String NS = "";
         String appendNS = "";
         if (declareNS) {
@@ -212,13 +210,11 @@ public class AudienceRestrictionImpl
         }
         sb.append("<").append(appendNS).
             append(AUDIENCE_RESTRICTION_ELEMENT).append(NS).append(">\n");
-        int length = 0;
-        if ((audiences != null) && ((length = audiences.size()) > 0)) {
-            for (int i = 0; i < length; i++) {
-                String au = (String)audiences.get(i);
-                sb.append("<").append(appendNS).append(AUDIENCE_ELEMENT).
-                    append(">").append(au).append("</").append(appendNS).
-                    append(AUDIENCE_ELEMENT).append(">\n");
+        if (audiences != null) {
+            for (String audience : audiences) {
+                sb.append("<").append(appendNS).append(AUDIENCE_ELEMENT).append(">").
+                        append(XMLUtils.escapeSpecialCharacters(audience)).
+                        append("</").append(appendNS).append(AUDIENCE_ELEMENT).append(">\n");
             }
         } else {
             SAML2SDKUtils.debug.error(
