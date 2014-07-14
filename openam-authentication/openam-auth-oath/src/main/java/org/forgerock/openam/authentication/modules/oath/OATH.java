@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted 2012 ForgeRock AS"
+ * "Portions Copyrighted 2012-2014 ForgeRock AS"
+ */
+
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -51,7 +55,6 @@ import java.util.ResourceBundle;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.login.LoginException;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -548,8 +551,11 @@ public class OATH extends AMLoginModule {
                             e);
                     throw new AuthLoginException(amAuthOATH, "authFailed", null);
                 }
-                long lastLoginTime = Long.parseLong(
-                        (String) (lastLoginTimeSet.iterator().next()));
+                long lastLoginTime = 0;
+                if (lastLoginTimeSet != null && !lastLoginTimeSet.isEmpty()) {
+                    lastLoginTime = Long.parseLong(
+                            (String) (lastLoginTimeSet.iterator().next()));
+                }
 
                 //Check TOTP values for validity
                 if (lastLoginTime < 0) {
