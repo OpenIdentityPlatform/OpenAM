@@ -86,8 +86,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
    directory.</para>
 
   <xinclude:include href="../shared/variablelist-agentadmin-folders.xml" />
+
+  <xinclude:include href="../shared/sec-apache-mpm-tuning.xml"/>
  </section>
- 
+
+
+
  <section xml:id="install-apache22-web-agent">
   <title>Installing Apache 2.2 Web Policy Agent</title>
   
@@ -258,7 +262,7 @@ $ <userinput>tail /path/to/web_agents/apache22_agent/Agent_001/logs/debug/amAgen
   </procedure>
  </section>
 
-<section xml:id="install-apache22-agent-windows">
+ <section xml:id="install-apache22-agent-windows">
     <title>Installing Apache 2.2 Web Policy Agent (Windows)</title>
     <para>The instructions for installing the Apache 2.2 Web Policy Agent on a
             Windows system mirror those on the Unix/Linux systems.
@@ -520,4 +524,5 @@ Uninstall log file location:
   </screen>
 
  </section>
+
 </chapter>

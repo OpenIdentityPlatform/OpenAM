@@ -85,6 +85,8 @@
    directory.</para>
 
   <xinclude:include href="../shared/variablelist-agentadmin-folders.xml" />
+
+  <xinclude:include href="../shared/sec-apache-mpm-tuning.xml"/>
  </section>
 
  <section xml:id="install-apache24-web-agent">
@@ -329,4 +331,5 @@ Uninstall log file location:
   </screen>
 
  </section>
+
 </chapter>
