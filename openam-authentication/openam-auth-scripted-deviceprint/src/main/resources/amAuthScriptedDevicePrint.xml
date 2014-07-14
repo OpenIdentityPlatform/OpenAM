@@ -56,11 +56,11 @@
                                  syntax="string"
                                  i18nKey="a101">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
+                        <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                         <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>Java Script</Value>
+                        <Value>JavaScript</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
@@ -116,11 +116,11 @@
                                      syntax="string"
                                      i18nKey="a101">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="choice1">Java Script</ChoiceValue>
+                            <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                             <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>Java Script</Value>
+                            <Value>JavaScript</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
