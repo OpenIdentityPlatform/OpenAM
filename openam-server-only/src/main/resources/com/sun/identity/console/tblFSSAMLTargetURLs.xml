@@ -25,38 +25,31 @@
    $Id: tblFSSAMLTargetURLs.xml,v 1.2 2008/06/25 05:45:17 qcheng Exp $
 
 -->
+<!--
+   Portions Copyrighted 2014 ForgeRock AS
+   Portions Copyrighted 2014 Nomura Research Institute, Ltd
+-->
 
 <!DOCTYPE table SYSTEM "table.dtd">
 
 <table>
-<actions>
-    <cc name="tblTargetURLsButtonAdd" 
-        tagclass="com.sun.web.ui.taglib.html.CCButtonTag" />
-    <cc name="tblTargetURLsButtonDelete" 
-        tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
-	<attribute name="dynamic" value="true" />
-	<attribute name="disabled" value="true" />
-    </cc>
-</actions>
-
-<column name="tblTargetURLsColName" sortname="target" 
-    rowheader="true" extrahtml="width='70%'">
-    <cc name="iplanetamsamlposttotargeturlseditLink" 
-        tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
-        <cc name="target" 
-            tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" >
-            <attribute name="bundleID" value="" />
+    <actions>
+        <cc name="tblTargetURLsButtonAdd" 
+            tagclass="com.sun.web.ui.taglib.html.CCButtonTag" />
+        <cc name="tblTargetURLsButtonDelete" 
+            tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
+            <attribute name="dynamic" value="true" />
+            <attribute name="disabled" value="true" />
         </cc>
-    </cc>
-</column>
-
-<column name="tblTargetURLsColAction" extrahtml="width='30%'">
-    <cc name="iplanetamsamlposttotargeturlsduplicateLink" 
-        tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
-        <cc name="iplanetamsamlposttotargeturlsduplicateLabel" 
-            tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
-    </cc>
-</column>
+    </actions>
+    <column name="tblTargetURLsColName" sortname="target" 
+            rowheader="true" extrahtml="width='70%'">
+        <cc name="iplanetamsamlposttotargeturlseditLink" 
+            tagclass="com.sun.web.ui.taglib.html.CCHrefTag">
+            <cc name="target" 
+                tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" >
+                <attribute name="bundleID" value="" />
+            </cc>
+        </cc>
+    </column>
 </table>
-
-
