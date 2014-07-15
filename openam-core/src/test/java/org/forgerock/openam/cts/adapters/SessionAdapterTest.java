@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -25,8 +25,8 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
+import org.forgerock.openam.utils.TimeUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -41,15 +41,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class SessionAdapterTest {
     private SessionAdapter adapter;
     private TokenIdFactory tokenIdFactory;
     private CoreTokenConfig coreTokenConfig;
     private JSONSerialisation jsonSerialisation;
-    private LDAPDataConversion ldapDataConversion;
     private TokenBlobUtils blobUtils;
 
     @BeforeMethod
@@ -57,9 +53,8 @@ public class SessionAdapterTest {
         tokenIdFactory = mock(TokenIdFactory.class);
         coreTokenConfig = mock(CoreTokenConfig.class);
         jsonSerialisation = mock(JSONSerialisation.class);
-        ldapDataConversion = mock(LDAPDataConversion.class);
         blobUtils = new TokenBlobUtils();
-        adapter = new SessionAdapter(tokenIdFactory, coreTokenConfig, jsonSerialisation, ldapDataConversion, blobUtils);
+        adapter = new SessionAdapter(tokenIdFactory, coreTokenConfig, jsonSerialisation, blobUtils);
     }
 
     @Test
@@ -69,19 +64,19 @@ public class SessionAdapterTest {
         // Sessions can only measure time to the closest second.
         Calendar now = Calendar.getInstance();
         now.set(Calendar.MILLISECOND, 0);
+        long mockTimestamp = TimeUtils.toUnixTime(now);
 
         String userId = "ferret";
         String sessionId = "badger";
         byte[] mockByteData = {};
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
 
         InternalSession session = mock(InternalSession.class);
         // Ensure Session ID is badger
         given(tokenIdFactory.toSessionTokenId(any(InternalSession.class))).willReturn(sessionId);
         // Ensure Session User is ferret
         given(coreTokenConfig .getUserId(any(InternalSession.class))).willReturn(userId);
-        // Ensure expiry date is now based on the epoched time in seconds format.
-        given(session.getExpirationTime()).willReturn(dataConversion.toEpochedSeconds(now));
+        // Ensure the expiration time is set.
+        given(session.getExpirationTime()).willReturn(mockTimestamp);
 
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSessionID.toString()).willReturn(sessionId);
@@ -94,8 +89,7 @@ public class SessionAdapterTest {
         adapter = new SessionAdapter(
                 tokenIdFactory,
                 coreTokenConfig ,
-                jsonSerialisation,
-                dataConversion, blobUtils);
+                jsonSerialisation, blobUtils);
 
         Token token = new Token(sessionId, TokenType.SESSION);
         token.setUserId(userId);
@@ -123,7 +117,7 @@ public class SessionAdapterTest {
 
         // need a real JSONSerialisation for this test
         JSONSerialisation serialisation = new JSONSerialisation();
-        adapter = new SessionAdapter(tokenIdFactory, coreTokenConfig, serialisation, ldapDataConversion, blobUtils);
+        adapter = new SessionAdapter(tokenIdFactory, coreTokenConfig, serialisation, blobUtils);
 
         // When
         InternalSession session = adapter.fromToken(token);
@@ -154,10 +148,10 @@ public class SessionAdapterTest {
         given(jsonSerialisation.serialise(any())).willReturn("");
 
         // When
-        adapter.toToken(mockSession);
+        Token token = adapter.toToken(mockSession);
 
         // Then
-        verify(ldapDataConversion).fromEpochedSeconds(eq(timestamp));
+        assertThat(token.getExpiryTimestamp()).isNotNull();
     }
 
     @Test

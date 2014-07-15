@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
@@ -24,9 +24,7 @@ import org.forgerock.opendj.ldap.Entries;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
@@ -39,8 +37,6 @@ import javax.inject.Inject;
  *
  * It also helps us work around a number of final classes in the SDK which were
  * hindering unit testing.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class LDAPAdapter {
     private final TokenAttributeConversion conversion;
@@ -137,21 +133,6 @@ public class LDAPAdapter {
             }
             throw e;
         }
-    }
-
-    /**
-     * Perform a delete against the Token ID provided asynchronously.
-     *
-     * This will place the request on a worker queue and the Handler will be notified when
-     * the deletion has compelted, or failed.
-     *
-     * @param connection Non null.
-     * @param tokenId The token ID to delete.
-     * @param handler An interface which will be called when the operation is completed.
-     */
-    public void deleteAsync(Connection connection, String tokenId, ResultHandler<Result> handler) {
-        String dn = String.valueOf(conversion.generateTokenDN(tokenId));
-        connection.deleteAsync(Requests.newDeleteRequest(dn), null, handler);
     }
 
     /**

@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock Inc
  */
 
 package com.iplanet.dpro.session.service;
@@ -46,8 +46,17 @@ import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
+import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.utils.TimeUtils;
 
 import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,8 +64,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
- 
- /**
+
+/**
   * <code>SessionCount</code> represents the session count for a given user
   * in 3 different mutually exclusive deployment modes from which the user 
   * sessions can be obtained.
@@ -264,17 +273,52 @@ public class SessionCount {
 
     private static Map<String, Long> getSessionsFromRepository(String uuid) throws Exception {
 
-        CTSPersistentStore repo = SessionService.getSessionService()
-                .getRepository();
-        Map<String, Long> sessions = null;
+        CTSPersistentStore repo = SessionService.getSessionService().getRepository();
         try {
-            sessions = repo.getTokensByUUID(uuid);
+            // Filter and Query the CTS
+            TokenFilter filter = new TokenFilterBuilder()
+                    .returnAttribute(SessionTokenField.SESSION_ID.getField())
+                    .returnAttribute(CoreTokenField.EXPIRY_DATE)
+                    .and()
+                    .withAttribute(CoreTokenField.USER_ID, uuid)
+                    .build();
+            Collection<PartialToken> partialTokens = repo.attributeQuery(filter);
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        "getSessionsFromRepository query success:\n" +
+                        "Query: {0}\n" +
+                        "Count: {1}",
+                        filter,
+                        partialTokens.size()));
+            }
+
+            // Populate the return Map from the query results.
+            Map<String, Long> sessions = new HashMap<String, Long>();
+            for (PartialToken partialToken : partialTokens) {
+                // Session ID
+                String sessionId = partialToken.getValue(SessionTokenField.SESSION_ID.getField());
+
+                // Expiration Date converted to Unix Time
+                Calendar timestamp = partialToken.getValue(CoreTokenField.EXPIRY_DATE);
+                long unixTime = TimeUtils.toUnixTime(timestamp);
+
+                sessions.put(sessionId, unixTime);
+            }
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        "getSessionsFromRepository query results:\n" +
+                        "{0}",
+                        sessions));
+            }
+
+            return sessions;
         } catch (Exception e) {
             debug.error("SessionCount.getSessionsFromRepository: "+
                 "Session repository is not available", e);            
             throw e;
         }
-        return sessions;
     }
 
     /**

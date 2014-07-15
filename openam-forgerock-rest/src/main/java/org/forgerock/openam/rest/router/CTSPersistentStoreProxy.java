@@ -16,20 +16,20 @@
 
 package org.forgerock.openam.rest.router;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.openam.cts.impl.query.PartialToken;
 
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
 
 /**
- * A proxy implementation of the CTSPersistentStore, which delegates all its calls to the "real" implemenation.
+ * A proxy implementation of the CTSPersistentStore, which delegates all its calls to the "real" implementation.
  * <br/>
  * Using this proxy instead of the "real" implementation prevents singletons in the core of OpenAM to be initialised
  * prior to OpenAM being configured. As if this happens then some functions in OpenAM will be broken and a restart will
@@ -93,7 +93,7 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String tokenId) throws DeleteFailedException {
+    public void delete(String tokenId) throws CoreTokenException {
         CTSHolder.get().delete(tokenId);
     }
 
@@ -101,7 +101,7 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
      * {@inheritDoc}
      */
     @Override
-    public int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
+    public int delete(Map<CoreTokenField, Object> query) throws CoreTokenException {
         return CTSHolder.get().delete(query);
     }
 
@@ -109,23 +109,15 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
      * {@inheritDoc}
      */
     @Override
-    public Collection<Token> list(Map<CoreTokenField, Object> query) throws CoreTokenException {
-        return CTSHolder.get().list(query);
+    public Collection<Token> query(TokenFilter filter) throws CoreTokenException {
+        return CTSHolder.get().query(filter);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Collection<Token> list(Filter filter) throws CoreTokenException {
-        return CTSHolder.get().list(filter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Map<String, Long> getTokensByUUID(String uuid) throws CoreTokenException {
-        return CTSHolder.get().getTokensByUUID(uuid);
+    public Collection<PartialToken> attributeQuery(TokenFilter tokenFilter) throws CoreTokenException {
+        return CTSHolder.get().attributeQuery(tokenFilter);
     }
 }

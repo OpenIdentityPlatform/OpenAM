@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +10,11 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
-import org.forgerock.openam.cts.adapters.OAuthValues;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -28,9 +27,6 @@ import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.junit.matchers.JUnitMatchers.hasItems;
 import static org.testng.Assert.assertEquals;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class OAuthValuesTest {
     @Test
     public void shouldStoreDateValue() {

@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +10,12 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.exceptions;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Filter;
@@ -24,8 +24,6 @@ import java.text.MessageFormat;
 
 /**
  * Indicates that a query operation has failed.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class QueryFailedException extends CoreTokenException {
     /**
@@ -38,8 +36,6 @@ public class QueryFailedException extends CoreTokenException {
      */
     public QueryFailedException(Connection connection, DN dn, Filter filter, Throwable cause) {
         super(MessageFormat.format(
-                    "\n" +
-                    CoreTokenConstants.DEBUG_HEADER+
                     "Failed to complete query:\n" +
                     "      DN: {0}\n" +
                     "    Conn: {1}\n" +
@@ -48,5 +44,21 @@ public class QueryFailedException extends CoreTokenException {
                     connection,
                     filter),
                 cause);
+    }
+
+    /**
+     * Creates a formatted error based on the async Query function failing.
+     *
+     * @param tokenFilter The filter used for the query.
+     * @param e The reason for the failure.
+     */
+    public QueryFailedException(TokenFilter tokenFilter, Exception e) {
+        super(MessageFormat.format(
+                    "Query operation Failed:\n" +
+                    "Error:  {0}\n" +
+                    "Filter: {1}",
+                    e.getMessage(),
+                    tokenFilter),
+                e);
     }
 }

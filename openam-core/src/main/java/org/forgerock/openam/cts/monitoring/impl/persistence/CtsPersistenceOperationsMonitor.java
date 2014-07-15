@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-14 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -13,15 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
+ * Copyright 2013-2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.cts.monitoring.impl.persistence;
 
-import java.util.Collection;
-import javax.inject.Inject;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.opendj.ldap.Entry;
+
+import javax.inject.Inject;
+import java.util.Collection;
 
 /**
  * This acts to control the interaction between the exposed monitoring endpoints and the CTS persistence
@@ -49,10 +47,7 @@ public class CtsPersistenceOperationsMonitor {
      * @throws CoreTokenException if there are problems communicating with the persistence store
      */
     public Long getTotalCount() throws CoreTokenException {
-
-        Collection<Entry> results = delegate.getTokenEntries();
-        return (long) results.size();
-
+        return (long) delegate.countAllTokens();
     }
 
     /**
@@ -68,9 +63,7 @@ public class CtsPersistenceOperationsMonitor {
             throw new NullPointerException("TokenType cannot be null.");
         }
 
-        Collection<Entry> results = delegate.getTokenEntries(tokenType);
-
-        return (long) results.size();
+        return (long) delegate.countTokenEntries(tokenType);
     }
 
     /**

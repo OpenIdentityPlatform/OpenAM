@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,27 +10,27 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
-import javax.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.utils.blob.BlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 import org.forgerock.openam.cts.utils.blob.strategies.encryption.DecryptAction;
 import org.forgerock.openam.cts.utils.blob.strategies.encryption.EncryptAction;
+import org.forgerock.util.Reject;
 
+import javax.inject.Inject;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 
 /**
  * Responsible for managing encryption of the Token based on the current Core Token Service
  * configuration.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class EncryptionStrategy implements BlobStrategy {
     private final Debug debug;
@@ -52,20 +50,21 @@ public class EncryptionStrategy implements BlobStrategy {
      *
      * @see org.forgerock.openam.cts.api.tokens.Token#getBlob()
      *
-     * @param token Non null token to encrypt.
+     * @param blob Non null token to encrypt.
      *
      * @return Non null copy of the Token which has been encrypted.
      */
-    public void perform(Token token) throws TokenStrategyFailedException {
+    public byte[] perform(byte[] blob) throws TokenStrategyFailedException {
+        Reject.ifTrue(blob == null);
         try {
-            encyptionAction.setBlob(token.getBlob());
+            encyptionAction.setBlob(blob);
             byte[] encryptedBlob = AccessController.doPrivileged(encyptionAction);
-            token.setBlob(encryptedBlob);
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Encrypted Token");
             }
 
+            return encryptedBlob;
         } catch (PrivilegedActionException e) {
             throw new TokenStrategyFailedException("Failed to encrypt JSON Blob", e);
         }
@@ -76,20 +75,21 @@ public class EncryptionStrategy implements BlobStrategy {
      *
      * @see org.forgerock.openam.cts.api.tokens.Token#getBlob()
      *
-     * @param token Non null Token to decrypt.
+     * @param blob Non null Token to decrypt.
      *
      * @return Non null copy of the Token which has been decrypted.
      */
-    public void reverse(Token token) throws TokenStrategyFailedException {
+    public byte[] reverse(byte[] blob) throws TokenStrategyFailedException {
+        Reject.ifTrue(blob == null);
         try {
-            decyptAction.setBlob(token.getBlob());
+            decyptAction.setBlob(blob);
             byte[] decryptedBlob = AccessController.doPrivileged(decyptAction);
-            token.setBlob(decryptedBlob);
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Decrypted Token");
             }
 
+            return decryptedBlob;
         } catch (PrivilegedActionException e) {
             throw new TokenStrategyFailedException("Failed to decrypt JSON Blob", e);
         }

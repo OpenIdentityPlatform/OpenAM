@@ -48,7 +48,7 @@ public class ShutdownManager {
     
     protected Set[] listeners;
 
-    protected boolean shutdownCalled;
+    protected volatile boolean shutdownCalled;
 
     private ShutdownListener appSSOTokenDestroyer;
 

@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,81 +10,77 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
-import org.forgerock.openam.cts.impl.LDAPAdapter;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultHandler;
-import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 
 import javax.inject.Inject;
-import java.io.Closeable;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 
 /**
- * Responsible for signalling batches of tokens to be deleted using the asynchronous
- * deletion mechanism.
+ * Deletes batches of Token IDs from the persistence layer.
  *
- * This class manages the collection of a connection from the ConnectionFactory, and
- * provides a means of releasing that connection once complete.
- *
- * The caller will decide when to close the connection because we need to ensure that
- * all async deletion operations have been completed before closing the connection.
- *
- * @author robert.wapshott@forgerock.com
+ * This class manages the detail of both the triggering the deletes and also collecting
+ * up the responses to ensure that the operation has been processed asynchronously.
  */
-public class TokenDeletion implements Closeable {
+public class TokenDeletion {
     // Injected
-    private final LDAPAdapter adapter;
-    private final ConnectionFactory factory;
-
-    private Connection connection;
+    private final TaskDispatcher queue;
 
     @Inject
-    public TokenDeletion(LDAPAdapter adapter, ConnectionFactory factory) {
-        this.adapter = adapter;
-        this.factory = factory;
-    }
-
-    /**
-     * @return A connection from the ConnectionFactory if one was available.
-     */
-    private Connection getConnection() throws ErrorResultException {
-        if (connection == null) {
-            connection = factory.getConnection();
-        }
-        return connection;
+    public TokenDeletion(TaskDispatcher queue) {
+        this.queue = queue;
     }
 
     /**
      * Performs a delete against a batch of Token IDs in the search results.
      *
-     * This operation requires that the connection factory provides a valid connection.
-     * If this fails then the operation will return early.
+     * This function will defer to the {@link TaskDispatcher} for deletion requests.
      *
-     * @param entries Non null collection of search results which contain
-     *                Token ID attributes.
-     * @param resultHandler The result handler which will be triggered when the deletion
-     *                      has been completed.
+     * @param tokens The Token ID's to delete.
+     *
+     * @return CountDownLatch A CountDownLatch which can be blocked on to ensure that
+     * the delete tasks have been completed.
+     *
+     * @throws CoreTokenException If there was any problem queuing the delete operation.
      */
-    public void deleteBatch(Collection<Entry> entries, ResultHandler<Result> resultHandler) throws ErrorResultException {
-        for (Entry entry : entries) {
-            String tokenId = entry.getAttribute(CoreTokenField.TOKEN_ID.toString()).firstValueAsString();
-            adapter.deleteAsync(getConnection(), tokenId, resultHandler);
+    public CountDownLatch deleteBatch(Collection<String> tokens) throws CoreTokenException {
+        CountDownLatch latch = new CountDownLatch(tokens.size());
+        ResultHandler<String> handler = new CountdownHandler(latch);
+        for (String token : tokens) {
+            queue.delete(token, handler);
         }
+        return latch;
     }
 
     /**
-     * Release the connection which was acquired by this TokenDeletion.
+     * Internal implementation to ensure that delete operations count down the latch.
      */
-    public void close() {
-        IOUtils.closeIfNotNull(connection);
-        connection = null;
+    private static class CountdownHandler implements ResultHandler<String> {
+        private final CountDownLatch latch;
+        public CountdownHandler(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        @Override
+        public String getResults() throws CoreTokenException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void processResults(String result) {
+            latch.countDown();
+        }
+
+        @Override
+        public void processError(CoreTokenException error) {
+            latch.countDown();
+        }
     }
 }

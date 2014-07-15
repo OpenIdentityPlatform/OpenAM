@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,44 +10,45 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob;
 
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.mock;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class TokenBlobUtilsTest {
+
+    private TokenBlobUtils utils;
+    private Token mockToken;
+
+    @BeforeMethod
+    public void setup() {
+        utils = new TokenBlobUtils();
+        mockToken = mock(Token.class);
+    }
+
     @Test
     public void shouldUseTokenWhenStoringStringAsBlob() throws CoreTokenException {
-        // Given
-        TokenBlobUtils utils = new TokenBlobUtils();
-        Token mockToken = mock(Token.class);
-
-        // When
         utils.setBlobFromString(mockToken, "badger");
-
-        // Then
         verify(mockToken).setBlob(any(byte[].class));
     }
 
     @Test
     public void shouldUseTokenForBlobAsString() throws CoreTokenException, UnsupportedEncodingException {
         // Given
-        TokenBlobUtils utils = new TokenBlobUtils();
-        Token mockToken = mock(Token.class);
         given(mockToken.getBlob()).willReturn("badger".getBytes(TokenBlobUtils.ENCODING));
 
         // When
@@ -63,7 +62,6 @@ public class TokenBlobUtilsTest {
     public void shouldDecodeEncoding() throws CoreTokenException {
         // Given
         String key = "badger";
-        TokenBlobUtils utils = new TokenBlobUtils();
         Token token = new Token("id", TokenType.SESSION);
 
         // When
@@ -72,5 +70,21 @@ public class TokenBlobUtilsTest {
 
         // Then
         assertThat(key).isEqualTo(result);
+    }
+
+    @Test (expectedExceptions = NullPointerException.class)
+    public void shouldNotAllowNullToConvert() throws UnsupportedEncodingException {
+        utils.toUTF8(null);
+    }
+
+    @Test
+    public void shouldReturnNullIfTokenHasNoBinaryDataAssigned() {
+        given(mockToken.getBlob()).willReturn(null);
+        assertThat(utils.getBlobAsString(mockToken)).isNull();
+    }
+
+    @Test (expectedExceptions = NullPointerException.class)
+    public void shouldNotAllNullContentsFromUTF8() throws UnsupportedEncodingException {
+        utils.fromUTF8(null);
     }
 }

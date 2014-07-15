@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,14 +10,17 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob;
 
-import javax.inject.Inject;
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.util.Reject;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +28,6 @@ import java.util.List;
 /**
  * Responsible for selecting the appropriate algorithm for dealing with Token binary objects
  * prior to them being stored in the data store.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class TokenBlobStrategy {
     private final Collection<BlobStrategy> strategies;
@@ -43,32 +42,50 @@ public class TokenBlobStrategy {
     }
 
     /**
-     * Perform the strategy on the Token.
+     * Perform the strategy on the byte array.
      *
-     * Note: This operation will modify the Token.
-     *
-     * @param token Non null Token to perform the strategy on.
+     * @param data Non null byte[] to perform the strategy on.
+     * @return A modified copy of the byte[].
      *
      * @throws TokenStrategyFailedException If an error occurred whilst processing the Token.
      */
-    public void perfom(Token token) throws TokenStrategyFailedException {
-        for (BlobStrategy strategy : strategies) {
-            strategy.perform(token);
-        }
+    public byte[] perform(byte[] data) throws TokenStrategyFailedException {
+        return apply(strategies, true, data);
     }
 
     /**
-     * Performs the reverse strategy on the Token.
+     * Performs the reverse strategy on the byte array.
      *
-     * Note: This operation will modify the Token.
-     *
-     * @param token Non null Token to perform the reverse strategy on.
+     * @param data Non null byte[] to perform the reverse strategy on.
+     * @return A modified copy of the byte[].
      *
      * @throws TokenStrategyFailedException If an error occurred whilst processing the Token.
      */
-    public void reverse(Token token) throws TokenStrategyFailedException {
-        for (BlobStrategy strategy : reverseStrategies) {
-            strategy.reverse(token);
+    public byte[] reverse(byte[] data) throws TokenStrategyFailedException {
+        return apply(reverseStrategies, false, data);
+    }
+
+    /**
+     * Applies the change to the byte[].
+     *
+     * @param strategies Non null strategies to apply.
+     * @param perform True indicates perform, false indicates reverse.
+     * @param data The data to apply the change to.
+     * @return A copy of the data with the change applied.
+     *
+     * @throws TokenStrategyFailedException If there was a problem performing the operation.
+     */
+    private byte[] apply(Collection<BlobStrategy> strategies,
+                         boolean perform, byte[] data) throws TokenStrategyFailedException {
+        Reject.ifTrue(data == null);
+        byte[] r = Arrays.copyOf(data, data.length);
+        for (BlobStrategy strategy : strategies) {
+            if (perform) {
+                r = strategy.perform(r);
+            } else {
+                r = strategy.reverse(r);
+            }
         }
+        return r;
     }
 }

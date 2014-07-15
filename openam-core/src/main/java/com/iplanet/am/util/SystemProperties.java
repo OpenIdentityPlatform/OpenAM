@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock, Inc.
  */
 package com.iplanet.am.util;
 
@@ -372,7 +372,25 @@ public class SystemProperties {
 
         return (value.equalsIgnoreCase(TRUE) ? true : false);
     }
-    
+
+    /**
+     * @param key The System Property key to lookup.
+     * @param defaultValue If the property was not set, or could not be parsed to an int.
+     * @return Either the defaultValue, or the numeric value assigned to the System Property.
+     */
+    public static int getAsInt(String key, int defaultValue) {
+        String value = get(key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     /**
      * Returns all the properties defined and their values.
      * 

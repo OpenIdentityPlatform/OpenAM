@@ -1,6 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +11,11 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
-import javax.inject.Inject;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.SAMLTokenField;
@@ -23,9 +23,10 @@ import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
+import org.forgerock.openam.utils.TimeUtils;
 
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.Calendar;
 
@@ -40,21 +41,19 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
     // Injected
     private final TokenIdFactory tokenIdFactory;
     private final JSONSerialisation serialisation;
-    private final LDAPDataConversion dataConversion;
     private final TokenBlobUtils blobUtils;
 
     /**
-     * Default constructor with dependencies exposed.
+     * Create a default instance of the SAMLAdapter.
      *
-     * @param tokenIdFactory Non null.
-     * @param serialisation Non null.
+     * @param tokenIdFactory Required for generating ID for Tokens.
+     * @param serialisation Required for handling serialisation.
+     * @param blobUtils Required for converting the TokenBlob.
      */
     @Inject
-    public SAMLAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation,
-                       LDAPDataConversion dataConversion, TokenBlobUtils blobUtils) {
+    public SAMLAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation, TokenBlobUtils blobUtils) {
         this.tokenIdFactory = tokenIdFactory;
         this.serialisation = serialisation;
-        this.dataConversion = dataConversion;
         this.blobUtils = blobUtils;
     }
 
@@ -72,7 +71,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         Token token = new Token(tokenId, TokenType.SAML2);
 
         // Expiry Date
-        Calendar timestamp = dataConversion.fromEpochedSeconds(samlToken.getExpiryTime());
+        Calendar timestamp = TimeUtils.fromUnixTime(samlToken.getExpiryTime());
         token.setExpiryTimestamp(timestamp);
 
         // Persist the SAML token class, because there is no obvious hierarchy to the SAML tokens.
@@ -122,7 +121,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         Object blob = serialisation.deserialise(jsonBlob, c);
 
         // Expiry Date
-        long expiryTime = dataConversion.toEpochedSeconds(token.getExpiryTimestamp());
+        long expiryTime = TimeUtils.toUnixTime(token.getExpiryTimestamp());
 
         // Secondary Key
         String secondaryKey = token.getValue(SAMLTokenField.SECONDARY_KEY.getField());

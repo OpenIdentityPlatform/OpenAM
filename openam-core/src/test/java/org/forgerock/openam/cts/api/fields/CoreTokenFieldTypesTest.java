@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,19 +10,19 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.api.fields;
 
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
-import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
+import org.fest.assertions.Assertions;
+import org.fest.assertions.Condition;
+import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class CoreTokenFieldTypesTest {
     @Test
     public void shouldValidateIntegerField() throws CoreTokenException {
@@ -74,5 +72,24 @@ public class CoreTokenFieldTypesTest {
 
         // When / Then
         CoreTokenFieldTypes.validateType(key, value);
+    }
+
+    @Test
+    public void shouldEnsureAllFieldTypesHaveAValidationType() {
+        for (CoreTokenField field : CoreTokenField.values()) {
+            // Ignore read only fields.
+            if (Token.isFieldReadOnly(field)) {
+                continue;
+            }
+
+            Assertions.assertThat(field).satisfies(new Condition<Object>("has valid type") {
+                @Override
+                public boolean matches(Object t) {
+                    CoreTokenField obj = (CoreTokenField) t;
+                    return CoreTokenFieldTypes.isByteArray(obj) || CoreTokenFieldTypes.isCalendar(obj)
+                            || CoreTokenFieldTypes.isInteger(obj) || CoreTokenFieldTypes.isString(obj);
+                }
+            });
+        }
     }
 }

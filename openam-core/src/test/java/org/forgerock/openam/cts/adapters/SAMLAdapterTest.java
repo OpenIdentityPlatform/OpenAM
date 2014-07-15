@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -23,7 +23,6 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.KeyConversion;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -35,13 +34,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class SAMLAdapterTest {
 
     private JSONSerialisation serialisation;
-    private LDAPDataConversion dataConversion;
     private SAMLAdapter adapter;
     private TokenIdFactory tokenIdFactory;
     private TokenBlobUtils blobUtils;
@@ -50,12 +45,11 @@ public class SAMLAdapterTest {
     @BeforeMethod
     public void setup() {
         serialisation = mock(JSONSerialisation.class);
-        dataConversion = mock(LDAPDataConversion.class);
         tokenIdFactory = mock(TokenIdFactory.class);
         blobUtils = mock(TokenBlobUtils.class);
         encoding = mock(KeyConversion.class);
 
-        adapter = new SAMLAdapter(tokenIdFactory, serialisation, dataConversion, blobUtils);
+        adapter = new SAMLAdapter(tokenIdFactory, serialisation, blobUtils);
     }
 
     @Test
@@ -66,7 +60,6 @@ public class SAMLAdapterTest {
         adapter = new SAMLAdapter(
                 new TokenIdFactory(encoding),
                 new JSONSerialisation(),
-                new LDAPDataConversion(),
                 new TokenBlobUtils());
 
         String tokenId = "badger";

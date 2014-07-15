@@ -1,6 +1,5 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,22 +11,27 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.utils.ModifiedProperty;
 
 import javax.inject.Inject;
 
 /**
- * Responsible for modelling the external configuration options for the Core Token Service.
+ * Models the external configuration of the Core Token Service.
  *
- * These
+ * This model is used by the {@link CTSConnectionFactory} to establish a connection to the
+ * persistence layer.
  *
- * @author robert.wapshott@forgerock.com
+ * @see CTSConnectionFactory
  */
 public class ExternalTokenConfig {
 
@@ -137,12 +141,12 @@ public class ExternalTokenConfig {
      * Causes this instance to refresh its configuration using System Properties.
      */
     public void update() {
-        hostname.set(SystemProperties.get(Constants.CTS_STORE_HOSTNAME));
-        port.set(SystemProperties.get(Constants.CTS_STORE_PORT));
-        username.set(SystemProperties.get(Constants.CTS_STORE_USERNAME));
-        password.set(SystemProperties.get(Constants.CTS_STORE_PASSWORD));
-        maxConnections.set(SystemProperties.get(Constants.CTS_MAX_CONNECTIONS));
-        sslMode.set(SystemProperties.getAsBoolean(Constants.CTS_SSL_ENABLED, false));
+        hostname.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
+        port.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PORT));
+        username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
+        password.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD));
+        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_MAX_CONNECTIONS));
+        sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_SSL_ENABLED, false));
 
         String heartbeatStr = SystemProperties.get(Constants.LDAP_HEARTBEAT);
         if (StringUtils.isNotEmpty(heartbeatStr)) {
@@ -155,7 +159,7 @@ public class ExternalTokenConfig {
             heartbeat.set(new Integer(-1));
         }
 
-        String mode = SystemProperties.get(Constants.CTS_STORE_LOCATION);
+        String mode = SystemProperties.get(CoreTokenConstants.CTS_STORE_LOCATION);
         if (StringUtils.isNotEmpty(mode)) {
             storeMode.set(StoreMode.valueOf(mode.toUpperCase()));
         } else {

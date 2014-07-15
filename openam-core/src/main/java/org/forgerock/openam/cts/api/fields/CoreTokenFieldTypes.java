@@ -102,6 +102,7 @@ public class CoreTokenFieldTypes {
         // Intentional fall-through
         switch (field) {
             case EXPIRY_DATE:
+            case CREATE_TIMESTAMP:
             case DATE_ONE:
             case DATE_TWO:
             case DATE_THREE:

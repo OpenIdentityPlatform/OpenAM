@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,57 +10,20 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
-import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
-import org.forgerock.openam.cts.utils.blob.strategies.CompressionStrategy;
-import org.mockito.ArgumentCaptor;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertTrue;
+import static org.fest.assertions.Assertions.assertThat;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class CompressionStrategyTest {
-    private final CompressionStrategy compression = new CompressionStrategy();
-
-    @Test
-    public void shouldUpdateToken() throws TokenStrategyFailedException {
-        // Given
-        Token token = mock(Token.class);
-        byte[] testData = JSON_SAMPLE.getBytes();
-        given(token.getBlob()).willReturn(testData);
-
-        // When
-        compression.perform(token);
-
-        // Then
-        verify(token).setBlob(any(byte[].class));
-    }
-
-    @Test
-    public void shouldCompressContents() throws TokenStrategyFailedException {
-        // Given
-        Token token = mock(Token.class);
-        byte[] testData = JSON_SAMPLE.getBytes();
-        given(token.getBlob()).willReturn(testData);
-
-        // When
-        compression.perform(token);
-
-        // Then
-        ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
-        verify(token).setBlob(captor.capture());
-        byte[] result = captor.getValue();
-        assertTrue(result.length < testData.length);
-    }
+    private CompressionStrategy compression;
+    private byte[] data;
 
     private static final String JSON_SAMPLE = "{\"clientDomain\":\"dc=openam,dc=forgerock,dc=org\",\"" +
             "clientID\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"cookieMode\":null,\"" +
@@ -95,4 +56,30 @@ public class CompressionStrategyTest {
             "ncipal\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\"},\"sessionState\":1,\"sessionTyp" +
             "e\":0,\"timedOutAt\":0,\"uuid\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"version" +
             "\":0,\"willExpireFlag\":true}";
+
+    @BeforeMethod
+    public void setUp() throws Exception {
+        data = JSON_SAMPLE.getBytes();
+        compression = new CompressionStrategy();
+    }
+
+    @Test (expectedExceptions = IllegalArgumentException.class)
+    public void shouldRejectIfNullBlobOnPerform() throws TokenStrategyFailedException {
+        compression.perform(null);
+    }
+
+    @Test (expectedExceptions = IllegalArgumentException.class)
+    public void shouldRejectIfNullBlobOnReverse() throws TokenStrategyFailedException {
+        compression.reverse(null);
+    }
+
+    @Test
+    public void shouldCompressContents() throws TokenStrategyFailedException {
+        assertThat(compression.perform(data).length).isLessThan(data.length);
+    }
+
+    @Test
+    public void shouldDecompressCompressedContents() throws TokenStrategyFailedException {
+        assertThat(compression.reverse(compression.perform(data))).isEqualTo(data);
+    }
 }

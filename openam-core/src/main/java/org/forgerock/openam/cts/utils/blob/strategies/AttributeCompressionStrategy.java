@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,25 +10,29 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob.strategies;
 
-import javax.inject.Inject;
 import com.iplanet.dpro.session.service.InternalSession;
-import org.forgerock.openam.cts.api.TokenType;
-import org.forgerock.openam.cts.api.tokens.Token;
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.cts.utils.blob.BlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
-import org.apache.commons.collections.BidiMap;
-import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.forgerock.util.Reject;
 
+import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Responsible for performing a specialised JSON compression based on the
@@ -42,8 +44,6 @@ import java.util.List;
  *
  * This approach is however brittle and only recommended if it will make
  * the required difference in performance.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class AttributeCompressionStrategy implements BlobStrategy {
     // Injected
@@ -55,6 +55,7 @@ public class AttributeCompressionStrategy implements BlobStrategy {
     public AttributeCompressionStrategy(TokenBlobUtils blobUtils) {
         this.blobUtils = blobUtils;
 
+        // Initialise the field names of the InternalSession into the map
         for (Field f : getAllValidFields(InternalSession.class)) {
             String fieldName = f.getName();
             replacement.put(fieldName, getInitials(fieldName));
@@ -63,59 +64,84 @@ public class AttributeCompressionStrategy implements BlobStrategy {
 
     /**
      * Ensures the Token is a Session Token and performs the compression.
-     * @param token {@inheritDoc}
-     * @throws org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException {@inheritDoc}
+     * @param blob {@inheritDoc}
+     * @throws TokenStrategyFailedException {@inheritDoc}
      */
-    public void perform(Token token) throws TokenStrategyFailedException {
-        if (!isTokenValidForCompression(token)) {
-            return;
+    public byte[] perform(byte[] blob) throws TokenStrategyFailedException {
+        Reject.ifTrue(blob == null);
+        if (!isTokenValidForCompression(blob)) {
+            return blob;
         }
 
-        performUpdate(token, replacement);
+        return performUpdate(blob, replacement);
     }
 
     /**
      * Ensures the Token is a Session Token and reverses the compression.
-     * @param token {@inheritDoc}
+     * @param blob {@inheritDoc}
      * @throws TokenStrategyFailedException {@inheritDoc}
      */
-    public void reverse(Token token) throws TokenStrategyFailedException {
-        if (!isTokenValidForCompression(token)) {
-            return;
+    public byte[] reverse(byte[] blob) throws TokenStrategyFailedException {
+        Reject.ifTrue(blob == null);
+        if (!isTokenValidForCompression(blob)) {
+            return blob;
         }
 
-        performUpdate(token, replacement.inverseBidiMap());
+        return performUpdate(blob, replacement.inverseBidiMap());
     }
 
     /**
-     * A simple heuristic for determining the Token is a Session Token containing JSON.
+     * A heuristic for identifying the contents of the binary data. The objective is to
+     * determine if the binary data contains a serialised Session Object.
      *
-     * @param token Non null Token to examine.
-     * @return True if it starts and ends with curly brackets.
+     * @param blob Non null Token to examine.
+     * @return True if the various points of the heuristic match. False if any fail to match.
      */
-    private boolean isTokenValidForCompression(Token token) {
-        if (token.getType() != TokenType.SESSION) {
+    @SuppressWarnings("unchecked")
+    private boolean isTokenValidForCompression(byte[] blob) {
+        if (blob == null) {
             return false;
         }
 
-        if (token.getBlob() == null) {
+        String contents;
+        try {
+            contents = blobUtils.toUTF8(blob);
+        } catch (UnsupportedEncodingException e) {
             return false;
         }
 
-        String contents = blobUtils.getBlobAsString(token);
-        return contents.startsWith("{") && contents.endsWith("}");
+        if (!contents.startsWith("{")) {
+            return false;
+        }
+
+        if (!contents.endsWith("}")) {
+            return false;
+        }
+
+        Set<String> keys = new HashSet<String>();
+        keys.addAll(replacement.keySet());
+        keys.addAll(replacement.values());
+        for (String key : keys) {
+            if (contents.contains(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Update the Token with the compressed contents.
-     * @param token Non null
+     *
+     * @param data The binary data to convert.
      * @param map Non null
-     * @throws TokenStrategyFailedException If any error occured.
+     * @throws TokenStrategyFailedException If any error occurred.
      */
-    private void performUpdate(Token token, BidiMap map) throws TokenStrategyFailedException {
-        String contents = blobUtils.getBlobAsString(token);
-        String replace = applyReplacement(map, contents);
-        blobUtils.setBlobFromString(token, replace);
+    private byte[] performUpdate(byte[] data, BidiMap map) throws TokenStrategyFailedException {
+        try {
+            return blobUtils.fromUTF8(applyReplacement(map, blobUtils.toUTF8(data)));
+        } catch (UnsupportedEncodingException e) {
+            throw new TokenStrategyFailedException(e);
+        }
     }
 
     /**

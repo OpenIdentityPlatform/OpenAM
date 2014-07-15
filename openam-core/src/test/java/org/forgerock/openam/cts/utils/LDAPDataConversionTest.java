@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +10,11 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -23,9 +22,6 @@ import java.util.TimeZone;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class LDAPDataConversionTest {
     // Reference time zones useful for testing.
     public final static TimeZone CHICAGO = TimeZone.getTimeZone("America/Chicago");
@@ -47,21 +43,5 @@ public class LDAPDataConversionTest {
         // Then
         assertEquals(result.getTimeInMillis(), calendar.getTimeInMillis());
         assertEquals(result.getTimeZone().getRawOffset(), calendar.getTimeZone().getRawOffset());
-    }
-
-    @Test
-    public void shouldConvertTimeToEpochedTimeAndBackAgain() {
-        // Given
-        LDAPDataConversion conversion = new LDAPDataConversion();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        // When
-        Calendar result = conversion.fromEpochedSeconds(conversion.toEpochedSeconds(calendar));
-
-        // Then
-        assertEquals(result.getTimeInMillis(), calendar.getTimeInMillis());
     }
 }

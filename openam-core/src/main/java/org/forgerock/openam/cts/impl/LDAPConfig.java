@@ -1,6 +1,5 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,15 +11,18 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
-import javax.inject.Inject;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.utils.ModifiedProperty;
 import org.forgerock.opendj.ldap.DN;
+
+import javax.inject.Inject;
 
 /**
  * Responsible for storing the configuration required by the LDAP implementation of the
@@ -28,8 +30,6 @@ import org.forgerock.opendj.ldap.DN;
  *
  * Note: This configuration data is partitioned into the impl package as it represents the
  * boundary of LDAP concepts within the Core Token Service code.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class LDAPConfig {
     private final DN defaultCTSRootSuffix;
@@ -72,6 +72,6 @@ public class LDAPConfig {
      * Will update its configuration from the System Properties.
      */
     public void update() {
-        tokenStoreRootSuffix.set(SystemProperties.get(Constants.CTS_ROOT_SUFFIX));
+        tokenStoreRootSuffix.set(SystemProperties.get(CoreTokenConstants.CTS_ROOT_SUFFIX));
     }
 }

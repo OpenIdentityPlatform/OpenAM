@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -19,7 +19,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
-import org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
+import com.sun.identity.common.ShutdownManagerWrapper;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -31,19 +31,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 /**
  * Unit test for IndexTresServiceImpl.
- *
- * @author andrew.forrest@forgerock.com
  */
 public class IndexTreeServiceImplTest {
 

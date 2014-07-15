@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,30 +10,23 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.time.StopWatch;
-import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.impl.query.QueryPageIterator;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQueryFactory;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.ResultHandler;
-import org.forgerock.opendj.ldap.responses.Result;
 
 import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -43,9 +34,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Responsible for the scheduled deletion of expired Tokens.
  *
- * This implementation consists a paged query (that is, one where results are returned
- * in pages) which is performed against the Directory and the results are scheduled for
- * deletion using the SDK provided asynchronous call.
+ * This implementation makes use of an LDAP specific concept of a paged query (that is,
+ * one where results are returned in pages) which is performed against the persistent store
+ * and the results are scheduled for deletion using the SDK provided asynchronous call.
  *
  * The LDAP SDK is responsible for managing the scheduling around asynchronous tasks and
  * as such simplifies the implementation to one that queries the results and delegates the
@@ -55,38 +46,35 @@ import java.util.concurrent.CountDownLatch;
  * complete before we close the connection to the Directory. Otherwise we risk closing a
  * connection that has pending operations on it.
  *
- * This class is not responsible for scheduling. See the {@link CTSReaperWatchDog} instead.
+ * This class is not responsible for scheduling and is expected to be scheduled according
+ * to system configuration.
  *
- * @author robert.wapshott@forgerock.com
+ * Thread Policy: This runnable will respond to Thread interrupts and will exit cleanly
+ * when interrupted.
  */
 public class CTSReaper implements Runnable {
-
     // Injected
-    private final QueryFactory factory;
-    private final CoreTokenConfig config;
     private final TokenDeletion tokenDeletion;
-    private final Debug debug;
+    private final ReaperQueryFactory queryFactory;
     private final CTSReaperMonitoringStore monitoringStore;
+    private final Debug debug;
 
-    private final Calendar calendar = Calendar.getInstance();
 
     /**
      * Create an instance, but do not schedule the instance for execution.
      *
-     * @param factory Required for generating queries against the directory.
-     * @param config Required for providing runtime configuration.
      * @param tokenDeletion Required for deleting tokens.
      * @param monitoringStore Required for monitoring reaper runs.
+     * @param debug Required for debugging.
      */
     @Inject
-    public CTSReaper(final QueryFactory factory, final CoreTokenConfig config, final TokenDeletion tokenDeletion,
-            @Named(CoreTokenConstants.CTS_REAPER_DEBUG) final Debug debug,
-            final CTSReaperMonitoringStore monitoringStore) {
-        this.factory = factory;
-        this.config = config;
+    public CTSReaper(final ReaperQueryFactory queryFactory, final TokenDeletion tokenDeletion,
+                     final CTSReaperMonitoringStore monitoringStore,
+                     @Named(CoreTokenConstants.CTS_REAPER_DEBUG) final Debug debug) {
+        this.queryFactory = queryFactory;
         this.tokenDeletion = tokenDeletion;
-        this.debug = debug;
         this.monitoringStore = monitoringStore;
+        this.debug = debug;
     }
 
     /**
@@ -95,65 +83,40 @@ public class CTSReaper implements Runnable {
      * not complete until all of the delete operations have returned.
      */
     public void run() {
+
+        debug("Reaper starting");
+
         // Timers for debugging
         StopWatch query = new StopWatch();
         StopWatch waiting = new StopWatch();
 
-        // Latches will track each page of results
+        // Latches will track deletion of each page of results
         List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
 
-        // Create the query against the directory
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        Filter expired = factory.createFilter().and().beforeDate(calendar).build();
-        QueryBuilder queryBuilder = factory.createInstance()
-                .withFilter(expired)
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID);
-        QueryPageIterator iterator = new QueryPageIterator(queryBuilder, config.getCleanupPageSize());
-
-        query.start();
-        long total = 0;
+        ReaperQuery reaperQuery = queryFactory.getQuery();
 
         try {
-            // Iterate over the result pages
-            while (iterator.hasNext()) {
-                Collection<Entry> entries = iterator.next();
-                total += entries.size();
-
+            long total = 0;
+            query.start();
+            for (Collection<String> ids = reaperQuery.nextPage(); ids != null; ids = reaperQuery.nextPage()) {
                 // If the thread has been interrupted, exit all processing.
                 if (Thread.interrupted()) {
+                    Thread.currentThread().interrupt();
+                    debug("Interrupted, returning");
                     return;
                 }
+
+                total += ids.size();
+                debug("Queried {0} tokens", Long.toString(total));
 
                 // Latch will track the deletions of the page
-                CountDownLatch latch = new CountDownLatch(entries.size());
-                DeleteComplete complete = new DeleteComplete(latch);
-                latches.add(latch);
-
-                // Delete the tokens.
-                try {
-                    tokenDeletion.deleteBatch(entries, complete);
-                } catch (ErrorResultException e) {
-                    debug.error("Failed to get a connection, will retry later", e);
-                    return;
-                }
-
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Reaper: Queried {0} Tokens",
-                            total));
-                }
+                latches.add(tokenDeletion.deleteBatch(ids));
             }
 
             query.stop();
             waiting.start();
 
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                        "Reaper: Expired Token Query Time: {0}ms",
-                        query.getTime()));
-            }
+            debug("Expired Token Query Time: {0}ms", Long.toString(query.getTime()));
 
             // Wait stage
             for (CountDownLatch latch : latches) {
@@ -167,37 +130,19 @@ public class CTSReaper implements Runnable {
             waiting.stop();
             monitoringStore.addReaperRun(query.getStartTime(), query.getTime() + waiting.getTime(), total);
 
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                                "Reaper: Worker threads Time: {0}ms",
-                        waiting.getTime()));
-            }
-        } finally {
-            // Once all latches are complete, close the TokenDeletion
-            IOUtils.closeIfNotNull(tokenDeletion);
+            debug("Worker threads Time: {0}ms", Long.toString(waiting.getTime()));
+        } catch (CoreTokenException e) {
+            debug.error("CTS Reaper failed", e);
         }
+
+        debug("Reaper complete");
     }
 
-    /**
-     * DeleteComplete implements the standard LDAP ResultHandler and will indicate that the
-     * request has completed or failed. In either case we are only interested in decrementing
-     * the provided CountDownLatch.
-     */
-    private class DeleteComplete implements ResultHandler<Result> {
-        private final CountDownLatch latch;
-
-        private DeleteComplete(CountDownLatch latch) {
-            this.latch = latch;
-        }
-
-        public void handleErrorResult(ErrorResultException e) {
-            debug.error("Failed to delete Token", e);
-            latch.countDown();
-        }
-
-        public void handleResult(Result result) {
-            latch.countDown();
+    private void debug(String msg, String... args) {
+        if (debug.messageEnabled()) {
+            debug.message(MessageFormat.format(
+                    CoreTokenConstants.DEBUG_HEADER + "Reaper: " + msg,
+                    args));
         }
     }
 }

@@ -55,7 +55,7 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 
 import java.security.AccessController;
@@ -271,7 +271,7 @@ public class ClientResource  implements CollectionResourceProvider {
             query.put(OAuthTokenField.CLIENT_ID.getField(), resourceId);
             try {
                 store.delete(query);
-            } catch (DeleteFailedException e) {
+            } catch (CoreTokenException e) {
                 if (auditLogger.isAuditLogEnabled()) {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                     auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);

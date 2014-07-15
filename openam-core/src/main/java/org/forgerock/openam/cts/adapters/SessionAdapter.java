@@ -22,9 +22,9 @@ import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
+import org.forgerock.openam.utils.TimeUtils;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
@@ -44,7 +44,6 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
     private final TokenIdFactory tokenIdFactory;
     private final CoreTokenConfig config;
     private final JSONSerialisation serialisation;
-    private final LDAPDataConversion dataConversion;
     private final TokenBlobUtils blobUtils;
 
     /**
@@ -62,12 +61,10 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      */
     @Inject
     public SessionAdapter(TokenIdFactory tokenIdFactory, CoreTokenConfig config,
-                          JSONSerialisation serialisation, LDAPDataConversion dataConversion,
-                          TokenBlobUtils blobUtils) {
+                          JSONSerialisation serialisation, TokenBlobUtils blobUtils) {
         this.tokenIdFactory = tokenIdFactory;
         this.config = config;
         this.serialisation = serialisation;
-        this.dataConversion = dataConversion;
         this.blobUtils = blobUtils;
     }
 
@@ -91,8 +88,8 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         token.setUserId(userId);
 
         // Expiry Date
-        long epochedTimeInSeconds = session.getExpirationTime() + config.getSessionExpiryGracePeriod();
-        Calendar expiryTimeStamp = dataConversion.fromEpochedSeconds(epochedTimeInSeconds);
+        long unitTime = session.getExpirationTime() + config.getSessionExpiryGracePeriod();
+        Calendar expiryTimeStamp = TimeUtils.fromUnixTime(unitTime);
         token.setExpiryTimestamp(expiryTimeStamp);
 
         // SessionID

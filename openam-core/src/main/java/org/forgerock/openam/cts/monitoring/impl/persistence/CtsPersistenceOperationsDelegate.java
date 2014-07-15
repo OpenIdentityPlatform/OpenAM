@@ -1,76 +1,73 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2014 ForgeRock AS.
-*/
-
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
+ */
 package org.forgerock.openam.cts.monitoring.impl.persistence;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import javax.inject.Inject;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.Filter;
+import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.utils.TimeUtils;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 
 /**
  * Used to query the CTS persistence store and return data to the monitoring service
  */
 public class CtsPersistenceOperationsDelegate {
 
-    private final LDAPDataConversion dataConversion;
-    private final QueryFactory factory;
+    private final CTSPersistentStore store;
 
     @Inject
-    public CtsPersistenceOperationsDelegate(LDAPDataConversion dataConversion, QueryFactory factory) {
-        this.dataConversion = dataConversion;
-        this.factory = factory;
+    public CtsPersistenceOperationsDelegate(CTSPersistentStore store) {
+        this.store = store;
     }
 
     /**
-     * Gathers (just the TOKEN_IDs) from the persistence store the current tokens
+     * Counts the number of tokens in the persistent store that match the requested type.
      *
      * @param tokenType The type of token for which we are gathering results
-     * @return
+     * @return Zero or positive integer of the number of tokens in the store.
      * @throws CoreTokenException
      */
-    public Collection<Entry> getTokenEntries(TokenType tokenType) throws CoreTokenException {
+    public int countTokenEntries(TokenType tokenType) throws CoreTokenException {
 
         //create the filter to restrict by token type
-        final Filter filter = factory.createFilter().and().attribute(CoreTokenField.TOKEN_TYPE, tokenType).build();
-
-        return factory.createInstance()
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID)
-                .withFilter(filter)
-                .executeRawResults();
+        final TokenFilter tokenFilter = new TokenFilterBuilder()
+                .returnAttribute(CoreTokenField.TOKEN_ID)
+                .and()
+                .withAttribute(CoreTokenField.TOKEN_TYPE, tokenType)
+                .build();
+        return store.attributeQuery(tokenFilter).size();
     }
 
     /**
-     * Gathers (just the TOKEN_IDs) from the persistence store the current tokens
+     * Counts all Tokens within the CTS Persistent store. All tokens are considered regardless of TokenType.
      *
-     * @return A {@link Collection} of {@link Entry}s, one for each token in the store
+     * @return Zero or positive integer.
      * @throws CoreTokenException if there are issues talking with the CTS
      */
-    public Collection<Entry> getTokenEntries() throws CoreTokenException {
-
-        return factory.createInstance()
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID)
-                .executeRawResults();
+    public int countAllTokens() throws CoreTokenException {
+        TokenFilter filter = new TokenFilterBuilder().returnAttribute(CoreTokenField.TOKEN_ID).build();
+        return store.attributeQuery(filter).size();
     }
 
     /**
@@ -84,19 +81,17 @@ public class CtsPersistenceOperationsDelegate {
 
         final Collection<Long> results = new ArrayList<Long>();
 
-        final long currentEpochTime = dataConversion.currentEpochedSeconds();
+        final long unixTime = TimeUtils.currentUnixTime();
 
-        final Filter filter = factory.createFilter().and().attribute(CoreTokenField.TOKEN_TYPE, tokenType).build();
+        final TokenFilter filter = new TokenFilterBuilder()
+                .returnAttribute(CoreTokenField.CREATE_TIMESTAMP)
+                .and()
+                .withAttribute(CoreTokenField.TOKEN_TYPE, tokenType)
+                .build();
 
-        final Collection<Entry> queryResults = factory.createInstance()
-                .returnTheseAttributes(CoreTokenField.CREATE_TIMESTAMP)
-                .withFilter(filter)
-                .executeRawResults();
-
-        for (Entry entry : queryResults) {
-            String dateString = entry.getAttribute(CoreTokenField.CREATE_TIMESTAMP.toString()).firstValueAsString();
-            Calendar timestamp = dataConversion.fromLDAPDate(dateString);
-            results.add(currentEpochTime - dataConversion.toEpochedSeconds(timestamp));
+        for (PartialToken token : store.attributeQuery(filter)) {
+            Calendar timestamp = token.getValue(CoreTokenField.CREATE_TIMESTAMP);
+            results.add(unixTime - TimeUtils.toUnixTime(timestamp));
         }
 
         return results;

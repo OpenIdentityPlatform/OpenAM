@@ -16,17 +16,15 @@
 
 package org.forgerock.openam.oauth2;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.opendj.ldap.Filter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,9 +45,6 @@ public class OAuthTokenStore {
     private final CTSPersistentStore cts;
     private final TokenAdapter<JsonValue> tokenAdapter;
     private final TokenIdFactory tokenIdFactory;
-
-    private static final LDAPDataConversion conversion = new LDAPDataConversion();
-    private static final QueryFilter queryFilter = new QueryFilter(conversion);
 
     /**
      * Constructs a new OAuthTokenStore instance.
@@ -106,9 +101,9 @@ public class OAuthTokenStore {
      * Deletes a token with the specified id.
      *
      * @param id The token's id.
-     * @throws DeleteFailedException If there is a problem deleting the token.
+     * @throws CoreTokenException If there is a problem deleting the token.
      */
-    public void delete(String id) throws DeleteFailedException {
+    public void delete(String id) throws CoreTokenException {
         cts.delete(id);
     }
 
@@ -120,7 +115,7 @@ public class OAuthTokenStore {
      * @throws CoreTokenException If there is a problem performing the query.
      */
     public JsonValue query(Map<String, Object> queryParameters) throws CoreTokenException {
-        Collection<Token> tokens = cts.list(convertRequest(queryParameters));
+        Collection<Token> tokens = cts.query(convertRequest(queryParameters));
         return convertResults(tokens);
     }
 
@@ -130,12 +125,12 @@ public class OAuthTokenStore {
      * @param filters A Map of filter parameters.
      * @return A Mapping of CoreTokenField to Objects to query by.
      */
-    private Filter convertRequest(Map<String, Object> filters) {
+    private TokenFilter convertRequest(Map<String, Object> filters) {
 
-        QueryFilter.QueryFilterBuilder builder = queryFilter.or();
+        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().or();
         for (OAuthTokenField field : OAuthTokenField.values()) {
             if (filters.containsKey(field.getOAuthField())) {
-                builder.attribute(field.getField(), filters.get(field.getOAuthField()));
+                builder.withAttribute(field.getField(), filters.get(field.getOAuthField()));
             }
         }
 

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -23,15 +23,15 @@ import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManagementDAO;
 import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
-import org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
-import org.forgerock.openam.entitlement.indextree.events.ModificationEvent;
-import org.forgerock.openam.entitlement.indextree.events.ModificationEventType;
 import org.forgerock.openam.entitlement.indextree.events.ErrorEventType;
 import org.forgerock.openam.entitlement.indextree.events.EventType;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeEvent;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObserver;
+import org.forgerock.openam.entitlement.indextree.events.ModificationEvent;
+import org.forgerock.openam.entitlement.indextree.events.ModificationEventType;
 import org.forgerock.openam.entitlement.utils.indextree.IndexRuleTree;
 import org.forgerock.openam.entitlement.utils.indextree.SimpleReferenceTree;
+import com.sun.identity.common.ShutdownManagerWrapper;
 
 import javax.inject.Inject;
 import java.security.AccessController;

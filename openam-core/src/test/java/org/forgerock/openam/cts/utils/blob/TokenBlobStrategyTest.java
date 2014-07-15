@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,29 +10,25 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils.blob;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.utils.blob.BlobStrategy;
-import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
-import org.forgerock.openam.cts.utils.blob.TokenStrategyFactory;
-import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
+import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Fail.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class TokenBlobStrategyTest {
     private CoreTokenConfig config;
     private TokenStrategyFactory factory;
@@ -55,17 +49,17 @@ public class TokenBlobStrategyTest {
         given(factory.getStrategies(any(CoreTokenConfig.class)))
                 .willReturn(Arrays.asList(first, second, third));
 
-        Token mockToken = mock(Token.class);
+        byte[] data = new byte[0];
 
         TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
 
         // When
-        strategy.perfom(mockToken);
+        strategy.perform(data);
 
         // Then
-        verify(first).perform(mockToken);
-        verify(second).perform(mockToken);
-        verify(third).perform(mockToken);
+        verify(first).perform(any(byte[].class));
+        verify(second).perform(any(byte[].class));
+        verify(third).perform(any(byte[].class));
     }
 
     @Test
@@ -78,29 +72,52 @@ public class TokenBlobStrategyTest {
         given(factory.getStrategies(any(CoreTokenConfig.class)))
                 .willReturn(Arrays.asList(first, second, third));
 
-        Token mockToken = mock(Token.class);
+        byte[] data = new byte[0];
 
         TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
 
         // When
-        strategy.reverse(mockToken);
+        strategy.reverse(data);
 
         // Then
-        verify(first).reverse(mockToken);
-        verify(second).reverse(mockToken);
-        verify(third).reverse(mockToken);
+        verify(first).reverse(any(byte[].class));
+        verify(second).reverse(any(byte[].class));
+        verify(third).reverse(any(byte[].class));
     }
 
     @Test
     public void shouldDoNothingWithNoStrategy() throws TokenStrategyFailedException {
         // Given
-        Token mockToken = mock(Token.class);
+        byte[] data = new byte[0];
         TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
 
         // When
-        strategy.perfom(mockToken);
+        byte[] result = strategy.perform(data);
 
         // Then
-        verify(mockToken, times(0)).getBlob();
+        assertThat(result).isEqualTo(data);
+    }
+
+    @Test
+    public void shouldNotModifyProvidedByteArray() throws TokenStrategyFailedException {
+        // Given
+        byte[] data = "badger".getBytes();
+
+        BlobStrategy first = mock(BlobStrategy.class);
+        ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
+        given(first.perform(captor.capture())).willReturn(data);
+
+        given(factory.getStrategies(any(CoreTokenConfig.class))).willReturn(Arrays.asList(first));
+        TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
+
+        // When
+        strategy.perform(data);
+
+        // Then
+        Object dataRef = data;
+        Object captorRef = captor.getValue();
+        if (dataRef == captorRef) { // Verify the references are different (the contents will be the same)
+            fail();
+        }
     }
 }

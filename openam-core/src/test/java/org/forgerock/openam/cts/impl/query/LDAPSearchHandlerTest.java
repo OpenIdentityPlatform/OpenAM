@@ -1,6 +1,4 @@
-/**
- * Copyright 2013-2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,88 +10,51 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.SearchResultReferenceIOException;
+import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
-import org.forgerock.opendj.ldap.responses.Result;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.Collection;
+import java.util.Collections;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class LDAPSearchHandlerTest {
 
-    protected LDAPConfig mockConstants;
-    protected ConnectionFactory mockFactory;
+    protected LDAPConfig mockConfig;
     protected Connection mockConnection;
     protected SearchRequest mockRequest;
     protected LDAPSearchHandler handler;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        mockConstants = mock(LDAPConfig.class);
-        mockFactory = mock(ConnectionFactory.class);
+        mockConfig = mock(LDAPConfig.class);
         mockConnection = mock(Connection.class);
         mockRequest = mock(SearchRequest.class);
 
-        handler = getTestObject();
-
-        given(mockFactory.getConnection()).willReturn(mockConnection);
-    }
-
-    protected LDAPSearchHandler getTestObject() {
-        return new LDAPSearchHandler(mockFactory, mockConstants);
+        handler = new LDAPSearchHandler(mockConfig);
     }
 
     @Test
-    public void shouldGetConnectionFromFactory() throws QueryFailedException, ErrorResultException, ErrorResultIOException {
-        // Given
-        given(mockFactory.getConnection()).willReturn(mockConnection);
-
-        // When
-        handler.performSearch(mockRequest, mock(Collection.class));
-
-        // Then
-        verify(mockFactory).getConnection();
+    public void shouldUseConnectionForSearch() throws QueryFailedException, ErrorResultException {
+        handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
+        verify(mockConnection).search(eq(mockRequest), anyCollection());
     }
 
-    @Test(expectedExceptions = QueryFailedException.class)
-    public void shouldHandleException() throws ErrorResultException, SearchResultReferenceIOException, ErrorResultIOException, QueryFailedException {
-        // Given
-        given(mockFactory.getConnection()).willThrow(ErrorResultException.class);
-
-        // When / Then
-        handler.performSearch(mockRequest, mock(Collection.class));
-    }
-
-    @Test
-    public void shouldReturnResult() throws ErrorResultException, QueryFailedException {
-        // Given
-        Result mockResult = mock(Result.class);
-        given(mockConnection.search(eq(mockRequest), any(Collection.class))).willReturn(mockResult);
-
-        // When
-        Result result = handler.performSearch(mockRequest, mock(Collection.class));
-
-        // Then
-        assertThat(result).isEqualTo(mockResult);
+    @Test (expectedExceptions = QueryFailedException.class)
+    public void shouldThrowExceptionOnFailure() throws QueryFailedException, ErrorResultException {
+        ErrorResultException error = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+        given(mockConnection.search(any(SearchRequest.class), anyCollection())).willThrow(error);
+        handler.performSearch(mockConnection, mockRequest, Collections.<Entry>emptyList());
     }
 }

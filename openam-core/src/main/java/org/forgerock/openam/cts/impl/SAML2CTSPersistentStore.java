@@ -20,6 +20,8 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
@@ -27,14 +29,12 @@ import org.forgerock.openam.cts.api.fields.SAMLTokenField;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
+import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +106,10 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
             Map<CoreTokenField, Object> queryMap = new EnumMap<CoreTokenField, Object>(CoreTokenField.class);
             queryMap.put(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
 
-            Collection<Token> tokens = persistentStore.list(queryMap);
+            TokenFilter filter = new TokenFilterBuilder()
+                    .withAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey)
+                    .build();
+            Collection<Token> tokens = persistentStore.query(filter);
             List<Object> results = new ArrayList<Object>(tokens.size());
             for (Token token : tokens) {
                 SAMLToken samlToken = tokenAdapter.fromToken(token);
@@ -129,7 +132,7 @@ public class SAML2CTSPersistentStore implements SAML2TokenRepository {
 
         try {
             persistentStore.delete(primaryKey);
-        } catch (DeleteFailedException e) {
+        } catch (CoreTokenException e) {
             debug.error("SAML2CTSPersistentStore.deleteSAML2Token(): failed to delete SAML2 " +
                     "token using primary key:" + primaryKey, e);
             throw new SAML2TokenRepositoryException(e.getMessage(), e);

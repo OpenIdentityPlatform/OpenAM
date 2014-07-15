@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,13 +10,14 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.utils;
 
 import org.forgerock.opendj.ldap.GeneralizedTime;
 
 import java.util.Calendar;
-import java.util.TimeZone;
 
 /**
  * Responsible for converting data types to and from compatible LDAP data types.
@@ -26,36 +25,6 @@ import java.util.TimeZone;
  * @author robert.wapshott@forgerock.com
  */
 public class LDAPDataConversion {
-    /**
-     * Convert the 'seconds since the epoch' value that is common in OpenAM to a Calendar.
-     *
-     * Note: The implication of this call is that the timestamp should be set to the local
-     * timezone on the system this conversion is performed.
-     *
-     * @param epochedTimeInSeconds Number of seconds since the epoch.
-     *
-     * @return A non null Calendar representing the timestamp.
-     */
-    public Calendar fromEpochedSeconds(long epochedTimeInSeconds) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(TimeZone.getDefault());
-        long millis = epochedTimeInSeconds * 1000L;
-        calendar.setTimeInMillis(millis);
-        return calendar;
-    }
-
-    /**
-     * Convert a Calendar to the 'seconds from epoch' timestamp.
-     *
-     * Note: This function strips off the timezone information. Use with care.
-     *
-     * @param date A non null Calendar object.
-     * @return A positive long.
-     */
-    public long toEpochedSeconds(Calendar date) {
-        return date.getTimeInMillis()/1000L;
-    }
-
     /**
      * Convert a Date to an LDAP date string.
      *
@@ -75,14 +44,5 @@ public class LDAPDataConversion {
      */
     public Calendar fromLDAPDate(String ldapDate) {
         return GeneralizedTime.valueOf(ldapDate).toCalendar();
-    }
-
-    /**
-     * Generates a long of the number of seconds since the epoch.
-     *
-     * @return A positive long.
-     */
-    public long currentEpochedSeconds() {
-        return toEpochedSeconds(Calendar.getInstance());
     }
 }

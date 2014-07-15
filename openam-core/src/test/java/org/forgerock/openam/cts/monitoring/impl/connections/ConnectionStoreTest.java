@@ -13,13 +13,13 @@
 *
 * Copyright 2014 ForgeRock AS.
 */
-
 package org.forgerock.openam.cts.monitoring.impl.connections;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ConnectionStoreTest {
 

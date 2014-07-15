@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,105 +10,44 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
-import org.forgerock.openam.cts.impl.LDAPAdapter;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class TokenDeletionTest {
 
-    private ConnectionFactory mockFactory;
-    private LDAPAdapter mockAdapter;
     private TokenDeletion deletion;
-    private Connection mockConnection;
+    private TaskDispatcher mockQueue;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        mockFactory = mock(ConnectionFactory.class);
-        mockConnection = mock(Connection.class);
-        given(mockFactory.getConnection()).willReturn(mockConnection);
-
-        mockAdapter = mock(LDAPAdapter.class);
-
-        deletion = new TokenDeletion(mockAdapter, mockFactory);
+        mockQueue = mock(TaskDispatcher.class);
+        deletion = new TokenDeletion(mockQueue);
     }
 
     @Test
-    public void shouldOpenConnectionOnFirstCall() throws ErrorResultException {
-        // Given
-        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
-        // When
-        deletion.deleteBatch(entries, mock(ResultHandler.class));
-        // Then
-        verify(mockFactory).getConnection();
+    public void shouldQueueEachTokenProvided() throws CoreTokenException {
+        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        deletion.deleteBatch(tokens);
+        verify(mockQueue, times(3)).delete(anyString(), any(ResultHandler.class));
     }
 
     @Test
-    public void shouldCloseConnectionWhenComplete() throws ErrorResultException {
-        // Given
-        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
-        deletion.deleteBatch(entries, mock(ResultHandler.class));
-        // When
-        deletion.close();
-        // Then
-        verify(mockConnection).close();
-    }
-
-    @Test
-    public void shouldReopenConnectionOnNextCall() throws ErrorResultException {
-        // Given
-        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
-        deletion.deleteBatch(entries, mock(ResultHandler.class));
-        deletion.close();
-
-        // When
-        deletion.deleteBatch(entries, mock(ResultHandler.class));
-
-        // Then
-        verify(mockFactory, times(2)).getConnection();
-    }
-
-    @Test
-    public void shouldDeleteEntries() throws ErrorResultException {
-        // Given
-        Collection<Entry> entries = Arrays.asList(
-                generateEntry("one"),generateEntry("two"),generateEntry("three"));
-        // When
-        deletion.deleteBatch(entries, mock(ResultHandler.class));
-        // Then
-        verify(mockAdapter, times(3)).deleteAsync(
-                eq(mockConnection),
-                anyString(),
-                any(ResultHandler.class));
-    }
-
-    private static Entry generateEntry(String id) {
-        Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValueAsString()).willReturn(id);
-
-        Entry entry = mock(Entry.class);
-        given(entry.getAttribute(anyString())).willReturn(attribute);
-
-        return entry;
+    public void shouldReturnCountDownLatchThatCorrespondsToTokensProvided() throws CoreTokenException {
+        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        assertThat(deletion.deleteBatch(tokens).getCount()).isEqualTo(tokens.size());
     }
 }

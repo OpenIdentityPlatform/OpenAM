@@ -1,6 +1,4 @@
-/**
- * Copyright 2013-2014 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl.query;
 
@@ -23,9 +23,12 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
 import org.forgerock.openam.cts.utils.TokenAttributeConversion;
 import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.Entry;
@@ -35,23 +38,24 @@ import org.forgerock.opendj.ldap.controls.SimplePagedResultsControl;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Fluent class responsible for constructing queries for the LDAP data store.
  *
- * This class will handle the details around preparing a query and executing the query, including processing
- * the return results.
+ * This class will handle the details around preparing a query and executing the query,
+ * including processing the return results.
  *
- * Uses Token as its main means of expressing the data returned from LDAP and so is intended for use
- * with the Core Token Service.
- *
- * @author robert.wapshott@forgerock.com
+ * Uses Token as its main means of expressing the data returned from LDAP and so is
+ * intended for use with the Core Token Service.
  */
 public class QueryBuilder {
     // Injected
@@ -79,8 +83,9 @@ public class QueryBuilder {
         this.attributeConversion = attributeConversion;
         this.constants = constants;
         this.handler = handler;
-        sizeLimit = 0;
         this.debug = debug;
+
+        sizeLimit = 0;
         pageSize = 0;
     }
 
@@ -98,7 +103,7 @@ public class QueryBuilder {
     /**
      * The search results can be paged by using the paging cookie.
      *
-     * See {@link QueryPageIterator} for more details on this.
+     * See {@link ReaperQuery} for more details on this.
      *
      * @param pageSize The size of each page of results.
      * @param cookie The paging cookie required to track paging. If this is the first
@@ -114,7 +119,7 @@ public class QueryBuilder {
     /**
      * The paging cookie is used as part of Paged Search Results.
      *
-     * See {@link QueryPageIterator} for more details.
+     * See {@link ReaperQuery} for more details.
      *
      * @return Null if no Paging Cookie was assigned.
      */
@@ -135,19 +140,39 @@ public class QueryBuilder {
     /**
      * Limit the search to return only the named attributes.
      *
-     * @param fields Collection of CoreTokenField that are required in the search results.
+     * @param returnFields Array of CoreTokenField which are required in the results.
      * @return The QueryBuilder instance.
+     * @throws IllegalArgumentException If array was null or empty.
      */
-    public QueryBuilder returnTheseAttributes(CoreTokenField... fields) {
-        if (fields == null) {
-            throw new IllegalArgumentException("Must supply at least one field");
-        }
+    public QueryBuilder returnTheseAttributes(CoreTokenField... returnFields) {
+        Reject.ifTrue(returnFields == null || returnFields.length == 0);
 
-        List<String> attributes = new ArrayList<String>();
-        for (CoreTokenField field : fields) {
+        Set<String> attributes = new HashSet<String>();
+        for (CoreTokenField field : returnFields) {
             attributes.add(field.toString());
         }
-        requestedAttributes = attributes.toArray(new String[attributes.size()]);
+        return setReturnAttributes(attributes);
+    }
+
+    /**
+     * Limit the search to return only the named attributes.
+     *
+     * @param returnFields Collection of CoreTokenField that are required in the search results.
+     * @return The QueryBuilder instance.
+     * @throws IllegalArgumentException If the requested fields were null or empty.
+     */
+    public QueryBuilder returnTheseAttributes(Collection<CoreTokenField> returnFields) {
+        Reject.ifTrue(returnFields == null || returnFields.isEmpty());
+
+        Set<String> fields = new HashSet<String>();
+        for (CoreTokenField field : returnFields) {
+            fields.add(field.toString());
+        }
+        return setReturnAttributes(fields);
+    }
+
+    private QueryBuilder setReturnAttributes(Set<String> fields) {
+        requestedAttributes = fields.toArray(new String[fields.size()]);
         return this;
     }
 
@@ -175,13 +200,38 @@ public class QueryBuilder {
     }
 
     /**
+     * Perform an Attribute based query against the persistent store.
+     *
+     * An attribute query is one where we are interested in specific attributes from the Tokens
+     * rather than all attributes assigned to the matched Tokens. This can be more performant
+     * than requesting back all attributes of a Token first.
+     *
+     * @param connection The connection used to perform the request.
+     *
+     * @return A non null, but possibly empty collection of PartialTokens.
+     *
+     * @throws CoreTokenException If there was an error performing the query or in converting
+     * the results.
+     */
+    public Collection<PartialToken> executeAttributeQuery(Connection connection) throws CoreTokenException {
+        Collection<Entry> entries = executeRawResults(connection);
+        Collection<PartialToken> partialTokens = new ArrayList<PartialToken>(entries.size());
+        for (Entry entry : entries) {
+            partialTokens.add(new PartialToken(attributeConversion.mapFromEntry(entry)));
+        }
+        return partialTokens;
+    }
+
+    /**
      * Perform the query and return the results as Entry instances.
+     *
+     * @param connection The connection used to perform the request.
      *
      * @return A non null but possibly empty collection.
      *
-     * @throws org.forgerock.openam.cts.exceptions.QueryFailedException If there was an error during the query.
+     * @throws QueryFailedException If there was an error during the query.
      */
-    public Collection<Entry> executeRawResults() throws CoreTokenException {
+    public Collection<Entry> executeRawResults(Connection connection) throws CoreTokenException {
         // Prepare the search
         Filter ldapFilter = getLDAPFilter();
         SearchRequest searchRequest = Requests.newSearchRequest(
@@ -197,7 +247,7 @@ public class QueryBuilder {
 
         // Perform the search
         Collection<Entry> entries = createResultsList();
-        final Result result = handler.performSearch(searchRequest, entries);
+        final Result result = handler.performSearch(connection, searchRequest, entries);
 
         if (isPagingResults()) {
             try {
@@ -243,18 +293,20 @@ public class QueryBuilder {
     /**
      * Perform the query and return the results as processed Token instances.
      *
+     * @param connection The connection used to perform the request.
+     *
      * @return A non null but possibly empty collection.
      *
      * @throws CoreTokenException If there was an error during the query.
      */
-    public Collection<Token> execute() throws CoreTokenException {
+    public Collection<Token> execute(Connection connection) throws CoreTokenException {
         if (!ArrayUtils.isEmpty(requestedAttributes)) {
             throw new IllegalStateException(
                     "Cannot convert results to Token if the query uses" +
                     "a reduced number of attributes in the return result");
         }
 
-        Collection<Entry> results = executeRawResults();
+        Collection<Entry> results = executeRawResults(connection);
         List<Token> tokens = new ArrayList<Token>(results.size());
         for (Entry entry : results) {
             Token token = attributeConversion.tokenFromEntry(entry);
@@ -310,9 +362,9 @@ public class QueryBuilder {
      * paging function, an empty cookie is passed in initially and must be
      * provided with each subsequent call.
      *
-     * The details of this are managed by the QueryPageIterator.
+     * The details of this are managed by the ReaperIterator.
      *
-     * @see QueryPageIterator
+     * @see ReaperQuery
      *
      * @return Non null empty ByteString.
      */

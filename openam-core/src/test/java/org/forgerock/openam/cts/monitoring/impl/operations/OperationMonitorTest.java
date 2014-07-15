@@ -13,17 +13,17 @@
 *
 * Copyright 2013-2014 ForgeRock AS.
 */
-
 package org.forgerock.openam.cts.monitoring.impl.operations;
 
 import org.forgerock.openam.cts.monitoring.TestCurrentMillis;
 import org.forgerock.openam.shared.monitoring.RateTimer;
 import org.forgerock.openam.shared.monitoring.RateWindow;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class OperationMonitorTest {
 

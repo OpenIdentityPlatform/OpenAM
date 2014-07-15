@@ -27,7 +27,6 @@ import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -65,7 +64,7 @@ public class CoreTokenResourceTest {
     }
 
     @Test
-    public void shouldDeleteTokenBasedOnTokenId() throws DeleteFailedException {
+    public void shouldDeleteTokenBasedOnTokenId() throws CoreTokenException {
         // Given
         String one = "one";
 

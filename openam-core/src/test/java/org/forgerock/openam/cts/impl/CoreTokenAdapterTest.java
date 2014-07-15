@@ -1,6 +1,4 @@
-/**
- * Copyright 2013-2014 ForgeRock, AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,84 +10,57 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS
  */
 package org.forgerock.openam.cts.impl;
 
-import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.CoreTokenConfigListener;
 import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import java.util.ArrayList;
+import java.util.Collection;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
+
 public class CoreTokenAdapterTest {
-    protected Connection mockConnection;
-    protected ConnectionFactory mockConnectionFactory;
-    protected QueryFactory mockQueryFactory;
-    protected Debug mockDebug;
-    protected LDAPAdapter mockLDAPAdapter;
-    protected ConfigurationObserver mockObserver;
-    protected CoreTokenConfigListener mockListener;
     protected CoreTokenAdapter adapter;
+
+    private TaskDispatcher mockTaskDispatcher;
+    private ResultHandlerFactory mockResultHandlerFactory;
+    private Debug mockDebug;
+    private CTSReaperInit mockReaperInit;
 
     @BeforeMethod
     public void setup() {
+        mockTaskDispatcher = mock(TaskDispatcher.class);
+        mockResultHandlerFactory = mock(ResultHandlerFactory.class);
+        mockReaperInit = mock(CTSReaperInit.class);
         mockDebug = mock(Debug.class);
-        mockLDAPAdapter = mock(LDAPAdapter.class);
-        mockQueryFactory = mock(QueryFactory.class);
 
-        mockConnection = mock(Connection.class);
-        mockConnectionFactory = mock(ConnectionFactory.class);
-        try {
-            given(mockConnectionFactory.getConnection()).willReturn(mockConnection);
-        } catch (ErrorResultException e) {
-            throw new IllegalStateException(e);
-        }
-
-        mockObserver = mock(ConfigurationObserver.class);
-        mockListener = mock(CoreTokenConfigListener.class);
-
-        adapter = getTestObject();
-    }
-
-    protected CoreTokenAdapter getTestObject() {
-        return new CoreTokenAdapter(
-                mockConnectionFactory,
-                mockQueryFactory,
-                mockLDAPAdapter,
-                mockObserver,
-                mockListener,
+        adapter = new CoreTokenAdapter(
+                mockTaskDispatcher,
+                mockResultHandlerFactory,
+                mockReaperInit,
                 mockDebug);
     }
 
-//    @Test
-    public void shouldAddListenerToObserver() {
-        // Given
-        // When
-        // Then
-        verify(mockObserver).addListener(eq(mockListener));
-    }
-
     @Test
-    public void shouldCreateToken() throws CoreTokenException, ErrorResultException {
+    public void shouldCreateToken() throws ErrorResultException, CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
 
@@ -97,16 +68,19 @@ public class CoreTokenAdapterTest {
         adapter.create(token);
 
         // Then
-        verify(mockLDAPAdapter).create(any(Connection.class), eq(token));
+        verify(mockTaskDispatcher).create(eq(token), any(ResultHandler.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void shouldReadToken() throws CoreTokenException, ErrorResultException {
         // Given
         String tokenId = "badger";
         Token token = new Token(tokenId, TokenType.SESSION);
 
-        given(mockLDAPAdapter.read(any(Connection.class), eq(tokenId))).willReturn(token);
+        ResultHandler<Token> mockResultHandler = mock(ResultHandler.class);
+        given(mockResultHandler.getResults()).willReturn(token);
+        given(mockResultHandlerFactory.getReadHandler()).willReturn(mockResultHandler);
 
         // When
         Token result = adapter.read(tokenId);
@@ -115,47 +89,61 @@ public class CoreTokenAdapterTest {
         assertThat(result.getTokenId()).isEqualTo(tokenId);
     }
 
-    @Test
-    public void shouldGenerateAnInstanceOfQueryBuilder() throws ErrorResultException {
-        // Given
-        // When
-        adapter.query();
-
-        // Then
-        verify(mockQueryFactory).createInstance();
+    @Test (expectedExceptions = IllegalArgumentException.class)
+    public void shouldPreventAttributeQueryWhenReturnAttributesAreNotDefined() throws CoreTokenException {
+        adapter.attributeQuery(new TokenFilterBuilder().and().build());
     }
 
     @Test
-    public void shouldPerformUpdate() throws CoreTokenException, ErrorResultException {
+    public void shouldUseTaskQueueForQuery() throws CoreTokenException {
+        // Given
+        Collection<Token> tokens = new ArrayList<Token>();
+
+        ResultHandler<Collection<Token>> mockResultHandler = mock(ResultHandler.class);
+        given(mockResultHandler.getResults()).willReturn(tokens);
+        given(mockResultHandlerFactory.getQueryHandler()).willReturn(mockResultHandler);
+
+        TokenFilter filter = new TokenFilterBuilder().and().build();
+
+        // When
+        adapter.query(filter);
+
+        // Then
+        verify(mockTaskDispatcher).query(eq(filter), eq(mockResultHandler));
+    }
+
+    @Test
+    public void shouldUseTaskQueueForAttributeQuery() throws CoreTokenException {
+        // Given
+        Collection<PartialToken> partialTokens = new ArrayList<PartialToken>();
+
+        ResultHandler<Collection<PartialToken>> mockResultHandler = mock(ResultHandler.class);
+        given(mockResultHandler.getResults()).willReturn(partialTokens);
+        given(mockResultHandlerFactory.getPartialQueryHandler()).willReturn(mockResultHandler);
+
+        TokenFilter filter = new TokenFilterBuilder().returnAttribute(CoreTokenField.BLOB).build();
+
+        // When
+        adapter.attributeQuery(filter);
+
+        // Then
+        verify(mockTaskDispatcher).partialQuery(eq(filter), eq(mockResultHandler));
+    }
+
+    @Test
+    public void shouldUseTaskQueueForUpdate() throws CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
-
-        given(mockLDAPAdapter.update(eq(mockConnection), any(Token.class), any(Token.class))).willReturn(true);
-        given(mockLDAPAdapter.read(eq(mockConnection), anyString())).willReturn(mock(Token.class));
 
         // When
         adapter.updateOrCreate(token);
 
         // Then
-        verify(mockLDAPAdapter).update(eq(mockConnection), any(Token.class), eq(token));
+        verify(mockTaskDispatcher).update(eq(token), any(ResultHandler.class));
     }
 
     @Test
-    public void shouldPerformCreateWhenPreviousMissingDuringUpdate() throws ErrorResultException, CoreTokenException {
-        // Given
-        Token token = new Token("badger", TokenType.SESSION);
-        given(mockLDAPAdapter.read(eq(mockConnection), anyString())).willReturn(null);
-
-        // When
-        adapter.updateOrCreate(token);
-
-        // Then
-        verify(mockLDAPAdapter, never()).update(eq(mockConnection), any(Token.class), eq(token));
-        verify(mockLDAPAdapter).create(eq(mockConnection), eq(token));
-    }
-
-    @Test
-    public void shouldPerformDelete() throws LDAPOperationFailedException, ErrorResultException, DeleteFailedException {
+    public void shouldPerformDelete() throws CoreTokenException {
         // Given
         String tokenId = "badger";
 
@@ -163,6 +151,6 @@ public class CoreTokenAdapterTest {
         adapter.delete(tokenId);
 
         // Then
-        verify(mockLDAPAdapter).delete(any(Connection.class), eq(tokenId));
+        verify(mockTaskDispatcher).delete(eq(tokenId), any(ResultHandler.class));
     }
 }

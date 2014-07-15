@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,24 +10,21 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.exceptions;
 
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 
 import java.text.MessageFormat;
 
 /**
  * Represents a failure to delete a Token from the Core Token Service.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class DeleteFailedException extends CoreTokenException {
     public DeleteFailedException(String tokenId, Throwable e) {
         super(MessageFormat.format(
-                "\n" +
-                CoreTokenConstants.DEBUG_HEADER +
                 "Failed to delete DN: {0}",
                 tokenId),
                 e);
@@ -37,8 +32,6 @@ public class DeleteFailedException extends CoreTokenException {
 
     public DeleteFailedException(QueryBuilder queryBuilder, Throwable e) {
         super(MessageFormat.format(
-                "\n" +
-                CoreTokenConstants.DEBUG_HEADER +
                 "Failed to delete based on query:\n" +
                 "{0}",
                 queryBuilder.toString()),

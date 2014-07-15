@@ -28,8 +28,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.common.ShutdownManagerWrapper;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
@@ -40,12 +39,6 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -54,20 +47,24 @@ import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.adapters.SAMLAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.SAMLToken;
-import org.forgerock.openam.cts.impl.CoreTokenAdapter;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.cts.impl.MonitoredCoreTokenAdapter;
-import org.forgerock.openam.cts.impl.query.LDAPSearchHandler;
-import org.forgerock.openam.cts.impl.query.MonitoredLDAPSearchHandler;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.impl.queue.config.AsyncProcessorCount;
+import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
+import org.forgerock.openam.cts.impl.queue.config.ReaperConnectionCount;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.connections.MonitoredCTSConnectionFactory;
+import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -79,12 +76,20 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
-import org.forgerock.openam.shared.concurrency.LockFactory;
+import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.SMSConfigurationFactory;
+import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.utils.Config;
-import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -139,6 +144,8 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_ASYNC_DEBUG))
+                .toInstance(Debug.getInstance(CoreTokenConstants.CTS_ASYNC_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG))
                 .toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
 
@@ -147,10 +154,6 @@ public class CoreGuiceModule extends AbstractModule {
 
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
-
-        // Add hooks for monitoring operation success/failure rates
-        bind(CoreTokenAdapter.class).to(MonitoredCoreTokenAdapter.class);
-        bind(LDAPSearchHandler.class).to(MonitoredLDAPSearchHandler.class);
 
         // CTS Connection Management
         bind(ConnectionFactory.class).to(MonitoredCTSConnectionFactory.class).in(Singleton.class);
@@ -170,6 +173,14 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        // Enable monitoring of all CTS operations
+        bind(ResultHandlerFactory.class).to(MonitoredResultHandlerFactory.class);
+
+        // CTS Reaper configuration
+        bind(ReaperQuery.class).to(ReaperConnection.class);
+
+        // CTS Async
+        bind(AsyncProcessorCount.class).to(ReaperConnectionCount.class);
 
         // Policy Monitoring
         bind(PolicyMonitor.class).to(PolicyMonitorImpl.class);
@@ -205,22 +216,39 @@ public class CoreGuiceModule extends AbstractModule {
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getPolicyMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createThreadPool(5);
+        return esf.createFixedThreadPool(5);
     }
 
     @Provides @Inject @Named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME)
     ExecutorService getCTSMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createThreadPool(5);
+        return esf.createFixedThreadPool(5);
     }
 
     @Provides @Inject @Named(SessionMonitoringStore.EXECUTOR_BINDING_NAME)
     ExecutorService getSessionMonitoringExecutorService(ExecutorServiceFactory esf) {
-        return esf.createThreadPool(5);
+        return esf.createFixedThreadPool(5);
     }
 
+    /**
+     * The CTS Worker Pool provides a thread pool specifically for CTS usage.
+     *
+     * This is only utilised by the CTS asynchronous queue implementation, therefore
+     * we can size the pool based on the configuration for that.
+     *
+     * @param esf Factory for generating an appropriate ExecutorService.
+     * @param queueConfiguration Required to resolve how many threads are required.
+     * @return A configured ExecutorService, appropriate for the CTS usage.
+     *
+     * @throws java.lang.RuntimeException If there was an error resolving the configuration.
+     */
     @Provides @Inject @Named(CoreTokenConstants.CTS_WORKER_POOL)
-    ExecutorService getCTSWorkerExecutorService(ExecutorServiceFactory esf) {
-        return esf.createThreadPool(5);
+    ExecutorService getCTSWorkerExecutorService(ExecutorServiceFactory esf, QueueConfiguration queueConfiguration) {
+        try {
+            int size = queueConfiguration.getProcessors();
+            return esf.createFixedThreadPool(size, CoreTokenConstants.CTS_WORKER_POOL);
+        } catch (CoreTokenException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Provides @Inject @Named(CoreTokenConstants.CTS_SCHEDULED_SERVICE)
@@ -228,9 +256,9 @@ public class CoreGuiceModule extends AbstractModule {
         return esf.createScheduledService(1);
     }
 
-    @Provides @Singleton @Named(CoreTokenConstants.CTS_LOCK_FACTORY)
-    LockFactory<String> getCTSLockFactory() {
-        return new LockFactory<String>();
+    @Provides @Inject @Named(CoreTokenConstants.CTS_SMS_CONFIGURATION)
+    ServerGroupConfiguration getCTSServerConfiguration(SMSConfigurationFactory factory) {
+        return factory.getSMSConfiguration();
     }
 
     @Provides @Singleton
@@ -290,45 +318,5 @@ public class CoreGuiceModule extends AbstractModule {
             return DNMapper.orgNameToRealmName(orgName);
         }
 
-    }
-
-    /**
-     * Wrap class to remove coupling to ShutdownManager static methods.
-     * <p/>
-     * Until ShutdownManager is refactored, this class can be used to assist with DI.
-     */
-    public static class ShutdownManagerWrapper {
-
-        /**
-         * @see com.sun.identity.common.ShutdownManager#addShutdownListener(com.sun.identity.common.ShutdownListener)
-         */
-        public void addShutdownListener(ShutdownListener listener) {
-            ShutdownManager shutdownManager = ShutdownManager.getInstance();
-
-            try {
-                if (shutdownManager.acquireValidLock()) {
-                    // Add the listener.
-                    shutdownManager.addShutdownListener(listener);
-                }
-            } finally {
-                shutdownManager.releaseLockAndNotify();
-            }
-        }
-
-        /**
-         * @see com.sun.identity.common.ShutdownManager#removeShutdownListener(com.sun.identity.common.ShutdownListener)
-         */
-        public void removeShutdownListener(ShutdownListener listener) {
-            ShutdownManager shutdownManager = ShutdownManager.getInstance();
-
-            try {
-                if (shutdownManager.acquireValidLock()) {
-                    // Remove the listener.
-                    shutdownManager.removeShutdownListener(listener);
-                }
-            } finally {
-                shutdownManager.releaseLockAndNotify();
-            }
-        }
     }
 }

@@ -30,7 +30,6 @@ import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -151,7 +150,7 @@ public class CTSOperations implements SessionOperations {
         String tokenId = idFactory.toSessionTokenId(sessionID);
         try {
             cts.delete(tokenId);
-        } catch (DeleteFailedException e) {
+        } catch (CoreTokenException e) {
             debug.error("Failed to delete Token: " + tokenId, e);
             throw new SessionException(e);
         }

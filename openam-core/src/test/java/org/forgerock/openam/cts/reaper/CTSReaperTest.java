@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,129 +10,110 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.reaper;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.impl.query.QueryFilter;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
+import org.forgerock.openam.cts.impl.query.reaper.ReaperQueryFactory;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
-import org.forgerock.openam.cts.utils.LDAPDataConversion;
-import org.forgerock.opendj.ldap.Attribute;
-import org.forgerock.opendj.ldap.Entry;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.Filter;
-import org.forgerock.opendj.ldap.ResultHandler;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.Matchers.anyCollection;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
-/**
- * @author robert.wapshott@forgerock.com
- */
 public class CTSReaperTest {
-
-    private QueryFactory mockQueryFactory;
-    private CoreTokenConfig mockConfig;
     private CTSReaper reaper;
-    private QueryBuilder mockBuilder;
     private TokenDeletion mockTokenDeletion;
     private CTSReaperMonitoringStore monitoringStore;
+    private ReaperQueryFactory mockQueryFactory;
+    private ReaperQuery mockQuery;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        mockQueryFactory = mock(QueryFactory.class);
-        mockBuilder = mock(QueryBuilder.class);
-        given(mockQueryFactory.createInstance()).willReturn(mockBuilder);
-
-        mockConfig = mock(CoreTokenConfig.class);
         mockTokenDeletion = mock(TokenDeletion.class);
         monitoringStore = mock(CTSReaperMonitoringStore.class);
 
-        reaper = new CTSReaper(mockQueryFactory, mockConfig, mockTokenDeletion, mock(Debug.class),
-                monitoringStore);
+        mockQuery = mock(ReaperQuery.class);
+        mockQueryFactory = mock(ReaperQueryFactory.class);
+        given(mockQueryFactory.getQuery()).willReturn(mockQuery);
+
+        reaper = new CTSReaper(mockQueryFactory, mockTokenDeletion, monitoringStore, mock(Debug.class));
     }
 
-    @Test (timeOut = 5000)
-    public void shouldDeleteResultsOfQuery() throws CoreTokenException, ErrorResultException {
-        // Given
-        String one = "one";
-        String two = "two";
-        String thr = "three";
-
-        // Create some search results
-        Collection<Entry> results = Arrays.asList(
-                generateEntry(one),generateEntry(two),generateEntry(thr));
-
-        // Enough mocking to get past QueryPageIterator
-        given(mockBuilder.executeRawResults()).willReturn(results);
-        given(mockBuilder.getPagingCookie()).willReturn(QueryBuilder.getEmptyPagingCookie());
-        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
-        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
-
-        QueryFilter queryFilter = new QueryFilter(new LDAPDataConversion());
-        given(mockQueryFactory.createFilter()).willReturn(queryFilter);
-
-        // Setup the simulated behaviour for the TokenDeletion to trigger the count down latch.
-        willAnswer(new Answer() {
-            public Object answer(InvocationOnMock invo) throws Throwable {
-                Collection entries = (Collection) invo.getArguments()[0];
-                ResultHandler handler = (ResultHandler) invo.getArguments()[1];
-                for (int ii = 0; ii < entries.size(); ii++) {
-                    handler.handleResult(null);
-                }
-                return null;
-            }
-        }).given(mockTokenDeletion).deleteBatch(any(Collection.class), any(ResultHandler.class));
-
-        // When
-        reaper.run();
-
-        // Then
-        verify(mockTokenDeletion).deleteBatch(any(Collection.class), any(ResultHandler.class));
-        verify(monitoringStore).addReaperRun(anyLong(), anyLong(), anyLong());
+    @AfterMethod
+    public void tearDown() {
+        // Clear the interrupt status.
+        Thread.interrupted();
     }
 
     @Test
-    public void shouldCloseTokenDeletionWhenComplete() throws CoreTokenException {
-        // Given
-        given(mockBuilder.executeRawResults()).willReturn(Collections.EMPTY_LIST);
-        given(mockBuilder.getPagingCookie()).willReturn(QueryBuilder.getEmptyPagingCookie());
-        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
-        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
+    public void shouldUseReaperQueryForNextPage() throws CoreTokenException {
+        given(mockQuery.nextPage()).willReturn(null);
+        reaper.run();
+        verify(mockQuery).nextPage();
+    }
 
-        QueryFilter queryFilter = new QueryFilter(new LDAPDataConversion());
-        given(mockQueryFactory.createFilter()).willReturn(queryFilter);
+    @Test
+    public void shouldSignalTokensToTokenDeletion() throws CoreTokenException {
+        // Given
+        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
+        given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(new CountDownLatch(0));
 
         // When
         reaper.run();
 
         // Then
-        verify(mockTokenDeletion).close();
-        verify(monitoringStore).addReaperRun(anyLong(), anyLong(), anyLong());
+        verify(mockTokenDeletion).deleteBatch(eq(tokens));
     }
 
-    private static Entry generateEntry(String id) {
-        Attribute attribute = mock(Attribute.class);
-        given(attribute.firstValueAsString()).willReturn(id);
+    @Test
+    public void shouldWaitForAllCountDownLatchesBeforeContinuing() throws CoreTokenException, InterruptedException {
+        // Given
+        CountDownLatch one = mock(CountDownLatch.class);
+        CountDownLatch two = mock(CountDownLatch.class);
+        CountDownLatch three = mock(CountDownLatch.class);
 
-        Entry entry = mock(Entry.class);
-        given(entry.getAttribute(anyString())).willReturn(attribute);
+        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        given(mockQuery.nextPage()).willReturn(tokens).willReturn(tokens).willReturn(tokens).willReturn(null);
 
-        return entry;
+        given(mockTokenDeletion.deleteBatch(anyCollection())).willReturn(one).willReturn(two).willReturn(three);
+
+        // When
+        reaper.run();
+
+        // Then
+        verify(one).await();
+        verify(two).await();
+        verify(three).await();
+    }
+
+    @Test
+    public void shouldRespondToInterruptSignal() throws CoreTokenException {
+        // Given
+        Collection<String> tokens = Arrays.asList("badger", "weasel", "ferret");
+        given(mockQuery.nextPage()).willReturn(tokens).willReturn(null);
+
+        Thread.currentThread().interrupt();
+
+        // When
+        reaper.run();
+
+        // Then
+        verify(mockTokenDeletion, times(0)).deleteBatch(eq(tokens));
     }
 }

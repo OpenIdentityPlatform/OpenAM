@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,10 +10,10 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.exceptions;
-
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 /**
  * Describes an error fetching a connection, or any operation that uses a connection that failed.
@@ -25,9 +23,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 public class ConnectionFailedException extends CoreTokenException {
 
     public ConnectionFailedException(Throwable cause) {
-        super("\n" +
-              CoreTokenConstants.DEBUG_HEADER +
-              "Failed to get a connection", cause);
+        super("Failed to get a connection", cause);
     }
 
     public ConnectionFailedException(String message) {

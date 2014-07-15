@@ -16,67 +16,54 @@
 package org.forgerock.openam.cts.impl;
 
 import com.google.inject.name.Named;
-import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.CoreTokenConfigListener;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.CreateFailedException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
-import org.forgerock.openam.cts.exceptions.SetFailedException;
-import org.forgerock.openam.cts.impl.query.QueryBuilder;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.openam.cts.exceptions.*;
+import org.forgerock.openam.cts.impl.query.PartialToken;
+import org.forgerock.openam.cts.impl.queue.ResultHandler;
+import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
+import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
+import org.forgerock.openam.cts.reaper.CTSReaperInit;
+import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
+import java.lang.IllegalArgumentException;
 import java.text.MessageFormat;
+import java.util.Collection;
 
 /**
- * Primary interface to LDAP which provides a CRUDL style interface.
+ * CoreTokenAdapter is the final layer before persistence. In this case it uses the
+ * LDAPAdapter for persistence which will in turn call the OpenDJ LDAP SDK.
+ *
+ * Exposes functionality via a similar CRUDQ style interface.
  *
  * Note: This class uses Token as its main means of adding data to and from LDAP and therefore is intended
  * for use by the Core Token Service.
  */
 public class CoreTokenAdapter {
     // Injected
-    private final ConnectionFactory connectionFactory;
-    private final QueryFactory queryFactory;
-    private final LDAPAdapter ldapAdapter;
+    private final TaskDispatcher dispatcher;
+    private final ResultHandlerFactory handlerFactory;
     private final Debug debug;
 
     /**
      * Create a new instance of the CoreTokenAdapter with dependencies.
-     * @param connectionFactory Required for connections to LDAP.
-     * @param queryFactory Required for query instances.
-     * @param ldapAdapter Required for all LDAP operations.
-     * @param observer Required for configuration change notifications.
-     * @param listener Required for configuration change notifications.
+     * @param dispatcher Non null TaskDispatcher to use for CTS operations.
+     * @param handlerFactory Factory used to generate ResultHandlers for CTS operations.
+     * @param reaperInit Required for starting the CTS Reaper.
      * @param debug Required for debug logging
      */
     @Inject
-    public CoreTokenAdapter(ConnectionFactory connectionFactory, QueryFactory queryFactory,
-                            LDAPAdapter ldapAdapter, ConfigurationObserver observer,
-                            CoreTokenConfigListener listener, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-        this.connectionFactory = connectionFactory;
-        this.queryFactory = queryFactory;
+    public CoreTokenAdapter(TaskDispatcher dispatcher, ResultHandlerFactory handlerFactory,
+                            CTSReaperInit reaperInit, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
+        this.handlerFactory = handlerFactory;
+        this.dispatcher = dispatcher;
         this.debug = debug;
-        this.ldapAdapter = ldapAdapter;
 
-        // Register the listener to respond to configuration changes which will trigger an update to the connection
-        /*
-            Commented-out due to OPENAM-3213. If we wish to support on-the-fly manipulation of CTS LDAP connectivity state,
-            then re-initializing this context may have to take place at a layer lower than the CTSConnectionFactory. If
-            we don't require this support, then the CoreTokenConfigListener and related functionality in the CTSConnectionFactory
-            can be removed.
-         */
-//        observer.addListener(listener);
+        dispatcher.startDispatcher();
+        reaperInit.startReaper();
     }
 
     /**
@@ -87,26 +74,8 @@ public class CoreTokenAdapter {
      * an error as a result of this operation.
      */
     public void create(Token token) throws CoreTokenException {
-        Connection connection = null;
-        try {
-            connection = connectionFactory.getConnection();
-            ldapAdapter.create(connection, token);
-
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                                "Create: Created {0} Token {1}\n" +
-                                "{2}",
-                        token.getType(),
-                        token.getTokenId(),
-                        token));
-            }
-
-        } catch (ErrorResultException e) {
-            throw new CreateFailedException(token, e);
-        } finally {
-            IOUtils.closeIfNotNull(connection);
-        }
+        debug("Create: queued {0} Token {1}\n{2}", token.getType(), token.getTokenId(), token);
+        dispatcher.create(token, handlerFactory.getCreateHandler());
     }
 
     /**
@@ -117,50 +86,21 @@ public class CoreTokenAdapter {
      * @throws CoreTokenException If there was an unexpected problem with the request.
      */
     public Token read(String tokenId) throws CoreTokenException {
-        Connection connection = null;
+        debug("Read: queued {0}", tokenId);
+        ResultHandler<Token> handler = handlerFactory.getReadHandler();
+        dispatcher.read(tokenId, handler);
+
         try {
-            connection = connectionFactory.getConnection();
-            final Token token = ldapAdapter.read(connection, tokenId);
-
+            Token token = handler.getResults();
             if (token == null) {
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Read: {0} not found.",
-                            tokenId));
-                }
-                return null;
+                debug("Read: no Token found for {0}", tokenId);
+            } else {
+                debug("Read: returned for {0}\n{1}", tokenId, token);
             }
-
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                        "Read: {0} successfully.",
-                        tokenId));
-            }
-
             return token;
-        } catch (ErrorResultException e) {
-            Result result = e.getResult();
-            throw new LDAPOperationFailedException(result);
-        } finally {
-            IOUtils.closeIfNotNull(connection);
+        } catch (CoreTokenException e) {
+            throw new ReadFailedException(tokenId, e);
         }
-    }
-
-    /**
-     * Start the query process.
-     *
-     * The API of the QueryBuilder will guide the caller through the available query options.
-     *
-     * @return A new QueryBuilder instance.
-     */
-    public QueryBuilder query() {
-        return queryFactory.createInstance();
-    }
-
-    public QueryFilter buildFilter() {
-        return queryFactory.createFilter();
     }
 
     /**
@@ -180,102 +120,79 @@ public class CoreTokenAdapter {
      * @throws SetFailedException If an error occurs updating an existing token.
      */
     public boolean updateOrCreate(Token token) throws CoreTokenException {
-
-        Connection connection = null;
-        try {
-            connection = connectionFactory.getConnection();
-
-            // Start off by fetching the previous entry.
-            Token previous = ldapAdapter.read(connection, token.getTokenId());
-            boolean createToken = (previous == null);
-
-            if (debug.messageEnabled()) {
-                if (previous == null) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Read: {0} not found.",
-                            token.getTokenId()));
-                } else {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Read: {0} successfully.",
-                            token.getTokenId()));
-                }
-            }
-
-            // Handle create case
-            if (createToken) {
-                ldapAdapter.create(connection, token);
-
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Create: Created {0} Token {1}\n" +
-                            "{2}",
-                            token.getType(),
-                            token.getTokenId(),
-                            token));
-                }
-
-            } else {
-
-                boolean updateResult = ldapAdapter.update(connection, previous, token);
-
-                if (updateResult) {
-                    if (debug.messageEnabled()) {
-                        debug.message(MessageFormat.format(
-                                CoreTokenConstants.DEBUG_HEADER +
-                                "Update: no modifications for Token {0}",
-                                token.getTokenId()));
-                    }
-                } else {
-                    if (debug.messageEnabled()) {
-                        debug.message(MessageFormat.format(
-                                CoreTokenConstants.DEBUG_HEADER +
-                                "Update: Token {0} changed.\n" +
-                                "Previous:\n" +
-                                "{1}\n" +
-                                "Current:\n" +
-                                "{2}",
-                                token.getTokenId(),
-                                previous,
-                                token));
-                    }
-                }
-            }
-
-            return createToken;
-        } catch (ErrorResultException e) {
-            throw new SetFailedException(token, e);
-        } finally {
-            IOUtils.closeIfNotNull(connection);
-        }
+        debug("UpdateOrCreate: queued {0} Token {1}\n{2}", token.getType(), token.getTokenId(), token);
+        dispatcher.update(token, handlerFactory.getUpdateHandler());
+        return false;
     }
 
     /**
      * Deletes a token from the store based on its token id.
      * @param tokenId Non null token id.
-     * @throws DeleteFailedException If there was an error while trying to remove the token with the given Id.
+     * @throws CoreTokenException If there was an error while trying to remove the token with the given Id.
      */
-    public void delete(String tokenId) throws DeleteFailedException {
-        Connection connection = null;
+    public void delete(String tokenId) throws CoreTokenException {
+        debug("Delete: queued delete {0}", tokenId);
+        dispatcher.delete(tokenId, handlerFactory.getDeleteHandler());
+    }
+
+    /**
+     * Queries the persistence layer using the given TokenFilter to constrain the values.
+     *
+     * @param tokenFilter A non null TokenFilter.
+     * @return A non null, possibly empty collection of Tokens that match the Filter.
+     *
+     * @throws CoreTokenException If there was a problem processing the error or if there
+     * was a problem waiting for the response from the processor.
+     */
+    public Collection<Token> query(final TokenFilter tokenFilter) throws CoreTokenException {
+        debug("Query: queued with Filter: {0}", tokenFilter);
+        ResultHandler<Collection<Token>> handler = handlerFactory.getQueryHandler();
+        dispatcher.query(tokenFilter, handler);
         try {
-            connection = connectionFactory.getConnection();
-            ldapAdapter.delete(connection, tokenId);
+            Collection<Token> tokens = handler.getResults();
+            debug("Query: returned {0} Tokens with Filter: {1}", tokens.size(), tokenFilter);
+            return tokens;
+        } catch (CoreTokenException e) {
+            throw new QueryFailedException(tokenFilter, e);
+        }
+    }
 
-            if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                        "Delete: Deleted DN {0}",
-                        tokenId));
-            }
+    /**
+     * Queries the persistence layer using the given TokenFilter which must have the required
+     * 'return attributes' defined within it. The results of this query will consist of PartialTokens
+     * that match the requested CoreTokenFields.
+     *
+     * @see TokenFilter#addReturnAttribute(org.forgerock.openam.cts.api.fields.CoreTokenField)
+     * @see org.forgerock.openam.cts.api.fields.CoreTokenField
+     *
+     * @param filter Non null TokenFilter with return attributes defined.
+     * @return Non null, but possibly empty results.
+     * @throws CoreTokenException If there was an error performing the query.
+     * @throws IllegalArgumentException If the filter did not define any Return Fields.
+     */
+    public Collection<PartialToken> attributeQuery(final TokenFilter filter)
+            throws CoreTokenException, IllegalArgumentException {
 
-        } catch (ErrorResultException e) {
-            throw new DeleteFailedException(tokenId, e);
-        } catch (LDAPOperationFailedException e) {
-            throw new DeleteFailedException(tokenId, e);
-        } finally {
-            IOUtils.closeIfNotNull(connection);
+        Reject.ifTrue(filter.getReturnFields().isEmpty(), "Must define return fields for attribute query.");
+
+        debug("Attribute Query: queued with Filter: {0}", filter);
+        ResultHandler<Collection<PartialToken>> handler = handlerFactory.getPartialQueryHandler();
+        dispatcher.partialQuery(filter, handler);
+        try {
+            Collection<PartialToken> partialTokens = handler.getResults();
+            debug("AttributeQuery: returned {0} Partial Tokens: {1}", partialTokens.size(), filter);
+            return partialTokens;
+
+        } catch (CoreTokenException e) {
+            throw new QueryFailedException(filter, e);
+        }
+    }
+
+    private void debug(String format, Object... args) {
+        if (debug.messageEnabled()) {
+            debug.message(MessageFormat.format(
+                    CoreTokenConstants.DEBUG_HEADER + format,
+                    args));
         }
     }
 }
