@@ -62,6 +62,8 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -76,8 +78,6 @@ import javax.security.auth.callback.ChoiceCallback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -281,21 +281,17 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         
         // get request ( GET ) parameters for 'login' process
         reqDataHash = AuthClientUtils.parseRequestParameters(request);
-        gotoUrl = request.getParameter("goto");
-        gotoOnFailUrl = request.getParameter("gotoOnFail");
-        String encoded = request.getParameter("encoded");
-        if (encoded != null && encoded.equals("true")) {
-            gotoUrl = AuthClientUtils.getBase64DecodedValue(gotoUrl);
-            gotoOnFailUrl = AuthClientUtils.getBase64DecodedValue(gotoOnFailUrl);
-        }
-        
+
+        gotoUrl = REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO);
+        gotoOnFailUrl = REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO_ON_FAIL);
+
         if (loginDebug.messageEnabled()) {
             //loginDebug.message("request data hash : " + reqDataHash);
             loginDebug.message("Request method is : " + request.getMethod());
             loginDebug.message("gotoUrl is : " + gotoUrl);
             loginDebug.message("gotoOnFailUrl is : " + gotoOnFailUrl);
         }
-        
+
         if (request.getMethod().equalsIgnoreCase("POST")) {
             isPost = true;
         }
@@ -519,7 +515,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         }
         clearGlobals();
     }
-    
+
     /**
      * Returns display url for auth auth Login UI
      * 
@@ -686,7 +682,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                  * redirect to 'goto' parameter or SPI hook or default
                  * redirect URL.
                  */
-                setSuccessURL(ssoToken.getProperty("Organization"), ssoToken.getProperty("successURL"));
+                setRedirectUrl(ssoToken.getProperty("Organization"), gotoUrl,
+                        ssoToken.getProperty("successURL"));
 
                 if (redirect_url == null) {
                     ResultVal = rb.getString("authentication.already.login");
@@ -837,7 +834,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             ResultVal = ErrorMessage;
             // redirect to 'gotoOnFail' parameter or SPI hook
             // or default redirect URL.
-            setFailureURL();
+            setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
             return;
         }
         
@@ -863,7 +860,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                      * redirect to 'goto' parameter or SPI hook or default
                      * redirect URL.
                      */
-                    setSuccessURL(ac.getOrganizationName(), ac.getSuccessURL());
+                    setRedirectUrl(ac.getOrganizationName(), gotoUrl,
+                            ac.getSuccessURL());
 
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
@@ -882,7 +880,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                      * redirect to 'goto' parameter or SPI hook or default
                      * redirect URL.
                      */
-                    setFailureURL();
+                    setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message("LoginFailedURL in getLoginDisplay : " + redirect_url);
                     }
@@ -910,7 +909,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
                     session.invalidate();
                 } else {
-                    setFailureURL();
+                    setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+
                     if (loginDebug.messageEnabled()) {
                         loginDebug.message(
                             "LoginFailedURL in getLoginDisplay : "
@@ -1187,10 +1187,11 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         
                         // redirect to 'goto' parameter or SPI hook or default
                         // redirect URL.
-                        setSuccessURL(ac.getOrganizationName(), ac.getSuccessURL());
+                        setRedirectUrl(ac.getOrganizationName(), gotoUrl, ac.getSuccessURL());
 
                         SSOTokenManager.getInstance().refreshSession(ac.getSSOToken());
-                        String successURLFromSession = ac.getSSOToken().getProperty(ISAuthConstants.POST_PROCESS_SUCCESS_URL);
+                        String successURLFromSession =
+                                ac.getSSOToken().getProperty(ISAuthConstants.POST_PROCESS_SUCCESS_URL);
 
                         if (successURLFromSession != null) {
                             redirect_url = successURLFromSession;
@@ -1212,13 +1213,15 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                         
                         // redirect to 'goto' parameter or SPI hook or
                         // default redirect URL.
-                        setFailureURL();
+                        setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+
                         if (loginDebug.messageEnabled()) {
                             loginDebug.message("LoginFailedURL : " + redirect_url);
                         }
                         session.invalidate();
                     } else {
-                        setFailureURL();
+                        setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+
                         if (loginDebug.messageEnabled()) {
                             loginDebug.message("LoginFailedURL in getLoginDisplay : "+ redirect_url);
                         }
@@ -1415,7 +1418,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             String new_org = reqDataHash.get("new_org");
             if ((new_org != null && new_org.equals("true")) &&
                 (encoded != null && encoded.equals("true"))){
-                indexName = AuthClientUtils.getBase64DecodedValue(reqModule);
+                indexName = Base64.decodeAsUTF8String(reqModule);
             } else {
                 indexName = reqModule;
             }
@@ -1850,22 +1853,10 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         return tmpLoginURL;
     }
 
-    private void setRedirectUrl(String orgName, String gotoUrl, String alternateUrl) {
-        if (REDIRECT_URL_VALIDATOR.isRedirectUrlValid(gotoUrl, orgName)) {
-            redirect_url = gotoUrl;
-        }
+    private void setRedirectUrl(String orgName, String newUrl, String alternateUrl) {
 
-        if (redirect_url == null || redirect_url.isEmpty() || redirect_url.equalsIgnoreCase("null")) {
-            redirect_url = alternateUrl;
-        }
-    }
-
-    private void setSuccessURL(String orgName, String successUrl) throws Exception {
-        setRedirectUrl(orgName, gotoUrl, successUrl);
-    }
-
-    private void setFailureURL() throws Exception {
-        setRedirectUrl(ac.getOrganizationName(), gotoOnFailUrl, ac.getFailureURL());
+        final String result = REDIRECT_URL_VALIDATOR.getRedirectUrl(orgName, newUrl, alternateUrl);
+        redirect_url = result;
     }
 
     ////////////////////////////////////////////////////////////////////////////

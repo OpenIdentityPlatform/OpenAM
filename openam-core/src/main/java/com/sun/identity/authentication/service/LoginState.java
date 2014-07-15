@@ -36,23 +36,20 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
-import com.sun.identity.shared.encode.CookieUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
-import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthenticationException;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.sm.DNMapper;
-import com.sun.identity.shared.DateUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.admin.AdminInterfaceUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -64,13 +61,19 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.log.LogConstants;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.utils.ClientUtils;
+import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.ldap.util.RDN;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;
@@ -99,11 +102,9 @@ import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
-import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader;
 import org.forgerock.openam.authentication.service.SessionPropertyUpgrader;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * This class maintains the User's login state information from the time user 
@@ -3652,7 +3653,7 @@ public class LoginState {
         if (arg != null && arg.length() != 0) {
             String encoded = servletRequest.getParameter("encoded");
             if (encoded != null && encoded.equals("true")) {
-                gotoURL = AuthUtils.getBase64DecodedValue(arg);
+                gotoURL = Base64.decodeAsUTF8String(arg);
             } else {
                 gotoURL = arg;
             }
@@ -3667,7 +3668,7 @@ public class LoginState {
         if (arg != null && arg.length() != 0) {
             String encoded = servletRequest.getParameter("encoded");
             if (encoded != null && encoded.equals("true")) {
-                gotoOnFailURL = AuthUtils.getBase64DecodedValue(arg);
+                gotoOnFailURL = Base64.decodeAsUTF8String(arg);
             } else {
                 gotoOnFailURL = arg;
             }
@@ -3701,7 +3702,7 @@ public class LoginState {
         (!currentGoto.equalsIgnoreCase("null"))) {
             String encoded = servletRequest.getParameter("encoded");
             if (encoded != null && encoded.equals("true")) {
-                currentGoto = AuthUtils.getBase64DecodedValue(currentGoto);
+                currentGoto = Base64.decodeAsUTF8String(currentGoto);
             }
             if (!ad.isGotoUrlValid(currentGoto, getOrgDN())) {
                 if (messageEnabled) {

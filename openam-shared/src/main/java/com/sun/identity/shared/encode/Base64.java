@@ -32,6 +32,9 @@
  */
 package com.sun.identity.shared.encode;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+
 public class Base64 {
 
     public static byte[] encodeToByte(byte[] bytes, boolean lineSep) {
@@ -72,5 +75,14 @@ public class Base64 {
 
     public static byte[] decodeFast(String encoded) {
         return org.forgerock.util.encode.Base64.decodeFast(encoded.toCharArray());
+    }
+
+    /**
+     * Decodes the supplied String into a UTF-8 String.
+     *
+     * @param s String to encode.
+     */
+    public static String decodeAsUTF8String(String s) {
+        return new String(decode(s), Charset.forName("UTF-8"));
     }
 }

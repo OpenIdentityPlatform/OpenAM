@@ -28,91 +28,80 @@
  */
 package com.sun.identity.authentication.client;
 
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.Collections;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.MalformedURLException;
-import java.net.HttpURLConnection;
-
-import java.security.AccessController;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
-
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.sso.SSOException;
-
-import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.share.SessionEncodeURL;
-import com.sun.identity.session.util.SessionUtils;
-
 import com.iplanet.am.util.AMClientDetector;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
-
-import com.iplanet.services.cdm.Client;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.services.cdm.AuthClient;
+import com.iplanet.services.cdm.Client;
 import com.iplanet.services.cdm.ClientsManager;
-import com.iplanet.services.util.Crypt;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
-
-import com.sun.identity.idm.IdUtils;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.security.EncodeAction;
-
+import com.iplanet.services.util.Crypt;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
-
-import com.sun.identity.common.ResourceLookup;
-import com.sun.identity.shared.Constants;
+import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.common.RequestUtils;
 import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.common.RequestUtils;
+import com.sun.identity.common.ResourceLookup;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.PolicyException;
-
+import com.sun.identity.policy.PolicyUtils;
+import com.sun.identity.policy.plugins.AuthSchemeCondition;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.session.util.SessionUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.Locale;
-import org.forgerock.openam.utils.ClientUtils;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSEntry;
-
-import com.sun.identity.policy.PolicyUtils;
-import com.sun.identity.policy.plugins.AuthSchemeCondition;
-import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.security.AccessController;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.ClientUtils;
 
 public class AuthClientUtils {
 
@@ -141,6 +130,8 @@ public class AuthClientUtils {
     .append(Constants.FILE_SEPARATOR)
     .append(ISAuthConstants.AUTH_DIR).toString();
     private static final String rootSuffix = SMSEntry.getRootSuffix();
+    protected static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
 
     // dsame version
     private static String dsameVersion =
@@ -386,7 +377,7 @@ public class AuthClientUtils {
                 // used and the form is posted again with the base64 encoded 
                 // parameters            	
                 if ((value != null) && (value.length()>0)){
-                    value = getBase64DecodedValue(value);
+                    value = Base64.decodeAsUTF8String(value);
                     StringTokenizer st = new StringTokenizer(value, "&");
                     while (st.hasMoreTokens()) {
                         String str = st.nextToken();
@@ -405,7 +396,7 @@ public class AuthClientUtils {
                 // base64 encoded parameters including goto
                 if ((value != null) && (value.length()>0)){
              	    if(encoded.equalsIgnoreCase("true")){
-             	        value = getBase64DecodedValue(value);
+             	        value = Base64.decodeAsUTF8String(value);
              	    }
                 }
                 data.put(name, 
@@ -639,8 +630,7 @@ public class AuthClientUtils {
     }       
 
     // Get Original Redirect URL for Auth to redirect the Login request
-    public static String getOrigRedirectURL(HttpServletRequest request,
-        SessionID sessID) {
+    public static String getOrigRedirectURL(HttpServletRequest request, SessionID sessID) {
         try {
             String sidString = null;
             if (sessID != null) {
@@ -650,23 +640,10 @@ public class AuthClientUtils {
             SSOToken ssoToken = manager.createSSOToken(sidString);
             if (manager.isValidToken(ssoToken)) {
                 utilDebug.message("Valid SSOToken");
-                String origRedirectURL = ssoToken.getProperty("successURL");
-                String gotoURL = request.getParameter("goto");
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("Original successURL : " 
-                                      + origRedirectURL);
-                    utilDebug.message("Request gotoURL : " + gotoURL);
-                }
-                if ((gotoURL != null) && (gotoURL.length() != 0) && 
-                    (!gotoURL.equalsIgnoreCase("null"))) {
-                    String encoded = request.getParameter("encoded");
-                    if (encoded != null && encoded.equals("true")) {
-                        origRedirectURL = getBase64DecodedValue(gotoURL);
-                    } else {
-                        origRedirectURL = gotoURL;
-                    }
-                }
-                return (origRedirectURL);
+
+                return REDIRECT_URL_VALIDATOR.getRedirectUrl(ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
+                        REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO),
+                        ssoToken.getProperty("successURL"));
             }
         } catch (Exception e) {
             if (utilDebug.messageEnabled()) {
@@ -1719,8 +1696,8 @@ public class AuthClientUtils {
                 if (parameter.equalsIgnoreCase("SunQueryParamsString")) {
                     String queryParams = request.getParameter(parameter);
                     if ((queryParams != null) && (queryParams.length()>0)){
-                        queryParams = getBase64DecodedValue(queryParams);
-                	}
+                        queryParams = Base64.decodeAsUTF8String(queryParams);
+                    }
                     if ((queryParams != null) &&
                          (queryParams.length()>0)) {
                         if(utilDebug.messageEnabled()) {
@@ -1740,7 +1717,7 @@ public class AuthClientUtils {
                     	   // button is used and the form is posted with the
                     	   // base64 encoded parameters including goto
                     	   if(encoded.equalsIgnoreCase("true")){
-                    	       value = getBase64DecodedValue(value);
+                    	       value = Base64.decodeAsUTF8String(value);
                     	   }
                        } 
                        queryString = queryString + URLEncDec.encode(parameter)
@@ -2905,32 +2882,6 @@ public class AuthClientUtils {
             }
         }
         return (buff.toString());
-    } 
-
-    /** 
-     * Returns the Base64 decoded value.
-     * @param encodedStr Base64 encoded string
-     * @return a String the Base64 decoded string value
-     */
-    public static String getBase64DecodedValue(String encodedStr) {
-        String returnValue = null;
-
-        if (encodedStr != null && encodedStr.length() != 0) {
-            try {
-                returnValue = new String(Base64.decode(encodedStr), "UTF-8");
-            } catch (RuntimeException rtex) {
-                utilDebug.warning("getBase64DecodedValue:RuntimeException");
-            } catch (java.io.UnsupportedEncodingException ueex) {
-                utilDebug.warning("getBase64DecodedValue:" + 
-                    "UnsupportedEncodingException");
-            }
-        }
-
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("getBase64DecodedValue:returnValue : " 
-                + returnValue);
-        }
-        return (returnValue);
     }
 
     /**

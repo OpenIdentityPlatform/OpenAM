@@ -28,72 +28,61 @@
  */
 package com.sun.identity.authentication.service;
 
-import java.net.URL;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-
-import java.security.AccessController;
-
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.security.auth.callback.Callback;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
-
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
-
-import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.am.util.Misc;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.iplanet.am.util.Misc;
-import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.InternalSession;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.Constants;
-
-import com.sun.identity.security.AdminTokenAction;
-
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.config.AMAuthLevelManager;
+import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
+import com.sun.identity.authentication.config.AMAuthLevelManager;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.server.AuthXMLRequest;
 import com.sun.identity.authentication.spi.AMLoginModule;
+import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.AuthLoginException;
-import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.authentication.client.AuthClientUtils;
-
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.ResourceLookup;
-
-import com.sun.identity.shared.encode.CookieUtils;
-import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.DNMapper;
-
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthLevelCondition;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
-import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
 import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
-
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
+import com.sun.identity.policy.plugins.AuthenticateToServiceCondition;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import java.net.URL;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.StringTokenizer;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
 public class AuthUtils extends AuthClientUtils {
     
@@ -1615,21 +1604,10 @@ public class AuthUtils extends AuthClientUtils {
         HttpServletRequest request,
         AuthContextLocal authContext) {
         String orgDN = authContext.getOrgDN();
-        String successURL = getValidGotoURL(request, orgDN);
-        if ((successURL == null) || (successURL.length() == 0) ||
-        (successURL.equalsIgnoreCase("null")) ) {
-            LoginState loginState = getLoginState(authContext);
-            if (loginState == null) {
-                successURL = getSessionProperty("successURL",authContext);
-            } else {
-                successURL =
-                getLoginState(authContext).getConfiguredSuccessLoginURL();
-            }
-        }
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("getSuccessURL : " + successURL);
-        }
-        return successURL;
+
+        return REDIRECT_URL_VALIDATOR.getRedirectUrl(orgDN,
+                REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO),
+                getSessionProperty("successURL",authContext));
     }              
     
     // Returns the set of Module instances resulting from a 'composite advice'
@@ -2020,20 +1998,6 @@ public class AuthUtils extends AuthClientUtils {
                AMPostAuthProcessInterface.POST_PROCESS_LOGOUT_URL);
         }
     }
-    
-    /**
-     * Returns valid goto parameter for this request.	 
-     * Validate goto parameter set in the current request, then returns it	 
-     * if valid	 
-     * @param request the HttpServletRequest	 
-     * @param authContext authentication context for this request.	 
-     * @return successURL a String	 
-     */	 
-    public static String getValidGotoURL(HttpServletRequest request,	 
-            AuthContextLocal authContext) {	 
-        String orgDN = authContext.getOrgDN();	 
-        return getValidGotoURL(request, orgDN);	 
-    }	 
 
     /**
      * Returns valid goto parameter for this request. Validate goto parameter set in the current request, then returns
@@ -2044,26 +2008,8 @@ public class AuthUtils extends AuthClientUtils {
      * @return The validated goto URL.
      */
     public static String getValidGotoURL(HttpServletRequest request, String orgDN) {
-        String gotoUrl = null;
-        if (request != null) {
-            gotoUrl = request.getParameter(ISAuthConstants.GOTO_PARAM);
-        }
-
-        if (gotoUrl != null && !gotoUrl.isEmpty() && !gotoUrl.equalsIgnoreCase("null")) {
-            String encoded = request.getParameter("encoded");
-            if (encoded != null && encoded.equals("true")) {
-                gotoUrl = getBase64DecodedValue(gotoUrl);
-            }
-
-            if (!AuthD.getAuth().isGotoUrlValid(gotoUrl, orgDN)) {
-                if (utilDebug.messageEnabled()) {
-                    utilDebug.message("AuthUtils.getValidGotoURL():Original goto URL is " + gotoUrl
-                            + " which is invalid");
-                }
-                return null;
-            }
-        }
-        return gotoUrl;
+        return REDIRECT_URL_VALIDATOR.getRedirectUrl(
+                orgDN, REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO), null);
     }
 
     /**

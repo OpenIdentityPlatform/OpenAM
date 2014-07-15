@@ -21,10 +21,16 @@ import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import java.io.IOException;
+import java.security.SignatureException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
@@ -33,28 +39,20 @@ import org.forgerock.openam.forgerockrest.authn.core.LoginStage;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.mockito.BDDMockito.given;
+import org.mockito.Matchers;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class RestAuthenticationHandlerTest {
 
@@ -248,7 +246,6 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.next(callbacks)).willReturn(loginProcess);
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
-
 
         JsonValue jsonCallbacks = new JsonValue(new HashMap<String, Object>());
 

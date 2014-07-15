@@ -64,6 +64,7 @@ import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.L10NMessage;
@@ -370,15 +371,12 @@ public class LoginViewBean extends AuthViewBeanBase {
                      */
                     if (request != null) {
 	                redirect_url = AuthUtils.getValidGotoURL(request, ssoToken.getProperty("Organization"));
-	                if ((redirect_url == null) || (redirect_url.length() 
-                            == 0)){
-                            redirect_url = ssoToken.getProperty(
-                                ISAuthConstants.SUCCESS_URL);
+	                if ((redirect_url == null) || (redirect_url.length() == 0)){
+                            redirect_url = ssoToken.getProperty(ISAuthConstants.SUCCESS_URL);
                         }
                     }
                     if (redirect_url == null) {
-                        ResultVal = rb.getString
-                            ("authentication.already.login");
+                        ResultVal = rb.getString("authentication.already.login");
                     }
                     LoginSuccess = true;
                     boolean doForward = AuthUtils.forwardSuccessExists(request);
@@ -1565,7 +1563,7 @@ public class LoginViewBean extends AuthViewBeanBase {
             String new_org = (String) reqDataHash.get("new_org");
             if ((new_org != null && new_org.equals("true")) &&
                 (encoded != null && encoded.equals("true"))){
-                indexName = AuthUtils.getBase64DecodedValue(reqModule);
+                indexName = Base64.decodeAsUTF8String(reqModule);
             } else {
                 indexName = reqModule;
             }

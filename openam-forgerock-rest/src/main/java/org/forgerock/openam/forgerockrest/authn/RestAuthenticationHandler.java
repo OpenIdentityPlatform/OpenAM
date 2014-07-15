@@ -21,6 +21,11 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import java.security.SignatureException;
+import javax.inject.Inject;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
@@ -33,14 +38,10 @@ import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
-
-import javax.inject.Inject;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.SignatureException;
 
 /**
  * Handles the initial authenticate and subsequent callback submit RESTful calls.
@@ -53,7 +54,9 @@ public class RestAuthenticationHandler {
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private final AuthIdHelper authIdHelper;
-
+    private final RedirectUrlValidator<String> urlValidator =
+            new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+    
     /**
      * Constructs an instance of the RestAuthenticationHandler.
      *
@@ -159,7 +162,8 @@ public class RestAuthenticationHandler {
             DEBUG.error(e.getMessage());
 
             if (loginProcess != null) {
-                String failureUrl = loginProcess.getAuthContext().getFailureURL();
+                String failureUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
+                        loginProcess.getAuthContext().getFailureURL(), null);
                 e.setFailureUrl(failureUrl);
             }
             throw e;
@@ -242,12 +246,13 @@ public class RestAuthenticationHandler {
                     jsonResponseObject.put("message", "Authentication Successful");
                 }
 
-                String successUrl = loginProcess.getAuthContext().getSuccessURL();
-                jsonResponseObject.put("successUrl", successUrl);
+                String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
+                        urlValidator.getValueFromJson(postBody, RedirectUrlValidator.GOTO),
+                        loginProcess.getAuthContext().getSuccessURL());
 
-                JsonValue jsonValue = jsonResponseObject.build();
+                jsonResponseObject.put("successUrl", gotoUrl);
 
-                return jsonValue;
+                return jsonResponseObject.build();
 
             } else {
                 // send Error to client
