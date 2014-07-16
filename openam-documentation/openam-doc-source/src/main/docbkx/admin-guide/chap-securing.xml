@@ -91,12 +91,48 @@
    </listitem>
 
    <listitem>
-    <para>Remove the demo user account. For example, if you configure the embedded OpenDJ
-     directory server as a configuration and CTS store, the default demo user
+    <para>Remove the demo user account. For example, if you configure the embedded
+     OpenDJ directory server as a configuration and CTS store, the default demo user
      account gets created during the installation process. You should
      remove the user using the OpenAM console under Access Control &gt; / (Top Realm)
      &gt; Subjects &gt; User.
     </para>
+   </listitem>
+
+   <listitem>
+    <para>Set the list of Valid <literal>goto</literal> URL Resources.
+     By default, OpenAM redirects the user to the URL specified in the
+     <literal>goto</literal> and <literal>gotoOnFail</literal> query string parameters
+     supplied to the authentication interface in the login URL.
+    </para>
+    <para>
+     To increase security against possible phishing attacks through open redirect,
+     you can specify a list of valid URL resources against which OpenAM
+     validates these URLs.
+     OpenAM only redirects a user if the <literal>goto</literal> and
+     <literal>gotoOnFail</literal> URL matches any of the resources specified in
+     this setting.
+     If no setting is present, it is assumed that the <literal>goto</literal> or
+     <literal>gotoOnFail</literal> URL is valid.
+    </para>
+    <para>To set the Valid <literal>goto</literal> URL Resources, use the OpenAM
+     console, and navigate to Access Control &gt; <replaceable>Realm Name </replaceable>
+     &gt; Services. Click Add, select Validation Service, and then add one or more
+     valid <literal>goto</literal> URLs.
+    </para>
+
+     <para>
+      When setting valid <literal>goto</literal> URLs,
+      you can use the "*" wildcard,
+      where "*" matches all characters except "?".
+      For more specific patterns,
+      use resource names with wildcards as described in the procedure,
+       <link
+        xlink:href="admin-guide#configure-valid-goto-url-resources"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        xlink:show="new"
+        ><citetitle>Configuring Valid goto URL Resources</citetitle></link>.
+     </para>
    </listitem>
   </itemizedlist>
  </section>
@@ -299,8 +335,7 @@
   </itemizedlist>
  </section>
 
-
-    <section xml:id="amadmin-changes">
+ <section xml:id="amadmin-changes">
         <title>Administering the amadmin Account</title>
 
         <para>You can make changes to the password and user name for the main OpenAM administrative account.</para>
