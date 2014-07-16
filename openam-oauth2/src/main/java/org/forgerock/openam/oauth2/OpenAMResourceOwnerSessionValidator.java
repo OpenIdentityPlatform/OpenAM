@@ -42,6 +42,7 @@ import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.ext.servlet.ServletUtils;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -59,6 +60,13 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
 public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSessionValidator {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
+    private final SSOTokenManager ssoTokenManager;
+
+    @Inject
+    public OpenAMResourceOwnerSessionValidator(SSOTokenManager ssoTokenManager) {
+
+        this.ssoTokenManager = ssoTokenManager;
+    }
 
     /**
      * {@inheritDoc}
@@ -66,7 +74,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     public ResourceOwner validate(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             AccessDeniedException, BadRequestException, InteractionRequiredException, LoginRequiredException {
 
-        final String prompt = request.getParameter("prompt");
+        final String prompt = request.getParameter(OAuth2Constants.Custom.PROMPT);
 
         final OpenIdPrompt openIdPrompt = new OpenIdPrompt(prompt);
 
@@ -77,7 +85,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
         SSOToken token = null;
         try {
-            token = getToken(ServletUtils.getRequest(request.<Request>getRequest()));
+            token = ssoTokenManager.createSSOToken(getHttpServletRequest(request.<Request>getRequest()));
         } catch (SSOException e) {
             logger.warning("Error authenticating user against OpenAM: ", e);
         }
@@ -87,8 +95,7 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
                 if (openIdPrompt.isPromptLogin()) {
                     try {
-                        final SSOTokenManager mgr = SSOTokenManager.getInstance();
-                        mgr.destroyToken(token);
+                        ssoTokenManager.destroyToken(token);
                     } catch (SSOException e) {
                         logger.error("Error destorying SSOToken: ", e);
                     }
@@ -129,40 +136,52 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
             throws AccessDeniedException, EncodingException, URISyntaxException {
 
         final Request req = request.getRequest();
-        final String authURL = getAuthURL(ServletUtils.getRequest(req));
+        final String authURL = getAuthURL(getHttpServletRequest(req));
         final URI authURI = new URI(authURL);
         final Reference loginRef = new Reference(authURI);
 
-        final String realm = request.getParameter("realm");
-        final String moduleName = request.getParameter("module");
-        final String serviceName = request.getParameter("service");
-        final String locale = request.getParameter("locale");
+        final String realm = request.getParameter(OAuth2Constants.Custom.REALM);
+        final String moduleName = request.getParameter(OAuth2Constants.Custom.MODULE);
+        final String serviceName = request.getParameter(OAuth2Constants.Custom.SERVICE);
+        final String locale = request.getParameter(OAuth2Constants.Custom.LOCALE);
 
         if (!isEmpty(realm)) {
-            loginRef.addQueryParameter("realm", realm);
+            loginRef.addQueryParameter(OAuth2Constants.Custom.REALM, realm);
         }
         if (!isEmpty(locale)) {
-            loginRef.addQueryParameter("locale", locale);
+            loginRef.addQueryParameter(OAuth2Constants.Custom.LOCALE, locale);
         }
         if (!isEmpty(moduleName)) {
-            loginRef.addQueryParameter("module", moduleName);
+            loginRef.addQueryParameter(OAuth2Constants.Custom.MODULE, moduleName);
         } else if (!isEmpty(serviceName)) {
-            loginRef.addQueryParameter("service", serviceName);
+            loginRef.addQueryParameter(OAuth2Constants.Custom.SERVICE, serviceName);
         }
 
-        //remove prompt parameter
-        Form query = req.getResourceRef().getQueryAsForm();
-        Parameter p = query.getFirst("prompt");
-        if (p != null) {
-            p.setFirst("_prompt");
-        }
-        req.getResourceRef().setQuery(query.getQueryString());
+        removeLoginPrompt(req);
 
         loginRef.addQueryParameter(OAuth2Constants.Custom.GOTO, req.getResourceRef().toString());
 
         return new ResourceOwnerAuthenticationRequired(loginRef.toUri());
     }
 
+    /**
+     * Removes "login" from prompt query parameter.
+     *
+     * This needs to be done before redirecting the user to login so that an infinite redirect loop is avoided.
+     */
+    private void removeLoginPrompt(Request req) {
+        Form query = req.getResourceRef().getQueryAsForm();
+        Parameter param = query.getFirst(OAuth2Constants.Custom.PROMPT);
+        if (param != null && param.getSecond() != null) {
+            String newValue = param.getSecond().toLowerCase().replace(OpenIdPrompt.PROMPT_LOGIN, "").trim();
+            param.setSecond(newValue);
+        }
+        req.getResourceRef().setQuery(query.getQueryString());
+    }
+
+    /**
+     * Derive full URL for login screen
+     */
     private String getAuthURL(HttpServletRequest request) {
         final String uri = request.getRequestURI();
         String deploymentURI = uri;
@@ -180,8 +199,11 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
         return sb.toString();
     }
 
-    private SSOToken getToken(HttpServletRequest request) throws SSOException {
-        final SSOTokenManager mgr = SSOTokenManager.getInstance();
-        return mgr.createSSOToken(request);
+    /**
+     * Hide static method call behind an instance method that can be overridden by unit tests.
+     */
+    HttpServletRequest getHttpServletRequest(Request req) {
+        return ServletUtils.getRequest(req);
     }
+
 }

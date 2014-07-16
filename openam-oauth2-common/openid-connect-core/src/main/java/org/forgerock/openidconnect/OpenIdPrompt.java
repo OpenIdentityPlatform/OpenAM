@@ -30,10 +30,10 @@ import static org.forgerock.oauth2.core.Utils.isEmpty;
  */
 public class OpenIdPrompt {
 
-    private static final String PROMPT_DELIMITER = " ";
-    private static final String PROMPT_NONE = "none";
-    private static final String PROMPT_LOGIN = "login";
-    private static final String PROMPT_CONSENT = "consent";
+    public static final String PROMPT_DELIMITER = " ";
+    public static final String PROMPT_NONE = "none";
+    public static final String PROMPT_LOGIN = "login";
+    public static final String PROMPT_CONSENT = "consent";
 
     private final Set<String> prompts;
 

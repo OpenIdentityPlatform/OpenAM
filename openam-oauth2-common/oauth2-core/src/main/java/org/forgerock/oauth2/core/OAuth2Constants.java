@@ -643,18 +643,24 @@ public class OAuth2Constants {
 
     public class Custom {
         /**
-         * This parameter indicates whether the user should be prompted to grant
-         * account access to your application each time he tries to complete a
-         * particular action. The default value is auto, which indicates that a
-         * user would only need to grant access the first time he tried to
-         * access a protected resource.
+         * This optional parameter indicates whether the user should be prompted
+         * for re-authentication and consent to grant account access to your
+         * application each time he tries to complete a particular action.
          * <p/>
-         * Set the parameter value to force to direct the user to a consent page
-         * even if he has already granted access to your application for a
-         * particular set of scopes."
+         * The default value is auto, which indicates that a user would only need
+         * to grant access the first time he tried to access a protected resource.
+         * <p/>
+         * The parameter value may contain a combination of the following values
+         * separated by spaces:
+         * <ul>
+         *     <li>login - Force re-authentication.</li>
+         *     <li>consent - Force re-approval of access; must be combined with login
+         *     if the user has not already authenticated.</li>
+         *     <li>none - Require that the user has already authenticated and saved
+         *     consent; cannot be combined with login or consent.</li>
+         * </ul>
          */
         public static final String PROMPT = "prompt";
-        public static final String _PROMPT= "_prompt";
         public static final String APPROVAL_PROMPT = "approval_prompt";
         public static final String AUTO = "auto";
         public static final String FORCE = "force";
