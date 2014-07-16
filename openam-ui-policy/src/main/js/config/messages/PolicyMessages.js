@@ -37,6 +37,14 @@ define("config/messages/PolicyMessages", [], function () {
         "applicationUpdated": {
             msg: "config.messages.PolicyMessages.applicationUpdated",
             type: "info"
+        },
+        "policyCreated": {
+            msg: "config.messages.PolicyMessages.policyCreated",
+            type: "info"
+        },
+        "policyUpdated": {
+            msg: "config.messages.PolicyMessages.policyUpdated",
+            type: "info"
         }
     };
 });

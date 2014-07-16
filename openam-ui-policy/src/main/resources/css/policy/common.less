@@ -271,15 +271,16 @@
     }
 }
 
-#manageApps .filter-sort-grid {
-    width: 100%;
-    margin: 20px 0 0 0;
-
+.filter-sort-grid {
     .ellipsis-col {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
     }
+}
+#manageApps .filter-sort-grid{
+    width: 100%;
+    margin: 20px 0 0 0;
 
     .policy-col {
         width: 50px;
@@ -298,10 +299,17 @@
     }
 }
 
-.manage-policies {
+#managePolicies .manage-policies {
     margin: 45px 0 0;
+    .resources-col {
+        max-width: 200px;
+    }
+
+    .lastModBy-col {
+        max-width: 200px;
+    }
 }
 
-#cancelButton {
+#cancelButton{
     margin-bottom: 15px;
 }

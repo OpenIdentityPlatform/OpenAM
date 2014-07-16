@@ -43,8 +43,8 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         render: function (args, callback) {
             _.extend(this.data, args);
 
-            if (!this.data.app.resources) {
-                this.data.app.resources = [];
+            if (!this.data.entity.resources) {
+                this.data.entity.resources = [];
             }
 
             this.parentRender(callback);
@@ -63,14 +63,14 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         deleteResources: function () {
             var self = this,
                 selected = this.$el.find('[data-resource-index]:checked'),
-                resources = self.data.app.resources,
+                resources = self.data.entity.resources,
                 resourcesToDelete = [];
 
             _.each(selected, function (value, key, list) {
                 resourcesToDelete.push(resources[value.getAttribute('data-resource-index')]);
             });
 
-            this.data.app.resources = _.difference(resources, resourcesToDelete);
+            this.data.entity.resources = _.difference(resources, resourcesToDelete);
 
             this.render(self.data);
         }

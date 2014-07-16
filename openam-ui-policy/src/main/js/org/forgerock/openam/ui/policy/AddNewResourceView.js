@@ -57,7 +57,7 @@ define("org/forgerock/openam/ui/policy/AddNewResourceView", [
          */
         addResource: function () {
             var newResource = this.$newResource.val(),
-                resources = this.data.app.resources,
+                resources = this.data.entity.resources,
                 duplicate = _.find(resources, function (res) {
                     return res === newResource;
                 });

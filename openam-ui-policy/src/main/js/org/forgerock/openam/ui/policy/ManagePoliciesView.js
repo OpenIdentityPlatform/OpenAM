@@ -40,7 +40,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
 
         render: function (args, callback) {
 
-            var appName = uiUtils.getCurrentHash().split('/', 2)[1],
+            var appName = args[0],
                 self = this;
 
             this.parentRender(function () {

@@ -149,5 +149,46 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
+    obj.getPolicyByName = function (name, successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/policies/" + name,
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
+    obj.updatePolicy = function (policyName, data, successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/policies/" + policyName,
+            type: "PUT",
+            data: JSON.stringify(data),
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
+    obj.createPolicy = function (data, successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/policies/" + data.name,
+            headers: { "If-None-Match": "*" },
+            type: "PUT",
+            data: JSON.stringify(data),
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
     return obj;
 });

@@ -1,219 +1,79 @@
 <div class="content-bg">
-<h1>Create Policy</h1>
+    <h1>Create Policy</h1>
 
-<p>To designate the conditions that define access to a protected resource, begin with Step 1 and
-    progress through step 6. Modifications can be made after it has been created.
-</p>
+    <p>To designate the conditions that define access to a protected resource, begin with Step 1 and
+        progress through step 6. Modifications can be made after it has been created.
+    </p>
 
-<form class="form">
-<a href="#" id="cancelButton" class="button">Cancel</a>
+    <form class="form">
+        <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button">Cancel</a>
 
-<div id="policy-steps" class="accordion">
-<a href="" class="accordion-header">Step 1: Define a Policy Name and Description</a>
-<section class="accordion-step clearfix">
-
-    <div class="group-field-block">
-        <label class="short" for="name">Name</label>
-        <input id="name" type="text" required value="" name="name">
-    </div>
-    <div class="group-field-block">
-        <label class="short" for="description">Description (optional)</label>
-        <textarea id="description" name="description"></textarea>
-    </div>
-
-    <input class="button" type="button" value="Next" name="nextButton">
-
-</section>
-
-<a href="" class="accordion-header">Step 2: Add Resources</a>
-<section class="accordion-step clearfix">
-
-    <div class="column-layout">
-        <div class="column2">
-            <table class="filter-sort-grid resources-grid">
-                <thead>
-                <tr class="header-titles">
-                    <th><input type="checkbox"/></th>
-                    <th><a href="">Resource</a></th>
-                </tr>
-                <tr class="header-filter">
-                    <th></th>
-                    <th><input type="text" value="Filter ..."/></th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr>
-                    <td><input type="checkbox"/></td>
-                    <td>http*://*.test.com
-                        <a class="resource-exceptions" href="">Exceptions</a>
-                    </td>
-                </tr>
-                <tr class="nested-row">
-                    <td colspan="2">
-                        <table class="filter-sort-grid">
-                            <thead>
-                            <tr class="header-actions">
-                                <th colspan="3">
-                                    <input type="button" class="button" value="Delete Selected">
-                                </th>
-                            </tr>
-                            <tr class="header-titles">
-                                <th><input type="checkbox"/></th>
-                                <th><a href="">Resource</a></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><input type="checkbox"/></td>
-                                <td>http*://qqq.test.com</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"/></td>
-                                <td>http*://qqq/qq/test.com</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"/></td>
-                                <td>http*://123/qq/test.com</td>
-                            </tr>
-                            </tbody>
-                            <tfoot></tfoot>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox"/></td>
-                    <td>http*://*/*/test.com</td>
-                </tr>
-                </tbody>
-                <tfoot></tfoot>
-            </table>
-        </div>
-        <div class="column2">
-            <fieldset class="fieldset">
-                <legend>Add New</legend>
-                <div class="group-field-block">
-                    <label class="prop-name" for="urlResource">New URL resource:</label>
-                    <select class="prop-val" id="urlResource">
-                        <option>Web Service</option>
-                        <option>Web Agent</option>
-                        <option>Banking</option>
-                    </select>
-                </div>
+        <div id="policy-steps" class="accordion">
+            <a href="" class="accordion-header">Step 1: Define a Policy Name and Description</a>
+            <section class="accordion-step clearfix">
 
                 <div class="group-field-block">
-                    <label class="prop-name">URL resource pattern:</label>
-            <span class="resource-pattern">
-                http <input type="text"/> :// <input type="text"/> .test.com
-            </span>
+                    <label class="short" for="policyName">Name</label>
+                    <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name"/>
                 </div>
-                <input type="button" class="button" value="Add"/>
-            </fieldset>
+                <div class="group-field-block">
+                    <label class="short" for="description">Description (optional)</label>
+                    <textarea class="prop-val" id="description" data-field="description">{{entity.description}}</textarea>
+                </div>
+
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <a href="" class="accordion-header">Step 2: Add Resources</a>
+            <section class="accordion-step clearfix">
+
+                <div class="column-layout">
+                    <div class="column2" id="resourcesList"></div>
+                    <div class="column2" id="addNewResource"></div>
+                </div>
+
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <a href="" class="accordion-header">Step 3: Configure Actions</a>
+            <section class="accordion-step clearfix">
+
+                <table id="actions" class="filter-sort-grid actions-grid"></table>
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <a href="" class="accordion-header">Step 4: Select Subjects</a>
+            <section class="accordion-step clearfix">
+
+                <div id="subjectContainer"></div>
+
+
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <a href="" class="accordion-header">Step 5: Environmental Conditions</a>
+            <section class="accordion-step clearfix">
+
+                <div id="environmentContainer"></div>
+
+
+                <input class="button" type="button" value="Next" name="nextButton">
+
+            </section>
+
+            <a href="" class="accordion-header">Step 6: Summary and Confirmation View</a>
+            <section class="accordion-step clearfix">
+
+                <p> Review the policy configuration and click Finish to save.</p>
+
+                <div class="column-layout" id="reviewPolicyInfo"></div>
+
+                <input class="button" type="button" value="Finish" name="submitForm">
+            </section>
         </div>
-    </div>
-
-    <input class="button" type="button" value="Next" name="nextButton">
-
-</section>
-
-<a href="" class="accordion-header">Step 3: Configure Actions</a>
-<section class="accordion-step clearfix">
-
-    <table class="filter-sort-grid actions-grid">
-        <thead>
-        <tr class="header-actions">
-            <th colspan="3">
-                <input type="button" class="button" value="Delete Selected">
-            </th>
-        </tr>
-        <tr class="header-titles">
-            <th><input type="checkbox"/></th>
-            <th><a href="">Action</a></th>
-            <th><a href="">Permission</a></th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr>
-            <td><input type="checkbox"/></td>
-            <td>post</td>
-            <td>
-                <div class="group-field-row">
-                    <input type="radio" name="actionPermission" id="allowPost" value="Allow"/>
-                    <label for="allowPost">Allow</label>
-
-                    <input type="radio" name="actionPermission" id="denyPost" value="Deny"/>
-                    <label for="denyPost">Deny</label>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td><input type="checkbox"/></td>
-            <td>get</td>
-            <td>
-                <div class="group-field-row">
-                    <input type="radio" name="actionPermission" id="allowGet" value="Allow"/>
-                    <label for="allowGet">Allow</label>
-
-                    <input type="radio" name="actionPermission" id="denyGet" value="Deny"/>
-                    <label for="denyGet">Deny</label>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <input class="button" type="button" value="Next" name="nextButton">
-
-</section>
-
-<a href="" class="accordion-header">Step 4: Select Subjects</a>
-<section class="accordion-step clearfix">
-
-    <div id="subjectContainer"></div>
-
-
-    <input class="button" type="button" value="Next" name="nextButton">
-
-</section>
-
-<a href="" class="accordion-header">Step 5: Environmental Conditions</a>
-<section class="accordion-step clearfix">
-
-    <div id="environmentContainer"></div>
-
-
-    <input class="button" type="button" value="Next" name="nextButton">
-
-</section>
-
-<a href="" class="accordion-header">Step 6: Summary and Confirmation View</a>
-<section class="accordion-step clearfix">
-
-    <p> Review the policy configuration and click Finish to save.</p>
-
-    <div class="column-layout">
-        <div class="column2">
-            <div class="review-row">
-                <a href="">Name</a> <span>Test</span>
-            </div>
-            <div class="review-row">
-                <a href="">Description</a> <span>Test description qwety</span>
-            </div>
-            <div class="review-row">
-                <a href="">Resources</a> <span>http*://*.test.com, http*://*/test.com</span>
-            </div>
-            <div class="review-row">
-                <a href="">Actions</a> <span>Create Content (POST): Allowed<br/>View Content (GET): Allowed</span>
-            </div>
-            <div class="review-row">
-                <a href="">Conditions</a> <span>Any of<br/>Any Transfer Limit, IP Range, Time Range</span>
-            </div>
-        </div>
-    </div>
-
-    <input class="button" type="button" value="Finish" name="finishButton">
-</section>
-</div>
-</form>
+    </form>
 </div>

@@ -28,20 +28,20 @@
 
 /*global window, define, $, form2js, _, js2form, document, console */
 
-define("org/forgerock/openam/ui/policy/ReviewApplicationInfoView", [
+define("org/forgerock/openam/ui/policy/ReviewInfoView", [
     "org/forgerock/commons/ui/common/main/AbstractView"
 ], function (AbstractView) {
-    var ReviewApplicationInfoView = AbstractView.extend({
-        element: "#reviewInfo",
-        template: "templates/policy/ReviewApplicationStepTemplate.html",
+    var ReviewInfoView = AbstractView.extend({
         noBaseTemplate: true,
 
-        render: function (args, callback) {
+        render: function (args, callback, element, template) {
             _.extend(this.data, args);
 
+            this.element = element;
+            this.template = template;
             this.parentRender(callback);
         }
     });
 
-    return new ReviewApplicationInfoView();
+    return new ReviewInfoView();
 });

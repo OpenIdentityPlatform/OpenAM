@@ -1,149 +1,162 @@
 <div class="content-bg">
-<h1>Create Applications</h1>
+    <h1>Create Applications</h1>
 
-<p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
-    service. This template is then used when policies are created for the service. To create an application, begin
-    with Step 1 and progress through step 7. Modifications can be made after the application has been created.</p>
+    <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
+        service. This template is then used when policies are created for the service. To create an application, begin
+        with Step 1 and progress through step 7. Modifications can be made after the application has been created.</p>
 
-<form class="form">
-<div class="accordion">
-<a class="accordion-header" href="">Step 1: Define an Application Name and Application Type</a>
-<section class="accordion-step clearfix">
-    <div class="group-field-block">
-        <label class="prop-name" for="appName">Name:</label>
-        <input class="prop-val" id="appName" type="text" value="{{app.name}}" data-field="name"/>
-    </div>
-    <div class="group-field-block">
-        <label class="prop-name" for="appDescription">Description (optional):</label>
-        <textarea class="prop-val" id="appDescription" data-field="description">{{app.description}}</textarea>
-    </div>
-    <hr/>
-    <div class="group-field-block">
-        <label class="prop-name" for="appType">Application Type:</label>
-        {{select appTypes 'appTypes' app.applicationType app.applicationType 'class="prop-val" id="appType"'}}
-    </div>
-    <div class="group-field-block">
-        <label class="prop-name" for="appRealm">Realm</label>
-        <input class="prop-val" id="appRealm" type="text" value="{{app.realm}}" data-field="realm"/>
-    </div>
-    <input type="button" value="Next" name="nextButton" class="button"/>
-</section>
+    <form class="form">
+        <div class="accordion">
+            <a class="accordion-header" href="">Step 1: Define an Application Name and Application Type</a>
+            <section class="accordion-step clearfix">
+                <div class="group-field-block">
+                    <label class="prop-name" for="appName">Name:</label>
+                    <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name"/>
+                </div>
+                <div class="group-field-block">
+                    <label class="prop-name" for="appDescription">Description (optional):</label>
+                    <textarea class="prop-val" id="appDescription"
+                              data-field="description">{{entity.description}}</textarea>
+                </div>
+                <hr/>
+                <div class="group-field-block">
+                    <label class="prop-name" for="appType">Application Type:</label>
+                    {{select appTypes 'appTypes' entity.applicationType entity.applicationType 'class="prop-val"
+                    id="appType"'}}
+                </div>
+                <div class="group-field-block">
+                    <label class="prop-name" for="appRealm">Realm</label>
+                    <input class="prop-val" id="appRealm" type="text" value="{{entity.realm}}" data-field="realm"/>
+                </div>
+                <input type="button" value="Next" name="nextButton" class="button"/>
+            </section>
 
-<a class="accordion-header" href="">Step 2: Add Resources</a>
-<section class="accordion-step clearfix">
-    <div class="column-layout">
-        <div class="column2" id="resourcesList"></div>
-        <div class="column2" id="addNewResource"></div>
-    </div>
+            <a class="accordion-header" href="">Step 2: Add Resources</a>
+            <section class="accordion-step clearfix">
+                <div class="column-layout">
+                    <div class="column2" id="resourcesList"></div>
+                    <div class="column2" id="addNewResource"></div>
+                </div>
 
-    <input type="button" class="button" value="Next" name="nextButton"/>
-</section>
+                <input type="button" class="button" value="Next" name="nextButton"/>
+            </section>
 
-<a class="accordion-header" href="">Step 3: Configure Actions</a>
-<section class="accordion-step clearfix">
-    <table id="actions" class="filter-sort-grid actions-grid"></table>
-    <input type="button" class="button" value="Next" name="nextButton"/>
-</section>
+            <a class="accordion-header" href="">Step 3: Configure Actions</a>
+            <section class="accordion-step clearfix">
+                <table id="actions" class="filter-sort-grid actions-grid"></table>
+                <input type="button" class="button" value="Next" name="nextButton"/>
+            </section>
 
-<a class="accordion-header" href="">Step 4: Select Subject Conditions</a>
-<section class="accordion-step clearfix">
-    <p>
-        Select one or more subject conditions. Additionally, choose one or more operators to combine conditions. Selections
-        made here define the available conditions during policy creation.
-    </p>
+            <a class="accordion-header" href="">Step 4: Select Subject Conditions</a>
+            <section class="accordion-step clearfix">
+                <p>
+                    Select one or more subject conditions. Additionally, choose one or more operators to combine
+                    conditions. Selections
+                    made here define the available conditions during policy creation.
+                </p>
 
-    <div class="column-layout">
-        <div class="column2 group-field-block">
-            <label>Allowed Subject Conditions:</label>
-            <div class="controls-group">
-                {{#each subjConditions}}
-                    {{#unless logical}}
-                    <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond" id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
-                    <label for="subjCond_{{name}}">{{name}}</label>
-                    {{/unless}}
-                {{/each}}
-            </div>
+                <div class="column-layout">
+                    <div class="column2 group-field-block">
+                        <label>Allowed Subject Conditions:</label>
+
+                        <div class="controls-group">
+                            {{#each subjConditions}}
+                            {{#unless logical}}
+                            <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond"
+                            id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
+                            <label for="subjCond_{{name}}">{{name}}</label>
+                            {{/unless}}
+                            {{/each}}
+                        </div>
+                    </div>
+
+                    <div class="column2 group-field-block">
+                        <label>Allowed Condition Operators:</label>
+
+                        <div class="controls-group">
+                            {{#each subjConditions}}
+                            {{#if logical}}
+                            <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond"
+                            id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
+                            <label for="subjCond_{{name}}">{{name}}</label>
+                            {{/if}}
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                <input type="button" class="button" value="Next" name="nextButton"/>
+            </section>
+
+            <a class="accordion-header" href="">Step 5: Select Environment Conditions</a>
+            <section class="accordion-step clearfix">
+                <p>
+                    Select one or more environment conditions. Additionally, choose one or more operators to combine
+                    conditions. Selections
+                    made here define the available conditions during policy creation.
+                </p>
+
+                <div class="column-layout">
+                    <div class="column2 group-field-block">
+                        <label>Allowed Environment Conditions:</label>
+
+                        <div class="controls-group">
+                            {{#each envConditions}}
+                            {{#unless logical}}
+                            <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}"
+                            value="{{name}}" data-field="conditions"/>
+                            <label for="envCond_{{name}}">{{name}}</label>
+                            {{/unless}}
+                            {{/each}}
+                        </div>
+                    </div>
+
+                    <div class="column2 group-field-block">
+                        <label>Allowed Condition Operators:</label>
+
+                        <div class="controls-group">
+                            {{#each envConditions}}
+                            {{#if logical}}
+                            <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}"
+                            value="{{name}}" data-field="conditions"/>
+                            <label for="envCond_{{name}}">{{name}}</label>
+                            {{/if}}
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                <input type="button" class="button" value="Next" name="nextButton"/>
+            </section>
+
+            <a class="accordion-header" href="">Step 6: Choose Decision Conflict Rule</a>
+            <section class="accordion-step clearfix">
+                <p>
+                    If a decision for a requested action is boolean, a value of false overrides one of true. For
+                    example, when
+                    deciding authorization for a URL, deny overrides allow. This is the only decision conflict rule
+                    currently
+                    supported.
+                </p>
+
+                <div class="group-field-block">
+                    <input type="radio" id="conflictRule" value="{{entity.entitlementCombiner}}" checked/>
+                    <label for="conflictRule">{{entity.entitlementCombiner}}: Allow</label>
+                </div>
+
+                <input type="button" class="button" value="Next" name="nextButton"/>
+            </section>
+
+            <a class="accordion-header" href="">Step 7: Review Configuration</a>
+            <section class="accordion-step clearfix">
+                <p>
+                    Review the application configuration and click Finish to save.
+                </p>
+
+                <div class="column-layout" id="reviewInfo"></div>
+
+                <input type="button" class="button" value="Finish" name="submitForm"/>
+            </section>
         </div>
-
-        <div class="column2 group-field-block">
-            <label>Allowed Condition Operators:</label>
-            <div class="controls-group">
-                {{#each subjConditions}}
-                    {{#if logical}}
-                    <input type="checkbox" {{#if selected}} checked {{/if}} name="subjCond" id="subjCond_{{name}}" value="{{name}}" data-field="subjects"/>
-                    <label for="subjCond_{{name}}">{{name}}</label>
-                    {{/if}}
-                {{/each}}
-            </div>
-        </div>
-    </div>
-
-    <input type="button" class="button" value="Next" name="nextButton"/>
-</section>
-
-<a class="accordion-header" href="">Step 5: Select Environment Conditions</a>
-<section class="accordion-step clearfix">
-    <p>
-        Select one or more environment conditions. Additionally, choose one or more operators to combine conditions. Selections
-        made here define the available conditions during policy creation.
-    </p>
-
-    <div class="column-layout">
-        <div class="column2 group-field-block">
-            <label>Allowed Environment Conditions:</label>
-
-            <div class="controls-group">
-                {{#each envConditions}}
-                    {{#unless logical}}
-                    <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}" value="{{name}}" data-field="conditions"/>
-                    <label for="envCond_{{name}}">{{name}}</label>
-                    {{/unless}}
-                {{/each}}
-            </div>
-        </div>
-
-        <div class="column2 group-field-block">
-            <label>Allowed Condition Operators:</label>
-            <div class="controls-group">
-                {{#each envConditions}}
-                    {{#if logical}}
-                    <input type="checkbox" {{#if selected}} checked {{/if}} name="envCond" id="envCond_{{this}}" value="{{name}}" data-field="conditions"/>
-                    <label for="envCond_{{name}}">{{name}}</label>
-                    {{/if}}
-                {{/each}}
-            </div>
-        </div>
-    </div>
-
-    <input type="button" class="button" value="Next" name="nextButton"/>
-</section>
-
-<a class="accordion-header" href="">Step 6: Choose Decision Conflict Rule</a>
-<section class="accordion-step clearfix">
-    <p>
-        If a decision for a requested action is boolean, a value of false overrides one of true. For example, when
-        deciding authorization for a URL, deny overrides allow. This is the only decision conflict rule currently
-        supported.
-    </p>
-
-    <div class="group-field-block">
-        <input type="radio" id="conflictRule" value="{{app.entitlementCombiner}}" checked/>
-        <label for="conflictRule">{{app.entitlementCombiner}}: Allow</label>
-    </div>
-
-    <input type="button" class="button" value="Next" name="nextButton"/>
-</section>
-
-<a class="accordion-header" href="">Step 7: Review Configuration</a>
-<section class="accordion-step clearfix">
-    <p>
-        Review the application configuration and click Finish to save.
-    </p>
-
-    <div class="column-layout" id="reviewInfo"></div>
-
-    <input type="button" class="button" value="Finish" name="submitForm"/>
-</section>
-</div>
-</form>
+    </form>
 </div>

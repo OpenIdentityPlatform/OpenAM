@@ -34,7 +34,8 @@ define([
     "text!templates/policy/ManageApplicationsTemplate.html",
     "text!templates/policy/ManagePoliciesTemplate.html",
     "text!templates/policy/ResourcesListTemplate.html",
-    "text!templates/policy/ReviewApplicationStepTemplate.html"
+    "text!templates/policy/ReviewApplicationStepTemplate.html",
+    "text!templates/policy/ReviewPolicyStepTemplate.html"
 ], function () {
     /* an unfortunate need to duplicate the file names here, but I haven't
      yet found a way to fool requirejs into doing dynamic dependencies */
@@ -49,7 +50,8 @@ define([
             "templates/policy/ManageApplicationsTemplate.html",
             "templates/policy/ManagePoliciesTemplate.html",
             "templates/policy/ResourcesListTemplate.html",
-            "templates/policy/ReviewApplicationStepTemplate.html"
+            "templates/policy/ReviewApplicationStepTemplate.html",
+            "templates/policy/ReviewPolicyStepTemplate.html"
         ],
         deps = arguments;
 
@@ -161,6 +163,56 @@ define([
                     "Content-Type": "application/json;charset=UTF-8"
                 },
                 "{\"result\":[{\"title\":\"DenyOverride\"}],\"resultCount\":1,\"pagedResultsCookie\":null,\"remainingPagedResults\":-1}"
+            ]
+        );
+
+        server.respondWith(
+            "GET",
+            "/openam/json/policies/newPolicy",
+            [
+                200,
+                {
+                    "Date": "Thu, 03 Jul 2014 10:55:52 GMT",
+                    "Cache-Control": "no-cache",
+                    "Server": "Apache-Coyote/1.1",
+                    "ETag": "&quot;1403599741705&quot;",
+                    "Content-Length": "524",
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "{\"name\":\"newPolicy\",\"active\":true,\"description\":\"changed\",\"resources\":{\"included\":[\"http://im.sun.com/register\",\"http://im.sun.com/im.jnlp\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"POST\":false,\"GET\":true,\"HEAD\":true,\"PUT\":true},\"subject\":{\"type\":\"User\",\"subjectName\":\"Bob Bob\"},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-06-24T08:49:01Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-11T13:56:43Z\"}"
+            ]
+        );
+
+        server.respondWith(
+            "GET",
+            "/openam/json/applications/im",
+            [
+                200,
+                {
+                    "Date": "Thu, 03 Jul 2014 10:55:52 GMT",
+                    "Cache-Control": "no-cache",
+                    "Server": "Apache-Coyote/1.1",
+                    "ETag": "&quot;1402486647976&quot;",
+                    "Content-Length": "918",
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "{\"name\":\"im\",\"resources\":[\"http://im.sun.com/register\",\"http://im.sun.com/im.jnlp\"],\"actions\":{\"POST\":true,\"PATCH\":true,\"GET\":true,\"DELETE\":true,\"OPTIONS\":true,\"HEAD\":true,\"PUT\":true},\"attributeNames\":[],\"description\":null,\"realm\":\"/\",\"entitlementCombiner\":\"com.sun.identity.entitlement.DenyOverride\",\"searchIndex\":null,\"resourceComparator\":\"com.sun.identity.entitlement.URLResourceName\",\"creationDate\":1402486647976,\"lastModifiedDate\":1402486647976,\"createdBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModifiedBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"conditions\":[\"dnsName\",\"ipRange\",\"daysOfWeek\"],\"applicationType\":\"iPlanetAMWebAgentService\",\"subjects\":[\"com.sun.identity.admin.model.IdRepoUserViewSubject\",\"com.sun.identity.admin.model.IdRepoRoleViewSubject\",\"com.sun.identity.admin.model.VirtualViewSubject\",\"com.sun.identity.admin.model.IdRepoGroupViewSubject\"],\"saveIndex\":null}"
+            ]
+        );
+
+        server.respondWith(
+            "GET",
+            "/openam/json/policies?_queryFilter=applicationName%20eq%20%22im%22",
+            [
+                200,
+                {
+                    "Date": "Thu, 03 Jul 2014 10:53:32 GMT",
+                    "Cache-Control": "no-cache",
+                    "Server": "Apache-Coyote/1.1",
+                    "Content-Length": "2353",
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                "{\"result\":[{\"name\":\"demo\",\"active\":true,\"description\":\"demo\",\"resources\":{\"included\":[\"http://im.sun.com/im.jnlp\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"PUT\":true},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-06-26T14:56:04Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-24T12:41:27Z\"},{\"name\":\"newtest\",\"active\":true,\"description\":\"test policy\",\"resources\":{\"included\":[\"http://im.sun.com/im.jnlp\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"DELETE\":true,\"HEAD\":true},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-07-02T13:37:18Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-24T07:19:48Z\"},{\"name\":\"SomenewPolicy\",\"active\":true,\"description\":\"test changed\",\"resources\":{\"included\":[\"http://im.sun.com/register\",\"http://im.sun.com/im.jnlp\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"POST\":false,\"GET\":true},\"subject\":{\"type\":\"User\",\"subjectName\":\"Bob Bob\"},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-06-24T07:31:13Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-11T13:58:17Z\"},{\"name\":\"newPolicy\",\"active\":true,\"description\":\"changed\",\"resources\":{\"included\":[\"http://im.sun.com/register\",\"http://im.sun.com/im.jnlp\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"POST\":false,\"GET\":true,\"HEAD\":true,\"PUT\":true},\"subject\":{\"type\":\"User\",\"subjectName\":\"Bob Bob\"},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-06-24T08:49:01Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-11T13:56:43Z\"},{\"name\":\"bender\",\"active\":true,\"description\":\"bender\",\"resources\":{\"included\":[\"http://im.sun.com/register\"],\"excluded\":[]},\"applicationName\":\"im\",\"actionValues\":{\"POST\":true},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-06-30T10:32:52Z\",\"createdBy\":\"id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-06-24T08:49:52Z\"}],\"resultCount\":5,\"pagedResultsCookie\":null,\"remainingPagedResults\":0}"
             ]
         );
     };

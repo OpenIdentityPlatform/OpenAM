@@ -57,16 +57,16 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
 
         init: function () {
             var data = this.data,
-                app = data.app,
+                entity = data.entity,
                 availableActions,
                 selectedActions;
 
-            if (!app.actions) {
-                app.actions = [];
+            if (!entity.actions) {
+                entity.actions = [];
             }
 
-            availableActions = data.typeActions[app.applicationType];
-            selectedActions = app.actions;
+            availableActions = entity.availableActions;
+            selectedActions = entity.actions;
 
             if (!_.isEmpty(selectedActions)) {
                 _.each(availableActions, function (action) {
@@ -78,7 +78,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
                 });
             }
 
-            app.actions = availableActions;
+            entity.actions = availableActions;
         },
 
         /**
@@ -87,7 +87,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
         toggleAction: function (e) {
             var actionName = e.target.getAttribute('data-action-name');
 
-            _.find(this.data.app.actions,function (action) {
+            _.find(this.data.entity.actions,function (action) {
                 return action.action === actionName;
             }).selected = e.target.checked;
         },
@@ -99,7 +99,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
             var value = e.target.value,
                 actionName = e.target.getAttribute('data-action-name');
 
-            _.find(this.data.app.actions,function (action) {
+            _.find(this.data.entity.actions,function (action) {
                 return action.action === actionName;
             }).value = value === 'Allow';
         },
@@ -109,7 +109,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
          */
         toggleAllActions: function (e) {
             var checked = e.target.checked,
-                actions = this.data.app.actions;
+                actions = this.data.entity.actions;
 
             _.each(actions, function (action) {
                 action.selected = checked;
