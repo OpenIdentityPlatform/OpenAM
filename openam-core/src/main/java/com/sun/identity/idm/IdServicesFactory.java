@@ -79,7 +79,7 @@ public class IdServicesFactory {
     /**
      * System property to set to force all attribute names to be converted to lower case. Defaults to true.
      */
-    private static final String USE_LOWERCASE_NAMES_PROPERTY = "org.forgerock.identity.idm.attribute.names.lower.case";
+    private static final String USE_LOWERCASE_NAMES_PROPERTY = "org.forgerock.openam.idm.attribute.names.lower.case";
 
     /**
      * Whether to convert all attribute names to lower case or not.
