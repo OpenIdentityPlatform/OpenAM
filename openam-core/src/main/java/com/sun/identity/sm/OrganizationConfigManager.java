@@ -24,10 +24,7 @@
  *
  * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.sm;
 
@@ -353,7 +350,7 @@ public class OrganizationConfigManager {
             AgentsRepo agentsRepo = new AgentsRepo();
             HashMap config = new HashMap(1);
             HashSet realmName = new HashSet(1);
-            realmName.add(subOrgName);
+            realmName.add(subOrgDN);
             config.put("agentsRepoRealmName", realmName);
             try {
                 agentsRepo.initialize(config);
