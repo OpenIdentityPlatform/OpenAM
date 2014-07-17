@@ -1465,7 +1465,7 @@ public class Session extends GeneralTaskRunnable {
         needToReset = false;
 
        SessionOperations operation = sessionStrategy.getOperation(this);
-       SessionInfo info = operation.refresh(this, reset);
+       SessionInfo info = operation.refresh(this, flag);
 
         long oldMaxCachingTime = maxCachingTime;
         long oldMaxIdleTime = maxIdleTime;
