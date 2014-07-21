@@ -24,10 +24,7 @@
  *
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.delegation.plugins;
 
@@ -83,17 +80,16 @@ import com.sun.identity.delegation.ResBundleUtils;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPrivilege;
+import java.util.List;
 
 /**
  * The class <code>DelegationPolicyImpl</code> implements the interface
- * <code>DelegationInterface</code> using OpenSSO Policy
+ * <code>DelegationInterface</code> using OpenAM Policy
  * Management and Evaluation APIs. It provides access control for access 
- * manager using the OpenSSO's internal policy framework.
+ * manager using the OpenAM's internal policy framework.
  */
 
-public class DelegationPolicyImpl implements DelegationInterface, 
-    ServiceListener, IdEventListener, PolicyListener 
-{
+public class DelegationPolicyImpl implements DelegationInterface, ServiceListener, IdEventListener, PolicyListener {
 
     private static final String POLICY_REPOSITORY_REALM = 
                                        PolicyManager.DELEGATION_REALM;
@@ -117,8 +113,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
      *  To configure the delegation cache size, specify the attribute
      * "com.sun.identity.delegation.cache.size" in AMConfig.properties.
      */
-    private static final String CONFIGURED_CACHE_SIZE = 
-                           "com.sun.identity.delegation.cache.size";
+    private static final String CONFIGURED_CACHE_SIZE = "com.sun.identity.delegation.cache.size";
     private static final int DEFAULT_CACHE_SIZE = 20000;
 
     /** delegation cache structure:
@@ -130,7 +125,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
      *  The cache is a LRU one and is updated based on subject change 
      *  notification and policy change notification.
      */
-    private static Cache delegationCache;
+    private Map<String, Map<String, List<Object>>> delegationCache;
     private static int maxCacheSize = DEFAULT_CACHE_SIZE;
     private static Map idRepoListeners = new HashMap();
     private static ServiceConfigManager scm;
@@ -151,37 +146,20 @@ public class DelegationPolicyImpl implements DelegationInterface,
     * @throws DelegationException if an error occurred during
     * initialization of <code>DelegationInterface</code> instance
     */
-
-    public void initialize(SSOToken token, Map configParams)
-        throws DelegationException {
+    public void initialize(SSOToken token, Map configParams) throws DelegationException {
         this.appToken = token;
         try {
-            String cacheSize = SystemProperties.get(CONFIGURED_CACHE_SIZE);
-            if (cacheSize != null) {
-                 try {
-                     maxCacheSize = Integer.parseInt(cacheSize); 
-                     // specifying cache size as 0 would virtually 
-                     // disable the delegation cache.
-                     if (maxCacheSize < 0) {
-                         maxCacheSize = DEFAULT_CACHE_SIZE;
-                     }
-                 } catch (NumberFormatException nfe) {
-                     DelegationManager.debug.error(
-                     "DelegationPolicyImpl.initialize(): " +
-                     "invalid cache size specified in AMConfig.properties."
-                     + " Use default cache size " + DEFAULT_CACHE_SIZE);
-                     maxCacheSize = DEFAULT_CACHE_SIZE;
-                 }
+            maxCacheSize = SystemProperties.getAsInt(CONFIGURED_CACHE_SIZE, DEFAULT_CACHE_SIZE);
+            // specifying cache size as 0 would virtually disable the delegation cache.
+            if (maxCacheSize < 0) {
+                maxCacheSize = DEFAULT_CACHE_SIZE;
             }
             delegationCache = new Cache(maxCacheSize);
             if (DelegationManager.debug.messageEnabled()) {
-                DelegationManager.debug.message(
-                "DelegationPolicyImpl.initialize(): cache size="
-                 + maxCacheSize);
+                DelegationManager.debug.message("DelegationPolicyImpl.initialize(): cache size=" + maxCacheSize);
             }
 
-            pe = new PolicyEvaluator(POLICY_REPOSITORY_REALM,
-                       DelegationManager.DELEGATION_SERVICE);
+            pe = new PolicyEvaluator(POLICY_REPOSITORY_REALM, DelegationManager.DELEGATION_SERVICE);
             
             // listen on delegation policy changes. once there is 
             // delegation policy change, we need to update the cache.
@@ -542,8 +520,7 @@ public class DelegationPolicyImpl implements DelegationInterface,
             if ((actions != null) && (!actions.isEmpty())) {
                 try {
                     resource = getResourceName(permission);
-                    pd = getResultFromCache(
-                                    tokenIdStr, resource, envParams);
+                    pd = getResultFromCache(tokenIdStr, resource, envParams);
                     if (pd != null) {
                         if (DelegationManager.debug.messageEnabled()) {
                             DelegationManager.debug.message(
@@ -604,38 +581,34 @@ public class DelegationPolicyImpl implements DelegationInterface,
      *         used to fetch the decisions.
      * @return policy decision 
      */
-    private static PolicyDecision getResultFromCache(String tokenIdStr,
-      String resource, Map envParams) 
-      throws SSOException, DelegationException {
+    private PolicyDecision getResultFromCache(String tokenIdStr, String resource, Map envParams)
+            throws SSOException, DelegationException {
         if (resource != null) {
-            Map items = (Map)delegationCache.get(tokenIdStr);
-            if ((items != null) && (!items.isEmpty())) {
-                ArrayList al = (ArrayList)items.get(resource);
+            Map<String, List<Object>> items = delegationCache.get(tokenIdStr);
+            if (items != null && !items.isEmpty()) {
+                List<Object> al = items.get(resource);
                 if (al != null) {
-                    Map cachedEnv = (Map)al.get(0);
-                    if ((envParams == null) || (envParams.isEmpty())) {
+                    Map cachedEnv = (Map) al.get(0);
+                    if (envParams == null || envParams.isEmpty()) {
                         envParams = Collections.EMPTY_MAP;
                     }
-                    if ((cachedEnv == null) || (cachedEnv.isEmpty())) {
+                    if (cachedEnv == null || cachedEnv.isEmpty()) {
                         cachedEnv = Collections.EMPTY_MAP;
                     }
                     if (envParams.equals(cachedEnv)) {
-                        PolicyDecision pd = (PolicyDecision)al.get(1);
+                        PolicyDecision pd = (PolicyDecision) al.get(1);
                         if (pd != null) {
                             long pdTTL = pd.getTimeToLive();
-                            long currentTime = 
-                                       System.currentTimeMillis(); 
+                            long currentTime = System.currentTimeMillis();
                             if (pdTTL > currentTime) {
                                 return pd;
                             } else {
                                 if (DelegationManager.debug.messageEnabled()) {
-                                    DelegationManager.debug.message(
-                                     "DelegationPolicyImpl: delegation "
-                                     + "decision expired.  TTL=" + pdTTL
-                                     + "; current time=" + currentTime);
+                                    DelegationManager.debug.message("DelegationPolicyImpl: delegation decision "
+                                            + "expired. TTL=" + pdTTL + "; current time=" + currentTime);
                                 }
                             }
-                        } 
+                        }
                     }
                 }
             }
@@ -653,19 +626,20 @@ public class DelegationPolicyImpl implements DelegationInterface,
      * @param pd policy decision being cached.
      * 
      */
-    private static void putResultIntoCache(String tokenIdStr,
-              String resource, Map envParams, PolicyDecision pd)
-        throws SSOException, DelegationException {
+    private void putResultIntoCache(String tokenIdStr, String resource, Map envParams, PolicyDecision pd)
+            throws SSOException, DelegationException {
         if (resource != null) {
-            ArrayList al = new ArrayList(2);
+            List<Object> al = new ArrayList<Object>(2);
             al.add(0, envParams);
             al.add(1, pd);
-            Map items = (Map)delegationCache.get(tokenIdStr);
-            if (items == null) {
-                items = new HashMap();
+            synchronized (delegationCache) {
+                Map<String, List<Object>> items = delegationCache.get(tokenIdStr);
+                if (items == null) {
+                    items = Collections.synchronizedMap(new HashMap<String, List<Object>>());
+                    delegationCache.put(tokenIdStr, items);
+                }
+                items.put(resource, al);
             }
-            items.put(resource, al);
-            delegationCache.put(tokenIdStr, items);
         }
     }
 
@@ -675,12 +649,11 @@ public class DelegationPolicyImpl implements DelegationInterface,
      * Cleans up the entire delegation cache, gets called
      * when any identity gets changed in the repository.
      */
-    private static void cleanupCache() {
+    private void cleanupCache() {
         if (delegationCache.size() > 0) {
-            delegationCache = new Cache(maxCacheSize);
+            delegationCache.clear();
             if (DelegationManager.debug.messageEnabled()) {
-               DelegationManager.debug.message(
-                "DelegationPolicyImpl.cleanupCache(): cache cleared");
+                DelegationManager.debug.message("DelegationPolicyImpl.cleanupCache(): cache cleared");
             }
         }
 
