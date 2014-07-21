@@ -78,7 +78,7 @@
    as the session quota exhaustion action.
   </para>
 
-  <programlisting language="java" width="85"
+  <programlisting language="java"
  >package org.forgerock.openam.examples.quotaexhaustionaction;
 
 import com.iplanet.dpro.session.Session;

@@ -154,7 +154,7 @@
   <title>To Upgrade OpenAM Distributed Authentication Server</title>
 
   <para>If you deployed the distributed authentication server (DAS) .war file,
-  then you should upgrade the DAS when you upgrade other OpenAM servers.</para>
+  then you must upgrade the DAS when you upgrade other OpenAM servers.</para>
 
   <step>
    <para>Redirect client application traffic away from the server.</para>

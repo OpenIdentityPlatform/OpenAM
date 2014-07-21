@@ -894,7 +894,7 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     <para>If you reformat the file, take care not to add white space around
     string values in elements.</para>
 
-    <programlisting language="xml" width="88"><?dbfo pgwide="1"?>
+    <programlisting language="xml">
 &lt;EntityConfig xmlns=&quot;urn:sun:fm:SAML:2.0:entityconfig&quot;
  xmlns:fm=&quot;urn:sun:fm:SAML:2.0:entityconfig&quot; hosted=&quot;1&quot;
  entityID=&quot;http://www.example.com:8080/fedlet&quot;&gt;
