@@ -24,7 +24,7 @@
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
  *
- * Portions copyright 2010-2014 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
@@ -64,17 +64,16 @@ class PrivilegeEvaluator {
     private boolean recursive;
     private EntitlementException eException;
     private final Lock lock = new ReentrantLock();
-    private Condition hasResults = lock.newCondition();
-    private final static String PRIVILEGE_EVALUATION_CONTEXT =
-            "org.forgerock.openam.entitlement.context";
+    private final Condition hasResults = lock.newCondition();
 
     // Static variables
     // TODO determine number of tasks per thread
     private static int evalThreadSize = Evaluator.DEFAULT_POLICY_EVAL_THREAD;
-    private static int tasksPerThread = 5;
+    private static final int TASKS_PER_THREAD = 5;
 
-    private static IThreadPool threadPool;
-    private static boolean isMultiThreaded;
+    private static final IThreadPool threadPool;
+    private static final IThreadPool referralThreadPool;
+    private static final boolean isMultiThreaded;
 
     static {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
@@ -92,10 +91,9 @@ class PrivilegeEvaluator {
                     e);
             }
         }
-        isMultiThreaded = (evalThreadSize > 1);
-        threadPool = (isMultiThreaded) ?
-            new EntitlementThreadPool(evalThreadSize) :
-            new SequentialThreadPool();
+        isMultiThreaded = evalThreadSize > 1;
+        threadPool = isMultiThreaded ? new EntitlementThreadPool(evalThreadSize) : new SequentialThreadPool();
+        referralThreadPool = isMultiThreaded ? new EntitlementThreadPool(evalThreadSize) : new SequentialThreadPool();
     }
 
     /**
@@ -260,12 +258,11 @@ class PrivilegeEvaluator {
 
         // Submit the privileges for evaluation
         // First collect tasks to be evaluated locally
-        Set<IPrivilege> localPrivileges = new HashSet<IPrivilege>(
-            2*tasksPerThread);
+        Set<IPrivilege> localPrivileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
         Debug debug = PrivilegeManager.debug;
 
         int totalCount = 0;
-        while (totalCount != tasksPerThread) {
+        while (totalCount != TASKS_PER_THREAD) {
             if (i.hasNext()) {
                 IPrivilege p = i.next();
                 if (debug.messageEnabled()) {
@@ -281,6 +278,7 @@ class PrivilegeEvaluator {
         }
         // Submit additional privilges to be executed by worker threads
         Set<IPrivilege> privileges = null;
+        Set<IPrivilege> referralPrivileges = null;
         boolean tasksSubmitted = false;
         PrivilegeEvaluatorContext ctx =
                 new PrivilegeEvaluatorContext(realm, resourceName, applicationName);
@@ -291,7 +289,11 @@ class PrivilegeEvaluator {
                 break;
             }
             if (privileges == null) {
-                privileges = new HashSet<IPrivilege>(2*tasksPerThread);
+                privileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
+                tasksSubmitted = true;
+            }
+            if (referralPrivileges == null) {
+                referralPrivileges = new HashSet<IPrivilege>(2 * TASKS_PER_THREAD);
                 tasksSubmitted = true;
             }
             IPrivilege p = i.next();
@@ -300,17 +302,26 @@ class PrivilegeEvaluator {
                 debug.message("[PolicyEval] search result: privilege=" +
                     p.getName(), null);
             }
-            privileges.add(p);
+            if (p instanceof ReferralPrivilege) {
+                referralPrivileges.add(p);
+            } else {
+                privileges.add(p);
+            }
             totalCount++;
-            if ((totalCount % tasksPerThread) == 0) {
-                threadPool.submit(new PrivilegeTask(this, privileges,
-                        isMultiThreaded, appToken, ctx));
+            if (!privileges.isEmpty() && (privileges.size() % TASKS_PER_THREAD) == 0) {
+                threadPool.submit(new PrivilegeTask(this, privileges, isMultiThreaded, appToken, ctx));
                 privileges.clear();
             }
+            if (!referralPrivileges.isEmpty() && (referralPrivileges.size() % TASKS_PER_THREAD) == 0) {
+                referralThreadPool.submit(new PrivilegeTask(this, referralPrivileges, isMultiThreaded, appToken, ctx));
+                referralPrivileges.clear();
+            }
         }
-        if ((privileges != null) && !privileges.isEmpty()) {
-            threadPool.submit(new PrivilegeTask(this, privileges,
-                    isMultiThreaded, appToken, ctx));
+        if (privileges != null && !privileges.isEmpty()) {
+            threadPool.submit(new PrivilegeTask(this, privileges, isMultiThreaded, appToken, ctx));
+        }
+        if (referralPrivileges != null && !referralPrivileges.isEmpty()) {
+            referralThreadPool.submit(new PrivilegeTask(this, referralPrivileges, isMultiThreaded, appToken, ctx));
         }
         // IPrivilege privileges locally
         (new PrivilegeTask(this, localPrivileges, tasksSubmitted, appToken, ctx)).run();
