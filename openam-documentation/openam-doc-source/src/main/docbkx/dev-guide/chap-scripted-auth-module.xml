@@ -1547,4 +1547,99 @@ Authentication allowed!
    then see the same log file for information about the errors.
   </para>
  </section>
+
+ <section xml:id="scripted-auth-module-sandbox">
+  <title>Scripted Authentication Sandbox</title>
+  <para>The OpenAM console provides a sandboxing feature to test your Javascript
+   or Groovy scripted authentication modules ensuring that malicious Java classes
+   are not directly called.
+
+   The sandbox validates the script by checking that all Java
+   classes directly called match those in a whitelist of classes that are
+   allowed to be invoked.
+  </para>
+  <para>You can configure the sandbox in the console by navigating to Configuration &gt;
+   Authentication &gt; Scripted Module. 
+  </para>
+  <para>The sandbox supports the following features:</para>
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">Java Class Whitelist</emphasis>. Specifies the list
+     of class-name patterns allowed to be invoked by the script. Every class
+     accessed by the script must match at least one of these patterns. You can
+     specify the classes as is or use "*" wildcards. The default whitelist values
+     are stored in the <literal>amAuthScripted.xml</literal> file.
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Java Class Blacklist</emphasis>. Specifies the list
+     of class-name patterns that are NOT allowed to be invoked by the script.
+     The blacklist is applied AFTER the whitelist to exclude those classes.
+
+     You can specify the classes to exclude as is or use "*" wildcards.
+     The default blacklist values are stored in the <literal>amAuthScripted.xml</literal> file.
+    </para>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">Using System SecurityManager</emphasis>. If enabled,
+     the sandbox will make an additional call to
+     <literal>System.getSecurityManager().checkPackageAccess(...)</literal>
+     for each class that is accessed. The method throws a SecurityException
+     if the calling thread is not allowed to access the package.
+     This feature only takes effect if the security manager is enabled for the JVM.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist>
+   <title>Points about the Scripted Authentication Sandbox</title>
+
+   <varlistentry>
+    <term>Sandbox only validates directly accessible classes.</term>
+    <listitem>
+     <para>The sandbox only applies to classes that the script <emphasis>directly</emphasis>
+      accesses. If the script calls <literal>Foo.a()</literal> and then that method
+      calls Bar.b(), then the sandbox will allow it. You must consider the whole
+      chain of accessible classes from each white-listed class.
+     </para>
+     <note><para>"Access" means importing/loading a class,
+      accessing any instance of that class (for example, passed as a parameter
+      to the script), calling a static method on that class, calling a method on
+      an instance of that class, accessing a method or field that returns an
+      instance of that class, etc.
+     </para></note>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>All Java reflection classes are blacklisted by default.</term>
+    <listitem>
+     <para>All Java reflection classes (<literal>java.lang.Class, java.lang.reflect.*</literal>)
+      are blacklisted by default to avoid bypassing the sandbox.
+      Do not enable these reflection classes.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>java.security.AccessController</literal> is blacklisted by default.</term>
+    <listitem>
+     <para>The <literal>java.security.AccessController</literal> is blacklisted by default
+      to prevent access to the <literal>doPrivileged()</literal> methods.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>No knowledge about inheritance.</term>
+    <listitem>
+     <para>The whitelist patterns apply only to the exact class or package names
+      involved. The sandbox does not know anything about inheritance, so it is
+      best to white list known, specific classes.
+     </para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+
+ </section>
 </chapter>
