@@ -62,8 +62,85 @@
                     </archive>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jslint-maven-plugin</artifactId>
+                <configuration>
+                    <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
+                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                    <!-- variables bound by rhino -->
+                    <predefinedVars>logger,idRepository,username,authState,FAILED,SUCCESS,clientSideScriptOutput,sharedState,fontDetector,output</predefinedVars>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jslint</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jsSrcDir>${project.basedir}${file.separator}src${file.separator}main${file.separator}js</jsSrcDir>
+                    <jsTestSrcDir>${project.basedir}${file.separator}src${file.separator}test${file.separator}js</jsTestSrcDir>
+                    <preloadSources>
+                        <source>am-binding-mocks.js</source>
+                    </preloadSources>
+                    <sourceExcludes>
+                        <sourceExclude>**/fontdetector.js</sourceExclude>
+                    </sourceExcludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>build-helper-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>inject-content</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>inject-content</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injects>
+                        <inject>
+                            <contents>
+                                <content>
+                                    <id>fontdetector</id>
+                                    <file>${project.build.sourceDirectory}/../js/fontdetector.js</file>
+                                </content>
+                                <content>
+                                    <id>client-js</id>
+                                    <file>${project.build.sourceDirectory}/../js/client-side.js</file>
+                                </content>
+                                <content>
+                                    <id>server-js</id>
+                                    <file>${project.build.sourceDirectory}/../js/server-side.js</file>
+                                </content>
+                            </contents>
+                            <destinationFile>${project.build.outputDirectory}/amAuthScriptedDevicePrint.xml</destinationFile>
+                            <contentConverter>xml</contentConverter>
+                        </inject>
+                    </injects>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
