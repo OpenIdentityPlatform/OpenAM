@@ -271,16 +271,15 @@
     }
 }
 
-.filter-sort-grid {
+#manageApps .filter-sort-grid, #managePolicies .manage-policies{
+    width: 100%;
+    margin: 20px 0 0 0;
+
     .ellipsis-col {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
     }
-}
-#manageApps .filter-sort-grid{
-    width: 100%;
-    margin: 20px 0 0 0;
 
     .policy-col {
         width: 50px;
@@ -294,22 +293,14 @@
         max-width: 150px;
     }
 
-    .name-col {
+    .name-col, .resources-col, .lastModBy-col {
         max-width: 200px;
     }
 }
 
-#managePolicies .manage-policies {
-    margin: 45px 0 0;
-    .resources-col {
-        max-width: 200px;
-    }
-
-    .lastModBy-col {
-        max-width: 200px;
-    }
+#cancelButton, #backButton {
+    margin: 0 15px 15px;
 }
-
-#cancelButton{
-    margin-bottom: 15px;
+#backToApps {
+    margin-right: 10px;
 }

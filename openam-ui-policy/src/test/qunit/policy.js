@@ -56,6 +56,7 @@ define([
                     QUnit.start();
 
                     QUnit.ok(editAppView.accordion.getActive() === 6, "Last step of accordion is selected");
+                    QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
                     var app = editAppView.data.entity;
 
@@ -244,6 +245,7 @@ define([
                     QUnit.start();
 
                     QUnit.ok(editAppView.accordion.getActive() === 0, "First step of accordion is selected");
+                    QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
                     var app = editAppView.data.entity;
 
@@ -320,6 +322,7 @@ define([
                     QUnit.start();
 
                     QUnit.ok(editPolView.accordion.getActive() === 5, "Last step of accordion is selected");
+                    QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
 
                     var pol = editPolView.data.entity;
 
@@ -480,6 +483,7 @@ define([
                     QUnit.start();
 
                     QUnit.ok(editPolView.accordion.getActive() === 0, "First step of accordion is selected");
+                    QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
 
                     // Step 1
                     QUnit.ok(editPolView.$el.find('#policyName').val() === '', "Name is empty");
@@ -518,6 +522,7 @@ define([
                             tRows = table.find('tbody tr');
 
                         QUnit.ok(tRows.length === managePolView.data.result.length, "Applications are listed in the table");
+                        QUnit.ok(managePolView.$el.find('#backToApps').length, "Back button is available");
                     }));
                 });
             });
