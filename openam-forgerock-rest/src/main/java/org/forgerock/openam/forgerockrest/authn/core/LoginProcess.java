@@ -232,7 +232,7 @@ public class LoginProcess {
                 authContext.destroySession();
                 authContext.restoreOldSession();
 
-            } else if (authContext.isSessionUpgrade()
+            } else if (authContext.hasOldSession()
                     && SystemProperties.getAsBoolean(Constants.DESTROY_SESSION_AFTER_UPGRADE)) {
                 DEBUG.message("Session upgrade succeeded - destroying old session");
                 authContext.destroyOldSession();

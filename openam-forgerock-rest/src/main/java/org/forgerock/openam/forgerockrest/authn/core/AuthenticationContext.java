@@ -170,6 +170,12 @@ public interface AuthenticationContext {
      */
     String getFailureURL();
 
+    /**
+     * Determines whether there is an old session associated with this authentication
+     *
+     * @return true if an old session exists
+     */
+    boolean hasOldSession();
 
     /**
      * Determines whether this authentication is for a session upgrade or not.

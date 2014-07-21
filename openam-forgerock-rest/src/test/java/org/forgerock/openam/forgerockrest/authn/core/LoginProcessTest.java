@@ -444,7 +444,7 @@ public class LoginProcessTest {
         // Given
         System.setProperty(Constants.DESTROY_SESSION_AFTER_UPGRADE, "true");
         given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
-        given(authContext.isSessionUpgrade()).willReturn(true);
+        given(authContext.hasOldSession()).willReturn(true);
 
         // When
         loginProcess.cleanup();

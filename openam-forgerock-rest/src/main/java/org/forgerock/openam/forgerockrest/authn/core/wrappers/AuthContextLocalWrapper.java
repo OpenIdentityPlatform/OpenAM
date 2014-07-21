@@ -219,6 +219,14 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasOldSession() {
+        return authContextLocal.getLoginState().getOldSession() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isForceAuth() {
         return authContextLocal.getLoginState().getForceFlag();
     }
