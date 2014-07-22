@@ -469,15 +469,22 @@
   default settings for configuration data cache. This section mainly covers the
   configuration choices you have for caching user data.</para>
 
-  <para>OpenAM server has two levels of user data caching. The global user data
-  cache is dirtied by LDAP persistent search. When the global user data cache is
-  enabled (as it is by default), the individual data store caches are not useful
-  because all requests for data go through the global cache. The individual data
-  store caches are therefore only useful when the global user data cache is
-  disabled.</para>
+  <para>OpenAM implements the global user data cache for its user data
+   stores.
+   Prior to OpenAM 11.0, OpenAM supported a secondary Time-to-Live (TTL)
+   data store caching layer, which has since been removed in OpenAM 11.0 and later
+   versions.
+  </para>
+
+  <para>The user data store also supports a DN Cache, used to cache DN lookups
+   that tend to occur in bursts during authentication.
+   The DN Cache can become out of date when a user is moved or renamed in the
+   underlying LDAP store, events that are not always reflected in a persistent search result.
+   You can enable the DN cache when the underlying LDAP store supports persistent
+   search and <literal>mod DN</literal> operations (that is, move or rename DN).</para>
 
   <para>The following diagram depicts the two kinds of cache, and also the
-  two levels of user data caching.</para>
+   two types of caching available for user data.</para>
 
   <mediaobject xml:id="figure-openam-caches">
    <alt>Caches in OpenAM server</alt>
@@ -773,6 +780,26 @@
        <entry><para><literal>false</literal></para></entry>
        <entry><para>Server &amp; SDK</para></entry>
       </row>
+
+      <row>
+       <entry><para><literal>sun-idrepo-ldapv3-dncache-enabled</literal></para></entry>
+       <entry>
+        <para>Set this to <literal>true</literal> to enable DN caching
+         of user data.</para>
+       </entry>
+       <entry><para><literal>false</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>sun-idrepo-ldapv3-dncache-size</literal></para></entry>
+       <entry>
+        <para>Sets the cache size.</para>
+       </entry>
+       <entry><para><literal>1500</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
      </tbody>
     </tgroup>
    </table>
