@@ -39,38 +39,29 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
     var EditSubjectView = AbstractView.extend({
 
         events: {
-            'click .icon-cog' :                   'toggleEditing',
-            'keyup .icon-cog' :                   'toggleEditing',
-            'dblclick' :                          'toggleEditing',
-            'click .icon-remove' :                'onDelete',
-            "keyup .icon-remove" :                'onDelete',
             'change select#selection' :           'changeSubjectType',
             'change .field-float-pattern input':  'changeInput'
         },
-        element:'#pickUpItem',
+
         data: {},
         mode:'append',
 
-        EDIT_START: 'editStart',
-        EDIT_STOP:  'editStop',
-
-        render: function( subjects, callback, element, itemID, htmlData ) {
+        render: function( schema, callback, element, itemID, itemData ) {
 
             var self = this;
-            this.setElement(this.element);
+            this.setElement(element);
 
-            this.data = $.extend(true, {}, subjects);
+            this.data = $.extend(true, [], schema);
             this.data.itemID = itemID;
 
-            this.$el.html(uiUtils.fillTemplateWithData("templates/policy/EditSubjectTemplate.html", this.data));
+            this.$el.append(uiUtils.fillTemplateWithData("templates/policy/EditSubjectTemplate.html", this.data));
             this.setElement('#subject_' + itemID );
             this.delegateEvents();
 
 
-            if (htmlData) {
-                this.$el.data('config',htmlData.config);
-                this.$el.data('title', htmlData.title);
-                this.$el.find('select#selection').val(htmlData.title).trigger('change');
+            if (itemData) {
+                this.$el.data('itemData',itemData);
+                this.$el.find('select#selection').val(itemData.type).trigger('change');
             }
 
             this.$el.find('select#selection').focus();
@@ -78,52 +69,47 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
             if (callback) {callback();}
         },
 
-
-        createListItem: function(subjects, deleteme, item){
+        createListItem: function(allSubjects, item){
 
             item.focus(); //  Required to trigger changeInput.
-            this.data = subjects;
-            var html = '<div><h3>Subject Type</h3><span>'+(item.data().title || "")+'</span></div>\n';
-            if (item.data().config) {
-                _.map(item.data().config.properties, function(value, key) {
+            this.data.subjects = allSubjects;
+            var html = '';
+            if (item.data().itemData) {
+                _.map(item.data().itemData, function(value, key) {
                     html += '<div><h3>'+key+'</h3><span>'+value+'</span></div>\n';
                 });
+            }
+            if (html === '') {
+                html = '<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>';
             }
             item.find('.item-subject-data').html(html);
             this.setElement('#'+item.attr('id') );
             this.delegateEvents();
         },
 
-        toggleEditing: function(e){
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            if (this.$el.hasClass('editing') ) {
-                this.$el.removeClass('editing');
-                this.trigger(this.EDIT_STOP, this.$el);
-            } else {
-                this.trigger(this.EDIT_START, this.$el);
-            }
-
-        },
-
         changeInput: function(e) {
             var label = $(e.currentTarget).prev('label').text();
-            this.$el.data().config.properties[label] = e.currentTarget.value;
+            this.$el.data().itemData[label] = e.currentTarget.value;
         },
 
         changeSubjectType: function(e) {
             e.stopPropagation();
 
-            //TODO: Check input is valid from list
             var self         = this,
-                data         = null,
+                itemData     = {},
+                schema       = {},
                 html         = '',
-                subjectType  = e.target.value,
+                selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
                 buildHTML    = function(properties) {
                     var count = 0,
                         returnVal = '';
                     _.map(properties, function(value, key) {
+                        if(key === 'type') {
+                            return; // the Type is rendered using the template
+                        }
                         if (_.isString(value)) {
+
                             returnVal += '\n'+
                             '<div class="field-float-pattern data-obj">'+
                                 '<label for="selection_' + (count) + '">' + key + '</label>'+
@@ -142,21 +128,26 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                         }
                         count++;
                     });
+
                     return returnVal;
                 };
 
-            if (this.$el.data().config && this.$el.data().title === subjectType) {
-                data = this.$el.data();
+
+            schema =  _.findWhere(this.data.subjects, {title: selectedType}) || {};
+
+            if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
+                itemData = this.$el.data().itemData;
             } else {
-                data =  _.findWhere(this.data.subjects, {title: subjectType}) || {};
+                itemData.type = schema.title;
+                _.map(schema.config.properties, function(value, key) {
+                    itemData[key] = value;
+                });
+                self.$el.data('itemData',itemData);
             }
 
-            self.$el.data('config',data.config);
-            self.$el.data('title', data.title);
+            if (itemData) {
 
-            if (data.config) {
-
-                html = buildHTML(data.config.properties);
+                html = buildHTML(itemData);
 
                 this.$el.find('.field-float-pattern input')
                     .addClass('placeholderText')
@@ -182,16 +173,6 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
             }
 
             this.delegateEvents();
-
-        },
-
-        onDelete: function(e) {
-            e.stopPropagation();
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            var item = $(e.currentTarget).closest('li'), self = this;
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function() {
-                self.remove();
-            });
         }
 
     });

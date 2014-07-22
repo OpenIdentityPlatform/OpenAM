@@ -41,28 +41,34 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         events: {
             'change    select' : 'onSelect',
             'onfocus   select' : 'checkOptions',
-            'mousedown select' : 'checkOptions',
-            'click     .item-button-panel > .icon-remove' : 'onDelete',
-            'keyup     .item-button-panel > .icon-remove' : 'onDelete'
+            'mousedown select' : 'checkOptions'
         },
         data: {},
         mode: 'append',
+        select: null,
+        dropbox: null,
+ 
+        render: function (args, callback, element, itemID) {
 
-        render: function (operators, callback, element, itemID) {
-            this.data = $.extend(true, {}, operators);
-            this.data.master = itemID === undefined ? true : false;
+            this.data = $.extend(true, {}, args);
             this.data.itemID = itemID;
             this.setElement(element);
-            this.$el.html(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
-
-            if (itemID !== undefined) {
-                this.setElement('#operator_'+itemID );
-            }
-
+            this.$el.append(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
+        
+            this.setElement('#operator_'+itemID );
+            this.select = this.$el.find("select");
             this.delegateEvents();
-            this.$el.find("select").focus().trigger("change");
+            
+            this.select.focus().trigger("change");
+            this.$el.data('logical',true);
+            this.dropbox = this.$el.find('.dropbox');
 
             if (callback) {callback();}
+        },
+
+
+        setValue: function(value) {
+            this.select.focus().val(value).trigger("change");
         },
 
         rebindElement: function() {
@@ -70,21 +76,26 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         },
 
         onSelect: function(e) {
-            e.stopPropagation();
+            
             var item = $(e.currentTarget).parent(),
                 value = e.currentTarget.value,
-                data = _.find(this.data.operators, function(obj) {
+                itemData = {},
+                schema = _.find(this.data.operators, function(obj) {
                     return obj.title === value;
                 });
+
+            itemData.type = schema.title;
+            _.map(schema.config.properties, function(value, key) {
+                itemData[key] = value;
+            });
+
+            item.data('itemData',itemData);
 
             _.each(this.data.operators, function(obj) {
                 item.removeClass( obj.title.toLowerCase() );
             });
-
-            item.data('logical',true);
-            item.data('title',  data.title);
-            item.data('config', data.config);
             item.addClass(value.toLowerCase());
+
         },
 
         checkOptions: function(e) {
@@ -103,14 +114,6 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
             } else {
                 select.children().prop('disabled', false);
             }
-        },
-
-        onDelete: function(e) {
-            e.stopPropagation();
-            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
-            this.$el.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function() {
-                this.remove();
-            });
         }
 
         // TODO...

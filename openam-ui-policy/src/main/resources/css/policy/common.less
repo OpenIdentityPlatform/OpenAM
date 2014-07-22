@@ -1,3 +1,5 @@
+@active-background-color: #EDFCF5;
+
 .filter-sort-grid {
     position: relative;
     .rounded-corners(5px);
@@ -23,6 +25,10 @@
         .filter-sort-grid {
             width: 100%;
         }
+    }
+
+    tbody tr:hover{
+        background-color:@active-background-color;
     }
 
     // Header
@@ -53,9 +59,6 @@
             width: 90%;
         }
 
-        input {
-            color: #ccc;
-        }
     }
 
     .header-actions {
@@ -150,7 +153,9 @@
 // Accordion
 .accordion {
     background-color: #fff;
-    border: 1px solid #5a646d;
+    border: 1px solid #BCBEC0;
+    border-bottom: none;
+    overflow: hidden;
     .rounded-corners(5px);
 
     .accordion-header {
@@ -158,20 +163,25 @@
         line-height: 30px;
         display: block;
         padding: 0 0 0 10px;
-        background-color: #5a646d;
-        color: #fff;
-        .linear-gradient(top left, #74828D 0%, #5D6871 100%);
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-        border-bottom: 1px solid #5a646d;
+        background-color: #d5d5d5;
+        color: #666;
+  
+        border-bottom: 1px solid #bebebe;
         text-decoration: none;
 
         &.accordion-step-disabled {
-            color: #5a646d;
+            background: #aaa;
+            cursor:default;
+        }
+
+        &:hover:not(.accordion-step-disabled), &.step-active:not(.accordion-step-disabled){
+            background-color: darken(@active-background-color, 5%);
         }
     }
 
     .accordion-step {
         padding: 20px 15px 15px;
+        border-bottom: 1px solid #bebebe;
 
         & > input.button {
             margin-top: 15px;
@@ -185,6 +195,10 @@
                 font-size: inherit;
                 font-weight: normal;
             }
+        }
+
+        &:last-of-type:not(.active-step){
+            border-bottom: none;
         }
     }
 
@@ -236,16 +250,36 @@
     }
 
     .review-row {
-        margin: 15px 0;
+       
+        background: #ebebeb;
+        padding: 8px;
+        clear: both;
+        font-size: 13px;
+        margin: 0 5px 5px 0;
+        border-radius: 3px;
+        border:1px solid #bebebe;
 
         a {
             float: left;
-            width: 170px;
+            width: 90px;
+            text-decoration: none;
         }
 
         span {
-            width: 250px;
-            display: inline-block;
+            font-family: monospace;
+            display: block;
+            float: left;
+        }
+
+        pre {
+            font-family: monospace;
+            line-height: 0.9em;
+            display: block;
+            float: left;
+        }
+
+        &:hover{
+            background: @active-background-color;
         }
     }
 

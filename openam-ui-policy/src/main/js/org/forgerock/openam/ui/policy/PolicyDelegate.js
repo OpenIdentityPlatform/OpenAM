@@ -113,7 +113,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.getEnvironmentConditions = function (successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/conditiontypes?_queryID=&_fields=title,logical",
+            url: "/conditiontypes?_queryID=&_fields=title,logical,config",
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -125,7 +125,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.getSubjectConditions = function (successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/subjecttypes?_queryID=&_fields=title,logical",
+            url: "/subjecttypes?_queryID=&_fields=title,logical,config",
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);

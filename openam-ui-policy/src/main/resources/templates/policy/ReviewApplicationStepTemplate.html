@@ -1,27 +1,27 @@
-<div class="column2">
-    <div class="review-row">
+<div class="col2">
+    <div class="review-row clearfix">
         <a href="">Name</a> <span id="reviewName">{{entity.name}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Realms</a> <span id="reviewRealm">{{entity.realm}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Description</a> <span id="reviewDescr">{{entity.description}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Application Type</a> <span id="reviewType">{{entity.applicationType}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Resources</a> <span id="reviewRes">{{#each entity.resources}}{{this}}<br/>{{/each}}</span>
     </div>
 </div>
 
-<div class="column2">
-    <div class="review-row">
+<div class="col2">
+    <div class="review-row clearfix">
         <a href="">Subject Conditions</a>
         <span id="reviewSubj">{{#each entity.subjects}} {{this}}<br/> {{/each}} </span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Actions</a>
         <span id="reviewActions">{{#each entity.actions}}
                 {{#if selected}}
@@ -30,11 +30,11 @@
               {{/each}}
         </span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Environment Conditions</a>
         <span id="reviewEnv">{{#each entity.conditions}} {{this}}<br/> {{/each}} </span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Override Rules</a> <span id="reviewEntComb">{{entity.entitlementCombiner}}: Allow</span>
     </div>
 </div>

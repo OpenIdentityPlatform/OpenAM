@@ -91,11 +91,11 @@
     </tr>
     <tr class="header-filter">
         <td></td>
-        <td><input type="text" value="Filter ..."/></td>
-        <td><input type="text" value="Filter ..."/></td>
-        <td><input type="text" value="Filter ..."/></td>
-        <td><input type="text" value="Filter ..."/></td>
-        <td><input type="text" value="Filter ..."/></td>
+        <td><input type="text" value="" placeholder="Filter ..." /></td>
+        <td><input type="text" value="" placeholder="Filter ..." /></td>
+        <td><input type="text" value="" placeholder="Filter ..." /></td>
+        <td><input type="text" value="" placeholder="Filter ..." /></td>
+        <td><input type="text" value="" placeholder="Filter ..." /></td>
     </tr>
     </thead>
 
@@ -107,7 +107,7 @@
         <td class="ellipsis-col description-col">{{description}}</td>
         <td class="lastModBy-col ellipsis-col">{{lastModifiedBy}}</td>
         <td class="ellipsis-col resources-col">included: {{resources.included}},</td>
-        <td class="subject-col">type: {{subject.type}}, subjectName: {{subject.subjectName}}</td>
+        <td class="ellipsis-col subject-col">type: {{subject.type}}, subjectName: {{subject.subjectName}}</td>
     </tr>
     {{/result}}
     </tbody>

@@ -1,23 +1,34 @@
-<div class="column2">
-    <div class="review-row">
+<div class="col2">
+    <div class="review-row clearfix">
         <a href="">Name</a> <span id="reviewPolName">{{entity.name}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Description</a> <span id="reviewPolDescr">{{entity.description}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Resources</a> <span id="reviewPolRes">{{#each entity.resources}} {{this}}<br/>{{/each}}</span>
     </div>
-    <div class="review-row">
+    <div class="review-row clearfix">
         <a href="">Actions</a>
-        <span id="reviewPolActions">{{#each entity.actions}}
+        <span id="reviewPolActions">
+            {{#each entity.actions}}
                 {{#if selected}}
                     {{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}<br/>
                 {{/if}}
-              {{/each}}
+            {{/each}}
         </span>
     </div>
-    <div class="review-row">
+    
+</div>
+
+<div class="col2">
+
+    <div class="review-row clearfix">
+        <a href="">Subjects</a> 
+        <pre>{{subjectString}}</pre>
+    </div>
+
+    <div class="review-row clearfix">
         <a href="">Conditions</a> <span>Any of<br/>Any Transfer Limit, IP Range, Time Range</span>
     </div>
 </div>

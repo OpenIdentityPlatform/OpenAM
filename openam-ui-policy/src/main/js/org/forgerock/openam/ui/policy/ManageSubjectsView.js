@@ -48,62 +48,70 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             'click  a#addSubject:not(.inactive)':  'addSubject',
             'click  a#addOperator:not(.inactive)': 'addOperator',
             'click  a#clear:not(.inactive)':       'onClear',
-            "mousedown  #first-rule li.subject:not(.editing)"  : 'setFocus',
-            "mousedown  #first-rule li.operator:not(.editing)" : 'setFocus'
+
+            "mousedown  #operator_0 li.subject:not(.editing)"  : 'setFocus',
+            "mousedown  #operator_0 li.operator:not(.editing)" : 'setFocus',
+
+            'click  .operator > .item-button-panel > .icon-remove' : 'onDelete',
+            'keyup  .operator > .item-button-panel > .icon-remove' : 'onDelete',
+            'change  #operator_0 .operator select' : 'onSelect',
+
+            'click    #operator_0 .subject > .item-button-panel > .icon-remove' :  'onDelete',
+            'keyup    #operator_0 .subject > .item-button-panel > .icon-remove' :  'onDelete',
+            'click    #operator_0 .subject > .item-button-panel > .icon-cog' :     'toggleEditing',
+            'keyup    #operator_0 .subject > .item-button-panel > .icon-cog' :     'toggleEditing',
+            'dblclick #operator_0 li.subject' :                                    'toggleEditing'
         },
 
         buttons:{},
         data: {},
         pickUpItem: null,
-        idCount: 0,
+        subjectEntity: {},
 
-        render: function(data, callback) {
+        render: function(args, callback, element) {
 
-            ///- TODO: to be moved to delegate and hardcoded data to be replaced with REST calls
-            this.data.subjects = _.filter(data.result, function(item) { return item.logical === false; });
-            _.each(this.data.subjects, function(subject) {
-                delete subject.config.properties.type;
-                delete subject.config.type;
-                _.map(subject.config.properties, function(value, key) {
+            var self = this;
+
+            _.extend(this.data, args);
+
+            this.subjectEntity = null;
+
+            if (this.data.entity.subject) {
+                this.subjectEntity = this.data.entity.subject;
+            }
+
+            this.data.subjects = [];
+            this.data.operators = [];
+            this.idCount = 1;
+            this.sortingInitialised = false;
+
+            _.each(args.entity.availableSubjects, function(item) {
+
+                _.map(item.config.properties, function(value, key) {
                     switch(value.type) {
                         case 'string':
-                            subject.config.properties[key] = '';
+                            item.config.properties[key] = '';
                         break;
 
                         case 'array':
-                            subject.config.properties[key] = [];
+                            item.config.properties[key] = [];
                         break;
 
                         case 'object':
-                            subject.config.properties[key] = {};
+                            item.config.properties[key] = {};
                         break;
                     }
-                    delete value.type;
                 });
+
+                if(item.logical === true){
+                    self.data.operators.push(item);
+                }else{
+                    self.data.subjects.push(item);
+                }
+
+                delete item.config.type;
             });
 
-            this.data.operators = _.filter(data.result, function(item) { return item.logical === true; });
-            _.each(this.data.operators, function(operator) {
-                delete operator.config.properties.type;
-                delete operator.config.type;
-                _.map(operator.config.properties, function(value, key) {
-                    switch(value.type) {
-                        case 'string':
-                            operator.config.properties[key] = '';
-                        break;
-
-                        case 'array':
-                            operator.config.properties[key] = [];
-                        break;
-
-                        case 'object':
-                            operator.config.properties[key] = {};
-                        break;
-                    }
-                    delete value.type;
-                });
-            });
-            ///-
 
             this.setElement(this.element);
 
@@ -114,14 +122,58 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 this.buttons.addOperator    = this.$el.find("a#addOperator");
                 this.pickUpItem             = this.$el.find('#pickUpItem');
 
-                var operatorRules = new OperatorRulesView();
-                    operatorRules.render(this.data, null, '#dropOffArea' );
-
+                this.buildList();
                 this.onClear();
                 this.initSorting();
 
+
+
                 if (callback) {callback();}
             });
+
+        },
+
+        buildList: function() {
+
+            var self = this,
+                newRule = null,
+                operators = _.pluck( this.data.operators, 'title' ),
+                buildListItem = null;
+
+                buildListItem = function(data, container, parent) {
+
+                    if( _.isArray(data) === false ){
+                        data = [data];
+                    }
+
+                    _.each(data, function(item) {
+
+                        if ( item && _.contains( operators, item.type )) {
+
+                            newRule = new OperatorRulesView();
+                            newRule.render(self.data, null, container, self.idCount );
+                            newRule.setValue(item.type);
+                            self.idCount++;
+
+                        } else if ( _.isEmpty(item) === false ) {
+
+                            newRule = new EditSubjectView();
+                            newRule.render({subjects:self.data.subjects}, null, container, self.idCount, item);
+                            newRule.createListItem({subjects:self.data.subjects}, newRule.$el );
+                            self.idCount++;
+                        }
+
+                        if (item && item.subjects) {
+                            buildListItem( item.subjects, newRule.dropbox, item );
+                        } else if (item && item.subject) {
+                            buildListItem( item.subject, newRule.dropbox, item );
+                        }
+
+                    });
+                };
+
+            buildListItem(this.subjectEntity, $('#dropbox'), null);
+            this.delegateEvents();
 
         },
 
@@ -129,6 +181,9 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
             var self = this,
                 adjustment = {};
+
+            // Adding the 'subject' property to the operator_0 means it can only accept one child.
+            this.$el.find('#operator_0').data('itemData', {subject:{}});
 
             this.$el.find("ol#dropbox").sortable({
                 group: self.element + ' rule-creation-group',
@@ -150,22 +205,22 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                     self.setInactive(self.buttons.addSubject, false);
                     self.setInactive(self.buttons.addOperator, false);
 
+                    item.focus();
                     item.css({width: item.width()}).addClass("dragged");
                     $("body").addClass("dragging");
 
                     if (!container.options.drop && item.hasClass('subject')) {
                         editSubjectView = $.extend( false, item, new EditSubjectView() );
-                        editSubjectView.createListItem({subjects:self.data.subjects}, '#dropOffArea', item);
-                        editSubjectView.on(editSubjectView.EDIT_START, self.editStart, self);
+                        editSubjectView.createListItem({subjects:self.data.subjects}, item);
                     }
 
                 },
 
                 onDrag: function (item, position) {
-                  item.css({
-                    left: position.left - self.adjustment.left,
-                    top: position.top - self.adjustment.top
-                  });
+                    item.css({
+                        left: position.left - self.adjustment.left,
+                        top: position.top - self.adjustment.top
+                    });
                 },
 
                 onDrop: function  (item, container, _super, event) {
@@ -186,13 +241,13 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                             clonedItem.detach();
                             item.removeClass('dropped');
 
-                            if (item.data().logical) {
+                            if (item.data().logical === true) {
                                 rule = $.extend( false, item, new OperatorRulesView() );
                                 rule.rebindElement();
                             }
                             item.focus();
                             _super(item, container);
-                            self.logData();
+                            self.save();
                         });
 
                     } else {
@@ -200,21 +255,29 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                         if (item.data().logical === undefined) {
 
                             rule = new EditSubjectView();
-                            rule.render( {subjects:self.data.subjects}, null, self.pickUpItem, self.idCount, item.data() );
+                            rule.render( {subjects:self.data.subjects}, null, self.pickUpItem, self.idCount, item.data().itemData );
                             self.idCount++;
+                            item.remove();
+
+                        } else {
+                            item.focus();
+                            _super(item, container);
                         }
-                        item.focus();
-                        _super(item, container);
-                        self.logData();
+
+                        self.save();
                     }
+
+                    $("body").removeClass("dragging");
+
+                    self.delegateEvents();
 
                 },
 
                 isValidTarget: function(item, container) {
 
-                    if (container.items.length > 0 &&
-                        container.target.parent().data().logical === true &&
-                        container.target.parent().data().config.properties.subject
+                    if ( container.items.length > 0 &&
+                         container.target.parent().data().itemData &&
+                         container.target.parent().data().itemData.subject
                     ) {
                         return false;
                     } else {
@@ -225,23 +288,22 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
                 serialize: function ($parent, $children, parentIsContainer) {
 
-                   var result = $.extend({}, $parent.data());
+                   var result = $.extend({}, $parent.data().itemData);
 
-                    if(parentIsContainer) {
+                    if ( parentIsContainer ) {
                         return $children;
                     }
 
                     else if ($children[0]) {
-                        if (result.config.properties.subjects) {
-                            result.config.properties.subjects.items = $children;
-                        } else if (result.config.properties.subject) {
-                            result.config.properties.subject = $children;
+                        if (result.subjects) {
+                            result.subjects = $children;
+                        } else if (result.subject) {
+                            result.subject = $children[0];
                         }
                     }
 
                     delete result.subContainers;
                     delete result.sortable;
-
                     return result;
                 }
 
@@ -252,6 +314,8 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 drop: false
             });
 
+            this.sortingInitialised = true;
+
         },
 
         editStart: function(item) {
@@ -259,8 +323,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
            $('body').addClass('editing');
            var self = this,
                editSubjectView = new EditSubjectView();
-           editSubjectView.render( {subjects:self.data.subjects}, null, self.pickUpItem, self.idCount, item.data() );
-           editSubjectView.on(editSubjectView.EDIT_STOP,  _.bind( self.editStop, self));
+               editSubjectView.render( {subjects:self.data.subjects}, null, self.pickUpItem, self.idCount, item.data().itemData );
            self.idCount++;
 
            editSubjectView.$el.addClass('editing');
@@ -274,10 +337,10 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             $('body').removeClass('editing');
 
             var editSubjectView = $.extend( false, item, new EditSubjectView() );
-                editSubjectView.createListItem({subjects:this.data.subjects}, '#dropOffArea', item);
-                editSubjectView.on(editSubjectView.EDIT_START, this.editStart, this);
+                editSubjectView.createListItem({subjects:this.data.subjects},  item);
 
             item.next().remove();
+            this.save();
         },
 
         setInactive: function(button, state) {
@@ -317,24 +380,52 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             this.idCount++;
         },
 
+        onSelect: function(e) {
+            e.stopPropagation();
+            this.save();
+        },
+
+        onDelete: function(e) {
+            e.stopPropagation();
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var self = this, item = $(e.currentTarget).closest('li');
+            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function() {
+                item.remove();
+                self.save();
+            });
+        },
+
+
+        toggleEditing: function(e){
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var item = $(e.currentTarget).closest('li');
+            if (item.hasClass('editing') ) {
+                item.removeClass('editing');
+                this.editStop(item);
+            } else {
+                this.editStart(item);
+            }
+
+        },
+
         setFocus: function(e) {
             e.stopPropagation();
             var target = $(e.target).is('select') || $(e.target).is('input') ?  e.target : e.currentTarget;
             $(target).focus();
         },
 
-        logData: function(e) {
+        save: function(e) {
 
-            var model = this.$el.find('#first-rule').data(),
-                properties = model.config.properties,
-                children = this.$el.find('ol#dropbox').sortable("serialize").get();
-            if (properties.subjects) {
-                properties.subjects.items = children;
-            } else if (properties.subject) {
-                properties.subject = children;
+            if (this.sortingInitialised !== true) {
+                return;
             }
+            var subject = this.$el.find('ol#dropbox').sortable('serialize').get();
 
-            console.log(model);
+            this.data.entity.subject = subject[0] || null;
+            console.log("\nsubject:",  JSON.stringify(this.data.entity.subject));
+            console.log("\nsubject:",  JSON.stringify(this.data.entity.subject, null, 2));
+
+
         }
 
     });

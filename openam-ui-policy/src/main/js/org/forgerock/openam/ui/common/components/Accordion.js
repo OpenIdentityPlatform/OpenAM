@@ -110,6 +110,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
      */
     Accordion.prototype.disableSections = function () {
         this.$headers.addClass('accordion-step-disabled');
+        this.$headers.removeClass('step-active');
     };
 
     /**
@@ -128,6 +129,9 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
 
         this.$activeSection = $(this.$sections[this.activeId]);
         expand(this.$activeSection);
+
+        this.$headers.removeClass('step-active');
+        $(this.$headers[id]).addClass('step-active');
     };
 
     return Accordion;

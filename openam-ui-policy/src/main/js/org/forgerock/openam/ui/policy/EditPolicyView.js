@@ -51,225 +51,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             'click input[name=nextButton]': 'openNextStep',
             'click input[name=submitForm]': 'submitForm'
         },
-        data: {              // Mock data to be replaced later
-            subjects: [
-                {
-                    type: "Virtual Subject",
-                    list: [
-                        { name: "iplanet-am-session-get-valid-sessions" },
-                        { name: "sunIdentityServerPPFacadegreetmesound" },
-                        { name: "iplanet-am-user-password-reset-question-answer" },
-                        { name: "iplanet-am-user-admin-start-dn" },
-                        { name: "iplanet-am-user-success-url" },
-                        { name: "sunIdentityServerPPDemographicsDisplayLanguage" },
-                        { name: "iplanet-am-user-federation-info" }
-                    ]
-                },
-                {
-                    type: "Attribute Subject",
-                    list: [
+        data:{},
 
-                        { name: "sunIdentityServerPPCommonNameMN" },
-                        { name: "iplanet-am-session-get-valid-sessions" },
-                        { name: "sunIdentityServerPPFacadegreetmesound" },
-                        { name: "iplanet-am-user-password-reset-question-answer" },
-                        { name: "iplanet-am-user-admin-start-dn" }
-                    ]
-                },
-                {
-                    type: "Identity Repository User",
-                    list: [
-                        { name: "sunIdentityServerPPInformalName" },
-                        { name: "sunIdentityServerPPFacadeGreetSound" },
-                        { name: "sunIdentityServerPPLegalIdentityGender" }
-                    ]
-                },
-                {
-                    type: "Identity Repository Group",
-                    list: [
-                        { name: "iplanet-am-user-password-reset-question-answer" },
-                        { name: "iplanet-am-user-admin-start-dn" },
-                        { name: "iplanet-am-user-success-url" },
-                        { name: "sunIdentityServerPPDemographicsDisplayLanguage" },
-                        { name: "iplanet-am-user-federation-info" }
-                    ]
-                }
-            ],
-
-
-            "result": [
-                {
-                    "title": "OR",
-                    "logical": true,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "conditions": {
-                                "type": "array",
-                                "items": {
-                                    "type": "any"
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "Time",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "startTime": {
-                                "type": "string"
-                            },
-                            "endTime": {
-                                "type": "string"
-                            },
-                            "startDay": {
-                                "type": "string"
-                            },
-                            "endDay": {
-                                "type": "string"
-                            },
-                            "startDate": {
-                                "type": "string"
-                            },
-                            "endDate": {
-                                "type": "string"
-                            },
-                            "enforcementTimeZone": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "IP",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "startIp": {
-                                "type": "string"
-                            },
-                            "endIp": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "StringAttribute",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "attributeName": {
-                                "type": "string"
-                            },
-                            "value": {
-                                "type": "string"
-                            },
-                            "caseSensitive": {
-                                "type": "boolean",
-                                "required": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "Policy",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "className": {
-                                "type": "string"
-                            },
-                            "properties": {
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "DNSName",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "domainNameMask": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "AttributeLookup",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "key": {
-                                "type": "string"
-                            },
-                            "value": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "AND",
-                    "logical": true,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "conditions": {
-                                "type": "array",
-                                "items": {
-                                    "type": "any"
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "NumericAttribute",
-                    "logical": false,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "attributeName": {
-                                "type": "string"
-                            },
-                            "operator": {
-                                "type": "string",
-                                "enum": [ "LESS_THAN", "LESS_THAN_OR_EQUAL", "EQUAL", "GREATER_THAN_OR_EQUAL", "GREATER_THAN" ]
-                            },
-                            "value": {
-                                "type": "number"
-                            }
-                        }
-                    }
-                },
-                {
-                    "title": "NOT",
-                    "logical": true,
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "condition": {
-                                "type": "object",
-                                "properties": {
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
-
-        },
         REVIEW_INFO_STEP: 5,
 
         render: function (args, callback) {
@@ -278,18 +61,20 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 appName = args[0],
                 policyName = args[1],
                 policyPromise = this.getPolicy(policyName),
-                appPromise = policyDelegate.getApplicationByName(appName);
+                appPromise = policyDelegate.getApplicationByName(appName),
+                allSubjectsPromise = policyDelegate.getSubjectConditions(); // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
 
-            $.when(policyPromise, appPromise).done(function (policy, app) {
+            $.when(policyPromise, appPromise, allSubjectsPromise).done(function (policy, app, allSubjects) {
                 var actions = [],
                     resources = [],
-                    exceptions = [];
+                    exceptions = [],
+                    subjects = [];
                 if (policyName) {
-                    _.each(policy.resources.included, function (value, list) {
+                    _.each(policy.resources.included, function (value) {
                         resources.push(value);
                     });
 
-                    _.each(policy.resources.excluded, function (value, list) {
+                    _.each(policy.resources.excluded, function (value) {
                         exceptions.push(value);
                     });
 
@@ -299,24 +84,36 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
                     data.entity = policy;
                     data.entityName = policyName;
+
                 } else {
                     data.entity = {};
                     data.entityName = null;
                 }
-                _.each(app[0].actions, function (value, key, list) {
+                _.each(app[0].actions, function (value, key) {
                     actions.push({action: key, selected: false, value: value});
                 });
 
+                _.each(allSubjects[0].result, function (value) {
+                   if ( value.title === 'POLICY' ){ return; } // AME-4011
+                   if ( _.contains(app[0].subjects, value.title) ){
+                       subjects.push(value);
+                   }
+                });
+
+                data.entity.availableSubjects = subjects;
                 data.entity.availableActions = actions;
                 data.entity.resourcePatterns = app[0].resources;
 
                 data.entity.applicationName = appName;
                 self.parentRender(function () {
                     manageSubjects.render(data);
-                    manageEnvironments.render(data);
+                    //manageEnvironments.render(data);
                     actionsView.render(data);
                     resourcesListView.render(data);
                     addNewResourceView.render(data);
+
+                    data.subjectString = JSON.stringify(data.entity.subject, null, 2);
+
                     reviewInfoView.render(data, null, self.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
 
                     self.initAccordion();
@@ -374,6 +171,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             _.each(dataFields, function (field, key, list) {
                 entity[field.getAttribute('data-field')] = field.value;
             });
+
+            this.data.subjectString = JSON.stringify(this.data.entity.subject, null, 2);
         },
 
         /**
