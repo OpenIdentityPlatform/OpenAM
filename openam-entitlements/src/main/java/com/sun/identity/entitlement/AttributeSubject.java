@@ -26,6 +26,9 @@
  */
 package com.sun.identity.entitlement;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +40,6 @@ public class AttributeSubject implements SubjectImplementation {
     private String value;
     private String id;
     private boolean exclusive;
-    private String state;
 
     /**
      * Constructor
@@ -118,12 +120,61 @@ public class AttributeSubject implements SubjectImplementation {
         return new SubjectDecision(satified, Collections.EMPTY_MAP);
     }
 
+    /**
+     * Sets state of the object
+     * @param state State of the object encoded as string
+     */
     public void setState(String state) {
-        this.state = state;
+        try {
+            JSONObject jo = new JSONObject(state);
+            id = jo.has("id") ? jo.optString("id") : null;
+            value = jo.has("value") ?
+                    jo.optString("value") : null;
+            exclusive = jo.has("exclusive") ?
+                    Boolean.parseBoolean(jo.optString("exclusive")) : false;
+        } catch (JSONException e) {
+            PrivilegeManager.debug.error("AttributeSubject.setState", e);
+        }
     }
 
+    /**
+     * Returns state of the object.
+     *
+     * @return state of the object encoded as string.
+     */
     public String getState() {
-        return state;
+        return toString();
+    }
+
+    /**
+     * Returns JSONObject mapping of the object.
+     *
+     * @return JSONObject mapping  of the object.
+     */
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jo = new JSONObject();
+        jo.put("id", id);
+        jo.put("value", value);
+        if (exclusive) {
+            jo.put("exclusive", exclusive);
+        }
+        return jo;
+    }
+
+    /**
+     * Returns string representation of the object.
+     *
+     * @return string representation of the object.
+     */
+    @Override
+    public String toString() {
+        String s = null;
+        try {
+            s = toJSONObject().toString(2);
+        } catch (JSONException e) {
+            PrivilegeManager.debug.error("EntitlementSubjectImpl.toString", e);
+        }
+        return s;
     }
 
     /**
@@ -187,7 +238,6 @@ public class AttributeSubject implements SubjectImplementation {
 
         if (exclusive != that.exclusive) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (state != null ? !state.equals(that.state) : that.state != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
 
         return true;
@@ -198,7 +248,6 @@ public class AttributeSubject implements SubjectImplementation {
         int result = value != null ? value.hashCode() : 0;
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (exclusive ? 1 : 0);
-        result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
     }
 }
