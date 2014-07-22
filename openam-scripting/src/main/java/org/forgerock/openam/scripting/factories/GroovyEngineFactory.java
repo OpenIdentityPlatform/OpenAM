@@ -22,6 +22,9 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
+import org.forgerock.util.Reject;
+import org.kohsuke.groovy.sandbox.GroovyValueFilter;
+import org.kohsuke.groovy.sandbox.SandboxTransformer;
 
 /**
  * This factory overrides the default getScriptEngine implementation, and ensures that we use the
@@ -30,6 +33,7 @@ import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
  * interrupt if the script's allowed running time is up.
  */
 public class GroovyEngineFactory extends GroovyScriptEngineFactory {
+    private volatile GroovyValueFilter sandbox;
 
     /**
      * Instantiates and returns an instance of {@link GroovyScriptEngineImpl} passing in
@@ -44,11 +48,23 @@ public class GroovyEngineFactory extends GroovyScriptEngineFactory {
     public ScriptEngine getScriptEngine() {
 
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
+        // Apply sandbox before any other customisation, otherwise sandbox will be applied to implementation details.
+        compilerConfig.addCompilationCustomizers(new SandboxTransformer());
         compilerConfig.addCompilationCustomizers(new ASTTransformationCustomizer(ThreadInterrupt.class));
         GroovyClassLoader classLoader =
                 new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), compilerConfig);
 
-        return new GroovyScriptEngineImpl(classLoader);
+        return new SandboxedGroovyScriptEngine(this, new GroovyScriptEngineImpl(classLoader), sandbox);
     }
 
+    /**
+     * Sets the Groovy value filter to use for sandboxing scripts. The filter is called every time an
+     * object is accessed by the script to verify that the access is allowed.
+     *
+     * @param sandbox the new sandbox to use.
+     */
+    public void setSandbox(final GroovyValueFilter sandbox) {
+        Reject.ifNull(sandbox);
+        this.sandbox = sandbox;
+    }
 }

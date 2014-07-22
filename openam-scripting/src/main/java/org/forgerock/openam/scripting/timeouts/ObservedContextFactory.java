@@ -42,7 +42,7 @@ public class ObservedContextFactory extends ContextFactory {
 
     @Override
     protected Context makeContext() {
-        return new ObservedJavaScriptContext();
+        return new ObservedJavaScriptContext(this);
     }
 
     /**
@@ -51,9 +51,8 @@ public class ObservedContextFactory extends ContextFactory {
     @Override
     protected void observeInstructionCount(Context cx, int instructionCount) {
         final ObservedJavaScriptContext context = (ObservedJavaScriptContext) cx;
-        boolean timeoutDisabled = manager.getTimeoutMillis() == 0;
-        if (!timeoutDisabled &&
-                System.currentTimeMillis() - context.getStartTime() > manager.getTimeoutMillis()) {
+        final long timeout = manager.getConfiguration().getScriptExecutionTimeout();
+        if (timeout > 0 && System.currentTimeMillis() - context.getStartTime() > timeout) {
             throw new Error("Interrupt.");
         }
     }
@@ -69,7 +68,8 @@ public class ObservedContextFactory extends ContextFactory {
     protected static class ObservedJavaScriptContext extends Context {
         private final long startTime;
 
-        public ObservedJavaScriptContext() {
+        public ObservedJavaScriptContext(final ObservedContextFactory factory) {
+            super(factory);
             this.startTime = System.currentTimeMillis();
             this.setOptimizationLevel(-1);
             this.setInstructionObserverThreshold(OBSERVER_THRESHOLD);

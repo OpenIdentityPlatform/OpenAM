@@ -17,9 +17,6 @@
 package org.forgerock.openam.scripting;
 
 import org.codehaus.groovy.control.io.NullWriter;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.scripting.timeouts.ScriptRunner;
-import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +28,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Evaluates scripts using the standard JSR 223 script engine framework.
@@ -55,11 +46,6 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StandardScriptEvaluator.class);
 
-    private static ExecutorService threadPool;
-
-    private static ExecutorServiceFactory executorServiceFactory =
-            InjectorHolder.getInstance(ExecutorServiceFactory.class);
-
     private final StandardScriptEngineManager scriptEngineManager;
 
     /**
@@ -74,13 +60,6 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
     }
 
     /**
-     * The engine manager for configuring timeout
-     */
-    public StandardScriptEngineManager getEngineManager() {
-        return scriptEngineManager;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -90,26 +69,19 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
     }
 
     /**
-     * This implementation of evaluateScript runs any provided script in its own thread.
+     * Evaluates scripts immediately using the configured JSR-223 script engine manager. This implementation should
+     * be wrapped with a {@link org.forgerock.openam.scripting.ThreadPoolScriptEvaluator} if script interruption or
+     * timeouts are required.
      *
-     * If timeouts have been configured in the script engine manager which this evaluator uses then
-     * the threads will be interrupted (or otherwise stop themselves depending on the engine's implementation)
-     * after the timeout period has expired if they have not already returned.
-     *
-     * @see org.forgerock.openam.scripting.factories.GroovyEngineFactory
-     *
-     * @param script {@inheritDoc}
-     * @param bindings {@inheritDoc}
-     * @throws ScriptException if anything went wrong during the script's execution
+     * @param script the script to evaluate.
+     * @param bindings any additional variable bindings to set before running the script.
+     * @param <T> the type of result returned from the script.
+     * @return the result of evaluating the script.
+     * @throws ScriptException if an error occurs in script execution.
      */
     @Override
     public <T> T evaluateScript(final ScriptObject script, final Bindings bindings) throws ScriptException {
         Reject.ifNull(script);
-
-        if (getThreadPool() == null) {
-            LOGGER.debug("Script module incorrectly configured.");
-            throw new IllegalStateException("ThreadPool must be configured before use.");
-        }
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Evaluating script: " + script);
@@ -119,50 +91,7 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
         final Bindings variableBindings = mergeBindings(script.getBindings(), bindings);
         final ScriptContext context = buildScriptContext(variableBindings);
 
-        return beginTask(engine, context, script);
-    }
-
-    /**
-     * Performs the task, gathering a thread from the threadPool and - if enabled - watches the
-     * script-executing thread from this one until the timeout has occured.
-     *
-     * If no timeout is enabled, and the script contains an infinite loop, these threads will
-     * never end.
-     *
-     * This method throws a {@link ScriptException} if any part of the script's execution failed - either
-     * through interrupt or internal error. This is thrown out of the Script Evaluator so that the calling code
-     * can determine whether or not to trust any state queryable about the engine (it is recommended to not trust
-     * any state set by a script which has not fully completed).
-     */
-    private <T> T beginTask(ScriptEngine engine, ScriptContext context, ScriptObject script) throws ScriptException {
-
-        final boolean timeoutDisabled = scriptEngineManager.getTimeoutMillis() == 0;
-
-        @SuppressWarnings("unchecked")
-        Future<T> result = getThreadPool().submit(new ScriptRunner(engine, context, script));
-        T myAnswer = null;
-
-        try {
-            if (timeoutDisabled) {
-                myAnswer = result.get(); //will run forever if infinite loop in script...
-            } else {
-                myAnswer = result.get(scriptEngineManager.getTimeoutMillis(), TimeUnit.MILLISECONDS);
-            }
-        } catch (InterruptedException e) {
-            LOGGER.debug("Script interrupted: " + e.getMessage());
-            Thread.currentThread().interrupt();
-            throw new ScriptException(e);
-        } catch (ExecutionException e) {
-            LOGGER.debug("Script execution failed: " + e.getMessage());
-            throw new ScriptException(e);
-        } catch (TimeoutException e) {
-            LOGGER.debug("Script timed out: " + e.getMessage());
-            throw new ScriptException(e);
-        } finally {
-            result.cancel(true); //if already completed this does no harm
-        }
-
-        return myAnswer;
+        return (T) engine.eval(script.getScript(), context);
     }
 
     /**
@@ -215,35 +144,6 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
         context.setWriter(NullWriter.DEFAULT);
         context.setErrorWriter(NullWriter.DEFAULT);
         return context;
-    }
-
-    /**
-     * Alters the static Thread Pool for this class. The internal queue will be the same size as the
-     * maximum number of threads to operate on. This method is only callable once. Subsequent calls will be
-     * rejected throwing an illegal state exception.
-     *
-     * @param newCoreSize size of the core thread pool generated. Must be greater than 0.
-     * @param newMaxSize size of the maximum thread pool generated Must be greater than 0.
-     */
-    public static synchronized void configureThreadPool(int newCoreSize, int newMaxSize) {
-        Reject.ifTrue(newCoreSize <= 0 || newMaxSize <= 0);
-
-        if (threadPool == null) {
-            threadPool = executorServiceFactory.createThreadPool(newCoreSize, newMaxSize, 60L, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<Runnable>(newMaxSize));
-        } else {
-            throw new IllegalStateException("Unable to re-configure the script module's thread pool once set up.");
-        }
-
-    }
-
-    /**
-     * This is used for overriding the thread pool for tests. Should not be used externally.
-     *
-     * @return The static threadPool.
-     */
-    ExecutorService getThreadPool() {
-        return threadPool;
     }
 
 }

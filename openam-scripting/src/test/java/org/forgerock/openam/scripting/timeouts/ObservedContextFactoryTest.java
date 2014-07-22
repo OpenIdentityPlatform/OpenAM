@@ -15,16 +15,25 @@
 */
 package org.forgerock.openam.scripting.timeouts;
 
+import org.forgerock.openam.scripting.ScriptEngineConfiguration;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mozilla.javascript.Context;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.TimeUnit;
 
 public class ObservedContextFactoryTest {
 
-    private StandardScriptEngineManager mockScriptEngineManager = mock(StandardScriptEngineManager.class);
-    private ObservedContextFactory testContextFactory = new ObservedContextFactory(mockScriptEngineManager);
+    private StandardScriptEngineManager scriptEngineManager;
+    private ObservedContextFactory testContextFactory;
+
+    @BeforeMethod
+    public void setupTests() {
+        scriptEngineManager = new StandardScriptEngineManager();
+        testContextFactory = new ObservedContextFactory(scriptEngineManager);
+    }
 
     @Test(expectedExceptions = Error.class)
     public void testThrowsErrorWhenInterrupted() {
@@ -34,8 +43,7 @@ public class ObservedContextFactoryTest {
                 = mock(ObservedContextFactory.ObservedJavaScriptContext.class);
 
         int instructionCount = 0;
-
-        when(mockScriptEngineManager.getTimeoutMillis()).thenReturn(1l);
+        setTimeout(1);
         when(mockContext.getStartTime()).thenReturn(1l);
 
         //when
@@ -53,12 +61,15 @@ public class ObservedContextFactoryTest {
                 = mock(ObservedContextFactory.ObservedJavaScriptContext.class);
         int instructionCount = 0;
 
-        when(mockScriptEngineManager.getTimeoutMillis()).thenReturn(0l);
-
+        setTimeout(0);
         //when
         testContextFactory.observeInstructionCount(mockContext, instructionCount);
 
         //then
     }
 
+    private void setTimeout(int timeout) {
+        scriptEngineManager.setConfiguration(ScriptEngineConfiguration.builder()
+                .withTimeout(timeout, TimeUnit.SECONDS).build());
+    }
 }

@@ -151,6 +151,7 @@
         <esapiport.version>2013-12-04</esapiport.version>
         <geoip.version>1.2.8</geoip.version>
         <groovy.version>2.3.3</groovy.version>
+        <groovy-sandbox.version>1.6</groovy-sandbox.version>
         <jaxb.version>1.0.6</jaxb.version>
         <jaxrpc-api.version>1.1</jaxrpc-api.version>
         <jaxrpc-impl.version>1.1.3_01-041406</jaxrpc-impl.version>
@@ -1067,6 +1068,20 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <!-- MIT licensed: http://groovy-sandbox.kohsuke.org/license.html -->
+                <groupId>org.kohsuke</groupId>
+                <artifactId>groovy-sandbox</artifactId>
+                <version>${groovy-sandbox.version}</version>
+                <!-- Groovy-sandbox depends on Groovy 1.8.5, so ignore that in favour of our version. -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

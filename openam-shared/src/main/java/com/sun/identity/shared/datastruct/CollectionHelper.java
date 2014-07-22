@@ -134,6 +134,24 @@ public class CollectionHelper {
     }
 
     /**
+     * Returns a long value from the given configuration map.
+     *
+     * @param config the map of attribute values.
+     * @param name the attribute name to get.
+     * @param defaultValue the default value to use if the attribute is not set or is not a long.
+     * @param debug the debug object to report format errors to.
+     * @return the long value of the attribute or the defaultValue if not set/not a long.
+     */
+    public static long getLongMapAttr(Map<String, Set<String>> config, String name, long defaultValue, Debug debug) {
+        try {
+            return Long.parseLong(getMapAttr(config, name));
+        } catch (NumberFormatException nfe) {
+            debug.error("CollectionHelper.getLongMapAttr", nfe);
+            return defaultValue;
+        }
+    }
+
+    /**
      * This convenience method is for getting server specific attributes from a
      * list attribute. Server specific is determined by prefixing a list
      * attribute value with DSAME local server name followed by the | character.

@@ -16,39 +16,41 @@
 
 package org.forgerock.openam.scripting;
 
+import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
+import org.forgerock.openam.scripting.factories.RhinoScriptEngineFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.util.List;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class StandardScriptEvaluatorTest {
 
+    private static final ScriptEngineConfiguration CONFIGURATION =
+            ScriptEngineConfiguration.builder()
+                // Allow any java.* classes for the unit tests
+                .withWhiteList(Arrays.asList(Pattern.compile("java\\..*"), Pattern.compile("groovy\\..*")))
+                // But deny access to reflection
+                .withBlackList(Arrays.asList(Pattern.compile("java\\.lang\\.Class"),
+                        Pattern.compile("java\\.lang\\.reflect\\..*")))
+                .build();
+
+    private static final RhinoScriptEngineFactory RHINO = new RhinoScriptEngineFactory();
+    private static final GroovyEngineFactory GROOVY = new GroovyEngineFactory();
+
     private StandardScriptEvaluator testEvaluator;
     private StandardScriptEngineManager scriptEngineManager;
-    private Future mockFuture = mock(Future.class);
 
     @BeforeMethod
     public void createTestEvaluator() {
         scriptEngineManager = new StandardScriptEngineManager();
+        scriptEngineManager.setConfiguration(CONFIGURATION);
         testEvaluator = new StandardScriptEvaluator(scriptEngineManager);
-        try {
-            StandardScriptEvaluator.configureThreadPool(10, 10);
-        } catch (IllegalStateException ise) { //ignore
-
-        }
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -85,18 +87,6 @@ public class StandardScriptEvaluatorTest {
         assertThat(result).isNotNull().isEqualTo(value);
     }
 
-    @Test (expectedExceptions = IllegalStateException.class)
-    public void shouldFailEvaluationOfSimpleScriptBeforeThreadPoolConfigured() throws Exception {
-        // Given
-        ScriptObject script = getGroovyScript("3 * 4");
-        StandardScriptEvaluator myTestEvaluator = new NoThreadStandardScriptEvaluator(scriptEngineManager);
-
-        // When
-        myTestEvaluator.evaluateScript(script, null);
-
-        // Then - exception
-    }
-
     @Test
     public void shouldEvaluateSimpleScripts() throws Exception {
         // Given
@@ -131,7 +121,7 @@ public class StandardScriptEvaluatorTest {
         String value = "a script value";
         Bindings bindings = new SimpleBindings();
         bindings.put(varName, value);
-        ScriptObject script = getJavascript(varName, bindings);
+        ScriptObject script = getJavascript(bindings, varName);
 
         // When
         String result = testEvaluator.evaluateScript(script, null);
@@ -165,7 +155,7 @@ public class StandardScriptEvaluatorTest {
         testEvaluator.bindVariableInGlobalScope(varName, globalValue);
         Bindings bindings = new SimpleBindings();
         bindings.put(varName, scriptValue);
-        ScriptObject script = getJavascript(varName, bindings);
+        ScriptObject script = getJavascript(bindings, varName);
 
         // When
         String result = testEvaluator.evaluateScript(script, null);
@@ -182,7 +172,7 @@ public class StandardScriptEvaluatorTest {
         String scriptValue = "script value";
         Bindings scriptBindings = new SimpleBindings();
         scriptBindings.put(varName, scriptValue);
-        ScriptObject script = getJavascript(varName, scriptBindings);
+        ScriptObject script = getJavascript(scriptBindings, varName);
         Bindings paramBindings = new SimpleBindings();
         paramBindings.put(varName, paramValue);
 
@@ -231,68 +221,8 @@ public class StandardScriptEvaluatorTest {
     }
 
     @Test
-    public void shouldStopJavaScriptExecutionWhenTimeoutReached() throws InterruptedException, ExecutionException, TimeoutException, ScriptException {
-        //given
-        mockFuture = mock(Future.class);
-        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
-        ScriptObject loopScript = getJavascript("while(true) { }");
-        myTestEvaluator.getEngineManager().configureTimeout(1);
-
-        //when
-        myTestEvaluator.<Void>evaluateScript(loopScript, null);
-
-        //then
-        verify(mockFuture).get(1000, TimeUnit.MILLISECONDS);
-    }
-
-    @Test
-    public void shouldNotStopJavaScriptExecutionWhenNoTimeoutConfigured() throws InterruptedException, ExecutionException, ScriptException {
-        //given
-        mockFuture = mock(Future.class);
-        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
-        ScriptObject loopScript = getJavascript("while(true) { }");
-        myTestEvaluator.getEngineManager().configureTimeout(0);
-
-        //when
-        myTestEvaluator.<Void>evaluateScript(loopScript, null);
-
-        //then
-        verify(mockFuture).get();
-    }
-
-    @Test
-    public void shouldNotStopGroovyScriptExecutionWhenTimeoutReached() throws ExecutionException, InterruptedException, ScriptException {
-        //given
-        mockFuture = mock(Future.class);
-        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
-        ScriptObject loopScript = getGroovyScript("while(true) { }");
-        myTestEvaluator.getEngineManager().configureTimeout(0);
-
-        //when
-        myTestEvaluator.<Void>evaluateScript(loopScript, null);
-
-        //then
-        verify(mockFuture).get();
-    }
-
-    @Test
-    public void shouldStopGroovyScriptExecutionWhenTimeoutReached() throws InterruptedException, ExecutionException, TimeoutException, ScriptException {
-        //given
-        mockFuture = mock(Future.class);
-        StandardScriptEvaluator myTestEvaluator = new FakeFutureStandardScriptEvaluator(scriptEngineManager);
-        ScriptObject loopScript = getGroovyScript("while(true) { }");
-        myTestEvaluator.getEngineManager().configureTimeout(1);
-
-        //when
-        myTestEvaluator.<Void>evaluateScript(loopScript, null);
-
-        //then
-        verify(mockFuture).get(1000, TimeUnit.MILLISECONDS);
-    }
-
-    @Test
     public void shouldSupportJSONParsing() throws Exception {
-        ScriptObject script = getJavascript("var json = JSON.parse(x); json['a']");
+        ScriptObject script = getJavascript("var json = JSON.parse(x)",  "json['a']");
         Bindings scope = new SimpleBindings();
         scope.put("x", "{\"a\" : 12}");
 
@@ -301,88 +231,72 @@ public class StandardScriptEvaluatorTest {
         assertThat(result).isEqualTo(12);
     }
 
-    private ScriptObject getJavascript(String script) {
-        return getJavascript(script, null);
+    @Test
+    public void shouldSupportJSONParsingInGroovy() throws Exception {
+        ScriptObject script = getGroovyScript("import groovy.json.JsonSlurper",
+                                              "def slurper = new JsonSlurper()",
+                                              "def json = slurper.parseText(x)",
+                                              "json.a");
+        Bindings scope = new SimpleBindings();
+        scope.put("x", "{\"a\" : 12}");
+
+        Object result = testEvaluator.evaluateScript(script, scope);
+
+        assertThat(result).isEqualTo(12);
     }
 
-    private ScriptObject getJavascript(String script, Bindings bindings) {
+    @Test(expectedExceptions = ScriptException.class,
+            expectedExceptionsMessageRegExp = ".*Access to Java class .*? is prohibited.*")
+    public void shouldForbidChangingIntegerCache() throws Exception {
+        // Given
+        // This script attempts to use reflection to alter the shared integer cache, making 1 == 2 in boxed Integer
+        // contexts.
+        ScriptObject evil = getJavascript(
+                "var value = new java.lang.Integer(0).getClass().getDeclaredField('value')",
+                 "value.setAccessible(true)",
+                 "value.set(java.lang.Integer.valueOf(1), java.lang.Integer.valueOf(2))",
+                 "java.lang.Integer.valueOf(1)"); // Would be 2 if allowed
+
+        // When
+        testEvaluator.evaluateScript(evil, null);
+
+        // Then - sandbox should abort script
+    }
+
+    @Test(expectedExceptions = ScriptException.class,
+            expectedExceptionsMessageRegExp = ".*Access to Java class .*? is prohibited.*")
+    public void shouldForbidChangingIntegerCacheFromGroovy() throws Exception {
+        // Given
+        // This script attempts to use reflection to alter the shared integer cache, making 1 == 2 in boxed Integer
+        // contexts.
+        ScriptObject evil = getGroovyScript(
+                "def value = new Integer(0).getClass().getDeclaredField('value')",
+                "value.setAccessible(true)",
+                "value.set(Integer.valueOf(1), Integer.valueOf(2))",
+                "Integer.valueOf(1)"); // Would be 2 if allowed
+
+        // When
+        testEvaluator.evaluateScript(evil, null);
+
+        // Then - sandbox should abort script
+
+    }
+
+
+    static ScriptObject getJavascript(String... script) {
+        return getJavascript(null, script);
+    }
+
+    static ScriptObject getJavascript(Bindings bindings, String... script) {
         final ScriptingLanguage language = SupportedScriptingLanguage.JAVASCRIPT;
         final String name = "test script";
 
-        return new ScriptObject(name, script, language, bindings);
+
+        return new ScriptObject(name, RHINO.getProgram(script), language, bindings);
     }
 
-    private ScriptObject getGroovyScript(String script) {
-        return new ScriptObject("groovyTest", script, SupportedScriptingLanguage.GROOVY, null);
-    }
-
-    // Executor that runs everything in the calling thread without a pool and returns a fake future when submit called
-    private class FakeFutureExecutor extends AbstractExecutorService {
-
-        public <T> java.util.concurrent.Future<T> submit(java.util.concurrent.Callable<T> tCallable) {
-            return mockFuture;
-        }
-
-        private volatile boolean shutdown;
-
-        public void shutdown() {
-            shutdown = true;
-        }
-
-        public List<Runnable> shutdownNow() {
-            return null;
-        }
-
-        public boolean isShutdown() {
-            return shutdown;
-        }
-
-        public boolean isTerminated() {
-            return shutdown;
-        }
-
-        public boolean awaitTermination(long time, TimeUnit unit) throws InterruptedException {
-            return true;
-        }
-
-        public void execute(Runnable runnable) {
-            return;
-        }
-
-    }
-
-    private class FakeFutureStandardScriptEvaluator extends StandardScriptEvaluator {
-
-        /**
-         * Constructs the script evaluator using the given JSR 223 script engine manager instance.
-         *
-         * @param scriptEngineManager the script engine manager to use for creating script engines. May not be null.
-         */
-        public FakeFutureStandardScriptEvaluator(StandardScriptEngineManager scriptEngineManager) {
-            super(scriptEngineManager);
-        }
-
-        @Override
-        ExecutorService getThreadPool() {
-            return new FakeFutureExecutor();
-        }
-    }
-
-    private class NoThreadStandardScriptEvaluator extends StandardScriptEvaluator {
-
-        /**
-         * Constructs the script evaluator using the given JSR 223 script engine manager instance.
-         *
-         * @param scriptEngineManager the script engine manager to use for creating script engines. May not be null.
-         */
-        public NoThreadStandardScriptEvaluator(StandardScriptEngineManager scriptEngineManager) {
-            super(scriptEngineManager);
-        }
-
-        @Override
-        ExecutorService getThreadPool() {
-            return null;
-        }
+    static ScriptObject getGroovyScript(String... lines) {
+        return new ScriptObject("groovyTest", GROOVY.getProgram(lines), SupportedScriptingLanguage.GROOVY, null);
     }
 
 

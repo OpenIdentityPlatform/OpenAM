@@ -15,82 +15,192 @@
 */
 package org.forgerock.openam.scripting;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
 import org.forgerock.openam.scripting.factories.RhinoScriptEngineFactory;
+import org.forgerock.openam.scripting.sandbox.GroovySandboxValueFilter;
+import org.forgerock.openam.scripting.sandbox.RhinoSandboxClassShutter;
 import org.forgerock.openam.scripting.timeouts.ObservedContextFactory;
 import org.forgerock.util.Reject;
+import org.mozilla.javascript.ClassShutter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.script.ScriptEngineManager;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * A singleton implementation of the {@link ScriptEngineManager}, this is augmented to support
- * the needs to limit a generic script engine returned by the manager to a specific timeout.
- *
- * After constructing the manager, configureTimeout must be called if the scripts run via engines
- * returned from this manager are to abide by the intended timeout.
+ * a publish/subscribe (observer) pattern for propagating configuration changes to individual language implementations
+ * and other listeners. This is used to adjust sandboxing and thread pool implementations in response to application
+ * configuration changes.
  */
 @Singleton
-public class StandardScriptEngineManager extends ScriptEngineManager {
+public final class StandardScriptEngineManager extends ScriptEngineManager {
+    private static final Debug DEBUG = Debug.getInstance("amScript");
 
-    private final static int DEFAULT_TIMEOUT = 0; //no timeout
+    /**
+     * Default configuration. Uses system security manager, no script timeouts, and a sandbox configuration that
+     * disallows access to all Java classes.
+     */
+    private static final ScriptEngineConfiguration DEFAULT_CONFIGURATION =
+            ScriptEngineConfiguration.builder()
+                .withTimeout(ScriptEngineConfiguration.NO_TIMEOUT, TimeUnit.SECONDS)
+                .withSystemSecurityManager()
+                .build();
 
-    private volatile int timeout = DEFAULT_TIMEOUT;
+    /**
+     * The current configuration. Configuration objects are themselves immutable and updates of this variable are
+     * atomic, ensuring that components always see a consistent configuration state.
+     */
+    private volatile ScriptEngineConfiguration configuration = DEFAULT_CONFIGURATION;
+
+    /**
+     * Set of listeners registered to receive updates whenever the configuration changes. Synchronized to ensure a
+     * consistent view of the set is seen when publishing events.
+     */
+    private final Set<ConfigurationListener> listeners
+            = Collections.synchronizedSet(new HashSet<ConfigurationListener>());
 
     /**
      * Constructs and configures the engine manager.
      */
     @Inject
     public StandardScriptEngineManager() {
-        final RhinoScriptEngineFactory rhino = new RhinoScriptEngineFactory(new ObservedContextFactory(this), null);
+
+        // Configure Rhino JS and Groovy script engine factories with sandboxing
+        final RhinoScriptEngineFactory rhino = new RhinoScriptEngineFactory(new ObservedContextFactory(this));
         rhino.setOptimisationLevel(RhinoScriptEngineFactory.INTERPRETED);
+        // Set an empty sandbox for now - will deny access to everything. App will set correct configuration before use.
+        final ClassShutter sandbox = new RhinoSandboxClassShutter(System.getSecurityManager(),
+                Collections.<Pattern>emptyList(), Collections.<Pattern>emptyList());
+        rhino.setClassShutter(sandbox);
+
+        final GroovyEngineFactory groovy = new GroovyEngineFactory();
+        groovy.setSandbox(new GroovySandboxValueFilter(sandbox));
+
+        // Add a listener to configure sandbox from configuration changes
+        addConfigurationListener(new SandboxConfigurationListener(rhino, groovy));
 
         registerEngineName(SupportedScriptingLanguage.JAVASCRIPT_ENGINE_NAME, rhino);
-        registerEngineName(SupportedScriptingLanguage.GROOVY_ENGINE_NAME, new GroovyEngineFactory());
+        registerEngineName(SupportedScriptingLanguage.GROOVY_ENGINE_NAME, groovy);
+
+        setConfiguration(DEFAULT_CONFIGURATION);
     }
 
     /**
-     * Configures the timeout for the scripting engine.
+     * Sets the configuration to use when evaluating any scripts. This method will synchronously publish the new
+     * configuration to all registered listeners and atomically update the configuration stored in this manager.
      *
-     * We perform the required actions for all supported engines in this method to enable interruption/time limiting.
-     * As the different engines approach this issue in individual ways, we keep a record of the timeout set accessible
-     * in this class.
-     *
-     * The Rhino engine is configured with a custom ContextFactory
-     * ({@link org.forgerock.openam.scripting.timeouts.ObservedContextFactory}) that has a reference to this script
-     * manager instance. It reads the timeout from here to ensure it always sees the most up-to-date setting.
-     *
-     * The Groovy engine does not require any further set up past that done in {@link GroovyEngineFactory},
-     * but does require that the timeout value is queryable.
-     *
-     * @param timeout the maximum number of seconds for which any given script should run. Must be >= 0.
+     * @param newConfiguration the new configuration to use.
      */
-    public void configureTimeout(int timeout) {
-        Reject.ifTrue(timeout < 0);
+    public void setConfiguration(ScriptEngineConfiguration newConfiguration) {
+        Reject.ifNull(newConfiguration);
 
-        this.timeout = timeout;
+        // Broadcast change to all registered listeners
+        synchronized (listeners) {
+            // Update the configuration within the synchronized block to ensure that the latest configuration always
+            // reflects the last configuration that was broadcast to listeners.
+            this.configuration = newConfiguration;
+
+            for (final ConfigurationListener listener : listeners) {
+                try {
+                    listener.onConfigurationChange(newConfiguration);
+                } catch (RuntimeException ex) {
+                    DEBUG.error("Script configuration listener failed with exception", ex);
+                }
+            }
+        }
     }
 
     /**
-     * Returns the length of the timeout configured for this engine manager in milliseconds. If the timeout is not in
-     * effect or has not yet been configured, return 0.
+     * Get the current script engine configuration in use for evaluating scripts. The configuration object is
+     * immutable and is guaranteed to be a consistent reflection of the last configuration that was set. Calls to
+     * {@link #setConfiguration(ScriptEngineConfiguration)} always 'happen-before' any subsequent calls to this method.
      *
-     * @return time in ms
+     * @return the current configuration.
      */
-    public long getTimeoutMillis() {
-        return TimeUnit.SECONDS.toMillis(getTimeoutSeconds());
+    public ScriptEngineConfiguration getConfiguration() {
+        return configuration;
     }
 
     /**
-     * Returns the length of the timeout configured for this engine manager in seconds. If the timeout is not in
-     * effect or has not yet been configured, return 0.
+     * Adds an observer to be called whenever the current script engine configuration changes. The listener will be
+     * called immediately after the configuration is updated and is guaranteed to be passed a consistent (immutable)
+     * object representing the new configuration. If the configuration is updated by multiple threads in quick
+     * succession, then the final configuration is guaranteed to be the configuration that was most recently published
+     * to any subscribers.
      *
-     * @return time in s
+     * @param listener the configuration listener to register.
+     * @return true if the listener was registered, or false if it was already registered.
      */
-    public int getTimeoutSeconds() {
-        return timeout > DEFAULT_TIMEOUT ? timeout : DEFAULT_TIMEOUT;
+    public boolean addConfigurationListener(ConfigurationListener listener) {
+        Reject.ifNull(listener);
+        // Call the listener immediately with the current configuration
+        listener.onConfigurationChange(getConfiguration());
+        return this.listeners.add(listener);
     }
 
+    /**
+     * Removes a configuration listener from the list of active subscribers. No subsequent configuration changes will
+     * be published to this listener.
+     *
+     * @param listener the listener to remove.
+     * @return true if the listener was removed, or false if it was not previously registered.
+     */
+    public boolean removeConfigurationListener(ConfigurationListener listener) {
+        return this.listeners.remove(listener);
+    }
+
+    /**
+     * Observer pattern interface for listening to changes in the script engine configuration.
+     */
+    public interface ConfigurationListener {
+        /**
+         * Indicates that the script engine configuration has changed and that the listener should update settings
+         * appropriately.
+         *
+         * @param newConfiguration the new script engine configuration. Never null.
+         */
+        void onConfigurationChange(ScriptEngineConfiguration newConfiguration);
+    }
+
+    /**
+     * Listens for configuration changes and configures the Rhino and Groovy sandbox to match current values.
+     */
+    private static final class SandboxConfigurationListener implements ConfigurationListener {
+        private final RhinoScriptEngineFactory rhinoScriptEngineFactory;
+        private final GroovyEngineFactory groovyEngineFactory;
+
+        private SandboxConfigurationListener(final RhinoScriptEngineFactory rhinoScriptEngineFactory,
+                                             final GroovyEngineFactory groovy) {
+            Reject.ifNull(rhinoScriptEngineFactory, groovy);
+            this.rhinoScriptEngineFactory = rhinoScriptEngineFactory;
+            this.groovyEngineFactory = groovy;
+        }
+
+        /**
+         * Updates the Rhino and Groovy sandbox implementations to match the current configuration entries.
+         *
+         * @param newConfiguration the new script engine configuration. Never null.
+         */
+        @Override
+        public void onConfigurationChange(final ScriptEngineConfiguration newConfiguration) {
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("Configuring Rhino sandbox: " + newConfiguration);
+            }
+
+            final ClassShutter sandbox = new RhinoSandboxClassShutter(
+                    newConfiguration.getSecurityManager(),
+                    newConfiguration.getClassWhiteList(),
+                    newConfiguration.getClassBlackList());
+
+            rhinoScriptEngineFactory.setClassShutter(sandbox);
+            groovyEngineFactory.setSandbox(new GroovySandboxValueFilter(sandbox));
+        }
+    }
 }

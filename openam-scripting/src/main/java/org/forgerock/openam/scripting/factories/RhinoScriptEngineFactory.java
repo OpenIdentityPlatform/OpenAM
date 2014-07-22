@@ -27,7 +27,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * JSR-223 wrapper around a Rhino {@link org.mozilla.javascript.ContextFactory}. Uses the configured
@@ -47,8 +46,8 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
     private final String version;
     private final String languageVersion;
 
-    private final ClassShutter classShutter;
-    private final AtomicInteger optimisationLevel = new AtomicInteger(INTERPRETED);
+    private volatile ClassShutter classShutter;
+    private volatile int optimisationLevel = INTERPRETED;
 
     /**
      * Constructs a script engine factory using the given context factory and class-shutter. If non-null, the given
@@ -57,12 +56,10 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      * implementation and language version provided.
      *
      * @param contextFactory the Rhino context factory. May not be null.
-     * @param classShutter the Rhino class-shutter for sandboxing. May be null to disable sandboxing.
      */
-    public RhinoScriptEngineFactory(ContextFactory contextFactory, ClassShutter classShutter) {
+    public RhinoScriptEngineFactory(ContextFactory contextFactory) {
         Reject.ifNull(contextFactory);
         this.contextFactory = contextFactory;
-        this.classShutter = classShutter;
 
         // Determine provided language/engine version
         Context context = contextFactory.enterContext();
@@ -76,10 +73,10 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
 
     /**
      * Constructs the script engine factory with a fresh context factory and no class-shutter.
-     * @see #RhinoScriptEngineFactory(org.mozilla.javascript.ContextFactory, org.mozilla.javascript.ClassShutter)
+     * @see #RhinoScriptEngineFactory(org.mozilla.javascript.ContextFactory)
      */
     public RhinoScriptEngineFactory() {
-        this(new ContextFactory(), null);
+        this(new ContextFactory());
     }
 
     /**
@@ -180,7 +177,7 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      */
     @Override
     public String getProgram(final String... statements) {
-        return StringUtils.join(statements, ';');
+        return StringUtils.join(statements, ";\n");
     }
 
     /**
@@ -210,9 +207,10 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      */
     Context getContext() {
         final Context context = contextFactory.enterContext();
-        context.setOptimizationLevel(optimisationLevel.get());
-        if (classShutter != null) {
-            context.setClassShutter(classShutter);
+        context.setOptimizationLevel(optimisationLevel);
+        final ClassShutter sandbox = classShutter;
+        if (sandbox != null) {
+            context.setClassShutter(sandbox);
         }
         return context;
     }
@@ -233,7 +231,16 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      * @param optimisationLevel the optimisation level to use.
      */
     public void setOptimisationLevel(final int optimisationLevel) {
-        this.optimisationLevel.set(optimisationLevel);
+        this.optimisationLevel = optimisationLevel;
+    }
+
+    /**
+     * Sets the class shutter to be used to sandbox scripts running in this engine.
+     *
+     * @param classShutter the class-shutter to use. May be null to disable sandboxing.
+     */
+    public void setClassShutter(final ClassShutter classShutter) {
+        this.classShutter = classShutter;
     }
 
     @Override

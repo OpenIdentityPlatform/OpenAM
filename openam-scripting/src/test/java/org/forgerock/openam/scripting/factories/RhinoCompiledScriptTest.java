@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.scripting.factories;
 
-import org.mockito.BDDMockito;
 import org.mozilla.javascript.Script;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

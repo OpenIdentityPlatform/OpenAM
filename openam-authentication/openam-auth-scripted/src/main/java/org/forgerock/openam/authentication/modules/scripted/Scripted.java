@@ -1,33 +1,17 @@
-/**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * $Id: LDAP.java,v 1.17 2010/01/25 22:09:16 qcheng Exp $
- *
- */
-
 /*
- * Portions Copyrighted 2010-2014 ForgeRock, Inc.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
@@ -45,7 +29,6 @@ import org.forgerock.http.client.request.HttpClientRequestFactory;
 import org.forgerock.openam.authentication.modules.scripted.http.JavaScriptHttpClient;
 import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.ScriptObject;
-import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 
 import javax.script.Bindings;
@@ -89,6 +72,13 @@ public class Scripted extends AMLoginModule {
     public static final String LOGGER_VARIABLE_NAME = "logger";
     public static final String IDENTITY_REPOSITORY = "idRepository";
 
+    /**
+     * Loaded on module startup to ensure the configuration listener is enabled. This ensures that configuration
+     * changes that affect script execution are propagated to the script framework.
+     */
+    private static final ScriptedAuthConfigurator CONFIGURATOR =
+            InjectorHolder.getInstance(ScriptedAuthConfigurator.class);
+
     private String userName;
     private String clientSideScript;
     private boolean clientSideScriptEnabled;
@@ -112,6 +102,9 @@ public class Scripted extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
         userName = (String) sharedState.get(getUserKey());
         moduleConfiguration = options;
+
+        // Ensure that configurator is registered (will do nothing if already initialised).
+        CONFIGURATOR.registerServiceListener();
 
         clientSideScript = getClientSideScript();
         scriptEvaluator = getScriptEvaluator();
@@ -189,16 +182,7 @@ public class Scripted extends AMLoginModule {
     }
 
     private ScriptEvaluator getScriptEvaluator() {
-        final StandardScriptEvaluator scriptEvaluator = InjectorHolder.getInstance(StandardScriptEvaluator.class);
-        scriptEvaluator.getEngineManager().configureTimeout(getServerTimeout());
-
-        try {
-            StandardScriptEvaluator.configureThreadPool(getCoreThreadSize(), getMaxThreadSize());
-        } catch (IllegalStateException ise) {
-            //we ignore this, but written explicitly for your knowledge
-        }
-
-        return scriptEvaluator;
+        return InjectorHolder.getInstance(ScriptEvaluator.class);
     }
 
     private RestletHttpClient getHttpClient() {

@@ -2,8 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011 ForgeRock AS. All Rights Reserved
-    Copyright 2011 Cybernetica AS.
+    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
 
     The contents of this file are subject to the terms
     of the Common Development and Distribution License
@@ -23,11 +22,6 @@
     your own identifying information:
     "Portions Copyrighted [year] [name of copyright owner]"
 
--->
-<!--
-    Portions Copyrighted 2012-2014 ForgeRock Inc
-    Portions Copyrighted 2012 Open Source Solution Technology Corporation
-    Portions Copyrighted 2013 Nomura Research Institute, Ltd
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -61,6 +55,54 @@
                                  rangeEnd="2147483647" i18nKey="a107">
                     <DefaultValues>
                         <Value>50</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-queue-size"
+                                 type="single" syntax="number_range" rangeStart="-1"
+                                 rangeEnd="2147483647" i18nKey="a111">
+                    <DefaultValues>
+                        <Value>10</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-idle-timeout"
+                                 type="single" syntax="number_range" rangeStart="0"
+                                 rangeEnd="2147483647" i18nKey="a112">
+                    <DefaultValues>
+                        <Value>60</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-white-list"
+                                 type="list" syntax="string" i18nKey="a108">
+                    <DefaultValues>
+                        <Value>java.lang.Integer</Value>
+                        <Value>java.lang.Number</Value>
+                        <Value>java.lang.Long</Value>
+                        <Value>java.lang.Float</Value>
+                        <Value>java.lang.Double</Value>
+                        <Value>java.lang.String</Value>
+                        <Value>com.sun.identity.shared.debug.Debug</Value>
+                        <Value>org.forgerock.openam.authentication.modules.scripted.*</Value>
+                        <Value>org.forgerock.openam.authentication.modules.scripted.http.*</Value>
+                        <Value>org.forgerock.http.client.*</Value>
+                        <Value>groovy.json.JsonSlurper</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-black-list"
+                                 type="list" syntax="string" i18nKey="a109">
+                    <DefaultValues>
+                        <Value>java.security.AccessController</Value>
+                        <Value>java.lang.Class</Value>
+                        <Value>java.lang.reflect.*</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-use-security-manager"
+                                 type="single" syntax="boolean" i18nKey="a110">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>
