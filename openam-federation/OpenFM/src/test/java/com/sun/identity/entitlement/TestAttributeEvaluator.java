@@ -89,9 +89,7 @@ public class TestAttributeEvaluator {
         set.add(attrValue);
         attrValues.put(attrName, set);
         user1 = IdRepoUtils.createUser("/", USER1_NAME, attrValues);
-        AttributeSubject as = new AttributeSubject();
-        as.setID(attrName);
-        as.setValue(attrValue);
+        AttributeSubject as = new AttributeSubject(attrName, attrValue);
         EntitlementSubject es1 = as;
         Privilege privilege = Privilege.getNewInstance();
         privilege.setName(PRIVILEGE1_NAME);
