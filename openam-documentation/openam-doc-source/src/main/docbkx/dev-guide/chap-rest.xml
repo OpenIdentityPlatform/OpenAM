@@ -465,6 +465,7 @@ $ <userinput>curl \
 $ <userinput>curl \
  --request POST \
  --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*" \
+ --header "Content-Type: application/json" \
  "https://openam.example.com:8443/openam/json/sessions/?_action=logout"</userinput>
 <computeroutput>
 {"result":"Successfully logged out"}</computeroutput>
