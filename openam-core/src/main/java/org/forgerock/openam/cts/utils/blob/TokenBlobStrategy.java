@@ -16,7 +16,6 @@
 package org.forgerock.openam.cts.utils.blob;
 
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -44,8 +43,8 @@ public class TokenBlobStrategy {
     /**
      * Perform the strategy on the byte array.
      *
-     * @param data Non null byte[] to perform the strategy on.
-     * @return A modified copy of the byte[].
+     * @param data A possibly null byte[] to perform the strategy on.
+     * @return A modified copy of the byte[] or null if data was null.
      *
      * @throws TokenStrategyFailedException If an error occurred whilst processing the Token.
      */
@@ -56,8 +55,8 @@ public class TokenBlobStrategy {
     /**
      * Performs the reverse strategy on the byte array.
      *
-     * @param data Non null byte[] to perform the reverse strategy on.
-     * @return A modified copy of the byte[].
+     * @param data A possibly null byte[] to perform the reverse strategy on.
+     * @return A modified copy of the byte[] or null if data was null.
      *
      * @throws TokenStrategyFailedException If an error occurred whilst processing the Token.
      */
@@ -70,14 +69,17 @@ public class TokenBlobStrategy {
      *
      * @param strategies Non null strategies to apply.
      * @param perform True indicates perform, false indicates reverse.
-     * @param data The data to apply the change to.
-     * @return A copy of the data with the change applied.
+     * @param data The data to apply the change to. May be null.
+     * @return A copy of the data with the change applied. May be null if data was null.
      *
      * @throws TokenStrategyFailedException If there was a problem performing the operation.
      */
-    private byte[] apply(Collection<BlobStrategy> strategies,
-                         boolean perform, byte[] data) throws TokenStrategyFailedException {
-        Reject.ifTrue(data == null);
+    private byte[] apply(Collection<BlobStrategy> strategies, boolean perform, byte[] data)
+            throws TokenStrategyFailedException {
+        if (data == null) {
+            return null;
+        }
+
         byte[] r = Arrays.copyOf(data, data.length);
         for (BlobStrategy strategy : strategies) {
             if (perform) {

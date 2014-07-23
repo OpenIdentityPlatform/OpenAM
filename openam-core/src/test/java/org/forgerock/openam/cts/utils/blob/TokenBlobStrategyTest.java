@@ -25,9 +25,7 @@ import java.util.Arrays;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.Fail.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class TokenBlobStrategyTest {
     private CoreTokenConfig config;
@@ -119,5 +117,31 @@ public class TokenBlobStrategyTest {
         if (dataRef == captorRef) { // Verify the references are different (the contents will be the same)
             fail();
         }
+    }
+
+    @Test
+    public void shouldReturnNullForNullInputDuringPerform() throws Exception {
+        byte[] data = null;
+
+        BlobStrategy first = mock(BlobStrategy.class);
+
+        given(factory.getStrategies(any(CoreTokenConfig.class))).willReturn(Arrays.asList(first));
+        TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
+
+        assertThat(strategy.perform(data)).isNull();
+        verify(first, times(0)).perform(any(byte[].class));
+    }
+
+    @Test
+    public void shouldReturnNullForNullInputDuringReverse() throws Exception {
+        byte[] data = null;
+
+        BlobStrategy first = mock(BlobStrategy.class);
+
+        given(factory.getStrategies(any(CoreTokenConfig.class))).willReturn(Arrays.asList(first));
+        TokenBlobStrategy strategy = new TokenBlobStrategy(factory, config);
+
+        assertThat(strategy.perform(data)).isNull();
+        verify(first, times(0)).reverse(any(byte[].class));
     }
 }
