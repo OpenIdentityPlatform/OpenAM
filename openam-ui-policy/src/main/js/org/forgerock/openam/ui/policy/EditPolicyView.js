@@ -92,9 +92,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 _.each(app[0].actions, function (value, key) {
                     actions.push({action: key, selected: false, value: value});
                 });
-
+                
                 _.each(allSubjects[0].result, function (value) {
-                   if ( value.title === 'POLICY' ){ return; } // AME-4011
                    if ( _.contains(app[0].subjects, value.title) ){
                        subjects.push(value);
                    }

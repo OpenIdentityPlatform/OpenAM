@@ -126,8 +126,6 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 this.onClear();
                 this.initSorting();
 
-
-
                 if (callback) {callback();}
             });
 
