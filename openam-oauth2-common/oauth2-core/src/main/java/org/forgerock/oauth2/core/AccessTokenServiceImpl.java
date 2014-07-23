@@ -91,7 +91,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
      */
     public AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException,
             InvalidClientException, InvalidRequestException, BadRequestException, ServerException,
-            ExpiredTokenException {
+            ExpiredTokenException, InvalidGrantException {
 
         Reject.ifTrue(isEmpty(request.<String>getParameter("refresh_token")), "Missing parameter, 'refresh_token'");
 

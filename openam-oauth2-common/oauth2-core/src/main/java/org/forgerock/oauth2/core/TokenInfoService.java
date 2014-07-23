@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidTokenException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -40,7 +41,8 @@ public interface TokenInfoService {
      * @throws ExpiredTokenException If the access token or refresh token has expired.
      * @throws ServerException If any internal server error occurs.
      * @throws BadRequestException If the request is malformed.
+     * @throws InvalidGrantException If the given token is not an Access token.
      */
     JsonValue getTokenInfo(OAuth2Request request) throws InvalidTokenException, InvalidRequestException,
-            ExpiredTokenException, ServerException, BadRequestException;
+            ExpiredTokenException, ServerException, BadRequestException, InvalidGrantException;
 }

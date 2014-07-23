@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.AccessTokenVerifier;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Request;
 import org.slf4j.Logger;
@@ -79,6 +80,9 @@ public class RestletHeaderAccessTokenVerifier implements AccessTokenVerifier {
             logger.debug(e.getMessage());
             return false;
         } catch (ServerException e) {
+            logger.debug(e.getMessage());
+            return false;
+        } catch (InvalidGrantException e) {
             logger.debug(e.getMessage());
             return false;
         }

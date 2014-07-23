@@ -30,6 +30,7 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuthProblemException;
@@ -190,6 +191,8 @@ public class ScopeImpl implements Scope {
                 throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, e.getMessage());
             } catch (InvalidClientException e) {
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, e.getMessage());
+            } catch (InvalidGrantException e) {
+                throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(null, e.getMessage());
             }
             if (tokenEntry != null) {
                 map.put(tokenEntry.getKey(), tokenEntry.getValue());

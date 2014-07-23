@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,8 +41,9 @@ public class OpenAMAccessToken extends AccessToken {
      * Constructs a new OpenAMAccessToken backed with the data in the specified JsonValue.
      *
      * @param token The JsonValue of the token.
+     * @throws InvalidGrantException If the given token is not an Access Token.
      */
-    public OpenAMAccessToken(JsonValue token) {
+    public OpenAMAccessToken(JsonValue token) throws InvalidGrantException {
         super(token);
     }
 

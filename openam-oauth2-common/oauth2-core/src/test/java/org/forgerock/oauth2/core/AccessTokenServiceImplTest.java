@@ -16,16 +16,9 @@
 
 package org.forgerock.oauth2.core;
 
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.ExpiredTokenException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidCodeException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,8 +29,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -70,9 +63,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    public void shouldRequestAccessToken() throws InvalidGrantException, RedirectUriMismatchException,
-            ClientAuthenticationFailedException, UnauthorizedClientException, InvalidRequestException,
-            InvalidCodeException, InvalidClientException, ServerException {
+    public void shouldRequestAccessToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -87,10 +78,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
-    public void requestAccessTokenShouldThrowInvalidGrantExceptionWhenGrantTypeDoesNotMatchHandler()
-            throws InvalidGrantException, RedirectUriMismatchException, ClientAuthenticationFailedException,
-            UnauthorizedClientException, InvalidRequestException, InvalidCodeException, InvalidClientException,
-            ServerException {
+    public void requestAccessTokenShouldThrowInvalidGrantExceptionWhenGrantTypeDoesNotMatchHandler() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -105,9 +93,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)
-    public void refreshTokenShouldThrowIllegalArgumentExceptionWhenRefreshTokenMissing() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void refreshTokenShouldThrowIllegalArgumentExceptionWhenRefreshTokenMissing() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -120,9 +106,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)
-    public void refreshTokenShouldThrowIllegalArgumentExceptionWhenRefreshTokenIsEmpty() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void refreshTokenShouldThrowIllegalArgumentExceptionWhenRefreshTokenIsEmpty() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -137,9 +121,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = InvalidRequestException.class)
-    public void refreshTokenShouldThrowInvalidRequestExceptionWhenRefreshTokenNotFound() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void refreshTokenShouldThrowInvalidRequestExceptionWhenRefreshTokenNotFound() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -158,9 +140,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = InvalidRequestException.class)
-    public void refreshTokenShouldThrowInvalidRequestExceptionWhenClientIdsDontMatch() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void refreshTokenShouldThrowInvalidRequestExceptionWhenClientIdsDontMatch() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -181,9 +161,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test (expectedExceptions = ExpiredTokenException.class)
-    public void refreshTokenShouldThrowExpiredTokenExceptionWhenRefreshTokenHasExpired() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void refreshTokenShouldThrowExpiredTokenExceptionWhenRefreshTokenHasExpired() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -205,8 +183,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    public void shouldRefreshToken() throws BadRequestException, ClientAuthenticationFailedException,
-            InvalidRequestException, InvalidClientException, ServerException, ExpiredTokenException {
+    public void shouldRefreshToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -237,9 +214,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    public void shouldRefreshTokenAndIncludeScopeInAccessToken() throws BadRequestException,
-            ClientAuthenticationFailedException, InvalidRequestException, InvalidClientException, ServerException,
-            ExpiredTokenException {
+    public void shouldRefreshTokenAndIncludeScopeInAccessToken() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.oauth2.legacy;
 
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.openam.oauth2.OpenAMAccessToken;
 
 import java.util.Map;
@@ -30,7 +31,7 @@ public class AccessTokenToLegacyAdapter extends OpenAMAccessToken {
 
     private final CoreToken token;
 
-    public AccessTokenToLegacyAdapter(CoreToken token) {
+    public AccessTokenToLegacyAdapter(CoreToken token) throws InvalidGrantException {
         super(token);
         this.token = token;
     }

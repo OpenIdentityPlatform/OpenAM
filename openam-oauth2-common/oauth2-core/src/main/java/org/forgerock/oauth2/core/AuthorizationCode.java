@@ -17,6 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,9 +35,13 @@ public class AuthorizationCode extends JsonValue implements Token {
      * Constructs a new AuthorizationCode backed with the data in the specified JsonValue.
      *
      * @param token The JsonValue of the token.
+     * @throws InvalidGrantException If the given token is not an Authorization Code token.
      */
-    protected AuthorizationCode(JsonValue token) {
+    protected AuthorizationCode(JsonValue token) throws InvalidGrantException {
         super(token);
+        if (!OAuth2Constants.Token.OAUTH_CODE_TYPE.equals(getTokenName())) {
+            throw new InvalidGrantException("Token is not an authorization code token: " + getTokenId());
+        }
     }
 
     /**

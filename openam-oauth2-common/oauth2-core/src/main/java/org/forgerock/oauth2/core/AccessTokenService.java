@@ -73,7 +73,8 @@ public interface AccessTokenService {
      * @throws ServerException If any internal server error occurs.
      * @throws ExpiredTokenException If the access token or refresh token has expired.
      * @throws IllegalArgumentException If the request is missing any required parameters.
+     * @throws InvalidGrantException If the given token is not a refresh token.
      */
     AccessToken refreshToken(OAuth2Request request) throws ClientAuthenticationFailedException, InvalidClientException,
-            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException;
+            InvalidRequestException, BadRequestException, ServerException, ExpiredTokenException, InvalidGrantException;
 }

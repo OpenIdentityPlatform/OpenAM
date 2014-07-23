@@ -19,6 +19,7 @@ package org.forgerock.openam.oauth2;
 import org.forgerock.oauth2.core.RefreshToken;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -39,8 +40,9 @@ public class OpenAMRefreshToken extends RefreshToken {
      * Constructs a new OpenAMRefreshToken backed with the data in the specified JsonValue.
      *
      * @param token The JsonValue of the token.
+     * @throws InvalidGrantException If the given token is not a Refresh Token.
      */
-    public OpenAMRefreshToken(JsonValue token) {
+    public OpenAMRefreshToken(JsonValue token) throws InvalidGrantException {
         super(token);
     }
 

@@ -325,7 +325,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public AccessToken readAccessToken(String tokenId) throws ServerException, BadRequestException {
+    public AccessToken readAccessToken(String tokenId) throws ServerException, BadRequestException,
+            InvalidGrantException {
+
         logger.message("Reading access token");
 
         JsonValue token;
@@ -340,7 +342,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         if (token == null) {
             logger.error("Unable to read access token corresponding to id: " + tokenId);
-            throw new BadRequestException("Could not read token in CTS");
+            throw new InvalidGrantException("Could not read token in CTS");
         }
 
         return new OpenAMAccessToken(token);
@@ -349,7 +351,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
     /**
      * {@inheritDoc}
      */
-    public RefreshToken readRefreshToken(String tokenId) throws BadRequestException, InvalidRequestException {
+    public RefreshToken readRefreshToken(String tokenId) throws BadRequestException, InvalidRequestException,
+            InvalidGrantException {
+
         logger.message("Read refresh token");
         JsonValue token;
 
