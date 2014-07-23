@@ -33,13 +33,22 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Microsoft IIS 6 Policy Agent</title>
- <indexterm><primary>Microsoft IIS</primary></indexterm>
+
+ <indexterm>
+  <primary>Microsoft IIS 6</primary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Microsoft 
  Internet Information Services 6.</para>
  
  <section xml:id="before-iis6-agent-install">
   <title>Before You Install</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 6</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
+
   <para>Make sure OpenAM is installed, running, that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -95,14 +104,24 @@
  
  <section xml:id="install-iis6-web-agent">
   <title>Installing IIS 6 Web Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 6</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
 
   <procedure xml:id="create-iis6-agent-pwdfile">
    <title>To Create the Password File</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 6</primary>
+    <secondary>creating a password file</secondary>
+   </indexterm>
+
    <step>
     <para>Protect the password file you will create as appropriate.</para>
    </step>
@@ -118,7 +137,13 @@ C:\><userinput>notepad C:\Windows\Temp\pwd.txt</userinput>
   
   <procedure xml:id="configure-iis6-agent-install">
    <title>To Configure Policy Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 6</primary>
+    <secondary>installing</secondary>
+    <tertiary>creating a configuration file</tertiary>
+   </indexterm>
+
    <step>
     <para>Log on as a user with Administrator privileges.</para>
    </step>
@@ -171,7 +196,13 @@ Agent Configuration file created : config.txt
   
   <procedure xml:id="install-agent-into-iis6">
    <title>To Install the Policy Agent into IIS 6</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 6</primary>
+    <secondary>installing</secondary>
+    <tertiary>into IIS 6</tertiary>
+   </indexterm>
+
    <step>
     <para>Log on as a user with Administrator privileges.</para>
    </step>
@@ -287,7 +318,13 @@ Internet services successfully restarted</computeroutput>
  
  <section xml:id="custom-iis6-agent-installation">
   <title>Custom IIS 6 Web Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 6</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
   <para>When protecting multiple IIS 6 websites on the same host, use different
   configuration files for each site.</para>
   
@@ -308,7 +345,12 @@ C:\web_agents\iis6_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</repla
  
  <section xml:id="uninstall-iis6-agent">
   <title>Remove IIS 6 Web Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 6</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>To remove the web policy agent, log on as a user with Administrator
   privileges, run <command>cscript IIS6Admin.vbs -unconfig config.txt</command>,
   and then run <command>iisreset</command>.</para>

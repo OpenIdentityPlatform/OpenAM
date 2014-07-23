@@ -30,8 +30,9 @@
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Configuring Web Policy Agents Behind Load Balancers</title>
+
  <indexterm>
-  <primary>Load balancers</primary>
+  <primary>load balancers</primary>
  </indexterm>
 
  <para>
@@ -41,6 +42,11 @@
 
  <section xml:id="lb-scenarios">
   <title>The Role of the Load Balancing Layer</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>role of</secondary>
+  </indexterm>
 
   <para>
    A load balancing layer that stands between clients and protected servers
@@ -113,6 +119,11 @@
  <section xml:id="lb-same-protocol-and-port">
   <title>When Protocols &amp; Port Number Match</title>
 
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>when protocols and port number match</secondary>
+  </indexterm>
+
   <para>
    When the protocol on the load balancer, such as HTTP or HTTPS,
    matches the protocol on the protected web server,
@@ -124,6 +135,11 @@
 
   <procedure xml:id="lb-fqdn-mapping">
    <title>To Map the Agent Host Name to the Load Balancer Host Name</title>
+
+   <indexterm>
+    <primary>load balancers</primary>
+    <secondary>mapping agent host name</secondary>
+   </indexterm>
 
    <para>
     When protocols and port numbers match,
@@ -201,6 +217,11 @@
 
  <section xml:id="lb-different-protocol-and-port">
   <title>When Protocols &amp; Port Number Differ</title>
+
+  <indexterm>
+   <primary>load balancers</primary>
+   <secondary>when protocols and port number differ</secondary>
+  </indexterm>
 
   <para>
    When the load balancer protocol and port, such as HTTPS and 443,

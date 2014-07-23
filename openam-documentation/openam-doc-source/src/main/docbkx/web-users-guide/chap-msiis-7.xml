@@ -33,7 +33,10 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Microsoft IIS 7 Policy Agent</title>
- <indexterm><primary>Microsoft IIS</primary></indexterm>
+
+ <indexterm>
+  <primary>Microsoft IIS 7</primary>
+ </indexterm>
 
  <para>
   This chapter covers installation of the policy agent for
@@ -43,6 +46,11 @@
  
  <section xml:id="before-iis7-agent-install">
   <title>Before You Install</title>
+
+  <indexterm>
+   <primary>Microsoft IIS 7</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
 
   <para>Make sure OpenAM is installed, running, that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
@@ -106,14 +114,25 @@
  
  <section xml:id="install-iis7-web-agent">
   <title>Installing IIS 7 Web Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 7</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
   
   <procedure xml:id="create-iis7-agent-pwdfile">
    <title>To Create the Password File</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 7</primary>
+    <secondary>creating password file</secondary>
+   </indexterm>
+
    <step>
     <para>Protect the password file you will create as appropriate.</para>
    </step>
@@ -129,7 +148,13 @@ C:\><userinput>notepad C:\Windows\Temp\pwd.txt</userinput>
   
   <procedure xml:id="configure-iis7-agent-install">
    <title>To Configure Policy Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 7</primary>
+    <secondary>installing</secondary>
+    <tertiary>creating a configuration file</tertiary>
+   </indexterm>
+
    <step>
     <para>Log on as a user with Administrator privileges.</para>
    </step>
@@ -182,7 +207,13 @@ Agent Configuration file created : config.txt
   
   <procedure xml:id="install-agent-into-iis7">
    <title>To Install the Policy Agent into IIS 7</title>
-   
+
+   <indexterm>
+    <primary>Microsoft IIS 7</primary>
+    <secondary>installing</secondary>
+    <tertiary>into IIS 7</tertiary>
+   </indexterm>
+
    <step>
     <para>Log on as a user with Administrator privileges.</para>
    </step>
@@ -294,7 +325,13 @@ Internet services successfully restarted</computeroutput>
  
  <section xml:id="custom-iis7-agent-installation">
   <title>Custom IIS 7 Web Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 7</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
   <para>When protecting multiple IIS 7 websites on the same host, use different
   configuration files for each site.</para>
   
@@ -313,6 +350,12 @@ C:\web_agents\iis7_agent\bin><userinput>cryptit.exe <replaceable>pwd-file</repla
  <!-- OPENAM-1644: Document changes to IIS 7 PA support for Basic Auth and password replay -->
  <section xml:id="iis7-enable-basic-auth">
   <title>Enable IIS 7 Basic Authentication &amp; Password Replay Support</title>
+
+  <indexterm>
+   <primary>Microsoft IIS 7</primary>
+   <secondary>basic authentication &amp; password relay support</secondary>
+   <tertiary>enabling</tertiary>
+  </indexterm>
 
   <itemizedlist>
    <para>The IIS 7 web policy agent now supports IIS 7 basic authentication and
@@ -608,7 +651,12 @@ C:><userinput>java -cp ${forgerockUtilLibrary};${coreLibrary}; ^
 
  <section xml:id="uninstall-iis7-agent">
   <title>Remove IIS 7 Web Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Microsoft IIS 7</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>To remove the web policy agent, log on as a user with Administrator
   privileges, run <command>cscript IIS7Admin.vbs -unconfig config.txt</command>,
   and then run <command>iisreset</command>.</para>

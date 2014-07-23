@@ -31,10 +31,13 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Configuring Web Policy Agents</title>
+
  <indexterm>
-  <primary>Policy agents</primary>
-  <secondary>Configuring</secondary>
+  <primary>policy agent profiles</primary>
+  <secondary>web policy agents</secondary>
+  <tertiary>creating</tertiary>
  </indexterm>
+
  <para>When you create a web policy agent profile and install the agent,
   you can choose to store the agent configuration centrally and configure
   the agent through OpenAM console. Alternatively, you can choose to store
@@ -65,6 +68,12 @@
 
  <section xml:id="configure-web-pa-global-props">
   <title>Configuring Web Policy Agent Global Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>global properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
 
   <para>This section covers global web agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under
@@ -178,6 +187,12 @@
 
   <variablelist xml:id="web-agent-general-properties">
    <title>General properties</title>
+
+   <indexterm>
+    <primary>web policy agents</primary>
+    <secondary>general properties</secondary>
+   </indexterm>
+
    <varlistentry>
     <term>SSO Only Mode</term>
     <listitem>
@@ -368,6 +383,12 @@
 
  <section xml:id="configure-web-pa-application-props">
   <title>Configuring Web Policy Agent Application Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>application properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
 
   <para>This section covers application web agent properties. After creating
    the agent profile, you access these properties in the OpenAM console under
@@ -656,6 +677,12 @@
  <section xml:id="configure-web-pa-sso-props">
   <title>Configuring Web Policy Agent SSO Properties</title>
 
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>SSO properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
+
   <para>This section covers SSO web agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under
    Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
@@ -766,6 +793,12 @@
 
  <section xml:id="configure-web-pa-services-props">
   <title>Configuring Web Policy Agent OpenAM Services Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>OpenAM services properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
 
   <para>This section covers OpenAM services web agent properties. After
    creating the agent profile, you access these properties in the OpenAM console
@@ -969,6 +1002,12 @@
 
  <section xml:id="configure-web-pa-misc-props">
   <title>Configuring Web Policy Agent Miscellaneous Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>miscellaneous properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
 
   <para>This section covers miscellaneous web agent properties. After creating
    the agent profile, you access these properties in the OpenAM console under
@@ -1194,6 +1233,12 @@
 
  <section xml:id="configure-web-pa-advanced-props">
   <title>Configuring Web Policy Agent Advanced Properties</title>
+
+  <indexterm>
+   <primary>web policy agents</primary>
+   <secondary>advanced properties</secondary>
+   <tertiary>configuring</tertiary>
+  </indexterm>
 
   <para>This section covers advanced web agent properties. After creating the
    agent profile, you access these properties in the OpenAM console under

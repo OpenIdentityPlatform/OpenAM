@@ -33,7 +33,11 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Configuring Web Policy Agent Profiles</title>
- <indexterm><primary>Policy agents</primary></indexterm>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>configuring</secondary>
+ </indexterm>
 
  <!-- The following two paras are used in the admin guide, j2ee pa users and web pa users guides -->
  <para> You install policy agents in web servers and web application containers

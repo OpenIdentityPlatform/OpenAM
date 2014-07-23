@@ -31,9 +31,10 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Delegating Agent Profile Creation</title>
+
  <indexterm>
-  <primary>Policy agents</primary>
-  <secondary>Creating profiles</secondary>
+  <primary>policy agent profiles</primary>
+  <secondary>delegating creation of</secondary>
  </indexterm>
 
  <para>If you want to create policy agent profiles when installing policy
@@ -46,6 +47,14 @@
   installs policy agents.</para>
 
  <procedure xml:id="create-agent-administrators">
+  <title>To Create Agent Administrators for a Realm</title>
+
+  <indexterm>
+   <primary>policy agent profiles</primary>
+   <secondary>agent administrators</secondary>
+   <tertiary>creating</tertiary>
+  </indexterm>
+
   <para>Follow these steps to create <firstterm>agent administrator</firstterm>
    users for a realm.</para>
 

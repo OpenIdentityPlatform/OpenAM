@@ -33,12 +33,22 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Apache 2.4 Policy Agent</title>
- <indexterm><primary>Apache HTTP Server</primary></indexterm>
+
+ <indexterm>
+  <primary>Apache 2.4 policy agent</primary>
+  <secondary>installation of</secondary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Apache
  HTTP Server 2.4.x.</para>
  
  <section xml:id="before-apache24-agent-install">
   <title>Before You Install</title>
+
+  <indexterm>
+   <primary>Apache 2.4 policy agent</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
   
   <para>Make sure OpenAM is installed, running, that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
@@ -92,6 +102,11 @@
  <section xml:id="install-apache24-web-agent">
   <title>Installing Apache 2.4 Web Policy Agent</title>
 
+  <indexterm>
+   <primary>Apache 2.4 policy agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
@@ -100,6 +115,12 @@
 
   <procedure xml:id="install-agent-into-apache24">
    <title>To Install the Policy Agent into Apache 2.4</title>
+
+   <indexterm>
+    <primary>Apache 2.4 policy agent</primary>
+    <secondary>installing</secondary>
+    <tertiary>into Apache 2.4</tertiary>
+   </indexterm>
 
    <step>
     <para>Shut down the Apache 2.4 server where you plan to install the
@@ -224,6 +245,12 @@ $ <userinput>/path/to/apache24/bin/apachectl -k start</userinput>
   <procedure xml:id="check-apache24-agent-installation">
    <title>To Check the Policy Agent Installation</title>
 
+   <indexterm>
+    <primary>Apache 2.4 policy agent</primary>
+    <secondary>installing</secondary>
+    <tertiary>checking the install</tertiary>
+   </indexterm>
+
    <step>
     <para>Check the Apache 2.4 error log after you start the server to make
     sure startup completed successfully.</para>
@@ -268,6 +295,12 @@ $ <userinput>tail /path/to/web_agents/apache24_agent/Agent_001/logs/debug/amAgen
  <section xml:id="custom-apache24-agent-installation">
   <title>Custom Apache 2.4 Web Policy Agent Installation</title>
 
+  <indexterm>
+   <primary>Apache 2.4 policy agent</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
   <para>When running multiple Apache 2.4 servers on the same host, use
   <command>./agentadmin --custom-install</command>. If you want to suppress
    the license agreement prompt, add the <command>--acceptLicense</command>
@@ -297,6 +330,11 @@ $ <userinput>tail /path/to/web_agents/apache24_agent/Agent_001/logs/debug/amAgen
 
  <section xml:id="uninstall-apache24-agent">
   <title>Remove Apache 2.4 Web Policy Agent Software</title>
+
+  <indexterm>
+   <primary>Apache 2.4 policy agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
 
   <para>Shut down the Apache 2.4 server before you uninstall the
     policy agent.</para>

@@ -31,7 +31,11 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the Varnish Policy Agent</title>
- <indexterm><primary>Varnish HTTP Accelerator</primary></indexterm>
+
+ <indexterm>
+  <primary>Varnish HTTP Accelerator</primary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Varnish
  HTTP Accelerator 3.0.3.</para>
  
@@ -45,7 +49,12 @@
  
  <section xml:id="before-varnish-agent-install">
   <title>Before You Install</title>
-  
+
+  <indexterm>
+   <primary>Varnish HTTP Accelerator</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
+
     <para>You need to setup your container and OpenAM before installing 
     the web agent.</para>
   
@@ -65,7 +74,12 @@
 
     <procedure xml:id="varnish-server">
      <title>Installing the server</title>
-   
+
+     <indexterm>
+      <primary>Varnish HTTP Accelerator</primary>
+      <secondary>installing</secondary>
+     </indexterm>
+
       <step>
        <para>Make sure OpenAM is installed and running.</para>
       </step>
@@ -79,9 +93,10 @@
 
     <procedure xml:id="create-varnish-agent-profile1f">
      <title>Creating a Policy Agent Profile</title>
-      <indexterm>
-      <primary>Policy agents</primary>
-      <secondary>Creating profiles</secondary>
+
+     <indexterm>
+      <primary>Varnish HTTP Accelerator</primary>
+      <secondary>creating a agent profile</secondary>
      </indexterm>
 
      <para>To create a new web agent profile, you need a name and password, and the 
@@ -168,7 +183,12 @@
 
     <procedure xml:id="create-varnish-agent-pwdfile">
      <title>To Create the Password File for Customized Installations</title>
-   
+
+     <indexterm>
+      <primary>Varnish HTTP Accelerator</primary>
+      <secondary>creating a password file</secondary>
+     </indexterm>
+
      <step>
       <para>Create a text file containing only the password.</para>
 
@@ -186,10 +206,17 @@ $ <userinput>chmod 400 /tmp/pwd.txt</userinput>
       </screen>
 
      </step>
-    </procedure> 
-     <procedure xml:id="prepare-web-policy-agent">
+    </procedure>
+
+    <procedure xml:id="prepare-web-policy-agent">
      <title>Preparing the Agent for Installation</title>
-  
+
+     <indexterm>
+      <primary>Varnish HTTP Accelerator</primary>
+      <secondary>installing</secondary>
+      <tertiary>preparing the install</tertiary>
+     </indexterm>
+
      <step>
       <para>Go to <link xlink:href="install-guide#download-openam-software"
       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
@@ -209,12 +236,23 @@ $ <userinput>chmod 400 /tmp/pwd.txt</userinput>
 
  <section xml:id="install-varnish-web-agent">
   <title>Installing Varnish Web Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Varnish HTTP Accelerator</primary>
+   <secondary>installing</secondary>
+   <tertiary>completing the install</tertiary>
+  </indexterm>
+
   <para>Complete the following procedure to install the policy agent.</para>
   
   <procedure xml:id="install-agent-into-varnish">
    <title>To Install the Varnish Policy Agent</title>
-   
+   <indexterm>
+    <primary>Varnish HTTP Accelerator</primary>
+    <secondary>installing</secondary>
+    <tertiary>into Varnish</tertiary>
+   </indexterm>
+
    <step>
     <para>Stop Varnish.</para>
 
@@ -393,7 +431,13 @@ $ <userinput>varnishd -u root -F -T localhost:8080 \
   </procedure>
   <procedure xml:id="check-varnish-agent-installation">
    <title>To Check the Policy Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>Varnish HTTP Accelerator</primary>
+    <secondary>installing</secondary>
+    <tertiary>checking the install</tertiary>
+   </indexterm>
+
    <step>
     <para>Check the Varnish error log after you start the server to make
     sure startup completed successfully.</para>
@@ -429,7 +473,13 @@ $ <userinput>tail /path/to/web_agents/varnish/instances/agent_1/logs/debug/amAge
  
  <section xml:id="custom-varnish-agent-installation">
   <title>Custom Varnish Web Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Varnish HTTP Accelerator</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
   <para>Varnish is unique because modifications are done in Command Line Mode
   where you can use it to create a new server configuration template/vcl file, 
   such as instance/agent_1/config. This file is then used to start Varnish to 
@@ -491,7 +541,12 @@ $ <userinput>tail /path/to/web_agents/varnish/instances/agent_1/logs/debug/amAge
  
  <section xml:id="uninstall-varnish-agent">
   <title>Remove Varnish Web Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Varnish HTTP Accelerator</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the Varnish server before you uninstall the
   policy agent.</para>
 

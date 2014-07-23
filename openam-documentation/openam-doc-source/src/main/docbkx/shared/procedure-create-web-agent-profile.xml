@@ -31,6 +31,11 @@
 
     <title>To Create the Agent Profile</title>
 
+    <indexterm>
+     <primary>web agent profile</primary>
+     <secondary>creating</secondary>
+    </indexterm>
+
     <para>Regardless of whether you store configurations centrally in OpenAM
             or locally with your agents, the agent requires a profile so that it can
             connect to and communicate with OpenAM.</para>

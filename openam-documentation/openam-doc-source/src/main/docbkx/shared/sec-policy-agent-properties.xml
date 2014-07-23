@@ -31,6 +31,11 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>About Policy Agent Properties</title>
+
+ <indexterm>
+  <primary>properties</primary>
+ </indexterm>
+
  <para>All policy agent configuration settings are stored centrally by default
   in the OpenAM configuration store, which allows you
   to configure your policy agents on the OpenAM console for easier management and

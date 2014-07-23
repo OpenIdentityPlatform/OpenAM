@@ -31,6 +31,12 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Kinds of Agent Profiles</title>
+
+ <indexterm>
+  <primary>policy agent profiles</primary>
+  <secondary>kinds of</secondary>
+ </indexterm>
+
  <para>When you open the OpenAM console to configure agents for the top level
   realm, you can choose from a number of different types of agents. Web and J2EE policy
   agents are the most common, requiring the least integration effort.</para>

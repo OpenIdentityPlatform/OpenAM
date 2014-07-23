@@ -33,14 +33,27 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Oracle iPlanet/Sun Web Server Policy Agent</title>
- <indexterm><primary>Oracle iPlanet Web Server</primary></indexterm>
- <indexterm><primary>Sun Web Server</primary></indexterm>
+
+ <indexterm>
+  <primary>Oracle iPlanet Web Server</primary>
+  <secondary>installation of</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>Sun Web Server</primary>
+  <see>Oracle iPlanet Web Server</see>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Oracle iPlanet
  Web Server, formerly known as Sun Web Server.</para>
  
  <section xml:id="before-sjsws-agent-install">
   <title>Before You Install</title>
-  
+
+  <indexterm>
+   <primary>Oracle iPlanet Web Server</primary>
+   <secondary>before you begin</secondary>
+  </indexterm>
+
   <para>Make sure OpenAM is installed, running, that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -89,7 +102,12 @@ $ <userinput>echo $JAVA_HOME</userinput>
  
  <section xml:id="install-sjsws-web-agent">
   <title>Installing Oracle iPlanet Web Server Web Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Oracle iPlanet Web Server</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
@@ -98,7 +116,13 @@ $ <userinput>echo $JAVA_HOME</userinput>
   
   <procedure xml:id="install-agent-into-sjsws">
    <title>To Install the Policy Agent into Oracle iPlanet Web Server</title>
-   
+
+   <indexterm>
+    <primary>Oracle iPlanet Web Server</primary>
+    <secondary>installing</secondary>
+    <tertiary>into iPlanet</tertiary>
+   </indexterm>
+
    <step>
     <para>Shut down Oracle iPlanet Web Server instance where you plan to install
     the agent.</para>
@@ -289,13 +313,17 @@ Service type=text/* method=(POST) fn=process_notification
      <para>Save the file and restart the Oracle iPlanet Web Server.</para>
     </step>
   </procedure>
-
-
  </section>
  
  <section xml:id="custom-sjsws-agent-installation">
   <title>Custom Oracle iPlanet Web Policy Agent Installation</title>
-  
+
+  <indexterm>
+   <primary>Oracle iPlanet Web Server</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
+
   <para>For alternative installations, use <command>agentadmin
   --custom-install</command>. If you want to suppress
   the license agreement prompt, add the <command>--acceptLicense</command> option to
@@ -325,7 +353,12 @@ Service type=text/* method=(POST) fn=process_notification
  
  <section xml:id="uninstall-sjsws-agent">
   <title>Remove Oracle iPlanet Web Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Oracle iPlanet Web Server</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the Oracle iPlanet Web Server before you uninstall the
     policy agent.</para>
   

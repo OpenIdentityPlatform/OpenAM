@@ -31,9 +31,10 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
          
  <title>Creating Agent Profiles</title>
+
  <indexterm>
-  <primary>Policy agents</primary>
-  <secondary>Creating profiles</secondary>
+  <primary>policy agent profiles</primary>
+  <secondary>creating</secondary>
  </indexterm>
 
  <para>This section concerns creating agent profiles, and creating groups

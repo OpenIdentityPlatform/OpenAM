@@ -33,13 +33,23 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Installing the Apache 2.2 Policy Agent</title>
- <indexterm><primary>Apache HTTP Server</primary></indexterm>
+
+ <indexterm>
+  <primary>Apache 2.2 policy agent</primary>
+  <secondary>installation of</secondary>
+ </indexterm>
+
  <para>This chapter covers installation of the policy agent for Apache
  HTTP Server 2.2.x.</para>
  
  <section xml:id="before-apache22-agent-install">
   <title>Before You Install</title>
-  
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>before you install</secondary>
+  </indexterm>
+
   <para>Make sure OpenAM is installed, running, that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
@@ -90,11 +100,14 @@ $ <userinput>echo $JAVA_HOME</userinput>
   <xinclude:include href="../shared/sec-apache-mpm-tuning.xml"/>
  </section>
 
-
-
  <section xml:id="install-apache22-web-agent">
   <title>Installing Apache 2.2 Web Policy Agent</title>
-  
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing</secondary>
+  </indexterm>
+
   <para>Complete the following procedures to install the policy agent.</para>
 
   <xinclude:include href="../shared/procedure-create-web-agent-profile.xml" />
@@ -223,7 +236,13 @@ $ <userinput>/path/to/apache22/bin/apachectl -k start</userinput>
   
   <procedure xml:id="check-apache22-agent-installation">
    <title>To Check the Policy Agent Installation</title>
-   
+
+   <indexterm>
+    <primary>Apache 2.2 policy agent</primary>
+    <secondary>installing</secondary>
+    <tertiary>checking the install</tertiary>
+   </indexterm>
+
    <step>
     <para>Check the Apache 2.2 error log after you start the server to make
     sure startup completed successfully.</para>
@@ -263,7 +282,13 @@ $ <userinput>tail /path/to/web_agents/apache22_agent/Agent_001/logs/debug/amAgen
  </section>
 
  <section xml:id="install-apache22-agent-windows">
-    <title>Installing Apache 2.2 Web Policy Agent (Windows)</title>
+  <title>Installing Apache 2.2 Web Policy Agent (Windows)</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing (Windows)</secondary>
+  </indexterm>
+
     <para>The instructions for installing the Apache 2.2 Web Policy Agent on a
             Windows system mirror those on the Unix/Linux systems.
     Run the following procedures.</para>
@@ -460,6 +485,12 @@ Thank you for using OpenAM Policy Agent</computeroutput>
 
  <section xml:id="custom-apache22-agent-installation">
   <title>Custom Apache 2.2 Web Policy Agent Installation</title>
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>installing</secondary>
+   <tertiary>custom</tertiary>
+  </indexterm>
   
   <para>When running multiple Apache 2.2 servers on the same host, use
   <command>./agentadmin --custom-install</command>. If you want to suppress
@@ -490,7 +521,12 @@ Thank you for using OpenAM Policy Agent</computeroutput>
  
  <section xml:id="uninstall-apache22-agent">
   <title>Remove Apache 2.2 Web Policy Agent Software</title>
-  
+
+  <indexterm>
+   <primary>Apache 2.2 policy agent</primary>
+   <secondary>removing</secondary>
+  </indexterm>
+
   <para>Shut down the Apache 2.2 server before you uninstall the
     policy agent.</para>
   

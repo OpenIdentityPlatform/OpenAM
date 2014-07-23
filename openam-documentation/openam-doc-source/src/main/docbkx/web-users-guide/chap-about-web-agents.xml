@@ -34,6 +34,11 @@
 
  <title>About OpenAM Web Policy Agents</title>
 
+ <indexterm>
+  <primary>web policy agent</primary>
+  <secondary>described</secondary>
+ </indexterm>
+
  <para>OpenAM web policy agents provide light touch integration for web
   applications running on supported web servers.
   This chapter covers what web policy agents do and how they work.</para>
@@ -57,6 +62,12 @@
 
  <section xml:id="web-agent-components">
   <title>Web Policy Agent Components</title>
+
+  <indexterm>
+   <primary>web policy agent</primary>
+   <secondary>components of</secondary>
+  </indexterm>
+
   <para>The web policy agent provides fast installation and light touch integration
    to protect the resources on the supported web server. The web agent consists
    a web server plug-in matching the API requirements of the particular web server
@@ -81,6 +92,15 @@
 
  <section xml:id="filter-modes">
   <title>Web Agent Filter Modes of Operation</title>
+
+  <indexterm>
+   <primary>web policy agent</primary>
+   <secondary>filter modes</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>filter modes</primary>
+  </indexterm>
+
   <para>The agent filter intercepts all inbound client requests
    to access a protected resource and processes the request based on
    a global configuration property,
@@ -129,6 +149,16 @@
  <!-- Elements here can be reused -->
  <section xml:id="web-agent-not-enforced-list">
   <title>Not-Enforced URL and Client IP Lists</title>
+
+  <indexterm>
+   <primary>not-enforced URL list</primary>
+   <secondary>described</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>not-enforced client IP list</primary>
+   <secondary>described</secondary>
+  </indexterm>
+
   <para>The policy agent supports properties to bypass authentication
    and grant immediate access to resources not requiring protection, such
    as images, stylesheets, or static HTML pages.</para>
@@ -172,6 +202,11 @@
 
  <section xml:id="example-agent-interaction">
   <title>How the User, Web Policy Agent, &amp; OpenAM Interact</title>
+
+  <indexterm>
+   <primary>web policy agent</primary>
+   <secondary>how it works</secondary>
+  </indexterm>
 
   <para>Imagine that a user attempts to access a protected resource before
    having authenticated by pointing her browser to a web page. Assume that you
@@ -236,12 +271,29 @@
  <!-- This section could be reused -->
  <section xml:id="web-agent-features">
   <title>Web Policy Agent Features</title>
+
+  <indexterm>
+   <primary>web policy agent</primary>
+   <secondary>features</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>features</primary>
+  </indexterm>
+
   <para>The Web policy agent provides a number of additional features
    useful for your deployment, some of which are described below:
   </para>
 
   <section xml:id="web-agent-attribute-fetching">
    <title>Attribute Fetch Modes</title>
+
+   <indexterm>
+    <primary>web policy agent</primary>
+    <secondary>attribute fetch modes</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>attribute fetch modes</primary>
+   </indexterm>
 
    <!-- TODO: Add examples/user cases of each type of attribute fetch -->
    <para>Web policy agents provides the capability
@@ -270,6 +322,15 @@
 
   <section xml:id="agent-login-attempt-limits">
    <title>Login Attempt Limits</title>
+
+   <indexterm>
+    <primary>features</primary>
+    <secondary>login attempt limits</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>login attempt limits</primary>
+   </indexterm>
+
    <para>When the user-agent does not present a valid SSO token, the agent
     will redirect the user to the login URL configured in OpenAM.
 
@@ -296,6 +357,15 @@
 
   <section xml:id="fqdn-checking">
    <title>FQDN Checking</title>
+
+   <indexterm>
+    <primary>features</primary>
+    <secondary>FQDN checking</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>FQDN checking</primary>
+   </indexterm>
+
    <para>The web policy agent requires that clients accessing
     protected resources use valid URLs with fully qualified domain names (FQDNs).
     If invalid URLs are referenced, policy evaluation can
@@ -337,6 +407,15 @@
 
   <section xml:id="cookie-reset">
    <title>Cookie Reset Properties</title>
+
+   <indexterm>
+    <primary>features</primary>
+    <secondary>cookie reset</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>cookie reset</primary>
+   </indexterm>
+
    <para>OpenAM provides cookie reset properties that the agent carries out
     prior to redirecting the client to a login page for authentication.
    </para>
@@ -362,6 +441,15 @@
 
   <section xml:id="agent-cdsso">
    <title>Cross Domain Single Sign-On</title>
+
+   <indexterm>
+    <primary>features</primary>
+    <secondary>cross domain single sign-on</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>cross domain single sign-on</primary>
+   </indexterm>
+
    <para>Cross domain single sign-on (CDSSO) allows the web policy agent
     to transfer a validated session ID between an OpenAM domain and an application
     domain using a proprietary OpenAM mechanism.
@@ -395,6 +483,16 @@
 
   <section xml:id="web-agent-load-balancer">
    <title>Load Balancer</title>
+
+   <indexterm>
+    <primary>features</primary>
+    <secondary>load balancer properties</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>properties</primary>
+    <secondary>load balancer</secondary>
+   </indexterm>
+
    <para>The web policy agent provides a number of advanced properties for
     load balancer deployments fronting multiple policy agents.
     Properties are available to get the client IP and host name from the load
@@ -425,7 +523,12 @@
  
  <section xml:id="web-agent-configuration">
   <title>How Web Policy Agents are Configured</title>
-  
+
+  <indexterm>
+   <primary>web policy agent</primary>
+   <secondary>configuration of</secondary>
+  </indexterm>
+
   <para>You install web policy agents in the web servers holding web resources
   that you want to protect. By default, the web policy agent has only enough
   configuration at installation time to connect to OpenAM in order to get the

@@ -31,6 +31,16 @@
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
 
  <title>Tuning Apache Multi-Processing Modules</title>
+
+ <indexterm>
+  <primary>Apache 2.2 policy agent</primary>
+  <secondary>tuning MPM</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>Apache 2.4 policy agent</primary>
+  <secondary>tuning MPM</secondary>
+ </indexterm>
+
  <para>
   Apache 2.0 and later comes with Multi-Processing Modules (MPMs) that extend
   the basic functionality of a web server to support the wide variety of operating
