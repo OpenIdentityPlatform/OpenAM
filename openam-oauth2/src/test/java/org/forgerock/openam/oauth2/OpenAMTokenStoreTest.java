@@ -26,7 +26,13 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.array;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -56,7 +62,7 @@ public class OpenAMTokenStoreTest {
     public void shouldReadAccessToken() throws Exception {
 
         //Given
-        JsonValue token = mock(JsonValue.class);
+        JsonValue token = json(object(field("tokenName", Collections.singleton("access_token"))));
 
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
 
