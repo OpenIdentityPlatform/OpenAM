@@ -1919,6 +1919,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
+                    <escapeString>\</escapeString>
                     <encoding>UTF-8</encoding>
                     <nonFilteredFileExtensions>
                         <!-- Exclude any binary files based upon File Types. -->
