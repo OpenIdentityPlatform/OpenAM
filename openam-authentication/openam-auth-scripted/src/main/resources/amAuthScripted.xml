@@ -80,6 +80,9 @@
                         <Value>java.lang.Float</Value>
                         <Value>java.lang.Double</Value>
                         <Value>java.lang.String</Value>
+                        <Value>java.util.HashSet</Value>
+                        <Value>java.util.HashMap</Value>
+                        <Value>java.util.HashMap$KeyIterator</Value>
                         <Value>com.sun.identity.shared.debug.Debug</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.*</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.http.*</Value>
