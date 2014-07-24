@@ -975,43 +975,16 @@ public final class IdentityResource implements CollectionResourceProvider {
             final ResultHandler<JsonValue> handler) {
 
         JsonValue jVal = details;
-        IdentityDetails dtls, identity;
-        IdentityServicesImpl idsvc;
-        String resourceId = null;
+        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+        String resourceId = identity.getName();
 
         boolean successfulCreate = false;
 
-        try {
-            idsvc = new IdentityServicesImpl();
-            identity = jsonValueToIdentityDetails(jVal, realm);
-            resourceId = identity.getName();
+        IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
 
-            // Create the resource
-            CreateResponse success = idsvc.create(identity, admin);
-            // Read created resource
-            dtls = idsvc.read(identity.getName(), getIdentityServicesAttributes(realm), admin);
+        if (dtls != null) {
             handler.handleResult(identityDetailsToJsonValue(dtls));
             successfulCreate = true;
-        } catch (final ObjectNotFound notFound) {
-            debug.error("IdentityResource.createInstance() :: Cannot READ " +
-                    resourceId + ": Resource cannot be found." + notFound);
-            handler.handleError(new NotFoundException("Resource not found.", notFound));
-        } catch (final DuplicateObject duplicateObject) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    resourceId + ": Resource already exists!" + duplicateObject);
-            handler.handleError(new NotFoundException("Resource already exists", duplicateObject));
-        } catch (final TokenExpired tokenExpired) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    resourceId + ":" + tokenExpired);
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        } catch (final NeedMoreCredentials needMoreCredentials) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    needMoreCredentials);
-            handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
-        } catch (final Exception exception) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
-                    exception);
-            handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
 
         return successfulCreate;
@@ -1033,34 +1006,40 @@ public final class IdentityResource implements CollectionResourceProvider {
         admin.setId(getCookieFromServerContext(context));
 
         final JsonValue jVal = request.getContent();
-        IdentityDetails dtls, identity;
-        Resource resource;
-        IdentityServicesImpl idsvc;
         String resourceId = request.getNewResourceId();
 
-        try {
-            idsvc = new IdentityServicesImpl();
-            identity = jsonValueToIdentityDetails(jVal, realm);
-            // check to see if request has included resource ID
-            if(resourceId != null ){
-                if(identity.getName() != null){
-                    if(!resourceId.equalsIgnoreCase(identity.getName())){
-                        throw new BadRequestException("id in path does not match id in request body");
-                    }
+        IdentityDetails identity = jsonValueToIdentityDetails(jVal, realm);
+        // check to see if request has included resource ID
+        if(resourceId != null ){
+            if(identity.getName() != null){
+                if(!resourceId.equalsIgnoreCase(identity.getName())){
+                    ResourceException be = new BadRequestException("id in path does not match id in request body");
+                    debug.error("IdentityResource.createInstance() :: Cannot CREATE ", be);
+                    handler.handleError(be);
                 }
-                identity.setName(resourceId);
-            } else {
-                resourceId = identity.getName();
             }
+            identity.setName(resourceId);
+        } else {
+            resourceId = identity.getName();
+        }
 
+        IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
 
+        if (dtls != null) {
+            Resource resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
+            handler.handleResult(resource);
+        }
+    }
+
+    private IdentityDetails attemptResourceCreation(ResultHandler<?> handler, String realm, Token admin,
+            IdentityDetails identity, String resourceId) {
+        IdentityDetails dtls = null;
+        try {
+            IdentityServicesImpl idsvc = new IdentityServicesImpl();
             // Create the resource
             CreateResponse success = idsvc.create(identity, admin);
             // Read created resource
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
-
-            resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
-            handler.handleResult(resource);
         } catch (final ObjectNotFound notFound) {
             debug.error("IdentityResource.createInstance() :: Cannot READ " +
                     resourceId + ": Resource cannot be found." + notFound);
@@ -1077,15 +1056,12 @@ public final class IdentityResource implements CollectionResourceProvider {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     needMoreCredentials);
             handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
-        } catch(BadRequestException be) {
-            debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
-                    be);
-            handler.handleError(be);
         } catch (final Exception exception) {
             debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
                     exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
+        return dtls;
     }
 
     /**
