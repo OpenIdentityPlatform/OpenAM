@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -71,6 +72,9 @@ public class Scripted extends AMLoginModule {
     public static final String HTTP_CLIENT_VARIABLE_NAME = "httpClient";
     public static final String LOGGER_VARIABLE_NAME = "logger";
     public static final String IDENTITY_REPOSITORY = "idRepository";
+    public static final String CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME = "clientScriptOutputData";
+    public static final String CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME = "clientScriptOutputData";
+    public static final String REQUEST_DATA_VARIABLE_NAME = "requestData";
 
     /**
      * Loaded on module startup to ensure the configuration listener is enabled. This ensures that configuration
@@ -142,10 +146,14 @@ public class Scripted extends AMLoginModule {
                 return STATE_RUN_SCRIPT;
 
             case STATE_RUN_SCRIPT:
-                NameCallback clientSideScriptOutput = (NameCallback) callbacks[1];
+                //NameCallback clientSideScriptOutput = (NameCallback) callbacks[1];
                 Bindings scriptVariables = new SimpleBindings();
-                scriptVariables.put("requestData", getScriptHttpRequestWrapper());
-                scriptVariables.put("clientSideScriptOutput", clientSideScriptOutput.getName());
+                scriptVariables.put(REQUEST_DATA_VARIABLE_NAME, getScriptHttpRequestWrapper());
+                String clientScriptOutputData = getClientScriptOutputData(callbacks);
+                scriptVariables.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
+                //scriptVariables.put("clientSideScriptOutput", clientSideScriptOutput.getName());
+                // TODO For Phil's script?:
+                scriptVariables.put("clientSideScriptOutput", clientScriptOutputData);
                 scriptVariables.put(LOGGER_VARIABLE_NAME, DEBUG);
                 scriptVariables.put(STATE_VARIABLE_NAME, state);
                 scriptVariables.put("sharedState", sharedStateWrapper);
@@ -165,6 +173,7 @@ public class Scripted extends AMLoginModule {
                 state = ((Number) scriptVariables.get(STATE_VARIABLE_NAME)).intValue();
                 userName = (String) scriptVariables.get(USERNAME_VARIABLE_NAME);
                 sharedState.putAll(sharedStateWrapper);
+                sharedState.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
 
                 if (state != SUCCESS_VALUE) {
                     throw new AuthLoginException("Authentication failed");
@@ -175,6 +184,15 @@ public class Scripted extends AMLoginModule {
                 throw new AuthLoginException("Invalid state");
         }
 
+    }
+
+    private String getClientScriptOutputData(Callback[] callbacks) {
+        String clientScriptOutputData = ( (HiddenValueCallback) callbacks[0]).getValue();
+        if (clientScriptOutputData == null) { // To cope with the classic UI
+            clientScriptOutputData = getScriptHttpRequestWrapper().
+                    getParameter(CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME);
+        }
+        return clientScriptOutputData;
     }
 
     private ScriptObject getServerSideScript() {
@@ -203,7 +221,7 @@ public class Scripted extends AMLoginModule {
 
     private String getClientSideScript() {
         final String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
-        return clientSideScript == null ? "" : "(function(output){\r\n" + clientSideScript + "\r\n})(document.forms[0].elements[1]);";
+        return clientSideScript == null ? "" : clientSideScript;
     }
 
     private int getServerTimeout() {
@@ -225,8 +243,19 @@ public class Scripted extends AMLoginModule {
     }
 
     private void substituteUIStrings() throws AuthLoginException {
-        ScriptTextOutputCallback callback = new ScriptTextOutputCallback(clientSideScript);
-        replaceCallback(STATE_RUN_SCRIPT, 0, callback);
+        //ScriptTextOutputCallback callback = new ScriptTextOutputCallback(clientSideScript);
+        //replaceCallback(STATE_RUN_SCRIPT, 0, callback);
+        replaceCallback(STATE_RUN_SCRIPT, 1, createClientSideScriptAndSelfSubmitCallback());
+    }
+
+    private Callback createClientSideScriptAndSelfSubmitCallback() {
+        String clientSideScriptExecutorFunction = ScriptedClientUtilityFunctions.
+                createClientSideScriptExecutorFunction(clientSideScript, CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME);
+        String autoSubmit = ScriptedClientUtilityFunctions.createAutoSubmissionLogic();
+        ScriptTextOutputCallback scriptAndSelfSubmitCallback =
+                new ScriptTextOutputCallback(clientSideScriptExecutorFunction + autoSubmit);
+
+        return scriptAndSelfSubmitCallback;
     }
 
     private SupportedScriptingLanguage getScriptType() {

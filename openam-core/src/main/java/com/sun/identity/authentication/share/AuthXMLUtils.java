@@ -32,6 +32,7 @@
 
 package com.sun.identity.authentication.share;
 
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -78,9 +79,6 @@ public class AuthXMLUtils {
     
     static Debug debug = Debug.getInstance("amAuthXMLUtils");
 
-    /**
-     * TODO-JAVADOC
-     */
     public static Callback[] getCallbacks(Node callbackNode,boolean noFilter) {
         try {
             return getCallbacks(callbackNode,noFilter,null);
@@ -89,10 +87,7 @@ public class AuthXMLUtils {
             return null;
         }
     }
-    
-    /**
-     * TODO-JAVADOC
-     */
+
     public static Callback[] getCallbacks(
         Node callbackNode,
         boolean noFilter,
@@ -140,87 +135,98 @@ public class AuthXMLUtils {
             
             Node childNode = childNodes.item(i);
             String childNodeName = childNode.getNodeName();
-            if (childNodeName.equals(AuthXMLTags.NAME_CALLBACK)) {
+            if (AuthXMLTags.HIDDEN_VALUE_CALLBACK.equals(childNodeName)) {
                 if (callbacks != null) {
-                    nameIndex= getNameCallbackIndex(callbacks,nameIndex);
+                    nameIndex= getNameCallbackIndex(callbacks, nameIndex);
                     if (nameIndex >= 0){
                         callbackList.add(
-                        createNameCallback(childNode,callbacks[nameIndex]));
+                                createHiddenValueCallback(childNode, callbacks[nameIndex]));
                     }
                     nameIndex = nameIndex +1;
                 } else {
-                    callbackList.add(createNameCallback(childNode,null));
+                    callbackList.add(createHiddenValueCallback(childNode, null));
+                }
+            } else if (childNodeName.equals(AuthXMLTags.NAME_CALLBACK)) {
+                if (callbacks != null) {
+                    nameIndex= getNameCallbackIndex(callbacks, nameIndex);
+                    if (nameIndex >= 0){
+                        callbackList.add(
+                        createNameCallback(childNode, callbacks[nameIndex]));
+                    }
+                    nameIndex = nameIndex +1;
+                } else {
+                    callbackList.add(createNameCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.PASSWORD_CALLBACK)) {
                 if (callbacks != null) {
-                    passIndex= getPasswordCallbackIndex(callbacks,passIndex);
+                    passIndex= getPasswordCallbackIndex(callbacks, passIndex);
                     if (passIndex >= 0) {
                         callbackList.add(createPasswordCallback(childNode,
-                        callbacks[passIndex]));
+                                callbacks[passIndex]));
                     }
                     passIndex= passIndex+1;
                 } else {
-                    callbackList.add(createPasswordCallback(childNode,null));
+                    callbackList.add(createPasswordCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.CHOICE_CALLBACK)) {
                 if (callbacks != null) {
-                    ccIndex = getChoiceCallbackIndex(callbacks,ccIndex);
+                    ccIndex = getChoiceCallbackIndex(callbacks, ccIndex);
                     if (ccIndex >= 0) {
                         callbackList.add(createChoiceCallback(childNode,
-                        callbacks[ccIndex]));
+                                callbacks[ccIndex]));
                     }
                     ccIndex = ccIndex + 1;
                 } else {
-                    callbackList.add(createChoiceCallback(childNode,null));
+                    callbackList.add(createChoiceCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.CONFIRMATION_CALLBACK)){
                 if (callbacks != null) {
-                    concIndex = getConfCallbackIndex(callbacks,concIndex);
+                    concIndex = getConfCallbackIndex(callbacks, concIndex);
                     if (concIndex >= 0) {
                         callbackList.add(createConfirmationCallback(childNode,
-                        callbacks[concIndex]));
+                                callbacks[concIndex]));
                     }
                     concIndex = concIndex+1;
                 } else {
                     callbackList.add(
-                        createConfirmationCallback(childNode,null));
+                        createConfirmationCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.TEXT_INPUT_CALLBACK)) {
                 if (callbacks != null) {
-                    tiIndex = getTextInputIndex(callbacks,tiIndex);
+                    tiIndex = getTextInputIndex(callbacks, tiIndex);
                     if ( tiIndex >= 0) {
                         callbackList.add(createTextInputCallback(childNode,
-                        callbacks[tiIndex]));
+                                callbacks[tiIndex]));
                     }
                     tiIndex = tiIndex + 1;
                 } else {
-                    callbackList.add(createTextInputCallback(childNode,null));
+                    callbackList.add(createTextInputCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.TEXT_OUTPUT_CALLBACK)) {
                 if (callbacks != null) {
-                    toIndex = getTextOutputIndex(callbacks,toIndex);
+                    toIndex = getTextOutputIndex(callbacks, toIndex);
                     if ( toIndex >= 0) {
                         callbackList.add(createTextOutputCallback(childNode,
-                        callbacks[toIndex]));
+                                callbacks[toIndex]));
                     }
                     toIndex = toIndex + 1;
                 } else {
-                    callbackList.add(createTextOutputCallback(childNode,null));
+                    callbackList.add(createTextOutputCallback(childNode, null));
                 }
             } else if (
                 childNodeName.equals(AuthXMLTags.PAGE_PROPERTIES_CALLBACK)
                     && noFilter
             ) {
                 if (callbacks != null) {
-                    ppIndex = getPagePropertiesIndex(callbacks,ppIndex);
+                    ppIndex = getPagePropertiesIndex(callbacks, ppIndex);
                     if ( ppIndex >= 0) {
                         callbackList.add(createPagePropertiesCallback(
-                        childNode,callbacks[ppIndex]));
+                                childNode, callbacks[ppIndex]));
                     }
                     ppIndex = ppIndex + 1;
                 } else {
                     callbackList.add(createPagePropertiesCallback(childNode,
-                    null));
+                            null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.LANGUAGE_CALLBACK)) {
                 if (callbacks != null) {
@@ -257,38 +263,38 @@ public class AuthXMLUtils {
                        AuthXMLTags.X509CERTIFICATE_CALLBACK)) {
                 if (callbacks != null) {
                     lcIndex =
-                        getX509CertificateCallbackIndex(callbacks,lcIndex);
+                        getX509CertificateCallbackIndex(callbacks, lcIndex);
                     if (lcIndex >= 0) {
                         callbackList.add(
                                 createX509CertificateCallback(childNode,
-                                callbacks[lcIndex]));
+                                        callbacks[lcIndex]));
                     }
                     lcIndex = lcIndex + 1;
                 } else {
                     callbackList.add(
-                            createX509CertificateCallback(childNode,null));
+                            createX509CertificateCallback(childNode, null));
                 }
             } else if (childNodeName.equals(
                     AuthXMLTags.HTTP_CALLBACK)) {
                 if (callbacks != null) {
-                    diIndex = getHttpCallbackIndex(callbacks,ppIndex);
+                    diIndex = getHttpCallbackIndex(callbacks, ppIndex);
                     if (diIndex >= 0) {
                         callbackList.add(createHttpCallback(childNode,
                                 callbacks[diIndex]));
                     }
                 } else {
-                    callbackList.add(createHttpCallback(childNode,null));
+                    callbackList.add(createHttpCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.CUSTOM_CALLBACK)) {
                 if (callbacks != null) {
-                    diIndex = getCustomCallbackIndex(callbacks,ppIndex);
+                    diIndex = getCustomCallbackIndex(callbacks, ppIndex);
                     if ( diIndex >= 0) {
                         callbackList.add(createCustomCallback(childNode,
-                        callbacks[diIndex]));
+                                callbacks[diIndex]));
                     }
                     diIndex = diIndex + 1;
                 } else {
-                    callbackList.add(createCustomCallback(childNode,null));
+                    callbackList.add(createCustomCallback(childNode, null));
                 }
             } else if (childNodeName.equals(AuthXMLTags.REDIRECT_CALLBACK)) {
                  if (callbacks != null) {
@@ -356,10 +362,7 @@ public class AuthXMLUtils {
 
         return (HttpServletResponse) obj;
     }
-    
-    /**
-     * TODO-JAVADOC
-     */
+
     public static String getXMLForCallbacks(Callback[] callbacks) {
         if (callbacks == null) {
             return ("");
@@ -377,7 +380,10 @@ public class AuthXMLUtils {
             .append(AuthXMLTags.ELEMENT_END);
         
         for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof NameCallback) {
+            if (callbacks[i] instanceof HiddenValueCallback) {
+                HiddenValueCallback hiddenValueCallback = (HiddenValueCallback) callbacks[i];
+                xmlString.append(getHiddenValueCallbackXML(hiddenValueCallback));
+            } else if (callbacks[i] instanceof NameCallback) {
                 NameCallback nameCallback = (NameCallback) callbacks[i];
                 xmlString.append(getNameCallbackXML(nameCallback));
             } else if (callbacks[i] instanceof PasswordCallback) {
@@ -466,7 +472,36 @@ public class AuthXMLUtils {
         
         return nameCallback;
     }
-    
+
+    static HiddenValueCallback createHiddenValueCallback(Node childNode, Callback callback) {
+        String id = getId(childNode);
+
+        HiddenValueCallback hiddenValueCallback = null;
+        if (callback instanceof HiddenValueCallback) {
+            hiddenValueCallback = (HiddenValueCallback) callback;
+        }
+
+        if (hiddenValueCallback == null) {
+            String defaultValue = getDefaultValue(childNode);
+            if (defaultValue == null) {
+                hiddenValueCallback = new HiddenValueCallback(id);
+            } else {
+                hiddenValueCallback = new HiddenValueCallback(id, defaultValue);
+            }
+        }
+
+        String value = getValue(childNode);
+        if (debug.messageEnabled()) {
+            debug.message("Value is : " + value);
+        }
+
+        if (value != null) {
+            hiddenValueCallback.setValue(value);
+        }
+
+        return hiddenValueCallback;
+    }
+
     static PasswordCallback createPasswordCallback(
         Node childNode,
         Callback callback) {
@@ -959,7 +994,34 @@ public class AuthXMLUtils {
         xmlString.append(AuthXMLTags.NAME_CALLBACK_END);
         return xmlString.toString();
     }
-    
+
+    static String getHiddenValueCallbackXML(HiddenValueCallback hiddenValueCallback) {
+        StringBuilder xmlString = new StringBuilder();
+        xmlString.append(AuthXMLTags.HIDDEN_VALUE_CALLBACK_BEGIN)
+                .append(AuthXMLTags.ID_BEGIN)
+                .append(XMLUtils.escapeSpecialCharacters(hiddenValueCallback.getId()))
+                .append(AuthXMLTags.ID_END);
+
+        String defaultValue = hiddenValueCallback.getDefaultValue();
+        if (defaultValue != null) {
+            xmlString.append(AuthXMLTags.DEFAULT_VALUE_BEGIN)
+                    .append(AuthXMLTags.VALUE_BEGIN)
+                    .append(XMLUtils.escapeSpecialCharacters(defaultValue))
+                    .append(AuthXMLTags.VALUE_END)
+                    .append(AuthXMLTags.DEFAULT_VALUE_END);
+        }
+
+        String value = hiddenValueCallback.getValue();
+        if (value != null) {
+            xmlString.append(AuthXMLTags.VALUE_BEGIN)
+                    .append(XMLUtils.escapeSpecialCharacters(value))
+                    .append(AuthXMLTags.VALUE_END);
+        }
+
+        xmlString.append(AuthXMLTags.HIDDEN_VALUE_CALLBACK_END);
+        return xmlString.toString();
+    }
+
     static String getPasswordCallbackXML(PasswordCallback passwordCallback) {
         StringBuilder xmlString = new StringBuilder();
         xmlString.append(AuthXMLTags.PASSWORD_CALLBACK_BEGIN)
@@ -1414,11 +1476,19 @@ public class AuthXMLUtils {
     protected static String getPrompt(Node node) {
         Node pNode = XMLUtils.getChildNode(node, AuthXMLTags.PROMPT);
         if (pNode != null) {
+            return XMLUtils.getValueOfValueNode(pNode);
+        }
+        return null;
+    }
+
+    protected static String getId(Node node) {
+        Node pNode = XMLUtils.getChildNode(node, AuthXMLTags.ID);
+        if (pNode != null) {
             return (XMLUtils.getValueOfValueNode(pNode));
         }
-        return (null);
+        return null;
     }
-    
+
     protected static String getValue(Node node) {
         Node pNode = XMLUtils.getChildNode(node, AuthXMLTags.VALUE);
         if (pNode != null) {
