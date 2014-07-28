@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -250,9 +251,13 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
 
             if (input.get(RESPONSE_TYPES.getType()).asList() != null) {
-                if (containsAllCaseInsensitive(providerSettings.getAllowedResponseTypes().keySet(),
-                        input.get(RESPONSE_TYPES.getType()).asList(String.class))) {
-                    clientBuilder.setResponseTypes(input.get(RESPONSE_TYPES.getType()).asList(String.class));
+                final List<String> clientResponseTypeList = input.get(RESPONSE_TYPES.getType()).asList(String.class);
+                final List<String> typeList = new ArrayList<String>();
+                for (String responseType : clientResponseTypeList) {
+                    typeList.addAll(Arrays.asList(responseType.split(" ")));
+                }
+                if (containsAllCaseInsensitive(providerSettings.getAllowedResponseTypes().keySet(), typeList)) {
+                    clientBuilder.setResponseTypes(clientResponseTypeList);
                 } else {
                     logger.error("Invalid response_types requested.");
                     throw new InvalidClientMetadata();
