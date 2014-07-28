@@ -194,7 +194,7 @@
                                      type="single"
                                      syntax="script"
                                      validator="no"
-                                     i18nKey="a105">
+                                     i18nKey="a120">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -215,7 +215,7 @@
                                      type="single"
                                      syntax="script"
                                      validator="ScriptValidator"
-                                     i18nKey="a106">
+                                     i18nKey="a121">
                         <DefaultValues>
                             <Value>
                                 var START_TIME = 9;  // 9am
