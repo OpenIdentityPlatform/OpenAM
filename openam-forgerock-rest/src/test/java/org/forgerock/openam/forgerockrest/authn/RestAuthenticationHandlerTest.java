@@ -32,6 +32,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
+import org.forgerock.openam.forgerockrest.authn.core.CompletedLoginProcess;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
@@ -40,6 +41,7 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWr
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
@@ -93,9 +95,9 @@ public class RestAuthenticationHandlerTest {
         given(ssoToken.getTokenID()).willReturn(ssoTokenID);
 
         AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
-        given(authContextLocalWrapper.getSSOToken()).willReturn(ssoToken);
 
         LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
         given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
@@ -238,6 +240,7 @@ public class RestAuthenticationHandlerTest {
         given(authContextLocalWrapper.getSSOToken()).willReturn(ssoToken);
 
         LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
         given(loginProcess.getLoginStage())
                 .willReturn(LoginStage.REQUIREMENTS_WAITING)
                 .willReturn(LoginStage.COMPLETE);
@@ -370,6 +373,7 @@ public class RestAuthenticationHandlerTest {
         given(authContextLocalWrapper.getSSOToken()).willReturn(ssoToken);
 
         LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
         given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
         given(loginProcess.isSuccessful()).willReturn(true);
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);

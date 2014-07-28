@@ -191,10 +191,8 @@ public class AuthUtils extends AuthClientUtils {
         
         try {
             dataHash = parseRequestParameters(request);
-            // commented this since it debug file
-            // has too many messages and making the file large
-            // in size.
             authContext = retrieveAuthContext(request, sid);
+
             if (utilDebug.messageEnabled()) {
                 utilDebug.message("AuthUtil:getAuthContext:sid is.. .: " 
                                   + sid);
@@ -204,7 +202,7 @@ public class AuthUtils extends AuthClientUtils {
 
             if(!sid.isNull() && authContext == null && !isSessionUpgrade) {
                 String authCookieValue = getAuthCookieValue(request);
-                if ((authCookieValue != null) && (authCookieValue.length() != 0)
+                if ((authCookieValue != null) && (!authCookieValue.isEmpty())
                         && (!authCookieValue.equalsIgnoreCase("LOGOUT"))) {
                     String cookieURL = null;
                     try {
@@ -225,7 +223,7 @@ public class AuthUtils extends AuthClientUtils {
                     	utilDebug.message("AuthUtils:getAuthContext():"
                             + "cookieURL : " + cookieURL);
                     }
-                    if ((cookieURL != null) && (cookieURL.length() != 0) &&
+                    if ((cookieURL != null) && (!cookieURL.isEmpty()) &&
                         (isLocalServer(cookieURL,true))) {
                         utilDebug.error("AuthUtils:getAuthContext(): "
                             + "Invalid Session Timed out");

@@ -21,6 +21,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdRepoException;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
@@ -37,14 +38,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.anyObject;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -194,6 +190,7 @@ public class LoginAuthenticatorTest {
         verify(coreServicesWrapper).isNewRequest(authContextLocalWrapper);
         verify(coreServicesWrapper).getDomainNameByRequest(request);
         verify(coreServicesWrapper).isOrganizationActive("ORG_DN");
+        verify(coreServicesWrapper).getExistingValidSSOToken(Matchers.<SessionID>anyObject());
         verifyNoMoreInteractions(coreServicesWrapper);
     }
 
@@ -227,7 +224,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login();
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -262,7 +260,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.USER, "INDEX_VALUE");
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -299,7 +298,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.ROLE, "INDEX_VALUE");
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -336,7 +336,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.SERVICE, "INDEX_VALUE");
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -373,7 +374,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.MODULE_INSTANCE, "INDEX_VALUE");
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -410,7 +412,8 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        verify(authContextLocalWrapper).login(AuthContext.IndexType.LEVEL, "5");
+        assertThat(loginProcess.isSuccessful()).isTrue();
+        verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
 
@@ -440,6 +443,7 @@ public class LoginAuthenticatorTest {
                 eq(true), eq(false))).willReturn(authContextLocalWrapper);
         given(coreServicesWrapper.getExistingValidSSOToken(eq(new SessionID("SSO_TOKEN_ID")))).willReturn(ssoToken);
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
@@ -477,6 +481,7 @@ public class LoginAuthenticatorTest {
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
         given(coreServicesWrapper.doesValueContainKey(anyString(), anyString())).willReturn(false);
         given(coreServicesWrapper.doesValueContainKey("INDEX_VALUE", "INDEX_VALUE")).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
@@ -514,6 +519,7 @@ public class LoginAuthenticatorTest {
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
         given(coreServicesWrapper.doesValueContainKey(anyString(), anyString())).willReturn(false);
         given(coreServicesWrapper.doesValueContainKey("INDEX_VALUE", "INDEX_VALUE")).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
@@ -551,6 +557,7 @@ public class LoginAuthenticatorTest {
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
         given(coreServicesWrapper.doesValueContainKey(anyString(), anyString())).willReturn(false);
         given(coreServicesWrapper.doesValueContainKey("INDEX_VALUE", "INDEX_VALUE")).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
@@ -588,6 +595,7 @@ public class LoginAuthenticatorTest {
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
         given(coreServicesWrapper.doesValueContainKey(anyString(), anyString())).willReturn(false);
         given(coreServicesWrapper.doesValueContainKey("INDEX_VALUE", "INDEX_VALUE")).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
@@ -621,6 +629,7 @@ public class LoginAuthenticatorTest {
                 .willReturn("ORG_DN");
         given(coreServicesWrapper.getAuthContext((HttpServletRequest) anyObject(), eq((HttpServletResponse) null),
                 (SessionID) anyObject(), eq(true), eq(false))).willReturn(authContextLocalWrapper);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
         given(coreServicesWrapper.getExistingValidSSOToken(eq(new SessionID("SSO_TOKEN_ID")))).willReturn(ssoToken);
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
 
@@ -658,6 +667,7 @@ public class LoginAuthenticatorTest {
                 (SessionID) anyObject(), eq(false), eq(false))).willReturn(authContextLocalWrapper);
         given(coreServicesWrapper.getExistingValidSSOToken(eq(new SessionID("SSO_TOKEN_ID")))).willReturn(ssoToken);
         given(coreServicesWrapper.isNewRequest(authContextLocalWrapper)).willReturn(true);
+        given(authContextLocalWrapper.isSessionUpgrade()).willReturn(true);
 
         //When
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);

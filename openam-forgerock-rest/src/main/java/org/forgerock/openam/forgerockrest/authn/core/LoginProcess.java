@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn.core;
 
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -183,6 +184,38 @@ public class LoginProcess {
 
     public boolean isFailed() {
         return AuthContext.Status.FAILED.equals(authContext.getStatus());
+    }
+
+    /**
+     * Returns the SSOToken for the login process
+     * @return The SSOToken object
+     */
+    public SSOToken getSSOToken() {
+        return authContext.getSSOToken();
+    }
+
+    /**
+     * Returns the success url from the underlying authcontext
+     * @return The success url
+     */
+    public String getSuccessURL() {
+        return authContext.getSuccessURL();
+    }
+
+    /**
+     * Returns the failure url from the underlying authcontext
+     * @return The failure url
+     */
+    public String getFailureURL() {
+        return authContext.getFailureURL();
+    }
+
+    /**
+     * Returns the organisation's domain name
+     * @return The organisation's domain name
+     */
+    public String getOrgDN() {
+        return authContext.getOrgDN();
     }
 
     /**

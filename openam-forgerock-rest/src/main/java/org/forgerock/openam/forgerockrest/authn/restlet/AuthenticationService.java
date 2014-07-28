@@ -21,9 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.object;
-import static org.forgerock.json.fluent.JsonValue.json;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
@@ -52,6 +49,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Base Restlet class for server-side resources. It acts as a wrapper to a given call,
@@ -117,28 +116,28 @@ public class AuthenticationService extends ServerResource implements ServiceProv
     @Post
     public Representation authenticate(JsonRepresentation entity) throws ResourceException {
 
-        if (entity != null && !MediaType.APPLICATION_JSON.equals(entity.getMediaType())) {
+        if (entity != null && !isSupportedMediaType(entity)) {
             throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
         }
 
         final HttpServletRequest request = getHttpServletRequest();
-        final HttpServletResponse response = ServletUtils.getResponse(getResponse());
+        final HttpServletResponse response = getHttpServletResponse();
 
-        final Map<String, String> queryString = getReference().getQueryAsForm().getValuesMap();
-        final String sessionUpgradeSSOTokenId = queryString.get("sessionUpgradeSSOTokenId");
+        final Map<String, String> urlQueryString = getUrlQueryString();
+        final String sessionUpgradeSSOTokenId = urlQueryString.get("sessionUpgradeSSOTokenId");
 
         try {
             JsonValue jsonContent = getJsonContent(entity);
-
             JsonValue jsonResponse;
+
             if (jsonContent != null && jsonContent.size() > 0) {
                 // submit requirements
                 jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
                         sessionUpgradeSSOTokenId);
             } else {
                 // initiate
-                final String authIndexType = queryString.get("authIndexType");
-                final String authIndexValue = queryString.get("authIndexValue");
+                final String authIndexType = urlQueryString.get("authIndexType");
+                final String authIndexValue = urlQueryString.get("authIndexValue");
                 jsonResponse = restAuthenticationHandler.initiateAuthentication(request, response, authIndexType,
                         authIndexValue, sessionUpgradeSSOTokenId);
             }
@@ -164,6 +163,18 @@ public class AuthenticationService extends ServerResource implements ServiceProv
             DEBUG.error("Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
         }
+    }
+
+    private Map<String, String> getUrlQueryString() {
+        return getReference().getQueryAsForm().getValuesMap();
+    }
+
+    private HttpServletResponse getHttpServletResponse() {
+        return ServletUtils.getResponse(getResponse());
+    }
+
+    private boolean isSupportedMediaType(JsonRepresentation entity) {
+        return MediaType.APPLICATION_JSON.equals(entity.getMediaType());
     }
 
     /**

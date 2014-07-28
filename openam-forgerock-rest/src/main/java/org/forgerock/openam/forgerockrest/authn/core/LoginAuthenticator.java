@@ -30,7 +30,6 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrappe
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -78,7 +77,13 @@ public class LoginAuthenticator {
 
         verifyAuthenticationRealm(loginConfiguration.getHttpRequest());
 
+        SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(new SessionID(loginConfiguration.getSSOTokenId()));
+        if (noMoreAuthenticationRequired(ssoToken, loginConfiguration)) {
+            return new CompletedLoginProcess(this, loginConfiguration, coreServicesWrapper, ssoToken);
+        }
+
         AuthContextLocalWrapper authContext = getAuthContext(loginConfiguration);
+
         LoginProcess loginProcess = new LoginProcess(this, loginConfiguration, authContext, coreServicesWrapper);
         if (coreServicesWrapper.isNewRequest(authContext)) {
             startLoginProcess(loginProcess);
@@ -172,8 +177,7 @@ public class LoginAuthenticator {
         boolean isSessionUpgrade = false;
         if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
             sessionID = new SessionID(loginConfiguration.getSSOTokenId());
-            SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(
-                    new SessionID(loginConfiguration.getSSOTokenId()));
+            SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(sessionID);
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
                     loginConfiguration.getIndexValue());
         }
@@ -197,6 +201,11 @@ public class LoginAuthenticator {
 
         String value;
         boolean upgrade = false;
+
+        if (ssoToken == null) {
+            return true;
+        }
+
         switch (indexType) {
         case USER: {
             value = ssoToken.getProperty("UserToken");
@@ -237,8 +246,14 @@ public class LoginAuthenticator {
             upgrade = true;
             break;
         }
+
         }
 
         return upgrade;
+    }
+
+    private boolean noMoreAuthenticationRequired(SSOToken ssoToken, LoginConfiguration loginConfiguration) throws AuthLoginException, SSOException {
+        return ssoToken != null &&
+                !checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(), loginConfiguration.getIndexValue());
     }
 }

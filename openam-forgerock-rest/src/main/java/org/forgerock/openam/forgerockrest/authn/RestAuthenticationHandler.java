@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
@@ -35,6 +36,7 @@ import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
@@ -127,23 +129,23 @@ public class RestAuthenticationHandler {
 
         LoginProcess loginProcess = null;
         try {
+
             AuthIndexType indexType = getAuthIndexType(authIndexType);
 
             String authId = null;
+            String sessionId = null;
 
             if (postBody != null) {
-                authId = postBody.get("authId").asString();
-            }
+                authId = getAuthId(postBody);
 
-            String sessionId = null;
-            if (authId != null) {
-                SignedJwt jwt = authIdHelper.reconstructAuthId(authId);
-                sessionId = jwt.getClaimsSet().getClaim("sessionId", String.class);
-                String authIndexTypeString = jwt.getClaimsSet().getClaim("authIndexType", String.class);
-                indexType = getAuthIndexType(authIndexTypeString);
-                indexValue = jwt.getClaimsSet().getClaim("authIndexValue", String.class);
-                String realmDN = jwt.getClaimsSet().getClaim("realm", String.class);
-                authIdHelper.verifyAuthId(realmDN, authId);
+                if (authId != null) {
+                    SignedJwt jwt = authIdHelper.reconstructAuthId(authId);
+                    sessionId = getSessionId(jwt);
+                    indexType = getAuthIndexType(jwt);
+                    indexValue = getAuthIndexValue(jwt);
+                    String realmDN = getRealmDomainName(jwt);
+                    authIdHelper.verifyAuthId(realmDN, authId);
+                }
             }
 
             LoginConfiguration loginConfiguration = new LoginConfiguration()
@@ -163,7 +165,7 @@ public class RestAuthenticationHandler {
 
             if (loginProcess != null) {
                 String failureUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
-                        loginProcess.getAuthContext().getFailureURL(), null);
+                        loginProcess.getFailureURL(), null);
                 e.setFailureUrl(failureUrl);
             }
             throw e;
@@ -182,6 +184,29 @@ public class RestAuthenticationHandler {
             throw new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
                     e.getErrorCode()), e);
         }
+    }
+
+    private String getRealmDomainName(SignedJwt jwt) {
+        return jwt.getClaimsSet().getClaim("realm", String.class);
+    }
+
+    private String getAuthIndexValue(SignedJwt jwt) {
+        return jwt.getClaimsSet().getClaim("authIndexValue", String.class);
+    }
+
+    private AuthIndexType getAuthIndexType(SignedJwt jwt) throws RestAuthException {
+        AuthIndexType indexType;
+        String authIndexTypeString = jwt.getClaimsSet().getClaim("authIndexType", String.class);
+        indexType = getAuthIndexType(authIndexTypeString);
+        return indexType;
+    }
+
+    private String getSessionId(SignedJwt jwt) {
+        return jwt.getClaimsSet().getClaim("sessionId", String.class);
+    }
+
+    private String getAuthId(JsonValue postBody) {
+        return postBody.get("authId").asString();
     }
 
     /**
@@ -238,17 +263,17 @@ public class RestAuthenticationHandler {
                 // send token to client
                 JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
 
-                SSOToken ssoToken = loginProcess.getAuthContext().getSSOToken();
+                SSOToken ssoToken = loginProcess.getSSOToken();
                 if (ssoToken != null) {
-                    String tokenId = loginProcess.getAuthContext().getSSOToken().getTokenID().toString();
+                    String tokenId = ssoToken.getTokenID().toString();
                     jsonResponseObject.put("tokenId", tokenId);
                 } else {
                     jsonResponseObject.put("message", "Authentication Successful");
                 }
 
-                String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
+                String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getOrgDN(),
                         urlValidator.getValueFromJson(postBody, RedirectUrlValidator.GOTO),
-                        loginProcess.getAuthContext().getSuccessURL());
+                        loginProcess.getSuccessURL());
 
                 jsonResponseObject.put("successUrl", gotoUrl);
 
