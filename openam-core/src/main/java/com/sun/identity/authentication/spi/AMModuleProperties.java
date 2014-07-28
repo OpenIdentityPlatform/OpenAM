@@ -32,7 +32,6 @@
 
 package com.sun.identity.authentication.spi;
 
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.share.AuthXMLTags;
@@ -256,40 +255,6 @@ class AMModuleProperties {
                             infoText.add("");
                         }
                         p++;
-                } else if (nodeName.equals("HiddenValueCallback")) {
-                    sub = node.getFirstChild();
-                    sub = sub.getNextSibling();
-                    String id = sub.getFirstChild().getNodeValue();
-
-                    String dftName = null;
-                    sub = sub.getNextSibling().getNextSibling();
-                    if (sub != null) {
-                        sub = sub.getFirstChild();
-                        dftName = sub.getNodeValue();
-                        callbacks[p] = new HiddenValueCallback(id, dftName);
-                    } else {
-                        callbacks[p] = new HiddenValueCallback(id);
-                    }
-
-                    tmp = getAttribute(node, "isRequired");
-                    if (Boolean.parseBoolean(tmp)) {
-                        require.add("true");
-                    } else {
-                        require.add("");
-                    }
-                    tmp = getAttribute(node, "attribute");
-                    if (tmp != null) {
-                        attribute.add(tmp);
-                    } else {
-                        attribute.add("");
-                    }
-                    tmp = getAttribute(node, "infoText");
-                    if (tmp != null) {
-                        infoText.add(tmp);
-                    } else {
-                        infoText.add("");
-                    }
-                    p++;
                 } else if (nodeName.equals("PasswordCallback")) {
                         String echo = getAttribute(node, "echoPassword");
                         sub = node.getFirstChild();

@@ -41,7 +41,6 @@ import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.StaticTextField;
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import java.util.List;
 import javax.security.auth.callback.Callback;
@@ -75,9 +74,6 @@ public class CallBackTiledView
     /** index of current tile */
     public static final String TXT_INDEX = "txtIndex";
 
-    /** id of current element */
-    public static final String TXT_ID = "txtId";
-
     /** tiled view of choice */
     public static final String TILED_CHOICE = "tiledChoices";
 
@@ -107,7 +103,6 @@ public class CallBackTiledView
      */
     protected void registerChildren() {
         registerChild(TXT_INDEX, StaticTextField.class);
-        registerChild(TXT_ID, StaticTextField.class);
         registerChild(TILED_CHOICE, CallBackChoiceTiledView.class);
         registerChild(TXT_PROMPT, StaticTextField.class);
         registerChild(TXT_VALUE, StaticTextField.class);
@@ -127,9 +122,6 @@ public class CallBackTiledView
     protected View createChild(String name) {
         if (name.equals(TXT_INDEX)) {
             return new StaticTextField(this, TXT_INDEX, "");
-        }
-        if (name.equals(TXT_ID)) {
-            return new StaticTextField(this, TXT_ID, "");
         }
         if (name.equals(TILED_CHOICE)) {
             return new CallBackChoiceTiledView(this, TILED_CHOICE);
@@ -196,9 +188,7 @@ public class CallBackTiledView
             curCallback = callbacks[curTile];
             setDisplayFieldValue(TXT_INDEX, Integer.toString(curTile));
 
-            if (curCallback instanceof HiddenValueCallback) {
-                setHiddenValueCallbackInfo((HiddenValueCallback) curCallback);
-            } else if (curCallback instanceof NameCallback) {
+            if (curCallback instanceof NameCallback) {
                 setNameCallbackInfo((NameCallback) curCallback);
             } else if (curCallback instanceof PasswordCallback) {
                 setPasswordCallbackInfo((PasswordCallback) curCallback);
@@ -238,23 +228,6 @@ public class CallBackTiledView
         this.callbacks = callbacks;
         this.requiredList = requiredList;
         this.infoText = infoText;
-    }
-
-    private void setHiddenValueCallbackInfo(HiddenValueCallback hvc) {
-        String value = hvc.getValue();
-
-        if ((value == null) || (value.isEmpty())) {
-            value = hvc.getDefaultValue();
-        }
-
-        String id = hvc.getId();
-        setDisplayFieldValue(TXT_ID, id);
-
-        setDisplayFieldValue(TXT_VALUE, value);
-
-        CallBackChoiceTiledView tView =
-                (CallBackChoiceTiledView) getChild(TILED_CHOICE);
-        tView.setChoices(curTile, null, 0);
     }
 
     private void setNameCallbackInfo(NameCallback nc) {
@@ -338,16 +311,6 @@ public class CallBackTiledView
      */
     public boolean beginTextBoxDisplay(ChildDisplayEvent event) {
         return (curCallback != null) && (curCallback instanceof NameCallback);
-    }
-
-    /**
-     * Begins display of hiddenValueBox field element
-     *
-     * @param event Child display event
-     * @return true if current callback is for hiddenValueBox
-     */
-    public boolean beginHiddenValueBoxDisplay(ChildDisplayEvent event) {
-        return curCallback instanceof HiddenValueCallback;
     }
 
     /**

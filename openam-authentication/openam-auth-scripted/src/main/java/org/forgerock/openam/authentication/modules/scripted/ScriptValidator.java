@@ -45,8 +45,7 @@ public class ScriptValidator implements DynamicAttributeValidator {
     private static final String LANGUAGE_NOT_SUPPORTED = "language-not-supported";
     private static final String SERVER_SIDE_SCRIPT = "a104";
     private static final String MODULE_DESCRIPTION = "iplanet-am-auth-scripted-service-description";
-    private static final Map<String, ScriptingLanguage> SUPPORTED_LANGUAGES =
-            new HashMap<String, ScriptingLanguage>() {{
+    private static final Map<String, ScriptingLanguage> SUPPORTED_LANGUAGES = new HashMap<String, ScriptingLanguage>() {{
         put(Scripted.JAVA_SCRIPT_LABEL, SupportedScriptingLanguage.JAVASCRIPT);
         put(Scripted.GROOVY_LABEL, SupportedScriptingLanguage.GROOVY);
     }};

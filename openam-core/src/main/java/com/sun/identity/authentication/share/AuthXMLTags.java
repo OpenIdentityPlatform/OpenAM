@@ -64,7 +64,6 @@ public interface AuthXMLTags {
     public static final String PRINCIPAL = "Principal";
     public static final String CALLBACKS = "Callbacks";
     public static final String NAME_CALLBACK = "NameCallback";
-    public static final String HIDDEN_VALUE_CALLBACK = "HiddenValueCallback";
     public static final String PASSWORD_CALLBACK = "PasswordCallback";
     public static final String CHOICE_CALLBACK = "ChoiceCallback";
     public static final String CONFIRMATION_CALLBACK = "ConfirmationCallback";
@@ -78,7 +77,6 @@ public interface AuthXMLTags {
         "X509CertificateCallback";
     public static final String CUSTOM_CALLBACK = "CustomCallback";
     public static final String PROMPT = "Prompt";
-    public static final String ID = "Id";
     public static final String ECHO_PASSWORD = "echoPassword";
     public static final String MULTI_SELECT_ALLOWED =
         "multipleSelectionsAllowed";
@@ -234,10 +232,6 @@ public interface AuthXMLTags {
     public static final String PROMPT_END = "</Prompt>";
     public static final String VALUE_BEGIN = "<Value>";
     public static final String VALUE_END = "</Value>";
-    public static final String HIDDEN_VALUE_CALLBACK_BEGIN="<HiddenValueCallback>";
-    public static final String HIDDEN_VALUE_CALLBACK_END="</HiddenValueCallback>";
-    public static final String ID_BEGIN = "<Id>";
-    public static final String ID_END = "</Id>";
     public static final String PASSWORD_CALLBACK_BEGIN="<PasswordCallback";
     public static final String PASSWORD_CALLBACK_END="</PasswordCallback>";
     public static final String CERT_CALLBACK_BEGIN="<X509CertificateCallback";

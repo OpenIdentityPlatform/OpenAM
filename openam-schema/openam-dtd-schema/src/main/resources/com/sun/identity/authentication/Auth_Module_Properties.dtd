@@ -63,7 +63,7 @@
     attributes for the UI customization. Attribute "error" defines the 'error 
     state' i.e. whether authentication framework/module needs to terminate the 
     authentication process (in case it is 'true'). -->
-<!ELEMENT       Callbacks       ( NameCallback | HiddenValueCallback | PasswordCallback |
+<!ELEMENT       Callbacks       ( NameCallback | PasswordCallback | 
                                 ChoiceCallback | ConfirmationCallback |
 				                HttpCallback | RedirectCallback |
                                 TextOutputCallback )* >
@@ -86,18 +86,6 @@
 <!ELEMENT       NameCallback    ( Prompt ) >
 <!ATTLIST       NameCallback        
         isRequired      ( true | false )        "false" 
-        attribute       CDATA                   ""
-        infoText        CDATA                   ""
->
-
-<!-- HiddenValueCallback element is used to hold any data required in a hidden
-    element. The Id will be the id of the element as it is produced on the page.
-    The attribute "isRequired" tells authentication UI whether the element
-    corresponding to this callback is a required field or not and attribute
-    "attribute" is the corresponding LDAP attribute for this callback value. -->
-<!ELEMENT       HiddenValueCallback    ( Id ) >
-<!ATTLIST       HiddenValueCallback
-        isRequired      ( true | false )        "false"
         attribute       CDATA                   ""
         infoText        CDATA                   ""
 >
@@ -176,10 +164,6 @@
 <!-- Prompt element will be used by the module to request the
     client to display the prompt. -->
 <!ELEMENT       Prompt          ( #PCDATA ) >
-
-<!-- Id element will be used by the module to request the
-client to display the id. -->
-<!ELEMENT       Id          ( #PCDATA ) >
 
 <!-- ChoiceValues element provides a list of choice values. -->
 <!ELEMENT       ChoiceValues    ( ChoiceValue+ ) >

@@ -32,7 +32,6 @@
 
 package com.sun.identity.authentication.spi;
 
-import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import java.io.IOException;
 import java.security.Principal;
@@ -295,34 +294,7 @@ public abstract class AMLoginModule implements LoginModule {
         // iterate through Callback array, and copy them one by one
         // if it is an external Callback, add to the extCallback list
         for (int i = 0; i < len; i++) {
-            if (original[i] instanceof HiddenValueCallback) {
-                final HiddenValueCallback hiddenValueCallback = (HiddenValueCallback) original[i];
-                String defaultValue = hiddenValueCallback.getDefaultValue();
-                if (defaultValue != null && defaultValue.length() != 0) {
-                    copy[i] = new HiddenValueCallback(
-                            hiddenValueCallback.getId(), defaultValue);
-                } else {
-                    copy[i] = new HiddenValueCallback(
-                            hiddenValueCallback.getId());
-                }
-                extCallbacks.add(copy[i]);
-                if (debug.messageEnabled()) {
-                    debug.message("clone #" + i + " is HiddenValueCallback");
-                }
-            } else if (original[i] instanceof NameCallback) {
-                String dftName = ((NameCallback) original[i]).getDefaultName();
-                if (dftName != null && dftName.length() != 0) {
-                    copy[i] = new NameCallback(
-                            ((NameCallback) original[i]).getPrompt(), dftName);
-                } else {
-                    copy[i] = new NameCallback(
-                            ((NameCallback) original[i]).getPrompt());
-                }
-                extCallbacks.add(copy[i]);
-                if (debug.messageEnabled()) {
-                    debug.message("clone #" + i + " is NameCallback");
-                }
-            } else if (original[i] instanceof NameCallback) {
+            if (original[i] instanceof NameCallback) {
                 String dftName = ((NameCallback)original[i]).getDefaultName();
                 if (dftName != null && dftName.length() != 0) {
                     copy[i] = new NameCallback(

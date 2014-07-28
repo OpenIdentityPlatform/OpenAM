@@ -127,9 +127,6 @@
                                                 <input class="textbox" type="text" name="IDToken<jato:text name="txtIndex" />" id="IDToken<jato:text name="txtIndex" />" value="<jato:text name="txtValue" />" />
                                             </div>
                                         </jato:content>
-                                        <jato:content name="hiddenValueBox">
-                                            <input class="hiddenValueBox" type="hidden" name="<jato:text name="txtId" />" id="<jato:text name="txtId" />" value="<jato:text name="txtValue" />" />
-                                        </jato:content>
                                         <jato:content name="password">
                                             <div class="row">
                                                 <label for="IDToken<jato:text name="txtIndex" />">
