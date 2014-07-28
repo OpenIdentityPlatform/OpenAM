@@ -15,10 +15,12 @@
  */
 package org.forgerock.openam.authentication.modules.scripted;
 
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.AMIdentityRepository;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
@@ -41,8 +43,6 @@ import javax.security.auth.login.LoginException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.sun.identity.shared.datastruct.CollectionHelper;
 
 /**
  * An authentication module that allows users to authenticate via a scripting language
@@ -71,6 +71,11 @@ public class Scripted extends AMLoginModule {
     public static final String HTTP_CLIENT_VARIABLE_NAME = "httpClient";
     public static final String LOGGER_VARIABLE_NAME = "logger";
     public static final String IDENTITY_REPOSITORY = "idRepository";
+    // Incoming from client side:
+    public static final String CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME = "clientScriptOutputData";
+    // Outgoing to server side:
+    public static final String CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME = "clientScriptOutputData";
+    public static final String REQUEST_DATA_VARIABLE_NAME = "requestData";
 
     /**
      * Loaded on module startup to ensure the configuration listener is enabled. This ensures that configuration
@@ -100,6 +105,8 @@ public class Scripted extends AMLoginModule {
      */
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
+        this.sharedState = sharedState;
+
         userName = (String) sharedState.get(getUserKey());
         moduleConfiguration = options;
 
@@ -133,7 +140,7 @@ public class Scripted extends AMLoginModule {
         switch (state) {
 
             case ISAuthConstants.LOGIN_START:
-                if (!clientSideScriptEnabled || clientSideScript.isEmpty()) {
+                if (!clientSideScriptEnabled) {
                     clientSideScript = " ";
                 }
 
@@ -144,7 +151,9 @@ public class Scripted extends AMLoginModule {
             case STATE_RUN_SCRIPT:
                 NameCallback clientSideScriptOutput = (NameCallback) callbacks[1];
                 Bindings scriptVariables = new SimpleBindings();
-                scriptVariables.put("requestData", getScriptHttpRequestWrapper());
+                scriptVariables.put(REQUEST_DATA_VARIABLE_NAME, getScriptHttpRequestWrapper());
+                String clientScriptOutputData = getClientScriptOutputData(callbacks);
+                scriptVariables.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
                 scriptVariables.put("clientSideScriptOutput", clientSideScriptOutput.getName());
                 scriptVariables.put(LOGGER_VARIABLE_NAME, DEBUG);
                 scriptVariables.put(STATE_VARIABLE_NAME, state);
@@ -161,20 +170,30 @@ public class Scripted extends AMLoginModule {
                     DEBUG.message("Error running server side scripts", e);
                     throw new AuthLoginException("Error running script", e);
                 }
-                
+
                 state = ((Number) scriptVariables.get(STATE_VARIABLE_NAME)).intValue();
                 userName = (String) scriptVariables.get(USERNAME_VARIABLE_NAME);
+                sharedState.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
                 sharedState.putAll(sharedStateWrapper);
 
                 if (state != SUCCESS_VALUE) {
                     throw new AuthLoginException("Authentication failed");
                 }
-                
+
                 return state;
             default:
                 throw new AuthLoginException("Invalid state");
         }
 
+    }
+
+    private String getClientScriptOutputData(Callback[] callbacks) {
+        String clientScriptOutputData = ((HiddenValueCallback) callbacks[0]).getValue();
+        if (clientScriptOutputData == null) { // To cope with the classic UI
+            clientScriptOutputData = getScriptHttpRequestWrapper().
+                    getParameter(CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME);
+        }
+        return clientScriptOutputData;
     }
 
     private ScriptObject getServerSideScript() {
@@ -225,8 +244,17 @@ public class Scripted extends AMLoginModule {
     }
 
     private void substituteUIStrings() throws AuthLoginException {
-        ScriptTextOutputCallback callback = new ScriptTextOutputCallback(clientSideScript);
-        replaceCallback(STATE_RUN_SCRIPT, 0, callback);
+        replaceCallback(STATE_RUN_SCRIPT, 1, createClientSideScriptAndSelfSubmitCallback());
+    }
+
+    private Callback createClientSideScriptAndSelfSubmitCallback() {
+        String clientSideScriptExecutorFunction = ScriptedClientUtilityFunctions.
+                createClientSideScriptExecutorFunction(clientSideScript, CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME);
+        String autoSubmit = ScriptedClientUtilityFunctions.createAutoSubmissionLogic();
+        ScriptTextOutputCallback scriptAndSelfSubmitCallback =
+                new ScriptTextOutputCallback(clientSideScriptExecutorFunction + autoSubmit);
+
+        return scriptAndSelfSubmitCallback;
     }
 
     private SupportedScriptingLanguage getScriptType() {

@@ -353,6 +353,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     result += "</ul>";
                 }
                 break;
+            case "HiddenValueCallback" :
+                result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index + '" value="" data-validator="required" required data-validator-event="keyup" />';
+                break;
             default:
                 result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';
                 break;

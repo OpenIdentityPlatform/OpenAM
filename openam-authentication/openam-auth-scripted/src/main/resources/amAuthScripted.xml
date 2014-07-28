@@ -134,7 +134,7 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a103">
+                                 i18nKey="a105">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -155,7 +155,7 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a106">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -174,9 +174,9 @@
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500">
-                    <DefaultValues>
-                        <Value>1</Value>
-                    </DefaultValues>
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                      type="single"
@@ -194,7 +194,7 @@
                                      type="single"
                                      syntax="script"
                                      validator="no"
-                                     i18nKey="a103">
+                                     i18nKey="a105">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -215,22 +215,22 @@
                                      type="single"
                                      syntax="script"
                                      validator="ScriptValidator"
-                                     i18nKey="a104">
+                                     i18nKey="a106">
                         <DefaultValues>
                             <Value>
-var START_TIME = 9;  // 9am
-var END_TIME   = 17; // 5pm
+                                var START_TIME = 9;  // 9am
+                                var END_TIME   = 17; // 5pm
 
-logger.message("Starting authentication javascript");
-logger.message("User: " + username);
+                                logger.message("Starting authentication javascript");
+                                logger.message("User: " + username);
 
-// Log out current cookies in the request
-if (logger.messageEnabled()) {
-    var cookies = requestData.getHeaders('Cookie');
-    for (cookie in cookies) {
-        logger.message('Cookie: ' + cookies[cookie]);
-    }
-}
+                                // Log out current cookies in the request
+                                if (logger.messageEnabled()) {
+                                var cookies = requestData.getHeaders('Cookie');
+                                for (cookie in cookies) {
+                                logger.message('Cookie: ' + cookies[cookie]);
+                                }
+                                }
 
 if (username) {
     // Fetch user information via REST
@@ -238,19 +238,19 @@ if (username) {
         cookies : [],
         headers : []
     });
-    // Log out response from REST call
-    logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
-}
+                                // Log out response from REST call
+                                logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
+                                }
 
-var now = new Date();
-logger.message("Current time: " + now.getHours());
-if (now.getHours() &lt; START_TIME || now.getHours() &gt; END_TIME) {
-    logger.error("Login forbidden outside work hours!");
-    authState = FAILED;
-} else {
-    logger.message("Authentication allowed!");
-    authState = SUCCESS;
-}
+                                var now = new Date();
+                                logger.message("Current time: " + now.getHours());
+                                if (now.getHours() &lt; START_TIME || now.getHours() &gt; END_TIME) {
+                                logger.error("Login forbidden outside work hours!");
+                                authState = FAILED;
+                                } else {
+                                logger.message("Authentication allowed!");
+                                authState = SUCCESS;
+                                }
                             </Value>
                         </DefaultValues>
                     </AttributeSchema>

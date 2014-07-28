@@ -32,6 +32,7 @@
 
 package com.sun.identity.authentication.share;
 
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -140,7 +141,18 @@ public class AuthXMLUtils {
             
             Node childNode = childNodes.item(i);
             String childNodeName = childNode.getNodeName();
-            if (childNodeName.equals(AuthXMLTags.NAME_CALLBACK)) {
+            if (AuthXMLTags.HIDDEN_VALUE_CALLBACK.equals(childNodeName)) {
+                if (callbacks != null) {
+                    nameIndex= getNameCallbackIndex(callbacks,nameIndex);
+                    if (nameIndex >= 0){
+                        callbackList.add(
+                                createHiddenValueCallback(childNode,callbacks[nameIndex]));
+                    }
+                    nameIndex = nameIndex +1;
+                } else {
+                    callbackList.add(createHiddenValueCallback(childNode,null));
+                }
+            } else if (childNodeName.equals(AuthXMLTags.NAME_CALLBACK)) {
                 if (callbacks != null) {
                     nameIndex= getNameCallbackIndex(callbacks,nameIndex);
                     if (nameIndex >= 0){
@@ -377,7 +389,10 @@ public class AuthXMLUtils {
             .append(AuthXMLTags.ELEMENT_END);
         
         for (int i = 0; i < callbacks.length; i++) {
-            if (callbacks[i] instanceof NameCallback) {
+            if (callbacks[i] instanceof HiddenValueCallback) {
+                HiddenValueCallback hiddenValueCallback = (HiddenValueCallback) callbacks[i];
+                xmlString.append(getHiddenValueCallbackXML(hiddenValueCallback));
+            } else if (callbacks[i] instanceof NameCallback) {
                 NameCallback nameCallback = (NameCallback) callbacks[i];
                 xmlString.append(getNameCallbackXML(nameCallback));
             } else if (callbacks[i] instanceof PasswordCallback) {
@@ -465,6 +480,35 @@ public class AuthXMLUtils {
         }
         
         return nameCallback;
+    }
+
+    static HiddenValueCallback createHiddenValueCallback(Node childNode, Callback callback) {
+        String id = getId(childNode);
+
+        HiddenValueCallback hiddenValueCallback = null;
+        if (callback instanceof HiddenValueCallback) {
+            hiddenValueCallback = (HiddenValueCallback) callback;
+        }
+
+        if (hiddenValueCallback == null) {
+            String defaultValue = getDefaultValue(childNode);
+            if (defaultValue == null) {
+                hiddenValueCallback = new HiddenValueCallback(id);
+            } else {
+                hiddenValueCallback = new HiddenValueCallback(id, defaultValue);
+            }
+        }
+
+        String value = getValue(childNode);
+        if (debug.messageEnabled()) {
+            debug.message("Value is : " + value);
+        }
+
+        if (value != null) {
+            hiddenValueCallback.setValue(value);
+        }
+
+        return hiddenValueCallback;
     }
     
     static PasswordCallback createPasswordCallback(
@@ -959,6 +1003,33 @@ public class AuthXMLUtils {
         xmlString.append(AuthXMLTags.NAME_CALLBACK_END);
         return xmlString.toString();
     }
+
+    static String getHiddenValueCallbackXML(HiddenValueCallback hiddenValueCallback) {
+        StringBuilder xmlString = new StringBuilder();
+        xmlString.append(AuthXMLTags.HIDDEN_VALUE_CALLBACK_BEGIN)
+                .append(AuthXMLTags.ID_BEGIN)
+                .append(XMLUtils.escapeSpecialCharacters(hiddenValueCallback.getId()))
+                .append(AuthXMLTags.ID_END);
+
+        String defaultValue = hiddenValueCallback.getDefaultValue();
+        if (defaultValue != null) {
+            xmlString.append(AuthXMLTags.DEFAULT_VALUE_BEGIN)
+                    .append(AuthXMLTags.VALUE_BEGIN)
+                    .append(XMLUtils.escapeSpecialCharacters(defaultValue))
+                    .append(AuthXMLTags.VALUE_END)
+                    .append(AuthXMLTags.DEFAULT_VALUE_END);
+        }
+
+        String value = hiddenValueCallback.getValue();
+        if (value != null) {
+            xmlString.append(AuthXMLTags.VALUE_BEGIN)
+                    .append(XMLUtils.escapeSpecialCharacters(value))
+                    .append(AuthXMLTags.VALUE_END);
+        }
+
+        xmlString.append(AuthXMLTags.HIDDEN_VALUE_CALLBACK_END);
+        return xmlString.toString();
+    }
     
     static String getPasswordCallbackXML(PasswordCallback passwordCallback) {
         StringBuilder xmlString = new StringBuilder();
@@ -1417,6 +1488,14 @@ public class AuthXMLUtils {
             return (XMLUtils.getValueOfValueNode(pNode));
         }
         return (null);
+    }
+
+    protected static String getId(Node node) {
+        Node pNode = XMLUtils.getChildNode(node, AuthXMLTags.ID);
+        if (pNode != null) {
+            return (XMLUtils.getValueOfValueNode(pNode));
+        }
+        return null;
     }
     
     protected static String getValue(Node node) {
