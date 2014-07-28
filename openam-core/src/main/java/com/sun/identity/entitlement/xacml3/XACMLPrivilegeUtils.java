@@ -25,8 +25,8 @@
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  */
 /**
- * Portions Copyrighted 2011-2013 ForgeRock AS
- * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -993,13 +993,15 @@ public class XACMLPrivilegeUtils {
     }
 
     static List<Match> getAllMatchesFromTarget(Target target) {
-        List<AnyOf> anyOfList = target.getAnyOf();
         List<Match> matches = new ArrayList<Match>();
-        for (AnyOf anyOf : anyOfList) {
-            List<AllOf> allOfList = anyOf.getAllOf();
-            for (AllOf allOf : allOfList) {
-                List<Match> matchList = allOf.getMatch();
-                matches.addAll(matchList);
+        if (target != null) {
+            List<AnyOf> anyOfList = target.getAnyOf();
+            for (AnyOf anyOf : anyOfList) {
+                List<AllOf> allOfList = anyOf.getAllOf();
+                for (AllOf allOf : allOfList) {
+                    List<Match> matchList = allOf.getMatch();
+                    matches.addAll(matchList);
+                }
             }
         }
         return matches;
