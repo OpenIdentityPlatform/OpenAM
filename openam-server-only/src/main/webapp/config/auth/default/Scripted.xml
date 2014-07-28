@@ -27,8 +27,5 @@
             <Id>clientScriptOutputData</Id>
         </HiddenValueCallback>
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
-        <NameCallback>
-            <Prompt>Script Output:</Prompt>
-        </NameCallback>
     </Callbacks>
 </ModuleProperties>
