@@ -1556,6 +1556,13 @@ $ <userinput>curl \
        Set of string action names,
        each set to a boolean indicating whether the action is allowed
       </para>
+
+      <para>
+       Action values can also be expressed as numeric values. When using
+       numeric values, use the value <literal>0</literal> for
+       <literal>false</literal> and use any non-zero numeric
+       value for <literal>true</literal>.
+      </para>
      </listitem>
     </varlistentry>
 
