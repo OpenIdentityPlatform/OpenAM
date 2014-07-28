@@ -32,7 +32,7 @@ public class AccessTokenToLegacyAdapter extends OpenAMAccessToken {
     private final CoreToken token;
 
     public AccessTokenToLegacyAdapter(CoreToken token) throws InvalidGrantException {
-        super(token);
+        super(token, token.getTokenName(), token.getTokenID());
         this.token = token;
     }
 

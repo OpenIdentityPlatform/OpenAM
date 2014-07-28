@@ -48,6 +48,18 @@ public class OpenAMAccessToken extends AccessToken {
     }
 
     /**
+     * Constructs a new OpenAMAccessToken backed with the data in the specified JsonValue.
+     *
+     * @param token The JsonValue of the token.
+     * @param tokenName The token name.
+     * @param tokenId The token identifier.
+     * @throws InvalidGrantException If the given token is not an Access Token.
+     */
+    public OpenAMAccessToken(JsonValue token, String tokenName, String tokenId) throws InvalidGrantException {
+        super(token, tokenName, tokenId);
+    }
+
+    /**
      * Constructs a new OpenAMAccessToken.
      *
      * @param id The token id.

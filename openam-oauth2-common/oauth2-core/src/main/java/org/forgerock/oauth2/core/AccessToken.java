@@ -44,9 +44,20 @@ public class AccessToken extends JsonValue implements Token {
      */
     public AccessToken(JsonValue token) throws InvalidGrantException {
         super(token);
-        if (!OAuth2Constants.Token.OAUTH_ACCESS_TOKEN.equals(getTokenName())) {
-            throw new InvalidGrantException("Token is not an access token: " + getTokenId());
-        }
+        validateTokenName(getTokenName(), getTokenId());
+    }
+
+    /**
+     * Constructs a new AccessToken backed with the data in the specified JsonValue.
+     *
+     * @param token The JsonValue of the token.
+     * @param tokenName The token name.
+     * @param tokenId The token identifier.
+     * @throws InvalidGrantException If the given token is not an Access Token.
+     */
+    public AccessToken(JsonValue token, String tokenName, String tokenId) throws InvalidGrantException {
+        super(token);
+        validateTokenName(tokenName, tokenId);
     }
 
     /**
@@ -352,6 +363,12 @@ public class AccessToken extends JsonValue implements Token {
     public void addExtraData(String key, String value) {
         if (value != null) {
             extraData.put(key, value);
+        }
+    }
+
+    private void validateTokenName(String tokenName, String tokenId) throws InvalidGrantException {
+        if (!OAuth2Constants.Token.OAUTH_ACCESS_TOKEN.equals(tokenName)) {
+            throw new InvalidGrantException("Token is not an access token: " + tokenId);
         }
     }
 }
