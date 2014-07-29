@@ -16,20 +16,18 @@
 
 package org.forgerock.openam.scripting;
 
-import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
 import org.forgerock.util.Reject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.script.Bindings;
 import javax.script.ScriptException;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -39,13 +37,11 @@ import java.util.concurrent.TimeoutException;
  */
 @Singleton
 public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
-    private static final Debug DEBUG = Debug.getInstance("amScript");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadPoolScriptEvaluator.class);
 
     private final StandardScriptEngineManager scriptEngineManager;
-    private final ExecutorServiceFactory executorServiceFactory;
+    private final ExecutorService threadPool;
     private final ScriptEvaluator delegate;
-
-    private volatile ExecutorService threadPool;
 
     /**
      * Constructs a script evaluator that uses a configurable thread pool to execute scripts, delegating actual script
@@ -53,20 +49,20 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
      * to current application settings.
      *
      * @param scriptEngineManager the manager object to listen for configuration changes. Not null.
-     * @param executorServiceFactory the factory to lazily initialise the thread pool from. Not null.
+     * @param threadPool the thread pool to use for evaluating scripts. Not null.
      * @param delegate the script evaluator to use to evaluate scripts from the thread pool. Not null.
      */
     @Inject
     public ThreadPoolScriptEvaluator(final StandardScriptEngineManager scriptEngineManager,
-                                     final ExecutorServiceFactory executorServiceFactory,
+                                     final ExecutorService threadPool,
                                      final ScriptEvaluator delegate) {
-        Reject.ifNull(scriptEngineManager, executorServiceFactory, delegate);
+        Reject.ifNull(scriptEngineManager, threadPool, delegate);
 
         this.scriptEngineManager = scriptEngineManager;
-        this.executorServiceFactory = executorServiceFactory;
+        this.threadPool = threadPool;
         this.delegate = delegate;
 
-        scriptEngineManager.addConfigurationListener(new ThreadPoolConfigurator());
+        scriptEngineManager.addConfigurationListener(new ThreadPoolConfigurator(threadPool));
     }
 
     /**
@@ -85,7 +81,7 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
     @Override
     public <T> T evaluateScript(final ScriptObject script, final Bindings bindings) throws ScriptException {
 
-        final Future<T> future = getThreadPool().submit(new ScriptExecutorTask<T>(script, bindings));
+        final Future<T> future = threadPool.submit(new ScriptExecutorTask<T>(script, bindings));
         final long timeout = scriptEngineManager.getConfiguration().getScriptExecutionTimeout();
         try {
             if (timeout == ScriptEngineConfiguration.NO_TIMEOUT) {
@@ -94,15 +90,15 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
                 return future.get(timeout, TimeUnit.SECONDS);
             }
         } catch (ExecutionException ex) {
-            DEBUG.message("Script terminated with exception", ex);
+            LOGGER.error("Script terminated with exception", ex);
             throw new ScriptException(ex);
         } catch (TimeoutException ex) {
-            DEBUG.message("Script timed out");
+            LOGGER.warn("Script timed out");
             throw new ScriptException(ex);
         } catch (InterruptedException ex) {
             // Reset interrupted status for callers
             Thread.currentThread().interrupt();
-            DEBUG.message("Interrupted while waiting for script result");
+            LOGGER.debug("Interrupted while waiting for script result");
             throw new ScriptException(ex);
         } finally {
             // Harmless if task has already completed
@@ -116,48 +112,6 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
     }
 
     /**
-     * Lazily initialise the thread execution thread pool to reduce likelihood of having to resize it later due to
-     * configuration being loaded.
-     *
-     * @return the configured thread pool to use for executing scripts.
-     */
-    private ExecutorService getThreadPool() {
-
-        // Always synchronize for safety when performing lazy initialisation. If this turns out to be a hotspot then
-        // we can move to double-checked locking (the threadPool is volatile), as per:
-        // http://www.oracle.com/technetwork/articles/javase/bloch-effective-08-qa-140880.html
-        synchronized (executorServiceFactory) {
-            if (threadPool == null) {
-                final ScriptEngineConfiguration configuration = scriptEngineManager.getConfiguration();
-                threadPool = executorServiceFactory.createThreadPool(
-                        configuration.getThreadPoolCoreSize(),
-                        configuration.getThreadPoolMaxSize(),
-                        configuration.getThreadPoolIdleTimeoutSeconds(),
-                        TimeUnit.SECONDS,
-                        getThreadPoolQueue(configuration.getThreadPoolQueueSize())
-                );
-            }
-        }
-
-        return threadPool;
-    }
-
-    /**
-     * Gets an appropriately configured blocking queue for the given queue size. Currently always returns an
-     * {@link java.util.concurrent.LinkedBlockingQueue} of the appropriate size (or unbounded if specified).
-     *
-     * @param queueSize the queue size to use, possibly {@link ScriptEngineConfiguration#UNBOUNDED_QUEUE_SIZE}.
-     * @return an appropriately configured queue for the queue size.
-     */
-    private BlockingQueue<Runnable> getThreadPoolQueue(final int queueSize) {
-        // Could investigate ArrayBlockingQueue here, but LinkedBlockingQueue seems to have best throughput.
-        // Also could maybe use a SynchronousQueue if size == 1.
-        return (queueSize == ScriptEngineConfiguration.UNBOUNDED_QUEUE_SIZE)
-                ? new LinkedBlockingQueue<Runnable>()
-                : new LinkedBlockingQueue<Runnable>(queueSize);
-    }
-
-    /**
      * Script engine configuration listener that resizes the script engine thread pool in response to configuration
      * changes. If the thread pool implementation supports re-configuration then this will resize the core and
      * maximum thread sizes. This typically takes effect as threads are returned to the pool or new threads are
@@ -168,37 +122,42 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
      * NB: The queue size is not reconfigurable, so changes will take effect only on server restart. All other settings
      * can be changed without a restart and the pool will adjust over time to the new settings.
      */
-    private final class ThreadPoolConfigurator implements StandardScriptEngineManager.ConfigurationListener {
+    private static final class ThreadPoolConfigurator implements StandardScriptEngineManager.ConfigurationListener {
+        private final ExecutorService executorService;
+
+        ThreadPoolConfigurator(final ExecutorService executorService) {
+            this.executorService = executorService;
+        }
+
         @Override
         public void onConfigurationChange(final ScriptEngineConfiguration newConfiguration) {
             try {
                 // This may throw a ClassCastException if implementation changes - handled below
-                final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) getThreadPool();
+                final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) executorService;
 
                 if (threadPool.getCorePoolSize() != newConfiguration.getThreadPoolCoreSize() ||
                     threadPool.getMaximumPoolSize() != newConfiguration.getThreadPoolMaxSize() ||
                     threadPool.getKeepAliveTime(TimeUnit.SECONDS) != newConfiguration.getThreadPoolIdleTimeoutSeconds())
                 {
 
-                    if (DEBUG.messageEnabled()) {
-                        DEBUG.message(String.format("Reconfiguring script evaluation thread pool. " +
-                            "Core pool size: old=%d, new=%d. " +
-                            "Max pool size: old=%d, new=%d. " +
-                            "Idle timeout (seconds): old=%d, new=%d.",
-                                threadPool.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
-                                threadPool.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
-                                threadPool.getKeepAliveTime(TimeUnit.SECONDS),
-                                newConfiguration.getThreadPoolIdleTimeoutSeconds()));
-                    }
+                    LOGGER.debug("Reconfiguring script evaluation thread pool. " +
+                                    "Core pool size: old=%d, new=%d. " +
+                                    "Max pool size: old=%d, new=%d. " +
+                                    "Idle timeout (seconds): old=%d, new=%d.",
+                            threadPool.getCorePoolSize(), newConfiguration.getThreadPoolCoreSize(),
+                            threadPool.getMaximumPoolSize(), newConfiguration.getThreadPoolMaxSize(),
+                            threadPool.getKeepAliveTime(TimeUnit.SECONDS),
+                            newConfiguration.getThreadPoolIdleTimeoutSeconds());
+
                     threadPool.setCorePoolSize(newConfiguration.getThreadPoolCoreSize());
                     threadPool.setMaximumPoolSize(newConfiguration.getThreadPoolMaxSize());
                     threadPool.setKeepAliveTime(newConfiguration.getThreadPoolIdleTimeoutSeconds(), TimeUnit.SECONDS);
                 }
 
             } catch (ClassCastException ex) {
-                DEBUG.warning("Unable to reconfigure script evaluation thread pool - pool is not reconfigurable");
+                LOGGER.warn("Unable to reconfigure script evaluation thread pool - pool is not reconfigurable");
             } catch (IllegalArgumentException ex) {
-                DEBUG.error("Attempt to configure script evaluation thread pool with invalid parameters", ex);
+                LOGGER.error("Attempt to configure script evaluation thread pool with invalid parameters", ex);
             }
         }
     }

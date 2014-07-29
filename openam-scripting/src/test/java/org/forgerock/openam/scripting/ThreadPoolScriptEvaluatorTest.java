@@ -16,8 +16,6 @@
 
 package org.forgerock.openam.scripting;
 
-import com.sun.identity.common.ShutdownManagerWrapper;
-import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,8 +23,7 @@ import javax.script.Bindings;
 import javax.script.SimpleBindings;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,7 +33,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getGroovyScript;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getJavascript;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -44,7 +40,6 @@ import static org.mockito.Mockito.verify;
 public class ThreadPoolScriptEvaluatorTest {
     private Future mockFuture;
     private StandardScriptEngineManager scriptEngineManager;
-    private ExecutorServiceFactory mockExecutorServiceFactory;
     private ScriptEvaluator mockEvaluator;
 
     private ThreadPoolScriptEvaluator testEvaluator;
@@ -53,11 +48,9 @@ public class ThreadPoolScriptEvaluatorTest {
     public void setupTests() {
         mockFuture = mock(Future.class);
         mockEvaluator = mock(ScriptEvaluator.class);
-        mockExecutorServiceFactory = mock(ExecutorServiceFactory.class);
         scriptEngineManager = new StandardScriptEngineManager();
-        setupThreadPool();
 
-        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, mockExecutorServiceFactory, mockEvaluator);
+        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, new FakeFutureExecutor(), mockEvaluator);
     }
 
 
@@ -77,7 +70,6 @@ public class ThreadPoolScriptEvaluatorTest {
     @Test
     public void shouldNotStopJavaScriptExecutionWhenNoTimeoutConfigured() throws Exception {
         //given
-        setupThreadPool();
         ScriptObject loopScript = getJavascript("while(true) { }");
         setTimeout(0);
 
@@ -91,7 +83,6 @@ public class ThreadPoolScriptEvaluatorTest {
     @Test
     public void shouldNotStopGroovyScriptExecutionWhenTimeoutReached() throws Exception {
         //given
-        setupThreadPool();
         ScriptObject loopScript = getGroovyScript("while(true) { }");
         setTimeout(0);
 
@@ -105,7 +96,6 @@ public class ThreadPoolScriptEvaluatorTest {
     @Test
     public void shouldStopGroovyScriptExecutionWhenTimeoutReached() throws Exception {
         //given
-        setupThreadPool();
         ScriptObject loopScript = getGroovyScript("while(true) { }");
         setTimeout(1);
 
@@ -120,11 +110,9 @@ public class ThreadPoolScriptEvaluatorTest {
     public void shouldReconfigureThreadPool() throws Exception {
         // Given
         // Configure thread pool with core = max = 1 threads
-        mockExecutorServiceFactory = mock(ExecutorServiceFactory.class);
         final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES,
                 new LinkedBlockingQueue<Runnable>());
-        setupThreadPool(threadPool);
-        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, mockExecutorServiceFactory, mockEvaluator);
+        testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager, threadPool, mockEvaluator);
         final int newCoreSize = 50;
         final int newMaxSize = 100;
         final ScriptEngineConfiguration newConfiguration = ScriptEngineConfiguration.builder()
@@ -142,9 +130,9 @@ public class ThreadPoolScriptEvaluatorTest {
 
     @Test
     public void shouldDelegateToConfiguredScriptEvaluator() throws Exception {
-        ShutdownManagerWrapper shutdownManagerWrapper = mock(ShutdownManagerWrapper.class);
+
         testEvaluator = new ThreadPoolScriptEvaluator(scriptEngineManager,
-                new ExecutorServiceFactory(shutdownManagerWrapper), mockEvaluator);
+                Executors.newSingleThreadExecutor(), mockEvaluator);
         ScriptObject testScript = getGroovyScript("x + 1");
         Bindings bindings = new SimpleBindings();
         bindings.put("x", 3);
@@ -162,16 +150,6 @@ public class ThreadPoolScriptEvaluatorTest {
     private void setTimeout(int timeout) {
         scriptEngineManager.setConfiguration(ScriptEngineConfiguration.builder()
                 .withTimeout(timeout, TimeUnit.SECONDS).build());
-    }
-
-    private void setupThreadPool(ExecutorService threadPool) {
-        given(mockExecutorServiceFactory
-                .createThreadPool(anyInt(), anyInt(), anyLong(), any(TimeUnit.class), any(BlockingQueue.class)))
-                .willReturn(threadPool);
-    }
-
-    private void setupThreadPool() {
-        setupThreadPool(new FakeFutureExecutor());
     }
 
     // Executor that runs everything in the calling thread without a pool and returns a fake future when submit called

@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.scripting.factories;
 
-import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.scripting.SupportedScriptingLanguage;
 import org.forgerock.util.Reject;
 import org.mozilla.javascript.ClassShutter;
@@ -27,6 +26,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.forgerock.util.Utils.joinAsString;
 
 /**
  * JSR-223 wrapper around a Rhino {@link org.mozilla.javascript.ContextFactory}. Uses the configured
@@ -161,7 +162,7 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      */
     @Override
     public String getMethodCallSyntax(final String object, final String method, final String... args) {
-        return String.format("%s.%s(%s)", object, method, StringUtils.join(args, ','));
+        return String.format("%s.%s(%s)", object, method, joinAsString(", ", (Object[]) args));
     }
 
     /**
@@ -177,7 +178,7 @@ public class RhinoScriptEngineFactory implements ScriptEngineFactory {
      */
     @Override
     public String getProgram(final String... statements) {
-        return StringUtils.join(statements, ";\n");
+        return joinAsString(";\n", (Object[]) statements);
     }
 
     /**

@@ -16,12 +16,14 @@
 package org.forgerock.openam.authentication.modules.scripted;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.http.client.RestletHttpClient;
@@ -38,7 +40,6 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
 import javax.security.auth.login.LoginException;
 import java.security.Principal;
 import java.util.HashMap;
@@ -54,9 +55,8 @@ public class Scripted extends AMLoginModule {
     public static final String SCRIPT_TYPE_ATTR_NAME = ATTR_NAME_PREFIX + "script-type";
     public static final String SERVER_SCRIPT_ATTRIBUTE_NAME = ATTR_NAME_PREFIX + "server-script";
     public static final String SCRIPT_NAME = "server-side-script";
-    public static final String SERVER_SCRIPT_TIMEOUT_NAME = ATTR_NAME_PREFIX + "server-timeout";
-    public static final String SERVER_SCRIPT_CORE_THREAD_NAME = ATTR_NAME_PREFIX + "core-threads";
-    public static final String SERVER_SCRIPT_MAX_THREAD_NAME = ATTR_NAME_PREFIX + "max-threads";
+
+    public static final String SCRIPT_MODULE_NAME = "amAuthScripted";
 
     public static final String JAVA_SCRIPT_LABEL = "JavaScript";
     public static final String GROOVY_LABEL = "Groovy";
@@ -76,13 +76,6 @@ public class Scripted extends AMLoginModule {
     // Outgoing to server side:
     public static final String CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME = "clientScriptOutputData";
     public static final String REQUEST_DATA_VARIABLE_NAME = "requestData";
-
-    /**
-     * Loaded on module startup to ensure the configuration listener is enabled. This ensures that configuration
-     * changes that affect script execution are propagated to the script framework.
-     */
-    private static final ScriptedAuthConfigurator CONFIGURATOR =
-            InjectorHolder.getInstance(ScriptedAuthConfigurator.class);
 
     private String userName;
     private String clientSideScript;
@@ -110,9 +103,6 @@ public class Scripted extends AMLoginModule {
         userName = (String) sharedState.get(getUserKey());
         moduleConfiguration = options;
 
-        // Ensure that configurator is registered (will do nothing if already initialised).
-        CONFIGURATOR.registerServiceListener();
-
         clientSideScript = getClientSideScript();
         scriptEvaluator = getScriptEvaluator();
         serverSideScript = getServerSideScript();
@@ -120,7 +110,6 @@ public class Scripted extends AMLoginModule {
         httpClient = getHttpClient();
         identityRepository  = getScriptIdentityRepository();
         sharedStateWrapper = new HashMap<String, Object>();
-        this.sharedState = sharedState;
     }
 
     private ScriptIdentityRepository getScriptIdentityRepository() {
@@ -202,7 +191,7 @@ public class Scripted extends AMLoginModule {
     }
 
     private ScriptEvaluator getScriptEvaluator() {
-        return InjectorHolder.getInstance(ScriptEvaluator.class);
+        return InjectorHolder.getInstance(Key.get(ScriptEvaluator.class, Names.named(SCRIPT_MODULE_NAME)));
     }
 
     private RestletHttpClient getHttpClient() {
@@ -225,11 +214,6 @@ public class Scripted extends AMLoginModule {
         final String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
         //return clientSideScript == null ? "" : "(function(output){\r\n" + clientSideScript + "\r\n})(document.forms[0].elements[1]);";
         return clientSideScript == null ? "" : clientSideScript;
-    }
-
-    private int getServerTimeout() {
-        final String value = getConfigValue(SERVER_SCRIPT_TIMEOUT_NAME);
-        return value == null || value.isEmpty() ? 0 : Integer.valueOf(value);
     }
 
     private String getRawServerSideScript() {
@@ -276,22 +260,12 @@ public class Scripted extends AMLoginModule {
         return Boolean.parseBoolean(clientSideScriptEnabled);
     }
 
-    private int getCoreThreadSize() {
-        final String value = getConfigValue(SERVER_SCRIPT_CORE_THREAD_NAME);
-        return value == null || value.isEmpty() ? 1 : Integer.valueOf(value); //defaults to 1
-    }
-
-    private int getMaxThreadSize() {
-        final String value = getConfigValue(SERVER_SCRIPT_MAX_THREAD_NAME);
-        return value == null || value.isEmpty() ? 1 : Integer.valueOf(value); //defaults to 1
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     public Principal getPrincipal() {
-        if(userName == null) {
+        if (userName == null) {
             DEBUG.message("Warning: username is null");
         }
 

@@ -16,9 +16,10 @@
 
 package org.forgerock.openam.scripting.sandbox;
 
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.util.Reject;
 import org.mozilla.javascript.ClassShutter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * approved by a call to {@link java.lang.SecurityManager#checkPackageAccess(String)}.
  */
 public final class RhinoSandboxClassShutter implements ClassShutter {
-    private static final Debug DEBUG = Debug.getInstance("amScript");
+    private static final Logger LOGGER = LoggerFactory.getLogger(RhinoSandboxClassShutter.class);
 
     private final SecurityManager securityManager;
     private final List<Pattern> whiteList;
@@ -62,15 +63,13 @@ public final class RhinoSandboxClassShutter implements ClassShutter {
      */
     @Override
     public boolean visibleToScripts(final String fullClassName) {
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Checking access to class '" + fullClassName + "'");
-        }
+        LOGGER.debug("Checking access to class '%s'", fullClassName);
 
         if (securityManager != null) {
             try {
                 securityManager.checkPackageAccess(fullClassName);
             } catch (SecurityException ex) {
-                DEBUG.error("Access denied by SecurityManager for class '" + fullClassName + "'");
+                LOGGER.error("Access denied by SecurityManager for class '%s'", fullClassName);
                 return false;
             }
         }
@@ -84,20 +83,18 @@ public final class RhinoSandboxClassShutter implements ClassShutter {
         }
 
         if (!allowed) {
-            if (DEBUG.warningEnabled()) {
-                DEBUG.warning("Classname failed to match whitelist: '" + fullClassName + "'");
-            }
+            LOGGER.warn("Classname failed to match whitelist: '%s'", fullClassName);
             return false;
         }
 
         for (final Pattern pattern : blackList) {
             if (pattern.matcher(fullClassName).matches()) {
-                DEBUG.error("Access to class '" + fullClassName + "' denied by blacklist pattern: " + pattern.pattern());
+                LOGGER.error("Access to class '%s' denied by blacklist pattern: %s", fullClassName, pattern.pattern());
                 return false;
             }
         }
 
-        DEBUG.message("Access allowed");
+        LOGGER.debug("Access allowed for class '%s'", fullClassName);
         return true;
     }
 }

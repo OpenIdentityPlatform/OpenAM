@@ -15,7 +15,6 @@
 */
 package org.forgerock.openam.scripting;
 
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.scripting.factories.GroovyEngineFactory;
 import org.forgerock.openam.scripting.factories.RhinoScriptEngineFactory;
 import org.forgerock.openam.scripting.sandbox.GroovySandboxValueFilter;
@@ -23,6 +22,8 @@ import org.forgerock.openam.scripting.sandbox.RhinoSandboxClassShutter;
 import org.forgerock.openam.scripting.timeouts.ObservedContextFactory;
 import org.forgerock.util.Reject;
 import org.mozilla.javascript.ClassShutter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,7 +42,7 @@ import java.util.regex.Pattern;
  */
 @Singleton
 public final class StandardScriptEngineManager extends ScriptEngineManager {
-    private static final Debug DEBUG = Debug.getInstance("amScript");
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandardScriptEngineManager.class);
 
     /**
      * Default configuration. Uses system security manager, no script timeouts, and a sandbox configuration that
@@ -111,7 +112,7 @@ public final class StandardScriptEngineManager extends ScriptEngineManager {
                 try {
                     listener.onConfigurationChange(newConfiguration);
                 } catch (RuntimeException ex) {
-                    DEBUG.error("Script configuration listener failed with exception", ex);
+                    LOGGER.error("Script configuration listener failed with exception", ex);
                 }
             }
         }
@@ -190,9 +191,7 @@ public final class StandardScriptEngineManager extends ScriptEngineManager {
          */
         @Override
         public void onConfigurationChange(final ScriptEngineConfiguration newConfiguration) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("Configuring Rhino sandbox: " + newConfiguration);
-            }
+            LOGGER.debug("Configuring sandbox: %s", newConfiguration);
 
             final ClassShutter sandbox = new RhinoSandboxClassShutter(
                     newConfiguration.getSecurityManager(),
