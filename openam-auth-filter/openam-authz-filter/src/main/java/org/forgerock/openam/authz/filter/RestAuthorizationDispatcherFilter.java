@@ -56,7 +56,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR = "sessionAuthzConfigurator";
 
     private final RestEndpointManager endpointManager;
-    private final AuthZFilter authZFilter;
+    private final AuthZFilter authZFilterGlobal;
     private FilterConfig filterConfig;
 
     private String realmsAuthzConfiguratorClassName;
@@ -72,7 +72,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
      */
     public RestAuthorizationDispatcherFilter() {
-        this(InjectorHolder.getInstance(RestEndpointManager.class), new AuthZFilter());
+        this(InjectorHolder.getInstance(RestEndpointManager.class), null);
     }
 
     /**
@@ -85,7 +85,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      */
     RestAuthorizationDispatcherFilter(final RestEndpointManager endpointManager, final AuthZFilter authZFilter) {
         this.endpointManager = endpointManager;
-        this.authZFilter = authZFilter;
+        this.authZFilterGlobal = authZFilter;
     }
 
     /**
@@ -187,6 +187,14 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      */
     private void authorize(final String authzConfiguratorClassName, ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+
+        AuthZFilter authZFilter;
+
+        if (authZFilterGlobal != null) {
+            authZFilter = authZFilterGlobal;
+        } else {
+            authZFilter = new AuthZFilter();
+        }
 
         authZFilter.init(new RestAuthorizationDispatcherFilterConfig(filterConfig, authzConfiguratorClassName));
 
