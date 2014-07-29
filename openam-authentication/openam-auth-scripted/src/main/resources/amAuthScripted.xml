@@ -74,12 +74,21 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-white-list"
                                  type="list" syntax="string" i18nKey="a108">
                     <DefaultValues>
-                        <Value>java.lang.Integer</Value>
-                        <Value>java.lang.Number</Value>
-                        <Value>java.lang.Long</Value>
-                        <Value>java.lang.Float</Value>
+                        <Value>java.lang.Boolean</Value>
+                        <Value>java.lang.Byte</Value>
+                        <Value>java.lang.Character</Value>
+                        <Value>java.lang.Character$Subset</Value>
+                        <Value>java.lang.Character$UnicodeBlock</Value>
                         <Value>java.lang.Double</Value>
+                        <Value>java.lang.Float</Value>
+                        <Value>java.lang.Integer</Value>
+                        <Value>java.lang.Long</Value>
+                        <Value>java.lang.Math</Value>
+                        <Value>java.lang.Number</Value>
+                        <Value>java.lang.Short</Value>
+                        <Value>java.lang.StrictMath</Value>
                         <Value>java.lang.String</Value>
+                        <Value>java.lang.Void</Value>
                         <Value>java.util.HashSet</Value>
                         <Value>java.util.HashMap</Value>
                         <Value>java.util.HashMap$KeyIterator</Value>
