@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter;
@@ -56,7 +56,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
     private static final String INIT_PARAM_SESSION_AUTHZ_CONFIGURATOR = "sessionAuthzConfigurator";
 
     private final RestDispatcher restDispatcher;
-    private final AuthZFilter authZFilter;
+    private final AuthZFilter authZFilterGlobal;
     private FilterConfig filterConfig;
 
     private String realmsAuthzConfiguratorClassName;
@@ -70,8 +70,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      * Constructs an instance of the RestAuthorizationDispatcherFilter.
      */
     public RestAuthorizationDispatcherFilter() {
-        this.restDispatcher = RestDispatcher.getInstance();
-        authZFilter = new AuthZFilter();
+        this(RestDispatcher.getInstance(), null);
     }
 
     /**
@@ -83,7 +82,7 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      */
     RestAuthorizationDispatcherFilter(RestDispatcher restDispatcher, AuthZFilter authZFilter) {
         this.restDispatcher = restDispatcher;
-        this.authZFilter = authZFilter;
+        this.authZFilterGlobal = authZFilter;
     }
 
     /**
@@ -171,6 +170,14 @@ public class RestAuthorizationDispatcherFilter implements Filter {
      */
     private void authorize(final String authzConfiguratorClassName, ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
+
+        AuthZFilter authZFilter;
+
+        if (authZFilterGlobal != null) {
+            authZFilter = authZFilterGlobal;
+        } else {
+            authZFilter = new AuthZFilter();
+        }
 
         authZFilter.init(new RestAuthorizationDispatcherFilterConfig(filterConfig, authzConfiguratorClassName));
 
