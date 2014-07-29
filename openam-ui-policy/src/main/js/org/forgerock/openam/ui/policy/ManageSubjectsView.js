@@ -67,6 +67,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
         data: {},
         pickUpItem: null,
         subjectEntity: {},
+        groupCounter: 0,
 
         render: function(args, callback, element) {
 
@@ -183,8 +184,10 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             // Adding the 'subject' property to the operator_0 means it can only accept one child.
             this.$el.find('#operator_0').data('itemData', {subject:{}});
 
+            this.groupCounter++;
+
             this.$el.find("ol#dropbox").sortable({
-                group: self.element + ' rule-creation-group',
+                group: self.element + 'rule-creation-group' + self.groupCounter,
                 exclude:'.item-button-panel, li.editing',
                 delay: 100,
 
@@ -308,7 +311,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             });
 
             self.pickUpItem.sortable({
-                group: self.element + ' rule-creation-group',
+                group: self.element + 'rule-creation-group' + self.groupCounter,
                 drop: false
             });
 
