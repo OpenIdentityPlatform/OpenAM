@@ -167,5 +167,5 @@ if (navigator.systemLanguage) {
 // To avoid the wait move the output.value assignment outside of the function callback
 collectGeolocationInfo(function(geolocationInfo) {
     devicePrint.geolocation = geolocationInfo;
-    output.value = JSON.stringify(devicePrint);
 });
+output.value = JSON.stringify(devicePrint);
