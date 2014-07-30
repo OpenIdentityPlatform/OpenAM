@@ -35,7 +35,7 @@ var logger = {
         }
     },
     username = "demo",
-    clientSideScriptOutput = "{}",
+    clientScriptOutputData = "{}",
     idRepository = {
         getAttribute: function(username, attributeName) {
             return {
