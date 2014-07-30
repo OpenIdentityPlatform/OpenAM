@@ -742,7 +742,7 @@ function matchDevicePrint() {
     } else {
 
         if (logger.messageEnabled()) {
-            logger.message("client devicePrint: " + clientSideScriptOutput);
+            logger.message("client devicePrint: " + clientScriptOutputData);
         }
 
         var getProfiles = function () {
@@ -776,7 +776,7 @@ function matchDevicePrint() {
 
                 return getNotExpiredProfiles();
             },
-            devicePrint = JSON.parse(clientSideScriptOutput),
+            devicePrint = JSON.parse(clientScriptOutputData),
             devicePrintProfiles = getProfiles();
 
         if (!hasRequiredAttributes(devicePrint, config.attributes)) {

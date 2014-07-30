@@ -142,8 +142,6 @@ public class Scripted extends AMLoginModule {
                 scriptVariables.put(REQUEST_DATA_VARIABLE_NAME, getScriptHttpRequestWrapper());
                 String clientScriptOutputData = getClientScriptOutputData(callbacks);
                 scriptVariables.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
-                // TODO Needed?:
-                scriptVariables.put("clientSideScriptOutput", clientScriptOutputData);
                 scriptVariables.put(LOGGER_VARIABLE_NAME, DEBUG);
                 scriptVariables.put(STATE_VARIABLE_NAME, state);
                 scriptVariables.put("sharedState", sharedStateWrapper);
@@ -211,7 +209,6 @@ public class Scripted extends AMLoginModule {
 
     private String getClientSideScript() {
         final String clientSideScript = getConfigValue(CLIENT_SCRIPT_ATTR_NAME);
-        //return clientSideScript == null ? "" : "(function(output){\r\n" + clientSideScript + "\r\n})(document.forms[0].elements[1]);";
         return clientSideScript == null ? "" : clientSideScript;
     }
 
