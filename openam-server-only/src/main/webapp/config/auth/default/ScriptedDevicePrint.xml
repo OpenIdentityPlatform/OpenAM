@@ -39,9 +39,9 @@
     <Callbacks length="0" order="1" timeout="600" header="#WILL NOT BE SHOWN#" />
 
     <Callbacks length="2" order="2" timeout="120" header="Sign in to OpenAM" >
+        <HiddenValueCallback>
+            <Id>clientScriptOutputData</Id>
+        </HiddenValueCallback>
         <TextOutputCallback messageType="script">PLACEHOLDER</TextOutputCallback>
-        <NameCallback>
-            <Prompt>Script Output:</Prompt>
-        </NameCallback>
     </Callbacks>
 </ModuleProperties>

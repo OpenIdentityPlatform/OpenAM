@@ -138,7 +138,6 @@ public class Scripted extends AMLoginModule {
                 return STATE_RUN_SCRIPT;
 
             case STATE_RUN_SCRIPT:
-                //NameCallback clientSideScriptOutput = (NameCallback) callbacks[1];
                 Bindings scriptVariables = new SimpleBindings();
                 scriptVariables.put(REQUEST_DATA_VARIABLE_NAME, getScriptHttpRequestWrapper());
                 String clientScriptOutputData = getClientScriptOutputData(callbacks);
