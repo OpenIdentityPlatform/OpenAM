@@ -85,6 +85,7 @@
                         <Value>java.lang.Long</Value>
                         <Value>java.lang.Math</Value>
                         <Value>java.lang.Number</Value>
+                        <Value>java.lang.Object</Value>
                         <Value>java.lang.Short</Value>
                         <Value>java.lang.StrictMath</Value>
                         <Value>java.lang.String</Value>
