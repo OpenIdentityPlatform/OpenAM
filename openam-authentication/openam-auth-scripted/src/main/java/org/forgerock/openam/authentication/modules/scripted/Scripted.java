@@ -76,6 +76,7 @@ public class Scripted extends AMLoginModule {
     // Outgoing to server side:
     public static final String CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME = "clientScriptOutputData";
     public static final String REQUEST_DATA_VARIABLE_NAME = "requestData";
+    public static final String SHARED_STATE = "sharedState";
 
     private String userName;
     private String clientSideScript;
@@ -90,7 +91,6 @@ public class Scripted extends AMLoginModule {
     final HttpClientRequestFactory httpClientRequestFactory = InjectorHolder.getInstance(HttpClientRequestFactory.class);
     private RestletHttpClient httpClient;
     private ScriptIdentityRepository identityRepository;
-    private Map<String, Object> sharedStateWrapper;
     private Map<String, Object> sharedState;
 
     /**
@@ -109,7 +109,6 @@ public class Scripted extends AMLoginModule {
         clientSideScriptEnabled = getClientSideScriptEnabled();
         httpClient = getHttpClient();
         identityRepository  = getScriptIdentityRepository();
-        sharedStateWrapper = new HashMap<String, Object>();
     }
 
     private ScriptIdentityRepository getScriptIdentityRepository() {
@@ -144,7 +143,7 @@ public class Scripted extends AMLoginModule {
                 scriptVariables.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
                 scriptVariables.put(LOGGER_VARIABLE_NAME, DEBUG);
                 scriptVariables.put(STATE_VARIABLE_NAME, state);
-                scriptVariables.put("sharedState", sharedStateWrapper);
+                scriptVariables.put(SHARED_STATE, sharedState);
                 scriptVariables.put(USERNAME_VARIABLE_NAME, userName);
                 scriptVariables.put(SUCCESS_ATTR_NAME, SUCCESS_VALUE);
                 scriptVariables.put(FAILED_ATTR_NAME, FAILURE_VALUE);
@@ -161,7 +160,6 @@ public class Scripted extends AMLoginModule {
                 state = ((Number) scriptVariables.get(STATE_VARIABLE_NAME)).intValue();
                 userName = (String) scriptVariables.get(USERNAME_VARIABLE_NAME);
                 sharedState.put(CLIENT_SCRIPT_OUTPUT_DATA_VARIABLE_NAME, clientScriptOutputData);
-                sharedState.putAll(sharedStateWrapper);
 
                 if (state != SUCCESS_VALUE) {
                     throw new AuthLoginException("Authentication failed");
