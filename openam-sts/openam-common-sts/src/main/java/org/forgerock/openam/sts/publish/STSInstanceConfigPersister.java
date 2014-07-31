@@ -42,6 +42,7 @@ public interface STSInstanceConfigPersister<T> {
      *
      * @param stsId The unique identifier for a particular STSInstanceConfig. Currently obtained by calling
      *              RestSTSInstanceConfig#getDeploymentSubPath.
+     * @param realm the realm in which the sts instance was deployed. Necessary for SMS lookup.
      */
     void removeSTSInstance(String stsId, String realm) throws STSPublishException;
 
@@ -54,6 +55,7 @@ public interface STSInstanceConfigPersister<T> {
      *              RestSTSInstanceConfig#getDeploymentConfig()#getUriElement(). This value will be used to identify
      *              a particular Rest STS instance to the TokenGenerationService as well as constitute the most discriminating
      *              element in the DN referencing the STS instance state in the SMS/LDAP.
+     * @param realm the realm in which the sts instance was deployed. Necessary for SMS lookup.
      * @return The STSInstanceConfig corresponding to this deployment url element.
      */
     public T getSTSInstanceConfig(String stsId, String realm) throws STSPublishException;
@@ -67,4 +69,16 @@ public interface STSInstanceConfigPersister<T> {
      * instances.
      */
     public List<T> getAllPublishedInstances() throws STSPublishException;
+
+    /**
+     * This method returns whether STS instance config referenced by the realm and id is present in the SMS. It is called
+     * by RestSTSPublishServiceRequestHandler#handleUpdate to determine whether the referenced sts id actually corresponds
+     * to a previously-published instance
+     * @param stsId The unique identifier for a particular STSInstanceConfig. Currently obtained by calling
+     *              RestSTSInstanceConfig#getDeploymentSubPath.
+     * @param realm the realm in which the sts instance was deployed. Necessary for SMS lookup.
+     * @return true if the instance is present
+     * @throws STSPublishException If an exception is encountered consulting the SMS.
+     */
+    public boolean isInstancePresent(String stsId, String realm) throws STSPublishException;
 }

@@ -88,6 +88,11 @@ public interface AMAdminConstants {
     String CORE_AUTH_SERVICE = "iPlanetAMAuthService";
 
     /**
+     * Name of the Rest STS Service.
+     */
+    String REST_STS_SERVICE = "RestSecurityTokenService";
+
+    /**
      * Locale SSO Token property
      */
     String SSO_TOKEN_LOCALE_ATTRIBUTE_NAME = "Locale";

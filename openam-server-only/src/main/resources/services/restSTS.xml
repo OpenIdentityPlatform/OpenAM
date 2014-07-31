@@ -23,7 +23,8 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/RestSecurityTokenService"
                 i18nFileName="restSTS" revisionNumber="1"
-                i18nKey="rest-security-token-service-description">
+                i18nKey="rest_security_token_service_description"
+                propertiesViewBeanURL="../reststs/RestSTSEdit">
 
             <Organization>
 <!--
@@ -41,7 +42,7 @@ provided for required attributes upon service registration.
                                  type="single" syntax="string" i18nKey="am_deployment_url"
                                  validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value>%protocol://%host:%port%uri/</Value>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="issuer-name"
@@ -54,9 +55,9 @@ provided for required attributes upon service registration.
                                  validator="RequiredValueValidator"
                                  i18nKey="supported_token_transforms">
                     <DefaultValues>
-                        <Value>USERNAME;SAML2;true</Value>
-                        <Value>OPENIDCONNECT;SAML2;true</Value>
-                        <Value>OPENAM;SAML2;false</Value>
+                        <Value>USERNAME|SAML2|true</Value>
+                        <Value>OPENIDCONNECT|SAML2|true</Value>
+                        <Value>OPENAM|SAML2|false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="deployment-realm"
@@ -73,8 +74,8 @@ provided for required attributes upon service registration.
                                  validator="RequiredValueValidator"
                                  i18nKey="deployment_auth_target_mappings">
                     <DefaultValues>
-                        <Value>UsernameToken;service;ldapService</Value>
-                        <Value>OpenIdConnectIdToken;module;oidc;oidc_id_token_auth_target_header_key=oidc_id_token</Value>
+                        <Value>USERNAME|service|ldapService</Value>
+                        <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="keystore-filename"
@@ -85,14 +86,6 @@ provided for required attributes upon service registration.
                                  type="single" syntax="password" i18nKey="keystore_password"
                                  validator="RequiredValueValidator">
                 </AttributeSchema>
-                <!--
-                 The REST STS does not currently use an encryption key for anything. This value has been added because
-                 the KeystoreConfig emits a Map with keys corresponding to keystore-encryption-key-alias and
-                 keystore-encryption-key-password. I may have to break the KeystoreConfig into two classes - one for
-                 REST, and one for SOAP (the SOAP incarnation will likely need the encryption keys for some SecurityPolicy
-                 bindings), and it may be that the REST incarnation will need it as well. For now, the AttributeSchema
-                 will remain, pending further input on whether they are really needed.
-                -->
                 <AttributeSchema name="keystore-encryption-key-alias"
                                  type="single" syntax="string" i18nKey="keystore_encryption_key_alias"
                                  validator="RequiredValueValidator">
@@ -169,7 +162,7 @@ provided for required attributes upon service registration.
                                      type="single" syntax="string" i18nKey="am_deployment_url"
                                      validator="RequiredValueValidator">
                         <DefaultValues>
-                            <Value>%protocol://%host:%port%uri/</Value>
+                            <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="issuer-name"
@@ -182,9 +175,9 @@ provided for required attributes upon service registration.
                                      validator="RequiredValueValidator"
                                      i18nKey="supported_token_transforms">
                         <DefaultValues>
-                            <Value>USERNAME;SAML2;true</Value>
-                            <Value>OPENIDCONNECT;SAML2;true</Value>
-                            <Value>OPENAM;SAML2;false</Value>
+                            <Value>USERNAME|SAML2|true</Value>
+                            <Value>OPENIDCONNECT|SAML2|true</Value>
+                            <Value>OPENAM|SAML2|false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="deployment-realm"
@@ -201,8 +194,8 @@ provided for required attributes upon service registration.
                                      validator="RequiredValueValidator"
                                      i18nKey="deployment_auth_target_mappings">
                         <DefaultValues>
-                            <Value>UsernameToken;service;ldapService</Value>
-                            <Value>OpenIdConnectIdToken;module;oidc;oidc_id_token_auth_target_header_key=oidc_id_token</Value>
+                            <Value>USERNAME|service|ldapService</Value>
+                            <Value>OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="keystore-filename"
@@ -213,14 +206,6 @@ provided for required attributes upon service registration.
                                      type="single" syntax="password" i18nKey="keystore_password"
                                      validator="RequiredValueValidator">
                     </AttributeSchema>
-                    <!--
-                    The REST STS does not currently use an encryption key for anything. This value has been added because
-                    the KeystoreConfig emits a Map with keys corresponding to keystore-encryption-key-alias and
-                    keystore-encryption-key-password. I may have to break the KeystoreConfig into two classes - one for
-                    REST, and one for SOAP (the SOAP incarnation will likely need the encryption keys for some SecurityPolicy
-                    bindings), and it may be that the REST incarnation will need it as well. For now, the AttributeSchema
-                    will remain, pending further input on whether they are really needed.
-                   -->
                     <AttributeSchema name="keystore-encryption-key-alias"
                                      type="single" syntax="string" i18nKey="keystore_encryption_key_alias"
                                      validator="RequiredValueValidator">

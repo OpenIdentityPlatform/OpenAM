@@ -114,7 +114,7 @@ public class ProofTokenState {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST,
                     "Exception caught marshalling from json to X509 cert: " + e, e);
         } catch (UnsupportedEncodingException e) {
-            throw new TokenMarshalException(ResourceException.INTERNAL_ERROR,
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST,
                     "Exception caught marshalling from json to X509 cert: " + e, e);
         }
     }

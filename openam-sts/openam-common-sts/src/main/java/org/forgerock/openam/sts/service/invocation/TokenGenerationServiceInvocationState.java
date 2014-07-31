@@ -32,8 +32,6 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 public class TokenGenerationServiceInvocationState {
-//    public enum SAML2SubjectConfirmation {BEARER, SENDER_VOUCHES, HOLDER_OF_KEY}
-
     public static class TokenGenerationServiceInvocationStateBuilder {
         private String ssoTokenString;
         /**

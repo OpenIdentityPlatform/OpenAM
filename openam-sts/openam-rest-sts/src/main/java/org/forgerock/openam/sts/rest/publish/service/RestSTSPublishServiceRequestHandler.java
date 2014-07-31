@@ -24,6 +24,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -31,6 +32,7 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
@@ -78,45 +80,34 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         handler.handleError(new NotSupportedException());
     }
 
+    /*
+     This method will be invoked by either a programmatic client, in which case a RestSTSInstanceConfig has emitted
+     properly-formatted json, or from the RestSecurityTokenServiceViewBean, in which case the configuration state is
+     in the sms-centric Map<String, Set<String>> format. This method needs to be able to handle both invocation types,
+     and marshal the invocation state in to a RestSTSInstanceConfig instance either way. It also needs to return an accurate
+     error message, so that in the case of RestSecurityTokenServiceViewBean invocation, the user can make appropriate
+      corrections to the configuration state.
+      */
     public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        RestSTSInstanceConfig instanceConfig;
+        final RestSTSInstanceConfig instanceConfig;
         try {
-            instanceConfig = RestSTSInstanceConfig.fromJson(request.getContent());
-        } catch (Exception e) {
-            logger.error("Exception caught marshalling json into RestSTSInstanceConfig instance: " + e);
-            handler.handleError(new BadRequestException(e));
+            instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
+        } catch (BadRequestException e) {
+            handler.handleError(e);
             return;
         }
         Injector instanceInjector;
         try {
-            instanceInjector = Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
-        } catch (Exception e) {
-            String message = "Exception caught creating the guice injector corresponding to rest sts instance: " + e;
-            logger.error(message);
-            handler.handleError(new InternalServerErrorException(message, e));
+            instanceInjector = createInjector(instanceConfig);
+        } catch (ResourceException e) {
+            handler.handleError(e);
             return;
         }
-        String urlElement = null;
         try {
-            boolean republish = false;
-            urlElement =
-                    publisher.publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), republish);
-            if (logger.isDebugEnabled()) {
-                logger.debug("rest sts instance successfully published at " + urlElement);
-            }
-            handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
-                    Integer.toString(instanceConfig.hashCode()), json(object(field(RESULT, SUCCESS),
-                    field(AMSTSConstants.SUCCESSFUL_REST_STS_PUBLISH_URL_ELEMENT, urlElement)))));
-        } catch (STSPublishException e) {
-            String message = "Exception caught publishing instance: at url " + urlElement + ". Exception" + e;
-            logger.error(message, e);
+            publishInstance(instanceConfig, instanceInjector, handler);
+        } catch (ResourceException e) {
             handler.handleError(e);
-        } catch (Exception e) {
-            String message = "Exception caught publishing instance: at url " + urlElement + ". Exception" + e;
-            logger.error(message, e);
-            handler.handleError(new InternalServerErrorException(message, e));
         }
-
     }
 
     public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
@@ -176,8 +167,84 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         }
     }
 
+     /*
+      * A PUT to the url composed of the publish endpont + the sts instance id with a payload corresponding to a
+      * RestSTSInstanceId (wrapped in invocation context information) will result in republishing the existing instance
+      * (which is a delete followed by a create).
+      */
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException());
+        String stsId = request.getResourceName();
+        String realm = getRealmFromResourceName(request.getResourceName());
+        /*
+        Insure that the instance is published before performing an update.
+         */
+        final boolean publishedToSMS;
+        try {
+            publishedToSMS = publisher.isInstancePersistedInSMS(stsId, realm);
+        } catch (STSPublishException e) {
+            logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught determining whether " +
+                    "instance persisted in SMS. Instance not updated. Exception: " + e, e);
+            handler.handleError(e);
+            return;
+        }
+        final boolean publishedToCrest = publisher.isInstanceExposedInCrest(stsId);
+
+        if (publishedToSMS) {
+            if (!publishedToCrest) {
+                /*
+                Entering this branch would seem to be an error condition. It could possibly happen in a site deployment,
+                where a rest sts instance is published to a different server than the current server, and the registered
+                ServiceListener was not called when the ldap replication created the service entry on the current server.
+                I will log a warning, and still publish the instance, just for robustness.
+                 */
+                logger.warn("The rest sts instance " + stsId + " in realm " + realm + " is present in the SMS, but " +
+                        "has not been hung off of the CREST router. This is an illegal state. The instance will be" +
+                        " republished.");
+            }
+            RestSTSInstanceConfig instanceConfig;
+            try {
+                instanceConfig = marshalInstanceConfigFromInvocation(request.getContent());
+            } catch (BadRequestException e) {
+                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught marshalling " +
+                        "invocation state to RestSTSInstanceConfig. Instance not updated. The state: "
+                        + request.getContent() + "Exception: " + e, e);
+                handler.handleError(e);
+                return;
+            }
+            Injector instanceInjector;
+            try {
+                instanceInjector = createInjector(instanceConfig);
+            } catch (ResourceException e) {
+                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught creating an " +
+                        "Injector using the RestSTSInstanceConfig. The instance: "+ instanceConfig.toJson() +
+                        "; Exception: " + e, e);
+                handler.handleError(e);
+                return;
+            }
+            try {
+                publisher.removeInstance(stsId, realm);
+            } catch (STSPublishException e) {
+                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught removing " +
+                        "rest sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
+                        "in indeterminate state, and has not been updated. The instance config: " +  instanceConfig
+                        + "; Exception: " + e, e);
+                handler.handleError(e);
+            }
+            try {
+                publishInstance(instanceConfig, instanceInjector, handler);
+                logger.info("Rest STS instance " + instanceConfig.getDeploymentSubPath() + " updated to state " +
+                    instanceConfig.toJson());
+            } catch (ResourceException e) {
+                logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught publishing " +
+                        "rest sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +
+                        "in indeterminate state, having been removed, but not successfully published with updated " +
+                        "state. The instance config: " +  instanceConfig + "; Exception: " + e, e);
+                handler.handleError(e);
+            }
+        } else {
+            //404 - realm and id not found in SMS
+            handler.handleError(new NotFoundException("No rest sts instance with id " + stsId + " in realm " + realm));
+        }
     }
 
     private String getRealmFromResourceName(String resourceName) {
@@ -185,5 +252,75 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
             return AMSTSConstants.FORWARD_SLASH;
         }
         return resourceName.substring(0, resourceName.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
+    }
+
+    private RestSTSInstanceConfig marshalInstanceConfigFromInvocation(JsonValue requestContent) throws BadRequestException {
+        /*
+        I want to distinguish the case where this method is invoked with a payload generated via a toJson()
+        invocation on a RestSTSInstanceConfig instance, and where this method is invoked with a payload generated by
+        the RestSecurityTokenServiceViewBean (i.e. a Map<String, List<String>>) so that the correct un-marshaling logic
+        can be invoked, and the correct error messages displayed. The two cases will be distinguished by distinct values
+        corresponding to the AMSTSContants.REST_STS_PUBLISH_INVOCATION_CONTEXT string in the top-level json object.
+         */
+        String invocationContext = requestContent.get(AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT).asString();
+        if (AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_CLIENT_SDK.equals(invocationContext)) {
+            try {
+                return RestSTSInstanceConfig.fromJson(requestContent.get(AMSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE));
+            } catch (Exception e) {
+                logger.error("Exception caught marshalling json into RestSTSInstanceConfig instance for SDK invocation " +
+                        "context: " + e);
+                throw new BadRequestException(e);
+            }
+        } else if (AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN.equals(invocationContext)) {
+            try {
+                return RestSTSInstanceConfig.marshalFromJsonAttributeMap(requestContent.get(
+                        AMSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE));
+            } catch (Exception e) {
+                logger.error("Exception caught marshalling attribute map into RestSTSInstanceConfig instance for " +
+                        "ViewBean invocation context: " + e);
+                throw new BadRequestException(e);
+            }
+        } else {
+            String message = "The top-level json object must contain a key named "
+                    + AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT + " and with a value corresponding to either "
+                    + AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_CLIENT_SDK + " or "
+                    + AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN + ". Actual invocation content: "
+                    + requestContent.toString();
+            logger.error(message);
+            throw new BadRequestException(message);
+        }
+    }
+
+    private Injector createInjector(RestSTSInstanceConfig instanceConfig) throws ResourceException {
+        try {
+            return Guice.createInjector(new RestSTSInstanceModule(instanceConfig));
+        } catch (Exception e) {
+            String message = "Exception caught creating the guice injector corresponding to rest sts instance: " + e;
+            logger.error(message);
+            throw new InternalServerErrorException(message, e);
+        }
+    }
+
+    private void publishInstance(RestSTSInstanceConfig instanceConfig, Injector instanceInjector,
+                                 ResultHandler<Resource> handler) throws ResourceException {
+        try {
+            boolean republish = false;
+            final String urlElement =
+                    publisher.publishInstance(instanceConfig, instanceInjector.getInstance(RestSTS.class), republish);
+            if (logger.isDebugEnabled()) {
+                logger.debug("rest sts instance successfully published at " + urlElement);
+            }
+            handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
+                    Integer.toString(instanceConfig.hashCode()), json(object(field(RESULT, SUCCESS),
+                    field(AMSTSConstants.SUCCESSFUL_REST_STS_PUBLISH_URL_ELEMENT, urlElement)))));
+        } catch (STSPublishException e) {
+            String message = "Exception caught publishing instance: " + instanceConfig.getDeploymentSubPath() + ". Exception" + e;
+            logger.error(message, e);
+            throw e;
+        } catch (Exception e) {
+            String message = "Exception caught publishing instance: " + instanceConfig.getDeploymentSubPath() + ". Exception" + e;
+            logger.error(message, e);
+            throw new InternalServerErrorException(message, e);
+        }
     }
 }

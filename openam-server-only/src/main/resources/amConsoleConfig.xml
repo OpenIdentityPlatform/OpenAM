@@ -193,6 +193,13 @@
                  tooltip="tab.configuration.agentconfig.tooltip"
                  status="tab.configuration.agentconfig.status"
                  permissions="sunIdentityRepositoryService/1.0/application/agent"/>
+            <tab id="19"
+                 viewbean="com.sun.identity.console.reststs.RestSTSHomeViewBean"
+                 url="../reststs/RestSTSHome"
+                 label="tab.configuration.reststs.label"
+                 tooltip="tab.configuration.reststs.tooltip"
+                 status="tab.configuration.reststs.status"
+                 permissions="RestSecurityTokenService"/>
         </profile>
         <profile id="cscGeneral">
             <tab id="421"

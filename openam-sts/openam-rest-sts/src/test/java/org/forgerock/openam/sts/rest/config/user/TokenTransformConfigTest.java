@@ -21,21 +21,22 @@ import org.forgerock.openam.sts.TokenType;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNotEquals;
 
 public class TokenTransformConfigTest {
+    private static final String STRING_TRANSFORM = "USERNAME|SAML2|true";
+
     @Test
     public void testEquals() {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         TokenTransformConfig ttc2 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-        assertTrue(ttc1.equals(ttc2));
-        assertTrue(ttc1.hashCode() == ttc2.hashCode());
+        assertEquals(ttc1, ttc2);
+        assertEquals(ttc1.hashCode(), ttc2.hashCode());
 
         TokenTransformConfig ttc3 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         TokenTransformConfig ttc4 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-        assertTrue(ttc3.equals(ttc4));
-        assertTrue(ttc3.hashCode() == ttc4.hashCode());
+        assertEquals(ttc3, ttc4);
+        assertEquals(ttc3.hashCode(), ttc4.hashCode());
 
     }
 
@@ -43,17 +44,17 @@ public class TokenTransformConfigTest {
     public void testNotEquals() {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         TokenTransformConfig ttc2 = new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-        assertFalse(ttc1.equals(ttc2));
-        assertFalse(ttc1.hashCode() == ttc2.hashCode());
+        assertNotEquals(ttc1, ttc2);
+        assertNotEquals(ttc1.hashCode(), ttc2.hashCode());
     }
 
     @Test
     public void testJsonRoundTrip() {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-        assertTrue(ttc1.equals(TokenTransformConfig.fromJson(ttc1.toJson())));
+        assertEquals(ttc1, TokenTransformConfig.fromJson(ttc1.toJson()));
 
         TokenTransformConfig ttc4 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, !AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
-        assertTrue(ttc4.equals(TokenTransformConfig.fromJson(ttc4.toJson())));
+        assertEquals(ttc4, TokenTransformConfig.fromJson(ttc4.toJson()));
     }
 
     @Test
@@ -61,5 +62,11 @@ public class TokenTransformConfigTest {
         TokenTransformConfig ttc1 = new TokenTransformConfig(TokenType.OPENAM, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
         assertEquals(ttc1, TokenTransformConfig.fromSMSString(ttc1.toSMSString()));
 
+    }
+    @Test
+    public void testStringRepresentationRoundTrip2() {
+        TokenTransformConfig ttc1 = TokenTransformConfig.fromSMSString(STRING_TRANSFORM);
+        TokenTransformConfig ttc2 = new TokenTransformConfig(TokenType.USERNAME, TokenType.SAML2, AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION);
+        assertEquals(ttc1, ttc2);
     }
 }

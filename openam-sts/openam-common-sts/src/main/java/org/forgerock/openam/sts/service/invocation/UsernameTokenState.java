@@ -42,7 +42,7 @@ public class UsernameTokenState {
             return this;
         }
 
-        public UsernameTokenStateBuilder password(byte[] password) throws TokenMarshalException {
+        public UsernameTokenStateBuilder password(byte[] password) {
             this.password = password;
             return this;
         }

@@ -52,7 +52,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         this.openIdConnectXmlMarshaller = openIdConnectXmlMarshaller;
     }
 
-    @Override
     public ReceivedToken marshallInputToken(JsonValue receivedToken) throws TokenMarshalException {
         Map<String,Object> tokenAsMap = receivedToken.asMap();
         String tokenType = (String)tokenAsMap.get(AMSTSConstants.TOKEN_TYPE_KEY);
@@ -74,7 +73,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
 
     }
 
-    @Override
     public TokenType getTokenType(JsonValue receivedToken) throws TokenMarshalException {
         JsonValue jsonTokenType = receivedToken.get(AMSTSConstants.TOKEN_TYPE_KEY);
         if (jsonTokenType.isNull() || !jsonTokenType.isString()) {
@@ -95,7 +93,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    @Override
     public SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException {
         try {
             SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
@@ -106,7 +103,7 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
              */
             String subjectConfirmationString = token.get(SAML2TokenState.SUBJECT_CONFIRMATION).asString();
             try {
-                return Enum.valueOf(SAML2SubjectConfirmation.class, subjectConfirmationString);
+                return SAML2SubjectConfirmation.valueOf(subjectConfirmationString);
             } catch (IllegalArgumentException iae) {
                 throw new TokenMarshalException(ResourceException.BAD_REQUEST,
                         "Invalid subjectConfirmation specified in the JsonValue corresponding to SAML2TokenState. " +
@@ -119,7 +116,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    @Override
     public String getServiceProviderAssertionConsumerServiceUrl(JsonValue token) throws TokenMarshalException {
         try {
             SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
@@ -138,34 +134,14 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    @Override
     public ProofTokenState getProofTokenState(JsonValue token) throws TokenMarshalException {
-        try {
-            final SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
-            final ProofTokenState proofTokenState = tokenState.getProofTokenState();
-            if (proofTokenState ==  null) {
-                throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
-                        " SAML2TokenState. The JsonValue: " + token);
-            } else {
-                return proofTokenState;
-            }
-        } catch (TokenMarshalException e) {
-            /*
-            Try to get the value directly
-             */
-            final JsonValue jsonProofToken = token.get(SAML2TokenState.PROOF_TOKEN_STATE);
-            if (jsonProofToken.isNull()) {
-                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                        "No ProofTokenState specified in the JsonValue corresponding to SAML2TokenState. " +
-                                "The JsonValue: " + token.toString());
-            }
-            final ProofTokenState proofTokenState = ProofTokenState.fromJson(jsonProofToken);
-            if (proofTokenState ==  null) {
-                throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
-                        " SAML2TokenState. The JsonValue: " + token);
-            } else {
-                return proofTokenState;
-            }
+        final SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
+        final ProofTokenState proofTokenState = tokenState.getProofTokenState();
+        if (proofTokenState ==  null) {
+            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "No ProofTokenState specified in the" +
+                    " SAML2TokenState. The JsonValue: " + token);
+        } else {
+            return proofTokenState;
         }
     }
 

@@ -59,7 +59,6 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
         this.principalFromSession = principalFromSession;
         this.logger = logger;
     }
-    @Override
     public boolean canHandleToken(ReceivedToken validateTarget) {
         Object token = validateTarget.getToken();
         if (token instanceof Element) {
@@ -72,12 +71,10 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
     /*
     The OIDC TokenValidator is not CXF-STS realm-aware, so just delegate non-realm method.
      */
-    @Override
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         return canHandleToken(validateTarget);
     }
 
-    @Override
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         TokenValidatorResponse response = new TokenValidatorResponse();
         ReceivedToken validateTarget = tokenParameters.getToken();
@@ -111,7 +108,7 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);
         } catch (TokenValidationException e) {
-            throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,
+            throw new AMSTSRuntimeException(ResourceException.FORBIDDEN,
                     "Exception caught validating OIDC token with authentication handler: " + e, e);
         } catch (TokenCreationException e) {
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,

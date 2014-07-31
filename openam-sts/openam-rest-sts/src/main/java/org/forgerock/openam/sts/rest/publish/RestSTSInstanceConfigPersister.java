@@ -46,7 +46,6 @@ import java.util.Set;
 public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersister<RestSTSInstanceConfig> {
     private static final int PRIORITY_ZERO = 0;
 
-    private static final String ROOT_REALM = "/";
     private final MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller;
     private final Logger logger;
 
@@ -81,10 +80,10 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
 
         } catch (SMSException e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught persisting RestSTSInstanceConfig instance: " + e, e);
+                    "Exception caught persisting RestSTSInstanceConfig instance " + stsInstanceId + "Exception: " + e, e);
         } catch (SSOException e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught persisting RestSTSInstanceConfig instance: " + e, e);
+                    "Exception caught persisting RestSTSInstanceConfig instance" + stsInstanceId + "Exception: " + e, e);
         }
     }
 
@@ -205,6 +204,24 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
         return instances;
     }
 
+    public boolean isInstancePresent(String stsId, String realm) throws STSPublishException {
+        try {
+            ServiceConfig baseService = new ServiceConfigManager(AMSTSConstants.REST_STS_SERVICE_NAME,
+                    getAdminToken()).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                return baseService.getSubConfig(stsId) != null;
+            } else {
+                return false;
+            }
+        } catch (SSOException e) {
+            throw new STSPublishException(ResourceException.NOT_FOUND,
+                    "Exception caught reading RestSTSInstanceConfig instance " + stsId + " from SMS: " + e, e);
+        } catch (SMSException e) {
+            throw new STSPublishException(ResourceException.NOT_FOUND,
+                    "Exception caught reading RestSTSInstanceConfig instance " + stsId + "from SMS: " + e, e);
+        }
+    }
+
     private Set<String> getAllRealmNames() throws STSPublishException {
         Set<String> realmNames = new HashSet<String>();
         /*
@@ -213,16 +230,40 @@ public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersiste
          */
         realmNames.add(AMSTSConstants.ROOT_REALM);
         try {
-            OrganizationConfigManager ocm = new OrganizationConfigManager(getAdminToken(), ROOT_REALM);
-            realmNames.addAll(ocm.getSubOrganizationNames());
+            Set<String> subRealms = getSubrealms(realmNames);
+            while (!subRealms.isEmpty()) {
+                realmNames.addAll(subRealms);
+                subRealms = getSubrealms(subRealms);
+            }
             return realmNames;
         } catch (SMSException e) {
             throw new STSPublishException(ResourceException.INTERNAL_ERROR,
                     "Could not obtain list of realms from the OrganizationConfigManager. " +
-                    "This means list of previously-published rest sts instances cannot be returned. Exception: " + e);
+                            "This means list of previously-published rest sts instances cannot be returned. Exception: " + e);
         }
+
     }
 
+    private Set<String> getSubrealms(Set<String> currentRealms) throws SMSException {
+        Set<String> subrealms = new HashSet<String>();
+        for (String realm : currentRealms) {
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getAdminToken(), realm);
+            subrealms.addAll(catenateRealmNames(realm, ocm.getSubOrganizationNames()));
+        }
+        return subrealms;
+    }
+
+    private Set<String> catenateRealmNames(String currentRealm, Set<String> subrealms) {
+        Set<String> catenatedNames = new HashSet<String>(subrealms.size());
+        if (AMSTSConstants.ROOT_REALM.equals(currentRealm)) {
+            catenatedNames.addAll(subrealms);
+        } else {
+            for (String subrealm : subrealms) {
+                catenatedNames.add(currentRealm + AMSTSConstants.FORWARD_SLASH + subrealm);
+            }
+        }
+        return catenatedNames;
+    }
     private SSOToken getAdminToken()  {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }

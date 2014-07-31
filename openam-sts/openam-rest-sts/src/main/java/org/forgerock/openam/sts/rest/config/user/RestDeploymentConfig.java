@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 
 import org.forgerock.openam.sts.MapMarshallUtils;
@@ -43,8 +44,8 @@ public class RestDeploymentConfig {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    private static final String REALM = "deployment-realm";
-    private static final String URI_ELEMENT = "deployment-url-element";
+    private static final String REALM = SharedSTSConstants.DEPLOYMENT_REALM;
+    private static final String URI_ELEMENT = SharedSTSConstants.DEPLOYMENT_URL_ELEMENT;
     public static final String AUTH_TARGET_MAPPINGS = AuthTargetMapping.AUTH_TARGET_MAPPINGS;
 
     public static class RestDeploymentConfigBuilder {

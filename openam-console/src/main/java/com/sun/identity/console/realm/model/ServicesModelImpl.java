@@ -111,6 +111,10 @@ public class ServicesModelImpl
             // remove auth configuration service too
             names.remove(AMAdminConstants.AUTH_CONFIG_SERVICE);
             names.remove(AMAdminConstants.CORE_AUTH_SERVICE);
+            /*
+            Creation and edit of instances of the Rest STS service handled by the STS tab.
+             */
+            names.remove(AMAdminConstants.REST_STS_SERVICE);
 
             logEvent("SUCCEED_GET_ASSIGNED_SERVICE_OF_REALM", param);
             return mapNameToDisplayName(names);
@@ -172,6 +176,10 @@ public class ServicesModelImpl
                 names, mgr.getAuthenticationServiceNames());
             removeNonDisplayableServices(names,SUPPORTED_SCHEMA_TYPE);
             names.remove(AMAdminConstants.CORE_AUTH_SERVICE);
+            /*
+            Creation and edit of instances of the Rest STS service handled by the STS tab.
+             */
+            names.remove(AMAdminConstants.REST_STS_SERVICE);
             logEvent("SUCCEED_GET_ASSIGNABLE_SERVICE_OF_REALM", param);
             return mapNameToDisplayName(names);
         } catch (AMConfigurationException e) {

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
@@ -118,6 +119,19 @@ public class RestSTSInstanceConfigTest {
 
         config = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_SAML2_CONFIG);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
+    }
+
+    @Test
+    public void testJsonMapMarshalRoundTrip() throws IOException {
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        Map<String, Set<String>> attributeMap = config.marshalToAttributeMap();
+        JsonValue jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
+        assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
+
+        config = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_SAML2_CONFIG);
+        attributeMap = config.marshalToAttributeMap();
+        jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
+        assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
     }
 
     private RestSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl, boolean withSaml2Config) throws UnsupportedEncodingException {
@@ -269,5 +283,15 @@ public class RestSTSInstanceConfigTest {
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .build();
+    }
+
+    private Map<String, List<String>> marshalSetValuesToListValues(Map<String, Set<String>> smsMap) {
+        Map<String, List<String>> listMap = new HashMap<String, List<String>>();
+        for (Map.Entry<String, Set<String>> entry : smsMap.entrySet()) {
+            ArrayList<String> list = new ArrayList<String>(entry.getValue().size());
+            list.addAll(entry.getValue());
+            listMap.put(entry.getKey(), list);
+        }
+        return listMap;
     }
 }

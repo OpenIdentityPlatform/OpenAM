@@ -43,7 +43,7 @@ public class DefaultAttributeStatementsProvider implements AttributeStatementsPr
         AttributeStatement attributeStatement = AssertionFactory.getInstance().createAttributeStatement();
         try {
             List<Attribute> attributeList = mapper.getAttributes(ssoToken, saml2Config.getAttributeMap());
-            if (attributeList.isEmpty()) {
+            if ((attributeList == null) || attributeList.isEmpty()) {
                 return Collections.emptyList();
             } else {
                 attributeStatement.setAttribute(attributeList);

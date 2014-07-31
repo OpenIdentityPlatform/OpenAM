@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.token.model;
 
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -27,14 +28,14 @@ public class OpenIdConnectIdTokenMarshallerTest {
     @Test
     public void testJsonRoundTrip() throws TokenMarshalException {
         OpenIdConnectIdToken idToken = new OpenIdConnectIdToken(TOKEN_VALUE);
-        OpenIdConnectIdTokenMarshaller marshaller = new OpenIdConnectIdTokenMarshaller();
+        OpenIdConnectIdTokenMarshaller marshaller = new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl());
         assertEquals(idToken.getTokenValue(), marshaller.fromJson(marshaller.toJson(idToken)).getTokenValue());
     }
 
     @Test
     public void testXmlRoundTrip() throws TokenMarshalException {
         OpenIdConnectIdToken idToken = new OpenIdConnectIdToken(TOKEN_VALUE);
-        OpenIdConnectIdTokenMarshaller marshaller = new OpenIdConnectIdTokenMarshaller();
+        OpenIdConnectIdTokenMarshaller marshaller = new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl());
         assertEquals(idToken.getTokenValue(), marshaller.fromXml(marshaller.toXml(idToken)).getTokenValue());
     }
 }

@@ -1,0 +1,306 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions Copyrighted [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS. All rights reserved.
+ */
+
+package com.sun.identity.console.reststs.model;
+
+import com.iplanet.sso.SSOException;
+import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.console.base.model.AMAdminConstants;
+import com.sun.identity.console.base.model.AMConsoleException;
+import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
+import com.sun.identity.console.base.model.AMSystemConfig;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.IOUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+
+/**
+ * @see com.sun.identity.console.reststs.model.RestSTSModel
+ * This class extends the AMServiceProfileModelImpl because this class provides functionality for reading values corresponding
+ * to propertySheets.
+ *
+ */
+public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestSTSModel {
+    public RestSTSModelImpl(HttpServletRequest req, Map map) throws AMConsoleException {
+        super(req, AMAdminConstants.REST_STS_SERVICE, map);
+    }
+
+    public Set<String> getPublishedInstances(String realm) throws AMConsoleException {
+        try {
+            ServiceConfig baseService = new ServiceConfigManager(AMAdminConstants.REST_STS_SERVICE,
+                    getUserSSOToken()).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                return baseService.getSubConfigNames();
+            } else {
+                return Collections.EMPTY_SET;
+            }
+        } catch (SMSException e) {
+            throw new AMConsoleException(e);
+        } catch (SSOException e) {
+            throw new AMConsoleException(e);
+        }
+    }
+
+    public void deleteInstances(Set<String> instanceNames) throws AMConsoleException {
+        for (String instanceName : instanceNames) {
+            try {
+                RestSTSModelResponse response = deleteInstance(instanceName);
+                if (!response.isSuccessful()) {
+                    throw new AMConsoleException(response.getMessage());
+                }
+            } catch (IOException e) {
+                throw new AMConsoleException(e);
+            }
+        }
+    }
+
+    public RestSTSModelResponse createInstance(Map<String, Set<String>> configurationState, String realm) throws AMConsoleException {
+        addProgrammaticConfigurationState(configurationState, realm);
+        JsonValue invocationJson = createInstanceInvocationState(configurationState);
+        try {
+            return invokeRestSTSInstancePublish(invocationJson.toString());
+        } catch (IOException e) {
+            throw new AMConsoleException(e);
+        }
+    }
+
+    public RestSTSModelResponse updateInstance(Map<String, Set<String>> configurationState, String realm, String instanceName) throws AMConsoleException {
+        addProgrammaticConfigurationState(configurationState, realm);
+        JsonValue invocationJson = createInstanceInvocationState(configurationState);
+        try {
+            return invokeRestSTSInstanceUpdate(invocationJson.toString(), instanceName);
+        } catch (IOException e) {
+            throw new AMConsoleException(e);
+        }
+    }
+
+    public Map<String, Set<String>> getInstanceState(String realm, String instanceName) throws AMConsoleException {
+        try {
+            ServiceConfig baseService = new ServiceConfigManager(AMAdminConstants.REST_STS_SERVICE,
+                    getUserSSOToken()).getOrganizationConfig(realm, null);
+            if (baseService != null) {
+                ServiceConfig serviceConfig = baseService.getSubConfig(instanceName);
+                if (serviceConfig != null) {
+                    return serviceConfig.getAttributes();
+                } else {
+                    return Collections.EMPTY_MAP;
+                }
+            } else {
+                return Collections.EMPTY_MAP;
+            }
+        } catch (SMSException e) {
+            throw new AMConsoleException(e);
+        } catch (SSOException e) {
+            throw new AMConsoleException(e);
+        }
+    }
+
+    public RestSTSModelResponse validateConfigurationState(Map<String, Set<String>> configurationState) {
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_TOKEN_LIFETIME))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.token.lifetime.message"));
+        }
+
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.deployment.url.message"));
+        } else {
+            String urlElement = configurationState.get(SharedSTSConstants.DEPLOYMENT_URL_ELEMENT).iterator().next();
+            if (urlElement.contains(SharedSTSConstants.FORWARD_SLASH)) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.deployment.url.content.message"));
+            }
+        }
+
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ISSUER_NAME))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.issuername.message"));
+        }
+
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.KEYSTORE_FILE_NAME))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.filename.message"));
+        }
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.KEYSTORE_PASSWORD))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.password.message"));
+        }
+        if ("true".equalsIgnoreCase(configurationState.get(SharedSTSConstants.SAML2_SIGN_ASSERTION).iterator().next())) {
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SIGNATURE_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.signature.keyalias.message"));
+            }
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SIGNATURE_KEY_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.signature.keypassword.message"));
+            }
+        }
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ENCRYPTION_KEY_ALIAS))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.encryption.keyalias.message"));
+        }
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ENCRYPTION_KEY_PASSWORD))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.encryption.keypassword.message"));
+        }
+
+        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.tokentransforms.message"));
+        }
+
+        return RestSTSModelResponse.success();
+    }
+
+    /*
+    Add the url corresponding to the am deployment, and the realm, as this information does not have to be solicited from the user.
+     */
+    private void addProgrammaticConfigurationState(Map<String, Set<String>> configurationState, String realm) {
+        configurationState.put(SharedSTSConstants.AM_DEPLOYMENT_URL, CollectionUtils.asSet(getAMDeploymentUrl()));
+        configurationState.put(SharedSTSConstants.DEPLOYMENT_REALM, CollectionUtils.asSet(realm));
+    }
+
+    private JsonValue createInstanceInvocationState(Map<String, Set<String>> configurationState) {
+        JsonValue propertiesMap = new JsonValue(marshalSetValuesToListValues(configurationState));
+        return json(object(
+                field(SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT, SharedSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN),
+                field(SharedSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE, propertiesMap)));
+    }
+
+    private String getSuccessMessage(HttpURLConnection connection) throws IOException {
+        return readInputStream(connection.getInputStream());
+    }
+
+    private String getErrorMessage(HttpURLConnection connection) throws IOException {
+        if (connection.getErrorStream() != null) {
+            return readInputStream(connection.getErrorStream());
+        } else {
+            return readInputStream(connection.getInputStream());
+        }
+    }
+
+    private String readInputStream(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            return "Empty error stream";
+        } else {
+            return IOUtils.readStream(inputStream);
+        }
+    }
+    private String getRestSTSInstanceDeletionUrl(String instanceId) {
+        String processedInstanceId = instanceId;
+        if (processedInstanceId.startsWith(SharedSTSConstants.FORWARD_SLASH)) {
+            processedInstanceId = processedInstanceId.substring(1);
+        }
+        return getRestSTSPublishEndpointUrl() + SharedSTSConstants.FORWARD_SLASH + processedInstanceId;
+    }
+
+    private String getRestSTSInstanceUpdateUrl(String instanceId) {
+        return getRestSTSInstanceDeletionUrl(instanceId);
+    }
+
+    private String getRestSTSInstanceCreationUrl() {
+        return getRestSTSPublishEndpointUrl() + SharedSTSConstants.REST_PUBLISH_SERVICE_CREATE_ACTION_URL_ELEMENT;
+    }
+
+    private String getRestSTSPublishEndpointUrl() {
+        return getAMDeploymentUrl() + SharedSTSConstants.REST_PUBLISH_SERVICE_URL_ELEMENT;
+    }
+
+    private String getAMDeploymentUrl() {
+        return AMSystemConfig.serverURL + AMSystemConfig.serverDeploymentURI;
+    }
+
+    /*
+    Currently, JsonValue#toString will only create a json array for elements which are lists. If I want the
+    Map<String, Set<String>> returned by this.getValues() to marshal to json correctly using JsonValue#toString(), I
+    need to transform the Map<String, Set<String>> to a Map<String, List<String>>.
+     */
+    private Map<String, List<String>> marshalSetValuesToListValues(Map<String, Set<String>> smsMap) {
+        Map<String, List<String>> listMap = new HashMap<String, List<String>>();
+        for (Map.Entry<String, Set<String>> entry : smsMap.entrySet()) {
+            List<String> list = new ArrayList<String>(entry.getValue().size());
+            list.addAll(entry.getValue());
+            listMap.put(entry.getKey(), list);
+        }
+        return listMap;
+    }
+
+    private boolean isNullOrEmpty(Set<String> set) {
+        return ((set == null) || set.isEmpty());
+    }
+
+    private RestSTSModelResponse deleteInstance(String instanceId) throws IOException {
+        return invokeRestSTSInstanceDeletion(getRestSTSInstanceDeletionUrl(instanceId));
+    }
+
+    private RestSTSModelResponse invokeRestSTSInstancePublish(String invocationPayload) throws IOException {
+        URL url = new URL(getRestSTSInstanceCreationUrl());
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+        writer.write(invocationPayload);
+        writer.close();
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+            return RestSTSModelResponse.success(getSuccessMessage(connection));
+        } else {
+            return RestSTSModelResponse.failure(getErrorMessage(connection));
+        }
+    }
+
+    private RestSTSModelResponse invokeRestSTSInstanceDeletion(String deletionUrl) throws IOException {
+        URL url = new URL(deletionUrl);
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
+        connection.setDoOutput(true);
+        connection.setRequestMethod("DELETE");
+        connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.connect();
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return RestSTSModelResponse.success(getSuccessMessage(connection));
+        } else {
+            return RestSTSModelResponse.failure(getErrorMessage(connection));
+        }
+    }
+
+    private RestSTSModelResponse invokeRestSTSInstanceUpdate(String invocationPayload, String instanceId) throws IOException {
+        URL url = new URL(getRestSTSInstanceUpdateUrl(instanceId));
+        HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
+        connection.setDoOutput(true);
+        connection.setRequestMethod("PUT");
+        connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+        writer.write(invocationPayload);
+        writer.close();
+
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return RestSTSModelResponse.success(getSuccessMessage(connection));
+        } else {
+            return RestSTSModelResponse.failure(getErrorMessage(connection));
+        }
+    }
+}

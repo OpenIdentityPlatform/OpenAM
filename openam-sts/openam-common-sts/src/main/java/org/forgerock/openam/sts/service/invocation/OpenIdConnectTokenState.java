@@ -18,6 +18,7 @@ package org.forgerock.openam.sts.service.invocation;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdTokenMarshaller;
 import org.forgerock.util.Reject;
@@ -78,11 +79,11 @@ public class OpenIdConnectTokenState {
     }
 
     public JsonValue toJson() throws TokenMarshalException {
-        return new OpenIdConnectIdTokenMarshaller().toJson(openIdConnectIdToken);
+        return new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl()).toJson(openIdConnectIdToken);
     }
 
     public static OpenIdConnectTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
-        OpenIdConnectIdToken idToken = new OpenIdConnectIdTokenMarshaller().fromJson(jsonValue);
+        OpenIdConnectIdToken idToken = new OpenIdConnectIdTokenMarshaller(new XMLUtilitiesImpl()).fromJson(jsonValue);
         return OpenIdConnectTokenState.builder().tokenValue(idToken.getTokenValue()).build();
     }
 }

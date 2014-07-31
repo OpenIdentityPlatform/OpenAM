@@ -114,7 +114,7 @@ public class SAML2TokenState {
         }
         SAML2SubjectConfirmation saml2SubjectConfirmation;
         try {
-            saml2SubjectConfirmation = Enum.valueOf(SAML2SubjectConfirmation.class, subjectConfirmationString);
+            saml2SubjectConfirmation = SAML2SubjectConfirmation.valueOf(subjectConfirmationString);
         } catch (IllegalArgumentException e) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Invalid subject confirmation type specified.");
         }

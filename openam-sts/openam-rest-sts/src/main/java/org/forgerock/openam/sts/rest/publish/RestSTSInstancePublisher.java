@@ -51,7 +51,6 @@ public interface RestSTSInstancePublisher {
      * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Rest STS is to be deployed.
      *
-     * Note that the subPath and realm constitute the unique identifier for a given Rest STS instance.
      * @throws STSPublishException
      */
     void removeInstance(String stsId, String realm) throws STSPublishException;
@@ -80,4 +79,25 @@ public interface RestSTSInstancePublisher {
      * previously-published instances. Exceptions encountered re-publishing individual instances will only be logged.
      */
     void republishExistingInstances() throws STSPublishException;
+
+    /**
+     * Determines whether the Rest STS instance identified by the stsId is present in the CREST router.
+     * This method is called by RestSTSPublishServiceRequestHandler#handleUpdate, and by the ServiceListener which
+     * listens for the creation of Rest STS instances on other site servers.
+     *
+     * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
+     *
+     */
+    boolean isInstanceExposedInCrest(String stsId);
+
+    /**
+     * Determines whether the Rest STS instance identified by the stsId is present in the SMS.
+     * This method is called by RestSTSPublishServiceRequestHandler#handleUpdate.
+     *
+     * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
+     * @param realm The realm in which the Rest STS is to be deployed.
+     *
+     * @throws STSPublishException
+     */
+    boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException;
 }

@@ -29,6 +29,7 @@ import java.util.Set;
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.openam.shared.sts.SharedSTSConstants.*;
 
 /**
  * The classes in this package define the objects which must be populated in order to create a fully-configured
@@ -82,18 +83,6 @@ public class KeystoreConfig {
         }
     }
 
-    /*
-    Define the names of fields to aid in json marshalling. Note that these names match the names of the AttributeSchema
-    entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
-    SMS persistence.
-     */
-    private static final String KEYSTORE_FILE_NAME = "keystore-filename";
-    private static final String KEYSTORE_PASSWORD = "keystore-password";
-    private static final String SIGNATURE_KEY_ALIAS = "keystore-signature-key-alias";
-    private static final String ENCRYPTION_KEY_ALIAS = "keystore-encryption-key-alias";
-    private static final String SIGNATURE_KEY_PASSWORD = "keystore-signature-key-password";
-    private static final String ENCRYPTION_KEY_PASSWORD = "keystore-encryption-key-password";
-
     private final String keystoreFileName;
     private final byte[] keystorePassword;
     private final String signatureKeyAlias;
@@ -118,10 +107,6 @@ public class KeystoreConfig {
         Reject.ifNull(encryptionKeyAlias, "Encryption key alias cannot be null");
         Reject.ifNull(signatureKeyPassword, "Signature key password cannot be null");
         Reject.ifNull(encryptionKeyPassword, "Encryption key password cannot be null");
-        /*
-        TODO: it may be that a deployed STS might not need to sign keys. If this is the case(currently TBD),
-        the Reject can be removed, and equals, toString, and hashCode updated to handle the null fields.
-         */
     }
 
     public static KeystoreConfigBuilder builder() {

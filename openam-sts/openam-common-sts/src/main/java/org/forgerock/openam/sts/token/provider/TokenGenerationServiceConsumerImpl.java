@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.token.provider;
 
+import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -24,6 +25,7 @@ import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -57,7 +59,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                                           String serviceProviderAssertionConsumerServiceUrl,
                                           String authnContextClassRef) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2Elements(
+                buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.BEARER,
                         authnContextClassRef,
                         stsInstanceId,
@@ -72,7 +74,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                                                  String realm,
                                                  String authnContextClassRef) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2Elements(
+                buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.SENDER_VOUCHES,
                         authnContextClassRef,
                         stsInstanceId,
@@ -87,7 +89,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                                                String authnContextClassRef,
                                                ProofTokenState proofTokenState) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
-                buildCommonSaml2Elements(
+                buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.HOLDER_OF_KEY,
                         authnContextClassRef,
                         stsInstanceId,
@@ -97,11 +99,11 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
         return makeInvocation(invocationStateBuilder.build().toJson().toString());
     }
 
-    private TokenGenerationServiceInvocationStateBuilder buildCommonSaml2Elements(SAML2SubjectConfirmation subjectConfirmation,
-                                                                                  String authnContextClassRef,
-                                                                                  String stsInstanceId,
-                                                                                  String realm,
-                                                                                  String ssoTokenString) {
+    private TokenGenerationServiceInvocationStateBuilder buildCommonSaml2InvocationState(SAML2SubjectConfirmation subjectConfirmation,
+                                                                                         String authnContextClassRef,
+                                                                                         String stsInstanceId,
+                                                                                         String realm,
+                                                                                         String ssoTokenString) {
         return TokenGenerationServiceInvocationState.builder()
                 .tokenType(TokenType.SAML2)
                 .saml2SubjectConfirmation(subjectConfirmation)
@@ -131,19 +133,16 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
             This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
             org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
             for details.
-            TODO: think about using the JsonValueBuilder to avoid new ObjectMapper creation with every invocation.
         */
-        Object responseContent;
+        JsonValue responseContent;
         try {
-            org.codehaus.jackson.JsonParser parser =
-                    new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(response);
-            responseContent = parser.readValueAs(Object.class);
-        } catch (IOException e) {
+            responseContent = JsonValueBuilder.toJsonValue(response);
+        } catch (JsonException e) {
             throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "Could not map the response from the TokenGenerationService to a json object. The response: "
                             + response + "; The exception: " + e);
         }
-        JsonValue assertionJson = new JsonValue(responseContent).get(AMSTSConstants.ISSUED_TOKEN);
+        JsonValue assertionJson = responseContent.get(AMSTSConstants.ISSUED_TOKEN);
         if (assertionJson.isNull() || !assertionJson.isString()) {
             throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "The json response returned from the TokenGenerationService did not have " +

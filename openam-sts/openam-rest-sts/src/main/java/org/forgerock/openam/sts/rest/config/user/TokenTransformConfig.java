@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.util.Reject;
 
@@ -35,7 +36,7 @@ public class TokenTransformConfig {
     /*
     Must be same as the delimiter used in the supported-token-transforms AttributeSchema defined in restSTS.xml.
      */
-    private static final String DELIMETER = ";";
+    private static final String DELIMETER = AMSTSConstants.PIPE;
     private final TokenType inputTokenType;
     private final TokenType outputTokenType;
     private final boolean invalidateInterimOpenAMSession;

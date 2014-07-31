@@ -28,7 +28,6 @@ import org.forgerock.openam.sts.XmlMarshaller;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
@@ -43,12 +42,6 @@ import static org.forgerock.json.fluent.JsonValue.json;
  Implements the json and xml marshalling for OpenAMSessionToken instances.
  */
 public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessionToken>, XmlMarshaller<OpenAMSessionToken> {
-
-    @Inject
-    public OpenAMSessionTokenMarshaller() {
-
-    }
-
     public OpenAMSessionToken fromJson(JsonValue jsonValue) throws TokenMarshalException {
         if (jsonValue.get(AMSTSConstants.TOKEN_TYPE_KEY).isNull()) {
             throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, "passed-in jsonValue does not have " +
@@ -83,7 +76,7 @@ public class OpenAMSessionTokenMarshaller implements JsonMarshaller<OpenAMSessio
             }
             return new OpenAMSessionToken(sessionId);
         } else {
-            String tokenString = null;
+            String tokenString;
             try {
                 Transformer transformer = XMLUtils.newTransformer();
                 StreamResult res =  new StreamResult(new ByteArrayOutputStream());

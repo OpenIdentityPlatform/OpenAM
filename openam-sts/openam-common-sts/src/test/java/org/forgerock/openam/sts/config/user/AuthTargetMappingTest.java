@@ -27,15 +27,21 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNull;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class AuthTargetMappingTest {
     private static final String USERNAME = "username";
     private static final String X509 = "X509";
+
+    private static final String MAP_ENTRY_ONE = "USERNAME|service|ldapService";
+    private static final String MAP_ENTRY_TWO = "OPENIDCONNECT|module|oidc|oidc_id_token_auth_target_header_key=oidc_id_token";
     @Test
     public void testEquals() {
         AuthTargetMapping mapping1 = AuthTargetMapping
@@ -211,6 +217,23 @@ public class AuthTargetMappingTest {
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         assertEquals(mapping, AuthTargetMapping.marshalFromAttributeMap(mapping.marshalToAttributeMap()));
+    }
+
+    @Test
+    public void testAttributeMappingFromMap() {
+        Set<String> mappings = new LinkedHashSet<String>();
+        mappings.add(MAP_ENTRY_ONE);
+        mappings.add(MAP_ENTRY_TWO);
+
+        Map<String, Set<String>> attributeMap = new HashMap<String, Set<String>>();
+        attributeMap.put(AuthTargetMapping.AUTH_TARGET_MAPPINGS, mappings);
+
+        AuthTargetMapping authTargetMapping = AuthTargetMapping.marshalFromAttributeMap(attributeMap);
+        Map<String, Set<String>> reconstitutedMap = authTargetMapping.marshalToAttributeMap();
+        Set<String> reconstitutedMappings = reconstitutedMap.get(AuthTargetMapping.AUTH_TARGET_MAPPINGS);
+        for (String entry : mappings) {
+            assertThat(reconstitutedMappings).contains(entry);
+        }
     }
 
     private Map<String, String> buildContext() {

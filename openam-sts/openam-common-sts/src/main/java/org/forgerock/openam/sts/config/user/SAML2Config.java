@@ -19,6 +19,7 @@ package org.forgerock.openam.sts.config.user;
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
 
@@ -46,7 +47,7 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * TODO: do I want a name-qualifier in addition to a nameIdFormat?
  */
 public class SAML2Config {
-    private static final String BAR = "|";
+    private static final String EQUALS = "=";
     public static class SAML2ConfigBuilder {
         /*
         use the ws-security constant, instead of the SAML2Constants defined in openam-federation, as this dependency
@@ -165,7 +166,7 @@ public class SAML2Config {
      */
     private static final String NAME_ID_FORMAT = "saml2-name-id-format";
     private static final String ATTRIBUTE_MAP = "saml2-attribute-map";
-    private static final String TOKEN_LIFETIME = "saml2-token-lifetime-seconds";
+    private static final String TOKEN_LIFETIME = SharedSTSConstants.SAML2_TOKEN_LIFETIME;
     private static final String AUDIENCES = "saml2-audiences";
     private static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
     private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
@@ -176,7 +177,7 @@ public class SAML2Config {
     private static final String CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS = "saml2-custom-authn-context-mapper-class-name";
     private static final String SIGNATURE_ALGORITHM = "saml2-signature-algorithm";
     private static final String CANONICALIZATION_ALGORITHM = "saml2-canonicalization-algorithm";
-    private static final String SIGN_ASSERTION = "saml2-sign-assertion";
+    private static final String SIGN_ASSERTION = SharedSTSConstants.SAML2_SIGN_ASSERTION;
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
@@ -441,7 +442,7 @@ public class SAML2Config {
             Set<String> attributeValues = new LinkedHashSet<String>();
             finalMap.put(ATTRIBUTE_MAP, attributeValues);
             for (Map.Entry<String, String> entry : ((Map<String, String>)attributesObject).entrySet()) {
-                attributeValues.add(entry.getKey() + BAR + entry.getValue());
+                attributeValues.add(entry.getKey() + EQUALS + entry.getValue());
             }
         } else {
             throw new IllegalStateException("Type corresponding to " + ATTRIBUTE_MAP + " key unexpected. Type: "
@@ -483,7 +484,7 @@ public class SAML2Config {
         jsonAttributes.remove(ATTRIBUTE_MAP);
         Map<String, Object> jsonAttributeMap = new LinkedHashMap<String, Object>();
         for (String entry : attributes) {
-            StringTokenizer st = new StringTokenizer(entry, BAR);
+            StringTokenizer st = new StringTokenizer(entry, EQUALS);
             jsonAttributeMap.put(st.nextToken(), st.nextToken());
         }
         jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));

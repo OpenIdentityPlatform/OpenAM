@@ -22,12 +22,12 @@ import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -43,17 +43,18 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * Responsible for marshalling OpenIdConnectIdToken instances to and from json and xml.
  */
 public class OpenIdConnectIdTokenMarshaller implements XmlMarshaller<OpenIdConnectIdToken>, JsonMarshaller<OpenIdConnectIdToken> {
+    private final XMLUtilities xmlUtilities;
     @Inject
-    public OpenIdConnectIdTokenMarshaller() {}
+    public OpenIdConnectIdTokenMarshaller(XMLUtilities xmlUtilities) {
+        this.xmlUtilities = xmlUtilities;
+    }
 
-    @Override
     public JsonValue toJson(OpenIdConnectIdToken idToken) {
         return json(object(
                 field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.OPENIDCONNECT.name()),
                 field(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY, idToken.getTokenValue())));
     }
 
-    @Override
     public OpenIdConnectIdToken fromJson(JsonValue json) throws TokenMarshalException {
         try {
             return new OpenIdConnectIdToken(json.get(AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_KEY).asString());
@@ -63,11 +64,10 @@ public class OpenIdConnectIdTokenMarshaller implements XmlMarshaller<OpenIdConne
         }
     }
 
-    @Override
     public Element toXml(OpenIdConnectIdToken idToken) throws TokenMarshalException {
         Document document;
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            document = xmlUtilities.newSafeDocument(false);
         } catch (ParserConfigurationException e) {
             throw new TokenMarshalException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
@@ -77,7 +77,6 @@ public class OpenIdConnectIdTokenMarshaller implements XmlMarshaller<OpenIdConne
         return rootElement;
     }
 
-    @Override
     public OpenIdConnectIdToken fromXml(Element element) throws TokenMarshalException {
         if (AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_ELEMENT_NAMESPACE.equals(element.getNamespaceURI())) {
             try {

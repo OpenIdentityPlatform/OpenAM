@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.util.Reject;
 
@@ -45,9 +46,9 @@ public class STSInstanceConfig {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    protected static final String AM_DEPLOYMENT_URL = "am-deployment-url";
+    protected static final String AM_DEPLOYMENT_URL = SharedSTSConstants.AM_DEPLOYMENT_URL;
     protected static final String KEYSTORE_CONFIG =  "keystore-config";
-    protected static final String ISSUER_NAME = "issuer-name";
+    protected static final String ISSUER_NAME = SharedSTSConstants.ISSUER_NAME;
     protected static final String SAML2_CONFIG = "saml2-config";
 
     protected final String amDeploymentUrl;

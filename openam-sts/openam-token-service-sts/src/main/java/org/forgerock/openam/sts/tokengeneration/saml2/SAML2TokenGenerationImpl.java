@@ -229,6 +229,7 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
 
     private String getSignatureAlgorithm(SAML2Config sam2Config, PrivateKey privateKey) throws TokenCreationException {
         if (sam2Config.getSignatureAlgorithm() != null) {
+            //TODO: do I want to check if the algorithm is supported?
             return sam2Config.getSignatureAlgorithm();
         }
         if (DSA_PRIVATE_KEY_ALGORITHM.equals(privateKey.getAlgorithm())) {

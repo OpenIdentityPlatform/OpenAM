@@ -97,7 +97,6 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         tokenTransforms = Collections.unmodifiableSet(interimTransforms);
     }
 
-    @Override
     public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext, SecurityContext securityContext)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         TokenType inputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getInputTokenState());

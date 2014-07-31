@@ -90,17 +90,10 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         complexities by checking my HashMap if an entry is present, as I need to maintain a reference to all
         published Routes in order to be able to remove them.
          */
-        String deploymentSubPath = instanceConfig.getDeploymentSubPath();
-        if (deploymentSubPath.endsWith(AMSTSConstants.FORWARD_SLASH)) {
-            deploymentSubPath = deploymentSubPath.substring(0, deploymentSubPath.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
-        }
-
-        if (deploymentSubPath.startsWith(AMSTSConstants.FORWARD_SLASH)) {
-            deploymentSubPath = deploymentSubPath.substring(1, deploymentSubPath.length());
-        }
+        String deploymentSubPath = normalizeDeploymentSubPath(instanceConfig.getDeploymentSubPath());
 
         if (publishedRoutes.containsKey(deploymentSubPath)) {
-            throw new STSPublishException(ResourceException.BAD_REQUEST, "A rest-sts instance at sub-path " +
+            throw new STSPublishException(ResourceException.CONFLICT, "A rest-sts instance at sub-path " +
                     deploymentSubPath + " has already been published.");
         }
         Route route = router.addRoute(deploymentSubPath, new RestSTSService(restSTSInstance, logger));
@@ -178,4 +171,24 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
             }
         }
     }
+
+    public boolean isInstanceExposedInCrest(String stsId) {
+        return publishedRoutes.get(normalizeDeploymentSubPath(stsId)) != null;
+    }
+
+    public boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException {
+        return persistentStore.isInstancePresent(stsId, realm);
+    }
+
+    private String normalizeDeploymentSubPath(String deploymentSubPath) {
+        if (deploymentSubPath.endsWith(AMSTSConstants.FORWARD_SLASH)) {
+            return deploymentSubPath.substring(0, deploymentSubPath.lastIndexOf(AMSTSConstants.FORWARD_SLASH));
+        }
+
+        if (deploymentSubPath.startsWith(AMSTSConstants.FORWARD_SLASH)) {
+            return deploymentSubPath.substring(1, deploymentSubPath.length());
+        }
+        return deploymentSubPath;
+    }
+
 }

@@ -24,6 +24,8 @@ import org.apache.cxf.sts.request.ReceivedToken;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
+import org.forgerock.openam.sts.XMLUtilities;
+import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
@@ -60,6 +62,7 @@ public class TokenRequestMarshallerImplTest {
             bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
             bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(TokenRequestMarshaller.class).to(TokenRequestMarshallerImpl.class);
+            bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
         }
 
         @Provides
