@@ -2667,7 +2667,11 @@ public class LoginState {
                 if (tokenSet.isEmpty()) {
                     debug.message("tokenset empty");
                     throw new AuthException(AMAuthErrorCode.AUTH_ERROR, null);
-                } else if (tokenSet.size() == 1) {  // for level , module
+                } else if (tokenSet.size() == 1) {
+                    if (isAccountLocked(token)) {
+                        debug.message(String.format("User account \"{0}\" locked", token));
+                        throw new AuthException(AMAuthErrorCode.AUTH_USER_LOCKED, null);
+                    }
                     debug.message("tokenset size is 1");
                     gotUserProfile = getCreateUserProfile(true);
                     if (!userEnabled) {
@@ -4417,7 +4421,7 @@ public class LoginState {
 
     public boolean isAccountLocked(String username) {
         AMAccountLockout amAccountLockout = new AMAccountLockout(this);
-        return amAccountLockout.isLockedOut(username);
+        return amAccountLockout.isLockedOut(username) || amAccountLockout.isAccountLocked(username);
     }
     
     /**
