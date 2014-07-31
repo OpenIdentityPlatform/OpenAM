@@ -132,10 +132,9 @@
         <jackson.version>2.1.2</jackson.version>
         <guice.version>3.0</guice.version>
         <forgerock.guice.version>1.0.1</forgerock.guice.version>
-        <slf4j.api.version>1.7.5</slf4j.api.version>
+        <slf4j.version>1.7.5</slf4j.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
-        <cxf-services-sts-core.version>2.7.8</cxf-services-sts-core.version>
-        <cxf-rt-ws-security.version>2.7.8</cxf-rt-ws-security.version>
+        <cxf.version>2.7.8</cxf.version>
         <!-- Same version as required by cxf-rt-ws-security. 2.x release introduced major changes -->
         <wss4j.version>1.6.13</wss4j.version>
         <click.version>2.3.0</click.version>
@@ -1275,13 +1274,18 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.api.version}</version>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-nop</artifactId>
-                <version>${slf4j.api.version}</version>
+                <version>${slf4j.version}</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -1730,12 +1734,37 @@
             <dependency>
                 <groupId>org.apache.cxf.services.sts</groupId>
                 <artifactId>cxf-services-sts-core</artifactId>
-                <version>${cxf-services-sts-core.version}</version>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-bindings-soap</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http-jetty</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-ws-policy</artifactId>
+                <version>${cxf.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-ws-security</artifactId>
-                <version>${cxf-rt-ws-security.version}</version>
+                <version>${cxf.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ws.security</groupId>
