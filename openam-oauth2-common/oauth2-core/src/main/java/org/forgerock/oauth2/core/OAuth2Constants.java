@@ -232,7 +232,7 @@ public class OAuth2Constants {
     /**
      * grant_type Registry
      */
-    public class TokeEndpoint {
+    public class TokenEndpoint {
         /**
          * @see <a
          *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.1.3">4.1.3.

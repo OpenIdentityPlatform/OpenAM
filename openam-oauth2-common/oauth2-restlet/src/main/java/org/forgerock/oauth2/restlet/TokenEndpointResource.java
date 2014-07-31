@@ -23,7 +23,6 @@ import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Request;
 import org.restlet.engine.header.Header;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -44,18 +43,21 @@ public class TokenEndpointResource extends ServerResource {
 
     private final OAuth2RequestFactory<Request> requestFactory;
     private final AccessTokenService accessTokenService;
+    private final ExceptionHandler exceptionHandler;
 
     /**
      * Constructs a new instance of the TokenEndpointResource.
      *
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param accessTokenService An instance of the AccessTokenService.
+     * @param exceptionHandler An instance of the ExceptionHandler.
      */
     @Inject
-    public TokenEndpointResource(OAuth2RequestFactory<Request> requestFactory,
-            AccessTokenService accessTokenService) {
+    public TokenEndpointResource(OAuth2RequestFactory<Request> requestFactory, AccessTokenService accessTokenService,
+            ExceptionHandler exceptionHandler) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
+        this.exceptionHandler = exceptionHandler;
     }
 
     /**
@@ -103,14 +105,6 @@ public class TokenEndpointResource extends ServerResource {
      */
     @Override
     protected void doCatch(Throwable throwable) {
-
-        if (throwable.getCause() instanceof OAuth2RestletException) {
-            final OAuth2RestletException e = (OAuth2RestletException) throwable.getCause();
-            doError(e.getStatus());
-            getResponse().setEntity(new JacksonRepresentation<Map>(e.asMap()));
-        } else {
-            final ServerException serverException = new ServerException(throwable);
-            doCatch(serverException);
-        }
+        exceptionHandler.handle(throwable, getResponse());
     }
 }

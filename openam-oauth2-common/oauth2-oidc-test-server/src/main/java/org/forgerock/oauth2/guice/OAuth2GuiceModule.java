@@ -42,7 +42,6 @@ import org.forgerock.oauth2.core.ClientCredentialsRequestValidator;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidatorImpl;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.GrantTypeHandler;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.PasswordCredentialsGrantTypeHandler;
@@ -54,10 +53,8 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
-import org.forgerock.oauth2.restlet.RefreshTokenResource;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
-import org.forgerock.oauth2.restlet.TokenEndpointResource;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.ClientDAOImpl;
 import org.forgerock.openidconnect.OpenIDConnectProvider;
@@ -73,7 +70,6 @@ import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.UserInfoService;
 import org.forgerock.openidconnect.UserInfoServiceImpl;
 import org.restlet.Request;
-import org.restlet.resource.ServerResource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -90,7 +86,7 @@ public class OAuth2GuiceModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-        bind(new TypeLiteral<OAuth2RequestFactory<Request>>(){}).to(RestletOAuth2RequestFactory.class);
+        bind(new TypeLiteral<OAuth2RequestFactory<Request>>() { }).to(RestletOAuth2RequestFactory.class);
         bind(ResourceOwnerConsentVerifier.class).to(OpenIdResourceOwnerConsentVerifier.class);
         bind(ClientRegistrationStore.class).to(OpenIdConnectClientRegistrationStoreImpl.class);
         bind(OpenIdConnectClientRegistrationStore.class).to(OpenIdConnectClientRegistrationStoreImpl.class);
@@ -127,17 +123,12 @@ public class OAuth2GuiceModule extends AbstractModule {
         passwordCredentialsRequestValidators.addBinding().to(PasswordCredentialsRequestValidatorImpl.class);
 
 
-        final MapBinder<String, GrantTypeHandler> grantTypeHandlers = MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
+        final MapBinder<String, GrantTypeHandler> grantTypeHandlers =
+                MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
         grantTypeHandlers.addBinding("client_credentials").to(ClientCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("password").to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("authorization_code").to(AuthorizationCodeGrantTypeHandler.class);
 
-
-        final MapBinder<String, ServerResource> oauth2Endpoint = MapBinder.newMapBinder(binder(), String.class, ServerResource.class);
-        oauth2Endpoint.addBinding(OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE).to(TokenEndpointResource.class);
-        oauth2Endpoint.addBinding(OAuth2Constants.TokeEndpoint.REFRESH_TOKEN).to(RefreshTokenResource.class);
-        oauth2Endpoint.addBinding(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS).to(TokenEndpointResource.class);
-        oauth2Endpoint.addBinding(OAuth2Constants.TokeEndpoint.PASSWORD).to(TokenEndpointResource.class);
     }
 
     @Inject

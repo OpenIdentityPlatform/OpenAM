@@ -44,7 +44,7 @@ public class OAuth2FlowFinder extends Finder {
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
     private final OAuth2RequestFactory<Request> requestFactory;
-    private final Map<String, ServerResource> endpointClasses;
+    private final Map<String, Finder> endpointClasses;
     private final ExceptionHandler exceptionHandler;
 
     /**
@@ -52,20 +52,21 @@ public class OAuth2FlowFinder extends Finder {
      *
      * @param context The Restlet context.
      * @param requestFactory An instance of the OAuth2RequestFactory.
+     * @param exceptionHandler An instance of the ExceptionHandler.
      * @param endpointClasses The endpoint handlers for the OAuth2 token endpoints.
      */
     public OAuth2FlowFinder(Context context, OAuth2RequestFactory<Request> requestFactory,
-            ExceptionHandler exceptionHandler, Map<String, ServerResource> endpointClasses) {
+            ExceptionHandler exceptionHandler, Map<String, Finder> endpointClasses) {
         super(context);
         this.requestFactory = requestFactory;
         this.exceptionHandler = exceptionHandler;
-        this.endpointClasses = new ConcurrentHashMap<String, ServerResource>(endpointClasses);
+        this.endpointClasses = new ConcurrentHashMap<String, Finder>(endpointClasses);
     }
 
     /**
      * Creates a new instance of the handler for the correct OAuth2 endpoint based from the grant type specified in
      * the requests query parameters.
-     * 
+     *
      * @param request {@inheritDoc}
      * @param response {@inheritDoc}
      * @return {@inheritDoc}
@@ -80,14 +81,15 @@ public class OAuth2FlowFinder extends Finder {
             return new ErrorResource(exceptionHandler, new InvalidRequestException("Grant type is not set"));
         }
 
-        ServerResource resource = endpointClasses.get(grantType);
-        if (resource == null) {
+        Finder finder = endpointClasses.get(grantType);
+        if (finder == null) {
             logger.error("Unsupported grant type: Type is not supported: " + grantType);
-            return new ErrorResource(exceptionHandler, new UnsupportedGrantTypeException("Grant type is not supported: " + grantType));
+            return new ErrorResource(exceptionHandler,
+                    new UnsupportedGrantTypeException("Grant type is not supported: " + grantType));
         }
 
         try {
-            return resource;
+            return finder.create(request, response);
         } catch (Exception e) {
             logger.warn("Exception while instantiating the target server resource.", e);
             return new ErrorResource(exceptionHandler, new ServerException(e.getMessage()));

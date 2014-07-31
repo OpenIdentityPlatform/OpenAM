@@ -138,7 +138,7 @@ public class TokenResource implements CollectionResourceProvider {
                     grantType = grantTypes.iterator().next();
                 }
                 
-                if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS)) {
+                if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
                     tokenStore.delete(resourceId);
                 } else {
                     Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
@@ -261,7 +261,7 @@ public class TokenResource implements CollectionResourceProvider {
                 grantType = grantTypes.iterator().next();
             }
             
-            if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokeEndpoint.CLIENT_CREDENTIALS)) {
+            if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
             	resource = new Resource(OAuth2Constants.Params.ID, "1", response);
             	handler.handleResult(resource);
             } else {
