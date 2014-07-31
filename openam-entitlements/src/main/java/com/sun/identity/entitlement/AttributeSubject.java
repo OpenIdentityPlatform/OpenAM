@@ -43,6 +43,13 @@ public class AttributeSubject implements SubjectImplementation {
 
     /**
      * Constructor
+     */
+    public AttributeSubject() {
+
+    }
+
+    /**
+     * Constructor
      * @param id Id of the attribute
      * @param value Value of the attribute
      */
