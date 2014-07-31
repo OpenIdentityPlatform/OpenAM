@@ -33,10 +33,10 @@ package com.sun.identity.log.handlers;
 
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownPriority;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 public class LoggingThread {
 
@@ -44,24 +44,20 @@ public class LoggingThread {
     private ThreadPool thread;
 
     protected LoggingThread() {
-        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                // Don't load the Debug object in static block as it can
-                // cause issues when doing a container restart.
-                thread = new ThreadPool("LoggingThread", 1, 0, false, Debug.getInstance("amLogging"));
-                shutdownMan.addShutdownListener(
-                    new ShutdownListener() {
-                        public void shutdown() {
-                            thread.shutdown();
-                            instance = null;
-                        }
-                    }, ShutdownPriority.LOWEST
-                );
-            } finally {
-                shutdownMan.releaseLockAndNotify();
-            }
-        }
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+        // Don't load the Debug object in static block as it can
+        // cause issues when doing a container restart.
+        thread = new ThreadPool("LoggingThread", 1, 0, false, Debug.getInstance("amLogging"));
+        shutdownMan.addShutdownListener(
+            new ShutdownListener() {
+                public void shutdown() {
+                    thread.shutdown();
+                    instance = null;
+                }
+            }, ShutdownPriority.LOWEST
+        );
+
     }
 
     public synchronized static LoggingThread getInstance() {

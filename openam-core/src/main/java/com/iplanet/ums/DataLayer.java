@@ -42,8 +42,6 @@ import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.services.ldap.event.EventService;
 import com.iplanet.services.util.I18n;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.ServerInstanceAction;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
@@ -77,6 +75,8 @@ import com.sun.identity.shared.ldap.LDAPSortKey;
 import com.sun.identity.shared.ldap.controls.LDAPProxiedAuthControl;
 import com.sun.identity.shared.ldap.controls.LDAPSortControl;
 import com.sun.identity.shared.ldap.controls.LDAPVirtualListControl;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * DataLayer (A PACKAGE SCOPE CLASS) to access LDAP or other database
@@ -201,8 +201,6 @@ public class DataLayer implements java.io.Serializable {
      *            LDAP host
      * @param port
      *            LDAP port
-     * @param guid
-     *            Identification of an authenticated principal
      * @param pwd
      *            Password for the user
      */
@@ -1474,11 +1472,6 @@ public class DataLayer implements java.io.Serializable {
 
     /**
      * Initialize the pool shared by all DataLayer object(s).
-     * 
-     * @param host
-     *            ldaphost to init the pool from
-     * @param port
-     *            ldapport to init the pool from
      */
     private synchronized void initLdapPool() throws UMSException {
         // Don't do anything if pool is already initialized
@@ -1578,25 +1571,20 @@ public class DataLayer implements java.io.Serializable {
             connOptions.put("referrals", Boolean.valueOf(referrals));
             connOptions.put("searchconstraints", _defaultSearchConstraints);
 
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    _ldapPool = new LDAPConnectionPool("DataLayer", poolMin,
-                        poolMax, hostName, 389, connDN, connPWD, _trialConn,
-                        connOptions);
-                    shutdownMan.addShutdownListener(
-                        new ShutdownListener() {
-                            public void shutdown() {
-                                if (_ldapPool != null) {
-                                    _ldapPool.destroy();
-                                }
-                            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            _ldapPool = new LDAPConnectionPool("DataLayer", poolMin,
+                poolMax, hostName, 389, connDN, connPWD, _trialConn,
+                connOptions);
+            shutdownMan.addShutdownListener(
+                new ShutdownListener() {
+                    public void shutdown() {
+                        if (_ldapPool != null) {
+                            _ldapPool.destroy();
                         }
-                    );
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+                    }
                 }
-            }
+            );
 
         } catch (LDAPException e) {
             debug.error("Exception in DataLayer.initLdapPool:", e);

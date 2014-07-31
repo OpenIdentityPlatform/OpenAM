@@ -16,25 +16,27 @@
 
 package org.forgerock.openam.scripting;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import javax.script.Bindings;
-import javax.script.SimpleBindings;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
+import javax.script.Bindings;
+import javax.script.SimpleBindings;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getGroovyScript;
 import static org.forgerock.openam.scripting.StandardScriptEvaluatorTest.getJavascript;
+import org.forgerock.util.thread.ExecutorServiceFactory;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 
 public class ThreadPoolScriptEvaluatorTest {
@@ -185,5 +187,28 @@ public class ThreadPoolScriptEvaluatorTest {
             return;
         }
 
+    }
+
+    //extended to allow us to mock this out, using a shutdownmanager
+    private class ExtendedExecutorServiceFactory extends ExecutorServiceFactory {
+
+        private ShutdownManager shutdownmanager;
+
+        public ExtendedExecutorServiceFactory(ShutdownManager shutdownManager) {
+            super(shutdownManager);
+            this.shutdownmanager = shutdownManager;
+        }
+
+        protected ShutdownManager getShutdownManager() {
+            return shutdownmanager;
+        }
+
+        private void registerShutdown(final ExecutorService service) {
+            getShutdownManager().addShutdownListener(new ShutdownListener() {
+                public void shutdown() {
+                    service.shutdownNow();
+                }
+            });
+        }
     }
 }

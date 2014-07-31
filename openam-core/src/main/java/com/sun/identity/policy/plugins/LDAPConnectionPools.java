@@ -35,12 +35,13 @@ import com.sun.identity.shared.ldap.*;
 import com.sun.identity.shared.debug.Debug;    
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.ResBundleUtils;
-import java.util.*; 
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
+import java.util.*;
 
 /**
  * Provides a pool of <code>LDAPConnection</code>
@@ -119,31 +120,27 @@ public class LDAPConnectionPools {
                             "minPoolSize=" + minPoolSize +
                             ", maxPoolSize=" + maxPoolSize);
                     }
-                    ShutdownManager shutdownMan = ShutdownManager.getInstance();
-                    if (shutdownMan.acquireValidLock()) {
-                        try {
-                            cPool = new LDAPConnectionPool (host + "-Policy",
-                                minPoolSize, maxPoolSize, ldc);
-                            if (debug.messageEnabled()) {
-                                debug.message(
-                                "LDAPConnectionPools.initConnectionPool(): " +
-                                    " host: " + host);
-                            }
-                            final LDAPConnectionPool finalPool = cPool;
-                            shutdownMan.addShutdownListener(new
-                                ShutdownListener() {
+                    ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
-                                    public void shutdown() {
-                                        if (finalPool != null) {
-                                            finalPool.destroy();
-                                        }
-                                    }
-
-                                });
-                        } finally {
-                            shutdownMan.releaseLockAndNotify();
-                        }
+                    cPool = new LDAPConnectionPool (host + "-Policy",
+                        minPoolSize, maxPoolSize, ldc);
+                    if (debug.messageEnabled()) {
+                        debug.message(
+                        "LDAPConnectionPools.initConnectionPool(): " +
+                            " host: " + host);
                     }
+                    final LDAPConnectionPool finalPool = cPool;
+                    shutdownMan.addShutdownListener(new
+                        ShutdownListener() {
+
+                            public void shutdown() {
+                                if (finalPool != null) {
+                                    finalPool.destroy();
+                                }
+                            }
+
+                        });
+
                     connectionPools.put(host, cPool);
                 }
             }

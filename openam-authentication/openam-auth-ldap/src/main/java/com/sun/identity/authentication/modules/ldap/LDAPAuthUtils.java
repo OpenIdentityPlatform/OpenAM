@@ -33,36 +33,35 @@
 
 package com.sun.identity.authentication.modules.ldap;
 
-import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.nio.charset.Charset;
 import java.security.AccessController;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import org.forgerock.openam.ldap.LDAPURL;
-import static org.forgerock.openam.ldap.LDAPUtils.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.forgerock.openam.ldap.LDAPUtils.convertToLDAPURLs;
+import static org.forgerock.openam.ldap.LDAPUtils.newFailoverConnectionPool;
+import static org.forgerock.openam.utils.CollectionUtils.asList;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
@@ -96,6 +95,7 @@ import org.forgerock.opendj.ldap.responses.BindResult;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
@@ -219,13 +219,11 @@ public class LDAPAuthUtils {
     /**
      * Constructor initializing the basic parameters.
      *
-     * @param configName Unique identifier for this auth module.
      * @param primaryServers List of primary servers.
      * @param secondaryServers List of secondary servers.
      * @param ldapSSL <code>true</code> if it is SSL.
      * @param bundle ResourceBundle to be used for getting localized messages.
      * @param baseDN Directory Base DN.
-     * @param debug Debug object.
      * @throws LDAPUtilException If the provided search base was invalid.
      */
     public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean ldapSSL,
@@ -337,18 +335,12 @@ public class LDAPAuthUtils {
                                     new FailoverLoadBalancingAlgorithm(asList(primaryCf, secondaryCf)));
                         }
 
-                        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-                        if (shutdownMan.acquireValidLock()) {
-                            try {
-                                shutdownMan.addShutdownListener(new ShutdownListener() {
+                        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+                        shutdownMan.addShutdownListener(new ShutdownListener() {
                                     public void shutdown() {
-                                        connFactory.close();
+                            connFactory.close();
                                     }
                                 });
-                            } finally {
-                                shutdownMan.releaseLockAndNotify();
-                            }
-                        }
 
                         connPool = connFactory;
                         connectionPools.put(configName, connPool);

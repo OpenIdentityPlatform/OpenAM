@@ -44,7 +44,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.StringTokenizer;
@@ -96,8 +95,6 @@ import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -112,9 +109,10 @@ import com.sun.identity.idm.common.IdRepoUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.shared.ldap.util.LDAPUtilException;
-import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.SchemaType;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 public class LDAPv3Repo extends IdRepo {
 
@@ -779,30 +777,26 @@ public class LDAPv3Repo extends IdRepo {
                 ldapPort = ldc.getPort();
 
                 // Construct the pool by cloning the successful connection
-                ShutdownManager shutdownMan = ShutdownManager.getInstance();
+                ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
-                if (shutdownMan.acquireValidLock()) {
-                    try {
-                        connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
-                            maxPoolSize, ldapServerList, ldapPort,
-                            ldc.getAuthenticationDN(),
-                                ldc.getAuthenticationPassword(),
-                                ldc, connOptions);
 
-                        // create the shutdown hook
-                        shutdownListener = new ShutdownListener() {
-                            public void shutdown() {
-                                if (connPool != null) {
-                                    connPool.destroy();
-                                }
-                            }
-                        };
-                        // Register the shutdown hook
-                        shutdownMan.addShutdownListener(shutdownListener);
-                    } finally {
-                        shutdownMan.releaseLockAndNotify();
+                connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
+                    maxPoolSize, ldapServerList, ldapPort,
+                    ldc.getAuthenticationDN(),
+                        ldc.getAuthenticationPassword(),
+                        ldc, connOptions);
+
+                // create the shutdown hook
+                shutdownListener = new ShutdownListener() {
+                    public void shutdown() {
+                        if (connPool != null) {
+                            connPool.destroy();
+                        }
                     }
-                }
+                };
+                // Register the shutdown hook
+                shutdownMan.addShutdownListener(shutdownListener);
+
             } catch (LDAPException lex) {
                 int resultCode = lex.getLDAPResultCode();
                 ldapConnError = Integer.toString(resultCode);
@@ -1096,18 +1090,14 @@ public class LDAPv3Repo extends IdRepo {
         removeListener();
         
         if (shutdownListener != null) {
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    shutdownMan.removeShutdownListener(shutdownListener);
-                    shutdownListener = null;                   
-                    if (debug.messageEnabled()) {
-                        debug.message("LDAPv3Repo: removed shutdown listener");
-                    }
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
-                }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            shutdownMan.removeShutdownListener(shutdownListener);
+            shutdownListener = null;
+            if (debug.messageEnabled()) {
+                debug.message("LDAPv3Repo: removed shutdown listener");
             }
+
         }        
         
         reBind = null;

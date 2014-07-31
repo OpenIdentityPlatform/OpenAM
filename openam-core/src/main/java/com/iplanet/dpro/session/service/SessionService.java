@@ -57,8 +57,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.internal.AuthPrincipal;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.HttpURLConnectionManager;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.delegation.DelegationEvaluator;
@@ -139,6 +137,8 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * This class represents a Session Service
@@ -424,22 +424,18 @@ public class SessionService {
         }
 
         // Establish Shutdown Manager.
-        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                threadPool = new ThreadPool("amSession", poolSize, threshold, true,
-                        sessionDebug);
-                shutdownMan.addShutdownListener(
-                        new ShutdownListener() {
-                            public void shutdown() {
-                                threadPool.shutdown();
-                            }
-                        }
-                );
-            } finally {
-                shutdownMan.releaseLockAndNotify();
-            }
-        }
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+        threadPool = new ThreadPool("amSession", poolSize, threshold, true,
+                sessionDebug);
+        shutdownMan.addShutdownListener(
+                new ShutdownListener() {
+                    public void shutdown() {
+                        threadPool.shutdown();
+                    }
+                }
+        );
+
         if (threadPool != null) {
             try {
                 maxSessions = Integer.parseInt(SystemProperties

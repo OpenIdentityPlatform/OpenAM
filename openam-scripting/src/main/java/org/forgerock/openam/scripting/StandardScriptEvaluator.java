@@ -80,6 +80,7 @@ public class StandardScriptEvaluator implements ScriptEvaluator {
      * @throws ScriptException if an error occurs in script execution.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T evaluateScript(final ScriptObject script, final Bindings bindings) throws ScriptException {
         Reject.ifNull(script);
 

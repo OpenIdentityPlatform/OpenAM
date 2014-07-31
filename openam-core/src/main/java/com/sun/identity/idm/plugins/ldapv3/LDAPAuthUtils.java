@@ -35,42 +35,42 @@ package com.sun.identity.idm.plugins.ldapv3;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.LDAPAttribute;
+import com.sun.identity.shared.ldap.LDAPBindRequest;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPControl;
 import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
 import com.sun.identity.shared.ldap.LDAPModificationSet;
+import com.sun.identity.shared.ldap.LDAPModifyRequest;
 import com.sun.identity.shared.ldap.LDAPRebind;
 import com.sun.identity.shared.ldap.LDAPRebindAuth;
 import com.sun.identity.shared.ldap.LDAPReferralException;
 import com.sun.identity.shared.ldap.LDAPRequestParser;
-import com.sun.identity.shared.ldap.LDAPBindRequest;
-import com.sun.identity.shared.ldap.LDAPModifyRequest;
+import com.sun.identity.shared.ldap.LDAPSearchConstraints;
 import com.sun.identity.shared.ldap.LDAPSearchRequest;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
-import com.sun.identity.shared.ldap.LDAPSearchConstraints;
 import com.sun.identity.shared.ldap.controls.LDAPPasswordExpiringControl;
 import com.sun.identity.shared.ldap.factory.JSSESocketFactory;
 import com.sun.identity.shared.ldap.util.LDAPUtilException;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.StringTokenizer;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 public class LDAPAuthUtils {
     private boolean returnUserDN;
@@ -320,24 +320,19 @@ public class LDAPAuthUtils {
                         
                         ldc.connect(hostName, portNumber);
                         ldc.authenticate(verNum, bindingUser, bindingPwd);
-                        ShutdownManager shutdownMan = 
-                            ShutdownManager.getInstance();
-                        if (shutdownMan.acquireValidLock()) {
-                            try {
-                                conPool = new LDAPConnectionPool(key + 
-                                    "-AuthLDAP", min, max, ldc);
-                                final LDAPConnectionPool tempConPool = conPool;
-                                shutdownMan.addShutdownListener(
-                                    new ShutdownListener() {
-                                        public void shutdown() {
-                                            tempConPool.destroy();
-                                        }
-                                    }
-                                );
-                            } finally {
-                                shutdownMan.releaseLockAndNotify();
+                        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+                        conPool = new LDAPConnectionPool(key +
+                            "-AuthLDAP", min, max, ldc);
+                        final LDAPConnectionPool tempConPool = conPool;
+                        shutdownMan.addShutdownListener(
+                            new ShutdownListener() {
+                                public void shutdown() {
+                                    tempConPool.destroy();
+                                }
                             }
-                        }
+                        );
+
                         connectionPools.put(key, conPool);
                         if (aConnectionPoolsStatus != null) {
                             aConnectionPoolsStatus.put(key, STATUS_UP);

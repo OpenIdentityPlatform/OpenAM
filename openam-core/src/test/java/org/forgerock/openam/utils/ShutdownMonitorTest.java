@@ -15,8 +15,8 @@
  */
 package org.forgerock.openam.utils;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManagerWrapper;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.BDDMockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ShutdownMonitorTest {
 
@@ -32,7 +33,7 @@ public class ShutdownMonitorTest {
 
     @BeforeTest
     public void setup() {
-        ShutdownManagerWrapper shutdownManagerWrapper = mock(ShutdownManagerWrapper.class);
+        ShutdownManager shutdownManagerWrapper = mock(ShutdownManager.class);
         ArgumentCaptor<ShutdownListener> captor = ArgumentCaptor.forClass(ShutdownListener.class);
         monitor = new ShutdownMonitor(shutdownManagerWrapper);
         verify(shutdownManagerWrapper).addShutdownListener(captor.capture());

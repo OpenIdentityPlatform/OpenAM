@@ -19,8 +19,8 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
-import com.sun.identity.common.ShutdownManagerWrapper;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,7 +57,7 @@ public class IndexTreeServiceImplTest {
     private IndexChangeManager manager;
     private PrivilegedAction<SSOToken> privilegedAction;
     private ServiceManagementDAO serviceManagementDAO;
-    private ShutdownManagerWrapper shutdownManager;
+    private ShutdownManager shutdownManager;
     private DNWrapper dnMapper;
     private SSOToken ssoToken;
 
@@ -70,7 +70,7 @@ public class IndexTreeServiceImplTest {
         privilegedAction = mock(MockPrivilegedAction.class);
         serviceManagementDAO = mock(ServiceManagementDAO.class);
         dnMapper = mock(DNWrapper.class);
-        shutdownManager = mock(ShutdownManagerWrapper.class);
+        shutdownManager = mock(ShutdownManager.class);
         ssoToken = mock(SSOToken.class);
         excludes = Collections.emptySet();
 

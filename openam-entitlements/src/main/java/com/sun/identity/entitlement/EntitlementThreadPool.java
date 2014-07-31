@@ -32,9 +32,9 @@
 
 package com.sun.identity.entitlement;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * Thread Pool
@@ -45,21 +45,14 @@ public class EntitlementThreadPool implements IThreadPool {
     public EntitlementThreadPool(int size) {
 
         thrdPool = new ThreadPool("entitlementThreadPool", size);
-        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                shutdownMan.addShutdownListener(new ShutdownListener() {
-                    public void shutdown() {
-                        thrdPool.shutdown();
-                        thrdPool = null;
-                    }
-                });
-            } finally {
-                shutdownMan.releaseLockAndNotify();
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+        shutdownMan.addShutdownListener(new ShutdownListener() {
+            public void shutdown() {
+                thrdPool.shutdown();
+                thrdPool = null;
             }
-        }
+        });
     }
-
 
     public void submit(Runnable task) {
 

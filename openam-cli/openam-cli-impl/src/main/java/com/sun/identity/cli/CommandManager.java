@@ -39,7 +39,7 @@ import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.common.ShutdownManager;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import com.sun.identity.log.Logger;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.Bootstrap;
@@ -199,14 +199,8 @@ public class CommandManager {
             exitCode = e.getExitCode();
         } finally {
             destroySSOTokens();
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    shutdownMan.shutdown();
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
-                }
-            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+            shutdownMan.shutdown();
         }
         System.exit(exitCode);
     }

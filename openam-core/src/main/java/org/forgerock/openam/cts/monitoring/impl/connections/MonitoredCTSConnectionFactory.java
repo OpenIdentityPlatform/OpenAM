@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
-import com.sun.identity.common.ShutdownListener;
 import javax.inject.Inject;
 import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
@@ -25,6 +24,7 @@ import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 /**
  * A wrapper for the CTSConnectionFactory which tracks the success/failure

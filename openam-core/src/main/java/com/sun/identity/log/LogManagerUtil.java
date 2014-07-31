@@ -37,12 +37,12 @@ import java.util.Enumeration;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.log.messageid.LogMessageProviderBase;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+import org.forgerock.util.thread.listener.ShutdownPriority;
 
 /**
  * This class is a work around for situations where our
@@ -71,20 +71,16 @@ public class LogManagerUtil {
         * the start and stop records
         */
        if (SystemProperties.isServerMode()) {
-           ShutdownManager shutdownMan = ShutdownManager.getInstance();
-           if (shutdownMan.acquireValidLock()) {
-               try {
-                   shutdownMan.addShutdownListener(new
-                       ShutdownListener() {
+           ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
 
-                           public void shutdown() {
-                               logEndRecords();
-                           }
-                       }, ShutdownPriority.LOWEST);
-               } finally {
-                   shutdownMan.releaseLockAndNotify();
-               }
-           }
+           shutdownMan.addShutdownListener(new
+               ShutdownListener() {
+
+                   public void shutdown() {
+                       logEndRecords();
+                   }
+               }, ShutdownPriority.LOWEST);
+
         }
     }
 

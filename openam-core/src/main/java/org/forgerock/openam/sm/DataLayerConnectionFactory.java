@@ -17,19 +17,18 @@ package org.forgerock.openam.sm;
 
 import com.google.inject.Inject;
 import com.iplanet.dpro.session.service.SessionConstants;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.shared.debug.Debug;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Named;
 import org.forgerock.openam.ldap.LDAPUtils;
-import com.sun.identity.common.ShutdownManagerWrapper;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.ResultHandler;
-
-import javax.inject.Named;
-import java.util.concurrent.TimeUnit;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * A factory for providing connections to LDAP.
@@ -48,15 +47,15 @@ public class DataLayerConnectionFactory implements ConnectionFactory, ShutdownLi
      * Initialise the connection factory.
      *
      * @param configurationFactory Required for resolving required configuration.
-     * @param wrapper Required to monitor the state of system shutdown.
+     * @param shutdownManager Required to monitor the state of system shutdown.
      * @param debug Required for debugging.
      */
     @Inject
     public DataLayerConnectionFactory(SMSConfigurationFactory configurationFactory,
-                                      ShutdownManagerWrapper wrapper,
+                                      ShutdownManager shutdownManager,
                                       @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
         this.factory = initialiseBalancer(configurationFactory.getSMSConfiguration());
-        wrapper.addShutdownListener(this);
+        shutdownManager.addShutdownListener(this);
         this.debug = debug;
     }
 

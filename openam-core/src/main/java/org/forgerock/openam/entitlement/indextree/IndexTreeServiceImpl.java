@@ -16,7 +16,6 @@
 package org.forgerock.openam.entitlement.indextree;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSDataEntry;
@@ -31,7 +30,8 @@ import org.forgerock.openam.entitlement.indextree.events.ModificationEvent;
 import org.forgerock.openam.entitlement.indextree.events.ModificationEventType;
 import org.forgerock.openam.entitlement.utils.indextree.IndexRuleTree;
 import org.forgerock.openam.entitlement.utils.indextree.SimpleReferenceTree;
-import com.sun.identity.common.ShutdownManagerWrapper;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import javax.inject.Inject;
 import java.security.AccessController;
@@ -68,7 +68,7 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
     @Inject
     public IndexTreeServiceImpl(IndexChangeManager manager, PrivilegedAction<SSOToken> adminTokenAction,
                                 ServiceManagementDAO smDAO, DNWrapper dnMapper,
-                                ShutdownManagerWrapper shutdownManager) {
+                                ShutdownManager shutdownManager) {
 
         this.manager = manager;
         this.adminAction = adminTokenAction;
@@ -79,7 +79,6 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
 
         // Register to the shutdown to clean up appropriate resources.
         shutdownManager.addShutdownListener(this);
-
         // Register interest with the change manager so that this service is notified of changes.
         manager.registerObserver(this);
     }

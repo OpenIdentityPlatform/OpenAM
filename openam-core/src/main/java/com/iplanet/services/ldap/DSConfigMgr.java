@@ -38,11 +38,13 @@ import com.iplanet.services.util.XMLException;
 import com.iplanet.services.util.XMLParser;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.common.LDAPConnectionPool;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.ServerInstanceAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.LDAPConnection;
+import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.shared.ldap.LDAPv2;
+import com.sun.identity.shared.ldap.LDAPv3;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,10 +54,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPv2;
-import com.sun.identity.shared.ldap.LDAPv3;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 
 /**
  * This object is the manager of all connection information. The server
@@ -325,26 +326,22 @@ public class DSConfigMgr implements IDSConfigMgr {
             ServerInstance si = getServerInstance(DEFAULT,
                     LDAPUser.Type.AUTH_ANONYMOUS);
             LDAPConnectionPool pool = null;
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    pool = new LDAPConnectionPool(
-                        "DSConfigMgr", si.getMinConnections(),
-                        si.getMaxConnections(), anonymousConnection);
-                    final LDAPConnectionPool finalPool = pool;
-                    shutdownMan.addShutdownListener(
-                        new ShutdownListener() {
-                            public void shutdown() {
-                                if (finalPool != null) {
-                                    finalPool.destroy();
-                                }
-                            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            pool = new LDAPConnectionPool(
+                "DSConfigMgr", si.getMinConnections(),
+                si.getMaxConnections(), anonymousConnection);
+            final LDAPConnectionPool finalPool = pool;
+            shutdownMan.addShutdownListener(
+                new ShutdownListener() {
+                    public void shutdown() {
+                        if (finalPool != null) {
+                            finalPool.destroy();
                         }
-                    );
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+                    }
                 }
-            }
+            );
+
             return pool;
         } catch (LDAPException le) {
             if (debugger.messageEnabled()) {

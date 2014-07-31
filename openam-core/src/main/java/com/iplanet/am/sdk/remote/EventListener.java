@@ -31,16 +31,6 @@
  */
 package com.iplanet.am.sdk.remote;
 
-import java.net.URL;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-
 import com.iplanet.am.sdk.AMEvent;
 import com.iplanet.am.sdk.AMEventManagerException;
 import com.iplanet.am.sdk.AMObjectListener;
@@ -56,13 +46,21 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.sm.CreateServiceConfig;
 import com.sun.identity.sm.SMSSchema;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 /**
  * The <code>EventListener</code> handles the events generated from the
@@ -135,34 +133,28 @@ class EventListener {
                         debug.message("EventListener: registerNotificationURL returned null ID");
                     }
                 }
-                ShutdownManager shutdownMan = ShutdownManager.getInstance();
-                if (shutdownMan.acquireValidLock()) {
-                    try {
-                        shutdownMan.addShutdownListener(new ShutdownListener() {
-                            @Override
-                            public void shutdown() {
-                                try {
-                                    if (remoteId != null) {
-                                        client.send("deRegisterNotificationURL", remoteId, null, null);
-                                        if (debug.messageEnabled()) {
-                                            debug.message("EventListener: deRegisterNotificationURL for " + remoteId);
-                                        }
-                                    } else {
-                                        if (debug.messageEnabled()) {
-                                            debug.message("EventListener: Could not deRegisterNotificationURL " +
-                                                    "due to null ID");
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    debug.error("EventListener: There was a problem calling " +
-                                            "deRegisterNotificationURL with ID " +  remoteId, e);
+                ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+                shutdownMan.addShutdownListener(new ShutdownListener() {
+                    @Override
+                    public void shutdown() {
+                        try {
+                            if (remoteId != null) {
+                                client.send("deRegisterNotificationURL", remoteId, null, null);
+                                if (debug.messageEnabled()) {
+                                    debug.message("EventListener: deRegisterNotificationURL for " + remoteId);
+                                }
+                            } else {
+                                if (debug.messageEnabled()) {
+                                    debug.message("EventListener: Could not deRegisterNotificationURL " +
+                                            "due to null ID");
                                 }
                             }
-                        });
-                    } finally {
-                        shutdownMan.releaseLockAndNotify();
+                        } catch (Exception e) {
+                            debug.error("EventListener: There was a problem calling " +
+                                    "deRegisterNotificationURL with ID " +  remoteId, e);
+                        }
                     }
-                }
+                });
                 // Register with PLLClient for notification
                 PLLClient.addNotificationHandler(
                         RemoteServicesImpl.SDK_SERVICE,

@@ -15,8 +15,8 @@
  */
 package org.forgerock.openam.utils;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManagerWrapper;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import javax.inject.Inject;
 
@@ -35,13 +35,13 @@ public class ShutdownMonitor {
      * @param shutdownManager Required.
      */
     @Inject
-    public ShutdownMonitor(ShutdownManagerWrapper shutdownManager) {
+    public ShutdownMonitor(ShutdownManager shutdownManager) {
         shutdownManager.addShutdownListener(new ShutdownListener() {
-            @Override
-            public void shutdown() {
-                setShutdown();
-            }
-        });
+                @Override
+                public void shutdown() {
+                    setShutdown();
+                }
+            });
     }
 
     /**

@@ -59,8 +59,6 @@ import com.sun.identity.shared.ldap.controls.LDAPEntryChangeControl;
 import com.sun.identity.shared.ldap.controls.LDAPPersistSearchControl;
 
 import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.SystemProperties;
@@ -78,6 +76,8 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * Event Service monitors changes on the server. Implemented with the persistant
@@ -357,26 +357,22 @@ public class EventService implements Runnable {
             _idleTimeOut = getPropertyIntValue(EVENT_IDLE_TIMEOUT_INTERVAL,
                 _idleTimeOut);
             _idleTimeOutMills = _idleTimeOut * 60000;
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    if (_idleTimeOut == 0) {
-                        _instance = new EventService();
-                    } else {
-                        _instance = new EventServicePolling();
-                    }
-                    shutdownMan.addShutdownListener(new
-                        ShutdownListener() {
-                            public void shutdown() {
-                                if (_instance != null) {
-                                    _instance.finalize();
-                                }
-                            }
-                        });
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
-                }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            if (_idleTimeOut == 0) {
+                _instance = new EventService();
+            } else {
+                _instance = new EventServicePolling();
             }
+            shutdownMan.addShutdownListener(new
+                ShutdownListener() {
+                    public void shutdown() {
+                        if (_instance != null) {
+                            _instance.finalize();
+                        }
+                    }
+                });
+
         }
         return _instance;
     }

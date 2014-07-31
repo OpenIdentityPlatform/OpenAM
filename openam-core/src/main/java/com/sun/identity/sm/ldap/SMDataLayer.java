@@ -37,8 +37,6 @@ import com.sun.identity.shared.ldap.LDAPBind;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchConstraints;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
@@ -47,6 +45,8 @@ import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 
 import com.sun.identity.common.LDAPConnectionPool;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * SMDataLayer (A PACKAGE SCOPE CLASS) to access LDAP or other database
@@ -208,11 +208,6 @@ class SMDataLayer {
 
     /**
      * Initialize the pool shared by all SMDataLayer object(s).
-     * 
-     * @param host
-     *            ldaphost to init the pool from
-     * @param port
-     *            ldapport to init the pool from
      */
     private synchronized void initLdapPool() {
         // Dont' do anything if pool is already initialized
@@ -303,25 +298,20 @@ class SMDataLayer {
             connOptions.put("referrals", Boolean.valueOf(referrals));
             connOptions.put("searchconstraints", _defaultSearchConstraints);
 
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    _ldapPool = new LDAPConnectionPool("SMS", poolMin, poolMax,
-                        hostName, 389, connDN, connPWD, _trialConn, 
-                        connOptions);
-                    shutdownMan.addShutdownListener(
-                        new ShutdownListener() {
-                            public void shutdown() {
-                                if (_ldapPool != null) {
-                                    _ldapPool.destroy();
-                                }
-                            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            _ldapPool = new LDAPConnectionPool("SMS", poolMin, poolMax,
+                hostName, 389, connDN, connPWD, _trialConn,
+                connOptions);
+            shutdownMan.addShutdownListener(
+                new ShutdownListener() {
+                    public void shutdown() {
+                        if (_ldapPool != null) {
+                            _ldapPool.destroy();
                         }
-                    );
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+                    }
                 }
-            }
+            );
 
         } catch (LDAPServiceException ex) {
             debug.error("SMDataLayer:initLdapPool()-"

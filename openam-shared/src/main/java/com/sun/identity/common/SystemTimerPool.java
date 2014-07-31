@@ -27,13 +27,14 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-14 ForgeRock Inc
  */
 package com.sun.identity.common;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 /**
  * SystemTimerPool is a TimerPool which shared in the system.
@@ -69,22 +70,17 @@ public class SystemTimerPool {
     public static synchronized TimerPool getTimerPool() {
         if (instance == null) {
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    // Don't load the Debug object in static block as it can
-                    // cause issues when doing a container restart.
-                    instance = new TimerPool("SystemTimerPool", 
-                        poolSize, false, Debug.getInstance("SystemTimerPool"));
-                    shutdownMan.addShutdownListener(new ShutdownListener() {
-                        public void shutdown() {
-                            instance.shutdown();
-                            instance = null;
-                        }
-                    });
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+
+            // Don't load the Debug object in static block as it can
+            // cause issues when doing a container restart.
+            instance = new TimerPool("SystemTimerPool",
+                poolSize, false, Debug.getInstance("SystemTimerPool"));
+            shutdownMan.addShutdownListener(new ShutdownListener() {
+                public void shutdown() {
+                    instance.shutdown();
+                    instance = null;
                 }
-            }
+            });
         }
         return instance;
     }

@@ -31,8 +31,6 @@
  */
 package com.sun.identity.policy.client;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
@@ -48,6 +46,9 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.AppSSOTokenProvider;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.LogRecord;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -203,33 +204,29 @@ public class PolicyEvaluator {
                         serviceName, policyProperties.getNotificationURL());
             }
             // Add a hook to remove our listener on shutdown.
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    shutdownMan.addShutdownListener(new ShutdownListener() {
-                        @Override
-                        public void shutdown() {
-                            if (policyProperties.useRESTProtocol()) {
-                                resourceResultCache.removeRESTRemotePolicyListener(appSSOToken,
-                                        serviceName, policyProperties.getRESTNotificationURL());
-                                if (debug.messageEnabled()) {
-                                    debug.message("PolicyEvaluator: called removeRESTRemotePolicyListener, service "
-                                            + serviceName + ", URL " + policyProperties.getRESTNotificationURL());
-                                }
-                            } else {
-                                resourceResultCache.removeRemotePolicyListener(appSSOToken,
-                                        serviceName, policyProperties.getNotificationURL());
-                                if (debug.messageEnabled()) {
-                                    debug.message("PolicyEvaluator: called removeRemotePolicyListener, service "
-                                            + serviceName + ", URL " + policyProperties.getNotificationURL());
-                                }
-                            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+            shutdownMan.addShutdownListener(new ShutdownListener() {
+                @Override
+                public void shutdown() {
+                    if (policyProperties.useRESTProtocol()) {
+                        resourceResultCache.removeRESTRemotePolicyListener(appSSOToken,
+                                serviceName, policyProperties.getRESTNotificationURL());
+                        if (debug.messageEnabled()) {
+                            debug.message("PolicyEvaluator: called removeRESTRemotePolicyListener, service "
+                                    + serviceName + ", URL " + policyProperties.getRESTNotificationURL());
                         }
-                    });
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+                    } else {
+                        resourceResultCache.removeRemotePolicyListener(appSSOToken,
+                                serviceName, policyProperties.getNotificationURL());
+                        if (debug.messageEnabled()) {
+                            debug.message("PolicyEvaluator: called removeRemotePolicyListener, service "
+                                    + serviceName + ", URL " + policyProperties.getNotificationURL());
+                        }
+                    }
                 }
-            }
+            });
+
         }
 
         ActionDecision.setClientClockSkew(policyProperties.getClientClockSkew());

@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.common;
 
 import javax.servlet.ServletContextEvent;
@@ -44,12 +48,6 @@ public class ShutdownServletContextListener implements ServletContextListener
 
     public void contextDestroyed(ServletContextEvent sce) {
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                shutdownMan.shutdown();
-            } finally {
-                shutdownMan.releaseLockAndNotify();
-            }
-        }
+        shutdownMan.shutdown();
     }
 }

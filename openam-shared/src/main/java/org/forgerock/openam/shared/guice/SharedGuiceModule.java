@@ -18,12 +18,11 @@ package org.forgerock.openam.shared.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.GuiceModule;
-import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
-import com.sun.identity.common.ShutdownManagerWrapper;
 import org.forgerock.openam.shared.concurrency.ThreadMonitor;
+import org.forgerock.util.thread.ExecutorServiceFactory;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,15 +34,20 @@ public class SharedGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(ShutdownManager.class).toInstance(ShutdownManager.getInstance());
         bind(Debug.class)
                 .annotatedWith(Names.named(DEBUG_THREAD_MANAGER))
                 .toInstance(Debug.getInstance(DEBUG_THREAD_MANAGER));
+        bind(ShutdownManager.class).toInstance(com.sun.identity.common.ShutdownManager.getInstance());
+    }
+
+    @Provides @Inject
+    ExecutorServiceFactory provideExecutorServiceFactory(ShutdownManager manager) {
+        return new ExecutorServiceFactory(manager);
     }
 
     @Provides @Inject @Singleton
-    public ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
-                                              ShutdownManagerWrapper wrapper,
+    ThreadMonitor provideThreadMonitor(ExecutorServiceFactory factory,
+                                              ShutdownManager wrapper,
                                               @Named(DEBUG_THREAD_MANAGER) Debug debug) {
         return new ThreadMonitor(factory.createCachedThreadPool(DEBUG_THREAD_MANAGER), wrapper, debug);
     }

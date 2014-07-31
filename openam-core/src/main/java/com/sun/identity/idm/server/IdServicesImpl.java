@@ -49,8 +49,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.DNUtils;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
@@ -84,6 +82,9 @@ import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 import java.security.AccessController;
 import javax.security.auth.callback.NameCallback;
 
@@ -118,23 +119,19 @@ public class IdServicesImpl implements IdServices {
        if (_instance == null) {
            DEBUG.message("IdServicesImpl.getInstance(): "
                    + "Creating new Instance of IdServicesImpl()");
-           ShutdownManager shutdownMan = ShutdownManager.getInstance();
-           if (shutdownMan.acquireValidLock()) {
-               try {
-                   _instance = new IdServicesImpl();
-                   shutdownMan.addShutdownListener(
-                       new ShutdownListener() {
-                           public void shutdown() {
-                               synchronized (_instance) {
-                                   shutdownCalled = true;
-                               }
-                               _instance.clearIdRepoPlugins();
-                           }
-                   });
-               } finally {
-                   shutdownMan.releaseLockAndNotify();
-               }
-           }
+           ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+           _instance = new IdServicesImpl();
+           shutdownMan.addShutdownListener(
+               new ShutdownListener() {
+                   public void shutdown() {
+                       synchronized (_instance) {
+                           shutdownCalled = true;
+                       }
+                       _instance.clearIdRepoPlugins();
+                   }
+           });
+
        }
        return _instance;
    }

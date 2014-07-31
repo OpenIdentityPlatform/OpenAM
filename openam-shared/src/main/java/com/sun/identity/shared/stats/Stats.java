@@ -28,12 +28,12 @@
 
 package com.sun.identity.shared.stats;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimer;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Vector;
 
 // NOTE: Since JVM specs guarantee atomic access/updates to int variables
 // (actually all variables except double and long), the design consciously
@@ -239,8 +238,7 @@ public class Stats implements ShutdownListener {
      * deprecated in future.
      * </p>
      * 
-     * @param statsFileName
-     *            name of the stats file to create or use
+     * @param statsName name of the stats file to create or use
      */
     private Stats(String statsName) {
         // Initialize the stats service the first time a Stats object is
@@ -257,14 +255,9 @@ public class Stats implements ShutdownListener {
             // explicitly ignore any duplicate instances.
             statsMap.put(statsName, this);
         }
-        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                shutdownMan.addShutdownListener(this);
-            } finally {
-                shutdownMan.releaseLockAndNotify();
-            }
-        }
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+        shutdownMan.addShutdownListener(this);
+
     }
 
     /**

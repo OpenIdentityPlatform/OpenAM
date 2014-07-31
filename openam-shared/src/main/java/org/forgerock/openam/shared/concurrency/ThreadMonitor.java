@@ -15,11 +15,11 @@
  */
 package org.forgerock.openam.shared.concurrency;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManagerWrapper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.forgerock.util.Reject;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,32 +66,32 @@ import java.util.concurrent.TimeUnit;
  *
  * @link https://en.wikipedia.org/wiki/Quis_custodiet_ipsos_custodes%3F
  * @see com.sun.identity.common.ShutdownManager
- * @see com.sun.identity.common.ShutdownManagerWrapper
+ * @see org.forgerock.util.thread.listener.ShutdownManager
  */
 public class ThreadMonitor {
     private static final String DEBUG_HEADER = "ThreadMonitor: ";
     private final ExecutorService workPool;
-    private final ShutdownManagerWrapper shutdownManagerWrapper;
+    private final ShutdownManager shutdownManager;
     private final Debug debug;
 
     /**
      * Create an instance of the ThreadMonitor with an assigned work pool of threads to use.
      *
-     * @see ExecutorServiceFactory
+     * @see org.forgerock.util.thread.ExecutorServiceFactory
      *
      * @param workPool A sized ExecutorService which is larger enough to handle the expected
      *                 number of jobs it needs to monitor. This ExecutorService should be
-     *                 generated using the {@link ExecutorServiceFactory} to ensure it responds
-     *                 to the global System Shutdown event. Non null.
-     * @param shutdownManagerWrapper Required to detect shutdown signals.
+     *                 generated using the {@link org.forgerock.util.thread.ExecutorServiceFactory}
+     *                 to ensure it responds to the global System Shutdown event. Non null.
+     * @param shutdownManager Required to detect shutdown signals.
      * @param debug Non null, required for signalling thread failure/restart.
      */
     @Inject
     public ThreadMonitor(ExecutorService workPool,
-                         ShutdownManagerWrapper shutdownManagerWrapper,
+                         ShutdownManager shutdownManager,
                          @Named(SharedGuiceModule.DEBUG_THREAD_MANAGER) Debug debug) {
         this.workPool = workPool;
-        this.shutdownManagerWrapper = shutdownManagerWrapper;
+        this.shutdownManager = shutdownManager;
         this.debug = debug;
     }
 
@@ -167,7 +167,7 @@ public class ThreadMonitor {
 
         public WatchDog(StartThread startThread) {
             this.startThread = startThread;
-            shutdownManagerWrapper.addShutdownListener(new ShutdownListener() {
+            shutdownManager.addShutdownListener(new ShutdownListener() {
                 public void shutdown() {
                     cancel();
                 }

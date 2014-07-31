@@ -17,7 +17,6 @@ package org.forgerock.openam.cts.impl;
 
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.ExternalTokenConfig;
@@ -33,6 +32,7 @@ import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.util.thread.listener.ShutdownListener;
 
 import javax.inject.Inject;
 import java.text.MessageFormat;

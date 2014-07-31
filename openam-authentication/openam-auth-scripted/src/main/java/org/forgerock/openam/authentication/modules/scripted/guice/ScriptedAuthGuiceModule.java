@@ -18,6 +18,12 @@ package org.forgerock.openam.authentication.modules.scripted.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.authentication.modules.scripted.Scripted;
 import org.forgerock.openam.authentication.modules.scripted.ScriptedAuthConfigurator;
@@ -26,14 +32,7 @@ import org.forgerock.openam.scripting.ScriptEvaluator;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.forgerock.openam.scripting.StandardScriptEvaluator;
 import org.forgerock.openam.scripting.ThreadPoolScriptEvaluator;
-import org.forgerock.openam.shared.concurrency.ExecutorServiceFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import org.forgerock.util.thread.ExecutorServiceFactory;
 
 /**
  * Guice configuration for scripted authentication.

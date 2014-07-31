@@ -29,13 +29,13 @@
 package com.sun.identity.sm;
 
 import com.sun.identity.shared.Constants;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * The class <code>SMSThreadPool</code> provides interfaces to manage
@@ -86,45 +86,33 @@ public class SMSThreadPool {
         if (debug.messageEnabled()) {
             debug.message("SMSThreadPool: poolSize=" + poolSize);
         }
-        ShutdownManager shutdownMan = ShutdownManager.getInstance(); 
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
         if (thrdPool != null) {
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    shutdownMan.removeShutdownListener(shutdownListener);
+            // Create a new thread pool
+            thrdPool = new ThreadPool("smIdmThreadPool",
+                poolSize, DEFAULT_TRESHOLD, false, debug);
+            // Create the shutdown hook
+            ShutdownListener newShutdownListener = new ShutdownListener() {
+                public void shutdown() {
                     thrdPool.shutdown();
-                    // Create a new thread pool
-                    thrdPool = new ThreadPool("smIdmThreadPool",
-                        poolSize, DEFAULT_TRESHOLD, false, debug);
-                    // Create the shutdown hook
-                    shutdownListener = new ShutdownListener() {
-                        public void shutdown() {
-                            thrdPool.shutdown();
-                        }
-                    };
-                    // Register to shutdown hook
-                    shutdownMan.addShutdownListener(shutdownListener);
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
                 }
-            }
+            };
+            // Register to shutdown hook
+            shutdownMan.replaceShutdownListener(shutdownListener, newShutdownListener, null);
         } else {
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    // Create a new thread pool
-                    thrdPool = new ThreadPool("smIdmThreadPool",
-                        poolSize, DEFAULT_TRESHOLD, false, debug);
-                    // Create the shutdown hook
-                    shutdownListener = new ShutdownListener() {
-                        public void shutdown() {
-                            thrdPool.shutdown();
-                        }
-                    };
-                    // Register to shutdown hook
-                    shutdownMan.addShutdownListener(shutdownListener);
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
+
+            // Create a new thread pool
+            thrdPool = new ThreadPool("smIdmThreadPool",
+                poolSize, DEFAULT_TRESHOLD, false, debug);
+            // Create the shutdown hook
+            shutdownListener = new ShutdownListener() {
+                public void shutdown() {
+                    thrdPool.shutdown();
                 }
-            }
+            };
+            // Register to shutdown hook
+            shutdownMan.addShutdownListener(shutdownListener);
+
         }
         initialized = true;
     }

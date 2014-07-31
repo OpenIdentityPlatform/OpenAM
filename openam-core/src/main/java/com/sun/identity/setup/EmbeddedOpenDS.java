@@ -33,9 +33,6 @@
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.LDAPAttribute;
@@ -43,22 +40,6 @@ import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPModification;
-import org.opends.messages.Message;
-import org.opends.server.core.DirectoryServer;
-import org.opends.server.extensions.ConfigFileHandler;
-import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
-import org.opends.server.tools.InstallDS;
-import org.opends.server.tools.RebuildIndex;
-import org.opends.server.tools.dsconfig.DSConfig;
-import org.opends.server.tools.dsreplication.ReplicationCliMain;
-import org.opends.server.types.DirectoryEnvironmentConfig;
-import org.opends.server.util.EmbeddedUtils;
-import org.opends.server.util.ServerConstants;
-import org.opends.server.util.TimeThread;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -87,7 +68,25 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
 import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
+import org.forgerock.util.thread.listener.ShutdownPriority;
+import org.opends.messages.Message;
+import org.opends.server.core.DirectoryServer;
+import org.opends.server.extensions.ConfigFileHandler;
+import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
+import org.opends.server.tools.InstallDS;
+import org.opends.server.tools.RebuildIndex;
+import org.opends.server.tools.dsconfig.DSConfig;
+import org.opends.server.tools.dsreplication.ReplicationCliMain;
+import org.opends.server.types.DirectoryEnvironmentConfig;
+import org.opends.server.util.EmbeddedUtils;
+import org.opends.server.util.ServerConstants;
+import org.opends.server.util.TimeThread;
 
 // OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
@@ -466,25 +465,21 @@ public class EmbeddedOpenDS {
 
         serverStarted = true;
 
-        ShutdownManager shutdownMan = ShutdownManager.getInstance();
-        if (shutdownMan.acquireValidLock()) {
-            try {
-                shutdownMan.addShutdownListener(new ShutdownListener() {
-                    public void shutdown() {
-                        try {
-                            shutdownServer("Graceful Shutdown");
-                        } catch (Exception ex) {
-                            Debug debug = Debug.getInstance(
-                                    SetupConstants.DEBUG_NAME);
-                            debug.error("EmbeddedOpenDS:shutdown hook failed",
-                                    ex);
-                        }
-                    }
-                }, ShutdownPriority.LOWEST);
-            } finally {
-                shutdownMan.releaseLockAndNotify();
+        ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+
+        shutdownMan.addShutdownListener(new ShutdownListener() {
+            public void shutdown() {
+                try {
+                    shutdownServer("Graceful Shutdown");
+                } catch (Exception ex) {
+                    Debug debug = Debug.getInstance(
+                            SetupConstants.DEBUG_NAME);
+                    debug.error("EmbeddedOpenDS:shutdown hook failed",
+                            ex);
+                }
             }
-        }
+        }, ShutdownPriority.LOWEST);
+
     }
 
 

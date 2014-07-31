@@ -15,10 +15,9 @@
  */
 package org.forgerock.openam.shared.concurrency;
 
-import com.sun.identity.common.ShutdownListener;
-import com.sun.identity.common.ShutdownManager;
-import com.sun.identity.common.ShutdownManagerWrapper;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.util.thread.listener.ShutdownListener;
+import org.forgerock.util.thread.listener.ShutdownManager;
 import org.mockito.ArgumentCaptor;
 import org.mockito.BDDMockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -33,14 +32,14 @@ import static org.mockito.BDDMockito.*;
 public class ThreadMonitorTest {
 
     private ExecutorService mockWorkPool;
-    private ShutdownManagerWrapper mockShutdownWrapper;
+    private ShutdownManager mockShutdownWrapper;
     private Debug mockDebug;
     private ThreadMonitor monitor;
 
     @BeforeMethod
     public void setup() {
         mockWorkPool = immediateExecutor();
-        mockShutdownWrapper = mock(ShutdownManagerWrapper.class);
+        mockShutdownWrapper = mock(ShutdownManager.class);
         mockDebug = mock(Debug.class);
 
         monitor = new ThreadMonitor(
@@ -215,7 +214,7 @@ public class ThreadMonitorTest {
         ExecutorService workPool = Executors.newCachedThreadPool();
         ThreadMonitor threadMonitor = new ThreadMonitor(
                 workPool,
-                new ShutdownManagerWrapper(ShutdownManager.getInstance()),
+                com.sun.identity.common.ShutdownManager.getInstance(),
                 subvertedDebugger);
 
         threadMonitor.watchThread(workPool, new Runnable(){

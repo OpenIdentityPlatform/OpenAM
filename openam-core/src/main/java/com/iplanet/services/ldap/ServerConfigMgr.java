@@ -31,25 +31,6 @@
  */
 package com.iplanet.services.ldap;
 
-import com.sun.identity.authentication.spi.AuthLoginException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.AccessController;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-
-import javax.security.auth.login.LoginException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.XMLException;
 import com.iplanet.sso.SSOException;
@@ -60,7 +41,7 @@ import com.iplanet.ums.PersistentObject;
 import com.iplanet.ums.UMSObject;
 import com.sun.identity.authentication.internal.AuthContext;
 import com.sun.identity.authentication.internal.AuthPrincipal;
-import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -72,23 +53,39 @@ import com.sun.identity.security.EncodeAction;
 import com.sun.identity.setup.Bootstrap;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSSchema;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.tools.bundles.VersionCheck;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.security.AccessController;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import com.sun.identity.shared.ldap.util.DN;
+import javax.security.auth.login.LoginException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.forgerock.util.thread.listener.ShutdownManager;
 
 /**
  * The class <code>ServiceConfigMgr</code> provides interfaces to set the
@@ -474,14 +471,8 @@ public class ServerConfigMgr {
             System.err.println(ex.getMessage());
             System.exit(1);
         } finally {
-            ShutdownManager shutdownMan = ShutdownManager.getInstance();
-            if (shutdownMan.acquireValidLock()) {
-                try {
-                    shutdownMan.shutdown();
-                } finally {
-                    shutdownMan.releaseLockAndNotify();
-                }
-            }
+            ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
+            shutdownMan.shutdown();
         }
     }
     
