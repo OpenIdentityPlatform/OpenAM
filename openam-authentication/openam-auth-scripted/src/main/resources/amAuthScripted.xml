@@ -1,78 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-
-    Copyright (c) 2014 ForgeRock AS. All Rights Reserved
-
-    The contents of this file are subject to the terms
-    of the Common Development and Distribution License
-    (the License). You may not use this file except in
-    compliance with the License.
-
-    You can obtain a copy of the License at
-    http://forgerock.org/license/CDDLv1.0.html
-    See the License for the specific language governing
-    permission and limitations under the License.
-
-    When distributing Covered Code, include this CDDL
-    Header Notice in each file and include the License file
-    at http://forgerock.org/license/CDDLv1.0.html
-    If applicable, add the following below the CDDL Header,
-    with the fields enclosed by brackets [] replaced by
-    your own identifying information:
-    "Portions Copyrighted [year] [name of copyright owner]"
-
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
 -->
-
-<!DOCTYPE ServicesConfiguration
-        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
-        "jar://com/sun/identity/sm/sms.dtd">
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
     <Service name="iPlanetAMAuthScriptedService" version="1.0">
         <Schema
-                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedService"
-                i18nFileName="amAuthScripted"
-                revisionNumber="1"
-                i18nKey="iplanet-am-auth-scripted-service-description">
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedService"
+            i18nFileName="amAuthScripted"
+            revisionNumber="1"
+            i18nKey="iplanet-am-auth-scripted-service-description">
             <Global>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a105">
+                                 rangeEnd="2147483647" i18nKey="g101">
                     <DefaultValues>
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-core-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="a106">
+                                 rangeEnd="2147483647" i18nKey="g102">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-max-threads"
                                  type="single" syntax="number_range" rangeStart="1"
-                                 rangeEnd="2147483647" i18nKey="a107">
+                                 rangeEnd="2147483647" i18nKey="g103">
                     <DefaultValues>
                         <Value>50</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-queue-size"
                                  type="single" syntax="number_range" rangeStart="-1"
-                                 rangeEnd="2147483647" i18nKey="a111">
+                                 rangeEnd="2147483647" i18nKey="g104">
                     <DefaultValues>
                         <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-idle-timeout"
                                  type="single" syntax="number_range" rangeStart="0"
-                                 rangeEnd="2147483647" i18nKey="a112">
+                                 rangeEnd="2147483647" i18nKey="g105">
                     <DefaultValues>
                         <Value>60</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-white-list"
-                                 type="list" syntax="string" i18nKey="a108">
+                                 type="list" syntax="string" i18nKey="g106">
                     <DefaultValues>
                         <Value>java.lang.Boolean</Value>
                         <Value>java.lang.Byte</Value>
@@ -101,7 +89,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-black-list"
-                                 type="list" syntax="string" i18nKey="a109">
+                                 type="list" syntax="string" i18nKey="g107">
                     <DefaultValues>
                         <Value>java.security.AccessController</Value>
                         <Value>java.lang.Class</Value>
@@ -109,7 +97,7 @@
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-use-security-manager"
-                                 type="single" syntax="boolean" i18nKey="a110">
+                                 type="single" syntax="boolean" i18nKey="g108">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -119,19 +107,20 @@
                     </DefaultValues>
                 </AttributeSchema>
             </Global>
+
             <Organization>
-                <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                <AttributeSchema name="ScriptValidator"
+                                 type="validator"
+                                 syntax="string">
                     <DefaultValues>
-                        <Value>1</Value>
+                        <Value>org.forgerock.openam.authentication.modules.scripted.ScriptValidator</Value>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a102">
+                                 i18nKey="a101">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -144,7 +133,7 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a105">
+                                 i18nKey="a102">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -152,7 +141,7 @@
                 <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                  type="single_choice"
                                  syntax="string"
-                                 i18nKey="a101">
+                                 i18nKey="a103">
                     <ChoiceValues>
                         <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                         <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -165,9 +154,51 @@
                                  type="single"
                                  syntax="script"
                                  validator="ScriptValidator"
-                                 i18nKey="a106">
+                                 i18nKey="a104">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>
+                            var START_TIME = 9;  // 9am
+                            var END_TIME   = 17; // 5pm
+
+                            logger.message("Starting authentication javascript");
+                            logger.message("User: " + username);
+
+                            // Log out current cookies in the request
+                            if (logger.messageEnabled()) {
+                                var cookies = requestData.getHeaders('Cookie');
+                                for (cookie in cookies) {
+                                    logger.message('Cookie: ' + cookies[cookie]);
+                                }
+                            }
+
+                            if (username) {
+                                // Fetch user information via REST
+                                var response = httpClient.get("http://localhost:8080/openam/json/users/" + username, {
+                                        cookies : [],
+                                        headers : []
+                                    });
+                                // Log out response from REST call
+                                logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
+                            }
+
+                            var now = new Date();
+                            logger.message("Current time: " + now.getHours());
+                            if (now.getHours() &lt; START_TIME || now.getHours() &gt; END_TIME) {
+                                logger.error("Login forbidden outside work hours!");
+                                authState = FAILED;
+                            } else {
+                                logger.message("Authentication allowed!");
+                                authState = SUCCESS;
+                            }
+                        </Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a500">
+                    <DefaultValues>
+                        <Value>1</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -180,18 +211,10 @@
                             <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
-                        <DefaultValues>
-                            <Value>1</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                      type="single"
                                      syntax="boolean"
-                                     i18nKey="a102">
+                                     i18nKey="a101">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -204,7 +227,7 @@
                                      type="single"
                                      syntax="script"
                                      validator="no"
-                                     i18nKey="a120">
+                                     i18nKey="a102">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
@@ -212,7 +235,7 @@
                     <AttributeSchema name="iplanet-am-auth-scripted-script-type"
                                      type="single_choice"
                                      syntax="string"
-                                     i18nKey="a101">
+                                     i18nKey="a103">
                         <ChoiceValues>
                             <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
                             <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
@@ -225,7 +248,7 @@
                                      type="single"
                                      syntax="script"
                                      validator="ScriptValidator"
-                                     i18nKey="a121">
+                                     i18nKey="a104">
                         <DefaultValues>
                             <Value>
                                 var START_TIME = 9;  // 9am
@@ -236,41 +259,40 @@
 
                                 // Log out current cookies in the request
                                 if (logger.messageEnabled()) {
-                                var cookies = requestData.getHeaders('Cookie');
-                                for (cookie in cookies) {
-                                logger.message('Cookie: ' + cookies[cookie]);
-                                }
+                                    var cookies = requestData.getHeaders('Cookie');
+                                    for (cookie in cookies) {
+                                        logger.message('Cookie: ' + cookies[cookie]);
+                                    }
                                 }
 
-if (username) {
-    // Fetch user information via REST
-    var response = httpClient.get("http://localhost:8080/openam/json/users/" + username,{
-        cookies : [],
-        headers : []
-    });
-                                // Log out response from REST call
-                                logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
+                                if (username) {
+                                    // Fetch user information via REST
+                                    var response = httpClient.get("http://localhost:8080/openam/json/users/" + username, {
+                                            cookies : [],
+                                            headers : []
+                                        });
+                                    // Log out response from REST call
+                                    logger.message("User REST Call. Status: " + response.getStatusCode() + ", Body: " + response.getEntity());
                                 }
 
                                 var now = new Date();
                                 logger.message("Current time: " + now.getHours());
                                 if (now.getHours() &lt; START_TIME || now.getHours() &gt; END_TIME) {
-                                logger.error("Login forbidden outside work hours!");
-                                authState = FAILED;
+                                    logger.error("Login forbidden outside work hours!");
+                                    authState = FAILED;
                                 } else {
-                                logger.message("Authentication allowed!");
-                                authState = SUCCESS;
+                                    logger.message("Authentication allowed!");
+                                    authState = SUCCESS;
                                 }
                             </Value>
                         </DefaultValues>
                     </AttributeSchema>
-
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500">
                         <DefaultValues>
-                            <Value>0</Value>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
@@ -278,4 +300,3 @@ if (username) {
         </Schema>
     </Service>
 </ServicesConfiguration>
-

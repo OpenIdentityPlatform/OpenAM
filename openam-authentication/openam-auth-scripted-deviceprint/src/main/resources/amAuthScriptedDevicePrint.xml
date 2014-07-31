@@ -2,7 +2,7 @@
 <!--
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
     Copyright 2011 Cybernetica AS.
 
     The contents of this file are subject to the terms
@@ -25,48 +25,32 @@
 
 -->
 <!--
-    Portions Copyrighted 2012-2014 ForgeRock AS.
     Portions Copyrighted 2012 Open Source Solution Technology Corporation
     Portions Copyrighted 2013 Nomura Research Institute, Ltd
 -->
 
-<!DOCTYPE ServicesConfiguration
-        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
-        "jar://com/sun/identity/sm/sms.dtd">
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" "jar://com/sun/identity/sm/sms.dtd">
 
 <ServicesConfiguration>
     <Service name="iPlanetAMAuthScriptedDevicePrintService" version="1.0">
         <Schema
-                serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedDevicePrintService"
-                i18nFileName="amAuthScriptedDevicePrint"
-                revisionNumber="1"
-                i18nKey="iplanet-am-auth-scripted-device-print-service-description">
-
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthScriptedDevicePrintService"
+            i18nFileName="amAuthScriptedDevicePrint"
+            revisionNumber="1"
+            i18nKey="iplanet-am-auth-scripted-device-print-service-description">
             <Organization>
-                <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 i18nKey="a500">
+                <AttributeSchema name="ScriptValidator"
+                                 type="validator"
+                                 syntax="string">
                     <DefaultValues>
-                        <Value>0</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-scripted-script-type"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a101">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
-                        <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>JavaScript</Value>
+                        <Value>org.forgerock.openam.authentication.modules.scripted.ScriptValidator</Value>
+                        <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
                                  type="single"
                                  syntax="boolean"
-                                 i18nKey="a102">
+                                 i18nKey="a101">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -79,9 +63,24 @@
                                  type="single"
                                  syntax="script"
                                  validator="no"
-                                 i18nKey="a103">
+                                 i18nKey="a102">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>
+                            ${inject.content.fontdetector}
+                            ${inject.content.client-js}
+                        </Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a103">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
+                        <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>JavaScript</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-scripted-server-script"
@@ -90,7 +89,17 @@
                                  validator="ScriptValidator"
                                  i18nKey="a104">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>
+                            ${inject.content.server-js}
+                        </Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a500">
+                    <DefaultValues>
+                        <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -103,30 +112,10 @@
                             <Value>com.sun.identity.sm.RequiredValueValidator</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
-                    <DefaultValues>
-                        <Value>1</Value>
-                    </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-auth-scripted-script-type"
-                                     type="single_choice"
-                                     syntax="string"
-                                     i18nKey="a101">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
-                            <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>JavaScript</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script-enabled"
-                                     type="single"
-                                     syntax="boolean"
-                                     i18nKey="a102">
+                                 type="single"
+                                 syntax="boolean"
+                                 i18nKey="a101">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -136,10 +125,10 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-client-script"
-                                     type="single"
-                                     syntax="script"
-                                     validator="no"
-                                     i18nKey="a103">
+                                 type="single"
+                                 syntax="script"
+                                 validator="no"
+                                 i18nKey="a102">
                         <DefaultValues>
                             <Value>
                                 ${inject.content.fontdetector}
@@ -147,22 +136,33 @@
                             </Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-scripted-script-type"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a103">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choice1">JavaScript</ChoiceValue>
+                            <ChoiceValue i18nKey="choice2">Groovy</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>JavaScript</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-scripted-server-script"
-                                     type="single"
-                                     syntax="script"
-                                     validator="ScriptValidator"
-                                     i18nKey="a104">
+                                 type="single"
+                                 syntax="script"
+                                 validator="ScriptValidator"
+                                 i18nKey="a104">
                         <DefaultValues>
                             <Value>
                                 ${inject.content.server-js}
                             </Value>
                         </DefaultValues>
                     </AttributeSchema>
-
                     <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a500">
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 i18nKey="a500">
                         <DefaultValues>
                             <Value>0</Value>
                         </DefaultValues>
@@ -172,4 +172,3 @@
         </Schema>
     </Service>
 </ServicesConfiguration>
-
