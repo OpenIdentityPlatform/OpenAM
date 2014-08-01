@@ -26,7 +26,7 @@
 : $Id: setup.bat,v 1.13 2009/01/28 05:34:46 ww203982 Exp $
 :
 
-: Portions Copyrighted 2013-2014 ForgeRock, Inc.
+: Portions Copyrighted 2013-2014 ForgeRock AS.
 
 if not "%JAVA_HOME%" == "" goto checkJavaHome
 echo Please define JAVA_HOME environment variable before running this program
@@ -127,8 +127,8 @@ set CLASSPATH="%CLASSPATH%;lib/forgerock-guice-core-${forgerock.guice.version}.j
 set CLASSPATH="%CLASSPATH%;lib/guice-${guice.version}-no_aop.jar"
 set CLASSPATH="%CLASSPATH%;lib/commons-lang-${commons-lang.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/javax.inject-${javax.inject.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/slf4j-api-${slf4j.api.version}.jar"
-set CLASSPATH="%CLASSPATH%;lib/slf4j-nop-${slf4j.api.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/slf4j-api-${slf4j.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/slf4j-nop-${slf4j.version}.jar"
 set CLASSPATH="%CLASSPATH%;resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main %accept_license%
