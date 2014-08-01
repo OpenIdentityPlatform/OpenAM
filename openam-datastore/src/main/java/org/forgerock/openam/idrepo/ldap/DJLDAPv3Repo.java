@@ -404,12 +404,12 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
         String dn = getDN(type, name);
         BindRequest bindRequest = Requests.newSimpleBindRequest(dn, oldPassword.toCharArray());
         ModifyRequest modifyRequest = Requests.newModifyRequest(dn);
-        byte[] encodedPwd = null;
-        if (AD_UNICODE_PWD_ATTR.equalsIgnoreCase(attrName)) {
-            encodedPwd = helper.encodePassword(newPassword);
-        }
-        modifyRequest.addModification(ModificationType.DELETE, attrName);
-        modifyRequest.addModification(ModificationType.ADD, attrName, encodedPwd != null ? encodedPwd : newPassword);
+
+        byte[] encodedOldPwd = helper.encodePassword(oldPassword);
+        byte[] encodedNewPwd = helper.encodePassword(newPassword);
+
+        modifyRequest.addModification(ModificationType.DELETE, attrName, encodedOldPwd);
+        modifyRequest.addModification(ModificationType.ADD, attrName, encodedNewPwd);
         Connection conn = null;
         try {
             conn = bindConnectionFactory.getConnection();
