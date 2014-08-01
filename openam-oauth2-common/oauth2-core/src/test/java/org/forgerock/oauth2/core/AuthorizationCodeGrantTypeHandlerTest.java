@@ -209,7 +209,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(true);
         given(tokenStore.createRefreshToken(anyString(), anyString(), anyString(), anyString(), anySetOf(String.class),
                 eq(request))).willReturn(refreshToken);
@@ -252,7 +252,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
@@ -293,7 +293,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.issueRefreshTokens()).willReturn(false);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))

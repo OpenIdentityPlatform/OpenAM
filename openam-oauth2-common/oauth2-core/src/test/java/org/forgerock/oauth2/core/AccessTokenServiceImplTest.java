@@ -197,7 +197,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
@@ -228,7 +228,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(),
@@ -264,7 +264,7 @@ public class AccessTokenServiceImplTest {
         given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
-        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 10);
+        given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
         given(providerSettings.validateRefreshTokenScope(eq(clientRegistration), anySetOf(String.class),
                 anySetOf(String.class), eq(request))).willReturn(validatedScope);
 
