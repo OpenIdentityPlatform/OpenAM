@@ -28,6 +28,7 @@ import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
 import org.forgerock.openam.cts.impl.queue.TaskDispatcher;
 import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -152,5 +153,21 @@ public class CoreTokenAdapterTest {
 
         // Then
         verify(mockTaskDispatcher).delete(eq(tokenId), any(ResultHandler.class));
+    }
+
+    @Test
+    public void shouldAddTokenIDAsReturnFieldForDeleteOnQuery() throws CoreTokenException {
+        // Given
+        TokenFilter filter = new TokenFilterBuilder().build();
+
+        // When
+        adapter.deleteOnQuery(filter);
+
+        // Then
+        ArgumentCaptor<TokenFilter> captor = ArgumentCaptor.forClass(TokenFilter.class);
+        verify(mockTaskDispatcher).partialQuery(captor.capture(), any(ResultHandler.class));
+        TokenFilter capturedFilter = captor.getValue();
+        assertThat(capturedFilter).isSameAs(filter);
+        assertThat(capturedFilter.getReturnFields()).containsOnly(CoreTokenField.TOKEN_ID);
     }
 }

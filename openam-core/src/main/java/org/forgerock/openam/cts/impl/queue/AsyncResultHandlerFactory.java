@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.queue;
 
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.impl.query.PartialToken;
 import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
@@ -27,6 +28,7 @@ import java.util.Collection;
  * type requested.
  */
 public class AsyncResultHandlerFactory implements ResultHandlerFactory {
+
     private final QueueConfiguration config;
 
     /**
@@ -77,5 +79,10 @@ public class AsyncResultHandlerFactory implements ResultHandlerFactory {
      */
     public ResultHandler<Collection<PartialToken>> getPartialQueryHandler() {
         return new AsyncResultHandler<Collection<PartialToken>>(config);
+    }
+
+    @Override
+    public ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler() {
+        return InjectorHolder.getInstance(DeleteOnQueryResultHandler.class);
     }
 }

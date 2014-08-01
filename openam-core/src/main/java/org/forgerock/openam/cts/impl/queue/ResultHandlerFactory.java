@@ -16,6 +16,7 @@
 package org.forgerock.openam.cts.impl.queue;
 
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.cts.impl.query.PartialToken;
 
 import java.util.Collection;
@@ -54,4 +55,11 @@ public interface ResultHandlerFactory {
      * @return Handler suitable for a partial query operation.
      */
     ResultHandler<Collection<PartialToken>> getPartialQueryHandler();
+
+    /**
+     * Returns a {@link ResultHandler} that performs a delete operation on the query's results.
+     *
+     * @return Handler suitable for delete on query operation.
+     */
+    ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler();
 }

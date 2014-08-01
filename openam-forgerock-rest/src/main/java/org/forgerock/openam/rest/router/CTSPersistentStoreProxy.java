@@ -13,7 +13,6 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.rest.router;
 
 import org.forgerock.guice.core.InjectorHolder;
@@ -119,5 +118,10 @@ public class CTSPersistentStoreProxy implements CTSPersistentStore {
     @Override
     public Collection<PartialToken> attributeQuery(TokenFilter tokenFilter) throws CoreTokenException {
         return CTSHolder.get().attributeQuery(tokenFilter);
+    }
+
+    @Override
+    public void deleteOnQuery(TokenFilter tokenFilter) throws CoreTokenException {
+        CTSHolder.get().deleteOnQuery(tokenFilter);
     }
 }

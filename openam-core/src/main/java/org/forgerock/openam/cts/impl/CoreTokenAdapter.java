@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock AS
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.impl;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.*;
@@ -29,7 +30,6 @@ import org.forgerock.openam.cts.reaper.CTSReaperInit;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
-import java.lang.IllegalArgumentException;
 import java.text.MessageFormat;
 import java.util.Collection;
 
@@ -173,19 +173,42 @@ public class CoreTokenAdapter {
     public Collection<PartialToken> attributeQuery(final TokenFilter filter)
             throws CoreTokenException, IllegalArgumentException {
 
-        Reject.ifTrue(filter.getReturnFields().isEmpty(), "Must define return fields for attribute query.");
-
-        debug("Attribute Query: queued with Filter: {0}", filter);
         ResultHandler<Collection<PartialToken>> handler = handlerFactory.getPartialQueryHandler();
-        dispatcher.partialQuery(filter, handler);
         try {
+            attributeQueryWithHandler(filter, handler);
             Collection<PartialToken> partialTokens = handler.getResults();
             debug("AttributeQuery: returned {0} Partial Tokens: {1}", partialTokens.size(), filter);
             return partialTokens;
-
         } catch (CoreTokenException e) {
             throw new QueryFailedException(filter, e);
         }
+    }
+
+    /**
+     * Queries the persistence layer using the given TokenFilter which must have the required
+     * 'return attributes' defined within it. The results os this query then will be deleted from the store.
+     *
+     * @param filter Non null TokenFilter with return attributes defined.
+     * @throws CoreTokenException If there was a problem queuing the task to be performed.
+     * @throws IllegalArgumentException If the filter did not define any Return Fields.
+     */
+    public void deleteOnQuery(final TokenFilter filter) throws CoreTokenException, IllegalArgumentException {
+        //Token ID should be always retrieved in order to be able to delete the returned tokens.
+        filter.addReturnAttribute(CoreTokenField.TOKEN_ID);
+        ResultHandler<Collection<PartialToken>> handler = handlerFactory.getDeleteOnQueryHandler();
+        try {
+            attributeQueryWithHandler(filter, handler);
+        } catch (CoreTokenException e) {
+            throw new QueryFailedException(filter, e);
+        }
+    }
+
+    private void attributeQueryWithHandler(final TokenFilter filter,
+            final ResultHandler<Collection<PartialToken>> handler) throws CoreTokenException {
+        Reject.ifTrue(filter.getReturnFields().isEmpty(), "Must define return fields for attribute query.");
+
+        debug("Attribute Query: queued with Filter: {0}", filter);
+        dispatcher.partialQuery(filter, handler);
     }
 
     private void debug(String format, Object... args) {

@@ -93,4 +93,13 @@ public class MonitoredResultHandlerFactory implements ResultHandlerFactory {
         return new DefaultMonitoringResultHandler<Collection<PartialToken>>(
                 factory.getPartialQueryHandler(), store, CTSOperation.LIST);
     }
+
+    /**
+     * @return A non monitored handler as this is a composite operation.
+     */
+    @Override
+    public ResultHandler<Collection<PartialToken>> getDeleteOnQueryHandler() {
+        return new DefaultMonitoringResultHandler<Collection<PartialToken>>(
+                factory.getDeleteOnQueryHandler(), store, CTSOperation.LIST);
+    }
 }
