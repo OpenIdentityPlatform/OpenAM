@@ -11,21 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap.helpers;
 
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
+import java.nio.charset.Charset;
+import java.util.Set;
 import org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo;
 import static org.forgerock.openam.idrepo.ldap.LDAPConstants.*;
 
 /**
  * Provides a generic implementation of directory specific settings, that for non-generic directories (like AD), could
  * override when needed.
- *
- * @author Peter Major
  */
 public class DirectoryHelper {
 
@@ -35,21 +35,36 @@ public class DirectoryHelper {
      * Encodes the password to use the "correct" character encoding.
      *
      * @param type The type of the identity, which should be always USER.
-     * @param attrValue The password value either in string or binary format.
-     * @return The encoded password, or null if encoding is not applicable.
+     * @param attrValue The password value either in string or binary format. If binary, it is assumed that the value
+     * is already correctly encoded. May be null.
+     * @return The encoded password, or null if the input was null.
      */
     public byte[] encodePassword(IdType type, Object attrValue) {
+        if (type.equals(IdType.USER)) {
+            if (attrValue instanceof Set) {
+                Set<String> password = (Set<String>) attrValue;
+                if (!password.isEmpty()) {
+                    return encodePassword(password.iterator().next());
+                }
+            } else if (attrValue instanceof byte[][]) {
+                byte[][] binaryAttr = (byte[][]) attrValue;
+                if (binaryAttr.length > 0) {
+                    return binaryAttr[0];
+                }
+            }
+        }
+
         return null;
     }
 
     /**
      * Encodes the password to use the "correct" character encoding.
      *
-     * @param password The password in string format.
-     * @return The encoded password, or null if encoding is not applicable.
+     * @param password The password in string format. May be null.
+     * @return The encoded password, or null if the input was null.
      */
     public byte[] encodePassword(String password) {
-        return null;
+        return password == null ? null : password.getBytes(Charset.forName("UTF-8"));
     }
 
     /**
