@@ -565,7 +565,7 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-auth-scripted-deviceprint</artifactId>
+                <artifactId>openam-auth-device-id</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

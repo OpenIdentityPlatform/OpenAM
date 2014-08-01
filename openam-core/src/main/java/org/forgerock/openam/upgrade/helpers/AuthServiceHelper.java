@@ -42,8 +42,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
     private final static String OPEN_ID_CONNECT = "org.forgerock.openam.authentication.modules.oidc.OpenIdConnect";
     private final static String SCRIPTED = "org.forgerock.openam.authentication.modules.scripted.Scripted";
-    private final static String SCRIPTED_DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.ScriptedDevicePrint";
-    private final static String DEVICE_PRINT_PERSIST = "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintPersist";
+    private final static String SCRIPTED_DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdMatch";
+    private final static String DEVICE_PRINT_PERSIST = "org.forgerock.openam.authentication.modules.deviceprint.DeviceIdSave";
 
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";

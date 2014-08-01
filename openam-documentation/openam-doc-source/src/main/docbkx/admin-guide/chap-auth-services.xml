@@ -3774,10 +3774,10 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   </section>
 
   <section xml:id="oidc-module-conf-hints">
-   <title>Hints for the OpenID Connect Token Authentication Module</title>
+   <title>Hints for the OpenID Connect Module</title>
 
    <para>
-    The OpenID Connect ID Token Authentication module lets OpenAM rely on
+    The OpenID Connect ID module lets OpenAM rely on
     an <link xlink:show="new" xlink:href="http://openid.net/connect/"
     >OpenID Connect 1.0</link> provider's ID Token to authenticate an end user.
     The module expects an OpenID Connect ID Token in an HTTP request header.
@@ -3789,7 +3789,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    </para>
 
    <para>
-    You configure the OpenID Connect ID Token Authentication module
+    You configure the OpenID Connect module
     to specify how OpenAM gets the information needed to validate the ID Token,
     which request header contains the ID Token,
     the issuer identifier for the provider who issued the ID Token,
