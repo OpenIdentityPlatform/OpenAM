@@ -24,6 +24,7 @@
  *
  * $Id: SMProfileModel.java,v 1.2 2008/06/25 05:43:21 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.session.model;
@@ -55,10 +56,9 @@ public interface SMProfileModel
      * @param list of session <code>ID</code>s.
      * @param pattern Search pattern.
      * @return a list of session <code>ID</code>s that cannot be validated.
+     * @throws AMConsoleException If an error occurred while invalidating the sessions.
      */
-    public List invalidateSessions(List list, String pattern)
-        throws AMConsoleException;
-
+    public List<String> invalidateSessions(List<String> list, String pattern) throws AMConsoleException;
 
     /**
      * Returns true if current user session state is valid.

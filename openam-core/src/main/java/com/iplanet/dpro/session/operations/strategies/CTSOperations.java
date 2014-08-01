@@ -1,6 +1,4 @@
-/**
- * Copyright 2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -27,10 +27,14 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
+import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.query.PartialToken;
 
+import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -82,9 +86,8 @@ public class CTSOperations implements SessionOperations {
      * converted to a SessionInfo object. The token is not modified as part of
      * this operation.
      *
-     * @param session Non null SessionID to use for the lookup.
+     * @param session Non null SessionID to update.
      * @param reset If true, then update the last modified timestamp of the Session.
-     * @param session The SessionID to update.
      * @return A non null SessionInfo
      * @throws SessionException If there was a problem locating the Session in the CTS.
      */
@@ -119,13 +122,33 @@ public class CTSOperations implements SessionOperations {
      *
      * This will, like logout, perform a delete on the token.
      *
-     * @param session Non null SessionID to use for the lookup.
-     * @throws SessionException If there was a problem deleting the token.
+     * @param requester {@inheritDoc}
+     * @param session {@inheritDoc}
+     * @throws SessionException {@inheritDoc}
      */
-    public void destroy(Session session) throws SessionException {
+    @Override
+    public void destroy(Session requester, Session session) throws SessionException {
         SessionID sessionID = session.getID();
-        removeToken(sessionID);
+        String sid = sessionID.toString();
+        if (sid.startsWith(SessionService.SHANDLE_SCHEME_PREFIX)) {
+            try {
+                Collection<PartialToken> matches = cts.attributeQuery(new TokenFilterBuilder()
+                        .returnAttribute(SessionTokenField.SESSION_ID.getField())
+                        .withAttribute(SessionTokenField.SESSION_HANDLE.getField(), sid)
+                        .build());
+                for (PartialToken match : matches) {
+                    //There should be always only one match, so this should be safe
+                    sessionID = new SessionID(match.<String>getValue(SessionTokenField.SESSION_ID.getField()));
+                }
+            } catch (CoreTokenException cte) {
+                debug.error("Failed to query/delete token based on session handle: " + sid, cte);
+                throw new SessionException(cte);
+            }
+        }
+
+        sessionService.checkPermissionToDestroySession(requester, sessionID);
         sessionService.destroyInternalSession(sessionID);
+        removeToken(sessionID);
     }
 
     /**

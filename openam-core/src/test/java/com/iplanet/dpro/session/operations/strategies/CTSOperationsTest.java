@@ -34,9 +34,6 @@ import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class CTSOperationsTest {
@@ -47,10 +44,12 @@ public class CTSOperationsTest {
     private SessionInfoFactory mockInfoFactory;
     private SessionService mockSessionService;
     private CTSOperations ctsOperations;
+    private Session mockRequester;
     private Session mockSession;
 
     @BeforeMethod
     public void setUp() throws Exception {
+        mockRequester = mock(Session.class);
         mockSession = mock(Session.class);
         mockCTS = mock(CTSPersistentStore.class);
         mockAdapter = mock(SessionAdapter.class);
@@ -126,16 +125,17 @@ public class CTSOperationsTest {
     }
 
     @Test
-    public void shouldDeleteTokenFromCTSDuringDestory() throws CoreTokenException, SessionException {
+    public void shouldDeleteTokenFromCTSDuringDestroy() throws Exception {
         // Given
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
 
         // When
-        ctsOperations.destroy(mockSession);
+        ctsOperations.destroy(mockRequester, mockSession);
 
         // Then
         verify(mockCTS).delete(anyString());
+        verify(mockSessionService).checkPermissionToDestroySession(mockRequester, mockSessionID);
         verify(mockSessionService).destroyInternalSession(eq(mockSessionID));
     }
 

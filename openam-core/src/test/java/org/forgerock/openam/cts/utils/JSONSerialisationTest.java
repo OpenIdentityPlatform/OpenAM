@@ -110,6 +110,7 @@ public class JSONSerialisationTest {
                 + "NpXlpg28.*AAJTSQACMDIAAlMxAAIwMQACU0sAEzc5ODIzMDM5MzQyNzU2MTg1NDQ.*"));
         assertThat(restriction).isNotNull().isInstanceOf(DNOrIPAddressListTokenRestriction.class);
         assertThat(restriction.toString().equals("Fzy2GsI/O1TsXhvlVuqjqIuTG2k="));
+        assertThat(is.getSessionHandle()).isNotNull().isEqualTo("shandle:weasel");
     }
 
     @DataProvider(name = "complex")
@@ -126,6 +127,7 @@ public class JSONSerialisationTest {
         assertThat(is).isNotNull();
         assertThat(is.getID()).isNotNull();
         assertThat(Collections.list(is.getPropertyNames())).hasSize(23);
+        assertThat(is.getSessionHandle()).isNotNull();
     }
 
     @Test(dataProvider = "complex")

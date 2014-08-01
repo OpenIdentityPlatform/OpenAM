@@ -24,12 +24,8 @@
  *
  * $Id: SMProfileModelImpl.java,v 1.5 2008/06/25 05:43:21 qcheng Exp $
  *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
-
 package com.sun.identity.console.session.model;
 
 import com.iplanet.dpro.session.Session;
@@ -146,23 +142,17 @@ public class SMProfileModelImpl extends AMModelBase
         return session;
     }
 
-    private Map getValidSessions(Session session, String pattern)
-        throws AMConsoleException
-    {
-        Map sessions = Collections.EMPTY_MAP;
+    private Map<String, Session> getValidSessions(Session session, String pattern) throws AMConsoleException {
+        Map<String, Session> sessions = Collections.emptyMap();
 
         try {
-            SearchResults result = session.getValidSessions(
-                serverName, pattern);
-            Map<String, Session> validSessions = (Map<String, Session>) result.getResultAttributes();
+            SearchResults result = session.getValidSessions(serverName, pattern);
+            Map<String, Session> validSessions = result.getResultAttributes();
 
             if ((validSessions != null) && !validSessions.isEmpty()) {
-                sessions = new HashMap(validSessions.size());
+                sessions = new HashMap<String, Session>(validSessions.size());
 
-                for (Iterator iter = validSessions.values().iterator();
-                    iter.hasNext();
-                ) {
-                    Session s = (Session)iter.next();
+                for (Session s : validSessions.values()) {
                     if (s != null) {
                         sessions.put(s.getID().toString(), s);
                     }
@@ -175,21 +165,12 @@ public class SMProfileModelImpl extends AMModelBase
         return sessions;
     }
 
-    /**
-     * Invalidates list of session.
-     *
-     * @param list of session <code>ID</code>s.
-     * @param pattern Search pattern.
-     * @return a list of session <code>ID</code>s that cannot be validated.
-     */
-    public List invalidateSessions(List list, String pattern) 
-        throws AMConsoleException
-    {
-        List failList = Collections.EMPTY_LIST;
+    public List<String> invalidateSessions(List<String> list, String pattern) throws AMConsoleException {
+        List<String> failList = Collections.emptyList();
 
         if ((list != null) && !list.isEmpty()) {
             Session session = getCurrentSession();
-            Map validSessions = getValidSessions(session, pattern);
+            Map<String, Session> validSessions = getValidSessions(session, pattern);
             list.retainAll(validSessions.keySet());
 
             if (!list.isEmpty()) {
@@ -206,20 +187,18 @@ public class SMProfileModelImpl extends AMModelBase
                 params[0] = serverName;
                 String curSessionId = null;
 
-                failList = new ArrayList(list.size());
+                failList = new ArrayList<String>(list.size());
 
-                for (Iterator iter = list.iterator(); iter.hasNext(); ) {
-                    String sessionId = (String)iter.next();
-                    Session s = (Session)validSessions.get(sessionId);
+                for (String sessionId : list) {
+                    Session s = validSessions.get(sessionId);
                     params[1] = sessionId;
                     boolean isCurrentSession = false;
 
-                     try {
-                        isCurrentSession = currentSessionHandler.equals(
-                            s.getProperty(Session.SESSION_HANDLE_PROP)); 
+                    try {
+                        isCurrentSession = currentSessionHandler.equals(s.getProperty(Session.SESSION_HANDLE_PROP));
                     } catch (SessionException se) {
                         logEvent("SESSION_EXCEPTION_INVALIDATE_SESSIONS",
-                            params);
+                                params);
                         throw new AMConsoleException(getErrorString(se));
                     }
 
@@ -232,20 +211,15 @@ public class SMProfileModelImpl extends AMModelBase
                             session.destroySession(s);
                             logEvent("SUCCEED_INVALIDATE_SESSIONS",params);
                         } catch (SessionException se) {
-                            String[] paramsEx = {serverName, sessionId,
-                                getErrorString(se)};
-                            logEvent("SESSION_EXCEPTION_INVALIDATE_SESSIONS",
-                                paramsEx);
-
+                            String[] paramsEx = {serverName, sessionId, getErrorString(se)};
+                            logEvent("SESSION_EXCEPTION_INVALIDATE_SESSIONS", paramsEx);
                             try {
                                 failList.add(s.getProperty(USER_ID));
                             } catch (SessionException e) {
-                                debug.error(
-                                    "SMProfileModelImpl.invalidateSessions", e);
+                                debug.error("SMProfileModelImpl.invalidateSessions", e);
                             }
 
-                            debug.error(
-                                "SMProfileModelImpl.invalidateSessions", se);
+                            debug.error("SMProfileModelImpl.invalidateSessions", se);
                         }
                     }
                 }
@@ -277,27 +251,6 @@ public class SMProfileModelImpl extends AMModelBase
      */
     public boolean isSessionValid() {
         return validSession;
-    }
-
-
-    /**
-     * Returns true if the two sessions passed are same.
-     *
-     * @param session current session
-     * @param sess session to be destroyed.
-     * @return true if two sessions are same
-     */
-    private boolean isSessionsEquals(Session session, Session sess) {
-        boolean isCurrentSession = false;
-        try {
-            String currentSessionHandler =
-                session.getProperty(Session.SESSION_HANDLE_PROP);
-            isCurrentSession = currentSessionHandler.equals(
-                sess.getProperty(Session.SESSION_HANDLE_PROP));
-        } catch (SessionException se) {
-            debug.error ("Could not determined if the sessions are same ", se);
-        }
-        return isCurrentSession;
     }
 
     /**

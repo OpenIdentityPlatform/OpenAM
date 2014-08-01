@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -40,12 +40,17 @@ public class RemoteOperationsTest {
 
     private Requests mockRequests;
     private RemoteOperations remoteOperations;
+    private Session mockRequester;
     private Session mockSession;
+    private SessionID mockRequesterId;
     private SessionID mockSessionId;
     private SessionResponse mockResponse;
 
     @BeforeMethod
     public void setup() throws SessionException {
+        mockRequester = mock(Session.class);
+        mockRequesterId = mock(SessionID.class);
+        given(mockRequester.getID()).willReturn(mockRequesterId);
         mockSession = mock(Session.class);
         mockSessionId = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionId);
@@ -119,7 +124,7 @@ public class RemoteOperationsTest {
         // Given
 
         // When
-        remoteOperations.destroy(mockSession);
+        remoteOperations.destroy(mockRequester, mockSession);
 
         // Then
         verify(mockRequests).sendRequestWithRetry(any(URL.class), any(SessionRequest.class), eq(mockSession));

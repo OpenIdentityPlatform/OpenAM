@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -35,8 +35,6 @@ import java.util.regex.Pattern;
 /**
  * SessionAdapter is responsible for providing conversions to and from InternalSession
  * and managing the details around data conversion for this class.
- *
- * @author robert.wapshott@forgerock.com
  */
 public class SessionAdapter implements TokenAdapter<InternalSession> {
 
@@ -104,6 +102,9 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
             token.setAttribute(SessionTokenField.LATEST_ACCESS_TIME.getField(), latestAccessTime);
         }
 
+        // Session handle
+        token.setAttribute(SessionTokenField.SESSION_HANDLE.getField(), session.getSessionHandle());
+
         return token;
     }
 
@@ -134,7 +135,14 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
             jsonBlob = jsonBlob.substring(0, index) + addition + jsonBlob.substring(index, jsonBlob.length());
         }
 
-        return serialisation.deserialise(jsonBlob, InternalSession.class);
+        InternalSession session = serialisation.deserialise(jsonBlob, InternalSession.class);
+        if (session.getSessionHandle() == null) {
+            //Originally the sessionHandle was stored in the serialize token, so if after the deserialization the
+            //sessionHandle field is not set, then we should attempt to retrieve the value directly from the token.
+            session.setSessionHandle(token.<String>getValue(SessionTokenField.SESSION_HANDLE.getField()));
+        }
+
+        return session;
     }
 
     /**

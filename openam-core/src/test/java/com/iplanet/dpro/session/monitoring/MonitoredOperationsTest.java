@@ -64,14 +64,15 @@ public class MonitoredOperationsTest {
     @Test
     public void destroyTest() throws SessionException {
         //given
+        Session mockRequester = mock(Session.class);
         Session mockSession = mock(Session.class);
 
         //when
-        testMoniteredOperations.destroy(mockSession);
+        testMoniteredOperations.destroy(mockRequester, mockSession);
 
         //then
 
-        verify(mockSessionOperations, times(1)).destroy(mockSession);
+        verify(mockSessionOperations, times(1)).destroy(mockRequester, mockSession);
         verify(mockStore).storeDestroyTime(anyLong(), any(SessionMonitorType.class));
     }
 

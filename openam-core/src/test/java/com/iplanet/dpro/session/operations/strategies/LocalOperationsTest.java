@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,12 +10,15 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.sun.identity.shared.debug.Debug;
@@ -25,23 +26,26 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
 
 public class LocalOperationsTest {
 
     private LocalOperations local;
     private SessionService mockService;
+    private Session mockRequester;
     private Session mockSession;
     private SessionID mockSessionID;
+    private InternalSession mockInternalSession;
 
     @BeforeMethod
     public void setup() {
         mockSessionID = mock(SessionID.class);
+        mockRequester = mock(Session.class);
         mockSession = mock(Session.class);
         given(mockSession.getID()).willReturn(mockSessionID);
+        mockInternalSession = mock(InternalSession.class);
+        given(mockInternalSession.getID()).willReturn(mockSessionID);
 
         mockService = mock(SessionService.class);
 
@@ -81,10 +85,11 @@ public class LocalOperationsTest {
     @Test
     public void shouldUseSessionServiceForDestroy() throws SessionException {
         // Given
+        given(mockService.getInternalSession(mockSessionID)).willReturn(mockInternalSession);
         // When
-        local.destroy(mockSession);
+        local.destroy(mockRequester, mockSession);
         // Then
-        verify(mockService).destroyInternalSession(eq(mockSessionID));
+        verify(mockService).destroySession(eq(mockRequester), eq(mockSessionID));
     }
 
     @Test

@@ -64,6 +64,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonSetter;
 
 /**
@@ -172,10 +173,10 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     private static long purgeDelay;
 
-    /*
-     * session handle is used to prevent administrator from impersonating other
-     * users
+    /**
+     * Session handle is used to prevent administrator from impersonating other users.
      */
+    @JsonIgnore
     private String sessionHandle = null;
 
     /** session property LoginURL */
@@ -1258,6 +1259,8 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
 
         info.properties = (Properties) sessionProperties.clone();
+        //Adding the sessionHandle as a session property, so the sessionHandle is available in Session objects.
+        info.properties.put(Session.SESSION_HANDLE_PROP, sessionHandle);
         return info;
     }
 
@@ -1660,13 +1663,24 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
     }
 
-    void setSessionHandle(String sessionHandle) {
+    /**
+     * Used during session deserialization. This method SHALL NOT be invoked by custom code.
+     *
+     * @param sessionHandle The sessionHandle to set.
+     */
+    @JsonSetter
+    public void setSessionHandle(String sessionHandle) {
         this.sessionHandle = sessionHandle;
-        putProperty(Session.SESSION_HANDLE_PROP, sessionHandle);
-        updateForFailover();
+        //No need to update the session for failover, as this method is invoked only upon session
+        //creation/deserialization.
     }
 
-    String getSessionHandle() {
+    /**
+     * Returns the session handle.
+     *
+     * @return The session handle.
+     */
+    public String getSessionHandle() {
         return sessionHandle;
     }
 

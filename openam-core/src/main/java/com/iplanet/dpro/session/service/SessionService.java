@@ -24,12 +24,8 @@
  *
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
-
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -288,7 +284,7 @@ public class SessionService {
 
     private static Set remoteSessionSet = null;
 
-    private static Hashtable sessionHandleTable = new Hashtable();
+    private static final Hashtable<String, InternalSession> sessionHandleTable = new Hashtable<String, InternalSession>();
 
     private static Map restrictedTokenMap = Collections.synchronizedMap(new HashMap());
 
@@ -729,8 +725,7 @@ public class SessionService {
                     isSiteEnabled ? thisSessionServerID : sessionServerID,
                     domain);
 
-        } while (sessionTable.get(sid) != null
-                || sessionHandleTable.get(sid) != null);
+        } while (sessionTable.get(sid) != null || sessionHandleTable.get(sid.toString()) != null);
         return sid;
     }
 
@@ -840,7 +835,7 @@ public class SessionService {
     public boolean isSessionPresent(SessionID sid) {
         boolean isPresent = sessionTable.get(sid) != null
                 || restrictedTokenMap.get(sid) != null
-                || sessionHandleTable.get(sid) != null;
+                || sessionHandleTable.get(sid.toString()) != null;
 
         return isPresent;
     }
@@ -990,7 +985,7 @@ public class SessionService {
      * @return Internal Session corresponding to a session handle
      */
     public InternalSession getInternalSessionByHandle(String shandle) {
-        return (InternalSession) sessionHandleTable.get(shandle);
+        return sessionHandleTable.get(shandle);
     }
 
     /**
@@ -1329,47 +1324,62 @@ public class SessionService {
      * Destroy a Internal Session, depending on the value of the user's
      * preferences.
      *
-     * @param s
+     * @param requester
      * @param sid
      * @throws SessionException
      */
-    public void destroySession(Session s, SessionID sid)
-            throws SessionException {
-        if (sid == null)
+    public void destroySession(Session requester, SessionID sid) throws SessionException {
+        if (sid == null) {
             return;
-        if (s.getState(false) != Session.VALID) {
-            throw new SessionException(SessionBundle
-                    .getString("invalidSessionState")
-                    + sid.toString());
         }
-        InternalSession sess = sessionService.getInternalSession(sid);
+
+        InternalSession sess = getInternalSession(sid);
 
         if (sess == null) {
             // let us check if the argument is a session handle
-            sess = sessionService.getInternalSessionByHandle(sid.toString());
+            sess = getInternalSessionByHandle(sid.toString());
         }
 
         if (sess != null) {
             sid = sess.getID();
-            try {
-                // a session can destroy itself or super admin can destroy
-                // anyone including another super admin
-                if ((s.getID().equals(sid)) || (hasTopLevelAdminRole(s))) {
-                    sessionService.destroyInternalSession(sid);
-                    return;
-                }
-                AMIdentity user = getUser(s);
-                Set orgList = user
-                        .getAttribute("iplanet-am-session-destroy-sessions");
-                if (!orgList.contains(s.getClientDomain())) {
-                    throw new SessionException(SessionBundle.rbName,
-                            "noPrivilege", null);
-                }
-                sessionService.destroyInternalSession(sid);
-            } catch (Exception e) {
-                throw new SessionException(e);
+            checkPermissionToDestroySession(requester, sid);
+            destroyInternalSession(sid);
+        }
+    }
+
+    /**
+     * Checks if the requester has the necessary permission to destroy the provided session. The user has the necessary
+     * privileges if one of these conditions is fulfilled:
+     * <ul>
+     *  <li>The requester attempts to destroy its own session.</li>
+     *  <li>The requester has top level admin role (having read/write access to any service configuration in the top
+     *  level realm).</li>
+     *  <li>The session's client domain is listed in the requester's profile under the
+     *  <code>iplanet-am-session-destroy-sessions service</code> service attribute.</li>
+     * </ul>
+     *
+     * @param requester The requester's session.
+     * @param sid The session to destroy.
+     * @throws SessionException If none of the conditions above is fulfilled, i.e. when the requester does not have the
+     * necessary permissions to destroy the session.
+     */
+    public void checkPermissionToDestroySession(Session requester, SessionID sid) throws SessionException {
+        if (requester.getState(false) != Session.VALID) {
+            throw new SessionException(SessionBundle.getString("invalidSessionState") + sid.toString());
+        }
+        try {
+            // a session can destroy itself or super admin can destroy anyone including another super admin
+            if (requester.getID().equals(sid) || hasTopLevelAdminRole(requester)) {
+                return;
             }
 
+            AMIdentity user = getUser(requester);
+            Set<String> orgList = user.getAttribute("iplanet-am-session-destroy-sessions");
+            if (!orgList.contains(requester.getClientDomain())) {
+                throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
+            }
+        } catch (Exception e) {
+            throw new SessionException(e);
         }
     }
 

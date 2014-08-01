@@ -938,7 +938,7 @@ public class Session extends GeneralTaskRunnable {
     public void destroySession(Session session) throws SessionException {
         try {
             SessionOperations operation = sessionStrategy.getOperation(session);
-            operation.destroy(session);
+            operation.destroy(this, session);
         } catch (Exception e) {
             throw new SessionException(e);
         }

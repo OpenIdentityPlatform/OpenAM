@@ -72,13 +72,10 @@ public class MonitoredOperations implements SessionOperations {
         sessionMonitoringStore.storeLogoutTime(System.nanoTime() - start, monitorType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void destroy(Session session) throws SessionException {
+    public void destroy(Session requester, Session session) throws SessionException {
         final long start = System.nanoTime();
-        sessionOperations.destroy(session);
+        sessionOperations.destroy(requester, session);
 
         sessionMonitoringStore.storeDestroyTime(System.nanoTime() - start, monitorType);
     }

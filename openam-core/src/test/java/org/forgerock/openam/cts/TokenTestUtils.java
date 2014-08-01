@@ -26,7 +26,7 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.fest.assertions.Assertions.*;
 
 /**
  * Provides CTS based Token testing functionality, specifically for unit testing.
@@ -40,7 +40,7 @@ public class TokenTestUtils {
      * @param expected Non null.
      */
     public static void assertTokenEquals(Token result, Token expected) {
-        assertEquals(result.getAttributeNames().size(), expected.getAttributeNames().size());
+        assertThat(result.getAttributeNames()).isEqualTo(expected.getAttributeNames());
         for (CoreTokenField field : result.getAttributeNames()) {
 
             if (CoreTokenFieldTypes.isCalendar(field)) {

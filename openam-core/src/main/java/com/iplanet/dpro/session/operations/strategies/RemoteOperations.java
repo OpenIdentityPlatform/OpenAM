@@ -109,19 +109,18 @@ public class RemoteOperations implements SessionOperations {
     /**
      * Destroys the Session via the Session remote service URL.
      *
-     * @param session Session to destroy.
-     * @throws SessionException
+     * @param requester {@inheritDoc}
+     * @param session {@inheritDoc}
+     * @throws SessionException {@inheritDoc}
      */
-    public void destroy(Session session) throws SessionException {
+    public void destroy(Session requester, Session session) throws SessionException {
         if (debug.messageEnabled()) {
             debug.message(MessageFormat.format(
                     "Remote destroy {0}",
                     session));
         }
 
-        SessionRequest sreq = new SessionRequest(
-                SessionRequest.DestroySession, session.getID().toString(),
-                false);
+        SessionRequest sreq = new SessionRequest(SessionRequest.DestroySession, requester.getID().toString(), false);
         sreq.setDestroySessionID(session.getID().toString());
         requests.sendRequestWithRetry(session.getSessionServiceURL(), sreq, session);
     }

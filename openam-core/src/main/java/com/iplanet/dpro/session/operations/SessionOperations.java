@@ -65,9 +65,11 @@ public interface SessionOperations {
      *
      * This operation is similar to the logout and uses similar behaviour.
      *
-     * @param session SessionID to destroy.
+     * @param requester The requester's non null session used to authorize the destroy operation.
+     * @param session The non null session to destroy.
+     * @throws SessionException If there was an error while deleting the token.
      */
-    public void destroy(Session session) throws SessionException;
+    public void destroy(Session requester, Session session) throws SessionException;
 
     /**
      * Assigns the property to the Session.

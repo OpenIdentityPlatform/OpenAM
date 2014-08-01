@@ -1,6 +1,4 @@
-/**
- * Copyright 2014 ForgeRock AS.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,6 +10,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -88,15 +88,16 @@ public class LocalOperations implements SessionOperations {
     /**
      * Destroy the Session using the SessionService.
      *
-     * @param session Session to destroy.
+     * @param requester {@inheritDoc}
+     * @param session {@inheritDoc}
+     * @throws SessionException {@inheritDoc}
      */
-    public void destroy(Session session) throws SessionException {
+    @Override
+    public void destroy(Session requester, Session session) throws SessionException {
         if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    "Local destroy for {0}",
-                    session.getID().toString()));
+            debug.message(MessageFormat.format("Local destroy for {0}", session.getID().toString()));
         }
-        service.destroyInternalSession(session.getID());
+        service.destroySession(requester, session.getID());
     }
 
     /**
