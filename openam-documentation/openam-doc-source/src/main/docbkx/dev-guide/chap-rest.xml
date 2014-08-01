@@ -173,7 +173,7 @@
   </tip>
 
   <section xml:id="rest-api-auth-json">
-   <title>Authentication &amp; Logout</title>
+   <title>REST APIs for Authentication &amp; Logout</title>
 
    <para>The simplest user name/password authentication returns a
    <literal>tokenId</literal> that applications can present as a cookie
@@ -263,7 +263,7 @@ $ <userinput>curl \
    values filled, as in this case where the user name is <literal>demo</literal>
    and the password is <literal>changeit</literal>.</para>
 
-   <informalexample><?dbfo pgwide="1"?>
+   <informalexample>
    <screen>
 $ <userinput>curl \
  --request POST \
@@ -284,7 +284,7 @@ $ <userinput>curl \
    <para>Alternatively, you can authenticate without requesting a session
    using the <literal>noSession</literal> query string parameter.</para>
 
-   <informalexample><?dbfo pgwide="1"?>
+   <informalexample>
    <screen>
 $ <userinput>curl \
  --request POST \
@@ -2410,7 +2410,7 @@ $ <userinput>curl \
       that returns only the first of three policies.
      </para>
 
-     <screen width="99">
+     <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_fields=name\&amp;_pageSize=1</userinput>
@@ -2435,7 +2435,7 @@ $ <userinput>curl \
       The following example sorts the policy objects by their names.
      </para>
 
-     <screen width="88">
+     <screen>
   $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w..." \
  https://openam.example.com:8443/openam/json/policies?_queryFilter=true\&amp;_sortKeys=name</userinput>
@@ -2994,7 +2994,7 @@ $ <userinput>curl \
       for a user who has access to perform the operation.
      </para>
 
-     <screen width="89">
+     <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/realm/applications/iPlanetAMWebAgentService</userinput>
@@ -3071,7 +3071,7 @@ $ <userinput>curl \
       for a user who has access to perform the operation.
      </para>
 
-     <screen width="81">
+     <screen>
 $ <userinput>curl \
  --request PUT \
  --header "iPlanetDirectoryPro: AQIC5..." \
@@ -3211,7 +3211,7 @@ $ <userinput>curl \
       setting at least the <literal>_queryFilter</literal> query string parameter.
      </para>
 
-     <screen width="81">
+     <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/realm/applications?_queryFilter=true</userinput>
@@ -3773,7 +3773,7 @@ $ <userinput>curl \
       as in the following example.
      </para>
 
-     <screen width="83">
+     <screen>
 $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5..." \
  https://openam.example.com:8443/openam/json/realm/conditiontypes?_queryFilter=true</userinput>
@@ -4332,7 +4332,7 @@ $ <userinput>curl \
      <para>Notice that the "state" is returned as a long string, and so is not
      shown here in full.</para>
 
-     <screen width="81">
+     <screen>
 $ <userinput>curl \
  --request GET \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -4399,7 +4399,7 @@ $ <userinput>curl \
      <para>To update a policy, use an HTTP PUT on the endpoint followed by the
      URL-encoded name of the policy.</para>
 
-     <screen width="81">
+     <screen>
 $ <userinput>cat update.json</userinput>
 <computeroutput>{
     "name": "Example HTTP",
@@ -4440,7 +4440,7 @@ $ <userinput>curl \
      <para>To delete a policy, use an HTTP DELETE on the endpoint followed by
      the URL-encoded name of the policy.</para>
 
-     <screen width="81">
+     <screen>
 $ <userinput>curl \
  --request DELETE \
  --cookie "iPlanetDirectoryPro=AQIC5...DU3*" \
@@ -5103,6 +5103,7 @@ $ <userinput>curl \
 
  <section xml:id="rest-api-self-registration">
   <title>User Self-Registration</title>
+
   <indexterm><primary>Self-registration</primary></indexterm>
 
   <para>
@@ -5122,10 +5123,10 @@ $ <userinput>curl \
   can further use to request creation of the user account to complete the
   transaction.</para>
 
-  <orderedlist>
-   <para>An example follows, showing the steps in more detail.</para>
+  <procedure xml:id="setup-user-self-registration">
+   <title>To Set Up User Self-Registration</title>
 
-   <listitem>
+   <step>
     <para>Configure the Email Service and REST Security.</para>
 
     <para>In particular, you must configure the Email Service to send mail
@@ -5151,9 +5152,9 @@ $ <userinput>curl \
      The steps that follow show how to use the REST API directly.
     </para>
 
-   </listitem>
+   </step>
 
-   <listitem>
+   <step>
     <para>Perform an HTTP POST on <literal>/json/users?_action=register</literal>
     with the new user's mail.</para>
 
@@ -5188,22 +5189,23 @@ $ <userinput>curl \
 
     <para>On success, the response is an empty JSON object <literal>{}</literal>
     as shown in the example.</para>
-   </listitem>
+   </step>
 
-   <listitem>
+   <step>
     <para>
      The user receives an email message that includes a URL
      similar to the following example, but all on one line.
+     The user has self-registered in the root realm:
     </para>
 
     <literallayout class="monospaced"
     >https://openam.example.com:8443/openam/json/confirmation/register?
      confirmationId=P23PK5kyAgNdqeNJpAvq1ebcpcg=
      &amp;email=newuser@example.com
-     &amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=</literallayout>
-   </listitem>
-
-   <listitem>
+     &amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=
+     &amp;realm=</literallayout>
+   </step>
+   <step>
     <para>Intercept the HTTP GET request to this URL when the user clicks the
     link.</para>
 
@@ -5231,9 +5233,9 @@ $ <userinput>curl \
 
     <para>The response is a further confirmation that the account can be
     created.</para>
-   </listitem>
+   </step>
 
-   <listitem>
+   <step>
     <para>Using the confirmation, your application must make an authenticated
     HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
     create the user as shown in the following example.</para>
@@ -5297,11 +5299,10 @@ $ <userinput>curl \
     ]
 }</computeroutput>
     </screen>
-   </listitem>
-  </orderedlist>
-
-  <para>At this point the user is registered, active, and can authenticate
-  with OpenAM.</para>
+    <para>At this point the user is registered, active, and can authenticate
+     with OpenAM.</para>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="rest-api-password-reset">
@@ -5739,7 +5740,7 @@ $ <userinput>curl \
    <para>The same HTTP POST and PUT mechanisms also work for other objects
    such as policy agent profiles and groups.</para>
 
-   <screen width="82">
+   <screen>
 $ <userinput>curl \
  --request POST \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
