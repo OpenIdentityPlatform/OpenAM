@@ -22,7 +22,9 @@
                 "notFoundError" : "Not found error.",
                 "badRequestError" : "Bad request error.",
                 "conflictError" : "Detected conflict in request.",
-                "incorrectRevisionError" : "Cannot update the record because the version is not the latest."
+                "incorrectRevisionError" : "Cannot update the record because the version is not the latest.",
+                "tokenNotFound" : "Token not found.",
+                "securityDataChanged" : "Password was changed"
             },
             "UserMessages" : {
                 "invalidOldPassword" : "Old password is invalid.",
@@ -36,7 +38,6 @@
                 "userNameUpdated" : "Username has been modified succesfully.",
                 "afterRegistration" : "User has been registered successfully",
                 "siteIdentificationChanged" : "Site identification image has been changed",
-                "securityDataChanged" : "Password was changed",
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
                 "errorFetchingNotifications" : "Error Fetching notifications."
