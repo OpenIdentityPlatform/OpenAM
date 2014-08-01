@@ -24,33 +24,33 @@
  *
  * $Id: Scoping.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
 package com.sun.identity.saml2.protocol;
 
 import com.sun.identity.saml2.common.SAML2Exception;
-import org.w3c.dom.Element;
 import java.util.List;
 
 
-/** 
- * This interface defines methods to retrieve Identity Providers and 
+/**
+ * This interface defines methods to retrieve Identity Providers and
  * context/limitations related to proxying of the request message.
  *
  * @supported.all.api
  */
 public interface Scoping {
-    
-    /** 
+
+    /**
      * Returns the <code>IDPList</code> Object.
      *
      * @return the <code>IDPList</code> object.
      * @see #setIDPList(IDPList)
      */
     public IDPList getIDPList();
-    
-    /** 
+
+    /**
      * Sets the <code>IDPList</code> Object.
      *
      * @param idpList the new <code>IDPList</code> object.
@@ -58,52 +58,51 @@ public interface Scoping {
      * @see #getIDPList
      */
     public void setIDPList(IDPList idpList) throws SAML2Exception;
-    
-    /** 
+
+    /**
      * Returns a list of <code>RequesterID</code> Objects..
      *
      * @return list of <code>RequesterID</code> objects.
      * @see #setRequesterIDs(List)
      */
-    public List getRequesterIDs();
-    
-    /** 
+    public List<RequesterID> getRequesterIDs();
+
+    /**
      * Sets a list of <code>RequesterID</code> Objects.
      *
      * @param requesterIDList the list of <code>RequesterID</code> object.
      * @throws SAML2Exception if the object is immutable.
      * @see #getRequesterIDs
      */
-    public void setRequesterIDs(List requesterIDList) 
-		throws SAML2Exception;
-    
-    /** 
+    public void setRequesterIDs(List<RequesterID> requesterIDList) throws SAML2Exception;
+
+    /**
      * Returns the value of <code>ProxyCount</code> attribute.
      *
      * @return the value of <code>ProxyCount</code> attribute.
      * @see #setProxyCount(Integer)
      */
     public Integer getProxyCount();
-    
-    /** 
+
+    /**
      * Sets the value of <code>ProxyCount</code> attribute.
      *
      * @param proxyCount new value of <code>ProxyCount</code> attribute.
      * @throws SAML2Exception if the object is immutable.
      * @see #getProxyCount
      */
-    
+
     public void setProxyCount(Integer proxyCount) throws SAML2Exception;
-    
-    /** 
+
+    /**
      * Returns a String representation of this Object.
      *
      * @return a String representation of this Object.
      * @throws SAML2Exception if cannot create String object
      */
     public String toXMLString() throws SAML2Exception;
-    
-    /** 
+
+    /**
      * Returns a String representation of this Object.
      *
      * @param includeNSPrefix determines whether or not the namespace
@@ -113,17 +112,17 @@ public interface Scoping {
      * @return the String representation of this Object.
      * @throws SAML2Exception if String object cannot be created.
      **/
-    
+
     public String toXMLString(boolean includeNSPrefix,boolean declareNS)
 	throws SAML2Exception;
-    
-        
-    /** 
-     * Makes this object immutable. 
+
+
+    /**
+     * Makes this object immutable.
      */
     public void makeImmutable() ;
-    
-    /** 
+
+    /**
      * Returns true if object is mutable.
      *
      * @return true if object is mutable.

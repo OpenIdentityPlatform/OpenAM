@@ -24,8 +24,8 @@
  *
  * $Id: ScopingImpl.java,v 1.5 2009/03/12 20:32:41 huacui Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
-
 
 package com.sun.identity.saml2.protocol.impl;
 
@@ -39,31 +39,29 @@ import com.sun.identity.saml2.protocol.RequesterID;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-/** 
- * This class defines methods to retrieve Identity  Providers and 
- * context/limitations related to proxying of the request message.
+/**
+ * This class defines methods to retrieve Identity Providers and context/limitations related to proxying of the request
+ * message.
  */
 
 public class ScopingImpl implements Scoping {
-    
-    static private final String PROXYCOUNT="ProxyCount";
+
+    private static final String PROXYCOUNT = "ProxyCount";
     private IDPList idpList;
-    private List requesterIDList=null;
-    private boolean isMutable=false;
+    private List<RequesterID> requesterIDList = null;
+    private boolean isMutable = false;
     private Integer proxyCount;
-    
-    
+
+
     /**
-     * Constructor to create Scoping object. 
+     * Constructor to create Scoping object.
      */
     public ScopingImpl() {
 	isMutable=true;
@@ -83,22 +81,20 @@ public class ScopingImpl implements Scoping {
     /**
      * Constructor to create the <code>Scoping</code> Object.
      *
-     * @param xmlString XML String Representation of <code>Scoping</code> 
+     * @param xmlString XML String Representation of <code>Scoping</code>
      *        Object.
      * @throws SAML2Exception if <code>Scoping<code> cannot be created.
      */
 
     public ScopingImpl(String xmlString) throws SAML2Exception {
-	Document xmlDocument =
-                   XMLUtils.toDOMDocument(xmlString,SAML2SDKUtils.debug);
-	if (xmlDocument == null) {
-            throw new SAML2Exception(
-		    SAML2SDKUtils.bundle.getString("errorObtainingElement"));
-	}
+        Document xmlDocument = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
+        if (xmlDocument == null) {
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("errorObtainingElement"));
+        }
         parseElement(xmlDocument.getDocumentElement());
     }
 
-    /** 
+    /**
      * Returns the <code>IDPList</code> Object.
      *
      * @return the <code>IDPList</code> object.
@@ -107,8 +103,8 @@ public class ScopingImpl implements Scoping {
     public IDPList getIDPList() {
 	return idpList;
     }
-    
-    /** 
+
+    /**
      * Sets the <code>IDPList</code> Object.
      *
      * @param idpList the new <code>IDPList</code> object.
@@ -119,38 +115,36 @@ public class ScopingImpl implements Scoping {
 	if (isMutable) {
 	    this.idpList = idpList;
 	 } else {
-	    throw new SAML2Exception(
-			SAML2SDKUtils.bundle.getString("objectImmutable"));
+	    throw new SAML2Exception(SAML2SDKUtils.bundle.getString("objectImmutable"));
 	}
     }
-    
-    /** 
+
+    /**
      * Returns a list of <code>RequesterID</code> Objects.
      *
      * @return list of <code>RequesterID</code> objects.
      * @see #setRequesterIDs(List)
      */
-    public List getRequesterIDs() {
+    public List<RequesterID> getRequesterIDs() {
 	return requesterIDList;
     }
-    
-    /** 
+
+    /**
      * Sets the <code>RequesterID</code> Object.
      *
      * @param value list of <code>RequesterID</code> objects.
      * @throws SAML2Exception if the object is immutable.
      * @see #getRequesterIDs
      */
-    public void setRequesterIDs(List value) throws SAML2Exception {
+    public void setRequesterIDs(List<RequesterID> value) throws SAML2Exception {
 	if (isMutable) {
 	    requesterIDList = value;
 	} else {
-	    throw new SAML2Exception(
-			SAML2SDKUtils.bundle.getString("objectImmutable"));
+	    throw new SAML2Exception(SAML2SDKUtils.bundle.getString("objectImmutable"));
 	}
     }
-    
-    /** 
+
+    /**
      * Returns the value of <code>ProxyCount</code> attribute.
      *
      * @return the value of <code>ProxyCount</code> attribute value.
@@ -158,24 +152,23 @@ public class ScopingImpl implements Scoping {
     public Integer getProxyCount() {
 	return proxyCount;
     }
-    
-    /** 
+
+    /**
      * Sets the value of <code>ProxyCount</code> attribute.
      *
      * @param proxyCount new value of <code>ProxyCount</code> attribute.
      * @throws SAML2Exception if the object is immutable.
      */
-    
+
     public void setProxyCount(Integer proxyCount) throws SAML2Exception {
 	if (isMutable) {
 	    this.proxyCount = proxyCount;
 	} else {
-	    throw new SAML2Exception(
-			SAML2SDKUtils.bundle.getString("objectImmutable"));
+	    throw new SAML2Exception(SAML2SDKUtils.bundle.getString("objectImmutable"));
 	}
     }
-    
-    /** 
+
+    /**
      * Returns a String representation of this Object.
      *
      * @return a  String representation of this Object.
@@ -184,8 +177,8 @@ public class ScopingImpl implements Scoping {
     public String toXMLString() throws SAML2Exception {
 	return toXMLString(true,false);
     }
-    
-    /** 
+
+    /**
      * Returns a String representation
      *
      * @param includeNSPrefix determines whether or not the namespace
@@ -195,17 +188,15 @@ public class ScopingImpl implements Scoping {
      * @return the String representation of this Object.
      * @throws SAML2Exception if String object cannot be created.
      */
-    
+
     public String toXMLString(boolean includeNSPrefix,boolean declareNS)
 	throws SAML2Exception {
 
-	String xmlElementString=null; 
-        if ((idpList != null) ||  
-            ((requesterIDList != null) && !requesterIDList.isEmpty()) ||
-	    (proxyCount != null)) {
+	String xmlElementString = null;
+        if (idpList != null || (requesterIDList != null && !requesterIDList.isEmpty()) || proxyCount != null) {
 
 	    validateProxyCount(proxyCount);
-	    StringBuffer xmlString = new StringBuffer(300);
+	    StringBuilder xmlString = new StringBuilder(300);
 	    xmlString.append(SAML2Constants.START_TAG);
 	    if (includeNSPrefix) {
 		xmlString.append(SAML2Constants.PROTOCOL_PREFIX);
@@ -233,41 +224,40 @@ public class ScopingImpl implements Scoping {
 	    }
 
 
-	    if ((requesterIDList != null) && !requesterIDList.isEmpty()) {
-		Iterator it = requesterIDList.iterator();
-		while (it.hasNext()) {
-		    RequesterID reqID = (RequesterID) it.next();
-		    String reqIDStr = reqID.toXMLString(includeNSPrefix,
-							declareNS);
-		    xmlString.append(reqIDStr).append(SAML2Constants.NEWLINE);
-		}
+	    if (requesterIDList != null) {
+                for (RequesterID reqID : requesterIDList) {
+                    String reqIDStr = reqID.toXMLString(includeNSPrefix, declareNS);
+                    xmlString.append(reqIDStr).append(SAML2Constants.NEWLINE);
+                }
 	    }
 	    xmlString.append(SAML2Constants.SAML2_END_TAG)
 		     .append(SAML2Constants.SCOPING)
 		     .append(SAML2Constants.END_TAG);
 
-	    xmlElementString = xmlString.toString();	
+	    xmlElementString = xmlString.toString();
 	}
 	return xmlElementString;
     }
-    
-        
-    /** 
-     * Makes this object immutable. 
+
+
+    /**
+     * Makes this object immutable.
      */
     public void makeImmutable() {
-	if (isMutable) {
-	    idpList.makeImmutable();
-	    Iterator i = requesterIDList.iterator();
-	    while (i.hasNext()) {
-		RequesterID reqID = (RequesterID)i.next();
-		reqID.makeImmutable();
-	    }
-	    isMutable = false;
-	}
+        if (isMutable) {
+            if (idpList != null) {
+                idpList.makeImmutable();
+            }
+            if (requesterIDList != null) {
+                for (RequesterID reqID : requesterIDList) {
+                    reqID.makeImmutable();
+                }
+            }
+            isMutable = false;
+        }
     }
-    
-    /** 
+
+    /**
      * Returns true if object is mutable.
      *
      * @return true if object is mutable.
@@ -287,28 +277,25 @@ public class ScopingImpl implements Scoping {
 
 	NodeList nList = element.getChildNodes();
 	if ((nList != null) && (nList.getLength()>0)) {
-	    if ((requesterIDList == null) || (requesterIDList.isEmpty())) {
-	        requesterIDList = new ArrayList();
-	    }
+            if (requesterIDList == null) {
+                requesterIDList = new ArrayList<RequesterID>();
+            }
 	    for (int i = 0; i < nList.getLength(); i++) {
 		Node childNode = nList.item(i);
 		String cName = childNode.getLocalName();
-		if (cName != null) {
-		    if (cName.equals(SAML2Constants.IDPLIST)) {
-			validateIDPList();
-                        idpList = ProtocolFactory.getInstance()
-					    .createIDPList((Element) childNode);
-		    } else if (cName.equals(SAML2Constants.REQUESTERID)) {
-			RequesterID reqID =
-			    ProtocolFactory.getInstance()
-			               .createRequesterID((Element)childNode);
-			requesterIDList.add(reqID);
-		    }
-		}
+                if (cName != null) {
+                    if (cName.equals(SAML2Constants.IDPLIST)) {
+                        validateIDPList();
+                        idpList = ProtocolFactory.getInstance().createIDPList((Element) childNode);
+                    } else if (cName.equals(SAML2Constants.REQUESTERID)) {
+                        RequesterID reqID = ProtocolFactory.getInstance().createRequesterID((Element) childNode);
+                        requesterIDList.add(reqID);
+                    }
+                }
 	    }
-	    if ((requesterIDList != null) && !requesterIDList.isEmpty()) {
-		requesterIDList=Collections.unmodifiableList(requesterIDList);
-	    }
+            if (requesterIDList != null && !requesterIDList.isEmpty()) {
+                requesterIDList = Collections.unmodifiableList(requesterIDList);
+            }
 	}
     }
 
@@ -316,26 +303,22 @@ public class ScopingImpl implements Scoping {
     private void validateIDPList() throws SAML2Exception {
         if (idpList != null) {
             SAML2SDKUtils.debug.message("Too many IDPList Elements");
-            throw new SAML2Exception(
-                    SAML2SDKUtils.bundle.getString("schemaViolation"));
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("schemaViolation"));
         }
         if (requesterIDList != null && !requesterIDList.isEmpty()) {
-            SAML2SDKUtils.debug.message("IDPList should be the first element"); 
-            throw new SAML2Exception(
-                    SAML2SDKUtils.bundle.getString("schemaViolation"));
+            SAML2SDKUtils.debug.message("IDPList should be the first element");
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("schemaViolation"));
         }
     }
 
     /* validate the proxy count  */
     private void validateProxyCount(Integer proxyCount) throws SAML2Exception {
-	if (proxyCount != null && ((proxyCount.intValue() < 0) 
-		|| (proxyCount.intValue() > SAML2Constants.MAX_INT_VALUE))) {
+	if (proxyCount != null
+                && (proxyCount.intValue() < 0 || proxyCount.intValue() > SAML2Constants.MAX_INT_VALUE)) {
 	    if (SAML2SDKUtils.debug.messageEnabled()) {
-		SAML2SDKUtils.debug.message("ProxyCount value should " + 
-					"be a nonnegative Integer");
+		SAML2SDKUtils.debug.message("ProxyCount value should be a nonnegative Integer");
 	    }
-	    throw new SAML2Exception(
-			SAML2SDKUtils.bundle.getString("invalidProxyCount"));
+	    throw new SAML2Exception(SAML2SDKUtils.bundle.getString("invalidProxyCount"));
 	}
     }
 }
