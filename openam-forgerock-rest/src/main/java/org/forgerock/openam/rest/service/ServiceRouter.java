@@ -37,7 +37,7 @@ public class ServiceRouter extends Restlet {
     private final RestletRealmRouter router;
     private final VersionSelector versionSelector;
     private final Set<String> routes = new CopyOnWriteArraySet<String>();
-    private Boolean defaultVersioningToLatest;
+    private DefaultVersionBehaviour defaultVersioningBehaviour = DefaultVersionBehaviour.LATEST;
 
     /**
      * Constructs a new ServerRouter.
@@ -59,11 +59,17 @@ public class ServiceRouter extends Restlet {
     public VersionRouter addRoute(String uriTemplate) {
         routes.add(uriTemplate);
         VersionRouter versionRouter = new VersionRouter(versionSelector);
-        if (defaultVersioningToLatest != null) {
-            if (defaultVersioningToLatest) {
+        switch (defaultVersioningBehaviour) {
+            case LATEST: {
                 versionRouter.defaultToLatest();
-            } else {
+                break;
+            }
+            case OLDEST: {
                 versionRouter.defaultToOldest();
+                break;
+            }
+            default: {
+                versionRouter.noDefault();
             }
         }
         router.attach(uriTemplate, new RestletWrapper(versionRouter));
@@ -91,7 +97,7 @@ public class ServiceRouter extends Restlet {
      * @see VersionSelector#defaultToLatest()
      */
     public ServiceRouter setVersioningToDefaultToLatest() {
-        defaultVersioningToLatest = true;
+        defaultVersioningBehaviour = DefaultVersionBehaviour.LATEST;
         return this;
     }
 
@@ -103,7 +109,19 @@ public class ServiceRouter extends Restlet {
      * @see VersionSelector#defaultToOldest()
      */
     public ServiceRouter setVersioningToDefaultToOldest() {
-        defaultVersioningToLatest = false;
+        defaultVersioningBehaviour = DefaultVersionBehaviour.OLDEST;
+        return this;
+    }
+
+    /**
+     * Removes the default behaviour of the version routing process which will result in {@code NotFoundException}s when
+     * the requested version is {@code null}.
+     *
+     * @see VersionRouter#noDefault()
+     * @see VersionSelector#noDefault()
+     */
+    public ServiceRouter setVersioningToDefaultToNone() {
+        defaultVersioningBehaviour = DefaultVersionBehaviour.NONE;
         return this;
     }
 
@@ -142,5 +160,14 @@ public class ServiceRouter extends Restlet {
         public void handle(Request request, Response response) {
             router.handle(request, response);
         }
+    }
+
+    /**
+     * Enum for describing the default behaviour when no resource version is requested.
+     */
+    private enum DefaultVersionBehaviour {
+        LATEST,
+        OLDEST,
+        NONE
     }
 }

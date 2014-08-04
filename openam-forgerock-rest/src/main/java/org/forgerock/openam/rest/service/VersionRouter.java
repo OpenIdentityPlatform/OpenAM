@@ -85,6 +85,16 @@ public class VersionRouter {
     }
 
     /**
+     * Removes the default behaviour of the selection process which will result in {@code NotFoundException}s when
+     * the requested version is {@code null}.
+     *
+     * @see VersionSelector#noDefault()
+     */
+    public void noDefault() {
+        versionSelector.defaultToOldest();
+    }
+
+    /**
      * Handles the selection of the service endpoint based on the requested version of the endpoint.
      *
      * @param request The Restlet request.
