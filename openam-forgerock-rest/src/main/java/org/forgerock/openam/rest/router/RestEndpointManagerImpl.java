@@ -16,9 +16,7 @@
 
 package org.forgerock.openam.rest.router;
 
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.SingletonResourceProvider;
-import org.forgerock.openam.rest.RestEndpointServlet;
+import org.forgerock.openam.rest.RestEndpoints;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,8 +28,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.ServiceProviderClass;
-
 /**
 * Implementation of the Rest Endpoint Manager.
 *
@@ -40,29 +36,22 @@ import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider
 @Singleton
 public class RestEndpointManagerImpl implements RestEndpointManager {
 
-    private final Map<String, CollectionResourceProvider> collectionResourceEndpoints;
-    private final Map<String, SingletonResourceProvider> singletonResourceEndpoints;
-    private final Map<String, ServiceProviderClass> serviceEndpoints;
+    private final Set<String> resourceEndpoints;
+    private final Set<String> serviceEndpoints;
 
     private final Map<EndpointTemplate, String> endpointTemplateMap = new HashMap<EndpointTemplate, String>();
 
     /**
      * Constructs an instance of the RestEndpointManagerImpl.
      *
-     * @param collectionResourceEndpoints A map of the collection resource endpoints and their handlers.
-     * @param singletonResourceEndpoints A map of the singleton resource endpoints and their handlers.
-     * @param serviceEndpoints A map of the service endpoints and their handler classes.
+     * @param restEndpoints
      */
     @Inject
-    public RestEndpointManagerImpl(final Map<String, CollectionResourceProvider> collectionResourceEndpoints,
-            final Map<String, SingletonResourceProvider> singletonResourceEndpoints,
-            final Map<String, ServiceProviderClass> serviceEndpoints) {
-        this.collectionResourceEndpoints = collectionResourceEndpoints;
-        this.singletonResourceEndpoints = singletonResourceEndpoints;
-        this.serviceEndpoints = serviceEndpoints;
-        createEndpointTemplates(collectionResourceEndpoints.keySet(), EndpointType.RESOURCE);
-        createEndpointTemplates(singletonResourceEndpoints.keySet(), EndpointType.RESOURCE);
-        createEndpointTemplates(serviceEndpoints.keySet(), EndpointType.SERVICE);
+    public RestEndpointManagerImpl(RestEndpoints restEndpoints) {
+        this.resourceEndpoints = restEndpoints.getResourceRouter().getRoutes();
+        this.serviceEndpoints = restEndpoints.getServiceRouter().getRoutes();
+        createEndpointTemplates(resourceEndpoints);
+        createEndpointTemplates(serviceEndpoints);
     }
 
     /**
@@ -70,9 +59,8 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
      * can be handled by the correct router for the endpoint type.
      *
      * @param endpoints The endpoints.
-     * @param endpointType The type of the endpoints.
      */
-    private void createEndpointTemplates(final Set<String> endpoints, final EndpointType endpointType) {
+    private void createEndpointTemplates(Set<String> endpoints) {
         for (String endpoint : endpoints) {
             EndpointTemplate template = EndpointTemplate.createTemplate(endpoint);
             endpointTemplateMap.put(template, endpoint);
@@ -83,20 +71,11 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean isEndpoint(String token) {
-        return collectionResourceEndpoints.containsKey(token) || singletonResourceEndpoints.containsKey(token)
-                || serviceEndpoints.containsKey(token);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public EndpointType getEndpointType(String endpoint) {
-        if (collectionResourceEndpoints.containsKey(endpoint) || singletonResourceEndpoints.containsKey(endpoint) ) {
+        if (resourceEndpoints.contains(endpoint)) {
             return EndpointType.RESOURCE;
         }
-        if (serviceEndpoints.containsKey(endpoint)) {
+        if (serviceEndpoints.contains(endpoint)) {
             return EndpointType.SERVICE;
         }
         return null;
@@ -109,7 +88,7 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
 
         for (final EndpointTemplate template : endpointTemplateMap.keySet()) {
 
-            final Matcher matcher = template.regex.matcher(RestEndpointServlet.normalizeResourceName(request));
+            final Matcher matcher = template.regex.matcher(normalizeResourceName(request));
 
             if (!matcher.matches()) {
                 continue;
@@ -205,7 +184,7 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
          * @return The template for the endpoint.
          */
         private static EndpointTemplate createTemplate(final String endpoint) {
-            final String t = RestEndpointServlet.normalizeResourceName(endpoint);
+            final String t = normalizeResourceName(endpoint);
 
             final StringBuilder builder = new StringBuilder(t.length() + 8);
             final List<String> variables = new ArrayList<String>();
@@ -256,5 +235,22 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
             return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))
                     || ((c >= '0') && (c <= '9')) || (c == '_');
         }
+    }
+
+    /**
+     * Normalises the resource name to ensure that the it does not begin or end with forward slashes.
+     *
+     * @param name The resource name.
+     * @return The normalised resource name.
+     */
+    private static String normalizeResourceName(final String name) {
+        String tmp = name;
+        if (tmp.startsWith("/")) {
+            tmp = tmp.substring(1);
+        }
+        if (tmp.endsWith("/")) {
+            tmp = tmp.substring(0, tmp.length() - 1);
+        }
+        return tmp;
     }
 }

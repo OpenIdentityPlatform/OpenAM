@@ -99,14 +99,6 @@ public interface RestEndpointManager {
     String POLICIES = "/policies";
 
     /**
-     * Determines whether the given token matches one of the registered endpoints.
-     *
-     * @param token The token to check.
-     * @return <code>true</code> if the token is an endpoint.
-     */
-    boolean isEndpoint(String token);
-
-    /**
      * Returns the type of endpoint of the given endpoint.
      *
      * @param endpoint The endpoint.
@@ -140,6 +132,6 @@ public interface RestEndpointManager {
         /**
          * Service Endpoint Type.
          */
-        SERVICE;
+        SERVICE
     }
 }

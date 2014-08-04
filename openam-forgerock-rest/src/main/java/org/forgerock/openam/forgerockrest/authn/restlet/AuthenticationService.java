@@ -24,7 +24,6 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
-import org.forgerock.openam.rest.service.ServiceProvider;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.restlet.data.MediaType;
@@ -39,6 +38,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -58,7 +58,7 @@ import static org.forgerock.json.fluent.JsonValue.*;
  *
  * @since 12.0.0
  */
-public class AuthenticationService extends ServerResource implements ServiceProvider {
+public class AuthenticationService extends ServerResource {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -76,19 +76,9 @@ public class AuthenticationService extends ServerResource implements ServiceProv
     /**
      * Constructs an instance of the AuthenticationRestService.
      *
-     * Used by the Restlet framework to create the instance.
-     */
-    public AuthenticationService() {
-        this.restAuthenticationHandler = InjectorHolder.getInstance(RestAuthenticationHandler.class);
-    }
-
-    /**
-     * Constructs an instance of the AuthenticationRestService.
-     *
-     * Used by tests to inject a mock RestAuthenticationHandler.
-     *
      * @param restAuthenticationHandler An instance of the RestAuthenticationHandler.
      */
+    @Inject
     public AuthenticationService(RestAuthenticationHandler restAuthenticationHandler) {
         this.restAuthenticationHandler = restAuthenticationHandler;
     }

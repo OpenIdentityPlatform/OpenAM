@@ -21,7 +21,6 @@ import com.google.inject.name.Names;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.resource.CrestHttpServlet;
-import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 
@@ -40,6 +39,8 @@ import java.io.IOException;
  */
 public class RestEndpointServlet extends HttpServlet {
 
+    public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
+
     private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
     private final RestletServiceServlet restServiceServlet;
     private final RestEndpointManager endpointManager;
@@ -49,7 +50,7 @@ public class RestEndpointServlet extends HttpServlet {
      */
     public RestEndpointServlet() {
         this.crestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
-                Names.named(RealmRouterConnectionFactory.CONNECTION_FACTORY_NAME))));
+                Names.named(CREST_CONNECTION_FACTORY_NAME))));
         this.restServiceServlet = new RestletServiceServlet(this);
         this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
     }
@@ -140,22 +141,5 @@ public class RestEndpointServlet extends HttpServlet {
     public void destroy() {
         crestServlet.destroy();
         restServiceServlet.destroy();
-    }
-
-    /**
-     * Normalises the resource name to ensure that the it does not begin or end with forward slashes.
-     *
-     * @param name The resource name.
-     * @return The normalised resource name.
-     */
-    public static String normalizeResourceName(final String name) {
-        String tmp = name;
-        if (tmp.startsWith("/")) {
-            tmp = tmp.substring(1);
-        }
-        if (tmp.endsWith("/")) {
-            tmp = tmp.substring(0, tmp.length() - 1);
-        }
-        return tmp;
     }
 }

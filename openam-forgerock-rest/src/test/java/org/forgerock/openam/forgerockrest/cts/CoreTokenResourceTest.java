@@ -156,7 +156,7 @@ public class CoreTokenResourceTest {
         String tokenJson = serialisation.serialise(token);
 
         given(value.toString()).willReturn(tokenJson);
-        given(updateRequest.getNewContent()).willReturn(value);
+        given(updateRequest.getContent()).willReturn(value);
 
         // When
         resource.updateInstance(null, "badger", updateRequest, handler);

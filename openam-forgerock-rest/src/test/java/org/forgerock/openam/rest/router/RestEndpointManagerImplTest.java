@@ -16,36 +16,52 @@
 
 package org.forgerock.openam.rest.router;
 
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.openam.rest.RestEndpoints;
+import org.forgerock.openam.rest.resource.CrestRealmRouter;
+import org.forgerock.openam.rest.service.ServiceRouter;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.ServiceProviderClass;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 
 public class RestEndpointManagerImplTest {
+
+    private RestEndpointManagerImpl endpointManager;
+
+    @BeforeMethod
+    public void setUp() {
+
+        RestEndpoints restEndpoints = mock(RestEndpoints.class);
+        CrestRealmRouter resourceRouter = mock(CrestRealmRouter.class);
+        ServiceRouter serviceRouter = mock(ServiceRouter.class);
+        Set<String> resourceRoutes = new HashSet<String>();
+        Set<String> serviceRoutes = new HashSet<String>();
+
+        given(restEndpoints.getResourceRouter()).willReturn(resourceRouter);
+        given(restEndpoints.getServiceRouter()).willReturn(serviceRouter);
+
+        given(resourceRouter.getRoutes()).willReturn(resourceRoutes);
+        given(serviceRouter.getRoutes()).willReturn(serviceRoutes);
+
+        resourceRoutes.add("/users");
+        resourceRoutes.add("/groups");
+        resourceRoutes.add("/config");
+
+        serviceRoutes.add("/authenticate");
+        serviceRoutes.add("/other");
+
+        endpointManager = new RestEndpointManagerImpl(restEndpoints);
+    }
 
     @Test
     public void shouldFindServiceEndpoint() {
 
         //Given
-        Map<String, CollectionResourceProvider> collectionResourceEndpoints =
-                new HashMap<String, CollectionResourceProvider>();
-        Map<String, SingletonResourceProvider> singletonResourceEndpoints =
-                new HashMap<String, SingletonResourceProvider>();
-        Map<String, ServiceProviderClass> serviceEndpoints = new HashMap<String, ServiceProviderClass>();
-
-        collectionResourceEndpoints.put("/users", null);
-        collectionResourceEndpoints.put("/groups", null);
-        singletonResourceEndpoints.put("/config", null);
-        serviceEndpoints.put("/authenticate", null);
-        serviceEndpoints.put("/other", null);
-
-        RestEndpointManagerImpl endpointManager = new RestEndpointManagerImpl(collectionResourceEndpoints,
-                singletonResourceEndpoints, serviceEndpoints);
 
         //When
         String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/authenticate/{id}");
@@ -58,20 +74,6 @@ public class RestEndpointManagerImplTest {
     public void shouldFindCollectionResourceEndpoint() {
 
         //Given
-        Map<String, CollectionResourceProvider> collectionResourceEndpoints =
-                new HashMap<String, CollectionResourceProvider>();
-        Map<String, SingletonResourceProvider> singletonResourceEndpoints =
-                new HashMap<String, SingletonResourceProvider>();
-        Map<String, ServiceProviderClass> serviceEndpoints = new HashMap<String, ServiceProviderClass>();
-
-        collectionResourceEndpoints.put("/users", null);
-        collectionResourceEndpoints.put("/groups", null);
-        singletonResourceEndpoints.put("/config", null);
-        serviceEndpoints.put("/authenticate", null);
-        serviceEndpoints.put("/other", null);
-
-        RestEndpointManagerImpl endpointManager = new RestEndpointManagerImpl(collectionResourceEndpoints,
-                singletonResourceEndpoints, serviceEndpoints);
 
         //When
         String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/groups/{id}");
@@ -84,21 +86,6 @@ public class RestEndpointManagerImplTest {
     public void shouldFindSingletonResourceEndpoint() {
 
         //Given
-        Map<String, CollectionResourceProvider> collectionResourceEndpoints =
-                new HashMap<String, CollectionResourceProvider>();
-        Map<String, SingletonResourceProvider> singletonResourceEndpoints =
-                new HashMap<String, SingletonResourceProvider>();
-        new HashMap<String, SingletonResourceProvider>();
-        Map<String, ServiceProviderClass> serviceEndpoints = new HashMap<String, ServiceProviderClass>();
-
-        collectionResourceEndpoints.put("/users", null);
-        collectionResourceEndpoints.put("/groups", null);
-        singletonResourceEndpoints.put("/config", null);
-        serviceEndpoints.put("/authenticate", null);
-        serviceEndpoints.put("/other", null);
-
-        RestEndpointManagerImpl endpointManager = new RestEndpointManagerImpl(collectionResourceEndpoints,
-                singletonResourceEndpoints, serviceEndpoints);
 
         //When
         String endpointType = endpointManager.findEndpoint("/realm1/{realm2}/realm3/config/{id}");

@@ -53,14 +53,6 @@ public class RestEndpointManagerProxy implements RestEndpointManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean isEndpoint(String token) {
-        return EndpointManagerHolder.get().isEndpoint(token);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public EndpointType getEndpointType(String endpoint) {
         return EndpointManagerHolder.get().getEndpointType(endpoint);
     }

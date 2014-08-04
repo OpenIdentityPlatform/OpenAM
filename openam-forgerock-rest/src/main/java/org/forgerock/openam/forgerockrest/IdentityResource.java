@@ -1385,7 +1385,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 
-        final JsonValue jVal = request.getNewContent();
+        final JsonValue jVal = request.getContent();
         final String rev = request.getRevision();
         IdentityDetails dtls, newDtls;
         IdentityServicesImpl idsvc = new IdentityServicesImpl();

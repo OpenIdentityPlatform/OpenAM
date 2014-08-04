@@ -26,7 +26,7 @@ import org.forgerock.json.resource.ServerContext;
  */
 public class RealmContext extends ServerContext {
 
-    private final String realm;
+    private String realm;
 
     /**
      * Constructs a new RealmContext instance with the realm.
@@ -46,5 +46,27 @@ public class RealmContext extends ServerContext {
      */
     public String getRealm() {
         return realm;
+    }
+
+    /**
+     * <p>Adds the sub-realm portion to the realm in the context.</p>
+     *
+     * <p>If the sub-realm is {@code null} or empty, no action is taken. If the sub-realm contains a leading or trailing
+     * backslash, they will be stripped before appending to the current realm value.</p>
+     *
+     * @param subrealm The sub-realm to add to the realm context.
+     */
+    void addSubRealm(String subrealm) {
+        if (subrealm == null || subrealm.isEmpty()) {
+            return;
+        }
+        if (subrealm.startsWith("/")) {
+            subrealm = subrealm.substring(1);
+        }
+        if (subrealm.endsWith("/")) {
+            subrealm = subrealm.substring(0, subrealm.length() - 1);
+        }
+
+        realm = realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
     }
 }

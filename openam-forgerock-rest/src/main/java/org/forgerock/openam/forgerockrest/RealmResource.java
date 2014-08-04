@@ -602,7 +602,7 @@ public final class RealmResource implements CollectionResourceProvider {
         RealmContext realmContext = context.asContext(RealmContext.class);
         String realmPath = realmContext.getRealm();
 
-        final JsonValue realmDetails = request.getNewContent();
+        final JsonValue realmDetails = request.getContent();
         Resource resource = null;
         String realm = null;
         OrganizationConfigManager ocm = null;

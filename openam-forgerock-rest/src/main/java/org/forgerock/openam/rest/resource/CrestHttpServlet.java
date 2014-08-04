@@ -41,7 +41,7 @@ public class CrestHttpServlet extends HttpServlet {
      * @param servlet The underlying container created Java HttpServlet.
      * @param connectionFactory The CREST ConnectionFactory used by this CREST instance.
      */
-    public CrestHttpServlet(final javax.servlet.http.HttpServlet servlet, final ConnectionFactory connectionFactory) {
+    public CrestHttpServlet(javax.servlet.http.HttpServlet servlet, ConnectionFactory connectionFactory) {
         super(connectionFactory);
         this.servlet = servlet;
     }

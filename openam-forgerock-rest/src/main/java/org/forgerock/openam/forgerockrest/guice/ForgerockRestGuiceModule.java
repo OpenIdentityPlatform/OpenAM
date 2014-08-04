@@ -18,6 +18,7 @@ package org.forgerock.openam.forgerockrest.guice;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.sun.identity.entitlement.EntitlementException;
@@ -25,16 +26,17 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.Resources;
+import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.forgerockrest.IdentityResource;
+import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
+import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementEvaluatorFactory;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementsResourceErrorHandler;
 import org.forgerock.openam.forgerockrest.entitlements.JsonPolicyParser;
@@ -43,18 +45,28 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.CrestRealmConnectionFactoryProvider;
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestCollectionResourceEndpointsBinder;
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestServiceEndpointsBinder;
-import static org.forgerock.openam.forgerockrest.guice.RestEndpointGuiceProvider.RestSingletonResourceEndpointsBinder;
-import org.forgerock.openam.rest.resource.RealmRouterConnectionFactory;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
+import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
+import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
+import org.forgerock.openam.rest.RestEndpointServlet;
+import org.forgerock.openam.rest.RestEndpoints;
+import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.util.SignatureUtil;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -106,20 +118,56 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .asEagerSingleton();
         bind(PolicyEvaluatorFactory.class).to(EntitlementEvaluatorFactory.class).in(Singleton.class);
 
-        // vvvv Rest Endpoint Bindings vvvv
         bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
+        bind(VersionSelector.class).in(Singleton.class);
+    }
 
-        // CREST Connection Factory
-        bind(ConnectionFactory.class)
-                .annotatedWith(Names.named(RealmRouterConnectionFactory.CONNECTION_FACTORY_NAME))
-                .toProvider(CrestRealmConnectionFactoryProvider.class)
-                .in(Singleton.class);
+    @Provides
+    @Inject
+    @Named(RestEndpointServlet.CREST_CONNECTION_FACTORY_NAME)
+    @Singleton
+    public ConnectionFactory getConnectionFactory(RestEndpoints restEndpoints) {
+        return Resources.newInternalConnectionFactory(restEndpoints.getResourceRouter());
+    }
 
-        // Actual endpoint bindings
-        RestCollectionResourceEndpointsBinder.newRestCollectionResourceEndpointBinder(binder());
-        RestSingletonResourceEndpointsBinder.newRestSingletonResourceEndpointBinder(binder());
-        RestServiceEndpointsBinder.newRestServiceEndpointBinder(binder());
-        // ^^^^ Rest Endpoint Bindings ^^^^
+    @Provides
+    @Named("UsersResource")
+    @Inject
+    @Singleton
+    public IdentityResource getUsersResource(MailServerLoader mailServerLoader) {
+        return new IdentityResource(IdentityResource.USER_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResource getGroupsResource(MailServerLoader mailServerLoader) {
+        return new IdentityResource(IdentityResource.GROUP_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResource getAgentsResource(MailServerLoader mailServerLoader) {
+        return new IdentityResource(IdentityResource.AGENT_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public CoreTokenResource getCoreTokenResource(JSONSerialisation jsonSerialisation,
+            CTSPersistentStoreProxy ctsPersistentStore) {
+        return new CoreTokenResource(jsonSerialisation, ctsPersistentStore);
+    }
+
+    @Provides
+    @Inject
+    @Singleton
+    public ApplicationsResource getApplicationsResource(@Named("frRest") Debug debug,
+            ApplicationManagerWrapper appManager, ApplicationTypeManagerWrapper appTypeManagerWrapper) {
+        return new ApplicationsResource(debug, appManager, appTypeManagerWrapper);
     }
 
     public static Map<Integer, Integer> getEntitlementsErrorHandlers() {
