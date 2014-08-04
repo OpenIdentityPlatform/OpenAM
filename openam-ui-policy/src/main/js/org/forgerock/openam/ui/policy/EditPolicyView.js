@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 var actions = [],
                     resources = [],
                     exceptions = [],
-                    subjects = [];
+                    subjects = [],
                     environments = [];
 
                 if (policyName) {
