@@ -62,7 +62,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 policyName = args[1],
                 policyPromise = this.getPolicy(policyName),
                 appPromise = policyDelegate.getApplicationByName(appName),
-                allSubjectsPromise = policyDelegate.getSubjectConditions(); // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
+                allSubjectsPromise = policyDelegate.getSubjectConditions(), // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
                 allEnvironmentsPromise = policyDelegate.getEnvironmentConditions();
 
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise).done(function (policy, app, allSubjects, allEnvironments) {
@@ -107,9 +107,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                        environments.push(value);
                    }
                 });
-
-
-
 
                 data.entity.availableSubjects = subjects;
                 data.entity.availableEnvironments = environments;
