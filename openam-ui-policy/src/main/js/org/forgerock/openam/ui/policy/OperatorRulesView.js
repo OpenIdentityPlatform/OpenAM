@@ -47,18 +47,18 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         mode: 'append',
         select: null,
         dropbox: null,
- 
+
         render: function (args, callback, element, itemID) {
 
             this.data = $.extend(true, {}, args);
             this.data.itemID = itemID;
             this.setElement(element);
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
-        
+
             this.setElement('#operator_'+itemID );
             this.select = this.$el.find("select");
             this.delegateEvents();
-            
+
             this.select.focus().trigger("change");
             this.$el.data('logical',true);
             this.dropbox = this.$el.find('.dropbox');
@@ -76,7 +76,6 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         },
 
         onSelect: function(e) {
-            
             var item = $(e.currentTarget).parent(),
                 value = e.currentTarget.value,
                 itemData = {},

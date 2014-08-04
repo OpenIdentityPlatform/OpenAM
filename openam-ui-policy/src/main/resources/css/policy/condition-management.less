@@ -31,22 +31,28 @@ body.editing{
 		background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
 	}
 
-	#condition-management ol.condition-management-group li.subject.editing{
+	#condition-management ol.condition-management-group li.subject.editing,
+	#condition-management ol.condition-management-group li.environment.editing{
 		position: absolute;
 		left: 0;
 		right: 0;
 		z-index: 700;
 		margin: -8px 48px 0;
 
-		.icon-cog{
-			font-size: 36px;
-		}
-
-		.icon-remove{
+		.icon-pencil {
 			display:none;
 		}
 
-		&:first-child{
+		.icon-checkmark {
+			font-size: 36px;
+			display:block;
+		}
+
+		.icon-remove {
+			display:none;
+		}
+
+		&:first-child {
 		 	margin-top: -3px;
 		}
 	}
@@ -121,6 +127,10 @@ body.editing{
 			padding: 0 5px;
 			opacity:0.5;
 			transition:opacity 200ms linear;
+
+			&.icon-checkmark {
+				display:none;
+			}
 
 	    	&:hover, &:focus {
 	    		opacity:1;
@@ -240,7 +250,7 @@ body.editing{
 
 			}
 
-			&.subject{
+			&.subject, &.environment{
 				cursor: default;
 				&:focus{
 					cursor: move;
@@ -264,7 +274,7 @@ body.editing{
 
 	}
 
-	.item-subject-data{
+	.item-data{
 
 		padding: 7px 5px 0 5px;
 
@@ -298,7 +308,7 @@ body.editing{
 
 	}
 
-	li.editing .item-subject-data, ol#pickUpItem li:not(.dragged) .item-subject-data{
+	li.editing .item-data, ol#pickUpItem li:not(.dragged) .item-data{
 		padding: 0;
 	}
 

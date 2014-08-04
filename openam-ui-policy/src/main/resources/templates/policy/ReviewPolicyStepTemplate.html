@@ -1,34 +1,55 @@
 <div class="col2">
-    <div class="review-row clearfix">
-        <a href="">Name</a> <span id="reviewPolName">{{entity.name}}</span>
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>{{entity.name}}</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.description}}<p>{{entity.description}}</p>{{/if}}
     </div>
-    <div class="review-row clearfix">
-        <a href="">Description</a> <span id="reviewPolDescr">{{entity.description}}</span>
-    </div>
-    <div class="review-row clearfix">
-        <a href="">Resources</a> <span id="reviewPolRes">{{#each entity.resources}} {{this}}<br/>{{/each}}</span>
-    </div>
-    <div class="review-row clearfix">
-        <a href="">Actions</a>
-        <span id="reviewPolActions">
-            {{#each entity.actions}}
-                {{#if selected}}
-                    {{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}<br/>
-                {{/if}}
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Resources</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.resources}}
+        <ul>
+            {{#each entity.resources}}
+            <li>{{this}}</li>
             {{/each}}
-        </span>
+        </ul>
+        {{/if}}
     </div>
-    
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Actions</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.actions}}
+        <ul>
+            {{#each entity.actions}}
+            {{#if selected}}
+            <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
+            {{/if}}
+            {{/each}}
+        </ul>
+        {{/if}}
+    </div>
+
 </div>
 
 <div class="col2">
 
-    <div class="review-row clearfix">
-        <a href="">Subjects</a> 
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Subjects</h2>
+        <span class="icon-pencil"></span>
+        {{#if subjectString}}
         <pre>{{subjectString}}</pre>
+        {{/if}}
     </div>
 
-    <div class="review-row clearfix">
-        <a href="">Conditions</a> <span>Any of<br/>Any Transfer Limit, IP Range, Time Range</span>
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Environments</h2>
+        <span class="icon-pencil"></span>
+        {{#if environmentString}}
+        <pre>{{environmentString}}</pre>
+        {{/if}}
     </div>
+
 </div>

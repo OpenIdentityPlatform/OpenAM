@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
     var EditSubjectView = AbstractView.extend({
 
         events: {
-            'change select#selection' :           'changeSubjectType',
+            'change select#selection' :           'changeType',
             'change .field-float-pattern input':  'changeInput'
         },
 
@@ -82,7 +82,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
             if (html === '') {
                 html = '<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>';
             }
-            item.find('.item-subject-data').html(html);
+            item.find('.item-data').html(html);
             this.setElement('#'+item.attr('id') );
             this.delegateEvents();
         },
@@ -92,7 +92,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
             this.$el.data().itemData[label] = e.currentTarget.value;
         },
 
-        changeSubjectType: function(e) {
+        changeType: function(e) {
             e.stopPropagation();
 
             var self         = this,

@@ -38,33 +38,141 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
     var EditEnvironmentView = AbstractView.extend({
 
-        events: {},
-        data:{},
-        editItem: null,
+        events: {
+            'change select#selection' : 'changeType',
+            'change .field-float-pattern input':  'changeInput'
+        },
 
-        render: function(data, callback, element) {
+        data: {},
+        mode:'append',
+
+        render: function( schema, callback, element, itemID, itemData ) {
+            var self = this;
             this.setElement(element);
-            this.data = data;
+
+            this.data = $.extend(true, [], schema);
+            this.data.itemID = itemID;
+
+            this.$el.append(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
+
+            this.setElement('#environment_' + itemID );
+            this.delegateEvents();
+
+            if (itemData) {
+                this.$el.data('itemData',itemData);
+                this.$el.find('select#selection').val(itemData.type).trigger('change');
+            }
+
+            this.$el.find('select#selection').focus();
+
             if (callback) {callback();}
         },
 
-        clearListItem: function(){
-            //TODO : unbind events
-            this.$el.empty();
+        createListItem: function(allEnvironments, item){
+
+            item.focus(); //  Required to trigger changeInput.
+            this.data.environments = allEnvironments;
+            var html = '';
+            if (item.data().itemData) {
+                _.map(item.data().itemData, function(value, key) {
+                    html += '<div><h3>'+key+'</h3><span>'+value+'</span></div>\n';
+                });
+            }
+            if (html === '') {
+                html = '<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>';
+            }
+            item.find('.item-data').html(html);
+            this.setElement('#'+item.attr('id') );
+            this.delegateEvents();
         },
 
-        newListItem: function(){
-            this.$el.html(uiUtils.fillTemplateWithData("templates/policy/EditEnvironmentTemplate.html", this.data));
-            this.$el.find('.icon-remove').bind("click", this.onDelete);
-        }
+        changeInput: function(e) {
+            var label = $(e.currentTarget).prev('label').text();
+            this.$el.data().itemData[label] = e.currentTarget.value;
+        },
 
-        /*onDelete: function(e){
-            var item = $(e.currentTarget).closest('li');
-            //TODO : unbind events
-            item.animate({height: 0, paddingTop: 0, paddingBottom: 0,marginTop: 0,marginBottom: 0, opacity:0}, function(){
-                item.remove();
-            });
-        }*/
+        changeType: function(e) {
+            e.stopPropagation();
+
+            var self         = this,
+                itemData     = {},
+                schema       = {},
+                html         = '',
+                selectedType = e.target.value,
+                delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
+                buildHTML    = function(properties) {
+                    var count = 0,
+                        returnVal = '';
+                    _.map(properties, function(value, key) {
+                        if(key === 'type') {
+                            return; // the Type is rendered using the template
+                        }
+                        if (_.isString(value)) {
+
+                            returnVal += '\n'+
+                            '<div class="field-float-pattern data-obj">'+
+                                '<label for="selection_' + (count) + '">' + key + '</label>'+
+                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="' + value + '" readonly=true class="placeholderText" />'+
+                            '</div>';
+                        } else if (_.isArray(value)) {
+                            // TODO ... We are assuming for now that items array will contain strings.
+                            returnVal += '\n'+
+                            '<div class="field-float-pattern data-obj">'+
+                                '<label for="selection_' + (count) + '">' + key + '</label>'+
+                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="TODO: Array UI" readonly=true class="placeholderText" />'+
+                            '</div>';
+                        } else if (_.isObject(value)) {
+                            // TODO ...
+                            console.log('TODO...');
+                        }
+                        count++;
+                    });
+
+                    return returnVal;
+                };
+
+
+            schema =  _.findWhere(this.data.environments, {title: selectedType}) || {};
+
+            if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
+                itemData = this.$el.data().itemData;
+            } else {
+                itemData.type = schema.title;
+                _.map(schema.config.properties, function(value, key) {
+                    itemData[key] = value;
+                });
+                self.$el.data('itemData',itemData);
+            }
+
+            if (itemData) {
+
+                html = buildHTML(itemData);
+
+                this.$el.find('.field-float-pattern input')
+                    .addClass('placeholderText')
+                    .prop('readonly', true)
+                    .prev('label')
+                    .removeClass('showLabel');
+
+                // setTimeout needed to delay transitions.
+                setTimeout( function() {
+                    self.$el.find('.field-float-pattern').remove();
+                    self.$el.find('.field-float-select').after( html );
+
+                    setTimeout( function() {
+
+                        self.$el.find('.field-float-pattern input')
+                            .removeClass('placeholderText')
+                            .prop('readonly', false)
+                            .prev('label')
+                            .addClass('showLabel');
+
+                        }, 10);
+                }, delay);
+            }
+
+            this.delegateEvents();
+        }
 
     });
 

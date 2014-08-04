@@ -165,7 +165,7 @@
         padding: 0 0 0 10px;
         background-color: #d5d5d5;
         color: #666;
-  
+
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
 
@@ -174,8 +174,9 @@
             cursor:default;
         }
 
-        &:hover:not(.accordion-step-disabled), &.step-active:not(.accordion-step-disabled){
+        &:focus:not(.accordion-step-disabled), &:hover:not(.accordion-step-disabled), &.step-active:not(.accordion-step-disabled){
             background-color: darken(@active-background-color, 5%);
+            box-shadow:none;
         }
     }
 
@@ -252,23 +253,30 @@
     .review-row {
 
         background: #ebebeb;
-        padding: 8px;
+        padding: 0 8px 13px;
         clear: both;
         font-size: 13px;
         margin: 0 5px 5px 0;
         border-radius: 3px;
         border:1px solid #bebebe;
+        cursor:pointer;
 
-        a {
+        h2 {
             float: left;
-            width: 90px;
-            text-decoration: none;
+            font-size: 15px;
+            line-height: 20px;
+            padding: 8px 10px 8px 0;
         }
 
-        span {
+        ul, p, pre {
+            clear:left;
+            padding: 0 0 0 20px;
+            display:block;
+        }
+
+        p, li {
             font-family: monospace;
             display: block;
-            float: left;
         }
 
         pre {
@@ -278,9 +286,21 @@
             float: left;
         }
 
-        &:hover{
-            background: @active-background-color;
+        .icon-pencil{
+            float:right;
+            opacity:0;
+            padding:8px 0 0 0;
+            transition:opacity 200ms linear;
         }
+
+        &:hover, &:focus{
+            background: @active-background-color;
+            box-shadow:none;
+            .icon-pencil{
+                opacity:0.5;
+            }
+        }
+
     }
 
     .resources-grid, .actions-grid {

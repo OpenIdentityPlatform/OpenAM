@@ -1,40 +1,81 @@
 <div class="col2">
-    <div class="review-row clearfix">
-        <a href="">Name</a> <span id="reviewName">{{entity.name}}</span>
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Name</h2>
+        <span class="icon-pencil"></span>
+        <p>{{entity.name}}</p>
+
+        <h2>Application Type</h2>
+        <p>{{entity.applicationType}}</p>
+        {{#if entity.description}}<p>{{entity.description}}</p>{{/if}}
+
+        <h2>Realms</h2>
+        {{#if entity.realm}}
+        <ul>
+            {{#each entity.realm}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
-    <div class="review-row clearfix">
-        <a href="">Realms</a> <span id="reviewRealm">{{entity.realm}}</span>
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Resources</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.resources}}
+        <ul>
+            {{#each entity.resources}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
-    <div class="review-row clearfix">
-        <a href="">Description</a> <span id="reviewDescr">{{entity.description}}</span>
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Actions</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.actions}}
+        <ul>
+            {{#each entity.actions}}
+            {{#if selected}}
+            <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
+            {{/if}}
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
-    <div class="review-row clearfix">
-        <a href="">Application Type</a> <span id="reviewType">{{entity.applicationType}}</span>
-    </div>
-    <div class="review-row clearfix">
-        <a href="">Resources</a> <span id="reviewRes">{{#each entity.resources}}{{this}}<br/>{{/each}}</span>
-    </div>
+
 </div>
 
 <div class="col2">
-    <div class="review-row clearfix">
-        <a href="">Subject Conditions</a>
-        <span id="reviewSubj">{{#each entity.subjects}} {{this}}<br/> {{/each}} </span>
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Subjects</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.subjects}}
+        <ul>
+            {{#each entity.subjects}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
+
     <div class="review-row clearfix">
-        <a href="">Actions</a>
-        <span id="reviewActions">{{#each entity.actions}}
-                {{#if selected}}
-                    {{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}<br/>
-                {{/if}}
-              {{/each}}
-        </span>
+        <h2>Environments</h2>
+        <span class="icon-pencil"></span>
+        {{#if entity.conditions}}
+        <ul>
+            {{#each entity.conditions}}
+            <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
-    <div class="review-row clearfix">
-        <a href="">Environment Conditions</a>
-        <span id="reviewEnv">{{#each entity.conditions}} {{this}}<br/> {{/each}} </span>
+
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Override Rules</h2>
+        <span class="icon-pencil"></span>
+        <p>{{entity.entitlementCombiner}}: Allow</p>
     </div>
-    <div class="review-row clearfix">
-        <a href="">Override Rules</a> <span id="reviewEntComb">{{entity.entitlementCombiner}}: Allow</span>
-    </div>
+
 </div>

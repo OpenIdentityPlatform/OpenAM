@@ -1,11 +1,21 @@
-<li class="environment clearfix">
+<li class="environment clearfix" id="environment_{{itemID}}" tabindex="0" >
+
+	<div class="item-data float-left">
+
+		<div class="field-float-select data-obj">
+			<label for="selection" >Type</label>
+			<select id="selection" class="placeholdertext" tabindex="0" >
+				<option value="" selected disabled >select...</option>
+				{{#environments}}<option value="{{title}}">{{title}}</option>{{/environments}}
+			</select>
+		</div>
+
+	</div>
 
 	<span class="item-button-panel">
-		<span class="icon-remove"></span>
+		<span tabindex="0" class="icon-checkmark"></span>
+		<span tabindex="0" class="icon-pencil"></span>
+		<span tabindex="0" class="icon-remove"></span>
 	</span>
 
-	<div class="item-subject-data">
-		//TODO Environment Conditions
-	</div>
-	
 </li>

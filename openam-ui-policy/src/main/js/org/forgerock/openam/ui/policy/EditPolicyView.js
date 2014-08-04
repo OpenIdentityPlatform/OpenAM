@@ -63,12 +63,15 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 policyPromise = this.getPolicy(policyName),
                 appPromise = policyDelegate.getApplicationByName(appName),
                 allSubjectsPromise = policyDelegate.getSubjectConditions(); // this possibly should be in the parent. We need a means to check if this exsists, and only make this searxh if it does not
+                allEnvironmentsPromise = policyDelegate.getEnvironmentConditions();
 
-            $.when(policyPromise, appPromise, allSubjectsPromise).done(function (policy, app, allSubjects) {
+            $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise).done(function (policy, app, allSubjects, allEnvironments) {
                 var actions = [],
                     resources = [],
                     exceptions = [],
                     subjects = [];
+                    environments = [];
+
                 if (policyName) {
                     _.each(policy.resources.included, function (value) {
                         resources.push(value);
@@ -92,26 +95,37 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 _.each(app[0].actions, function (value, key) {
                     actions.push({action: key, selected: false, value: value});
                 });
-                
+
                 _.each(allSubjects[0].result, function (value) {
                    if ( _.contains(app[0].subjects, value.title) ){
                        subjects.push(value);
                    }
                 });
 
+                _.each(allEnvironments[0].result, function (value) {
+                   if ( _.contains(app[0].conditions, value.title) ){
+                       environments.push(value);
+                   }
+                });
+
+
+
+
                 data.entity.availableSubjects = subjects;
+                data.entity.availableEnvironments = environments;
                 data.entity.availableActions = actions;
                 data.entity.resourcePatterns = app[0].resources;
 
                 data.entity.applicationName = appName;
                 self.parentRender(function () {
                     manageSubjects.render(data);
-                    //manageEnvironments.render(data);
+                    manageEnvironments.render(data);
                     actionsView.render(data);
                     resourcesListView.render(data);
                     addNewResourceView.render(data);
 
                     data.subjectString = JSON.stringify(data.entity.subject, null, 2);
+                    data.environmentString = JSON.stringify(data.entity.condition, null, 2);
 
                     reviewInfoView.render(data, null, self.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
 
@@ -172,6 +186,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             });
 
             this.data.subjectString = JSON.stringify(this.data.entity.subject, null, 2);
+            this.data.environmentString = JSON.stringify(this.data.entity.condition, null, 2);
         },
 
         /**

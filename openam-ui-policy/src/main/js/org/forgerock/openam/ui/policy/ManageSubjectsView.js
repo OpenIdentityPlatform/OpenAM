@@ -56,11 +56,13 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             'keyup  .operator > .item-button-panel > .icon-remove' : 'onDelete',
             'change  #operator_0 .operator select' : 'onSelect',
 
-            'click    #operator_0 .subject > .item-button-panel > .icon-remove' :  'onDelete',
-            'keyup    #operator_0 .subject > .item-button-panel > .icon-remove' :  'onDelete',
-            'click    #operator_0 .subject > .item-button-panel > .icon-cog' :     'toggleEditing',
-            'keyup    #operator_0 .subject > .item-button-panel > .icon-cog' :     'toggleEditing',
-            'dblclick #operator_0 li.subject' :                                    'toggleEditing'
+            'click    #operator_0 .subject > .item-button-panel > .icon-remove' :    'onDelete',
+            'keyup    #operator_0 .subject > .item-button-panel > .icon-remove' :    'onDelete',
+            'click    #operator_0 .subject > .item-button-panel > .icon-pencil' :    'toggleEditing',
+            'keyup    #operator_0 .subject > .item-button-panel > .icon-pencil' :    'toggleEditing',
+            'click    #operator_0 .subject > .item-button-panel > .icon-checkmark' : 'toggleEditing',
+            'keyup    #operator_0 .subject > .item-button-panel > .icon-checkmark' : 'toggleEditing',
+            'dblclick #operator_0 li.subject' :                                      'toggleEditing'
         },
 
         buttons:{},
@@ -73,8 +75,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
             var self = this;
 
-            _.extend(this.data, args);
-
+            this.data.entity = args.entity;
             this.subjectEntity = null;
 
             if (this.data.entity.subject) {
@@ -86,7 +87,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             this.idCount = 1;
             this.sortingInitialised = false;
 
-            _.each(args.entity.availableSubjects, function(item) {
+            _.each(this.data.entity.availableSubjects, function(item) {
 
                 _.map(item.config.properties, function(value, key) {
                     switch(value.type) {
@@ -123,6 +124,10 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 this.buttons.addOperator    = this.$el.find("a#addOperator");
                 this.pickUpItem             = this.$el.find('#pickUpItem');
 
+                if (self.data.operators.length === 0) {
+                    this.buttons.addOperator.hide();
+                }
+
                 this.buildList();
                 this.onClear();
                 this.initSorting();
@@ -150,11 +155,11 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                         if ( item && _.contains( operators, item.type )) {
 
                             newRule = new OperatorRulesView();
-                            newRule.render(self.data, null, container, self.idCount );
+                            newRule.render(self.data, null, container, "subject_" + self.idCount  );
                             newRule.setValue(item.type);
                             self.idCount++;
 
-                        } else if ( _.isEmpty(item) === false ) {
+                        } else if ( !_.isEmpty(item) ) {
 
                             newRule = new EditSubjectView();
                             newRule.render({subjects:self.data.subjects}, null, container, self.idCount, item);
@@ -171,7 +176,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                     });
                 };
 
-            buildListItem(this.subjectEntity, $('#dropbox'), null);
+            buildListItem(this.subjectEntity, this.$el.find("ol#dropbox"), null);
             this.delegateEvents();
 
         },
@@ -365,7 +370,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             this.setInactive(this.buttons.addOperator, true);
 
             var operatorRules = new OperatorRulesView();
-                operatorRules.render(this.data, null, this.pickUpItem, this.idCount);
+                operatorRules.render(this.data, null, this.pickUpItem, "subject_" + this.idCount);
             this.idCount++;
         },
 
