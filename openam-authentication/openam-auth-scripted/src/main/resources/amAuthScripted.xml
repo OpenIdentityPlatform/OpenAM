@@ -78,9 +78,15 @@
                         <Value>java.lang.StrictMath</Value>
                         <Value>java.lang.String</Value>
                         <Value>java.lang.Void</Value>
+                        <Value>java.util.ArrayList</Value>
                         <Value>java.util.HashSet</Value>
                         <Value>java.util.HashMap</Value>
                         <Value>java.util.HashMap$KeyIterator</Value>
+                        <Value>java.util.LinkedHashMap</Value>
+                        <Value>java.util.LinkedHashSet</Value>
+                        <Value>java.util.LinkedList</Value>
+                        <Value>java.util.TreeMap</Value>
+                        <Value>java.util.TreeSet</Value>
                         <Value>com.sun.identity.shared.debug.Debug</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.*</Value>
                         <Value>org.forgerock.openam.authentication.modules.scripted.http.*</Value>
