@@ -33,8 +33,8 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
      */
     public void validateRequest(OAuth2Request request) throws BadRequestException {
         try {
-            Reject.ifFalse(new OpenIdPrompt(request.<String>getParameter("prompt")).isValid(),
-                    "Prompt parameter is invalid");
+            OpenIdPrompt prompt = new OpenIdPrompt(request);
+            Reject.ifFalse(prompt.isValid(), "Prompt parameter " + prompt.getOriginalValue() + " is invalid");
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage());
         }

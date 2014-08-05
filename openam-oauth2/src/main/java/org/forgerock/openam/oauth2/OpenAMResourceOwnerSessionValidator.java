@@ -74,13 +74,12 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
     public ResourceOwner validate(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             AccessDeniedException, BadRequestException, InteractionRequiredException, LoginRequiredException {
 
-        final String prompt = request.getParameter(OAuth2Constants.Custom.PROMPT);
-
-        final OpenIdPrompt openIdPrompt = new OpenIdPrompt(prompt);
+        final OpenIdPrompt openIdPrompt = new OpenIdPrompt(request);
 
         if (!openIdPrompt.isValid()) {
-            logger.message("Invalid prompt parameter");
-            throw new BadRequestException("Invalid prompt parameter");
+            String message = "Invalid prompt parameter \"" + openIdPrompt.getOriginalValue() + "\"";
+            logger.message(message);
+            throw new BadRequestException(message);
         }
 
         SSOToken token = null;
@@ -92,12 +91,11 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
 
         try {
             if (token != null) {
-
-                if (openIdPrompt.isPromptLogin()) {
+                if (openIdPrompt.containsLogin()) {
                     try {
                         ssoTokenManager.destroyToken(token);
                     } catch (SSOException e) {
-                        logger.error("Error destorying SSOToken: ", e);
+                        logger.error("Error destroying SSOToken: ", e);
                     }
                     throw authenticationRequired(request);
                 }
@@ -115,12 +113,9 @@ public class OpenAMResourceOwnerSessionValidator implements ResourceOwnerSession
                     throw new LoginRequiredException();
                 }
             } else {
-                if (openIdPrompt.isNoPrompt()) {
+                if (openIdPrompt.containsNone()) {
                     logger.error("Not pre-authenticated and prompt parameter equals none.");
                     throw new InteractionRequiredException();
-                } else if (openIdPrompt.isPromptConsent() && !openIdPrompt.isPromptLogin()) {
-                    logger.error("Prompt parameter doesn't allow the login prompt: ");
-                    throw new LoginRequiredException();
                 } else {
                     throw authenticationRequired(request);
                 }

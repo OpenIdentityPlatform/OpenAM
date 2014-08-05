@@ -60,20 +60,17 @@ public class ResourceOwnerSessionValidatorImpl implements ResourceOwnerSessionVa
     public ResourceOwner validate(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             AccessDeniedException, BadRequestException, InteractionRequiredException, LoginRequiredException {
 
-        final String prompt = request.getParameter("prompt");
-
-        final OpenIdPrompt openIdPrompt = new OpenIdPrompt(prompt);
+        final OpenIdPrompt openIdPrompt = new OpenIdPrompt(request);
 
         if (!openIdPrompt.isValid()) {
-            throw new BadRequestException("Invalid prompt parameter");
+            throw new BadRequestException("Invalid prompt parameter \"" + openIdPrompt.getOriginalValue());
         }
 
         final String sessionId = getSessionId(ServletUtils.getRequest(request.<Request>getRequest()));
 
         try {
             if (sessionId != null) {
-
-                if (openIdPrompt.isPromptLogin()) {
+                if (openIdPrompt.containsLogin()) {
                     sessionManager.delete(sessionId);
                     throw authenticationRequired(request);
                 }
@@ -84,10 +81,8 @@ public class ResourceOwnerSessionValidatorImpl implements ResourceOwnerSessionVa
                 }
                 return userStore.get(clientId);
             } else {
-                if (openIdPrompt.isNoPrompt()) {
+                if (openIdPrompt.containsNone()) {
                     throw new InteractionRequiredException();
-                } else if (openIdPrompt.isPromptConsent() && !openIdPrompt.isPromptLogin()) {
-                    throw new LoginRequiredException();
                 } else {
                     throw authenticationRequired(request);
                 }

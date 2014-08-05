@@ -167,7 +167,10 @@ public class OpenAMResourceOwnerSessionValidatorTest {
         // InteractionRequiredException
     }
 
-    @Test (expectedExceptions = LoginRequiredException.class)
+    // OPENAM-4092: When the user has no SSO token and specifies prompt=consent the
+    // user should be presented with the OpenAM login page
+    //
+    @Test (expectedExceptions = ResourceOwnerAuthenticationRequired.class)
     public void shouldFailIfUserIsNotAuthenticatedAndOnlyConsentPromptIsPresent() throws Exception {
 
         //Given

@@ -36,16 +36,12 @@ public class OpenIdResourceOwnerConsentVerifier implements ResourceOwnerConsentV
      * {@inheritDoc}
      */
     public boolean verify(boolean consentSaved, OAuth2Request request) throws ResourceOwnerConsentRequiredException {
-        final OpenIdPrompt prompt = new OpenIdPrompt(request.<String>getParameter(OAuth2Constants.Custom.PROMPT));
+        final OpenIdPrompt prompt = new OpenIdPrompt(request);
 
-        if (prompt.isNoPrompt() && !consentSaved) {
+        if (prompt.containsNone() && !consentSaved) {
             throw new ResourceOwnerConsentRequiredException();
         }
 
-        if (!prompt.isPromptConsent() && prompt.isPromptLogin() && !consentSaved) {
-            throw new ResourceOwnerConsentRequiredException();
-        }
-
-        return consentSaved && !prompt.isPromptConsent();
+        return consentSaved && !prompt.containsConsent();
     }
 }
