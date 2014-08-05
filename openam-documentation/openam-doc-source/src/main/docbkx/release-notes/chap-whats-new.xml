@@ -142,7 +142,7 @@ Agreement (yes/no): [no]:</screen>
     For instructions, see <link
      xlink:href="install-guide#enable-cors-support"
      xlink:role="http://docbook.org/xlink/role/olink"
-     xlink:show="new"><citetitle>Authorization</citetitle></link>.
+     xlink:show="new"><citetitle>Enabling CORS Support</citetitle></link>.
    </para>
   </listitem>
 
