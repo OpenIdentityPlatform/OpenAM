@@ -24,6 +24,7 @@
  *
  * $Id: StatusCodeImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
  */
 
 
@@ -169,12 +170,11 @@ public class StatusCodeImpl implements StatusCode {
             if (includeNSPrefix) {
                 xmlString.append(SAML2Constants.PROTOCOL_PREFIX);
             }
-            xmlString.append(SAML2Constants.STATUS_CODE)
-            .append(SAML2Constants.SPACE);
+            xmlString.append(SAML2Constants.STATUS_CODE);
             if (declareNS) {
-                xmlString.append(SAML2Constants.PROTOCOL_DECLARE_STR)
-                .append(SAML2Constants.NEWLINE);
+                xmlString.append(SAML2Constants.PROTOCOL_DECLARE_STR);
             }
+            xmlString.append(SAML2Constants.SPACE);
             
             xmlString.append(SAML2Constants.VALUE)
             .append(SAML2Constants.EQUAL)
