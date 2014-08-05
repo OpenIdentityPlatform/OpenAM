@@ -21,6 +21,7 @@ import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
@@ -74,12 +75,13 @@ public interface AuthorizationService {
      * @throws ResourceOwnerConsentRequiredException If the OpenID Connect prompt parameter enforces that the resource
      *          owner is not asked for consent, but the resource owners consent has not been previously stored.
      * @throws IllegalArgumentException If the request is missing any required parameters.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      */
     AuthorizationToken authorize(OAuth2Request request) throws ResourceOwnerAuthenticationRequired,
             ResourceOwnerConsentRequired, InvalidClientException, UnsupportedResponseTypeException,
             RedirectUriMismatchException, InvalidRequestException, AccessDeniedException, ServerException,
             LoginRequiredException, BadRequestException, InteractionRequiredException,
-            ResourceOwnerConsentRequiredException;
+            ResourceOwnerConsentRequiredException, InvalidScopeException;
 
     /**
      * Handles an authorization request from a OAuth2 client, validates the request is valid and contains the required
@@ -111,9 +113,10 @@ public interface AuthorizationService {
      * @throws InteractionRequiredException If the OpenID Connect prompt parameter enforces that the resource owner
      *          is not asked to authenticate, but the resource owner does not have a current authenticated session.
      * @throws IllegalArgumentException If the request is missing any required parameters.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      */
     AuthorizationToken authorize(OAuth2Request request, boolean consentGiven, boolean saveConsent)
             throws AccessDeniedException, ResourceOwnerAuthenticationRequired, InvalidClientException,
             UnsupportedResponseTypeException, InvalidRequestException, RedirectUriMismatchException, ServerException,
-            LoginRequiredException, BadRequestException, InteractionRequiredException;
+            LoginRequiredException, BadRequestException, InteractionRequiredException, InvalidScopeException;
 }

@@ -17,26 +17,69 @@
 package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
+import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidClientException;
+import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.util.Reject;
 
+import javax.inject.Inject;
+import java.util.Set;
+
 /**
- * Implementation of the AuthorizeRequestValidator for OAuth2 request validation.
+ * Implementation of the AuthorizeRequestValidator for OpenID Connect request validation.
  *
  * @since 12.0.0
  */
 public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestValidator {
 
+    private final ClientRegistrationStore clientRegistrationStore;
+
+    /**
+     * Constructs a new OpenIdConnectAuthorizeRequestValidator instance.
+     *
+     * @param clientRegistrationStore An instance of the ClientRegistrationStore.
+     */
+    @Inject
+    public OpenIdConnectAuthorizeRequestValidator(ClientRegistrationStore clientRegistrationStore) {
+        this.clientRegistrationStore = clientRegistrationStore;
+    }
+
     /**
      * {@inheritDoc}
      */
-    public void validateRequest(OAuth2Request request) throws BadRequestException {
+    public void validateRequest(OAuth2Request request) throws BadRequestException, InvalidRequestException,
+            InvalidClientException, InvalidScopeException {
+
+        validateOpenIdScope(request);
+
         try {
             OpenIdPrompt prompt = new OpenIdPrompt(request);
             Reject.ifFalse(prompt.isValid(), "Prompt parameter " + prompt.getOriginalValue() + " is invalid");
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage());
+        }
+    }
+
+    private void validateOpenIdScope(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
+            InvalidScopeException {
+        final ClientRegistration clientRegistration = clientRegistrationStore.get(
+                request.<String>getParameter(OAuth2Constants.Params.CLIENT_ID), request);
+        final Set<String> clientScope = clientRegistration.getAllowedScopes();
+        final Set<String> requestScope = Utils.splitScope(request.<String>getParameter(OAuth2Constants.Params.SCOPE));
+
+        if (clientScope.contains(OAuth2Constants.Params.OPENID) && !requestScope.contains(OAuth2Constants.Params.OPENID)) {
+            throw new InvalidRequestException(
+                    "Client configured as OpenID Connect and requires 'openid' to be in the scope of this request");
+        }
+
+        if (!clientScope.contains(OAuth2Constants.Params.OPENID) && requestScope.contains(OAuth2Constants.Params.OPENID)) {
+            throw new InvalidScopeException("Invalid scope 'openid' in request to non OpenID Connect client");
         }
     }
 }

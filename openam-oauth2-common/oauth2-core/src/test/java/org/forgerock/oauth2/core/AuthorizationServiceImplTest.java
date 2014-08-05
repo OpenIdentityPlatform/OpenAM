@@ -17,17 +17,7 @@
 package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.InteractionRequiredException;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
-import org.forgerock.oauth2.core.exceptions.LoginRequiredException;
-import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
-import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequiredException;
-import org.forgerock.oauth2.core.exceptions.ServerException;
-import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -75,10 +65,7 @@ public class AuthorizationServiceImplTest {
 
     @Test (expectedExceptions = ResourceOwnerConsentRequired.class)
     public void authorizeShouldThrowResourceOwnerConsentRequiredExceptionWhenResourceOwnerConsentRequired()
-            throws UnsupportedResponseTypeException, AccessDeniedException, ResourceOwnerAuthenticationRequired,
-            ResourceOwnerConsentRequiredException, InvalidRequestException, InteractionRequiredException,
-            InvalidClientException, ServerException, RedirectUriMismatchException, ResourceOwnerConsentRequired,
-            BadRequestException, LoginRequiredException {
+            throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -101,11 +88,7 @@ public class AuthorizationServiceImplTest {
     }
 
     @Test
-    public void authorizeShouldIssueAuthorizationTokensWhenResourceOwnerHasSavedConsent()
-            throws UnsupportedResponseTypeException, AccessDeniedException, ResourceOwnerAuthenticationRequired,
-            ResourceOwnerConsentRequiredException, InvalidRequestException, InteractionRequiredException,
-            InvalidClientException, ServerException, RedirectUriMismatchException, ResourceOwnerConsentRequired,
-            BadRequestException, LoginRequiredException {
+    public void authorizeShouldIssueAuthorizationTokensWhenResourceOwnerHasSavedConsent() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -129,10 +112,7 @@ public class AuthorizationServiceImplTest {
     }
 
     @Test (expectedExceptions = AccessDeniedException.class)
-    public void authorizeShouldThrowAccessDeniedExceptionWhenResourceOwnerDoesNotGiveConsent()
-            throws UnsupportedResponseTypeException, AccessDeniedException, ResourceOwnerAuthenticationRequired,
-            InvalidRequestException, InteractionRequiredException, InvalidClientException, ServerException,
-            RedirectUriMismatchException, BadRequestException, LoginRequiredException {
+    public void authorizeShouldThrowAccessDeniedExceptionWhenResourceOwnerDoesNotGiveConsent() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -150,10 +130,7 @@ public class AuthorizationServiceImplTest {
     }
 
     @Test
-    public void authorizeShouldIssueAuthorizationTokensWhenResourceOwnerHasGivenConsent()
-            throws UnsupportedResponseTypeException, AccessDeniedException, ResourceOwnerAuthenticationRequired,
-            InvalidRequestException, InteractionRequiredException, InvalidClientException, ServerException,
-            RedirectUriMismatchException, BadRequestException, LoginRequiredException {
+    public void authorizeShouldIssueAuthorizationTokensWhenResourceOwnerHasGivenConsent() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -176,10 +153,7 @@ public class AuthorizationServiceImplTest {
     }
 
     @Test
-    public void authorizeShouldSaveConsentWhenResourceOwnerRequests()
-            throws UnsupportedResponseTypeException, AccessDeniedException, ResourceOwnerAuthenticationRequired,
-            InvalidRequestException, InteractionRequiredException, InvalidClientException, ServerException,
-            RedirectUriMismatchException, BadRequestException, LoginRequiredException {
+    public void authorizeShouldSaveConsentWhenResourceOwnerRequests() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);

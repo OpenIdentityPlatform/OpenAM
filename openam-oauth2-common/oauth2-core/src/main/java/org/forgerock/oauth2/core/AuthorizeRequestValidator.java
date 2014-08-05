@@ -19,6 +19,7 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
+import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
@@ -47,7 +48,9 @@ public interface AuthorizeRequestValidator {
      * @throws ServerException If any internal server error occurs.
      * @throws BadRequestException If the request is malformed.
      * @throws IllegalArgumentException If the request is missing any required parameters.
+     * @throws InvalidScopeException If the requested scope is invalid, unknown, or malformed.
      */
     void validateRequest(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
-            RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, BadRequestException;
+            RedirectUriMismatchException, UnsupportedResponseTypeException, ServerException, BadRequestException,
+            InvalidScopeException;
 }

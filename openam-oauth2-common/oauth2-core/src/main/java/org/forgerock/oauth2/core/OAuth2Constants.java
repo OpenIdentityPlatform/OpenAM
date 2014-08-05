@@ -171,6 +171,11 @@ public class OAuth2Constants {
          */
         public static final String REALM = "realm";
 
+        /**
+         * Parameter usage location: OpenId Connect request, as value in scope
+         */
+        public static final String OPENID = "openid";
+
     }
 
     public class CoreTokenParams{
