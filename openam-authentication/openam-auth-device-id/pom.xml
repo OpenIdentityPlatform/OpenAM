@@ -70,7 +70,7 @@
                     <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
                     <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
                     <!-- variables bound by rhino -->
-                    <predefinedVars>logger,idRepository,username,authState,FAILED,SUCCESS,clientScriptOutputData,sharedState,fontDetector,output</predefinedVars>
+                    <predefinedVars>logger,idRepository,username,authState,FAILED,SUCCESS,clientScriptOutputData,sharedState,fontDetector,output,autoSubmitDelay,submit</predefinedVars>
                 </configuration>
                 <executions>
                     <execution>

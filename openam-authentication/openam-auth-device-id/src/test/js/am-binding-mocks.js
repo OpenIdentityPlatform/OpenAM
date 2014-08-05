@@ -16,11 +16,11 @@
 
 
 /* For client-side.js */
-var fontDetector = {detect: function() {
-
-}}, console = {warn: function() {
-
-}}, output = {value: ""};
+var fontDetector = {detect: function() {}},
+    console = {warn: function() {}},
+    output = {value: ""},
+    autoSubmitDelay = 0;
+function submit() {}
 
 /* For server-side.js */
 var logger = {

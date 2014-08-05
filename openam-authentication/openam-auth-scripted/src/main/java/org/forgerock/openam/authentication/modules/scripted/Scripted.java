@@ -230,9 +230,8 @@ public class Scripted extends AMLoginModule {
     private Callback createClientSideScriptAndSelfSubmitCallback() {
         String clientSideScriptExecutorFunction = ScriptedClientUtilityFunctions.
                 createClientSideScriptExecutorFunction(clientSideScript, CLIENT_SCRIPT_OUTPUT_DATA_PARAMETER_NAME);
-        String autoSubmit = ScriptedClientUtilityFunctions.createAutoSubmissionLogic();
         ScriptTextOutputCallback scriptAndSelfSubmitCallback =
-                new ScriptTextOutputCallback(clientSideScriptExecutorFunction + autoSubmit);
+                new ScriptTextOutputCallback(clientSideScriptExecutorFunction);
 
         return scriptAndSelfSubmitCallback;
     }

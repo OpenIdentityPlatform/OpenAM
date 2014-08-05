@@ -31,27 +31,26 @@ public class ScriptedClientUtilityFunctions {
      * @return The anonymous function, supplied with the element with the id.
      */
     public static String createClientSideScriptExecutorFunction(String script, String outputParameterId) {
-        String clientSideScriptFunction = "(function(output){\n" +
-                script +
-                "\n})" +
-                "(document.forms[0].elements['" + outputParameterId + "']);\n";
-        return clientSideScriptFunction;
-    }
-
-    /**
-     * Creates a piece of Javascript which will cause the login form to submit.
-     *
-     * @return The Javascript which causes the form submission.
-     */
-    public static String createAutoSubmissionLogic() {
-        String autoSubmit = "" +
-                "if(!(window.jQuery)) {\n" + // Crude detection to see if XUI is not present.
-                    "document.forms[0].submit();\n" +
-                "} else {\n" +
-                    "$('input[type=submit]').trigger('click');\n" +
-                "}";
-
-        return autoSubmit;
+        return String.format(
+                "(function(output) {\n" +
+                "    var autoSubmitDelay = 0,\n" +
+                "        submitted = false;\n" +
+                "    function submit() {\n" +
+                "        if (submitted) {\n" +
+                "            return;\n" +
+                "        }" +
+                "        if (!(window.jQuery)) {\n" + // Crude detection to see if XUI is not present.
+                "            document.forms[0].submit();\n" +
+                "        } else {\n" +
+                "            $('input[type=submit]').trigger('click');\n" +
+                "        }\n" +
+                "        submitted = true;\n" +
+                "    }\n" +
+                "    %s\n" + // script
+                "    setTimeout(submit, autoSubmitDelay);\n" +
+                "}) (document.forms[0].elements['%s']);\n", // outputParameterId
+                script,
+                outputParameterId);
     }
 
 }

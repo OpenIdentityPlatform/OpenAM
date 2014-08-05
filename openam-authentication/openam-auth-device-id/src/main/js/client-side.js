@@ -77,13 +77,19 @@ var collectScreenInfo = function () {
     },
 // Getting geolocation takes some time and is done asynchronously, hence need a callback which is called once geolocation is retrieved.
     collectGeolocationInfo = function (callback) {
-        var geolocationInfo = {};
-        if (navigator && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocationInfo = {},
+            successCallback = function(position) {
                 geolocationInfo.longitude = position.coords.longitude;
                 geolocationInfo.latitude = position.coords.latitude;
                 callback(geolocationInfo);
-            });
+            }, errorCallback = function(error) {
+                console.warn("Cannot collect geolocation information. " + error.code + ": " + error.message);
+                callback(geolocationInfo);
+            };
+        if (navigator && navigator.geolocation) {
+            // NB: If user chooses 'Not now' on Firefox neither callback gets called
+            //     https://bugzilla.mozilla.org/show_bug.cgi?id=675533
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         } else {
             console.warn("Cannot collect geolocation information. navigator.geolocation is not defined.");
             callback(geolocationInfo);
@@ -163,9 +169,12 @@ if (navigator.systemLanguage) {
     devicePrint.systemLanguage = navigator.systemLanguage;
 }
 
-// This will cause the script to wait until the user's location has been found.
-// To avoid the wait move the output.value assignment outside of the function callback
+// Attempt to collect geo-location information and return this with the data collected so far.
+// Otherwise, if geo-location fails or takes longer than 30 seconds, auto-submit the data collected so far.
+autoSubmitDelay = 30000;
+output.value = JSON.stringify(devicePrint);
 collectGeolocationInfo(function(geolocationInfo) {
     devicePrint.geolocation = geolocationInfo;
+    output.value = JSON.stringify(devicePrint);
+    submit();
 });
-output.value = JSON.stringify(devicePrint);
