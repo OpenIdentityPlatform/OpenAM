@@ -24,6 +24,7 @@
  *
  * $Id: PWResetUserValidationModel.java,v 1.2 2008/06/25 05:43:43 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
  */
 
 package com.sun.identity.password.ui.model;
@@ -133,4 +134,16 @@ public interface PWResetUserValidationModel extends PWResetModel {
      * @return the realm for the user reseting password.
      */
     String getUserRealm();
+
+    /**
+     * Returns <code>true</code> if the entered user attr value 
+     * is comprised of safe characters. It will return false 
+     * and view bean will display an error message if it
+     * contains invalid characters
+     *
+     * @param orgDN organization DN
+     * @param userAttrValue User enter data for user validation.
+     * @return <code>true</code> if entered data is valid.
+     */
+    boolean isUserAttrValueValid(String orgDN, String userAttrValue);
 }

@@ -24,9 +24,7 @@
  *
  * $Id: PWResetUserValidationModelImpl.java,v 1.3 2010/01/28 08:17:10 bina Exp $
  *
- */
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -43,16 +41,21 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * <code>PWResetUserValidationModelImpl</code> defines a set of methods that
@@ -95,7 +98,15 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
      * Name of user service ns account lockout attribute
      */
     private static final String USER_SERVICE_NS_LOCKOUT =  "nsaccountlock";
-    
+
+    /**
+     * Name of password reset invalid char regex attribute
+     * regular expression defined for this attribute will be used
+     * to locate invalid chars in user attribute
+     */
+    private static final String PW_RESET_INVALIDCHAR_REGEX =
+        "openam-am-password-reset-invalidchar-regex";
+
     /**
      *  Name for string false value
      */
@@ -452,5 +463,55 @@ public class PWResetUserValidationModelImpl extends PWResetModelImpl
      */
     public String getUserRealm() {
         return userRealm;
+    }
+    
+    /**
+     * Returns <code>true</code> if the entered user attr value 
+     * is comprised of safe characters. It will return false 
+     * and view bean will display an error message if it
+     * contains invalid characters
+     *
+     * @param orgDN organization DN.
+     * @param userAttrValue User enter data for user validation.
+     * @return <code>true</code> if entered data is valid.
+     */
+    public boolean isUserAttrValueValid(String orgDN, String userAttrValue) {
+        String regexExpr = null;
+        boolean isValid = false;
+        try {
+            regexExpr = getAttributeValue(orgDN, PW_RESET_INVALIDCHAR_REGEX);
+        } catch (SSOException e) {
+            debug.warning("PWResetUserValidationModelImpl.isUserAttrValueValid", e);
+            errorMsg = getErrorString(e);
+        } catch (SMSException e) {
+            debug.error("PWResetUserValidationModelImpl.isUserAttrValueValid", e);
+            errorMsg = getErrorString(e);
+        }
+
+        // assume all characters are allowed when regex expression is not defined
+        if (regexExpr == null || regexExpr.isEmpty()) {
+            return true;
+        } 
+        
+        if (debug.messageEnabled()) {
+            debug.message("PWResetUserValidationModelImpl.isUserAttrValueValid: " 
+                    + "using regular expression '" +regexExpr+ "'");
+        }
+
+        try {
+            Pattern pattern = Pattern.compile(regexExpr);
+            Matcher matcher = pattern.matcher(userAttrValue);
+            boolean found = matcher.find();
+            if (found) {
+                errorMsg = getLocalizedString("userNotExists.message");
+            } else {
+                isValid = true;
+            }
+        } catch (PatternSyntaxException pse) {
+            debug.error("PWResetUserValidationModelImpl.isUserAttrValueValid: " 
+                    + "expression's syntax is invalid '" +regexExpr+ "'", pse);
+            errorMsg = getErrorString(pse);
+        }
+        return isValid;
     }
 }

@@ -24,10 +24,7 @@
  *
  * $Id: PWResetUserValidationViewBean.java,v 1.4 2010/01/28 08:17:10 bina Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.password.ui;
 
@@ -262,7 +259,8 @@ public class PWResetUserValidationViewBean extends PWResetViewBeanBase  {
                 model.getMissingUserAttrMessage(userAttrName));
             forwardTo();
         } else {
-            if (model.isUserExists(userAttrValue, userAttrName, orgDN) &&
+            if (model.isUserAttrValueValid(orgDN, userAttrValue) && 
+                model.isUserExists(userAttrValue, userAttrName, orgDN) &&
                 model.isUserActive(model.getUserRealm())) 
             {
                 forwardToPWResetQuestionVB(orgDN, userAttrValue, orgDNFlag,locale);
