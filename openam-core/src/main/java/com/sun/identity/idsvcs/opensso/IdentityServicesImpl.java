@@ -24,9 +24,6 @@
  *
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
@@ -448,9 +445,13 @@ public class IdentityServicesImpl
                         s.add(Long.toString(ssoToken.getMaxIdleTime()));
                     } else {
                         propertyNext = ssoToken.getProperty(attrNext);
-                        s.add(propertyNext);
+                        if (propertyNext != null && !propertyNext.isEmpty()) {
+                            s.add(propertyNext);
+                        }
                     }
-                    sessionAttributes.put(attrNext, s);
+                    if (!s.isEmpty()) {
+                        sessionAttributes.put(attrNext, s);
+                    }
                 }
             }
             // Obtain user memberships (roles and groups)
@@ -526,9 +527,9 @@ public class IdentityServicesImpl
                     name = it.next().toString();
                     attribute.setName(name);
                     value = (Set) userAttributes.get(name);
-                    List valueList = new ArrayList(value.size());
-                    // Convert the set to a List of String
-                    if (value != null) {
+                    if (value != null && !value.isEmpty()) {
+                        List valueList = new ArrayList(value.size());
+                        // Convert the set to a List of String
                         for (Iterator valueIt = value.iterator();
                             valueIt.hasNext();) {
                             Object next = valueIt.next();
@@ -536,10 +537,10 @@ public class IdentityServicesImpl
                                 valueList.add(next.toString());
                             }
                         }
+                        String[] v = new String[valueList.size()];
+                        attribute.setValues((String[]) valueList.toArray(v));
+                        attributes.add(attribute);
                     }
-                    String[] v = new String[valueList.size()];
-                    attribute.setValues((String[]) valueList.toArray(v));
-                    attributes.add(attribute);
                 }
                 Attribute[] a = new Attribute[attributes.size()];
                 details.setAttributes((Attribute[]) attributes.toArray(a));
