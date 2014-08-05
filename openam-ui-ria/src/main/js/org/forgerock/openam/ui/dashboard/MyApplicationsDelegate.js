@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -24,19 +24,15 @@
 
 /*global $, define, _ */
 
-/**
- * @author jfeasel
- */
-define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
+define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, AbstractDelegate, configuration, eventManager) {
+    "org/forgerock/commons/ui/common/main/Configuration"
+], function(constants, AbstractDelegate, conf) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/dashboard");
+    var obj = new AbstractDelegate(constants.host + '/' + constants.context + '/json/dashboard');
 
-    obj.sortApps = function (apps) {
+    obj.sortApps = function(apps) {
 
         var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) { 
             var app = {}; 
@@ -48,32 +44,30 @@ define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
         return sortedApps;
     };
 
-    obj.getMyApplications = function (callback) {
-
-        obj.serviceCall({
+    obj.getMyApplications = function() {
+        var self = this;
+        return obj.serviceCall({
             url: "/assigned",
             headers: {"Cache-Control": "no-cache"},
-            type: "GET",
-            success: _.bind(function (apps) {
-                callback(this.sortApps(apps));
-            }, this)
+            type: "GET"
+        }).then(function(apps) {
+            return self.sortApps(apps);
         });
         
     };
 
-    obj.getAvailableApplications = function (callback) {
-
-        obj.serviceCall({
+    obj.getAvailableApplications = function() {
+        var self = this;
+        return obj.serviceCall({
             url: "/available",
             headers: {"Cache-Control": "no-cache"},
-            type: "GET",
-            success:  _.bind(function (apps) {
-                callback(this.sortApps(apps));
-            }, this)
+            type: "GET"
+        }).then(function(apps) {
+            return self.sortApps(apps);
         });
 
     };
-    
+
     return obj;
 });
 

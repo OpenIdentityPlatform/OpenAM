@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright 2011-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,30 +29,22 @@
  */
 define("org/forgerock/openam/ui/dashboard/DashboardView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/dashboard/DashboardDelegate",
-    "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function(AbstractView, DashboardDelegate, eventManager, constants, conf) {
-    
+    "org/forgerock/openam/ui/dashboard/MyApplicationsView",
+    "org/forgerock/openam/ui/dashboard/TrustedDevicesView"
+], function(AbstractView, MyApplicationsView, TrustedDevicesView) {
+
     var Dashboard = AbstractView.extend({
         template: "templates/openam/DashboardTemplate.html",
         render: function() {
-            
-            DashboardDelegate.getMyApplications(_.bind(function (apps) {
-                this.data = {};
-                this.data.apps = apps;
-                this.parentRender(_.bind(function () {
-                    if (this.data.apps.length === 0) {
-                        this.$el.find("#appsList").text($.t("openam.apps.noneFound"));
-                    }
-                }, this));
-                
-            }, this));
-            
+
+            this.parentRender(function() {
+
+                MyApplicationsView.render();
+                TrustedDevicesView.render();
+            });
         }
     });
-    
+
     return new Dashboard();
 });
 

@@ -340,6 +340,14 @@
             "header" : "My Applications",
             "noneFound": "You have no applications assigned to you"
         },
+        "trusted" : {
+            "devices" : {
+                "header" : "Trusted Devices",
+                "deviceName" : "Name",
+                "lastUsed" : "Last Used",
+                "deleteDevice" : "Delete Device"
+            }
+        },
         "authentication": {
             "input": {
                 "name": "Username",

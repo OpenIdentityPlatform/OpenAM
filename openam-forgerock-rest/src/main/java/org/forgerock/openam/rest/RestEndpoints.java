@@ -33,6 +33,7 @@ import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
+import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
 import org.forgerock.openam.rest.resource.CrestRealmRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.service.ServiceRouter;
@@ -79,6 +80,9 @@ public class RestEndpoints {
 
         router.addRoute("/users")
                 .addVersion("1.0", get(Key.get(IdentityResource.class, Names.named("UsersResource"))));
+
+        router.addRoute("/users/{user}/devices/trusted")
+                .addVersion("1.0", get(TrustedDevicesResource.class));
 
         router.addRoute("/groups")
                 .addVersion("1.0", get(Key.get(IdentityResource.class, Names.named("GroupsResource"))));

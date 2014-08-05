@@ -1,0 +1,13 @@
+<div id="appsList">
+    <h2 class="header">{{t "openam.apps.header"}}</h2>
+
+    <ul class="appsDashboard">
+        {{#if apps}}
+            {{#each apps}}
+            <li><a href="{{dashboardLogin}}"><img src="{{dashboardIcon}}">{{dashboardName}}</a></li>
+            {{/each}}
+        {{else}}
+        {{t "openam.apps.noneFound"}}
+        {{/if}}
+    </ul>
+</div>

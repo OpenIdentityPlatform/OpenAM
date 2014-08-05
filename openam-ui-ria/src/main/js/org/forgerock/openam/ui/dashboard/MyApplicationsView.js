@@ -22,12 +22,31 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global define, $, form2js, _ */
 
-define("org/forgerock/openam/ui/dashboard/main", [
-    "./MyApplicationsDelegate",
-    "./MyApplicationsView",
-    "./TrustedDevicesDelegate",
-    "./TrustedDevicesView",
-    "./DashboardView"
-]);
+define("org/forgerock/openam/ui/dashboard/MyApplicationsView", [
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/openam/ui/dashboard/MyApplicationsDelegate"
+], function(AbstractView, MyApplicationsDelegate) {
+    
+    var Applications = AbstractView.extend({
+        template: "templates/openam/MyApplicationsTemplate.html",
+        noBaseTemplate: true,
+        element: '#myApplications',
+        render: function() {
+
+            var self = this;
+            MyApplicationsDelegate.getMyApplications().then(function(apps) {
+                if (apps.length > 0) {
+                    self.data.apps = apps;
+                }
+
+                self.parentRender();
+            });
+        }
+    });
+
+    return new Applications();
+});
+
+
