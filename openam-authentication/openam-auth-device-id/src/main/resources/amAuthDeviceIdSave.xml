@@ -59,7 +59,7 @@
                 </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
-                    <AttributeSchema name="iplanet-am-auth-scripted-auth-level"
+                    <AttributeSchema name="iplanet-am-auth-device-id-save-auth-level"
                                      type="single"
                                      syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                      i18nKey="a500">
