@@ -1,23 +1,9 @@
 <html>
     <head>
-        <script language="javascript" type="text/javascript">
-            var context = window.location.href.substring(0,window.location.href.indexOf('confirm.html')),
-                params = window.location.search.substring(1);
-            function doConfirm() {
-                var url = context;
-                if(window.location.search.indexOf('username=') > -1) {
-                    url += "#forgotPasswordChange/&" + params;
-                }
-                else if(window.location.search.indexOf('email=') > -1) {
-                    url += "#continueRegister/&" + params;
-                }
-                else {
-                    url += "#login/";
-                }
-                location.href = url;
-            };
-            doConfirm();
-        </script>
+        <script src="libs/jquery-1.8.1-min.js"></script> 
+        <script src="libs/underscore-1.4.4-min.js"></script>
+        <script src="libs/backbone-0.9.2-min.js"></script>
+        <script data-main="confirm" src="libs/requirejs-2.1.10-min.js"></script>
     </head>
     <body>
     </body>

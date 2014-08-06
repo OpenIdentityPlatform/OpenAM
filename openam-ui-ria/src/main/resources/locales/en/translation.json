@@ -10,6 +10,7 @@
             "CommonMessages" : {
                 "authenticationFailed" : "Login/password combination is invalid.",
                 "loginFailureLockout" : "This user is not active. Contact your system administrator.",
+                "invalidRealm" : "The realm doesn't exist",
                 "serviceUnavailable" : "Service unavailable",
                 "unknown" : "Unknown error. Please contact your Administrator",
                 "loggedIn" : "You have been successfully logged in.",

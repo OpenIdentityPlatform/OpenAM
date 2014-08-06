@@ -101,6 +101,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         render: function(args, callback) {
             var urlParams = {};//deserialized querystring params
+            var promise = $.Deferred();
 
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
@@ -245,6 +246,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                         }
                                         this.parentRender(_.bind(function() {
                                             this.reloadData();
+                                            // resolve a promise when all templates will be loaded
+                                            promise.resolve();
                                         }, this));
                                     }, this)
                                 );
@@ -257,6 +260,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     this.template = this.unavailableTemplate;
                     this.parentRender();
                 }, this));
+
+                promise
+                    .done(function() {
+                        if (cookieHelper.getCookie('invalidRealm')) {
+                            cookieHelper.deleteCookie('invalidRealm');
+                            eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                        }
+                    });
 
         },
         reloadData: function () {
