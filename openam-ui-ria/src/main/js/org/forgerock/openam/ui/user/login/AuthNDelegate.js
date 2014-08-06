@@ -247,5 +247,18 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
     };
 
+    obj.setGoToUrl = function (tokenId, urlGoTo){
+        var args = {};
+        args.goto = urlGoTo;
+        return obj.serviceCall({
+            type: "POST",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            data: JSON.stringify(args),
+            url: "",
+            serviceUrl: constants.host + "/" + constants.context + "/json/users?_action=validateGoto",
+            errorsHandlers: {"Bad Request": {status: 400}}
+        });
+    };
+
     return obj;
 });

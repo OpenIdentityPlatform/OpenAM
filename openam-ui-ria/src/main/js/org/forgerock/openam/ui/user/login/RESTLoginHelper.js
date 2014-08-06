@@ -61,9 +61,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         if (result.hasOwnProperty("tokenId")) {
                             obj.getLoggedUser(function(user){
                                 conf.setProperty('loggedUser', user);
-                                _this.setSuccessURL();
-                                successCallback(user);
-                                authNDelegate.resetProcess();
+                                _this.setSuccessURL(result.tokenId).then(function(){
+                                    successCallback(user);
+                                    authNDelegate.resetProcess();
+                                });
                             }, errorCallback);
                         } else if (result.hasOwnProperty("authId")) {
                             // re-render login form for next set of required inputs
@@ -121,21 +122,32 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         return uiUtils.convertQueryParametersToJSON(url.substring(url.indexOf('?') + 1));
        
     };
-    
-    obj.setSuccessURL = function() {
-        var url = conf.globalData.auth.successURL;
-        if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),conf.loggedUser.username.toLowerCase())){
-            if(!conf.globalData.auth.urlParams){
-                conf.globalData.auth.urlParams = {};
+
+    obj.setSuccessURL = function(tokenId) {
+        var promise = $.Deferred(),
+            urlParams = uiUtils.convertCurrentUrlToJSON().params,
+            url = conf.globalData.auth.successURL;
+        if (urlParams && urlParams.goto) {
+            authNDelegate
+                .setGoToUrl(tokenId, urlParams.goto)
+                .then( function(data){
+                    conf.globalData.auth.urlParams.goto = data.successURL;
+                    promise.resolve();
+                }, function(){
+                    promise.reject();
+                });
+        } else {
+            if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),conf.loggedUser.username.toLowerCase())){
+                if(!conf.globalData.auth.urlParams){
+                    conf.globalData.auth.urlParams = {};
+                }
+                if(!conf.globalData.auth.urlParams.goto){
+                    conf.globalData.auth.urlParams.goto = url;
+                }
             }
-            if(!conf.globalData.auth.urlParams.goto){
-                conf.globalData.auth.urlParams.goto = url;
-            }
+            promise.resolve();
         }
-        else{
-            url = "";
-        }
-        return url;
+        return promise;
     };
     
     obj.filterUrlParams = function(params){
