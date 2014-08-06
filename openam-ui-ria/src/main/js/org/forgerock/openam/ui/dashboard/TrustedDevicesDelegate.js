@@ -35,14 +35,15 @@ define("org/forgerock/openam/ui/dashboard/TrustedDevicesDelegate", [
    obj.getTrustedDevices = function() {
        return obj.serviceCall({
             url: conf.loggedUser.uid + '/devices/trusted/?_queryId=*',
-            headers: {"Cache-Control": "no-cache"}
+            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
    obj.deleteTrustedDevice = function(id) {
        return obj.serviceCall({
            url: conf.loggedUser.uid + '/devices/trusted/' + id,
-           type: "DELETE"
+           type: "DELETE",
+           headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
        });
     };
 

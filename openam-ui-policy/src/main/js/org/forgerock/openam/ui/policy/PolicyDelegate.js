@@ -38,6 +38,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getAllApplications = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applications?_queryFilter=true",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -50,6 +51,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getApplicationTypes = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applicationtypes?_queryFilter=true",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -62,6 +64,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getApplicationByName = function (name, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applications/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -74,6 +77,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.updateApplication = function (appName, data, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applications/" + appName,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
             success: function (data) {
@@ -88,6 +92,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.createApplication = function (data, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applications/?_action=create",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "POST",
             data: JSON.stringify(data),
             success: function (data) {
@@ -102,6 +107,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getDecisionCombiners = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/decisioncombiners/?_queryId=&_fields=title",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -114,6 +120,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getEnvironmentConditions = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/conditiontypes?_queryID=&_fields=title,logical,config",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -126,6 +133,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getSubjectConditions = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/subjecttypes?_queryID=&_fields=title,logical,config",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -140,6 +148,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
         return obj.serviceCall({
             url: "/policies?_queryFilter=" + filter,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -152,6 +161,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getPolicyByName = function (name, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/policies/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);
@@ -164,6 +174,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.updatePolicy = function (policyName, data, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/policies/" + policyName,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
             success: function (data) {
@@ -178,7 +189,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.createPolicy = function (data, successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/policies/" + data.name,
-            headers: { "If-None-Match": "*" },
+            headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(data),
             success: function (data) {

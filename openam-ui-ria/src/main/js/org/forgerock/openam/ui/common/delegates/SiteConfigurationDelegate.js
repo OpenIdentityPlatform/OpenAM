@@ -42,6 +42,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
         
         console.info("Getting configuration");
         obj.serviceCall({
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             url: "/json/serverinfo/*",
             success: successCallback,
             error: errorCallback
@@ -71,6 +72,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             }
             return obj.serviceCall({
                 type: "GET",
+                headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
                 url: "/json" + lastKnownRealm + "/serverinfo/*",
                 errorsHandlers: {
                     "unauthorized": { status: "401"}

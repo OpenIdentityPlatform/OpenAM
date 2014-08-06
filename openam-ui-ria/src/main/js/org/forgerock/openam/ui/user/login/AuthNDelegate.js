@@ -67,6 +67,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
         obj.serviceCall({
                 type: "POST",
+                headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
                 data: "",
                 url: url,
                 errorsHandlers: {
@@ -139,6 +140,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
             obj.serviceCall({
                 type: "POST",
+                headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
                 data: JSON.stringify(requirements),
                 url: "",
                 errorsHandlers: {
@@ -230,6 +232,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
         return obj.serviceCall({
             type: "POST",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             data: "{}",
             url: "",
             serviceUrl: constants.host + "/"+ constants.context + "/json/sessions?_action=logout",

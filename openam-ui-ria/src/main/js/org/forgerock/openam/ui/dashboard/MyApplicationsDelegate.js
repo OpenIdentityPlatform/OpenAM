@@ -48,7 +48,7 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
         var self = this;
         return obj.serviceCall({
             url: "/assigned",
-            headers: {"Cache-Control": "no-cache"},
+            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "GET"
         }).then(function(apps) {
             return self.sortApps(apps);
@@ -60,7 +60,7 @@ define("org/forgerock/openam/ui/dashboard/MyApplicationsDelegate", [
         var self = this;
         return obj.serviceCall({
             url: "/available",
-            headers: {"Cache-Control": "no-cache"},
+            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "GET"
         }).then(function(apps) {
             return self.sortApps(apps);
