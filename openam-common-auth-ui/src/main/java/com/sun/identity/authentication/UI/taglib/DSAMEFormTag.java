@@ -24,18 +24,18 @@
  *
  * $Id: DSAMEFormTag.java,v 1.2 2008/06/25 05:41:50 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.authentication.UI.taglib;
 
 import javax.servlet.jsp.JspException;
+
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.taglib.html.FormTag;
 import com.iplanet.jato.util.NonSyncStringBuffer;
 import com.sun.identity.authentication.UI.AuthViewBeanBase;
 import com.iplanet.jato.view.ViewBean;
+import com.sun.identity.shared.Constants;
 
 import java.util.Map;
 import java.util.Iterator;
@@ -47,9 +47,12 @@ import java.util.Iterator;
  */
 public class DSAMEFormTag  extends FormTag 
 {
+    private boolean autoCompleteEnabled = true;
+
     /** constructs a form tag */
     public DSAMEFormTag() {
         super();
+        autoCompleteEnabled = SystemProperties.getAsBoolean(Constants.AUTOCOMPLETE_ENABLED, true);
     }
 
     /**
@@ -71,6 +74,9 @@ public class DSAMEFormTag  extends FormTag
             String key= (String) it.next();
             String val = (String) m.get(key);
             buffer.append ("  "+key+"=\""+val+"\"");
+        }
+        if (!autoCompleteEnabled) {
+            buffer.append (" autocomplete=\"off\"");
         }
         buffer.append( ">");
 

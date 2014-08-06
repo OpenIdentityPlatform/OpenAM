@@ -1293,4 +1293,9 @@ public interface Constants {
      */
     public static final String RESOURCE_LOOKUP_CACHE_ENABLED =
             "org.forgerock.openam.core.resource.lookup.cache.enabled";
+
+    /**
+     * Property to enable/disable autocomplete on password/form fields.
+     */
+    public static final String AUTOCOMPLETE_ENABLED = "org.forgerock.openam.console.autocomplete.enabled";
 }
