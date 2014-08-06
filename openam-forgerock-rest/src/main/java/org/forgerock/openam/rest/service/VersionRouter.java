@@ -91,7 +91,7 @@ public class VersionRouter {
      * @see VersionSelector#noDefault()
      */
     public void noDefault() {
-        versionSelector.defaultToOldest();
+        versionSelector.noDefault();
     }
 
     /**

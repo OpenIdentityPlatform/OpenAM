@@ -31,7 +31,7 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceNotFoundException;
-import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
 
 import java.security.AccessController;
 import java.util.Set;
@@ -133,14 +133,14 @@ public class RestSecurity {
     private void initializeSettings(ServiceConfigManager serviceConfigManager) {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
-            Boolean selfRegistration = RestUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
-            String selfRegistrationConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
-            Boolean forgotPassword = RestUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
-            String forgotPasswordConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
-            Long selfRegTokLifeTime = RestUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
-            Long forgotPassTokLifeTime = RestUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
-            Set protectedUserAttributes = RestUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
-            String successfulUserRegistrationDestination = RestUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
+            Boolean selfRegistration = ServiceConfigUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
+            String selfRegistrationConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
+            Boolean forgotPassword = ServiceConfigUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
+            String forgotPasswordConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
+            Long selfRegTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
+            Long forgotPassTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
+            Set protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
+            String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     selfRegistrationConfirmationUrl,

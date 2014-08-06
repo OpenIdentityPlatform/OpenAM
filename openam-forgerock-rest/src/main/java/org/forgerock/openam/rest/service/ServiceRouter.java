@@ -17,12 +17,15 @@
 package org.forgerock.openam.rest.service;
 
 import org.forgerock.json.resource.VersionSelector;
+import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.rest.router.VersionedRouter;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -32,11 +35,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  * @since 12.0.0
  */
-public class ServiceRouter extends Restlet {
+public class ServiceRouter extends Restlet implements VersionedRouter<ServiceRouter> {
 
     private final RestletRealmRouter router;
     private final VersionSelector versionSelector;
     private final Set<String> routes = new CopyOnWriteArraySet<String>();
+    private final Set<VersionRouter> routers = new HashSet<VersionRouter>();
     private DefaultVersionBehaviour defaultVersioningBehaviour = DefaultVersionBehaviour.LATEST;
 
     /**
@@ -59,6 +63,17 @@ public class ServiceRouter extends Restlet {
     public VersionRouter addRoute(String uriTemplate) {
         routes.add(uriTemplate);
         VersionRouter versionRouter = new VersionRouter(versionSelector);
+        setVersionBehaviour(versionRouter);
+        routers.add(versionRouter);
+        router.attach(uriTemplate, new RestletWrapper(versionRouter));
+        return versionRouter;
+    }
+
+    /**
+     * Sets the version behaviour for a single router.
+     * @param versionRouter The router being set.
+     */
+    private void setVersionBehaviour(VersionRouter versionRouter) {
         switch (defaultVersioningBehaviour) {
             case LATEST: {
                 versionRouter.defaultToLatest();
@@ -72,8 +87,6 @@ public class ServiceRouter extends Restlet {
                 versionRouter.noDefault();
             }
         }
-        router.attach(uriTemplate, new RestletWrapper(versionRouter));
-        return versionRouter;
     }
 
     /**
@@ -90,38 +103,16 @@ public class ServiceRouter extends Restlet {
     }
 
     /**
-     * Sets the behaviour of the version routing process to always use the latest resource version when the requested
-     * version is {@code null}.
+     * Sets the behaviour of the version routing process when the requested version is {@code null}.
      *
      * @see VersionRouter#defaultToLatest()
      * @see VersionSelector#defaultToLatest()
      */
-    public ServiceRouter setVersioningToDefaultToLatest() {
-        defaultVersioningBehaviour = DefaultVersionBehaviour.LATEST;
-        return this;
-    }
-
-    /**
-     * Sets the behaviour of the version routing process to always use the oldest resource version when the requested
-     * version is {@code null}.
-     *
-     * @see VersionRouter#defaultToOldest()
-     * @see VersionSelector#defaultToOldest()
-     */
-    public ServiceRouter setVersioningToDefaultToOldest() {
-        defaultVersioningBehaviour = DefaultVersionBehaviour.OLDEST;
-        return this;
-    }
-
-    /**
-     * Removes the default behaviour of the version routing process which will result in {@code NotFoundException}s when
-     * the requested version is {@code null}.
-     *
-     * @see VersionRouter#noDefault()
-     * @see VersionSelector#noDefault()
-     */
-    public ServiceRouter setVersioningToDefaultToNone() {
-        defaultVersioningBehaviour = DefaultVersionBehaviour.NONE;
+    public ServiceRouter setVersioning(DefaultVersionBehaviour behaviour) {
+        defaultVersioningBehaviour = behaviour;
+        for (VersionRouter router : routers) {
+            setVersionBehaviour(router);
+        }
         return this;
     }
 
@@ -162,12 +153,4 @@ public class ServiceRouter extends Restlet {
         }
     }
 
-    /**
-     * Enum for describing the default behaviour when no resource version is requested.
-     */
-    private enum DefaultVersionBehaviour {
-        LATEST,
-        OLDEST,
-        NONE
-    }
 }

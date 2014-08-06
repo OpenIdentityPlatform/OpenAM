@@ -37,7 +37,9 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.VersionHandler;
 import org.forgerock.json.resource.VersionRouter;
+import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.RestRealmValidator;
+import org.forgerock.openam.rest.router.VersionedRouter;
 
 import java.util.Collections;
 import java.util.Set;
@@ -50,7 +52,7 @@ import static org.forgerock.json.resource.RoutingMode.STARTS_WITH;
  *
  * @since 12.0.0
  */
-public class CrestRealmRouter implements RequestHandler {
+public class CrestRealmRouter implements RequestHandler, VersionedRouter<CrestRealmRouter> {
 
     private final RestRealmValidator realmValidator;
     private final VersionRouter router;
@@ -65,6 +67,27 @@ public class CrestRealmRouter implements RequestHandler {
         this.realmValidator = realmValidator;
         this.router = new VersionRouter();
         router.addRoute(STARTS_WITH, "/{realm}", this);
+    }
+
+    /**
+     * Sets the behaviour of the version routing process when the requested version is {@code null}.
+     *
+     * @see org.forgerock.openam.rest.service.VersionRouter#defaultToLatest()
+     * @see org.forgerock.json.resource.VersionSelector#defaultToLatest()
+     */
+    public CrestRealmRouter setVersioning(DefaultVersionBehaviour behaviour) {
+        switch(behaviour) {
+            case LATEST:
+                router.setVersioningToDefaultToLatest();
+                break;
+            case OLDEST:
+                router.setVersioningToDefaultToOldest();
+                break;
+            case NONE:
+                router.setVersioningBehaviourToNone();
+                break;
+        }
+        return this;
     }
 
     /**
