@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.config;
 
@@ -749,7 +750,7 @@ public class AMAuthenticationManager {
         ServiceConfig serviceConfig = instance.getServiceConfig();
         if (serviceConfig == null) {
             throw new AMConfigurationException(BUNDLE_NAME,
-                "authInstanceIsGloal", new Object[] {type});
+                "authInstanceIsGlobal", new Object[] {type});
              }
         try {
             if (name.equals(type)) {
