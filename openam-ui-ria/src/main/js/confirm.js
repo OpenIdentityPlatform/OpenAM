@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global require, define*/
+/*global require, define, window*/
 
 
 /**
@@ -98,9 +98,12 @@ require([
         conf = {
             defaultHeaders: {}
         },
+        callParams,
+        responseMessage,
         urlParams = uiUtils.convertCurrentUrlToJSON().params,
         host = constants.host + "/"+ constants.context + "/json",
         searchParams = window.location.search.substring(1);
+
         callParams = {
             url: host + urlParams.realm +'/serverinfo/*',
             type: "GET",
@@ -109,7 +112,7 @@ require([
                 location.href = uiUtils.getCurrentUrlBasePart() + "/"+ constants.context + '/XUI/#continueRegister/&' + searchParams;
             },
             error: function(err) {
-                var responseMessage = JSON.parse(err.responseText).message;
+                responseMessage = JSON.parse(err.responseText).message;
                 if (responseMessage.indexOf("Invalid realm") > -1) {
 
                     cookieHelper.cookiesEnabled();

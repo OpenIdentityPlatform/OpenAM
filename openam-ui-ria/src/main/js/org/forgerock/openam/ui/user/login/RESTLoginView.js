@@ -100,8 +100,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         render: function(args, callback) {
-            var urlParams = {};//deserialized querystring params
-            var promise = $.Deferred();
+            var 
+                urlParams = {},//deserialized querystring params
+                promise = $.Deferred();
 
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
