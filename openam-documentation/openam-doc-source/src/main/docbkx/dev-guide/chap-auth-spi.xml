@@ -135,13 +135,13 @@
   <title>Sample Auth Properties</title>
   
   <para>OpenAM uses a Java properties file per locale to retrieve the
-  appropriate, localized strings for the authentication module.</para>
-  
+   appropriate, localized strings for the authentication module.</para>
+
   <para>The following is the Sample Authentication Module properties file,
-  <filename>amAuthSampleAuth.properties</filename>.</para>
-  
+   <filename>amAuthSampleAuth.properties</filename>.</para>
+
   <programlisting language="java"
-  >sampleauth-service-description=Sample Authentication Module
+   >sampleauth-service-description=Sample Authentication Module
 a500=Authentication Level
 a501=Service Specific Attribute
 
@@ -251,7 +251,7 @@ public Principal getPrincipal()</programlisting>
   <!--
        Using JCite would be nice here. At present the source is copy/pasted.
   -->
-  <informalexample><?dbfo pgwide="1"?><?dbfo keep-together="auto"?>
+  <informalexample><?dbfo keep-together="auto"?>
    <programlisting language="java">/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -453,7 +453,7 @@ public class SampleAuth extends AMLoginModule
   <!--
        Using JCite would be nice here. At present the source is copy/pasted.
   -->
-  <informalexample><?dbfo pgwide="1"?><?dbfo keep-together="auto"?>
+  <informalexample><?dbfo keep-together="auto"?>
    <programlisting language="java">/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *

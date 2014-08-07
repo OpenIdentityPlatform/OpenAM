@@ -412,7 +412,7 @@ Import file, xacmlPdp-extended.xml.</computeroutput>
  <para>After you have configured OpenAM and the properties files, run the
  sample client script, and observe the XACML request and response.</para>
 
- <screen width="83">
+ <screen>
 $ <userinput>sh scripts/run-xacml-client-sample.sh</userinput>
 <computeroutput>Using properties file:xacmlClientSample
 sample properties:

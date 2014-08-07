@@ -45,7 +45,7 @@
  <para>This short chapter presents an overview of the APIs and protocols that
  OpenAM supports.</para>
 
- <mediaobject xml:id="figure-openam-apis-overview"><?dbfo pgwide="1"?>
+ <mediaobject xml:id="figure-openam-apis-overview">
   <alt>High-level view of OpenAM APIs and SPIs</alt>
   <imageobject>
    <imagedata fileref="images/openam-apis-overview.png" format="PNG" />
