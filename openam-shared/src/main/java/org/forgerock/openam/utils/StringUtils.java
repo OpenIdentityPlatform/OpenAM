@@ -22,10 +22,16 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
+
 package org.forgerock.openam.utils;
 
 import org.forgerock.util.Reject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -68,4 +74,28 @@ public final class StringUtils {
         return (original == null || original.isEmpty()) ? defaultString : original;
     }
 
+    /**
+     * Encodes the passed String using an algorithm that's compatible
+     * with JavaScript's <code>encodeURIComponent</code> function. Returns
+     * <code>null</code> if the String is <code>null</code>.
+     * 
+     * @param component String to be encoded.
+     * @param encoding The name of character encoding.
+     * @return the same value as JavaScript encodeURIComponent function
+     * @exception UnsupportedEncodingException
+     *            If the named encoding is not supported
+     */
+    public static String encodeURIComponent(String component, String encoding) throws UnsupportedEncodingException {
+        if (component == null) {
+            return null;
+        }
+        String result = URLEncoder.encode(component, encoding)
+                .replaceAll("\\%28", "(")
+                .replaceAll("\\%29", ")")
+                .replaceAll("\\+", "%20")
+                .replaceAll("\\%27", "'")
+                .replaceAll("\\%21", "!")
+                .replaceAll("\\%7E", "~");
+        return result;
+    }
 }

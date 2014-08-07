@@ -13,10 +13,16 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 
 package org.forgerock.openam.utils;
 
 import static org.fest.assertions.Assertions.assertThat;
+
+import java.io.UnsupportedEncodingException;
+
 import org.testng.annotations.Test;
 
 /**
@@ -48,6 +54,14 @@ public class StringUtilsTest {
         String value = StringUtils.ifNullOrEmpty("", "def");
         // Then...
         assertThat(value).isEqualTo("def");
+    }
+
+    @Test
+    public void shouldEncodeSpaceUsingPercentEncoding() throws UnsupportedEncodingException {
+        // When...
+        String value = StringUtils.encodeURIComponent("Hello !'()~ World", "UTF-8");
+        // Then...
+        assertThat(value).isEqualTo("Hello%20!'()~%20World");
     }
 
 }

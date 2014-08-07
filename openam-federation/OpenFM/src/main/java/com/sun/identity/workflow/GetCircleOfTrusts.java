@@ -25,6 +25,10 @@
  * $Id: GetCircleOfTrusts.java,v 1.4 2009/01/09 17:42:55 veiming Exp $
  *
  */
+/*
+ * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ */
 
 package com.sun.identity.workflow;
 
@@ -34,13 +38,14 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
+
+import org.forgerock.openam.utils.StringUtils;
 
 public class GetCircleOfTrusts
     extends Task 
@@ -85,7 +90,7 @@ public class GetCircleOfTrusts
                         buff.append("|");
                     }
                     try {
-                        buff.append(URLEncoder.encode(c, "UTF-8"));
+                        buff.append(StringUtils.encodeURIComponent(c, "UTF-8"));
                     } catch (UnsupportedEncodingException e) {
                         buff.append(c);
                     }
