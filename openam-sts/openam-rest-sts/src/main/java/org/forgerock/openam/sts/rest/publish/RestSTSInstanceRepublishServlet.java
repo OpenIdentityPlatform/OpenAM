@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.publish;
 
 import com.google.inject.Key;
+import com.sun.identity.setup.AMSetupServlet;
 import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
 import org.slf4j.Logger;
@@ -39,10 +40,24 @@ public class RestSTSInstanceRepublishServlet extends HttpServlet {
     }
     @Override
     public void init() throws ServletException {
-        try {
-            RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)).republishExistingInstances();
-        } catch (STSPublishException e) {
-            logger.error("Exception caught republishing existing Rest STS instances: " + e);
+        /*
+        Don't reference the RestSTSInstancePublisher if we are installing OpenAM, as the RestSTSInstancePublisherImpl
+        ctor attempts to register a ServiceListener, which requires an Admin token, which will fail prior to OpenAM
+        installation.
+         */
+        if (AMSetupServlet.isCurrentConfigurationValid()) {
+            try {
+                RestSTSInstancePublisher publisher = RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class));
+                /*
+                Don't register the ServiceListener until after the SMS-resident rest-sts instances have been re-published
+                upon startup. The ServiceListener is only there to bring the rest-sts-instance CREST router in congruence
+                with the state of the SMS in site deployments.
+                 */
+                publisher.republishExistingInstances();
+                publisher.registerServiceListener();
+            } catch (STSPublishException e) {
+                logger.error("Exception caught republishing existing Rest STS instances: " + e);
+            }
         }
     }
 }

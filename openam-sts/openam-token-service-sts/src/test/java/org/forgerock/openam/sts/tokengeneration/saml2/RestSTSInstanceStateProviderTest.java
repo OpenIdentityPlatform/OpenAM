@@ -18,7 +18,10 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+import com.sun.identity.sm.ServiceListener;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
@@ -26,10 +29,13 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
 import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
+import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
+import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationModule;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
 import org.slf4j.Logger;
@@ -53,7 +59,7 @@ public class RestSTSInstanceStateProviderTest {
     private static final String DEPLOYMENT_URL_ELEMENT = "bobo/inst1";
     private static final String REALM = "/";
     private RestSTSInstanceStateProvider provider;
-    private RestSTSInstanceConfigPersister mockConfigPersister;
+    private RestSTSInstanceConfigStore mockConfigStore;
     private RestSTSInstanceStateFactory mockRestSTSInstanceStateFactory;
     private RestSTSInstanceState mockRestSTSInstanceState;
 
@@ -62,12 +68,17 @@ public class RestSTSInstanceStateProviderTest {
         protected void configure() {
             mockRestSTSInstanceState = mock(RestSTSInstanceState.class);
             mockRestSTSInstanceStateFactory = mock(RestSTSInstanceStateFactory.class);
-            mockConfigPersister = mock(RestSTSInstanceConfigPersister.class);
-            bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).toInstance(mockConfigPersister);
+            mockConfigStore = mock(RestSTSInstanceConfigStore.class);
+            bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).toInstance(mockConfigStore);
             bind(Logger.class).toInstance(mock(Logger.class));
             bind(RestSTSInstanceStateFactory.class).toInstance(mockRestSTSInstanceStateFactory);
             bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
             bind(RestSTSInstanceStateProvider.class);
+            bind(ServiceListenerRegistration.class).toInstance(mock(ServiceListenerRegistrationImpl.class));
+            bind(ServiceListener.class).annotatedWith(Names.named(TokenGenerationModule.REST_STS_INSTANCE_STATE_LISTENER))
+                    .to(RestSTSInstanceStateServiceListener.class);
+            bind(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})
+                    .to(RestSTSInstanceStateProvider.class).in(Scopes.SINGLETON);
         }
     }
 
@@ -79,7 +90,7 @@ public class RestSTSInstanceStateProviderTest {
     @Test
     public void verifyCaching() throws TokenCreationException, STSPublishException {
         RestSTSInstanceConfig instanceConfig = createSAMLRestInstanceConfig(DEPLOYMENT_URL_ELEMENT);
-        when(mockConfigPersister.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(instanceConfig);
+        when(mockConfigStore.getSTSInstanceConfig(DEPLOYMENT_URL_ELEMENT, REALM)).thenReturn(instanceConfig);
         when(mockRestSTSInstanceStateFactory.createRestSTSInstanceState(any(RestSTSInstanceConfig.class))).thenReturn(mockRestSTSInstanceState);
         provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);
         provider.getSTSInstanceState(DEPLOYMENT_URL_ELEMENT, REALM);

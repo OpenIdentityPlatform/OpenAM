@@ -29,7 +29,7 @@ import java.util.List;
  * be persisted.
  *
  */
-public interface STSInstanceConfigPersister<T> {
+public interface STSInstanceConfigStore<T> {
     /**
      * Called by the RestSTSInstancePublisherImpl class to persist the configuration corresponding to the published
      * STS instance

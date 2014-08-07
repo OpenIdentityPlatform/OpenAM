@@ -50,10 +50,13 @@ public interface RestSTSInstancePublisher {
      * Remove the Rest STS instance from the SMS, and from the CREST router.
      * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Rest STS is to be deployed.
+     * @param removeOnlyFromRouter Set to true when called by a ServiceListener in a site deployment to remove a rest-sts instance, deleted
+     *                             on another server, and thus removed from the SMS, but requiring removal from the CREST router.
+     *                             Set to false in all other cases.
      *
      * @throws STSPublishException
      */
-    void removeInstance(String stsId, String realm) throws STSPublishException;
+    void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException;
 
     /**
      * Called to obtain the configuration elements corresponding to previously-published STS instances.
@@ -100,4 +103,12 @@ public interface RestSTSInstancePublisher {
      * @throws STSPublishException
      */
     boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException;
+
+    /**
+     * This method is called by the RestSTSInstanceRepublishServlet, and causes the registration of a ServiceListener
+     * to listen for the creation of rest-sts instances. This listener has to be registered upon startup, so that the
+     * ServiceListener can expose rest-sts instances published to other site servers off of the rest-sts-instance
+     * CREST router in the current OpenAM server.
+     */
+    void registerServiceListener();
 }

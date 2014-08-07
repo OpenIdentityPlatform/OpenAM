@@ -19,19 +19,24 @@ package org.forgerock.openam.sts.rest.publish;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sun.identity.setup.AMSetupServlet;
+import com.sun.identity.sm.ServiceListener;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Route;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.STSPublishException;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.RestSTS;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
 import org.forgerock.openam.sts.rest.config.RestSTSInstanceModule;
+import org.forgerock.openam.sts.rest.config.RestSTSModule;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.service.RestSTSService;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +56,22 @@ import java.util.Map;
  */
 public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     private final Router router;
-    private final STSInstanceConfigPersister<RestSTSInstanceConfig> persistentStore;
+    private final STSInstanceConfigStore<RestSTSInstanceConfig> persistentStore;
     private final Map<String, Route> publishedRoutes;
+    private final ServiceListenerRegistration serviceListenerRegistration;
+    private final ServiceListener serviceListener;
     private final Logger logger;
 
     @Inject
-    RestSTSInstancePublisherImpl(Router router, STSInstanceConfigPersister<RestSTSInstanceConfig> persistentStore, Logger logger) {
+    RestSTSInstancePublisherImpl(Router router,
+                                 STSInstanceConfigStore<RestSTSInstanceConfig> persistentStore,
+                                 ServiceListenerRegistration serviceListenerRegistration,
+                                 @Named(RestSTSModule.REST_STS_PUBLISH_LISTENER)ServiceListener serviceListener,
+                                 Logger logger) {
         this.router = router;
         this.persistentStore = persistentStore;
+        this.serviceListenerRegistration = serviceListenerRegistration;
+        this.serviceListener = serviceListener;
         publishedRoutes = new HashMap<String, Route>();
         this.logger = logger;
     }
@@ -92,7 +105,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
          */
         String deploymentSubPath = normalizeDeploymentSubPath(instanceConfig.getDeploymentSubPath());
 
-        if (publishedRoutes.containsKey(deploymentSubPath)) {
+        if (publishedRoutes.containsKey(normalizeDeploymentSubPathForRouteCache(deploymentSubPath))) {
             throw new STSPublishException(ResourceException.CONFLICT, "A rest-sts instance at sub-path " +
                     deploymentSubPath + " has already been published.");
         }
@@ -100,7 +113,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         /*
         Need to persist the published Route instance as it is necessary for router removal.
          */
-        publishedRoutes.put(deploymentSubPath, route);
+        publishedRoutes.put(normalizeDeploymentSubPathForRouteCache(deploymentSubPath), route);
         /*
         If this is a republish (i.e. re-constitute previously-published Rest STS instances following OpenAM restart),
         then the RestSTSInsanceConfig does not need to be persisted, as it was obtained from the SMS via a GET
@@ -120,17 +133,22 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
      * @param stsId the path, relative to the base rest-sts service, to the to-be-removed service. Note that this path
      *              includes the realm.
      * @param realm The realm of the STS instance
+     * @param removeOnlyFromRouter Set to true when called by a ServiceListener in a site deployment to remove a rest-sts instance, deleted
+     *                             on another server, and thus removed from the SMS, but requiring removal from the CREST router.
+     *                             Set to false in all other cases.
      * @throws org.forgerock.openam.sts.STSPublishException if the entry in the SMS could not be removed, or if no
      * Route entry could be found in the Map corresponding to a previously-published instance.
      */
-    public synchronized void removeInstance(String stsId, String realm) throws STSPublishException {
-        Route route = publishedRoutes.remove(stsId);
+    public synchronized void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException {
+        Route route = publishedRoutes.remove(normalizeDeploymentSubPathForRouteCache(stsId));
         if (route == null) {
             throw new STSPublishException(ResourceException.NOT_FOUND, "No previously published STS instance with id "
                     + stsId + " in realm " + realm + " found!");
         }
-        persistentStore.removeSTSInstance(stsId, realm);
         router.removeRoute(route);
+        if (!removeOnlyFromRouter) {
+            persistentStore.removeSTSInstance(stsId, realm);
+        }
     }
 
     public List<RestSTSInstanceConfig> getPublishedInstances() throws STSPublishException{
@@ -173,11 +191,40 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     }
 
     public boolean isInstanceExposedInCrest(String stsId) {
-        return publishedRoutes.get(normalizeDeploymentSubPath(stsId)) != null;
+        return publishedRoutes.get(normalizeDeploymentSubPathForRouteCache(normalizeDeploymentSubPath(stsId))) != null;
     }
 
     public boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException {
-        return persistentStore.isInstancePresent(stsId, realm);
+        return persistentStore.isInstancePresent(normalizeDeploymentSubPath(stsId), realm);
+    }
+
+    /*
+    This method is called by the RestSTSInstanceRepublishServlet, but only if AMSetupServlet.isCurrentConfigurationValid() -
+    i.e. not during installation. The registerServiceListener method requires the Admin SSO token, which is not available
+    during installation. The problem with this approach is that the ServiceListener will not be registered immediately after
+    installation - it will require an OpenAM restart for the registration to occur. The only way I could get around this
+    would be to check if ServiceListener registration has occurred in some of the methods above - but even then, in a
+    site deployment, if another instance is targeted to publish/remove rest-sts instances, the ServiceListener will not
+    be registered, which is precisely the case in which the ServiceListener should be registered. It does appear that
+    customers are encouraged to restart OpenAM following installation, so given that there is no good solution, I will
+    leave things as they are, until a good solution presents itself. TODO
+    A possible solution: see AMSetupServlet.registerListeners, and the com.sun.identity.setup.SetupListener file in
+    resources/META-INF.services under openam-core. The SubRealmObserver is specified here, and this class registers
+    a ServiceListener, so it must be that the Admin SSO Token is available at this juncture, which would seem to be
+    the solution to my problem.
+     */
+    public void registerServiceListener() {
+        try {
+            serviceListenerRegistration.registerServiceListener(AMSTSConstants.REST_STS_SERVICE_NAME,
+                    AMSTSConstants.REST_STS_SERVICE_VERSION, serviceListener);
+            logger.debug("In RestSTSInstancePublisherImpl ctor, successfully added ServiceListener for service "
+                    + AMSTSConstants.REST_STS_SERVICE_NAME);
+        } catch (STSInitializationException e) {
+            final String message = "Exception caught registering ServiceListener in " +
+                    "RestSTSInstancePublisherImpl#registerServiceListener. This means that rest-sts-instances published " +
+                    "to other site instances will not be propagated to the rest-sts-instnace CREST router on this server." + e;
+            logger.error(message, e);
+        }
     }
 
     private String normalizeDeploymentSubPath(String deploymentSubPath) {
@@ -191,4 +238,17 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         return deploymentSubPath;
     }
 
+    /*
+    In a site deployment, the RestSTSPublishServiceListener will need to listen for rest-sts instance deletion events,
+    and remove the rest-sts instance from the CREST router on all site servers other than the site server where the instance
+    was actually deleted. But the serviceComponent identifying the subconfig entry corresponding to the rest-sts-instance state,
+    passed to ServiceListener#organizationConfigChanged, is always lower-case. Thus, when a rest-sts instance is deleted in
+    a site deployment, and the RestSTSPublishServiceListener is called, it needs to be able to remove the route by referencing
+    a lower-case rest-identifier. This method insures that all cached routes are cached with a lower-case id. Note that this
+    does mean that multiple rest-sts instances with the same deploymentUrl except for the casing, cannot be published to the
+    same realm.
+     */
+    private String normalizeDeploymentSubPathForRouteCache(String deploymentSubPath) {
+        return deploymentSubPath.toLowerCase();
+    }
 }

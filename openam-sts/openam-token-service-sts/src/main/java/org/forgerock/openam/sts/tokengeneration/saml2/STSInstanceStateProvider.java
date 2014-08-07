@@ -26,5 +26,22 @@ import org.forgerock.openam.sts.TokenCreationException;
  * The generic type corresponds to either RestSTSInstanceState or SoapSTSInstanceState (latter class still pending).
  */
 public interface STSInstanceStateProvider<T> {
+    /**
+     * Returns the instance type specified by the generic type. Implementations of this interface will cache returned
+     * state, so that the persistent store (SMS) does not have to be consulted every time, as each token generation for
+     * a particular sts instance will have to consult sts instance-specific state.
+     * @param instanceId the sts instance id
+     * @param realm the realm in which this instance is deployed
+     * @return An instance of the generic type (currently RestSTSInstanceState)
+     * @throws TokenCreationException If an instance of the Generic type cannot be created
+     * @throws STSPublishException If the persistent store throws an exception
+     */
     T getSTSInstanceState(String instanceId, String realm) throws TokenCreationException, STSPublishException;
+
+    /**
+     * Because implementations may cache sts instance state, it must be possible for persistent-store listeners
+     * (currently ServiceListener implementations) to invalidate cached entries
+     * @param instanceId the sts instance id
+     */
+    void invalidateCachedEntry(String instanceId);
 }

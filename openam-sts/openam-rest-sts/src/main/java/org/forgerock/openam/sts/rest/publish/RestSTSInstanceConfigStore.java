@@ -28,7 +28,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshaller;
 import org.forgerock.openam.sts.STSPublishException;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.slf4j.Logger;
 
@@ -41,16 +41,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @see org.forgerock.openam.sts.publish.STSInstanceConfigPersister
+ * @see org.forgerock.openam.sts.publish.STSInstanceConfigStore
  */
-public class RestSTSInstanceConfigPersister implements STSInstanceConfigPersister<RestSTSInstanceConfig> {
+public class RestSTSInstanceConfigStore implements STSInstanceConfigStore<RestSTSInstanceConfig> {
     private static final int PRIORITY_ZERO = 0;
 
     private final MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller;
     private final Logger logger;
 
     @Inject
-    RestSTSInstanceConfigPersister(MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller, Logger logger) {
+    RestSTSInstanceConfigStore(MapMarshaller<RestSTSInstanceConfig> instanceConfigMapMarshaller, Logger logger) {
         this.instanceConfigMapMarshaller = instanceConfigMapMarshaller;
         this.logger = logger;
     }

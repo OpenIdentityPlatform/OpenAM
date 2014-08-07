@@ -104,6 +104,7 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
                 RestSTSModelResponse creationResponse = model.createInstance(configurationState, currentRealm);
                 if (creationResponse.isSuccessful()) {
                     setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
+                    disableSaveAndResetButtons();
                 } else {
                     setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
                 }
@@ -114,6 +115,11 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
             setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
         }
         forwardTo();
+    }
+
+    protected void disableSaveAndResetButtons() {
+        disableButton("button1", true);
+        disableButton("button2", true);
     }
 
     /*

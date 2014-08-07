@@ -30,13 +30,14 @@ import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
-import com.sun.identity.console.base.model.AMServiceProfileModel;
 import com.sun.identity.console.reststs.model.RestSTSModel;
 import com.sun.identity.console.reststs.model.RestSTSModelImpl;
 import com.sun.identity.console.reststs.model.RestSTSModelResponse;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -133,6 +134,7 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
                 }
                 if (!map.isEmpty()) {
                     AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+                    propertySheetModel.clear();
                     ps.setAttributeValues(map, getModel());
                 } else {
                     setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
@@ -159,45 +161,92 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
      */
     public void handleButton1Request(RequestInvocationEvent event) throws ModelControlException {
         submitCycle = true;
-        Map<String, Set<String>> configurationState = getAttributeSettings();
-        RestSTSModel model = (RestSTSModel)getModel();
-        RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
-        if (validationResponse.isSuccessful()) {
-            final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-            final String instanceName = (String)getPageSessionAttribute(RestSTSHomeViewBean.INSTANCE_NAME);
-            try {
-                RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
-                if (creationResponse.isSuccessful()) {
-                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
-                } else {
-                    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
-                }
-            } catch (AMConsoleException e) {
-                throw new ModelControlException(e);
-            }
+        final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+        final String instanceName = (String)getPageSessionAttribute(RestSTSHomeViewBean.INSTANCE_NAME);
+        Map<String, Set<String>> configurationState = getUpdatedConfigurationState(currentRealm, instanceName);
+        if (configurationState.isEmpty()) {
+            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "Property values have not been updated!");
         } else {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+            RestSTSModel model = (RestSTSModel) getModel();
+            RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+            if (validationResponse.isSuccessful()) {
+                try {
+                    RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
+                    if (creationResponse.isSuccessful()) {
+                        setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
+                        disableSaveButton();
+                    } else {
+                        setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
+                    }
+                } catch (AMConsoleException e) {
+                    throw new ModelControlException(e);
+                }
+            } else {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+            }
         }
         forwardTo();
     }
 
-    /*
-    Returns a map of all settings, including those not changed from the default values in the model.
-     */
-    private Map<String, Set<String>> getAttributeSettings() throws ModelControlException {
-        Map<String, Set<String>> values = null;
-        AMServiceProfileModel model = (AMServiceProfileModel)getModel();
-
-        if (model != null) {
-            AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
-            try {
-                values = ps.getAttributeValues(model.getAttributeValues(), false, model);
-            } catch (AMConsoleException e) {
-                throw new ModelControlException(e.getMessage(), e);
-            }
-        }
-        return values;
+    protected void disableSaveButton() {
+        disableButton("button1", true);
     }
+
+
+    /*
+    Called to harvest the full set of configuration properties. If no properties have been updated in the property-sheet,
+    an empty-set will be returned.
+     */
+    private Map<String, Set<String>> getUpdatedConfigurationState(String realm, String instanceName) throws ModelControlException {
+        RestSTSModel model = (RestSTSModel)getModel();
+        Map<String, Set<String>> currentPersistedInstanceState;
+        try {
+            currentPersistedInstanceState = model.getInstanceState(realm, instanceName);
+        } catch (AMConsoleException e) {
+            throw new ModelControlException(e.getMessage(), e);
+        }
+        AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
+        try {
+            Map<String, Set<String>> updatedValues = ps.getAttributeValues(currentPersistedInstanceState, model);
+            removeCannedPasswordEntriesFromConfigurationState(updatedValues);
+            if (updatedValues.isEmpty()) {
+                return updatedValues;
+            } else {
+                currentPersistedInstanceState.putAll(updatedValues);
+                return currentPersistedInstanceState;
+            }
+        } catch (AMConsoleException e) {
+            throw new ModelControlException(e.getMessage(), e);
+        }
+    }
+
+    /*
+    The AMPropertySheet sets passwords to AMPropertySheetModel.passwordRandom for display, and thus these values are
+    always returned as updated, as they don't match the original password. I will remove these entries from the
+    configurationState, as we don't want to update the password to these values.
+
+    TODO: it seems that this is more robustly handled by password confirm fields - I should probably add those to the
+    password fields for robustness, and to insure that no-one actually sets the password to AMPropertySheetModel.passwordRandom,
+    as updating a password to the passwordRandom field would result in passwords not being updated.
+     */
+    private void removeCannedPasswordEntriesFromConfigurationState(Map<String, Set<String>> configurationState) {
+        if (configurationState == null) {
+            return;
+        }
+        String password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.KEYSTORE_PASSWORD);
+        if (AMPropertySheetModel.passwordRandom.equals(password)) {
+            configurationState.remove(SharedSTSConstants.KEYSTORE_PASSWORD);
+        }
+        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SIGNATURE_KEY_PASSWORD);
+        if (AMPropertySheetModel.passwordRandom.equals(password)) {
+            configurationState.remove(SharedSTSConstants.SIGNATURE_KEY_PASSWORD);
+        }
+        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.ENCRYPTION_KEY_PASSWORD);
+        if (AMPropertySheetModel.passwordRandom.equals(password)) {
+            configurationState.remove(SharedSTSConstants.ENCRYPTION_KEY_PASSWORD);
+        }
+    }
+
 
     public void handleButton2Request(RequestInvocationEvent event)
             throws ModelControlException, AMConsoleException {

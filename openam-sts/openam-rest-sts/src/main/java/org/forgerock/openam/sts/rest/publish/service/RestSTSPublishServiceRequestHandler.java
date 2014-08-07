@@ -114,7 +114,8 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
         String stsId = request.getResourceName();
         String realm = getRealmFromResourceName(request.getResourceName());
         try {
-            publisher.removeInstance(stsId, realm);
+            boolean removeOnlyFromRouter = false;
+            publisher.removeInstance(stsId, realm, removeOnlyFromRouter);
             if (logger.isDebugEnabled()) {
                 logger.debug("rest sts instance " + stsId + " successfully removed from realm " + realm);
             }
@@ -222,7 +223,8 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 return;
             }
             try {
-                publisher.removeInstance(stsId, realm);
+                boolean removeOnlyFromRouter = false;
+                publisher.removeInstance(stsId, realm, removeOnlyFromRouter);
             } catch (STSPublishException e) {
                 logger.error("In RestSTSPublishServiceRequestHandler#handleUpdate, exception caught removing " +
                         "rest sts instance " + instanceConfig.getDeploymentSubPath() + ". This means instance is" +

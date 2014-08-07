@@ -20,19 +20,24 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.sm.ServiceListener;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshaller;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.marshal.RestSTSInstanceConfigMapMarshaller;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
+import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisherImpl;
+import org.forgerock.openam.sts.rest.publish.RestSTSPublishServiceListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,7 @@ import javax.inject.Singleton;
  * publishing Rest STS instances.
  */
 public class RestSTSModule extends AbstractModule {
+    public static final String REST_STS_PUBLISH_LISTENER = "rest_sts_publish_listener";
     private final Router router;
     public RestSTSModule() {
         router = new Router();
@@ -56,9 +62,23 @@ public class RestSTSModule extends AbstractModule {
         A binding for the concern of marshalling RestSTSInstanceConfig instances to and from an attribute map representation,
         which is necessary for SMS persistence.
          */
-        bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigMapMarshaller.class);
-        bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigPersister.class).in(Scopes.SINGLETON);
+        bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigMapMarshaller.class).in(Scopes.SINGLETON);
+        bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigStore.class).in(Scopes.SINGLETON);
 
+        /*
+        Bind the class which encapsulates ServiceListener registration so that the RestSTSInstancePublisherImpl can
+        invoke it to register a ServiceListener to add rest-sts-instances, published at another server in a site deployment,
+        the CREST rest-sts-instance router.
+         */
+        bind(ServiceListenerRegistration.class).to(ServiceListenerRegistrationImpl.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the ServiceListener injected into the RestSTSInstancePublisher, which will be registered with the
+        ServiceListenerRegistration by the RestSTSInstancePublisher so that it can hang rest-sts instances published to
+        another server in a site deployment to the CREST rest-sts-instance router.
+         */
+        bind(ServiceListener.class).annotatedWith(Names.named(REST_STS_PUBLISH_LISTENER))
+                .to(RestSTSPublishServiceListener.class).in(Scopes.SINGLETON);
     }
 
     /*

@@ -20,18 +20,23 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+import com.sun.identity.sm.ServiceListener;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.publish.STSInstanceConfigPersister;
+import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
+import org.forgerock.openam.sts.rest.ServiceListenerRegistrationImpl;
 import org.forgerock.openam.sts.rest.config.user.RestSTSInstanceConfig;
 import org.forgerock.openam.sts.rest.marshal.RestSTSInstanceConfigMapMarshaller;
-import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigPersister;
+import org.forgerock.openam.sts.rest.publish.RestSTSInstanceConfigStore;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateFactoryImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateProvider;
+import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceStateServiceListener;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGenerationImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.SSOTokenIdentity;
@@ -52,6 +57,7 @@ import org.slf4j.LoggerFactory;
  * Defines the bindings which specify the functionality of the TokenGenerationService.
  */
 public class TokenGenerationModule extends AbstractModule {
+    public static final String REST_STS_INSTANCE_STATE_LISTENER = "rest_sts_instance_state_listener";
     @Override
     protected void configure() {
         bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
@@ -63,7 +69,7 @@ public class TokenGenerationModule extends AbstractModule {
         Once the TokenGenerationService gets called by the SOAP STS, I will need to bind a
         STSInstanceConfigPersister<SoapSTSInstanceConfig> class.
          */
-        bind(new TypeLiteral<STSInstanceConfigPersister<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigPersister.class)
+        bind(new TypeLiteral<STSInstanceConfigStore<RestSTSInstanceConfig>>(){}).to(RestSTSInstanceConfigStore.class)
                 .in(Scopes.SINGLETON);
         bind(new TypeLiteral<MapMarshaller<RestSTSInstanceConfig>>() {}).to(RestSTSInstanceConfigMapMarshaller.class);
 
@@ -72,6 +78,22 @@ public class TokenGenerationModule extends AbstractModule {
         bind(KeyInfoFactory.class).to(KeyInfoFactoryImpl.class);
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
         bind(SSOTokenIdentity.class).to(SSOTokenIdentityImpl.class);
+
+        /*
+        Bind the class which encapsulates ServiceListener registration so that the RestSTSInstanceStateProvider can
+        invoke it to register a ServiceListener to remove cached RestSTSInstanceState instances.
+         */
+        bind(ServiceListenerRegistration.class).to(ServiceListenerRegistrationImpl.class).in(Scopes.SINGLETON);
+
+        /*
+        Bind the ServiceListener injected into the RestSTSInstanceStateProvider, which will be registered with the
+        ServiceListenerRegistration by the RestSTSInstanceStateProvider so that its cache of RestSTSInstanceState entries
+        can be invalidated when the service is changed. The RestSTSInstanceStateServiceListener class will be injected
+        with the RestSTSInstanceConfigPersister singleton, and use the STSInstanceConfigPersister interface to invalidate
+        the appropriate cache entries.
+         */
+        bind(ServiceListener.class).annotatedWith(Names.named(REST_STS_INSTANCE_STATE_LISTENER))
+                .to(RestSTSInstanceStateServiceListener.class).in(Scopes.SINGLETON);
     }
 
     @Provides
