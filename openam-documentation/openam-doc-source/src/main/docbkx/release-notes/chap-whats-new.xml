@@ -346,6 +346,58 @@ Agreement (yes/no): [no]:</screen>
   </listitem>
 
   <listitem>
+   <para>
+    <emphasis role="bold">Device ID (Match) and Device ID (Save) Authentication Modules</emphasis>.
+    OpenAM 12.0 introduces new Device ID (Match) and Device ID (Save) authentication
+    modules that support the ability to customize your device fingerprinting
+    implementations.
+   </para>
+   <para>The Device ID (Match), HMAC One-Time Password (HOTP), and
+    Device ID (Save) modules, configured together in an authentication chain,
+    provide the same functionality as the Device Print Authentication
+    module that is present in OpenAM 11.x versions. The Device ID (Match)
+    module also requires the DataStore module or any other module that can provide
+    an authenticated username as an input.
+   </para>
+
+   <para>
+    New installations of OpenAM 12.0 or later do not display the Device Print
+    authentication module in the OpenAM console and only provide access to the
+    Device ID (Match) and Device ID (Save) modules.
+   </para>
+   <para>
+    The Device Print authentication module is only available
+    for OpenAM 11.x versions and their upgrades.
+    Customers who have upgraded from OpenAM 11.x to OpenAM 12.0
+    can still use the Device Print module, customize it, and create new instances
+    of the module or use the Device ID (Match) and Device ID (Save) modules.
+   </para>
+   <important><para>The Device ID (Match) profiles (that is, device fingerprints)
+    are incompatible with profiles created from the Device Print authentication module.
+    If the user has existing device print profiles, created from the Device
+    Print authentication module, these old profiles will always fail to match the
+    client's new device profiles using the scripted Device ID (Match) module
+    even when using the same device.</para>
+    <para>With the Device ID (Match) and Device ID (Save) modules, the user must re-save each
+     device profile, which deletes the old 11.x profiles stored for the user.</para>
+   </important>
+   <para>
+    For more information on the Device ID (Match) module, see <link
+    xlink:show="new"
+    xlink:href="admin-guide#device-id-match-hints"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Hints for the Device ID (Match) Authentication Module</citetitle></link>.
+   </para>
+   <para>
+    For more information on the Device ID (Save) module, see <link
+    xlink:show="new"
+    xlink:href="admin-guide#device-id-save-hints"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Hints for the Device ID (Save) Authentication Module</citetitle></link>.
+   </para>
+  </listitem>
+
+  <listitem>
     <para>
      TODO: Update for next version
     </para>
