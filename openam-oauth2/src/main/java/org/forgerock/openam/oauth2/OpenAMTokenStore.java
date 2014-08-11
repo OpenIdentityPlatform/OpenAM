@@ -366,7 +366,7 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         if (token == null) {
             logger.error("Unable to read refresh token corresponding to id: " + tokenId);
-            throw new BadRequestException("Could not find token from CTS");
+            throw new InvalidGrantException("grant is invalid");
         }
 
         return new OpenAMRefreshToken(token);

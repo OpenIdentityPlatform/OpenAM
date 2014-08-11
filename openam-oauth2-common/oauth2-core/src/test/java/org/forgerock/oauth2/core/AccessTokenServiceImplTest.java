@@ -160,8 +160,8 @@ public class AccessTokenServiceImplTest {
         // Expect InvalidRequestException
     }
 
-    @Test (expectedExceptions = ExpiredTokenException.class)
-    public void refreshTokenShouldThrowExpiredTokenExceptionWhenRefreshTokenHasExpired() throws Exception {
+    @Test (expectedExceptions = InvalidGrantException.class)
+    public void refreshTokenShouldThrowInvalidGrantExceptionWhenRefreshTokenHasExpired() throws Exception {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
@@ -179,7 +179,7 @@ public class AccessTokenServiceImplTest {
         accessTokenService.refreshToken(request);
 
         //Then
-        // Expect ExpiredTokenException
+        // Expect InvalidGrantException
     }
 
     @Test

@@ -112,7 +112,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
         if (refreshToken.isExpired()) {
             logger.warn("Refresh Token is expired for id: " + refreshToken.getTokenId());
-            throw new ExpiredTokenException();
+            throw new InvalidGrantException("grant is invalid");
         }
 
         final Set<String> scope = splitScope(request.<String>getParameter("scope"));
