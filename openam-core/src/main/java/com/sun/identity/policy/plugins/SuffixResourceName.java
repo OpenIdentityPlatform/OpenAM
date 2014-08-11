@@ -96,7 +96,7 @@ public class SuffixResourceName implements ResourceName {
     }
 
 
-    public Set getServiceTypeNames() 
+    public Set<String> getServiceTypeNames()
     {
         return null;
     }

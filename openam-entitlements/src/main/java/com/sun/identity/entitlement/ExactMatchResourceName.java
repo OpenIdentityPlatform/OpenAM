@@ -119,7 +119,12 @@ public class ExactMatchResourceName
         }
     }
 
-    public Set getServiceTypeNames() {
+    public Set<String> getServiceTypeNames() {
         return null;
     }
+
+    public String[] split(String res) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
 }
