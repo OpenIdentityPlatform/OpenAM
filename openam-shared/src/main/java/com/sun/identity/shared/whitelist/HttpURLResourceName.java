@@ -49,8 +49,6 @@ import com.sun.identity.shared.debug.Debug;
 
 public class HttpURLResourceName extends URLResourceName {
 
-    private Debug debug = Debug.getInstance("patternMatching");
-
     /**
      * Compares two resources.
      *

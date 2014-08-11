@@ -47,8 +47,6 @@ import com.sun.identity.shared.debug.Debug;
 @Deprecated
 public class HttpURLResourceName extends URLResourceName {
 
-    private static final Debug DEBUG = Debug.getInstance(PolicyManager.POLICY_DEBUG_NAME);
-
     public ResourceMatch compare(String requestResource, String targetResource, boolean wildcardCompare) {
         try {
             // Eagerly normalise the resource and target URLs.
@@ -56,7 +54,7 @@ public class HttpURLResourceName extends URLResourceName {
             targetResource = canonicalize(targetResource);
 
         } catch (PolicyException pE) {
-            DEBUG.error("HttpURLResourceName#compare: Unable to normalise resource and target URLs", pE);
+            debug.error("HttpURLResourceName#compare: Unable to normalise resource and target URLs", pE);
         }
 
         return super.compare(requestResource, targetResource, wildcardCompare);
