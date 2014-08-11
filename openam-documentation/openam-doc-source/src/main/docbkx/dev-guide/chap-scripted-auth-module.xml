@@ -30,7 +30,7 @@
          xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>Scripting Authentication</title>
+ <title>Scripted Authentication</title>
 
  <para>
   This chapter demonstrates how to develop scripts
@@ -336,8 +336,8 @@
     <title>HTTP Client Methods</title>
     <tgroup cols="4">
      <colspec colnum="1" colwidth="1*"/>
-     <colspec colnum="2" colwidth="1*"/>
-     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="2" colwidth="2*"/>
+     <colspec colnum="3" colwidth="2*"/>
      <colspec colnum="4" colwidth="3*"/>
      <thead>
       <row>
@@ -357,7 +357,8 @@
        <entry>
         <para>
          <literal><replaceable>uri</replaceable></literal> (type: <literal>String</literal>),
-         <literal><replaceable>requestData</replaceable></literal> (type: <literal>Map</literal>)
+         <literal><replaceable>requestData</replaceable></literal> (type:
+         <literal>Map</literal>)
         </para>
        </entry>
        <entry>
@@ -384,7 +385,8 @@
         <para>
          <literal><replaceable>uri</replaceable></literal> (type: <literal>String</literal>),
          <literal><replaceable>body</replaceable></literal> (type: <literal>String</literal>),
-         <literal><replaceable>requestData</replaceable></literal> (type: <literal>Map</literal>)
+         <literal><replaceable>requestData</replaceable></literal> (type:
+         <literal>Map</literal>)
         </para>
        </entry>
        <entry>
@@ -403,6 +405,105 @@
      </tbody>
     </tgroup>
    </table>
+
+   <para>
+    The <literal>requestData</literal> object is a map where the keys are
+    <literal>cookies</literal> and <literal>headers</literal>. OpenAM ignores other keys.
+   </para>
+   <para>
+    The <literal>cookies</literal> value, specifying the cookie headers in the
+    request, is a list of Maps where the keys are <literal>domain</literal>,
+    <literal>field</literal>, and <literal>value</literal>.
+   </para>
+   <para>
+    The <literal>headers</literal> value, specifying the headers in the request,
+    is a list of Maps where the keys are <literal>field</literal>, and
+    <literal>value</literal>.
+   </para>
+   <para>An example <literal>requestData</literal> JavaScript object using GET
+    would be as follows:</para>
+   <programlisting language="javascript">
+var response = httpClient.get("http://example.com:8080/openam/json/users" + username,
+ {
+   cookies:[
+    {
+       "domain": ".example.com",
+       "field": "iPlanetDirectoryPro,
+       "value": "E8cDkvlad83kdKDodkIEIxqJ938DKSDLIE31djkiefjekda.*DLEDLKJKD09dkleuhDK3kEJKj"
+    }
+   ],
+   headers:[
+    {
+       "field": "Content-type",
+       "value": "application/json"
+    }
+   ]
+ });
+   </programlisting>
+
+   <para>An example <literal>requestData</literal> JavaScript object using POST
+    would be as follows:</para>
+
+   <programlisting language="javascript">
+var response = httpClient.post("http://example.com:8080/openam/json/authenticate","{
+  "authId": "eyAiYWxnIjogIkhTMjU2IiwgInR5cCI6ICJqd3QiIH0.eyAib3RrIjogIm03ODVzN2x
+   sbnR1bjZvbGZ1MHZhOGVtYTQxIiwgInNlc3Npb25JZCI6ICJBUUlDNXdNMkxZNFNmY3lEeDY3QnB
+   PdzJtRU9rUzNpLWhfNDdRWlMwNHBEN1ppdy4qQUFKVFNRQUNNREVBQWxOTEFCUXROak15TURjNU1
+   UZzROVFUwTXpnNE5qRTNNQS4uKiIsICJyZWFsbSI6ICJkYz1vcGVuYW0sZGM9Zm9yZ2Vyb2NrLGR
+   jPW9yZyIgfQ.VDRqaekQuXBm2lNI29hfwVADLxjepezuO0241VNDsIM",
+  "template": "",
+  "stage": "DataStore1",
+  "callbacks": [
+    {
+      "type": "NameCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "User Name:"
+        }
+       ],
+      "input": [
+        {
+          "name": "IDToken1",
+          "value": "demo"
+        }
+       ]
+    },
+    {
+      "type": "PasswordCallback",
+      "output": [
+        {
+          "name": "prompt",
+          "value": "Password:"
+        }
+       ],
+      "input": [
+        {
+          "name": "IDToken2",
+          "value": "changeit"
+        }
+      ]
+    }
+  ]
+ }",
+ {
+   cookies:[
+   ],
+   headers:[
+    {
+      "field": "Content-Type",
+      "value": "application/json"
+    }
+   ]
+ });
+</programlisting>
+
+   <note><para>To get the form data, you can access the <literal>sharedState</literal>
+    object to get the data that previous modules in the chain have obtained.
+    For example, if you have a DataStore module in your chain, you can get the
+    username and password from the <literal>sharedState</literal> object in the
+    script.
+   </para></note>
 
    <para>
     HTTP client requests are synchronous, blocking until they return.
@@ -732,7 +833,7 @@
      <colspec colnum="1" colwidth="1*"/>
      <colspec colnum="2" colwidth="1*"/>
      <colspec colnum="3" colwidth="1*"/>
-     <colspec colnum="4" colwidth="3*"/>
+     <colspec colnum="4" colwidth="2*"/>
      <thead>
       <row>
        <entry>Method</entry>
@@ -921,7 +1022,7 @@
      <colspec colnum="1" colwidth="1*"/>
      <colspec colnum="2" colwidth="1*"/>
      <colspec colnum="3" colwidth="1*"/>
-     <colspec colnum="4" colwidth="3*"/>
+     <colspec colnum="4" colwidth="2*"/>
      <thead>
       <row>
        <entry>Method</entry>
@@ -950,7 +1051,7 @@
        </entry>
        <entry>
         <para>
-         Return the values of the named attribute for the named user
+         Return the values of the named attribute for the named user.
         </para>
        </entry>
       </row>
@@ -976,10 +1077,37 @@
        <entry>
         <para>
          Set the named attribute to the specified value for the named user,
-         and persist the result in the user's profile
+         and persist the result in the user's profile.
         </para>
        </entry>
       </row>
+
+      <row>
+       <entry>
+        <para>
+         <literal>addAttribute</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal><replaceable>userName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeName</replaceable></literal> (type: String),
+         <literal><replaceable>attributeValue</replaceable></literal> (type: String)
+        </para>
+       </entry>
+       <entry>
+        <para>
+         <literal>void</literal>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Adds an attribute value to the list of attribute values associated with the
+         attribute name for a particular user.
+        </para>
+       </entry>
+      </row>
+
      </tbody>
     </tgroup>
    </table>
@@ -1015,7 +1143,7 @@
      <colspec colnum="1" colwidth="1*"/>
      <colspec colnum="2" colwidth="1*"/>
      <colspec colnum="3" colwidth="1*"/>
-     <colspec colnum="4" colwidth="3*"/>
+     <colspec colnum="4" colwidth="2*"/>
      <thead>
       <row>
        <entry>Method</entry>
@@ -1180,7 +1308,10 @@
 
    <para>
     The following table lists the methods
-    of the <literal>requestData</literal> object.
+    of the <literal>requestData</literal> object. Note that this object differs
+    from the client-side <literal>requestData</literal> object (see
+     <xref linkend="scripted-auth-module-http-client-methods">HTTP Client Methods</xref>)
+    and contains information about the original authentication request made by the user.
    </para>
 
    <table xml:id="scripted-auth-module-request-data-methods" pgwide="1">
@@ -1189,7 +1320,7 @@
      <colspec colnum="1" colwidth="1*"/>
      <colspec colnum="2" colwidth="1*"/>
      <colspec colnum="3" colwidth="1*"/>
-     <colspec colnum="4" colwidth="3*"/>
+     <colspec colnum="4" colwidth="2*"/>
      <thead>
       <row>
        <entry>Method</entry>
@@ -1551,15 +1682,14 @@ Authentication allowed!
  <section xml:id="scripted-auth-module-sandbox">
   <title>Scripted Authentication Sandbox</title>
   <para>The OpenAM console provides a sandboxing feature to test your Javascript
-   or Groovy scripted authentication modules ensuring that malicious Java classes
+   or Groovy scripted authentication modules, ensuring that malicious Java classes
    are not directly called.
 
-   The sandbox validates the script by checking that all Java
-   classes directly called match those in a whitelist of classes that are
-   allowed to be invoked.
+   The sandbox validates the script by checking that all directly-called Java
+   classes match those in a whitelist of classes that are allowed to be invoked.
   </para>
   <para>You can configure the sandbox in the console by navigating to Configuration &gt;
-   Authentication &gt; Scripted Module. 
+   Authentication &gt; Scripted Module.
   </para>
   <para>The sandbox supports the following features:</para>
   <itemizedlist>
@@ -1639,7 +1769,8 @@ Authentication allowed!
    </varlistentry>
 
   </variablelist>
-
-
  </section>
+
+
+
 </chapter>
