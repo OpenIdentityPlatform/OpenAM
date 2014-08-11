@@ -22,8 +22,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2014 Forgerock AS.
- *
  * $Id: RegExResourceName.java,v 1.1 2009/12/07 19:53:02 veiming Exp $
  */
 
@@ -203,9 +201,4 @@ public class RegExResourceName implements ResourceName {
             patternCacheLock.writeLock().unlock();
         }
     }
-
-    public String[] split(String res) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
 }

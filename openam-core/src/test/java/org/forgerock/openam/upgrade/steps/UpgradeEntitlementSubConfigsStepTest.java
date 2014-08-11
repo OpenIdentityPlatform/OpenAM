@@ -427,10 +427,6 @@ public class UpgradeEntitlementSubConfigsStepTest {
             throw new UnsupportedOperationException();
         }
 
-        public String[] split(String res) {
-            throw new UnsupportedOperationException("Not implemented");
-        }
-
     }
 
 
