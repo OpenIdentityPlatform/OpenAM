@@ -24,13 +24,10 @@
  *
  * $Id: AMConsoleException.java,v 1.2 2008/06/25 05:42:49 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.base.model;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /* - NEED NOT LOG - */
 
@@ -39,27 +36,14 @@ import java.util.List;
  * that incorrect behavior is encountered in processing a request.
  */
 public class AMConsoleException extends Exception {
-    private List errList = null;
 
     /**
      * Creates a Console Exception object.
      *
-     * @param msg exception message.
+     * @param message exception message.
      */
-    public AMConsoleException(String msg) {
-        super(msg);
-        errList = new ArrayList(1);
-        errList.add(msg);
-    }
-
-    /**
-     * Creates a Console Exception object.
-     *
-     * @param errors list of error messages.
-     */
-    public AMConsoleException(List errors) {
-        super(errors.toArray().toString());
-        errList = errors;
+    public AMConsoleException(String message) {
+        super(message);
     }
 
     /**
@@ -68,17 +52,15 @@ public class AMConsoleException extends Exception {
      * @param t <code>Throwable</code> instance.
      */
     public AMConsoleException(Throwable t) {
-        super(t.getMessage());
-        errList = new ArrayList(1);
-        errList.add(t.getMessage());
+        this(t.getMessage(), t);
     }
 
     /**
-     * Gets error list.
-     *
-     * @return error list.
+     * Creates a Console Exception object.
+     * @param message Exception message.
+     * @param initCause The init cause.
      */
-    public List getErrors() {
-        return (errList == null) ? Collections.EMPTY_LIST : errList;
+    public AMConsoleException(String message, Throwable initCause) {
+        super(message, initCause);
     }
 }

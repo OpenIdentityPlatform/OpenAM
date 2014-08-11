@@ -276,8 +276,7 @@ public class ImportEntityViewBean
                     
             } catch (AMConsoleException ame) {
                 debug.warning("ImportEntityViewBean.handleButton1req ", ame);             
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                 "import.entity.error");
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", ame.getMessage());
                 forwardTo();
             }
         }

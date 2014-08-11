@@ -24,10 +24,7 @@
  *
  * $Id: ImportEntityModelImpl.java,v 1.11 2009/11/10 01:19:49 exu Exp $
  *
- */
-
- /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS.
  */
 package com.sun.identity.console.federation.model;
 
@@ -129,7 +126,7 @@ public class ImportEntityModelImpl extends AMModelBase
                 createWSFedEntity();
             }
         } catch (WorkflowException ex) {
-            throw new AMConsoleException(ex.getMessage());
+            throw new AMConsoleException(ex);
         }
     }
     
@@ -164,7 +161,7 @@ public class ImportEntityModelImpl extends AMModelBase
                 metaManager.createEntityConfig(realm, configElt);
             }        
         } catch (SAML2MetaException e) {
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         }
     }
     
@@ -177,10 +174,10 @@ public class ImportEntityModelImpl extends AMModelBase
                 (EntityConfigElement)obj : null;
         } catch (JAXBException e) {
             debug.error("ImportEntityModel.getEntityConfigElement", e);
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } catch (IllegalArgumentException e) {
             debug.error("ImportEntityModel.getEntityConfigElement", e);
-            throw new AMConsoleException(e.getMessage());        
+            throw new AMConsoleException(e);
         }
     }
 
@@ -207,25 +204,24 @@ public class ImportEntityModelImpl extends AMModelBase
             }
         } catch (JAXBException e) {
             debug.error("ImportEntityModel.importWSFedMetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } catch (IllegalArgumentException e) {
             debug.error("ImportEntityModel.importWSFedMetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         }
     }
             
     private void importSAML2MetaData(SAML2MetaManager metaManager, String realm)
-        throws SAML2MetaException, AMConsoleException {
-
+            throws SAML2MetaException, AMConsoleException {
         try {
             Document doc = XMLUtils.toDOMDocument(standardMetaData, debug);
             SAML2MetaUtils.importSAML2Document(metaManager, realm, doc);
         } catch (JAXBException e) {
-            debug.warning("ImportEntityModel.importSAML2MetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            debug.error("ImportEntityModel.importSAML2MetaData", e);
+            throw new AMConsoleException(e);
         } catch (IllegalArgumentException e) {
             debug.warning("ImportEntityModel.importSAML2MetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } 
     }    
     
@@ -262,7 +258,7 @@ public class ImportEntityModelImpl extends AMModelBase
             }
 
         } catch (IDFFMetaException e) {
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } 
     }
 
@@ -294,11 +290,11 @@ public class ImportEntityModelImpl extends AMModelBase
             }
     
         } catch (JAXBException e) {
-            debug.warning("ImportEntityModel.importIDFFMetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            debug.error("ImportEntityModel.importIDFFMetaData", e);
+            throw new AMConsoleException(e);
         } catch (IllegalArgumentException e) {
             debug.warning("ImportEntityModel.importIDFFMetaData", e);
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } 
     }
            
@@ -370,9 +366,9 @@ public class ImportEntityModelImpl extends AMModelBase
              (com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement)
                 obj : null;
         } catch (JAXBException e) {            
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         } catch (IllegalArgumentException e) {
-            throw new AMConsoleException(e.getMessage());
+            throw new AMConsoleException(e);
         }
     }
 

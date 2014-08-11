@@ -24,10 +24,7 @@
  *
  * $Id: ImportSAML2MetaData.java,v 1.5 2008/07/08 01:12:01 exu Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.workflow;
 
@@ -46,6 +43,8 @@ import org.w3c.dom.Document;
  * Import SAML2 Metadata.
  */
 public class ImportSAML2MetaData {
+
+    private static final Debug DEBUG = Debug.getInstance("workflow");
 
     private ImportSAML2MetaData() {
     }
@@ -94,8 +93,10 @@ public class ImportSAML2MetaData {
                 metaManager.createEntityConfig(realm, configElt);
             }
         } catch (SAML2MetaException e) {
+            DEBUG.error("An error occurred while importing the SAML metadata", e);
             throw new WorkflowException(e.getMessage());
         } catch (JAXBException e) {
+            DEBUG.error("An error occurred while importing the SAML metadata", e);
             throw new WorkflowException(e.getMessage());
         }
 
@@ -109,8 +110,7 @@ public class ImportSAML2MetaData {
 
        String result = null;
 
-       Debug debug = Debug.getInstance("workflow");
-       Document doc = XMLUtils.toDOMDocument(metadata, debug);
+       Document doc = XMLUtils.toDOMDocument(metadata, DEBUG);
        if (doc == null) {
            throw new WorkflowException(
                    "import-entity-exception-invalid-descriptor", null);
