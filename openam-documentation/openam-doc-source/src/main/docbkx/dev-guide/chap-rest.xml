@@ -6548,6 +6548,31 @@ $ <userinput>curl \
    xlink:show="new">HTTP status code</link>.</para>
   </section>
 
+  <section xml:id="rest-api-retrieve-identity-using-session-cookie">
+   <title>Retrieving Identities Using the Session Cookie</title>
+   <para>If you only have access to the <literal>iPlanetDirectoryPro</literal>
+    session cookie, you can retrieve the user ID by performing an HTTP POST
+    operation on the <literal>/json/users</literal>
+    endpoint using the <literal>idFromSession</literal> action.
+   </para>
+   <screen>
+$ <userinput>curl \
+ --verbose \
+ --request POST \
+ --header "iplanetdirectorypro: AQIC5wM2LY4SfczUFNs-TJwFrCVAKgR0NulIAyNaIkQmjis.*AAJTSQACMDEA
+ AlNLABQtNTQ3NDE2Njc5ODk4MjYzMzA2MQ..*" \
+ --header "Content-Type: application/json" http://openam.example.com:8080/openam/json/users?_action=idFromSession</userinput>
+<computeroutput>
+{
+  "id":"demo",
+  "realm":"/",
+  "dn":"id=demo,ou=user,dc=openam,dc=forgerock,dc=org",
+  "successURL":"/openam/console",
+  "fullLoginURL":null
+}</computeroutput>
+   </screen>
+  </section>
+
   <section xml:id="rest-api-change-password">
    <title>Changing Passwords</title>
    <indexterm>
