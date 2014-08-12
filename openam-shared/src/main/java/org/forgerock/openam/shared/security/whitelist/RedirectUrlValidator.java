@@ -155,7 +155,7 @@ public class RedirectUrlValidator<T> {
      * @return The String representation fo the "goto" key's value, or null.
      */
     public String getValueFromJson(JsonValue input, String paramName) {
-        if (input == null || !input.contains(paramName)) {
+        if (input == null || !input.isDefined(paramName)) {
             return null;
         }  else {
             return input.get(paramName).asString();
