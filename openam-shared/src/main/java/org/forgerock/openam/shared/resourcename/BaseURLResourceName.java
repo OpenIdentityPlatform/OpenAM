@@ -77,7 +77,15 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
         String targetSchemeHostPort = targetResource.substring(0, wildcardHostPort.start(1));
         String targetPath = targetResource.substring(wildcardHostPort.start(1));
 
-        int requestPathIndex = requestResource.indexOf("/", requestResource.indexOf("//") + 2);
+        int schemeEnd = requestResource.indexOf("//");
+        if (schemeEnd == -1) {
+            return super.compare(requestResource, targetResource, wildcardCompare);
+        }
+        int requestPathIndex = requestResource.indexOf("/", schemeEnd + 2);
+        if (requestPathIndex == -1) {
+            return super.compare(requestResource, targetResource, wildcardCompare);
+        }
+
         String requestSchemeHostPort = requestResource.substring(0, requestPathIndex);
         String requestPath = requestResource.substring(requestPathIndex);
 
