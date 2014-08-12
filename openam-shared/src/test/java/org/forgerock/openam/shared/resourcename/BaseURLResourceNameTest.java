@@ -52,6 +52,7 @@ public class BaseURLResourceNameTest {
     @Test
     public void testNoMatchCompare() throws Exception {
         match(NO_MATCH, "http://example.com:80/private/fred/index.html", "http*://*example.com:*/fred/*", true);
+        match(NO_MATCH, "http://hello.world:80/hacked.example.com:80/index.html", "http://*.example.com:80/index.html", true);
     }
 
     private void match(ResourceMatch expected, String requestResource, String targetResource, boolean wildcard) {

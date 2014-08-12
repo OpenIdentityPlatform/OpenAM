@@ -51,7 +51,7 @@ public abstract class BaseURLResourceName<T, E extends Exception> extends BasePr
     private static final String DEFAULT_PORT = "80";
     private static final String SECURE_PORT = "443";
     private static final Pattern ACCEPTABLE_URLS = Pattern.compile("^(http|https)\\**://.*$");
-    private static final Pattern WILDCARD_HOST_PORT = Pattern.compile("^[^/]+://[^/]+\\*(/)");
+    private static final Pattern WILDCARD_HOST_PORT = Pattern.compile("^[^/]+://[^/]*\\*[^/]*(/)");
 
     /**
      * Specific comparison for URLs, where a wildcard in the host/port should not match any of the path.
