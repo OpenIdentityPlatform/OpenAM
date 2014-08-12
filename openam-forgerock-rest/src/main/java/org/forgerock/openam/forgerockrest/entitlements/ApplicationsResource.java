@@ -17,6 +17,7 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
 import static java.lang.Math.max;
@@ -43,6 +44,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
@@ -205,6 +207,22 @@ public class ApplicationsResource implements CollectionResourceProvider {
     }
 
     /**
+     * Creates an {@link ApplicationWrapper} to hold the {@link Application} object.
+     * <p/>
+     * This method provides an abstraction to aid testing.
+     *
+     * @param application
+     *         The application
+     * @param type
+     *         The application type
+     *
+     * @return A new {@link ApplicationWrapper} wrapping the passed application
+     */
+    protected ApplicationWrapper createApplicationWrapper(Application application, ApplicationTypeManagerWrapper type) {
+        return new ApplicationWrapper(application, type);
+    }
+
+    /**
      * Deletes an {@link Application} as per the {@link DeleteRequest}.
      *
      * @param context {@inheritDoc}
@@ -274,11 +292,9 @@ public class ApplicationsResource implements CollectionResourceProvider {
         try {
             final Set<String> appNames = appManager.getApplicationNames(subject, realm);
 
-            for(String appName : appNames) {
-                final ApplicationWrapper wrapp =
-                        new ApplicationWrapper(appManager.getApplication(subject, realm, appName), appTypeManagerWrapper);
-
-                apps.add(wrapp);
+            for (String appName : appNames) {
+                final Application application = appManager.getApplication(subject, realm, appName);
+                apps.add(createApplicationWrapper(application, appTypeManagerWrapper));
             }
         } catch (EntitlementException e) {
             debug.error("Application failed to retrieve the resource specified.", e);
@@ -286,33 +302,28 @@ public class ApplicationsResource implements CollectionResourceProvider {
             return;
         }
 
-        int totalSize = apps.size();
-        int pageSize = request.getPageSize();
-        int offset = request.getPagedResultsOffset();
+        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        if (pageSize > 0) {
-            Collections.sort(apps);
-            apps = apps.subList(offset, offset + pageSize);
-        }
-
-        for(ApplicationWrapper app : apps) {
-            try {
-                handler.handleResource(new Resource(app.getName(), Long.toString(app.getLastModifiedDate()),
-                        app.toJsonValue()));
-            } catch (IOException e) {
-                debug.error("Unable to convert resource to JSON.", e);
-                handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-                return;
+        int remaining = 0;
+        try {
+            if (apps != null) {
+                remaining = apps.size();
+                for (ApplicationWrapper app : apps) {
+                    boolean keepGoing = handler.handleResource(
+                            new Resource(app.getName(), Long.toString(app.getLastModifiedDate()), app.toJsonValue()));
+                    remaining--;
+                    if (!keepGoing) {
+                        break;
+                    }
+                }
             }
+        } catch (IOException e) {
+            debug.error("Unable to convert resource to JSON.", e);
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return;
         }
 
-        //paginate
-        if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ? String.valueOf(totalSize) : String.valueOf(offset + pageSize);
-            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
-        } else {
-            handler.handleResult(new QueryResult(null, -1));
-        }
+        handler.handleResult(new QueryResult(null, remaining));
     }
 
     /**
