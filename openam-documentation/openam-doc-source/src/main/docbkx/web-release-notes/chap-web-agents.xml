@@ -31,10 +31,22 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Web Policy Agents ${agentsDocTargetVersion}</title>
 
- <para>
-  This chapter concerns OpenAM web policy agents.
-  Web policy agents run in web servers and protect access to web pages.
- </para>
+ <important>
+  <para>
+   OpenAM Web Policy Agents ${agentsDocTargetVersion} is a maintenance release
+   that resolves a number of issues, including security issues.
+  </para>
+
+  <para>
+   It is strongly recommended that you update to this release
+   to make your deployment more secure,
+   and to take advantage of important functional fixes.
+  </para>
+
+  <para>
+   ForgeRock customers can contact support for help and further information.
+  </para>
+ </important>
 
  <section xml:id="what-new-web-agents">
   <title>New in Web Policy Agents ${agentsDocTargetVersion}</title>
@@ -327,7 +339,8 @@
         Although the changes introduced by the improvements affect mainly edge cases,
         they do impact deployments relying on previous, inconsistent behaviors.
         The following points describe how OpenAM and policy agents behave
-        following upgrade to OpenAM 11.0.1 and web policy agents 3.3.1.
+        following upgrade from OpenAM 11.0.0 and web policy agents 3.3.0
+        to OpenAM 11.0.1 and web policy agents 3.3.1 or later.
        </para>
 
        <listitem>
@@ -499,9 +512,10 @@
 
   <important>
    <para>
-    OpenAM web policy agents 3.3.1 together with OpenAM 11.0.1
-    address backward compatibility with earlier agents.
-    For details, make you read <xref linkend="web-agent-major-changes" />.
+    Starting with policy agents version 3.3.1 and OpenAM version 11.0.1,
+    OpenAM web policy agents address backward compatibility with earlier agents.
+    For details, make sure that you read
+    <xref linkend="web-agent-major-changes" />.
    </para>
   </important>
 
@@ -516,11 +530,13 @@
     >OpenAM issue tracker</link>.
    </para>
 
-   <!-- List generated at 11:09:58 20140227 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.3.1"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 09:28:14 20140812 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.3.2"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
-    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3667" xlink:show="new">OPENAM-3667</link>: Agent removes trailing / from the URL</para></listitem>
-    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3334" xlink:show="new">OPENAM-3334</link>: WPA might crash when REST service returns com.sun.identity.idsvcs.GeneralFailure exception</para></listitem>
-    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3215" xlink:show="new">OPENAM-3215</link>: Apache Web Agents do not handle notifications - OS independent issue</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4199" xlink:show="new">OPENAM-4199</link>: Web policy agent might fail to parse URL when there is no port value specified</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4088" xlink:show="new">OPENAM-4088</link>: SJSWS web policy agent does not handle post data preservation in cdsso mode</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4020" xlink:show="new">OPENAM-4020</link>: Web policy agent silently ignores InternalException::AM_INVALID_RESOURCE_FORMAT exception abandoning further not enforced rule evaluation</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3501" xlink:show="new">OPENAM-3501</link>: SJS Web Server agent fails if 'com.sun.identity.agents.config.ignore.path.info=true' is set</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3375" xlink:show="new">OPENAM-3375</link>: IIS6 notification mode does not work if SSL offloading is done at a loadbalancer</para></listitem>
    </itemizedlist>
   </section>
 
@@ -560,8 +576,12 @@
     >OpenAM issue tracker</link>.
    </para>
 
-   <!-- List generated at 15:27:51 20140225 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 12:59:00 20140812 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4285" xlink:show="new">OPENAM-4285</link>: WPA local audit log file is not rotating</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3875" xlink:show="new">OPENAM-3875</link>: 'Encode URL's Special Characters' in Web Agent does not consistently encode the / charater</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3631" xlink:show="new">OPENAM-3631</link>: Renaming of SSO Token Cookie to substring of request URL will cause failed agent evaluation.</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3334" xlink:show="new">OPENAM-3334</link>: WPA might crash when REST service returns com.sun.identity.idsvcs.GeneralFailure exception</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2974" xlink:show="new">OPENAM-2974</link>: agentadmin should allow to configure multiple instances for the same agent on the same host</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1927" xlink:show="new">OPENAM-1927</link>: Silent Installation does not work for Apache2.4/Suse11</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1889" xlink:show="new">OPENAM-1889</link>: Sun Web Server policy agent: Wrong password in combination with naming service failover causes internal error on OpenAM</para></listitem>
