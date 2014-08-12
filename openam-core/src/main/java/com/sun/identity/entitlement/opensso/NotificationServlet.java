@@ -23,11 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: NotificationServlet.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
+ *
+ * Portions Copyrighted 2012-2014 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2012 ForgeRock Inc
- */
 package com.sun.identity.entitlement.opensso;
 
 import com.sun.identity.entitlement.ApplicationManager;
@@ -35,6 +34,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferredApplicationManager;
+import org.forgerock.openam.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.Writer;
 import javax.servlet.ServletException;
@@ -93,14 +94,9 @@ public class NotificationServlet extends HttpServlet {
             writer.write("200");
             writer.flush();
         } catch (IOException ex) {
-            PrivilegeManager.debug.error("NotificationServlet.handleRequest",
-                ex);
+            PrivilegeManager.debug.error("NotificationServlet.handleRequest " + ex.getMessage(), ex);
         } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                //ignore
-            }
+            IOUtils.closeIfNotNull(writer);
         }
     }
 
