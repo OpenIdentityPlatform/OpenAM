@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.openam.upgrade.NewServiceWrapper;
 import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
 import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
 import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
@@ -67,16 +69,19 @@ public class ServiceSchemaModifications {
     private Set<SchemaUpgradeWrapper> schemaModifications = null;
     private Map<String, ServiceSchemaUpgradeWrapper> modifications = null;
     private Map<String, SubSchemaUpgradeWrapper> subSchemaChanges = null;
+    private NewServiceWrapper newServiceWrapper = null;
 
-    public ServiceSchemaModifications(String serviceName,
-                          Document schemaDoc,
-                          SSOToken adminToken)
-    throws UpgradeException {
+    public ServiceSchemaModifications(String serviceName, Document schemaDoc, SSOToken adminToken, boolean newService)
+            throws UpgradeException {
         this.serviceName = serviceName;
         this.serviceSchemaDoc = schemaDoc;
         this.adminToken = adminToken;
 
-        parseServiceDefinition();
+        if (newService) {
+            parseNewServiceDefinition();
+        } else {
+            parseExistingServiceDefinition();
+        }
     }
 
     public boolean isServiceModified() {
@@ -103,7 +108,27 @@ public class ServiceSchemaModifications {
         return subSchemaChanges;
     }
 
-    private void parseServiceDefinition() throws UpgradeException {
+    /**
+     * Get the wrapper that wraps the new service and any modifications it might have.
+     * @return The service wrapper.
+     */
+    public NewServiceWrapper getNewServiceWrapper() {
+        return newServiceWrapper;
+    }
+
+    private void parseNewServiceDefinition() throws UpgradeException {
+        //we should only fetch these once to prevent performance problems, also in case of fetchNew to prevent
+        //encrypting passwords multiple times.
+        final Map<String, ServiceSchemaImpl> newSchemaMap = fetchNewServiceAttributes(serviceSchemaDoc);
+        createServiceModifications(newSchemaMap);
+        if (UpgradeUtils.debug.messageEnabled()) {
+            UpgradeUtils.debug.message("Service " + serviceName + " has been added");
+            UpgradeUtils.debug.message((newServiceWrapper.getModifiedSchemaMap().isEmpty() ? "No" : "Some") +
+                    " modifications were made to " + serviceName);
+        }
+    }
+
+    private void parseExistingServiceDefinition() throws UpgradeException {
         //we should only fetch these once to prevent performance problems, also in case of fetchNew to prevent
         //encrypting passwords multiple times.
         Map<String, ServiceSchemaImpl> newSchemaMap = fetchNewServiceAttributes(serviceSchemaDoc);
@@ -475,5 +500,97 @@ public class ServiceSchemaModifications {
         Map<String, ServiceSchemaImpl> schemas = getAttributes(ssm.getDocumentCopy());
 
         return schemas;
+    }
+
+    /**
+     * This will use the service schemas to find any upgrade handlers registered for the service and
+     * populate the NewServiceWrapper's ServiceSchemaModificationWrappers.
+     * @param newSchemaMap The service schemas representing the service.
+     * @throws UpgradeException If an upgrade error occurs.
+     */
+    private void createServiceModifications(Map<String, ServiceSchemaImpl> newSchemaMap) throws UpgradeException {
+        try {
+            final Map<String, ServiceSchemaModificationWrapper> serviceSchemaMap =
+                    new HashMap<String, ServiceSchemaModificationWrapper>();
+            for (Map.Entry<String, ServiceSchemaImpl> newAttrSchemaEntry : newSchemaMap.entrySet()) {
+                final ServiceSchemaModificationWrapper attributesAdded =
+                        getServiceModificationsRecursive(newAttrSchemaEntry.getKey(), newAttrSchemaEntry.getValue());
+
+                if (attributesAdded.hasBeenModified()) {
+                    serviceSchemaMap.put(newAttrSchemaEntry.getKey(), attributesAdded);
+                }
+            }
+            newServiceWrapper = new NewServiceWrapper(serviceName, serviceSchemaMap, serviceSchemaDoc);
+        } catch (SMSException smse) {
+            UpgradeUtils.debug.error("Error whilst determining schema changes for service: " + serviceName, smse);
+            throw new UpgradeException(smse.getMessage(), smse);
+        }
+    }
+
+    /**
+     * This will recursively go through the service schema and add modifications if any was found.
+     *
+     * @param schemaName Name of the schema being processed.
+     * @param newSchema The schema being processed.
+     * @return The schema modification wrapper.
+     * @throws UpgradeException If an error occurred during attribute upgrade.
+     */
+    private ServiceSchemaModificationWrapper getServiceModificationsRecursive(String schemaName,
+                                                                              ServiceSchemaImpl newSchema)
+            throws SMSException, UpgradeException {
+
+        final ServiceSchemaModificationWrapper attrModifiedResult =
+                new ServiceSchemaModificationWrapper(serviceName, schemaName);
+
+        if (newSchema.getAttributeSchemas() != null) {
+            final Set<AttributeSchemaImpl> attrsModified = getAttributesModified(newSchema.getAttributeSchemas());
+            if (!attrsModified.isEmpty()) {
+                attrModifiedResult.setAttributes(attrsModified);
+            }
+        }
+
+        if (!newSchema.getSubSchemaNames().isEmpty()) {
+            for (String subSchemaName : (Set<String>) newSchema.getSubSchemaNames()) {
+                final ServiceSchemaModificationWrapper subSchemaResult =
+                        getServiceModificationsRecursive(subSchemaName, newSchema.getSubSchema(subSchemaName));
+                if (subSchemaResult.hasBeenModified()) {
+                    attrModifiedResult.addSubSchema(subSchemaName, subSchemaResult);
+                }
+            }
+        }
+
+        return attrModifiedResult;
+    }
+
+    /**
+     * This will find the service helper specified for a newly added service if one is registered.
+     * If any attributes are registered they will be passed to the helper for modification.
+     * @param newAttrs The new attributes being added by this service.
+     * @return The modified attributes.
+     * @throws UpgradeException If an error occurred during attribute upgrade.
+     */
+    private Set<AttributeSchemaImpl> getAttributesModified(Set<AttributeSchemaImpl> newAttrs) throws UpgradeException {
+        final Set<AttributeSchemaImpl> attrMods = new HashSet<AttributeSchemaImpl>();
+        final UpgradeHelper helper = ServerUpgrade.getServiceHelper(serviceName);
+
+        if (helper != null) {
+            for (AttributeSchemaImpl newAttr : newAttrs) {
+                // skip attributes that are not explicitly named for upgrade
+                if (!helper.getAttributes().contains(newAttr.getName())) {
+                    continue;
+                }
+                try {
+                    final AttributeSchemaImpl upgradedAttr = helper.upgradeAttribute(newAttr);
+                    if (upgradedAttr != null) {
+                        attrMods.add(upgradedAttr);
+                    }
+                } catch (UpgradeException ue) {
+                    UpgradeUtils.debug.error("Unable to process upgrade helper for service: " + serviceName, ue);
+                    throw ue;
+                }
+            }
+        }
+
+        return attrMods;
     }
 }

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -103,6 +103,20 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
      */
     public abstract AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException;
+
+    /**
+     * Implement this method to perform modifications to a newly added attribute. In order to create a hook for
+     * a certain attribute, during upgradehelper initialization the attribute name should be captured in
+     * {@link AbstractUpgradeHelper#attributes}.
+     *
+     * @param newAttr The attribute schema definition we are planning to upgrade to.
+     * @return If there is nothing to upgrade, implementations MUST return <code>null</code>,
+     * otherwise the amended attribute can be returned directly.
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
+     */
+    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl newAttr) throws UpgradeException {
+        return null;
+    }
 
     @Override
     public final Set<String> getAttributes() {

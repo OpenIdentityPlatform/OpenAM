@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -57,6 +57,16 @@ public interface UpgradeHelper {
      */
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException;
+    /**
+     * This is used when a new service is added and the default upgrade value of the attribute
+     * is different from it's default install value. Given the new attribute schema the upgrade helper
+     * can modify the value.
+     *
+     * @param newAttr The new attribute schema
+     * @return The possibly updated attribute schema, this will be used in the upgrade
+     * @throws UpgradeException If something bad happens, this will be used to log not stop the upgrade
+     */
+    public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl newAttr) throws UpgradeException;
 
     /**
      * Return the Set of attributes that are to be upgrade by this service helper

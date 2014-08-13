@@ -43,6 +43,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.upgrade.NewServiceWrapper;
 import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
 import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
 import org.forgerock.openam.upgrade.ServerUpgrade;
@@ -81,7 +82,7 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
     private static final String NEW_SUB_SCHEMAS = "%NEW_SUB_SCHEMAS%";
     private static final String DELETED_SERVICES = "%DELETED_SERVICES%";
     private final List<String> serviceNames = new ArrayList<String>();
-    private final Map<String, Document> addedServices = new HashMap<String, Document>();
+    private final List<NewServiceWrapper> addedServices = new ArrayList<NewServiceWrapper>();
     private final Map<String, Set<SchemaUpgradeWrapper>> modifiedSchemas =
             new HashMap<String, Set<SchemaUpgradeWrapper>>();
     private final Map<String, Map<String, ServiceSchemaUpgradeWrapper>> modifiedServices =
@@ -167,32 +168,25 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
         Set<String> existingServiceNames = UpgradeUtils.getExistingServiceNames(adminToken);
         Set<String> newServiceNames = listNewServices(serviceDefinitions.keySet(), existingServiceNames);
 
-        for (String newServiceName : newServiceNames) {
-            addedServices.put(newServiceName, serviceDefinitions.get(newServiceName));
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("found new service: " + newServiceName);
-            }
-        }
-
         deletedServices.addAll(listDeletedServices(existingServiceNames));
 
         for (Map.Entry<String, Document> service : serviceDefinitions.entrySet()) {
-            // service is new, skip modification check
-            if (newServiceNames.contains(service.getKey())) {
-                continue;
-            }
-
             // service has been removed, skip modification check
             if (deletedServices.contains(service.getKey())) {
                 continue;
             }
 
-            modifications = new ServiceSchemaModifications(service.getKey(), service.getValue(), adminToken);
+            final boolean newService = newServiceNames.contains(service.getKey());
+            modifications = new ServiceSchemaModifications(service.getKey(), service.getValue(), adminToken, newService);
+
+            if (newService) {
+                addedServices.add(modifications.getNewServiceWrapper());
+            }
 
             if (modifications.hasSchemaChanges()) {
                 modifiedSchemas.put(service.getKey(), modifications.getSchemaModifications());
             }
+
             if (modifications.isServiceModified()) {
                 modifiedServices.put(service.getKey(), modifications.getServiceModifications());
             }
@@ -254,15 +248,15 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
                 buffer.append("services to add: ");
             }
 
-            for (Map.Entry<String, Document> serviceToAdd : addedServices.entrySet()) {
-                StringBuilder serviceDefinition = new StringBuilder(SERVICE_PROLOG);
-                serviceDefinition.append(XMLUtils.print(serviceToAdd.getValue()));
-                UpgradeProgress.reportStart("upgrade.addservice", serviceToAdd.getKey());
-                UpgradeUtils.createService(serviceDefinition.toString(), getAdminToken());
+            for (NewServiceWrapper serviceToAdd : addedServices) {
+                final StringBuilder serviceDefinition = new StringBuilder(SERVICE_PROLOG);
+                serviceDefinition.append(XMLUtils.print(serviceToAdd.getServiceDocument()));
+                UpgradeProgress.reportStart("upgrade.addservice", serviceToAdd.getServiceName());
+                UpgradeUtils.createService(serviceDefinition.toString(), serviceToAdd, getAdminToken());
                 UpgradeProgress.reportEnd("upgrade.success");
 
                 if (DEBUG.messageEnabled()) {
-                    buffer.append(serviceToAdd.getKey()).append(": ");
+                    buffer.append(serviceToAdd.getServiceName()).append(": ");
                 }
             }
 
@@ -327,8 +321,8 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
         StringBuilder buffer = new StringBuilder();
 
         if (addedServices != null && !addedServices.isEmpty()) {
-            for (Map.Entry<String, Document> added : addedServices.entrySet()) {
-                buffer.append(added.getKey()).append(" (").append(BUNDLE.getString("upgrade.new")).append(")");
+            for (NewServiceWrapper added : addedServices) {
+                buffer.append(added.getServiceName()).append(" (").append(BUNDLE.getString("upgrade.new")).append(")");
                 buffer.append(delimiter);
             }
         }
@@ -400,8 +394,8 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
         if (addedServices != null && !addedServices.isEmpty()) {
             StringBuilder aBuf = new StringBuilder();
 
-            for (Map.Entry<String, Document> added : addedServices.entrySet()) {
-                aBuf.append(BULLET).append(UpgradeUtils.getServiceName(added.getValue())).append(delimiter);
+            for (NewServiceWrapper added : addedServices) {
+                aBuf.append(BULLET).append(added.getServiceName()).append(delimiter);
             }
 
             tags.put(NEW_SERVICES, aBuf.toString());

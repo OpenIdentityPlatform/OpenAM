@@ -428,6 +428,34 @@ public class UpgradeUtils {
         }
     }
 
+    /**
+     * This will parse the given XML and create the service specified within. Once the service has been created
+     * the given NewServiceWrapper will be used to apply any modifications specified for the new service.
+     * @param xml The XML text describing the new service.
+     * @param newServiceModifications The NewServiceWrapper that contains the modification to the new service.
+     * @param adminToken The sso token.
+     * @throws UpgradeException If an upgrade error occurs.
+     */
+    public static void createService(String xml,
+                                     NewServiceWrapper newServiceModifications,
+                                     SSOToken adminToken) throws UpgradeException {
+        createService(xml, adminToken);
+
+        for (Map.Entry<String, ServiceSchemaModificationWrapper> schemaMods :
+                newServiceModifications.getModifiedSchemaMap().entrySet()) {
+
+            final ServiceSchemaModificationWrapper ssmWrapper = schemaMods.getValue();
+
+            if (ssmWrapper != null && ssmWrapper.hasBeenModified()) {
+                modifyAttributesInExistingSchema(newServiceModifications.getServiceName(),
+                        schemaMods.getKey(),
+                        ssmWrapper,
+                        getServiceSchema(ssmWrapper.getServiceName(), null, schemaMods.getKey(), adminToken),
+                        adminToken);
+            }
+        }
+    }
+
     public static void modifyService(String serviceName,
                                      Map<String, ServiceSchemaUpgradeWrapper> serviceChanges,
                                      SSOToken adminToken)
