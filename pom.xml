@@ -218,7 +218,7 @@
                 <dependency>
                     <groupId>com.sun</groupId>
                     <artifactId>tools</artifactId>
-                    <version>${java.target.version}</version>
+                    <version>${maven.compiler.source}</version>
                     <scope>system</scope>
                     <optional>true</optional>
                     <systemPath>${toolsjar}</systemPath>
