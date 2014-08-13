@@ -102,10 +102,8 @@
         <!-- **************************************************************** -->
 
         <!-- Java Properties -->
-        <java.source.version>1.5</java.source.version>
-        <java.target.version>1.5</java.target.version>
-        <federation.java.source.version>1.6</federation.java.source.version>
-        <federation.java.target.version>1.6</federation.java.target.version>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
 
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms256m -Xmx256m -XX:MaxPermSize=96m</java.surefire.options>
@@ -1911,8 +1909,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${java.source.version}</source>
-                    <target>${java.target.version}</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                     <encoding>UTF-8</encoding>
                     <!-- Override Enforcer Rules for OpenAM Compilation -->
                     <compilerArgument>-Xlint:none</compilerArgument>
@@ -1991,7 +1989,7 @@
                 <configuration>
                     <charset>utf-8</charset>
                     <encoding>utf-8</encoding>
-                    <source>${java.source.version}</source>
+                    <source>${maven.compiler.source}</source>
                     <additionalJOption>${javadoc.options}</additionalJOption>
                     <detectLinks>true</detectLinks>
                     <bottom>

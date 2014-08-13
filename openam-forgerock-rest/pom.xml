@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
+  ~ Copyright (c) 2012-2014 ForgeRock AS. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -38,11 +38,6 @@
     <name>OpenAM Forgerock REST API</name>
 
     <description>OpenAM Forgerock REST API</description>
-
-    <properties>
-        <java.source.version>1.6</java.source.version>
-        <java.target.version>1.6</java.target.version>
-    </properties>
 
     <build>
         <plugins>
