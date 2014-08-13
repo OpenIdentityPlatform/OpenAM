@@ -16,6 +16,7 @@
 package org.forgerock.openam.scripting.timeouts;
 
 
+import java.util.concurrent.TimeUnit;
 import org.forgerock.openam.scripting.StandardScriptEngineManager;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -51,7 +52,8 @@ public class ObservedContextFactory extends ContextFactory {
     @Override
     protected void observeInstructionCount(Context cx, int instructionCount) {
         final ObservedJavaScriptContext context = (ObservedJavaScriptContext) cx;
-        final long timeout = manager.getConfiguration().getScriptExecutionTimeout();
+        final long timeout = TimeUnit.MILLISECONDS.convert(manager.getConfiguration().getScriptExecutionTimeout(),
+                TimeUnit.SECONDS);
         if (timeout > 0 && System.currentTimeMillis() - context.getStartTime() > timeout) {
             throw new Error("Interrupt.");
         }
