@@ -6550,6 +6550,7 @@ $ <userinput>curl \
 
   <section xml:id="rest-api-retrieve-identity-using-session-cookie">
    <title>Retrieving Identities Using the Session Cookie</title>
+
    <para>If you only have access to the <literal>iPlanetDirectoryPro</literal>
     session cookie, you can retrieve the user ID by performing an HTTP POST
     operation on the <literal>/json/users</literal>

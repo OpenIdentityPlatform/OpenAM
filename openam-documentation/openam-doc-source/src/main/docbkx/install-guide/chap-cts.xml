@@ -36,30 +36,35 @@
     <primary>Core Token Service</primary>
   </indexterm>
 
-  <para>The Core Token Service (CTS) provides persistent and highly available
-   token storage for several components within OpenAM, including session,
-   OAuth 2.0, and SAML 2.0 tokens.
-   CTS is set up in a generalized token storage format, which by default is
-   always used for OAuth 2.0 tokens.
-   If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
+ <para>The Core Token Service (CTS) provides persistent and highly available
+  token storage for OpenAM session, OAuth 2.0, and SAML 2.0 tokens.
+  CTS is set up in a generalized token storage format, which by default is
+  always used for OAuth 2.0 tokens.
+  If configured, it can also be used to persist session and SAML 2.0 tokens.</para>
 
-  <para>CTS relies on OpenDJ to store and replicate tokens.
-   Only OpenDJ is supported for CTS. No other directory server is supported currently.
-  </para>
+ <para>The easiest CTS configuration is to run the default configuration
+  option in the installer, which uses an embedded OpenDJ directory server to store both
+  configuration and CTS tokens including the CTS schema.
+  If your deployment requires it, you can go beyond the default
+  embedded directory server and deploy separate external directory servers to store
+  configuration and CTS data.
+ </para>
 
-  <para>CTS tokens are volatile and change frequently, while other data stored
-   in an OpenDJ server is considerably more static.
-   Therefore, the performance tuning requirements are quite different for
-   both types of data.
+ <important><para>CTS relies on OpenDJ to store and replicate its tokens.
+  Only OpenDJ is supported for CTS. No other directory server is supported currently.</para>
+  <para>
+   If you deploy separate external stores for configuration
+   and CTS data respectively, note that external <emphasis>configuration</emphasis> stores
+   support OpenDJ and DSEE servers, while
+   external <emphasis>CTS</emphasis> stores only support OpenDJ currently.
   </para>
-  <para>The easiest CTS configuration is to run the default configuration
-   option in the installer, which uses an embedded OpenDJ server to store both
-   configuration and CTS tokens and automatically includes the CTS schema.
-   If your deployment requires it, then you can go beyond the default
-   embedded configuration and deploy separate external configuration and CTS
-   stores. External configuration stores supports OpenDJ and DSEE servers. External
-   CTS stores only support OpenDJ.
-  </para>
+ </important>
+
+ <para>CTS tokens are volatile and change frequently, while other data stored
+  in an OpenDJ server is considerably more static.
+  Therefore, the performance tuning requirements are quite different for
+  both types of data.
+ </para>
 
   <para>If you choose to set up CTS in an external OpenDJ instance, you will
    have to install OpenDJ separately from OpenAM.
