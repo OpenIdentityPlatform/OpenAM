@@ -79,7 +79,7 @@
   <para>
    The client-side script data is returned to OpenAM by self-submitting form.
    This makes the client-side data available to the server-side script.
-   The client-side script does this by adding data to a Map object,
+   The client-side script does this by adding data to a String object,
    <literal>clientScriptOutputData</literal>.
   </para>
 
@@ -303,21 +303,12 @@
    <title>Access Client-Side Script Output Data</title>
 
    <para>
-    Client-side scripts add data they gather into a Map object
+    Client-side scripts add data they gather into a String object
     named <literal>clientScriptOutputData</literal>.
     Client-side scripts then cause the user-agent automatically
     to return the data to OpenAM by HTTP POST of a self-submitting form.
    </para>
 
-   <para>
-    This object is implemented in OpenAM as a Java
-    <link
-     xlink:href="http://docs.oracle.com/javase/6/docs/api/java/util/LinkedHashMap.html"
-     xlink:show="new"
-    ><literal>LinkedHashMap</literal></link>.
-    Server-side scripts can access the client-side output data
-    by calling the methods supported by <literal>LinkedHashMap</literal>.
-   </para>
   </section>
 
   <section xml:id="scripted-auth-module-http-client">
