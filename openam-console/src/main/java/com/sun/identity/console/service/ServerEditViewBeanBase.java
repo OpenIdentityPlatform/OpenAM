@@ -24,11 +24,9 @@
  *
  * $Id: ServerEditViewBeanBase.java,v 1.3 2008/09/11 16:33:16 veiming Exp $
  *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
- */
 package com.sun.identity.console.service;
 
 import com.iplanet.jato.RequestManager;
@@ -292,14 +290,17 @@ public abstract class ServerEditViewBeanBase
             if (value == null) {
                 value = "";
             }
-            
-            Object[] params = {name, value};
-            String xmlComponent = MessageFormat.format(TEXT_TEMPLATE, params);
 
             int idx = xml.indexOf("<cc name=\"" + name + "\"");
             if (idx != -1) {
                 int endIdx = xml.indexOf("</cc>", idx);
-                xml = xml.substring(0, idx) + xmlComponent + 
+                String[] params = {name, value};
+                // If we find a Password field, obfuscate the value before it is shown.
+                if (xml.substring(idx, endIdx).contains(PASSWORD_FIELD_TAG)) {
+                    params[1] = "********";
+                }
+                String xmlComponent = MessageFormat.format(TEXT_TEMPLATE, params);
+                xml = xml.substring(0, idx) + xmlComponent +
                     xml.substring(endIdx+5);
             }
         }
@@ -432,4 +433,5 @@ public abstract class ServerEditViewBeanBase
     protected abstract String getPropertyXML();
     private static final String TEXT_TEMPLATE =
         "<cc name=\"{0}\" tagclass=\"com.sun.web.ui.taglib.html.CCStaticTextFieldTag\"><attribute name=\"defaultValue\" value=\"{1}\" /></cc>";
+    private static final String PASSWORD_FIELD_TAG = "com.sun.web.ui.taglib.html.CCPasswordTag";
 }
