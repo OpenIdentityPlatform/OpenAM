@@ -37,14 +37,186 @@
  integration between web client applications and OpenAM.</para>
  
  <section xml:id="about-openam-rest-api">
-  <title>About the RESTful API</title>
+  <title>About the RESTful APIs</title>
 
-  <para>Interface Stability: <link xlink:show="new"
-  xlink:href="admin-guide#interface-stability"
-  xlink:role="http://docbook.org/xlink/role/olink">Evolving</link></para>
+  <para>
+   <link
+    xlink:show="new"
+    xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"
+   >Representational State Transfer</link>(REST) is an architectural style
+   that sets certain constraints for designing and building
+   large-scale distributed hypermedia systems.
+   As an architectural style, REST has very broad application.
+   The designs of both HTTP 1.1 and also URIs follow RESTful principles.
+   The World Wide Web is no doubt the largest and best known REST application.
+   Many other web services also follow the REST architectural style.
+   Examples include OAuth 2.0 and OpenID Connect 1.0.
+  </para>
 
-  <para>OpenAM offers a RESTful API for these access and identity management
-  operations:</para>
+  <para>
+   ForgeRock Common REST (CREST) applies RESTful principles
+   to define common verbs for HTTP-based APIs that access web resources
+   and collections of web resources.
+  </para>
+
+  <para>
+   Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs.
+   (In contrast, OAuth 2.0 and OpenID Connect 1.0 APIs follow the standards.)
+   APIs covered in sections labelled (Legacy API) predate CREST,
+   and there do not use the CREST verbs.
+  </para>
+
+  <para>
+   When using a CREST API, you use the common verbs as query string parameters
+   in resource and resource collection URIs.
+  </para>
+
+  <variablelist>
+   <para>
+    CREST APIs use these verbs.
+   </para>
+
+   <varlistentry>
+    <term>_create</term>
+    <listitem>
+     <para>
+      Add a new resource
+     </para>
+
+     <para>
+      Create maps to HTTP PUT (or POST).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_read</term>
+    <listitem>
+     <para>
+      Retrieve a single resource
+     </para>
+
+     <para>
+      Read maps to HTTP GET.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_update</term>
+    <listitem>
+     <para>
+      Replace an existing resource
+     </para>
+
+     <para>
+      Update maps to HTTP PUT.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_delete</term>
+    <listitem>
+     <para>
+      Remove an existing resource
+     </para>
+
+     <para>
+      Delete maps to HTTP DELETE.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_patch</term>
+    <listitem>
+     <para>
+      Modify part of an existing resource
+     </para>
+
+     <para>
+      Patch maps to HTTP PATCH.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_action</term>
+    <listitem>
+     <para>
+      Perform a predefined action
+     </para>
+
+     <para>
+      Action maps to HTTP POST.
+     </para>
+
+     <para>
+      The generic _action verb extends what the API can do
+      where none of the other standard CREST verbs fit,
+      as in <literal>_action=logout</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>_query</term>
+    <listitem>
+     <para>
+      Search a collection of resources
+     </para>
+
+     <para>
+      Query maps to HTTP GET.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   <acronym>CRUDPAQ</acronym> is an acronym for the verbs.
+   Notice that reserved words in CREST, such as the verbs,
+   start with underscores (<literal>_</literal>).
+  </para>
+
+  <para>
+   In CREST, you can address resources in collections of resources
+   by their unique identifiers, their IDs.
+   IDs are exposed in the resource URIs
+   as in <literal>/users/<replaceable>id</replaceable></literal>
+   and <literal>/groups/<replaceable>id</replaceable></literal>.
+   The ID is also in the "_id" field of the resource.
+  </para>
+
+  <para>
+   In CREST, resources are versioned using revision numbers.
+   A revision is specified in the resource's "_rev" field.
+   Revisions make it possible to figure out whether to apply changes
+   without resource locking and without distributed transactions.
+  </para>
+
+  <para>
+   In CREST, you can explicitly request APIs versions.
+   This means that OpenAM can continue to support older API versions
+   as well as newer API versions as developers migrate their applications
+   to take advantage of capabilities provided by newer APIs.
+  </para>
+
+  <para>
+   Interface Stability:
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#interface-stability"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   >Evolving</link>
+  </para>
+
+  <para>
+   OpenAM offers RESTful APIs for
+   these access and identity management operations:
+  </para>
+
   <itemizedlist>
    <listitem>
     <para><link linkend="rest-api-auth">Authentication</link> (login)</para>
@@ -6550,7 +6722,6 @@ $ <userinput>curl \
 
   <section xml:id="rest-api-retrieve-identity-using-session-cookie">
    <title>Retrieving Identities Using the Session Cookie</title>
-
    <para>If you only have access to the <literal>iPlanetDirectoryPro</literal>
     session cookie, you can retrieve the user ID by performing an HTTP POST
     operation on the <literal>/json/users</literal>
