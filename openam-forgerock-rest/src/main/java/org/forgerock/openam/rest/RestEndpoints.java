@@ -18,9 +18,6 @@ package org.forgerock.openam.rest;
 
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.forgerockrest.IdentityResource;
@@ -39,7 +36,6 @@ import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.resource.CrestRealmRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
-import org.forgerock.openam.rest.router.VersionedRouter;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import org.restlet.Request;
@@ -50,7 +46,6 @@ import org.restlet.resource.ServerResource;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.security.AccessController;
 
 /**
  * Singleton class which contains both the routers for CREST resources and Restlet service endpoints.
@@ -59,10 +54,6 @@ import java.security.AccessController;
  */
 @Singleton
 public class RestEndpoints {
-
-    private static final String SERVICE_NAME = "RestApisService";
-    private static final String SERVICE_VERSION = "1.0";
-    private static Debug debug = Debug.getInstance("frRest");
 
     private final RestRealmValidator realmValidator;
     private final VersionSelector versionSelector;
@@ -155,7 +146,9 @@ public class RestEndpoints {
         router.addRoute("/decisioncombiners")
                 .addVersion("1.0", get(DecisionCombinersResource.class));
 
-        return registerConfigListener(router);
+        VersionBehaviourConfigListener.bindToServiceConfigManager(router);
+
+        return router;
     }
 
     /**
@@ -170,18 +163,8 @@ public class RestEndpoints {
         router.addRoute("/authenticate")
                 .addVersion("1.0", wrap(AuthenticationService.class));
 
-        return registerConfigListener(router);
-    }
+        VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
-    private <T extends VersionedRouter<T>> T registerConfigListener(T router) {
-        try {
-            VersionBehaviourConfigListener configListener = new VersionBehaviourConfigListener(router);
-            ServiceConfigManager mgr = new ServiceConfigManager(
-                    AccessController.doPrivileged(AdminTokenAction.getInstance()), SERVICE_NAME, SERVICE_VERSION);
-            configListener.register(mgr);
-        } catch (Exception e) {
-            debug.error("Cannot get ServiceConfigManager - cannot register default version config listener", e);
-        }
         return router;
     }
 
@@ -197,8 +180,8 @@ public class RestEndpoints {
         return new Finder() {
             @Override
             public ServerResource create(Request request, Response response) {
-                return InjectorHolder.getInstance(resource)
-;            }
+                return InjectorHolder.getInstance(resource);
+            }
         };
     }
 }

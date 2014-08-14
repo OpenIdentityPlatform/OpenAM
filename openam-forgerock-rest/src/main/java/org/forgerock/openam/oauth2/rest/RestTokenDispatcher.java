@@ -16,26 +16,65 @@
 
 package org.forgerock.openam.oauth2.rest;
 
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.json.resource.VersionRouter;
+import org.forgerock.openam.rest.DefaultVersionBehaviour;
+import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
+import org.forgerock.openam.rest.router.VersionedRouter;
 
 import javax.servlet.ServletException;
+import java.security.AccessController;
 
 /**
- * @author jason.lemay@forgerock.com
+ * Connection factory provider for OAuth2Rest CREST HttpServlet.
+ *
+ * @see org.forgerock.json.resource.servlet.HttpServlet
  */
 public class RestTokenDispatcher {
+
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
-            final Router router = new Router();
-            router.addRoute("/token/", InjectorHolder.getInstance(TokenResource.class));
-            router.addRoute("/client/", InjectorHolder.getInstance(ClientResource.class));
-            final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
-            return factory;
+            final VersionRouter router = new VersionRouter();
+            router.addRoute("/token/").addVersion("1.0", InjectorHolder.getInstance(TokenResource.class));
+            router.addRoute("/client/").addVersion("1.0", InjectorHolder.getInstance(ClientResource.class));
+            VersionBehaviourConfigListener.bindToServiceConfigManager(new VersionedRouterAdapter(router));
+            return Resources.newInternalConnectionFactory(router);
         } catch (final Exception e) {
             throw new ServletException(e);
         }
     }
+
+    /**
+     * Adapts CREST {@link VersionRouter} to {@link VersionedRouter} for {@link VersionBehaviourConfigListener}.
+     */
+    private static final class VersionedRouterAdapter implements VersionedRouter<VersionRouter> {
+
+        private final VersionRouter versionRouter;
+
+        private VersionedRouterAdapter(VersionRouter versionRouter) {
+            this.versionRouter = versionRouter;
+        }
+
+        @Override
+        public VersionRouter setVersioning(DefaultVersionBehaviour behaviour) {
+            switch(behaviour) {
+                case LATEST:
+                    versionRouter.setVersioningToDefaultToLatest();
+                    break;
+                case OLDEST:
+                    versionRouter.setVersioningToDefaultToOldest();
+                    break;
+                case NONE:
+                    versionRouter.setVersioningBehaviourToNone();
+                    break;
+            }
+            return versionRouter;
+        }
+    }
+
 }
