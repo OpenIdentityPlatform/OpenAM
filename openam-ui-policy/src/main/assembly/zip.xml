@@ -44,12 +44,6 @@
     </fileSets>
     <dependencySets>
         <dependencySet>
-            <includes>
-                <include>org.forgerock.commons.ui.libs:jquery-sortable</include>
-            </includes>
-            <outputDirectory>/libs</outputDirectory>
-        </dependencySet>
-        <dependencySet>
             <unpack>true</unpack>
             <unpackOptions>
                 <excludes>
@@ -60,6 +54,18 @@
                 <include>org.forgerock.commons.ui:forgerock-ui-commons</include>
             </includes>
             <outputDirectory>.</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.commons.ui.libs:jquery-sortable</include>
+            </includes>
+            <outputDirectory>/libs</outputDirectory>
+        </dependencySet>
+        <dependencySet>
+            <includes>
+                <include>org.forgerock.commons.ui.libs:jquery.jqGrid</include>
+            </includes>
+            <outputDirectory>/libs</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>

@@ -35,19 +35,6 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/openam/json");
 
-    obj.getAllApplications = function (successCallback, errorCallback) {
-        return obj.serviceCall({
-            url: "/applications?_queryFilter=true",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
-        });
-    };
-
     obj.getApplicationTypes = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/applicationtypes?_queryFilter=true",
@@ -133,21 +120,6 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     obj.getSubjectConditions = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/subjecttypes?_queryID=&_fields=title,logical,config",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
-        });
-    };
-
-    obj.getApplicationPolicies = function (appName, successCallback, errorCallback) {
-        var filter = encodeURIComponent('applicationName eq "' + appName + '"');
-
-        return obj.serviceCall({
-            url: "/policies?_queryFilter=" + filter,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {

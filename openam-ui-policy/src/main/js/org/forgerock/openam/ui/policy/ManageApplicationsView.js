@@ -29,26 +29,63 @@
 /*global window, define, $, form2js, _, js2form, document, console */
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/policy/ListView",
-    "org/forgerock/openam/ui/policy/PolicyDelegate"
-], function (AbstractView, listView, policyDelegate) {
+    "org/forgerock/commons/ui/common/main/AbstractView"
+], function (AbstractView) {
     var ManageApplicationsView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManageApplicationsTemplate.html",
 
         render: function (args, callback) {
-            var self = this;
+            var self = this,
+
+                appLinkFormatter = function (cellvalue, options, rowObject) {
+                    return '<a href="#app/' + cellvalue + '">' + cellvalue + '</a>';
+                },
+                policyLinkFormatter = function (cellvalue, options, rowObject) {
+                    return '<a href="#app/' + cellvalue + '/policies/">View</a>';
+                };
 
             this.parentRender(function () {
-                policyDelegate.getAllApplications().done(function (data) {
-                    self.listApplications(data, callback, self.$el.find('#manageApps'));
+                self.$el.find("#manageApps").jqGrid({
+                    url: '/openam/json/applications?_queryFilter=true',
+                    datatype: "json",
+                    loadBeforeSend: function (jqXHR) {
+                        jqXHR.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
+                    },
+                    colNames: ['Name', 'Realm', 'Type', 'Last Modified', 'Policies'],
+                    colModel: [
+                        {name: 'name', formatter: appLinkFormatter},
+                        {name: 'realm'},
+                        {name: 'applicationType'},
+                        {name: 'lastModifiedDate'},
+                        {name: 'name', formatter: policyLinkFormatter}
+                    ],
+                    height: 'auto',
+                    jsonReader: {
+                        root: function (obj) {
+                            return obj.result;
+                        }
+                    },
+                    search: null,
+                    prmNames: {
+                        nd: null,
+                        order: null,
+                        sort: null,
+                        search: null,
+                        rows: null, // number of records to fetch
+                        page: null // page number
+                    },
+                    loadComplete: function (data) {
+                        _.extend(self.data, data);
+                    }
+                });
+
+                self.$el.find("#manageApps").on("jqGridAfterGridComplete", function () {
+                    if (callback) {
+                        callback();
+                    }
                 });
             });
-        },
-
-        listApplications: function (data, callback, element) {
-            listView.render(data, callback, element, "templates/policy/ListApplicationsTemplate.html");
         }
     });
 

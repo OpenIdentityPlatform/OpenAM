@@ -30,8 +30,6 @@ define([
 
     "./PolicyDelegate",
 
-    "./ListView",
-
     "./ManageApplicationsView",
     "./EditApplicationView",
 

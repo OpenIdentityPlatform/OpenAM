@@ -35,7 +35,6 @@ define([
     "text!css/policy/common.less",
     "text!css/policy/condition-management.less",
     "text!css/policy/font-iconmoon.less",
-    "text!templates/policy/BaseTemplate.html",
     "text!templates/common/NavigationTemplate.html",
     "text!templates/common/FooterTemplate.html"
 ], function () {
@@ -54,7 +53,6 @@ define([
             "css/policy/common.less",
             "css/policy/condition-management.less",
             "css/policy/font-iconmoon.less",
-            "templates/policy/BaseTemplate.html",
             "templates/common/NavigationTemplate.html",
             "templates/common/FooterTemplate.html"
         ],
@@ -83,7 +81,5 @@ define([
                 "{\"id\":\"amadmin\",\"realm\":\"/\",\"dn\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"successURL\":\"/openam/console\",\"fullLoginURL\":\"/openam/UI/Login?realm=%2F&goto=http%3A%2F%2Famserver.restful.com%2Fopenam-policy-debug%2F\"}"
             ]
         );
-
     };
-
 });

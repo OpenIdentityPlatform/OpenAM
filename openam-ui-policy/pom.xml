@@ -69,6 +69,13 @@
             <version>1.14.0</version>
             <type>js</type>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>jquery.jqGrid</artifactId>
+            <version>4.5.4</version>
+            <classifier>min</classifier>
+            <type>js</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -90,6 +97,7 @@
                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
                    <excludes>
                        <exclude>**/libs/*.js</exclude>
+                       <exclude>**/libs/i18n/*.js</exclude>
                        <exclude>**/*Test.js</exclude>
                    </excludes>
                </configuration>
@@ -138,14 +146,28 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-dependencies</id>
+                        <id>copy-lib-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dependency/libs</outputDirectory>
+                            <includeArtifactIds>jquery-sortable,jquery.jqGrid</includeArtifactIds>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-test-dependencies</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/test/libs</outputDirectory>
-                            <includeArtifactIds>sinon,qunit,jquery-sortable</includeArtifactIds>
+                            <includeArtifactIds>sinon,qunit</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
