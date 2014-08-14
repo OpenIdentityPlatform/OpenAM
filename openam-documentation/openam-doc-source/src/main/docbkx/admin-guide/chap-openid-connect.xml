@@ -25,12 +25,12 @@
   !    
 -->
 <chapter xml:id='chap-openid-connect'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
-                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing OpenID Connect 1.0 Authorization</title>
  <indexterm>
   <primary>Authorization</primary>
@@ -40,37 +40,54 @@
   <primary>OpenID Connect 1.0</primary>
  </indexterm>
 
- <para>This chapter covers OpenAM support for OpenID Connect 1.0. <link
- xlink:href="http://openid.net/connect/" xlink:show="new">OpenID Connect</link>
- 1.0 extends OAuth 2.0 so the client can verify claims about the identity of
- the end user, get profile information about the end user, and log the user out
- at the end of the OpenAM session. OpenID Connect also makes it possible to
- discover the provider for an end user, and to register client applications
- dynamically. OpenID connect services are built on OAuth 2.0, JSON Web Token
- (JWT), WebFinger and Well-Known URIs.</para>
+ <para>
+  This chapter covers OpenAM support for OpenID Connect 1.0.
+  <link
+   xlink:href="http://openid.net/connect/"
+   xlink:show="new"
+  >OpenID Connect</link> 1.0 extends OAuth 2.0
+  so the client can verify claims about the identity of the end user,
+  get profile information about the end user,
+  and log the user out at the end of the OpenAM session.
+  OpenID Connect also makes it possible
+  to discover the provider for an end user,
+  and to register client applications dynamically.
+  OpenID connect services are built on
+  OAuth 2.0, JSON Web Token (JWT), WebFinger and Well-Known URIs.
+ </para>
 
  <section xml:id="about-openid-connect-support">
   <title>About OpenID Connect 1.0 Support in OpenAM</title>
 
-  <para>In its role as OpenID Provider, OpenAM lets OpenID Connect clients
-  discover its capabilities, handles both dynamic and static registration of
-  OpenID Connect clients, responds to client requests with authorization codes,
-  access tokens, and user information according to the Basic and Implicit Client
-  Profiles of OpenID Connect, and manages sessions.</para>
+  <para>
+   In its role as OpenID Provider, OpenAM
+   lets OpenID Connect clients discover its capabilities,
+   handles both dynamic and static registration of OpenID Connect clients,
+   responds to client requests with authorization codes, access tokens,
+   and user information
+   according to the Basic and Implicit Client Profiles of OpenID Connect,
+   and manages sessions.
+  </para>
 
-  <para>This section describes how OpenAM fits into the OpenID Connect picture
-  in terms of the roles that it plays in basic and implicit client profiles,
-  provider discovery, client registration, and session management.</para>
+  <para>
+   This section describes how OpenAM fits into the OpenID Connect picture
+   in terms of the roles that it plays in basic and implicit client profiles,
+   provider discovery, client registration, and session management.
+  </para>
 
   <section xml:id="openam-openid-basic-client-profile">
    <title>OpenID Connect Basic Client Profile</title>
 
-   <para>The OpenID Connect Basic Client Profile specifies how the client
-   application interacts with the provider, in this case OpenAM, based on use
-   of the OAuth 2.0 authorization grant. The following sequence diagram shows
-   successful processing from the authorization request, through grant of the
-   authorization code, access token, and ID token, and optional use of the
-   access token to get information about the end user.</para>
+   <para>
+    The OpenID Connect Basic Client Profile specifies
+    how the client application interacts with the provider,
+    in this case OpenAM,
+    based on use of the OAuth 2.0 authorization grant.
+    The following sequence diagram shows successful processing
+    from the authorization request,
+    through grant of the authorization code, access token, and ID token,
+    and optional use of the access token to get information about the end user.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-basic">
     <alt>OpenAM in OpenID Connect Basic Client Profile</alt>
@@ -78,25 +95,35 @@
      <imagedata fileref="images/openid-connect-basic.png" format="PNG"/>
     </imageobject>
     <textobject>
-     <para>OpenAM supports the OpenID Connect Basic Client Profile.</para>
+     <para>
+      OpenAM supports the OpenID Connect Basic Client Profile.
+     </para>
     </textobject>
    </mediaobject>
 
-   <para>In addition to what OAuth 2.0 specifies, OpenID Connect uses an ID
-   token so the client can validate claims about the end user. It also defines
-   how to get user information such as profile, email, address, and phone
-   details from the UserInfo endpoint with a valid access token.</para>
+   <para>
+    In addition to what OAuth 2.0 specifies,
+    OpenID Connect uses an ID token
+    so the client can validate claims about the end user.
+    It also defines how to get user information
+    such as profile, email, address, and phone details
+    from the UserInfo endpoint with a valid access token.
+   </para>
   </section>
 
   <section xml:id="openam-openid-implicit-client-profile">
    <title>OpenID Connect Implicit Client Profile</title>
 
-   <para>The OpenID Connect Implicit Client Profile specifies how the client
-   application interacts with the provider, in this case OpenAM, based on
-   use of the OAuth 2.0 implicit grant. The following sequence diagram shows
-   successful processing from the authorization request, through grant of the
-   access and ID tokens, and optional use of the access token to get information
-   about the end user.</para>
+   <para>
+    The OpenID Connect Implicit Client Profile specifies
+    how the client application interacts with the provider,
+    in this case OpenAM,
+    based on use of the OAuth 2.0 implicit grant.
+    The following sequence diagram shows successful processing
+    from the authorization request,
+    through grant of the access and ID tokens,
+    and optional use of the access token to get information about the end user.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-implicit">
     <alt>OpenAM in OpenID Connect Implicit Client Profile</alt>
@@ -104,14 +131,19 @@
      <imagedata fileref="images/openid-connect-implicit.png" format="PNG"/>
     </imageobject>
     <textobject>
-     <para>OpenAM supports the OpenID Connect Implicit Client Profile.</para>
+     <para>
+      OpenAM supports the OpenID Connect Implicit Client Profile.
+     </para>
     </textobject>
    </mediaobject>
 
-   <para>As for the Basic Client Profile, the Implicit Client Profile specifies
-   an ID token so the client can validate claims about the end user. It also
-   defines how to get user information such as profile, email, address, and
-   phone details from the UserInfo endpoint with a valid access token.</para>
+   <para>
+    As for the Basic Client Profile, the Implicit Client Profile specifies
+    an ID token so the client can validate claims about the end user.
+    It also defines how to get user information
+    such as profile, email, address, and phone details
+    from the UserInfo endpoint with a valid access token.
+   </para>
   </section>
 
   <section xml:id="openam-openid-discovery">
@@ -142,7 +174,7 @@
      xlink:show="new"
      xlink:href="reference#servers-advanced-configuration"
      xlink:role="http://docbook.org/xlink/role/olink"
-     ><citetitle>Servers > Advanced</citetitle></link>.
+    ><citetitle>Servers > Advanced</citetitle></link>.
     Take care to limit or throttle dynamic client registration
     if you enable this capability on production systems.
    </para>
