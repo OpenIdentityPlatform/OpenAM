@@ -29,6 +29,7 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @since 12.0.0
@@ -173,5 +174,47 @@ public class AuthorizationServiceImplTest {
         verify(providerSettings).saveConsent(eq(resourceOwner), anyString(), anySetOf(String.class));
         verify(tokenIssuer).issueTokens(eq(request), eq(clientRegistration), eq(resourceOwner), anySetOf(String.class),
                 eq(providerSettings));
+    }
+
+    @Test
+    public void authorizeShouldThrowAccessDeniedExceptionWithFragmentParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("response_type")).willReturn("id_token");
+        boolean consentGiven = false;
+        boolean saveConsent = false;
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
+
+        given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
+
+        //When
+        try {
+            authorizationService.authorize(request, consentGiven, saveConsent);
+        } catch(AccessDeniedException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
+        }
+    }
+
+    @Test
+    public void authorizeShouldThrowAccessDeniedExceptionWithQueryParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("response_type")).willReturn("code");
+        boolean consentGiven = false;
+        boolean saveConsent = false;
+        ResourceOwner resourceOwner = mock(ResourceOwner.class);
+
+        given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
+
+        //When
+        try {
+            authorizationService.authorize(request, consentGiven, saveConsent);
+        } catch(AccessDeniedException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
+        }
     }
 }

@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.restlet;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 import org.restlet.data.Status;
 
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class OAuth2RestletException extends Exception {
     private final String redirectUri;
     private final String state;
     private String errorUri;
+    private final UrlLocation parameterLocation;
 
     /**
      * Constructs a new OAuth2RestletException without a redirect uri.
@@ -50,6 +52,7 @@ public class OAuth2RestletException extends Exception {
 
     /**
      * Constructs a new OAuth2RestletException with a redirect uri.
+     * The {@link UrlLocation} for the parameters are defaulted to QUERY.
      *
      * @param statusCode The status code.
      * @param error The error.
@@ -58,11 +61,26 @@ public class OAuth2RestletException extends Exception {
      * @param state The state from the request.
      */
     public OAuth2RestletException(int statusCode, String error, String description, String redirectUri, String state) {
+        this(statusCode, error, description, redirectUri, state, UrlLocation.QUERY);
+    }
+
+    /**
+     * Constructs a new OAuth2RestletException with a redirect uri.
+     *
+     * @param statusCode The status code.
+     * @param error The error.
+     * @param description The description.
+     * @param redirectUri The redirect uri from the request.
+     * @param state The state from the request.
+     */
+    public OAuth2RestletException(int statusCode, String error, String description, String redirectUri, String state,
+                                  UrlLocation parameterLocation) {
         super(description);
         this.statusCode = statusCode;
         this.error = error;
         this.redirectUri = redirectUri;
         this.state = state;
+        this.parameterLocation = parameterLocation;
     }
 
     /**
@@ -126,6 +144,15 @@ public class OAuth2RestletException extends Exception {
      */
     public Status getStatus() {
         return new Status(statusCode);
+    }
+
+    /**
+     * Gets the location of the parameters in the URL.
+     *
+     * @return the location of the parameters.
+     */
+    public UrlLocation getParameterLocation() {
+        return parameterLocation;
     }
 
     /**

@@ -58,7 +58,7 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
     /**
      * {@inheritDoc}
      */
-    public ReturnLocation getReturnLocation() {
-        return ReturnLocation.QUERY;
+    public OAuth2Constants.UrlLocation getReturnLocation() {
+        return OAuth2Constants.UrlLocation.QUERY;
     }
 }

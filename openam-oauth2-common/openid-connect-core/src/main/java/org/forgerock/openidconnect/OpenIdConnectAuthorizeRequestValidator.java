@@ -74,12 +74,15 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
         final Set<String> requestScope = Utils.splitScope(request.<String>getParameter(OAuth2Constants.Params.SCOPE));
 
         if (clientScope.contains(OAuth2Constants.Params.OPENID) && !requestScope.contains(OAuth2Constants.Params.OPENID)) {
-            throw new InvalidRequestException(
-                    "Client configured as OpenID Connect and requires 'openid' to be in the scope of this request");
+            throw new InvalidRequestException("Missing expected scope=openid from request",
+                    Utils.isOpenIdConnectImplicitFlow(request) ?
+                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
         }
 
         if (!clientScope.contains(OAuth2Constants.Params.OPENID) && requestScope.contains(OAuth2Constants.Params.OPENID)) {
-            throw new InvalidScopeException("Invalid scope 'openid' in request to non OpenID Connect client");
+            throw new InvalidScopeException("Missing expected scope=openid from OpenID Connect client",
+                    Utils.isOpenIdConnectImplicitFlow(request) ?
+                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
         }
     }
 }

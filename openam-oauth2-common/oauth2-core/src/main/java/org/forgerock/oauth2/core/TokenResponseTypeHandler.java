@@ -58,7 +58,7 @@ public class TokenResponseTypeHandler implements ResponseTypeHandler {
     /**
      * {@inheritDoc}
      */
-    public ReturnLocation getReturnLocation() {
-        return ReturnLocation.FRAGMENT;
+    public OAuth2Constants.UrlLocation getReturnLocation() {
+        return OAuth2Constants.UrlLocation.FRAGMENT;
     }
 }

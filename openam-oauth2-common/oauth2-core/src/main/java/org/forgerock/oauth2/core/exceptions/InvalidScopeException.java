@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core.exceptions;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+
 /**
  * Thrown when the requested scope is invalid, unknown, or malformed.
  *
@@ -32,10 +34,21 @@ public class InvalidScopeException extends OAuth2Exception {
 
     /**
      * Constructs a new InvalidScopeException with the specified message.
+     * The {@link UrlLocation} for the parameters are defaulted to QUERY.
      *
      * @param message The reason for the exception.
      */
     public InvalidScopeException(final String message) {
-        super(400, "invalid_scope", message);
+        this(message, UrlLocation.QUERY);
+    }
+
+    /**
+     * Constructs a new InvalidScopeException with the specified message.
+     *
+     * @param message The reason for the exception.
+     * @param parameterLocation Indicates the location of the parameters in the URL.
+     */
+    public InvalidScopeException(final String message, final UrlLocation parameterLocation) {
+        super(400, "invalid_scope", message, parameterLocation);
     }
 }

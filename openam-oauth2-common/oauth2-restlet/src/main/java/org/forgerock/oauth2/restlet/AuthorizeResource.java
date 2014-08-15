@@ -112,7 +112,8 @@ public class AuthorizeResource extends ServerResource {
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
+                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
+                    e.getParameterLocation());
         }
     }
 
@@ -187,7 +188,8 @@ public class AuthorizeResource extends ServerResource {
                     request.<String>getParameter("state"));
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
-                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
+                    request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"),
+                    e.getParameterLocation());
         }
     }
 

@@ -16,6 +16,7 @@
 
 package org.forgerock.oauth2.restlet;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -104,7 +105,11 @@ public class ExceptionHandler {
 
         if (!isEmpty(exception.getRedirectUri())) {
             Reference ref = new Reference(exception.getRedirectUri());
-            ref.addQueryParameters(representation.toForm(exception.asMap()));
+            if (UrlLocation.FRAGMENT.equals(exception.getParameterLocation())) {
+                ref.setFragment(representation.toForm(exception.asMap()).getQueryString());
+            } else {
+                ref.addQueryParameters(representation.toForm(exception.asMap()));
+            }
             final Redirector redirector = new Redirector(context, ref.toString(), Redirector.MODE_CLIENT_FOUND);
             redirector.handle(request, response);
             return;

@@ -75,6 +75,6 @@ public class TokenResponseTypeHandlerTest {
 
     @Test
     public void shouldGetReturnLocation() {
-        assertEquals(responseTypeHandler.getReturnLocation(), ResponseTypeHandler.ReturnLocation.FRAGMENT);
+        assertEquals(responseTypeHandler.getReturnLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
     }
 }

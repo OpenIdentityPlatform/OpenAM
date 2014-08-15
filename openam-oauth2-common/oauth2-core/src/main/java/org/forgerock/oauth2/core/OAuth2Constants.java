@@ -876,4 +876,14 @@ public class OAuth2Constants {
             return null;
         }
     }
+
+    /**
+     * Indicates the location of an entity in a URL.
+     */
+    public enum UrlLocation {
+        /** The query part of the URL. */
+        QUERY,
+        /** The fragment part of the URL. */
+        FRAGMENT
+    }
 }

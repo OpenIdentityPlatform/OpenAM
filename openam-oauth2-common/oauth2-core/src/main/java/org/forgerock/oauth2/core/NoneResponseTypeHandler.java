@@ -37,7 +37,7 @@ public class NoneResponseTypeHandler implements ResponseTypeHandler {
     /**
      * {@inheritDoc}
      */
-    public ReturnLocation getReturnLocation() {
+    public OAuth2Constants.UrlLocation getReturnLocation() {
         return null;
     }
 }

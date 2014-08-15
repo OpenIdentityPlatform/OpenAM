@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core.exceptions;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+
 /**
  * Base exception for all OAuth2 exceptions.
  *
@@ -25,6 +27,19 @@ public abstract class OAuth2Exception extends Exception {
 
     private final int statusCode;
     private final String error;
+    private final UrlLocation parameterLocation;
+
+    /**
+     * Constructs a new OAuth2Exception with specified status code, error and description.
+     * The {@link UrlLocation} for the parameters are defaulted to QUERY.
+     *
+     * @param statusCode The status code of the exception. Maps to HTTP status codes.
+     * @param error The error/name of the exception.
+     * @param description The reason and description for the exception.
+     */
+    public OAuth2Exception(final int statusCode, final String error, final String description) {
+        this(statusCode, error, description, UrlLocation.QUERY);
+    }
 
     /**
      * Constructs a new OAuth2Exception with specified status code, error and description.
@@ -32,11 +47,14 @@ public abstract class OAuth2Exception extends Exception {
      * @param statusCode The status code of the exception. Maps to HTTP status codes.
      * @param error The error/name of the exception.
      * @param description The reason and description for the exception.
+     * @param parameterLocation Indicates the location of the parameters in the URL.
      */
-    public OAuth2Exception(final int statusCode, final String error, final String description) {
+    public OAuth2Exception(final int statusCode, final String error, final String description,
+                           final UrlLocation parameterLocation) {
         super(description);
         this.statusCode = statusCode;
         this.error = error;
+        this.parameterLocation = parameterLocation;
     }
 
     /**
@@ -55,5 +73,14 @@ public abstract class OAuth2Exception extends Exception {
      */
     public String getError() {
         return error;
+    }
+
+    /**
+     * Gets the location of the parameters in the URL.
+     *
+     * @return the location of the parameters.
+     */
+    public UrlLocation getParameterLocation() {
+        return parameterLocation;
     }
 }

@@ -124,4 +124,22 @@ public final class Utils {
         return new HashSet<String>(Arrays.asList(string.split(" ")));
     }
 
+    /**
+     * When using the OpenId Connect authorization Implicit Flow the response_type value is
+     * "id_token token" or "id_token".
+     * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#ImplicitAuthRequest">
+     *     3.2.2.1. Authentication Request</a>
+     *
+     * @param request The OAuth2Request for the client requesting authorization.
+     * @return True if the request is part of an OpenId Connect authorization Implicit Flow.
+     */
+    public static boolean isOpenIdConnectImplicitFlow(OAuth2Request request) {
+        final Set<String> requestedResponseTypes = splitResponseType(
+                request.<String>getParameter(OAuth2Constants.Params.RESPONSE_TYPE));
+        if (requestedResponseTypes.contains(OAuth2Constants.AuthorizationEndpoint.ID_TOKEN)) {
+            return true;
+        }
+        return false;
+    }
+
 }

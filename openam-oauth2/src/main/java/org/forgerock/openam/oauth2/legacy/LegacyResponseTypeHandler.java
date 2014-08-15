@@ -72,7 +72,7 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
                 new LegacyToken(token));
     }
 
-    public ReturnLocation getReturnLocation() {
-        return ReturnLocation.valueOf(responseType.getReturnLocation().toUpperCase());
+    public OAuth2Constants.UrlLocation getReturnLocation() {
+        return OAuth2Constants.UrlLocation.valueOf(responseType.getReturnLocation().toUpperCase());
     }
 }

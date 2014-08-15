@@ -100,8 +100,8 @@ public class AuthorizationTokenIssuer {
                 tokens.put(token.getKey(), token.getValue());
 
                 if (!returnAsFragment) {
-                    final ResponseTypeHandler.ReturnLocation returnLocation = responseTypeHandler.getReturnLocation();
-                    returnAsFragment = ResponseTypeHandler.ReturnLocation.FRAGMENT.equals(returnLocation);
+                    final OAuth2Constants.UrlLocation returnLocation = responseTypeHandler.getReturnLocation();
+                    returnAsFragment = OAuth2Constants.UrlLocation.FRAGMENT.equals(returnLocation);
                 }
             }
         }
@@ -114,9 +114,9 @@ public class AuthorizationTokenIssuer {
         if (!Utils.isEmpty(additionalData)) {
             final String returnLoc = additionalData.remove("returnLocation");
             if (!Utils.isEmpty(returnLoc)) {
-                final ResponseTypeHandler.ReturnLocation returnLocation =
-                        ResponseTypeHandler.ReturnLocation.valueOf(returnLoc.toUpperCase());
-                if (!returnAsFragment && ResponseTypeHandler.ReturnLocation.FRAGMENT.equals(returnLocation)) {
+                final OAuth2Constants.UrlLocation returnLocation =
+                        OAuth2Constants.UrlLocation.valueOf(returnLoc.toUpperCase());
+                if (!returnAsFragment && OAuth2Constants.UrlLocation.FRAGMENT.equals(returnLocation)) {
                     returnAsFragment = true;
                 }
             }

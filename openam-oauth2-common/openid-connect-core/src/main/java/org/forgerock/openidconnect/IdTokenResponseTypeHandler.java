@@ -16,6 +16,7 @@
 
 package org.forgerock.openidconnect;
 
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
 import org.forgerock.oauth2.core.Token;
@@ -71,7 +72,7 @@ public abstract class IdTokenResponseTypeHandler implements ResponseTypeHandler 
     /**
      * {@inheritDoc}
      */
-    public ReturnLocation getReturnLocation() {
-        return ReturnLocation.FRAGMENT;
+    public OAuth2Constants.UrlLocation getReturnLocation() {
+        return OAuth2Constants.UrlLocation.FRAGMENT;
     }
 }

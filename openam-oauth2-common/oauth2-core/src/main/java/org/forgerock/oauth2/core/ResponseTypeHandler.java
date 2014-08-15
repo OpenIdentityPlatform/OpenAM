@@ -18,6 +18,7 @@ package org.forgerock.oauth2.core;
 
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
 
 import java.util.Map;
 import java.util.Set;
@@ -29,16 +30,6 @@ import java.util.Set;
  * @supported.all.api
  */
 public interface ResponseTypeHandler {
-
-    /**
-     * The possible return location that the token can be returned at.
-     */
-    enum ReturnLocation {
-        /** Returned as apart of the query parameters of the URL. */
-        QUERY,
-        /** Returned as apart of the fragment of the URL. */
-        FRAGMENT
-    }
 
     /**
      * Handles the creating of a Token instance and storing the Token in the OAuth2 provider {@link TokenStore}.
@@ -59,9 +50,9 @@ public interface ResponseTypeHandler {
             String redirectUri, String nonce, OAuth2Request request) throws ServerException, InvalidClientException;
 
     /**
-     * Returns the location in which the token should be returned, {@link ReturnLocation}.
+     * Returns the location in which the token should be returned, {@link UrlLocation}.
      *
-     * @return The ReturnLocation.
+     * @return The UrlLocation.
      */
-    ReturnLocation getReturnLocation();
+    UrlLocation getReturnLocation();
 }

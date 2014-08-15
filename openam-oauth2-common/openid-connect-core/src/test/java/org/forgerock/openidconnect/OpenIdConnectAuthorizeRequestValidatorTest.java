@@ -18,6 +18,7 @@ package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -26,11 +27,13 @@ import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.HashSet;
+import java.util.Collections;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * @since 12.0.0
@@ -53,7 +56,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(new HashSet<String>() {{add("openid");}});
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
 
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
@@ -67,7 +70,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(new HashSet<String>() {{add("openid");}});
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
 
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("nothing");
@@ -81,12 +84,96 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
-        given(clientRegistration.getAllowedScopes()).willReturn(new HashSet<String>() {{add("nonoidcscope");}});
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
 
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
 
         //When
         requestValidator.validateRequest(request);
+    }
+
+    @Test
+    public void validateShouldFailWithInvalidRequestExceptionAndFragmentParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("nothing");
+        given(request.getParameter("response_type")).willReturn("id_token");
+
+        //When
+        try {
+            requestValidator.validateRequest(request);
+            fail();
+        } catch (InvalidRequestException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
+        }
+    }
+
+    @Test
+    public void validateShouldFailWithInvalidScopeExceptionAndFragmentParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("openid");
+        given(request.getParameter("response_type")).willReturn("id_token");
+
+        //When
+        try {
+            requestValidator.validateRequest(request);
+            fail();
+        } catch (InvalidScopeException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.FRAGMENT);
+        }
+    }
+
+    @Test
+    public void validateShouldFailWithInvalidRequestExceptionAndQueryParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("nothing");
+        given(request.getParameter("response_type")).willReturn("code");
+
+        //When
+        try {
+            requestValidator.validateRequest(request);
+            fail();
+        } catch (InvalidRequestException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
+        }
+    }
+
+    @Test
+    public void validateShouldFailWithInvalidScopeExceptionAndQueryParameters() throws Exception {
+
+        //Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("nonoidcscope"));
+
+        given(request.getParameter("client_id")).willReturn("CLIENT_ID");
+        given(request.getParameter("scope")).willReturn("openid");
+        given(request.getParameter("response_type")).willReturn("code");
+
+        //When
+        try {
+            requestValidator.validateRequest(request);
+            fail();
+        } catch (InvalidScopeException e) {
+            //Then
+            assertEquals(e.getParameterLocation(), OAuth2Constants.UrlLocation.QUERY);
+        }
     }
 }

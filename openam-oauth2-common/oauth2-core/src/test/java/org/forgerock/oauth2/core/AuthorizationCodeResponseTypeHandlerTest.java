@@ -72,6 +72,6 @@ public class AuthorizationCodeResponseTypeHandlerTest {
 
     @Test
     public void shouldGetReturnLocation() {
-        assertEquals(responseTypeHandler.getReturnLocation(), ResponseTypeHandler.ReturnLocation.QUERY);
+        assertEquals(responseTypeHandler.getReturnLocation(), OAuth2Constants.UrlLocation.QUERY);
     }
 }

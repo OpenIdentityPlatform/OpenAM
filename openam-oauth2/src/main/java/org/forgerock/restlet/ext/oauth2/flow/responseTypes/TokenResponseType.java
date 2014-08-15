@@ -41,8 +41,6 @@ import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.ResponseTypeHandler.ReturnLocation.FRAGMENT;
-
 /**
  *
  * Implements the Implicit Flow
@@ -85,7 +83,7 @@ public class TokenResponseType implements ResponseType {
     }
 
     public String getReturnLocation(){
-        return FRAGMENT.toString();
+        return OAuth2Constants.UrlLocation.FRAGMENT.toString();
     }
 
     public String URIParamValue(){

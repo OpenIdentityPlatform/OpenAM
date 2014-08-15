@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core.exceptions;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+
 /**
  * Thrown when the resource owner authentication fails.
  *
@@ -25,11 +27,12 @@ public class AccessDeniedException extends OAuth2Exception {
 
     /**
      * Constructs a new AccessDeniedException with specified message.
+     * The {@link UrlLocation} for the parameters are defaulted to QUERY.
      *
      * @param message The reason for the exception.
      */
     public AccessDeniedException(final String message) {
-        super(400, "access_denied", message);
+        this(message, UrlLocation.QUERY);
     }
 
     /**
@@ -39,5 +42,14 @@ public class AccessDeniedException extends OAuth2Exception {
      */
     public AccessDeniedException(final Throwable cause) {
         this(cause.getMessage());
+    }
+
+    /**
+     * Constructs a new AccessDeniedException with specified message.
+     *
+     * @param message The reason for the exception.
+     */
+    public AccessDeniedException(final String message, final UrlLocation parameterLocation) {
+        super(400, "access_denied", message, parameterLocation);
     }
 }

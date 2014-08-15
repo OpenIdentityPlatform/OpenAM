@@ -41,8 +41,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
-import static org.forgerock.oauth2.core.ResponseTypeHandler.ReturnLocation.FRAGMENT;
-
 /**
  *
  * @deprecated Use {@link org.forgerock.openidconnect.IdTokenResponseTypeHandler} instead.
@@ -81,7 +79,7 @@ public class IDTokenResponseType implements ResponseType {
     }
 
     public String getReturnLocation(){
-        return FRAGMENT.toString();
+        return OAuth2Constants.UrlLocation.FRAGMENT.toString();
     }
 
     public String URIParamValue(){

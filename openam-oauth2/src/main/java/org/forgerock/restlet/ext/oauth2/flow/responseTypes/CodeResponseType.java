@@ -41,8 +41,6 @@ import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.ResponseTypeHandler.ReturnLocation.QUERY;
-
 /**
  *
  * @deprecated Use {@link org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler} instead.
@@ -80,7 +78,7 @@ public class CodeResponseType implements ResponseType {
     }
 
     public String getReturnLocation(){
-        return QUERY.toString();
+        return OAuth2Constants.UrlLocation.QUERY.toString();
     }
 
     public String URIParamValue(){

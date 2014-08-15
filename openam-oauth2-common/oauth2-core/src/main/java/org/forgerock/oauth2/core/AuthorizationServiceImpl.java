@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.Utils.splitResponseType;
+
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
  * client by a specific resource owner.
@@ -158,7 +160,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         if (!consentGiven) {
             logger.debug("Resource Owner did not authorize the request");
-            throw new AccessDeniedException("Resource Owner did not authorize the request");
+            throw new AccessDeniedException("Resource Owner did not authorize the request",
+                    Utils.isOpenIdConnectImplicitFlow(request) ?
+                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
         }
 
         final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
