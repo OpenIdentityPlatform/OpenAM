@@ -4773,82 +4773,169 @@ to a runtime exception with messages that I think suggest that it needed to be c
         </variablelist>
     </section>
 
-    <section xml:id="json-rest-endponts">
-        <title>JSON REST Endpoints</title>
-        <indexterm>
-            <primary>REST</primary>
-            <secondary>JSON</secondary>
-        </indexterm>
+ <section xml:id="json-rest-endpoints">
+  <title>JSON REST Endpoints</title>
+  <indexterm>
+   <primary>REST</primary>
+   <secondary>JSON</secondary>
+  </indexterm>
 
-        <para>The endpoints in this section document the REST-based JSON interfaces used for authentication
-        and authorization.</para>
+  <para>The endpoints in this section document the REST-based JSON interfaces
+   used for authentication and authorization.</para>
         
-        <variablelist>
-            <varlistentry>
-                <term>/json/agents</term>
-                <listitem>
-                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
-                        performed in the filter. Information is logged. The authorization logic is performed by the
-                        underlying identity services.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/authenticate</term>
-                <listitem>
-                    <para>Authentication: Supports HTTP GET and POST methods. Can handle Integrated Windows
-                    Authentication.</para>
-                    <para>Authorization: No filter.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/dashboard</term>
-                <listitem>
-                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
-                        performed in the filter. Information is logged.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/groups</term>
-                <listitem>
-                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
-                        performed in the filter. Information is logged. The authorization logic is performed by the
-                        underlying identity services.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/serverinfo</term>
-                <listitem>
-                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
-                        performed in the filter. Information is logged. One sub-endpoint,
-                    <literal>/json/serverinfo/cookieDomains</literal>, supports HTTP GET.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/sessions</term>
-                <listitem>
-                    <para>Authorization: Supports the SessionResourceAuthZFilter. Allows POST _action=logout for all
-                        users. Other functionality is limited to the administrative amadmin superuser.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/tokens</term>
-                <listitem>
-                    <para>Authorization: Supports the AdminAuthorizationFilter. Access limited to the amadmin
-                        superuser.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>/json/users</term>
-                <listitem>
-                    <para>Authentication: Supports HTTP POST. Uses the _action query parameter with the following
-                        allowed values: register, confirm, forgotPassword, forgotPasswordReset.</para>
-                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
-                        performed in the filter. Information is logged. The authorization logic is performed by the
-                        underlying identity services.</para>
-                </listitem>
-            </varlistentry>
-        </variablelist>
-    </section>
+  <variablelist>
+   <varlistentry>
+    <term>/json/agents</term>
+    <listitem>
+     <para>Authorization: Supports the PassThroughAuthorizationFilter.
+      No authorization logic is performed in the filter. Information is logged.
+      The authorization logic is performed by the underlying identity services.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/applications</term>
+    <listitem>
+     <para>Authorization: sets constraints for the policies that can be defined
+      for a particular application.
+      Application resources are represented in JSON and built from standard JSON
+      objects and values (strings, numbers, objects, arrays, true, false, and null).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/applicationtypes</term>
+    <listitem>
+     <para>Authorization: sets constraints for the policies that can be defined
+      for a particular application.
+      Application resources are represented in JSON and are built from standard
+      JSON objects and values (strings, numbers, objects, arrays, true, false, and null).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/authenticate</term>
+     <listitem>
+      <para>Authentication: Supports HTTP GET and POST methods. Can handle
+       Integrated Windows Authentication.
+      </para>
+      <para>Authorization: No filter.</para>
+     </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/conditiontypes</term>
+    <listitem>
+     <para>Authorization: describe the JSON representation of conditions that
+      you can use in policy definitions.
+      Condition types are server-wide, and do not differ by realm. Hence the URI
+      for the conditiontypes API does not contain a realm component.
+     </para>
+    </listitem>
+
+   </varlistentry>
+   <varlistentry>
+    <term>/json/dashboard</term>
+    <listitem>
+     <para>Authorization: Supports the PassThroughAuthorizationFilter.
+      No authorization logic is performed in the filter. Information is logged.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/decisioncombiners</term>
+    <listitem>
+     <para>Authorization: Decision combiners describe how to resolve policy
+      decisions when multiple policies apply.
+      Decision combiners are server-wide, and do not differ by realm.
+      Hence the URI for the decision combiners API does not contain a realm component.
+      No authorization logic is performed in the filter. Information is logged.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/groups</term>
+    <listitem>
+     <para>Authorization: Supports the PassThroughAuthorizationFilter.
+      No authorization logic is performed in the filter. Information is logged.
+      The authorization logic is performed by the underlying identity services.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json[/realm/]policies</term>
+    <listitem>
+     <para>Authorization: Supports the management of policies; both for
+      requesting policy decisions, and also for administering policy definitions.
+      You can specify for specific realms.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/serverinfo</term>
+    <listitem>
+     <para>Authorization: Supports the PassThroughAuthorizationFilter.
+      No authorization logic is performed in the filter. Information is logged.
+      One sub-endpoint, <literal>/json/serverinfo/cookieDomains</literal>, supports
+      HTTP GET.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/sessions</term>
+    <listitem>
+     <para>Authorization: Supports the SessionResourceAuthZFilter.
+      Allows POST <literal>_action=logout</literal> for all users. Other functionality is limited
+      to the administrative superuser, which is typically <literal>amadmin</literal>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/subjecttypes</term>
+    <listitem>
+     <para>Authorization: describe the JSON representation of subjects that you
+      can use in policy definitions. Subject types are server-wide, and do not
+      differ by realm. Hence, the URI for the subject types API does not contain
+      a realm component.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/tokens</term>
+    <listitem>
+     <para>Authorization: Supports the AdminAuthorizationFilter. Access limited
+      to the <literal>amadmin</literal> administrative superuser.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>/json/users</term>
+    <listitem>
+     <para>Authentication: Supports HTTP POST. Uses the <literal>_action</literal>
+      query parameter with the following allowed values: <literal>register</literal>,
+      <literal>confirm</literal>, <literal>forgotPassword</literal>, and
+      <literal>forgotPasswordReset</literal>.
+     </para>
+     <para>Authorization: Supports the PassThroughAuthorizationFilter.
+      No authorization logic is performed in the filter. Information is logged.
+      The authorization logic is performed by the underlying identity services.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+ </section>
 
     <section xml:id="well-known-endpoints">
      <title>Well-Known Endpoints</title>
