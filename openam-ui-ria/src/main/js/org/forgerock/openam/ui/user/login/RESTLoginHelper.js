@@ -126,12 +126,16 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     obj.setSuccessURL = function(tokenId) {
         var promise = $.Deferred(),
             urlParams = uiUtils.convertCurrentUrlToJSON().params,
-            url = conf.globalData.auth.successURL;
+            url = conf.globalData.auth.successURL,
+            context = "";
         if (urlParams && urlParams.goto) {
             authNDelegate
                 .setGoToUrl(tokenId, urlParams.goto)
                 .then( function(data){
-                    conf.globalData.auth.urlParams.goto = data.successURL;
+                    if ((data.successURL.startsWith("/")) && (!data.successURL.startsWith("/" + constants.context))) {
+                        context = "/" + constants.context;
+                    }
+                    conf.globalData.auth.urlParams.goto = context + data.successURL;
                     promise.resolve();
                 }, function(){
                     promise.reject();
