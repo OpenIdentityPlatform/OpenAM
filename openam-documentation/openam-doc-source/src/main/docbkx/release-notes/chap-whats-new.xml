@@ -396,6 +396,97 @@ Agreement (yes/no): [no]:</screen>
     ><citetitle>Hints for the Device ID (Save) Authentication Module</citetitle></link>.
    </para>
   </listitem>
+  <listitem>
+   <para><emphasis role="bold">User Management of Trusted Devices</emphasis>.
+    Authentication chains that include the Device ID (Match) and Device ID (Save)
+    modules also allow users to manage their own list of trusted devices from
+    their Dashboard page.
+   </para>
+
+   <para>
+    When the user logs on to the console, OpenAM determines if the user's device
+    differs from that of the stored profile.
+    If there are differences, OpenAM sends an "Enter OTP" page, requiring the
+    user to enter a one-time password, which will be sent to the user via email or SMS.
+    The user also has the option to request a one-time password.</para>
+
+   <figure xml:id="figure-device-print-hotp">
+    <title>HOTP Page</title>
+    <mediaobject>
+     <alt>HMAC One-Time Password Page</alt>
+     <imageobject>
+      <imagedata fileref="images/device-print-hotp.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>HMAC One-Time Password page.
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure>
+
+   <para>
+    Next, OpenAM presents the user with a "Add to Trusted Devices?" page,
+    asking if she wants to add the device to the list of trusted device profiles.
+   </para>
+
+   <figure xml:id="figure-device-print-trust-dialog">
+    <title>Add Device to Trusted Devices Dialog</title>
+    <mediaobject>
+     <alt>Add Device to Trusted Devices Dialog</alt>
+     <imageobject>
+      <imagedata fileref="images/device-print-trust-dialog.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>Add Device to Trusted Devices Dialog
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure>
+
+   <para>
+    If the user clicks "Yes", OpenAM prompts the user to enter a descriptive name
+    for the trusted device.
+   </para>
+
+   <figure xml:id="figure-device-print-trust-name">
+    <title>Trusted Device Name page</title>
+    <mediaobject>
+     <alt>Trusted Device Name page</alt>
+     <imageobject>
+      <imagedata fileref="images/device-print-trust-name.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>Device print trust name dialog
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure>
+
+   <para>OpenAM presents the user with the User Profile page, where the
+    user can click the Dashboard link in the upper left corner to access the My
+    Applications and Trusted Devices page. Once on the Dashboard, the user can
+    view the list of trusted devices or remove the device by clicking the
+    Delete Device link.
+   </para>
+
+   <figure xml:id="figure-trusted-device-mgmt">
+    <title>Trusted Device Management on the Dashboard</title>
+    <mediaobject>
+     <alt>Trusted Device Management</alt>
+     <imageobject>
+      <imagedata fileref="images/trusted-device-mgmt.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>Trusted Device Management on the User Profile page.
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure>
+  </listitem>
 
   <listitem>
     <para>
