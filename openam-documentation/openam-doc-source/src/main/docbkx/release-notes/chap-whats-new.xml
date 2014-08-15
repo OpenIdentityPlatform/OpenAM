@@ -410,16 +410,16 @@ Agreement (yes/no): [no]:</screen>
     user to enter a one-time password, which will be sent to the user via email or SMS.
     The user also has the option to request a one-time password.</para>
 
-   <figure xml:id="figure-device-print-hotp">
-    <title>HOTP Page</title>
+   <figure xml:id="figure-device-print-otp">
+    <title>OTP Page</title>
     <mediaobject>
-     <alt>HMAC One-Time Password Page</alt>
+     <alt>One-Time Password Page</alt>
      <imageobject>
       <imagedata fileref="images/device-print-hotp.png"
                  format="PNG" />
      </imageobject>
      <textobject>
-      <para>HMAC One-Time Password page.
+      <para>One-Time Password page.
       </para>
      </textobject>
     </mediaobject>
