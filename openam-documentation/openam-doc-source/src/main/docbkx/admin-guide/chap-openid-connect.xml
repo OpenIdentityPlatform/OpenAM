@@ -45,13 +45,94 @@
   <link
    xlink:href="http://openid.net/connect/"
    xlink:show="new"
-  >OpenID Connect</link> 1.0 extends OAuth 2.0
-  so the client can verify claims about the identity of the end user,
-  get profile information about the end user,
-  and log the user out at the end of the OpenAM session.
+  >OpenID Connect</link> 1.0 is an authentication layer built on OAuth 2.0.
+  OpenID Connect 1.0 is a specific implementation of OAuth 2.0
+  where the identity provider that runs the authorization server
+  also holds the protected resource
+  that the third-party application aims to access.
+  This resource is the <emphasis>UserInfo</emphasis>,
+  information about the authenticated end user expressed in a standard format.
+  In this way OpenID Connect 1.0 allows relying parties
+  both to verify the identity of the end user
+  and also to obtain user information using REST.
+  This contrasts with OAuth 2.0, which only defines the authorization mechanism.
+ </para>
+
+ <itemizedlist>
+  <para>
+   The names used in OpenID Connect 1.0 differ from those used in OAuth 2.0.
+   In OpenID Connect 1.0, the key entities are the following.
+  </para>
+
+  <listitem>
+   <para>
+    The <firstterm>end user</firstterm> (OAuth 2.0 resource owner)
+    whose user information the application needs to access.
+   </para>
+
+   <para>
+    The end user wants to use an application
+    through existing identity provider account
+    without signing up to and creating credentials for yet another web service.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    The <firstterm>Relying Party</firstterm> (RP) (OAuth 2.0 client)
+    needs access to the end user's protected user information.
+   </para>
+
+   <para>
+    For example, an online mail application needs to know which end user
+    is accessing the application in order to present the correct inbox.
+   </para>
+
+   <para>
+    As another example, an online shopping site needs to know which end user
+    is accessing the site in order to present
+    the right offerings, account, and shopping cart.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    The <firstterm>OpenID Provider</firstterm> (OP)
+    (OAuth 2.0 authorization server and also resource server)
+    that holds the user information and grants access.
+   </para>
+
+   <para>
+    OpenAM can play this role in an OpenID Connect deployment.
+   </para>
+
+   <para>
+    The OP effectively has the end user's consent to providing the RP
+    with access to some of its user information.
+    As OpenID Connect 1.0 defines unique identification for an account
+    (subject identifier + issuer identifier),
+    the RP can use this as a key to its own user profile.
+   </para>
+
+   <para>
+    In the case of the online mail application,
+    this key could be used to access the mailboxes
+    and related account information.
+    In the case of the online shopping site,
+    this key could be used to access
+    the offerings, account, shopping cart and so forth.
+    The key makes it possible to serve users as if they had local accounts.
+   </para>
+  </listitem>
+ </itemizedlist>
+
+ <para>
+  In OpenID Connect the relying party can verify claims
+  about the identity of the end user,
+  and log the user out at the end of a session.
   OpenID Connect also makes it possible
-  to discover the provider for an end user,
-  and to register client applications dynamically.
+  to discover the OpenID Provider for an end user,
+  and to register relying party client applications dynamically.
   OpenID connect services are built on
   OAuth 2.0, JSON Web Token (JWT), WebFinger and Well-Known URIs.
  </para>
@@ -61,26 +142,27 @@
 
   <para>
    In its role as OpenID Provider, OpenAM
-   lets OpenID Connect clients discover its capabilities,
-   handles both dynamic and static registration of OpenID Connect clients,
-   responds to client requests with authorization codes, access tokens,
+   lets OpenID Connect relying parties (clients) discover its capabilities,
+   handles both dynamic and static registration of OpenID Connect relying parties,
+   responds to relying party requests with authorization codes, access tokens,
    and user information
-   according to the Basic and Implicit Client Profiles of OpenID Connect,
+   according to the Authorization Code and Implicit flows of OpenID Connect,
    and manages sessions.
   </para>
 
   <para>
    This section describes how OpenAM fits into the OpenID Connect picture
-   in terms of the roles that it plays in basic and implicit client profiles,
+   in terms of the roles that it plays
+   in the authorization code and implicit flows,
    provider discovery, client registration, and session management.
   </para>
 
   <section xml:id="openam-openid-basic-client-profile">
-   <title>OpenID Connect Basic Client Profile</title>
+   <title>OpenID Connect Authorization Code Flow</title>
 
    <para>
-    The OpenID Connect Basic Client Profile specifies
-    how the client application interacts with the provider,
+    The OpenID Connect Authorization Code Flow specifies
+    how the relying party interacts with the OpenID Provider,
     in this case OpenAM,
     based on use of the OAuth 2.0 authorization grant.
     The following sequence diagram shows successful processing
@@ -90,13 +172,13 @@
    </para>
 
    <mediaobject xml:id="figure-openid-connect-basic">
-    <alt>OpenAM in OpenID Connect Basic Client Profile</alt>
+    <alt>OpenAM in OpenID Connect Authorization Code Flow</alt>
     <imageobject>
      <imagedata fileref="images/openid-connect-basic.png" format="PNG"/>
     </imageobject>
     <textobject>
      <para>
-      OpenAM supports the OpenID Connect Basic Client Profile.
+      OpenAM supports the OpenID Connect Authorization Code Flow.
      </para>
     </textobject>
    </mediaobject>
@@ -104,7 +186,7 @@
    <para>
     In addition to what OAuth 2.0 specifies,
     OpenID Connect uses an ID token
-    so the client can validate claims about the end user.
+    so the relying party can validate claims about the end user.
     It also defines how to get user information
     such as profile, email, address, and phone details
     from the UserInfo endpoint with a valid access token.
@@ -112,11 +194,11 @@
   </section>
 
   <section xml:id="openam-openid-implicit-client-profile">
-   <title>OpenID Connect Implicit Client Profile</title>
+   <title>OpenID Connect Implicit Flow</title>
 
    <para>
-    The OpenID Connect Implicit Client Profile specifies
-    how the client application interacts with the provider,
+    The OpenID Connect Implicit Flow specifies
+    how the relying party interacts with the OpenID Provider,
     in this case OpenAM,
     based on use of the OAuth 2.0 implicit grant.
     The following sequence diagram shows successful processing
@@ -126,20 +208,20 @@
    </para>
 
    <mediaobject xml:id="figure-openid-connect-implicit">
-    <alt>OpenAM in OpenID Connect Implicit Client Profile</alt>
+    <alt>OpenAM in OpenID Connect Implicit Flow</alt>
     <imageobject>
      <imagedata fileref="images/openid-connect-implicit.png" format="PNG"/>
     </imageobject>
     <textobject>
      <para>
-      OpenAM supports the OpenID Connect Implicit Client Profile.
+      OpenAM supports the OpenID Connect Implicit Flow.
      </para>
     </textobject>
    </mediaobject>
 
    <para>
-    As for the Basic Client Profile, the Implicit Client Profile specifies
-    an ID token so the client can validate claims about the end user.
+    As for the Authorization Code Flow, the Implicit Flow specifies
+    an ID token so that the relying party can validate claims about the end user.
     It also defines how to get user information
     such as profile, email, address, and phone details
     from the UserInfo endpoint with a valid access token.
@@ -149,23 +231,27 @@
   <section xml:id="openam-openid-discovery">
    <title>OpenID Connect Discovery</title>
 
-   <para>OpenID Connect defines how a client application can discover the
-   OpenID connect provider and corresponding OpenID Connect configuration for
+   <para>OpenID Connect defines how a relying party can discover the
+   OpenID Provider and corresponding OpenID Connect configuration for
    an end user. The discovery mechanism relies on WebFinger to get the
    information based on the end user's identifier. The server returns the
    information in JSON Resource Descriptor (JRD) format.</para>
   </section>
 
   <section xml:id="openam-openid-client-registration">
-   <title>OpenID Connect Client Registration</title>
-
-   <para>OpenID Connect clients can register with OpenAM as a provider both
-   statically, as for other OAuth 2.0 clients, and also dynamically as specified
-   by OpenID Connect. To allow dynamic registration, you register an initial
-   client that other clients can use to get access tokens for registration.</para>
+   <title>OpenID Connect Relying Party Registration</title>
 
    <para>
-    You can also enable OpenID Connect clients to register dynamically
+    OpenID Connect relying parties register OAuth 2.0 client profiles with OpenAM.
+    Relying parties can register with OpenAM as a provider both statically,
+    as for other OAuth 2.0 clients,
+    and also dynamically as specified by OpenID Connect Discovery.
+    To allow dynamic registration, you register an initial OAuth 2.0 client
+    that other relying parties can use to get access tokens for registration.
+   </para>
+
+   <para>
+    You can also enable OpenID Connect relying parties to register dynamically
     without having to provide an access token.
     For details, see the documentation on the advanced server property,
     <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
@@ -175,7 +261,7 @@
      xlink:href="reference#servers-advanced-configuration"
      xlink:role="http://docbook.org/xlink/role/olink"
     ><citetitle>Servers > Advanced</citetitle></link>.
-    Take care to limit or throttle dynamic client registration
+    Take care to limit or throttle dynamic registration
     if you enable this capability on production systems.
    </para>
   </section>
@@ -183,9 +269,9 @@
   <section xml:id="openam-openid-session-management">
    <title>OpenID Connect Session Management</title>
 
-   <para>OpenID Connect lets the client track whether the end user is logged in
+   <para>OpenID Connect lets the relying party track whether the end user is logged in
    at the provider, and also initiate end user logout at the provider. The
-   specification has the client application monitor session state using an
+   specification has the relying party monitor session state using an
    invisible iframe and communicate status using the HTML 5 postMessage
    API.</para>
   </section>
@@ -193,10 +279,10 @@
  </section>
 
  <section xml:id="configure-openid-connect-provider">
-  <title>Configuring OpenAM As an OpenID Connect Provider</title>
+  <title>Configuring OpenAM As OpenID Provider</title>
 
   <para>You can configure OpenAM's OAuth 2.0 authorization service to double
-  as an OpenID Connect 1.0 Provider. To do so, make sure that the Response Type
+  as an OpenID Provider. To do so, make sure that the Response Type
   Plugins list includes at least the default plugin classes.</para>
 
   <para>
@@ -216,12 +302,15 @@
  <section xml:id="configure-openid-connect-discovery">
   <title>Configuring OpenAM For OpenID Connect Discovery</title>
 
-  <para>In order to allow clients to discover the provider for an end user,
-  OpenAM supports OpenID Connect Discovery 1.0. In addition to discovering
-  the provider for an end user, the client can also request the OpenID
-  Connect Provider configuration.</para>
+  <para>
+   In order to allow relying parties to discover
+   the OpenID Provider for an end user,
+   OpenAM supports OpenID Connect Discovery 1.0.
+   In addition to discovering the OpenID Provider for an end user,
+   the relying party can also request the OpenID Provider configuration.
+  </para>
   
-  <para>OpenAM as OpenID Connect Provider exposes two endpoints for
+  <para>OpenAM as OpenID Provider exposes two endpoints for
   discovery:</para>
 
   <simplelist type="vert" columns="1">
@@ -229,11 +318,13 @@
    <member><literal>/.well-known/openid-configuration</literal></member>
   </simplelist>
   
-  <para>A client needs to be able to discover the provider for an end user. In
-  this case you should consider redirecting requests to URIs at the server root,
-  such as <literal>http://www.example.com/.well-known/webfinger</literal>
-  and <literal>http://www.example.com/.well-known/openid-configuration</literal>,
-  to these Well-Known URIs in OpenAM's space.</para>
+  <para>
+   A relying party needs to be able to discover the OpenID provider for an end user.
+   In this case you should consider redirecting requests to URIs at the server root,
+   such as <literal>http://www.example.com/.well-known/webfinger</literal>
+   and <literal>http://www.example.com/.well-known/openid-configuration</literal>,
+   to these Well-Known URIs in OpenAM's space.
+  </para>
 
   <para>Discovery relies on <link xlink:show="new"
   xlink:href="http://tools.ietf.org/html/draft-ietf-appsawg-webfinger"
@@ -244,23 +335,25 @@
   URLs defined by OpenID Connect Discovery.</para>
   
   <para>Unless you deploy OpenAM in the root context of a container listening
-  on port 80 on the primary host for your domain, clients need to find
+  on port 80 on the primary host for your domain, relying parties need to find
   the right <replaceable>host:port/deployment-uri</replaceable> combination
   to locate the well-known endpoints. Therefore you must manage the redirection
   to OpenAM. If you are using WebFinger for something else than OpenID Connect
   Discovery, then you probably also need proxy logic to route the requests.</para>
 
-  <para>To retrieve the provider for an end user, the client needs the
-  following.</para>
+  <para>
+   To retrieve the OpenID Provider for an end user,
+   the relying party needs the following.
+  </para>
 
   <variablelist>
    <varlistentry>
     <term><literal>host</literal></term>
     <listitem>
-     <para>The server where the client can access the WebFinger service.</para>
+     <para>The server where the relying party can access the WebFinger service.</para>
 
      <para>Notice that this is a host name rather than a URL to the endpoint,
-     which is why you might need to redirect clients appropriately as described
+     which is why you might need to redirect relying parties appropriately as described
      above.</para>
     </listitem>
    </varlistentry>
@@ -270,7 +363,7 @@
     <listitem>
      <para>Identifies the end user that is the subject of the request.</para>
 
-     <para>The client must percent-encode the resource value when using it in
+     <para>The relying party must percent-encode the resource value when using it in
      the query string of the request, so when using the "acct" URI scheme and
      the resource is <literal>acct:user@example.com</literal>, then the value
      to use is <literal>acct%3Auser%40example.com</literal>.</para>
@@ -307,12 +400,14 @@ $ <userinput>curl \
 }</computeroutput>
   </screen>
 
-  <para>This shows that the OpenID Connect Provider for the OpenAM demo user is
+  <para>This shows that the OpenID Provider for the OpenAM demo user is
   indeed the OpenAM server.</para>
 
-  <para>The client can also discover the provider configuration. Ignoring the
-  question of redirection, you can test this (output lines folded to make them
-  easier to read).</para>
+  <para>
+   The relying party can also discover the OpenID provider configuration.
+   Ignoring the question of redirection, you can test this
+   (output lines folded to make them easier to read).
+  </para>
 
   <informalexample>
 
@@ -354,18 +449,20 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
  </section>
 
  <section xml:id="register-openid-connect-clients">
-  <title>Registering OpenID Connect Clients</title>
+  <title>Registering OpenID Connect Relying Parties</title>
 
-  <para>OpenID Connect Clients can register with OpenAM both statically through
-  OpenAM console for example, and also dynamically using OpenID Connect 1.0
-  Dynamic Registration.</para>
+  <para>
+   OpenID Connect relying parties can register with OpenAM
+   both statically through OpenAM console for example,
+   and also dynamically using OpenID Connect 1.0 Dynamic Registration.
+  </para>
 
   <procedure xml:id="register-openid-connect-client-static">
-   <title>To Register a Client With OpenAM Console</title>
+   <title>To Register a Relying Party With OpenAM Console</title>
 
-   <para>Registering a client by using the OpenAM console consists of first
+   <para>Registering a relying party by using the OpenAM console consists of first
    creating an OAuth 2.0 Client agent profile, and then editing the profile
-   to indicate the client settings pertinent to OpenID Connect 1.0.</para>
+   for the settings pertinent to OpenID Connect 1.0.</para>
 
    <step>
     <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
@@ -379,39 +476,39 @@ $ <userinput>curl https://openam.example.com:8443/openam/.well-known/openid-conf
     xlink:href="admin-guide#configure-oauth2-client"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
     OAuth 2.0 &amp; OpenID Connect 1.0 Clients</citetitle></link> to edit
-    the profile to match the client configuration.</para>
+    the profile to match the relying party configuration.</para>
 
-    <para>In order to read and edit the client configuration dynamically later
+    <para>In order to read and edit the relying party profile dynamically later
     without using OpenAM console, be sure to set an access token in the Access
     Token field.</para>
    </step>
   </procedure>
 
   <procedure xml:id="register-openid-connect-client-dynamic">
-   <title>To Register a Client Dynamically</title>
+   <title>To Register a Relying Party Dynamically</title>
 
-   <para>For dynamic registration you need the client configuration metadata,
+   <para>For dynamic registration you need the relying party profile data,
    and an access token to write the configuration to OpenAM by HTTP POST. To
    obtain the access token, register an initial client statically after creating
    the provider, as described in
-   <xref linkend="register-openid-connect-client-static" />. Other clients can
+   <xref linkend="register-openid-connect-client-static" />. Relying parties can
    then use that client to obtain the access token needed to perform dynamic
    registration.</para>
 
    <tip>
     <para>
      As described in <xref linkend="openam-openid-client-registration" />,
-     You can allow clients to register without having an access token
+     You can allow relying parties to register without having an access token
      by setting the advanced server property,
      <literal>org.forgerock.openam.openidconnect.allow.open.dynamic.registration</literal>,
      to <literal>true</literal>.
      When using that setting in production systems,
-     take care to limit or throttle dynamic client registration.
+     take care to limit or throttle dynamic registration.
     </para>
    </tip>
 
    <para>On successful registration, OpenAM responds with information including
-   an access token to allow the client subsequently to read and edit its
+   an access token to allow the relying party subsequently to read and edit its
    profile.</para>
 
    <step>
@@ -444,7 +541,7 @@ $ <userinput>curl \
    </step>
 
    <step>
-    <para>HTTP POST the client registration profile to the
+    <para>HTTP POST the relying party registration profile to the
     <literal>/oauth2/connect/register</literal> endpoint, using bearer token
     authorization with the access token you obtained from OpenAM.</para>
 
@@ -477,43 +574,43 @@ $ <userinput>curl \
  <section xml:id="manage-sessions-openid-connect">
   <title>Managing User Sessions</title>
 
-  <para>OpenID Connect Session Management 1.0 allows the client to manage
+  <para>OpenID Connect Session Management 1.0 allows the relying party to manage
   OpenID Connect sessions, making it possible to know when the end user should
   be logged out.</para>
 
   <para>As described in the <link
   xlink:href="http://openid.net/specs/openid-connect-session-1_0.html"
   xlink:show="new">OpenID Connect Session Management 1.0</link> specification,
-  OpenAM's OpenID Connect provider exposes both a "check_session_iframe" URL
-  that allows the client to receive notifications when the end user's session
+  OpenAM's OpenID Provider exposes both a "check_session_iframe" URL
+  that allows the relying party to receive notifications when the end user's session
   state changes at the provider, and also an "end_session_endpoint" URL to
   which to redirect an end user for logout.</para>
 
-  <para>When registering your client that uses session management, you set the
+  <para>When registering your relying party that uses session management, you set the
   OAuth 2.0 client agent profile properties Post Logout Redirect URI and
   Client Session URI, described in <link xlink:show="new"
   xlink:href="admin-guide#configure-oauth2-client"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
   OAuth 2.0 &amp; OpenID Connect 1.0 Clients</citetitle></link>. The Post
   Logout Redirect URI is used to redirect the end user user-agent after logout.
-  The Client Session URI is the client URI where OpenAM sends notifications
+  The Client Session URI is the relying party URI where OpenAM sends notifications
   when the end user's session state changes.</para>
  </section>
 
  <section xml:id="openid-connect-examples">
-  <title>Client Examples</title>
+  <title>Relying Party Examples</title>
 
-  <para>OpenID Connect Basic and Implicit Client Profiles define how clients
+  <para>OpenID Connect Authorization Code Flow and Implicit Flow define how clients
   interact with the provider to obtain end user authorization and profile
-  information. Although you can run the simple example clients mentioned in
+  information. Although you can run the simple example relying parties mentioned in
   this section without setting up Transport Layer Security, do not deploy
-  clients in production without securing the transport.</para>
+  relying parties in production without securing the transport.</para>
 
-  <para>Code for the client examples shown here is <link xlink:show="new"
+  <para>Code for the relying party examples shown here is <link xlink:show="new"
   xlink:href="https://github.com/markcraig/openid/">available online</link>.
   Clone the example project to deploy it in the same web container as
   OpenAM. Edit the configuration at the outset of the .js files in the project,
-  register a corresponding profile for the example client as described in
+  register a corresponding profile for the example relying party as described in
   <xref linkend="register-openid-connect-clients"/>, and browse the deployment
   URL to see the initial page.</para>
 
@@ -524,24 +621,25 @@ $ <userinput>curl \
    </imageobject>
    <textobject>
     <para>The OpenID Connect Client Profiles Start Page lets you choose whether
-    to try the Basic Client Profile or the Implicit Client Profile.</para>
+    to try the Basic Client Profile (Authorization Code Flow)
+     or the Implicit Client Profile (Implicit Code Flow).</para>
    </textobject>
   </mediaobject>
 
   <section xml:id="openid-basic-profile-example">
-   <title>Basic Client Profile Example</title>
+   <title>Authorization Code Flow Example</title>
 
-   <para>OpenID Connect Basic Client Profile 1.0 is designed for web-based
+   <para>OpenID Connect Authorization Code Flow is designed for web-based
    relying parties that use the OAuth 2.0 Authorization Code grant type.
-   This grant type makes it possible for the client to get the access code
+   This grant type makes it possible for the relying party to get the access code
    by using the authorization code directly, without passing through the end
    user's browser. To protect its client secret (password), part of the
-   client must run on the server.</para>
+   relying party must run on a server.</para>
 
    <para>In the example, the Basic Client Profile Start Page describes the
-   prerequisite configuration, which must be part of the client profile stored
+   prerequisite configuration, which must be part of the relying party profile stored
    in the OpenAM realm where you set up the OpenID Provider. In OpenAM console,
-   check that the OAuth 2.0 agent profile matches the settings described.</para>
+   check that the OAuth 2.0 client profile matches the settings described.</para>
 
    <mediaobject xml:id="figure-openid-connect-basic-start-page">
     <alt>OpenID Connect Basic Client Profile Start Page</alt>
@@ -556,17 +654,17 @@ $ <userinput>curl \
 
    <para>Logout of OpenAM, and click the link at the bottom of the page to
    request authorization. The link sends an HTTP GET request asking for
-   <literal>openid profile</literal> scopes to the OpenID Connect provider
+   <literal>openid profile</literal> scopes to the OpenID Provider
    authorization URI.</para>
 
-   <para>If everything is configured correctly, OpenAM's OpenID Connect provider
+   <para>If everything is configured correctly, OpenAM's OpenID Provider
    has you authenticate as an end user, such as the demo user with username
    <literal>demo</literal> and password <literal>changeit</literal>, and
-   grant (Allow) the client access to your profile.</para>
+   grant (Allow) the relying party access to your profile.</para>
 
-   <para>If you successfully authenticate and allow the example client access
-   to your profile, OpenAM returns an authorization code to the example client.
-   The example client then uses the authorization code to request an access
+   <para>If you successfully authenticate and allow the example relying party access
+   to your profile, OpenAM returns an authorization code to the example relying party.
+   The example relying party then uses the authorization code to request an access
    token and an ID token. It shows the response to that request, and also
    decodes the ID token to show the content and to perform some validation.
    Finally it uses the access token to request information about the end user
@@ -578,8 +676,10 @@ $ <userinput>curl \
      <imagedata fileref="images/openid-connect-basic-response-page.png" format="PNG" />
     </imageobject>
     <textobject>
-     <para>The Basic Client Profile response page shows responses from OpenAM's
-     OpenID Connect provider.</para>
+     <para>
+      The Basic Client Profile response page for the Authorization Code Flow
+      shows responses from OpenAM's OpenID Provider.
+     </para>
     </textobject>
    </mediaobject>
 
@@ -588,21 +688,20 @@ $ <userinput>curl \
   </section>
 
   <section xml:id="openid-implicit-profile-example">
-   <title>Implicit Client Profile Example</title>
+   <title>Implicit Flow Example</title>
 
-   <para>OpenID Connect Implicit Client Profile 1.0 is designed for relying
+   <para>OpenID Connect Implicit Flow is designed for relying
    parties that use the OAuth 2.0 Implicit grant type. This grant type is
-   designed for clients implemented in a browser. Rather than protect a
+   designed for relying parties implemented in a browser. Rather than protect a
    client secret, the client profile must register a protected redirect URI
    in advance with the OpenID Provider.</para>
 
    <para>In the example, the Implicit Client Profile Start Page describes the
-   prerequisite configuration, which must be part of the client profile stored
+   prerequisite configuration, which must be part of the relying party profile stored
    in the OpenAM realm where you set up the OpenID Provider. In OpenAM console,
-   check that the OAuth 2.0 agent profile matches the settings described.
-   If you have already configured the agent profile for the Basic Client Profile
-   then you still need to add the redirect URI for the Implicit Client
-   Profile.</para>
+   check that the OAuth 2.0 client profile matches the settings described.
+   If you have already configured the agent profile for the Authorization Code Flow example
+   then you still need to add the redirect URI for the Implicit Flow.</para>
 
    <mediaobject xml:id="figure-openid-connect-implicit-start-page">
     <alt>OpenID Connect Implicit Client Profile Start Page</alt>
@@ -610,29 +709,31 @@ $ <userinput>curl \
      <imagedata fileref="images/openid-connect-implicit-start-page.png" format="PNG" />
     </imageobject>
     <textobject>
-     <para>The Implicit Client Profile start page describes the configuration
-     required.</para>
+     <para>
+      The Implicit Client Profile start page for the Implicit Flow
+      describes the configuration required.
+     </para>
     </textobject>
    </mediaobject>
 
    <para>Logout of OpenAM, and click the link at the bottom of the page to
    request authorization. The link sends an HTTP GET request asking for
    <literal>id_token token</literal> response types and <literal>openid
-   profile</literal> scopes to the OpenID Connect provider authorization
+   profile</literal> scopes to the OpenID Provider authorization
    URI.</para>
 
-   <para>If everything is configured correctly, OpenAM's OpenID Connect provider
+   <para>If everything is configured correctly, OpenAM's OpenID Provider
    has you authenticate as an end user, such as the demo user with username
    <literal>demo</literal> and password <literal>changeit</literal>, and
-   grant (Allow) the client access to your profile.</para>
+   grant (Allow) the relying party access to your profile.</para>
 
-   <para>If you successfully authenticate and allow the example client access
+   <para>If you successfully authenticate and allow the example relying party access
    to your profile, OpenAM returns the access token and ID token directly in
-   the fragment (after <literal>#</literal>) of the redirect URI. The client
-   does not get an authorization code. The client shows the response to the
+   the fragment (after <literal>#</literal>) of the redirect URI. The relying party
+   does not get an authorization code. The relying party shows the response to the
    request, and also decodes the ID token to show the content and to perform
    some validation (though it does not check the ID token signature). Finally
-   the client uses the access token to request information about the end user
+   the relying party uses the access token to request information about the end user
    who authenticated, and displays the result.</para>
 
    <mediaobject xml:id="figure-openid-connect-implicit-response-page">
@@ -641,13 +742,18 @@ $ <userinput>curl \
      <imagedata fileref="images/openid-connect-implicit-response-page.png" format="PNG" />
     </imageobject>
     <textobject>
-     <para>The Implicit Client Profile response page shows responses from
-     OpenAM's OpenID Connect provider.</para>
+     <para>
+      The Implicit Client Profile response page for the Implicit Flow
+      shows responses from OpenAM's OpenID Provider.
+     </para>
     </textobject>
    </mediaobject>
 
-   <para>As for the Basic Client Profile, the ID Token indicates the end user's
-   OpenAM realm in addition to the standard information.</para>
+   <para>
+    As for the Authorization Code Flow example,
+    the ID Token indicates the end user's
+   OpenAM realm in addition to the standard information.
+   </para>
   </section>
  </section>
 

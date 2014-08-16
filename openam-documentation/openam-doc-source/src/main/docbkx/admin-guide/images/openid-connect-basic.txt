@@ -21,7 +21,7 @@
    
     CCPL HEADER END
    
-         Copyright 2013 ForgeRock AS
+         Copyright 2013-2014 ForgeRock AS
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
@@ -30,9 +30,9 @@
 title OpenID Connect Authorization Code Flow
 autonumber
 
-participant "Client" as Client
-participant "End-User" as User
-box "OpenAM" #FAFAFA
+participant "Relying Party" as Client
+participant "End User" as User
+box "OpenID Provider\n(OpenAM)" #FAFAFA
 	participant "Authorization Server" as AuthzServer
 	participant "Token Endpoint" as AccessToken
 	participant "UserInfo Endpoint" as UserInfo
@@ -42,7 +42,7 @@ Client->Client: Prepare Authorization Request
 
 Client->AuthzServer: Authorization Request
 
-AuthzServer->User: Authenticate End-User
+AuthzServer->User: Authenticate End User
 
 User->AuthzServer: Consent/authorization
 
@@ -54,7 +54,7 @@ Client->AccessToken: Authorization Code
 
 AccessToken->Client: Access Token and ID Token
 
-Client->Client: Validate ID Token and get End-User subject ID
+Client->Client: Validate ID Token and get End User subject ID
 
 Client->UserInfo: (<i>Optional</i>) Access Token
 
