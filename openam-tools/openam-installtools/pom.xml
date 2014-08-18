@@ -89,6 +89,7 @@
                                     <include>org.forgerock.openam:openam-license-core</include>
                                     <include>org.forgerock.openam:openam-license-manager-cli</include>
                                     <include>org.forgerock.commons:forgerock-guice-core</include>
+                                    <include>org.forgerock.commons:forgerock-util</include>
                                     <include>org.forgerock.openam:openam-shared</include>
                                     <include>com.google.inject:guice:no_aop</include>
                                     <include>javax.inject:javax.inject</include>
