@@ -2,9 +2,9 @@
 
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
@@ -29,7 +29,7 @@
 -->
 
 <!-- This stylesheet converts an is:Inquiry into a WML deck.
-      Note that this  an example. 
+      Note that this  an example.
       This could be customized during deployement.
       -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -64,7 +64,7 @@
     <xsl:template match="/">
         <xsl:apply-templates select="//is:Inquiry" />
     </xsl:template>
-    
+
     <xsl:template match="is:Inquiry">
         <wml>
             <xsl:apply-templates select="is:Confirm"/>
@@ -72,7 +72,7 @@
             <xsl:apply-templates select="is:Text"/>
         </wml>
     </xsl:template>
-    
+
     <xsl:template match="is:Text">
         <card>
         <p>

@@ -2,9 +2,9 @@
 
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
@@ -29,7 +29,7 @@
 -->
 
 <!-- This stylesheet converts an is:Inquiry into an HTML form.
-      Note that this is  an example. 
+      Note that this is  an example.
       This could be customized during deployement.
       -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
@@ -64,7 +64,7 @@
     <xsl:template match="/">
         <xsl:apply-templates select="//is:Inquiry" />
     </xsl:template>
-    
+
     <xsl:template match="is:Inquiry">
         <html>
             <head>
@@ -93,14 +93,14 @@
             </body>
         </html>
     </xsl:template>
-    
+
     <xsl:template match="is:Text">
         <p/>
         <xsl:element name="label">
             <xsl:attribute name="for">isid_<xsl:value-of select="@name"/></xsl:attribute>
             <xsl:value-of select="is:Label"/>
             <br/>
-        </xsl:element>            
+        </xsl:element>
         <xsl:element name="input">
             <xsl:attribute name="type">text</xsl:attribute>
             <xsl:attribute name="name">isparam_<xsl:value-of select="@name"/></xsl:attribute>
@@ -116,7 +116,7 @@
         <xsl:element name="label">
             <xsl:attribute name="for">isid_<xsl:value-of select="@name"/>yes</xsl:attribute>
             <xsl:value-of select="$trueLabel"/>
-        </xsl:element>            
+        </xsl:element>
         <xsl:element name="input">
             <xsl:attribute name="type">radio</xsl:attribute>
             <xsl:attribute name="name">isparam_<xsl:value-of select="@name"/></xsl:attribute>
@@ -127,7 +127,7 @@
         <xsl:element name="label">
             <xsl:attribute name="for">isid_<xsl:value-of select="@name"/>no</xsl:attribute>
             <xsl:value-of select="$falseLabel"/>
-        </xsl:element>            
+        </xsl:element>
         <xsl:element name="input">
             <xsl:attribute name="type">radio</xsl:attribute>
             <xsl:attribute name="name">isparam_<xsl:value-of select="@name"/></xsl:attribute>
@@ -136,14 +136,14 @@
             <xsl:attribute name="id">isid_<xsl:value-of select="@name"/>no</xsl:attribute>
         </xsl:element>
     </xsl:template>
-    
+
     <xsl:template match="is:Select">
         <p/>
         <xsl:element name="label">
             <xsl:attribute name="for">isid_<xsl:value-of select="@name"/></xsl:attribute>
             <xsl:value-of select="is:Label"/>
             <br/>
-        </xsl:element>            
+        </xsl:element>
         <xsl:element name="select">
             <xsl:attribute name="name">isparam_<xsl:value-of select="@name"/></xsl:attribute>
             <xsl:attribute name="id">isid_<xsl:value-of select="@name"/></xsl:attribute>
