@@ -76,6 +76,8 @@ define( "org/forgerock/openam/ui/policy/ManageEnvironmentsView", [
             var self = this;
 
             this.data.entity = args.entity;
+            this.data.options = args.options;
+
             this.environmentEntity = null;
 
             if (this.data.entity.condition) {
@@ -87,7 +89,7 @@ define( "org/forgerock/openam/ui/policy/ManageEnvironmentsView", [
             this.idCount = 1;
             this.sortingInitialised = false;
 
-            _.each(this.data.entity.availableEnvironments, function(item) {
+            _.each(this.data.options.availableEnvironments, function(item) {
 
                 _.map(item.config.properties, function(value, key) {
                     // needs something a little more specific here

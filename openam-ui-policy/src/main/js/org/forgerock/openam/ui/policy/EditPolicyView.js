@@ -108,10 +108,12 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                    }
                 });
 
-                data.entity.availableSubjects = subjects;
-                data.entity.availableEnvironments = environments;
-                data.entity.availableActions = actions;
-                data.entity.resourcePatterns = app[0].resources;
+                data.options = {};
+
+                data.options.availableSubjects = subjects;
+                data.options.availableEnvironments = environments;
+                data.options.availableActions = actions;
+                data.options.resourcePatterns = app[0].resources;
 
                 data.entity.applicationName = appName;
                 self.parentRender(function () {

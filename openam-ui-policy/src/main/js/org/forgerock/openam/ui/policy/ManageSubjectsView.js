@@ -76,6 +76,8 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             var self = this;
 
             this.data.entity = args.entity;
+            this.data.options = args.options;
+
             this.subjectEntity = null;
 
             if (this.data.entity.subject) {
@@ -87,7 +89,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             this.idCount = 1;
             this.sortingInitialised = false;
 
-            _.each(this.data.entity.availableSubjects, function(item) {
+            _.each(this.data.options.availableSubjects, function(item) {
 
                 _.map(item.config.properties, function(value, key) {
                     switch(value.type) {

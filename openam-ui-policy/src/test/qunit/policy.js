@@ -52,7 +52,7 @@ define([
 
                 editAppView.render(['iPlanetAMWebAgentService'], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each entity.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
                         actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
 
                     resListView.element = resListViewEl[0];
@@ -64,7 +64,8 @@ define([
                     QUnit.ok(editAppView.accordion.getActive() === 6, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
-                    var app = editAppView.data.entity;
+                    var app = editAppView.data.entity,
+                        options = editAppView.data.options;
 
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === app.name, "Name is set");
@@ -184,7 +185,7 @@ define([
 
                     // Step 6
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
+                    QUnit.ok(options.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
 
                     /*
                     TODO: remove comment and fix tests as part of AME-4287
@@ -243,7 +244,7 @@ define([
                         }
 
                         // Entitlement Combiner
-                        QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === app.entitlementCombiner, "Correct name is displayed in the review step");
+                        QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === options.entitlementCombiner, "Correct name is displayed in the review step");
                     }));
                     */
                 });
@@ -254,7 +255,7 @@ define([
 
                 editAppView.render([], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each entity.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
                         actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
 
                     resListView.element = resListViewEl[0];
@@ -305,8 +306,10 @@ define([
                     QUnit.ok(envCond.length === 0, "0 environment conditions is selected");
 
                     // Step 6
+
+                    var options = editAppView.data.options;
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
+                    QUnit.ok(options.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
                 });
             });
 
@@ -330,7 +333,7 @@ define([
 
                 editPolView.render(['sunIdentityServerLibertyPPService', 'qwwqqw'], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each entity.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
                         actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
 
                     resListView.element = resListViewEl[0];
@@ -342,7 +345,8 @@ define([
                     QUnit.ok(editPolView.accordion.getActive() === 5, "Last step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
 
-                    var pol = editPolView.data.entity;
+                    var pol = editPolView.data.entity,
+                        options = editPolView.data.options;
 
                     // Step 1
                     QUnit.ok(editPolView.$el.find('#policyName').val() === pol.name, "Name is set");
@@ -363,11 +367,11 @@ define([
                     addNewResView.render([], function () {
                         var resPattern = addNewResView.$el.find('#urlResource');
 
-                        QUnit.ok(resPattern.find('option').length === pol.resourcePatterns.length, "Correct number of resource patterns");
+                        QUnit.ok(resPattern.find('option').length === options.resourcePatterns.length, "Correct number of resource patterns");
 
                         var resPatternPresent = true;
                         _.each(resPattern.find('option'), function (val, key, list) {
-                            resPatternPresent = resPatternPresent && _.contains(pol.resourcePatterns, val.innerHTML);
+                            resPatternPresent = resPatternPresent && _.contains(options.resourcePatterns, val.innerHTML);
                         });
                         QUnit.ok(resPatternPresent, "Resource Patters are displayed correctly");
 
@@ -401,7 +405,7 @@ define([
                     // Step 3
                     actionsView.render([], function () {
                         // Correct available actions are displayed
-                        var availableActions = actionsView.data.entity.availableActions,
+                        var availableActions = actionsView.data.options.availableActions,
                             actionsCells = actionsView.$el.find('.action-name');
                         QUnit.ok(availableActions.length === actionsCells.length, "Correct number of actions is displayed");
 
@@ -494,7 +498,7 @@ define([
 
                 editPolView.render(['sunIdentityServerLibertyPPService'], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each entity.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
                         actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
 
                     resListView.element = resListViewEl[0];
@@ -518,7 +522,7 @@ define([
 
                     // Step 3
                     actionsView.render([], function () {
-                        var availableActions = actionsView.data.entity.availableActions,
+                        var availableActions = actionsView.data.options.availableActions,
                             actionsCells = actionsView.$el.find('.action-name');
                         QUnit.ok(availableActions.length === actionsCells.length, "Correct number of actions is displayed");
 

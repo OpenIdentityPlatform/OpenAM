@@ -70,12 +70,13 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
 
                     self.processConditions(data, envConditions[0].result, subjConditions[0].result);
 
-                    data.entity.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
+                    data.options = {};
+                    data.options.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
 
                     // Available resource patterns are supposed to be defined by the selected application type. For now we
                     // assume any resource might be created, hence we hard code the '*'.
-                    data.entity.resourcePatterns = ['*'];
-                    data.entity.availableActions = data.typeActions[data.entity.applicationType];
+                    data.options.resourcePatterns = ['*'];
+                    data.options.availableActions = data.typeActions[data.entity.applicationType];
 
                     self.parentRender(function () {
                         actionsView.render(data);
@@ -179,7 +180,7 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
         handleAppTypeChange: function (e) {
             this.data.entity.applicationType = e.target.value;
             this.data.entity.actions = [];
-            this.data.entity.availableActions = this.data.typeActions[this.data.entity.applicationType];
+            this.data.options.availableActions = this.data.typeActions[this.data.entity.applicationType];
 
             actionsView.render(this.data);
         },

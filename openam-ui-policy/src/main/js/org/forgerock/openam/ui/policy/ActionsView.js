@@ -65,7 +65,7 @@ define("org/forgerock/openam/ui/policy/ActionsView", [
                 entity.actions = [];
             }
 
-            availableActions = entity.availableActions;
+            availableActions = data.options.availableActions;
             selectedActions = entity.actions;
 
             if (!_.isEmpty(selectedActions)) {
