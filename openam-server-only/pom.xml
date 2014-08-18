@@ -68,8 +68,6 @@
 
                                 <property name="core.xml.dir" value="${project.basedir}/../openam-core/src/main/resources/xml" />
 
-                                <property name="library.xml.dir" value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml" />
-
                                 <property name="federation.xml.dir" value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
 
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
@@ -272,20 +270,6 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath>legal-notices</targetPath>
-                        </webResource>
-                        <webResource>
-                            <directory>
-                                ${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml
-                            </directory>
-                            <includes>
-                                <include>*.xsl</include>
-                                <include>*.xml</include>
-                            </includes>
-                            <excludes>
-                                <exclude>web.xml</exclude>
-                            </excludes>
-                            <targetPath>WEB-INF/classes</targetPath>
-                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
