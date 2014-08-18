@@ -43,13 +43,15 @@ public class ApplicationTypesResourceTest {
     private ApplicationTypesResource testResource;
 
     private ApplicationTypeManagerWrapper typeManager;
-    private ApplicationTypeManagerWrapper mockApplicationTypeManager = mock(ApplicationTypeManagerWrapper.class);
-    private Debug mockDebug = mock(Debug.class);
+    private ApplicationTypeManagerWrapper mockApplicationTypeManager;
+    private Debug mockDebug;
 
     @BeforeMethod
     public void setUp() {
         typeManager = mock(ApplicationTypeManagerWrapper.class);
         testResource = new ApplicationTypesResource(typeManager, mock(Debug.class));
+        mockApplicationTypeManager = mock(ApplicationTypeManagerWrapper.class);
+        mockDebug = mock(Debug.class);
 
         testResource = new ApplicationTypesResource(mockApplicationTypeManager, mockDebug) {
             @Override
