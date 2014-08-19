@@ -1403,6 +1403,14 @@ public final class IdentityResource implements CollectionResourceProvider {
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
             // Continue modifying the identity if read success
 
+            for (String key : jVal.keys()) {
+                if ("userpassword".equalsIgnoreCase(key)) {
+                    handler.handleError(new BadRequestException("Cannot update user password via PUT. "
+                            + "Use POST with _action=forgotPassword."));
+                    return;
+                }
+            }
+
             newDtls = jsonValueToIdentityDetails(jVal, realm);
 
             if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
@@ -1413,13 +1421,6 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-
-            // Strips any key matching 'userpassword', ignoring case to ensure password not changed on update.
-            for (String key : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(key)) {
-                    jVal.remove(key);
-                }
-            }
 
             // Handle attribute change when password is required
             // Get restSecurity for this realm
