@@ -48,7 +48,7 @@
 
     function validateEncKey() {
         $('nextTabButton').disabled = true;
-        var value = escape($('encryptionKey').value);
+        var value = encodeURIComponent($('encryptionKey').value);
         var callUrl =
             "$context$path?actionLink=validateEncKey&encKey=" + value;
         setTimeout("enableNextButton()", 500);
@@ -117,7 +117,7 @@
         ie7fix++;
 	    field = "rootSuffix";
         var callUrl = "$context$path?actionLink=validateRootSuffix&ie7fix=" +
-            ie7fix + "&rootSuffix=" +  escape($(field).value);
+            ie7fix + "&rootSuffix=" +  encodeURIComponent($(field).value);
         setTimeout("enableNextButton()", 500);
         AjaxUtils.call(callUrl, fieldValidated);
     }
@@ -357,7 +357,7 @@
     }
 
     function isEncryptionKeyOk() {
-        var value = escape($('encryptionKey').value);
+        var value = encodeURIComponent($('encryptionKey').value);
         return (value.length > 0);
     }
 

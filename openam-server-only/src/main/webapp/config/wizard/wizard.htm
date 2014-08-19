@@ -34,7 +34,7 @@
             function validate() {
                 var callUrl = "$context$path?actionLink=validateInput";
                 var key = "&key=" + field;
-                var value = "&value=" + escape($(field).value);
+                var value = "&value=" + encodeURIComponent($(field).value);
                 ie7fix++;
                 callUrl = callUrl + "&ie7fix=" + ie7fix;
                 AjaxUtils.call(callUrl+key+value, fieldValidated);
@@ -43,7 +43,7 @@
             function validatePost() {
                 var callUrl = "$context$path?actionLink=validateInput";
                 var key = "key=" + field;
-                var value = "&value=" + escape($(field).value);
+                var value = "&value=" + encodeURIComponent($(field).value);
                 ie7fix++;
                 callUrl = callUrl + "&ie7fix=" + ie7fix;
                 AjaxUtils.doPost(null, callUrl, key+value, fieldValidated,

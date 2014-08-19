@@ -134,7 +134,7 @@
     function validateADUserStorePassword() {
         field = "ADuserStorePassword";
         var callUrl = "$context$path?actionLink=setPassword";
-        var param = "password=" + escape($('ADuserStorePassword').value);
+        var param = "password=" + encodeURIComponent($('ADuserStorePassword').value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.doPost(null, callUrl, param, validateADUserFields, 
@@ -162,7 +162,7 @@
     function validateUserStoreRootSuffix() {
         field = "userStoreRootSuffix";
         var callUrl = "$context$path?actionLink=setRootSuffix";
-        var param = "&rootsuffix=" + escape($('userStoreRootSuffix').value);
+        var param = "&rootsuffix=" + encodeURIComponent($('userStoreRootSuffix').value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl+param, validateUserFields);
@@ -180,7 +180,7 @@
     function validateUserStorePassword() {
         field = "userStorePassword";
         var callUrl = "$context$path?actionLink=setPassword";
-        var param = "password=" + escape($('userStorePassword').value);
+        var param = "password=" + encodeURIComponent($('userStorePassword').value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.doPost(null, callUrl, param, validateUserFields, null, null);
