@@ -100,6 +100,7 @@ import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
 import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
 import org.mozilla.jss.crypto.ObjectNotFoundException;
 
@@ -523,7 +524,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         //check expiry
         org.forgerock.openam.cts.api.tokens.Token ctsToken = CTSHolder.getCTS().read(tokenID);
 
-        if (ctsToken == null) {
+        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < System.currentTimeMillis()) {
             throw new NotFoundException("Cannot find tokenID: " + tokenID);
         }
 
