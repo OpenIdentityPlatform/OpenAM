@@ -34,6 +34,8 @@ import java.security.AccessController;
 public class VersionBehaviourConfigListener implements ServiceListener {
 
     static final String VERSION_BEHAVIOUR_ATTRIBUTE = "openam-rest-apis-default-version";
+    static final String WARNING_BEHAVIOUR_ATTRIBUTE = "openam-rest-apis-header-warning";
+
     private static final String SERVICE_NAME = "RestApisService";
     private static final String SERVICE_VERSION = "1.0";
     private static Debug debug = Debug.getInstance("frRest");
@@ -81,7 +83,10 @@ public class VersionBehaviourConfigListener implements ServiceListener {
         try {
             ServiceConfig serviceConfig = mgr.getGlobalConfig(null);
             String versionBehaviour = ServiceConfigUtils.getStringAttribute(serviceConfig, VERSION_BEHAVIOUR_ATTRIBUTE);
-            router.setVersioning(DefaultVersionBehaviour.valueOf(versionBehaviour));
+            router.setVersioning(DefaultVersionBehaviour.valueOf(versionBehaviour.toUpperCase()));
+            final boolean warningBehaviour = ServiceConfigUtils.getBooleanAttribute(serviceConfig,
+                    WARNING_BEHAVIOUR_ATTRIBUTE);
+            router.setHeaderWarningEnabled(warningBehaviour);
             if (debug.messageEnabled()) {
                 debug.message("Successfully updated rest version behaviour settings to " + versionBehaviour);
             }
@@ -112,7 +117,7 @@ public class VersionBehaviourConfigListener implements ServiceListener {
      */
     @Override
     public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,
-            int type) {
+                                    int type) {
         updateSettings();
     }
 

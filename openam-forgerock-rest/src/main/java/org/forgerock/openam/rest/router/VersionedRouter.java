@@ -30,4 +30,14 @@ public interface VersionedRouter<T> {
      * @see org.forgerock.json.resource.VersionSelector#defaultToLatest()
      */
     T setVersioning(DefaultVersionBehaviour behaviour);
+
+    /**
+     * Sets whether or not to include a warning heading during the routing process when the
+     * API version is not included in the request.
+     *
+     * @param warningEnabled Indicating whether to include the header or not.
+     * @return The router of type T.
+     */
+    T setHeaderWarningEnabled(boolean warningEnabled);
+
 }

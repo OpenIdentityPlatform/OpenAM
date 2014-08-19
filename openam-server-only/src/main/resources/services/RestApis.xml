@@ -38,12 +38,25 @@
                                  any="display"
                                  i18nKey="a101">
                     <ChoiceValues>
-                        <ChoiceValue i18nKey="a101a">LATEST</ChoiceValue>
-                        <ChoiceValue i18nKey="a101b">OLDEST</ChoiceValue>
-                        <ChoiceValue i18nKey="a101c">NONE</ChoiceValue>
+                        <ChoiceValue i18nKey="a101a">Latest</ChoiceValue>
+                        <ChoiceValue i18nKey="a101b">Oldest</ChoiceValue>
+                        <ChoiceValue i18nKey="a101c">None</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>LATEST</Value>
+                        <Value>Latest</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-rest-apis-header-warning"
+                                 type="single"
+                                 syntax="boolean"
+                                 any="display"
+                                 i18nKey="a102">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="a102a">Enabled</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="a102b">Disabled</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>Enabled</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>

@@ -16,19 +16,14 @@
 
 package org.forgerock.openam.oauth2.rest;
 
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfigManager;
+import javax.servlet.ServletException;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.Router;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionRouter;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.router.VersionedRouter;
-
-import javax.servlet.ServletException;
-import java.security.AccessController;
 
 /**
  * Connection factory provider for OAuth2Rest CREST HttpServlet.
@@ -73,6 +68,12 @@ public class RestTokenDispatcher {
                     versionRouter.setVersioningBehaviourToNone();
                     break;
             }
+            return versionRouter;
+        }
+
+        @Override
+        public VersionRouter setHeaderWarningEnabled(boolean warningEnabled) {
+            //versionRouter.setWarningEnabled(warningEnabled); //todo: update when crest supports
             return versionRouter;
         }
     }

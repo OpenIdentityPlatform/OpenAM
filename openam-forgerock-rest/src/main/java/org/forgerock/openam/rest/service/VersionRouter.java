@@ -42,6 +42,7 @@ public class VersionRouter {
 
     private final VersionSelector versionSelector;
     private final Map<Version, Restlet> routes = new ConcurrentHashMap<Version, Restlet>();
+    private boolean headerWarning = true; //will be used to determine whether to include the warning
 
     /**
      * Constructs a new VersionRouter instance.
@@ -50,6 +51,10 @@ public class VersionRouter {
      */
     VersionRouter(VersionSelector versionSelector) {
         this.versionSelector = versionSelector;
+    }
+
+    public void setHeaderWarning(boolean headerWarning) {
+        this.headerWarning = headerWarning;
     }
 
     /**

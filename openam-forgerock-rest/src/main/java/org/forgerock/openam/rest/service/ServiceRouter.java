@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.rest.service;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.RestRealmValidator;
@@ -23,11 +27,6 @@ import org.forgerock.openam.rest.router.VersionedRouter;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * A router for Restlet service endpoints which allows for new routes to be attached for particular URI templates and
@@ -113,6 +112,15 @@ public class ServiceRouter extends Restlet implements VersionedRouter<ServiceRou
         for (VersionRouter router : routers) {
             setVersionBehaviour(router);
         }
+        return this;
+    }
+
+    @Override
+    public ServiceRouter setHeaderWarningEnabled(boolean warningEnabled) {
+        for (VersionRouter router : routers) {
+            router.setHeaderWarning(warningEnabled);
+        }
+
         return this;
     }
 
