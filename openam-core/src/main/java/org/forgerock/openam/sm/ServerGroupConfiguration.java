@@ -18,17 +18,16 @@ package org.forgerock.openam.sm;
 import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
+import org.forgerock.openam.ldap.LDAPURL;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.forgerock.openam.ldap.LDAPURL;
 
 /**
  * Represents the configuration information for a server group.
- *
- * @author robert.wapshott@forgerock.com
  */
-public class ServerGroupConfiguration {
+public class ServerGroupConfiguration implements ConnectionConfig {
     private ServerGroup group;
     private ServerInstance instance;
 

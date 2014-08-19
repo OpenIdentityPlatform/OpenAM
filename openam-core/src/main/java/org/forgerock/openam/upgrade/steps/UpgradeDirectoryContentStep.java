@@ -19,19 +19,20 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
-import org.forgerock.openam.upgrade.UpgradeException;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-
-import javax.inject.Inject;
 
 /**
  * This upgrade step is meant to upgrade the directory schema/content for external configuration stores. For the
@@ -47,8 +48,8 @@ public class UpgradeDirectoryContentStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeDirectoryContentStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                       final DataLayerConnectionFactory connectionFactory) {
-        super(adminTokenAction, connectionFactory);
+                                       @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

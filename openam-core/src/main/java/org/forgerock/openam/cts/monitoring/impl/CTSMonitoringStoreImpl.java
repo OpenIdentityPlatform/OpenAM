@@ -66,9 +66,11 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
      * @param reaperMonitor An instance of the ReaperMonitor.
      */
     @Inject
-    public CTSMonitoringStoreImpl(@Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
-            @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
-                                  final ReaperMonitor reaperMonitor, final ConnectionStore connectionStore) {
+    public CTSMonitoringStoreImpl(@Named(EXECUTOR_BINDING_NAME) final ExecutorService executorService,
+                                  final TokenOperationsStore tokenOperationsStore,
+                                  final ReaperMonitor reaperMonitor,
+                                  final ConnectionStore connectionStore,
+                                  @Named(CoreTokenConstants.CTS_DEBUG) final Debug debug) {
         this.debug = debug;
         this.executorService = executorService;
         this.tokenOperationsStore = tokenOperationsStore;

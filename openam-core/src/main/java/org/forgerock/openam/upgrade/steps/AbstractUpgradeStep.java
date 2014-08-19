@@ -1,6 +1,4 @@
 /*
- * Copyright 2013-2014 ForgeRock AS.
- *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,32 +10,31 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.ErrorResultException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.utils.CollectionUtils;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
-
-import javax.inject.Inject;
-
 /**
  * An abstract class that provides utility methods for upgrade steps.
- *
- * @author Peter Major
  */
 public abstract class AbstractUpgradeStep implements UpgradeStep {
 
@@ -46,11 +43,11 @@ public abstract class AbstractUpgradeStep implements UpgradeStep {
     protected static final Debug DEBUG = Debug.getInstance("amUpgrade");
     protected static ResourceBundle BUNDLE = ResourceBundle.getBundle("amUpgrade");
     private final PrivilegedAction<SSOToken> adminTokenAction;
-    private final DataLayerConnectionFactory connectionFactory;
+    private final ConnectionFactory connectionFactory;
 
     @Inject
     public AbstractUpgradeStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                               final DataLayerConnectionFactory connectionFactory) {
+                               @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory connectionFactory) {
         this.adminTokenAction = adminTokenAction;
         this.connectionFactory = connectionFactory;
     }

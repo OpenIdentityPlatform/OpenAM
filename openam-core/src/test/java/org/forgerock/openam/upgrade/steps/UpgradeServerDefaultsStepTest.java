@@ -15,33 +15,32 @@
  */
 package org.forgerock.openam.upgrade.steps;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.sm.SMSException;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.Mockito.mock;
 
 public class UpgradeServerDefaultsStepTest {
 
     private UpgradeServerDefaultsStep upgradeStep;
     private PrivilegedAction<SSOToken> adminTokenAction;
-    private DataLayerConnectionFactory connectionFactory;
+    private ConnectionFactory connectionFactory;
 
     @BeforeMethod
     public void setUp() throws Exception {
         adminTokenAction = mock(PrivilegedAction.class);
-        connectionFactory = mock(DataLayerConnectionFactory.class);
+        connectionFactory = mock(ConnectionFactory.class);
         upgradeStep = new UpgradeServerDefaultsStep(adminTokenAction, connectionFactory);
     }
 

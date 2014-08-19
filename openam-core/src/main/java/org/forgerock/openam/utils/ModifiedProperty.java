@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.utils;
 
+import java.text.MessageFormat;
+
 /**
  * Responsible for tracking the current and previous values of a property
  * and indicating when they are differ.
@@ -49,5 +51,12 @@ public class ModifiedProperty<T> {
      */
     public boolean hasChanged() {
         return (current == null ? previous != null : !current.equals(previous));
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format(
+                "{0}[{1}]",
+                current, previous);
     }
 }

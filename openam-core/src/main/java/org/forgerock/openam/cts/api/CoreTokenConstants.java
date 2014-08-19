@@ -99,7 +99,7 @@ public class CoreTokenConstants {
     /**
      * Enable/disable SSL for the CTS token store connections.
      */
-    public static final String CTS_SSL_ENABLED = "org.forgerock.services.cts.store.ssl.enabled";
+    public static final String CTS_STORE_SSL_ENABLED = "org.forgerock.services.cts.store.ssl.enabled";
 
     /**
      * Hostname where the CTS token store may be reached. This may point to a load balancer.
@@ -124,7 +124,7 @@ public class CoreTokenConstants {
     /**
      * Maximum number of connections to the token store.
      */
-    public static final String CTS_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
+    public static final String CTS_STORE_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
 
     /**
      * The maximum duration in seconds to wait whilst placing tasks on the asynchronous work queue.

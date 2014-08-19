@@ -28,25 +28,13 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-
-import java.security.PrivilegedAction;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
@@ -57,6 +45,19 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 import org.json.JSONObject;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import java.security.PrivilegedAction;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
+import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
 
 /**
  * Upgrades the entitlements stored in the configuration. The following steps are taken:
@@ -103,8 +104,8 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeEntitlementsStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                   final DataLayerConnectionFactory connectionFactory) {
-        super(adminTokenAction, connectionFactory);
+                                   @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

@@ -17,44 +17,54 @@ package org.forgerock.openam.cts.impl.queue.config;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.sm.ConnectionConfig;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.ConnectionConfigFactory;
+import org.forgerock.openam.sm.datalayer.api.StoreMode;
+import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
+import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 public class QueueConfigurationTest {
 
-    private AsyncProcessorCount mockCount;
     private QueueConfiguration config;
+    private ConnectionConfigFactory mockConfigFactory;
+    private ConnectionCount connectionCount;
+    private ConnectionConfig mockConfig;
 
     @BeforeMethod
-    public void setup() {
-        mockCount = mock(AsyncProcessorCount.class);
-        config = new QueueConfiguration(
-                mockCount,
-                mock(Debug.class));
+    public void setup() throws InvalidConfigurationException {
+        mockConfigFactory = mock(ConnectionConfigFactory.class);
+        mockConfig = mock(ConnectionConfig.class);
+        given(mockConfigFactory.getConfig(any(ConnectionType.class))).willReturn(mockConfig);
+
+        connectionCount = new ConnectionCount(StoreMode.DEFAULT);
+        config = new QueueConfiguration(mockConfigFactory, connectionCount, mock(Debug.class));
     }
 
     @Test
-    public void shouldUseConnectionCountForProcessors() throws CoreTokenException {
-        given(mockCount.getProcessorCount()).willReturn(2);
-        config.getProcessors();
-        verify(mockCount).getProcessorCount();
+    public void shouldReturnConnectionsFromConfiguration() throws CoreTokenException {
+        int count = 20;
+        given(mockConfig.getMaxConnections()).willReturn(count);
+        int result = config.getProcessors();
+        assertThat(result).isLessThan(count);
     }
 
     @Test
-    public void shouldReturnCountWhenPowerOfTwo() throws CoreTokenException {
-        int count = 2;
-        given(mockCount.getProcessorCount()).willReturn(count);
-        assertThat(config.getProcessors()).isEqualTo(count);
-    }
-
-    @Test (expectedExceptions = CoreTokenException.class)
-    public void shouldRejectANegativeValue() throws CoreTokenException {
-        given(mockCount.getProcessorCount()).willReturn(-1);
-        config.getProcessors();
+    public void shouldThrowExceptionIfConnectionsTooLow() throws CoreTokenException {
+        given(mockConfig.getMaxConnections()).willReturn(1);
+        CoreTokenException result = null;
+        try {
+            config.getProcessors();
+        } catch (CoreTokenException e) {
+            result = e;
+        }
+        assertThat(result).isNotNull();
     }
 }

@@ -17,12 +17,14 @@ package org.forgerock.openam.cts.impl.query.reaper;
 
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 
 /**
@@ -45,7 +47,7 @@ public class ReaperConnection implements ReaperQuery {
      * @param impl The specific implementation that will be delegated to.
      */
     @Inject
-    public ReaperConnection(ConnectionFactory factory, ReaperImpl impl) {
+    public ReaperConnection(@Named(DataLayerConstants.DATA_LAYER_CTS_REAPER_BINDING) ConnectionFactory factory, ReaperImpl impl) {
         this.factory = factory;
         this.impl = impl;
     }

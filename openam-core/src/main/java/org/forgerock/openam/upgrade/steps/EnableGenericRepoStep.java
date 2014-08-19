@@ -21,19 +21,20 @@ import com.sun.identity.idm.IdConstants;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-
-import java.security.PrivilegedAction;
-import java.util.HashMap;
-import java.util.Map;
-import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 
 /**
  * A very simple step to reenable the Generic LDAPv3 data store (i.e. making it available on the admin console as an
@@ -49,8 +50,8 @@ public class EnableGenericRepoStep extends AbstractUpgradeStep {
 
     @Inject
     public EnableGenericRepoStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                 final DataLayerConnectionFactory connectionFactory) {
-        super(adminTokenAction, connectionFactory);
+                                 @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

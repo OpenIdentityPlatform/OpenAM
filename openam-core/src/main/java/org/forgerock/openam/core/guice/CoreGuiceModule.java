@@ -44,7 +44,6 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CTSPersistentStoreImpl;
 import org.forgerock.openam.cts.CoreTokenConfig;
-import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
 import org.forgerock.openam.cts.adapters.SAMLAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
@@ -55,14 +54,11 @@ import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.cts.impl.query.reaper.ReaperConnection;
 import org.forgerock.openam.cts.impl.query.reaper.ReaperQuery;
 import org.forgerock.openam.cts.impl.queue.ResultHandlerFactory;
-import org.forgerock.openam.cts.impl.queue.config.AsyncProcessorCount;
 import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
-import org.forgerock.openam.cts.impl.queue.config.ReaperConnectionCount;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
-import org.forgerock.openam.cts.monitoring.impl.connections.MonitoredCTSConnectionFactory;
 import org.forgerock.openam.cts.monitoring.impl.queue.MonitoredResultHandlerFactory;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
@@ -75,11 +71,10 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitor;
 import org.forgerock.openam.entitlement.monitoring.PolicyMonitorImpl;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepository;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.ExternalCTSConfig;
 import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.utils.Config;
-import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 
@@ -117,12 +112,6 @@ public class CoreGuiceModule extends AbstractModule {
 
         }).in(Singleton.class);
 
-        /**
-         * Configuration data for Data Layer LDAP connections.
-         * Using a provider to defer initialisation of the factory until
-         * it is needed.
-         */
-        bind(DataLayerConnectionFactory.class).in(Singleton.class);
         bind(DSConfigMgr.class).toProvider(new Provider<DSConfigMgr>() {
             public DSConfigMgr get() {
                 try {
@@ -154,13 +143,12 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CoreTokenConfig.class).in(Singleton.class);
 
         // CTS Connection Management
-        bind(ConnectionFactory.class).to(MonitoredCTSConnectionFactory.class).in(Singleton.class);
         bind(LDAPConfig.class).toProvider(new Provider<LDAPConfig>() {
             public LDAPConfig get() {
                 return new LDAPConfig(SMSEntry.getRootSuffix());
             }
         }).in(Singleton.class);
-        bind(ExternalTokenConfig.class).in(Singleton.class);
+        bind(ExternalCTSConfig.class).in(Singleton.class);
         bind(ConfigurationObserver.class).toProvider(new Provider<ConfigurationObserver>() {
             public ConfigurationObserver get() {
                 return ConfigurationObserver.getInstance();
@@ -176,9 +164,6 @@ public class CoreGuiceModule extends AbstractModule {
 
         // CTS Reaper configuration
         bind(ReaperQuery.class).to(ReaperConnection.class);
-
-        // CTS Async
-        bind(AsyncProcessorCount.class).to(ReaperConnectionCount.class);
 
         // Policy Monitoring
         bind(PolicyMonitor.class).to(PolicyMonitorImpl.class);

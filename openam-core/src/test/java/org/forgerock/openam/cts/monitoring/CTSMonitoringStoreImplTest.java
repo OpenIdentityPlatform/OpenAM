@@ -56,8 +56,12 @@ public class CTSMonitoringStoreImplTest {
         reaperMonitor = mock(ReaperMonitor.class);
         connectionStore = mock(ConnectionStore.class);
 
-        ctsOperationsMonitoringStore = new CTSMonitoringStoreImpl(debug, executorService, tokenOperationsStore,
-                reaperMonitor, connectionStore);
+        ctsOperationsMonitoringStore = new CTSMonitoringStoreImpl(
+                executorService,
+                tokenOperationsStore,
+                reaperMonitor,
+                connectionStore,
+                debug);
         ctsReaperMonitoringStore = (CTSReaperMonitoringStore) ctsOperationsMonitoringStore;
 
         given(executorService.submit(any(Callable.class))).will(new Answer<Object>() {

@@ -11,13 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManagementDAO;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.FutureResult;
@@ -30,12 +30,11 @@ import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This monitor implementation acquires a connection against the data source and uses a persistent search to listen for
  * index changes. The persistent search uses a search result handler to feed back any changes or errors.
- *
- * @author andrew.forrest@forgerock.com
  */
 public class IndexChangeMonitorImpl implements IndexChangeMonitor {
 
@@ -43,7 +42,7 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
     private static final Debug DEBUG = Debug.getInstance("amEntitlements");
 
     private final SearchResultHandler handler;
-    private final DataLayerConnectionFactory factory;
+    private final ConnectionFactory factory;
 
     private final SearchRequest request;
 
@@ -52,7 +51,8 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
 
     @Inject
     public IndexChangeMonitorImpl(SearchResultHandler handler,
-                                  DataLayerConnectionFactory factory, ServiceManagementDAO smDAO) {
+                                  @Named(DataLayerConstants.DATA_LAYER_BINDING) ConnectionFactory factory,
+                                  ServiceManagementDAO smDAO) {
         this.handler = handler;
         this.factory = factory;
 

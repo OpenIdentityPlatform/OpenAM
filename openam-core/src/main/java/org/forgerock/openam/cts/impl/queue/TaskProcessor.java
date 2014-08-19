@@ -20,6 +20,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LDAPAdapter;
 import org.forgerock.openam.cts.impl.task.Task;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -60,7 +61,7 @@ public class TaskProcessor implements Runnable {
      * @param debug Required for debugging.
      */
     @Inject
-    public TaskProcessor(ConnectionFactory connectionFactory,
+    public TaskProcessor(@Named(DataLayerConstants.DATA_LAYER_CTS_ASYNC_BINDING) ConnectionFactory connectionFactory,
                          LDAPAdapter adapter,
                          @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.connectionFactory = connectionFactory;
@@ -119,11 +120,15 @@ public class TaskProcessor implements Runnable {
     }
 
     /**
+     * Close the connection if it was not null.
+     *
      * @param connection The possibly null connection to close.
      */
     private void close(Connection connection) {
-        debug("Closing connection");
-        IOUtils.closeIfNotNull(connection);
+        if (connection != null) {
+            debug("Closing connection");
+            IOUtils.closeIfNotNull(connection);
+        }
     }
 
     private void debug(String format, Object... args) {

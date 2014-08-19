@@ -15,30 +15,29 @@
 */
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
-import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ResultHandler;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertTrue;
 
 public class MonitoredCTSConnectionFactoryTest {
 
     private CTSConnectionMonitoringStore monitoringStore;
 
-    private CTSConnectionFactory connectionFactory;
+    private ConnectionFactory connectionFactory;
     private MonitoredCTSConnectionFactory monitoredConnectionFactory;
     private WrappedHandlerFactory handlerFactory;
 
     @BeforeMethod
     public void setUp() {
 
-        connectionFactory = mock(CTSConnectionFactory.class);
+        connectionFactory = mock(ConnectionFactory.class);
         monitoringStore = mock(CTSConnectionMonitoringStore.class);
         handlerFactory = mock(WrappedHandlerFactory.class);
 

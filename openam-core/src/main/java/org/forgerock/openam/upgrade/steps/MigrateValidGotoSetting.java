@@ -27,6 +27,15 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.PrivilegedAction;
@@ -34,14 +43,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
 
-import static org.forgerock.openam.upgrade.UpgradeServices.*;
+import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 
 /**
  * Migrates the list of valid goto domains from iPlanetAMAuthService to validationService and also updates the
@@ -60,8 +63,9 @@ public class MigrateValidGotoSetting extends AbstractUpgradeStep {
     private final Map<String, Set<String>> changes = new HashMap<String, Set<String>>();
 
     @Inject
-    public MigrateValidGotoSetting(PrivilegedAction<SSOToken> adminTokenAction, DataLayerConnectionFactory dlcf) {
-        super(adminTokenAction, dlcf);
+    public MigrateValidGotoSetting(PrivilegedAction<SSOToken> adminTokenAction,
+                                   @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

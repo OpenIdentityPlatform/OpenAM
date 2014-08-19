@@ -51,16 +51,4 @@ public class QueueSelectorTest {
             assertThat(select).isGreaterThanOrEqualTo(0);
         }
     }
-
-    @Test
-    public void shouldFindPowerOfTwo() {
-        int value = 64;
-        assertThat(QueueSelector.findPowerOfTwo(value)).isEqualTo(value);
-    }
-
-    @Test
-    public void shouldFindPowerOfTwoLessThanStartingValue() {
-        int value = 20;
-        assertThat(QueueSelector.findPowerOfTwo(value)).isEqualTo(16);
-    }
 }

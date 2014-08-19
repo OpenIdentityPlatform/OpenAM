@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl.queue;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
 import org.testng.annotations.BeforeMethod;
@@ -29,15 +30,19 @@ import static org.mockito.BDDMockito.mock;
 
 public class AsyncResultHandlerTest {
 
-    private AsyncResultHandler<String> handler;
     private String badger;
+    private AsyncResultHandler<String> handler;
     private QueueConfiguration mockConfig;
+    private Debug mockDebug;
 
     @BeforeMethod
     public void setup() {
-        mockConfig = mock(QueueConfiguration.class);
-        handler = new AsyncResultHandler<String>(mockConfig);
         badger = "Badger";
+
+        mockConfig = mock(QueueConfiguration.class);
+        mockDebug = mock(Debug.class);
+
+        handler = new AsyncResultHandler<String>(mockConfig, mockDebug);
     }
 
     @Test
@@ -77,13 +82,14 @@ public class AsyncResultHandlerTest {
                 ref[0].processResults(key);
             }
         });
-        ref[0] = new AsyncResultHandler<String>(mockConfig, new ArrayBlockingQueue<Object>(1){
+        ArrayBlockingQueue<Object> mockQueue = new ArrayBlockingQueue<Object>(1) {
             @Override
             public Object poll(long l, TimeUnit timeUnit) throws InterruptedException {
                 resultThread.start();
                 return super.poll(l, timeUnit);
             }
-        });
+        };
+        ref[0] = new AsyncResultHandler<String>(mockConfig, mockQueue, mockDebug);
 
         // When
         String results = ref[0].getResults();

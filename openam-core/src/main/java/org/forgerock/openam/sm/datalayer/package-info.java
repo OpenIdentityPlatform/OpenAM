@@ -13,17 +13,10 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
-package org.forgerock.openam.cts.impl.queue.config;
-
-import org.forgerock.openam.cts.exceptions.CoreTokenException;
 
 /**
- * Describes the ability to calculate the number of connections available to
- * the CTS for asynchronous processing.
+ * All packages relating to the Service Manager Data Layer, a group of classes that
+ * provide connections for services that need to access the Service Manager configuration
+ * and other operations.
  */
-public interface AsyncProcessorCount {
-    /**
-     * @return The number of connections that can be used for CTS async processing.
-     */
-    int getProcessorCount() throws CoreTokenException;
-}
+package org.forgerock.openam.sm.datalayer;

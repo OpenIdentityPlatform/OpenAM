@@ -14,44 +14,36 @@
  *
  * Copyright 2013-2014 ForgeRock AS.
  */
-package org.forgerock.openam.cts;
+package org.forgerock.openam.sm;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.impl.CTSConnectionFactory;
+import org.forgerock.openam.ldap.LDAPURL;
 import org.forgerock.openam.utils.ModifiedProperty;
 
-import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Models the external configuration of the Core Token Service.
  *
- * This model is used by the {@link CTSConnectionFactory} to establish a connection to the
+ * This model is used by the {@link ConnectionConfigFactory} to establish a connection to the
  * persistence layer.
  *
- * @see CTSConnectionFactory
+ * @see ConnectionConfigFactory
  */
-public class ExternalTokenConfig {
+@Singleton
+public class ExternalCTSConfig implements ConnectionConfig {
 
     /**
-     * Describe the two possible modes the CTS connection factory can operate in.
+     * Invalid number indicates a non numeric was entered into the configuration for a
+     * numeric field.
      */
-    public enum StoreMode {
-        /**
-         * The CTS can defer to the standard Configuration Store settings. These may be
-         * the internal embedded store, or a configured external store.
-         */
-        DEFAULT,
-        /**
-         * The CTS Connection Factory can instead operate on an entirely external
-         * data store. The connection details are assumed to be assigned.
-         */
-        EXTERNAL;
-    }
+    public static final int INVALID = -1;
 
-    private ModifiedProperty<StoreMode> storeMode = new ModifiedProperty<StoreMode>();
     private ModifiedProperty<String> hostname = new ModifiedProperty<String>();
     private ModifiedProperty<String> port = new ModifiedProperty<String>();
     private ModifiedProperty<String> username = new ModifiedProperty<String>();
@@ -60,61 +52,64 @@ public class ExternalTokenConfig {
     private ModifiedProperty<Boolean> sslMode = new ModifiedProperty<Boolean>();
     private ModifiedProperty<Integer> heartbeat = new ModifiedProperty<Integer>();
 
-    @Inject
-    public ExternalTokenConfig() {
-        // This is the default value.
-        storeMode.set(StoreMode.DEFAULT);
-    }
-
     /**
-     * The Store Mode indicates whether the CTSConnectionFactory should use an external
-     * store, or passthrough to the default settings based on the Configuration Store.
+     * The hostname of the server to connect to.
      *
-     * @see StoreMode for more details.
+     * @see LDAPURL
      *
-     * @return The Store Mode which is to be used. Maybe null.
+     * @return A set of exactly one hostname or null if the port was not assigned.
      */
-    public StoreMode getStoreMode() {
-        return storeMode.get();
+    public Set<LDAPURL> getLDAPURLs() {
+        Integer port = getPort();
+        if (port == null) {
+            return null;
+        }
+        String host = hostname.get();
+        boolean sslMode = isSslMode();
+
+        LDAPURL ldapurl = LDAPURL.valueOf(host, port, sslMode);
+        return Collections.singleton(ldapurl);
     }
 
     /**
-     * @return The External Token Store Hostname. Maybe null.
+     * @return The External Token Store port, or null if not set.
+     * @throws IllegalArgumentException If the port was not a number.
      */
-    public String getHostname() {
-        return hostname.get();
-    }
-
-    /**
-     * @return The External Token Store port as a String. Maybe null.
-     */
-    public String getPort() {
-        return port.get();
+    public Integer getPort() {
+        return parseNumber(port.get());
     }
 
     /**
      * @return The External Token Store username. Maybe null.
      */
-    public String getUsername() {
+    public String getBindDN() {
         return username.get();
     }
 
     /**
      * @return The External Token Store password. Maybe null.
      */
-    public String getPassword() {
-        return password.get();
+    public char[] getBindPassword() {
+        if (password.get() == null) {
+            return null;
+        }
+        return password.get().toCharArray();
     }
 
-    public String getMaxConnections() {
-        return maxConnections.get();
+    /**
+     * The maximum number of connections permitted to this server.
+     *
+     * @return A positive number if valid, or -1.
+     */
+    public int getMaxConnections() {
+        return parseNumber(maxConnections.get());
     }
 
     /**
      * @return The External Token Store heartbeat value. Value 0 or negetive indicates no heartbeat used.
      */
-    public int getHeartbeat(){
-        return heartbeat.get().intValue();
+    public int getLdapHeartbeat(){
+        return heartbeat.get();
     }
 
     /**
@@ -124,9 +119,11 @@ public class ExternalTokenConfig {
         return sslMode.get();
     }
 
+    /**
+     * @return True if the configuration is now in a changed state.
+     */
     public boolean hasChanged() {
-        return storeMode.hasChanged() ||
-               hostname.hasChanged() ||
+        return hostname.hasChanged() ||
                port.hasChanged() ||
                username.hasChanged() ||
                password.hasChanged() ||
@@ -136,8 +133,6 @@ public class ExternalTokenConfig {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Causes this instance to refresh its configuration using System Properties.
      */
     public void update() {
@@ -145,8 +140,8 @@ public class ExternalTokenConfig {
         port.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PORT));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
         password.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD));
-        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_MAX_CONNECTIONS));
-        sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_SSL_ENABLED, false));
+        maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS));
+        sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_SSL_ENABLED, false));
 
         String heartbeatStr = SystemProperties.get(Constants.LDAP_HEARTBEAT);
         if (StringUtils.isNotEmpty(heartbeatStr)) {
@@ -158,12 +153,37 @@ public class ExternalTokenConfig {
         } else {
             heartbeat.set(new Integer(-1));
         }
+    }
 
-        String mode = SystemProperties.get(CoreTokenConstants.CTS_STORE_LOCATION);
-        if (StringUtils.isNotEmpty(mode)) {
-            storeMode.set(StoreMode.valueOf(mode.toUpperCase()));
-        } else {
-            storeMode.set(StoreMode.DEFAULT);
+    /**
+     * Convenience parsing method which handles the unassigned condition.
+     *
+     * @param number String representation of the number.
+     *
+     * @return A number if parsed successfully. -1 if there was a parsing issue and null if there was not
+     * number provided.
+     */
+    private Integer parseNumber(String number) {
+        if (StringUtils.isEmpty(number)) {
+            return null;
         }
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            return INVALID;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ExternalTokenConfig{" +
+                "hostname=" + hostname +
+                ", port=" + port +
+                ", username=" + username +
+                ", password=" + password +
+                ", maxConnections=" + maxConnections +
+                ", sslMode=" + sslMode +
+                ", heartbeat=" + heartbeat +
+                '}';
     }
 }

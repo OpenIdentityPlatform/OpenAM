@@ -19,6 +19,11 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.impl.queue.QueueSelector;
+import org.forgerock.openam.sm.datalayer.api.ConnectionType;
+import org.forgerock.openam.sm.ConnectionConfigFactory;
+import org.forgerock.openam.sm.datalayer.utils.ConnectionCount;
+import org.forgerock.openam.sm.exceptions.InvalidConfigurationException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,16 +42,20 @@ public class QueueConfiguration {
     public static final int DEFAULT_TIMEOUT = 120;
     public static final int DEFAULT_QUEUE_SIZE = 5000;
 
-    private final AsyncProcessorCount connectionCount;
+    private final ConnectionConfigFactory dataLayerConfig;
+    private final ConnectionCount connectionCount;
     private final Debug debug;
 
     /**
-     * @param connectionCount Required to determine available connections.
+     * @param dataLayerConfig Required for resolving the number of connections available.
+     * @param connectionCount
      * @param debug Required for debugging.
      */
     @Inject
-    public QueueConfiguration(AsyncProcessorCount connectionCount,
+    public QueueConfiguration(ConnectionConfigFactory dataLayerConfig,
+                              ConnectionCount connectionCount,
                               @Named(CoreTokenConstants.CTS_ASYNC_DEBUG) Debug debug) {
+        this.dataLayerConfig = dataLayerConfig;
         this.connectionCount = connectionCount;
         this.debug = debug;
     }
@@ -87,24 +96,22 @@ public class QueueConfiguration {
      * The number of CTS asynchronous Task Processors that should be initialised.
      * This value is based on the number of connections available to the CTS.
      *
-     * Importantly: This value must be a power of two because of the queue selection
-     * algorithm used by the CTS async queue.
+     * @see org.forgerock.openam.sm.ConnectionConfigFactory
+     * @see ConnectionCount
+     * @see QueueSelector
      *
-     * @see CTSConnectionCount
-     * @see org.forgerock.openam.cts.impl.queue.QueueSelector
-     *
+     * @throws CoreTokenException If there was any issue resolving the configuration of the processors.
      * @return A positive number of processors to initialise.
-     * @throws CoreTokenException If the number of connections was too low to make a
-     * number to the power of two, or there was a problem parsing the External CTS
-     * configuration.
      */
     public int getProcessors() throws CoreTokenException {
-        int count = connectionCount.getProcessorCount();
-        if (count > 0) {
-            return count;
+        try {
+            int max = dataLayerConfig.getConfig(ConnectionType.CTS_ASYNC).getMaxConnections();
+            return connectionCount.getConnectionCount(max, ConnectionType.CTS_ASYNC);
+        } catch (IllegalArgumentException e) {
+            throw new CoreTokenException("Number of connections too low", e);
+        } catch (InvalidConfigurationException e) {
+            throw new CoreTokenException("Configuration was invalid", e);
         }
-
-        throw new CoreTokenException("Too few connections allocated to the CTS");
     }
 
     private void debug(String format, Object... args) {

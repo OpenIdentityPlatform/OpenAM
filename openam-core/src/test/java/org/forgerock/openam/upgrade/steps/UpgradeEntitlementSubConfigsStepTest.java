@@ -29,6 +29,13 @@ import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.mockito.ArgumentMatcher;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,20 +44,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import static org.fest.assertions.Assertions.assertThat;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.mockito.ArgumentMatcher;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-import org.w3c.dom.Document;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit test to exercise the behaviour of {@link UpgradeEntitlementSubConfigsStep}.
@@ -67,7 +63,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
     private EntitlementConfiguration entitlementService;
     private PrivilegedAction<SSOToken> adminTokenAction;
-    private DataLayerConnectionFactory connectionFactory;
+    private ConnectionFactory connectionFactory;
 
     private Set<ApplicationType> mockTypes;
     private Set<Application> mockApplications;
@@ -101,7 +97,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         entitlementService = mock(EntitlementConfiguration.class);
         adminTokenAction = mock(PrivilegedAction.class);
-        connectionFactory = mock(DataLayerConnectionFactory.class);
+        connectionFactory = mock(ConnectionFactory.class);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(
                 entitlementService, adminTokenAction, connectionFactory);
 
@@ -359,7 +355,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         public SafeUpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
                                                     final PrivilegedAction<SSOToken> adminTokenAction,
-                                                    final DataLayerConnectionFactory connectionFactory) {
+                                                    final ConnectionFactory connectionFactory) {
             super(entitlementService, adminTokenAction, connectionFactory);
         }
 

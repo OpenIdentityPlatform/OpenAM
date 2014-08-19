@@ -28,6 +28,27 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.AttributeSchemaImpl;
 import com.sun.identity.sm.ServiceSchemaModifications;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.NewServiceWrapper;
+import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
+import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.ServerUpgrade;
+import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
+import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.SubSchemaModificationWrapper;
+import org.forgerock.openam.upgrade.SubSchemaUpgradeWrapper;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeHttpServletRequest;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.w3c.dom.Document;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -41,28 +62,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.NewServiceWrapper;
-import org.forgerock.openam.upgrade.NewSubSchemaWrapper;
-import org.forgerock.openam.upgrade.SchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.ServerUpgrade;
-import org.forgerock.openam.upgrade.ServiceSchemaModificationWrapper;
-import org.forgerock.openam.upgrade.ServiceSchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.SubSchemaModificationWrapper;
-import org.forgerock.openam.upgrade.SubSchemaUpgradeWrapper;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeHttpServletRequest;
-import org.forgerock.openam.upgrade.UpgradeProgress;
+
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import static org.forgerock.openam.utils.CollectionUtils.*;
-import org.forgerock.openam.utils.IOUtils;
-import org.w3c.dom.Document;
-
-import javax.inject.Inject;
+import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
 
 /**
  * Detects changes in the service schema and upgrades them if required.
@@ -93,8 +96,8 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeServiceSchemaStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                    final DataLayerConnectionFactory connectionFactory) {
-        super(adminTokenAction, connectionFactory);
+                                    @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

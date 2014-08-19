@@ -23,9 +23,23 @@ import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
-import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
-import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
 import com.sun.identity.sm.SMSUtils;
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeServices;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.openam.utils.IOUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.util.Reject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.InputStream;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -36,20 +50,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import org.forgerock.openam.entitlement.utils.EntitlementUtils;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeServices;
+
+import static com.sun.identity.shared.xml.XMLUtils.getNodeAttributeValue;
+import static com.sun.identity.shared.xml.XMLUtils.parseAttributeValuePairTags;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.util.Reject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Upgrade step is responsible for ensuring any new application types and/or applications defined in the
@@ -93,7 +97,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     @Inject
     public UpgradeEntitlementSubConfigsStep(final EntitlementConfiguration entitlementService,
                                             final PrivilegedAction<SSOToken> adminTokenAction,
-                                            final DataLayerConnectionFactory connectionFactory) {
+                                            @Named(DataLayerConstants.DATA_LAYER_BINDING)
+                                                final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
         this.entitlementService = entitlementService;
         missingTypes = new ArrayList<Node>();

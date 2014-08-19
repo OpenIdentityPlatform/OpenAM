@@ -26,7 +26,6 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.util.Reject;
 
-import java.lang.IllegalArgumentException;
 import java.text.MessageFormat;
 import java.util.Collection;
 

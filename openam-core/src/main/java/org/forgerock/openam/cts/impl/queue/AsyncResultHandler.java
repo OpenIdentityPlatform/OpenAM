@@ -15,11 +15,13 @@
  */
 package org.forgerock.openam.cts.impl.queue;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.filter.TokenFilter;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.queue.config.QueueConfiguration;
 
-import java.lang.IllegalStateException;
+import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -41,17 +43,33 @@ import java.util.concurrent.TimeUnit;
  * @param <T> {@inheritDoc}
  */
 public class AsyncResultHandler<T> implements ResultHandler<T> {
-    private final BlockingQueue<Object> syncQueue;
     private static final String NULL_SIGNAL = "--NULL--";
-    private final QueueConfiguration config;
 
-    public AsyncResultHandler(QueueConfiguration config) {
-        this(config, new ArrayBlockingQueue<Object>(1));
+    private final BlockingQueue<Object> syncQueue;
+    private final QueueConfiguration config;
+    private final Debug debug;
+
+    /**
+     * Creates an instance of the {@link ResultHandler} with a default queue.
+     *
+     * @param config Non null configuration required for timeout configuration.
+     * @param debug Non null.
+     */
+    public AsyncResultHandler(QueueConfiguration config, Debug debug) {
+        this(config, new ArrayBlockingQueue<Object>(1), debug);
     }
 
-    AsyncResultHandler(QueueConfiguration config, BlockingQueue<Object> queue) {
+    /**
+     * Test only constructor.
+     *
+     * @param config Non null configuration required for timeout configuration.
+     * @param queue Custom queue implementation if required.
+     * @param debug Non null.
+     */
+    AsyncResultHandler(QueueConfiguration config, BlockingQueue<Object> queue, Debug debug) {
         this.config = config;
         this.syncQueue = queue;
+        this.debug = debug;
     }
 
     /**
@@ -70,6 +88,7 @@ public class AsyncResultHandler<T> implements ResultHandler<T> {
 
             // In case the value was null
             if (value.equals(NULL_SIGNAL)) {
+                debug("Results: <null>");
                 return null;
             }
             // In case there was an error
@@ -77,6 +96,7 @@ public class AsyncResultHandler<T> implements ResultHandler<T> {
                 throw (CoreTokenException) value;
             }
 
+            debug("Results: {0}", value.toString());
             return (T) value;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -90,6 +110,7 @@ public class AsyncResultHandler<T> implements ResultHandler<T> {
      */
     @Override
     public void processResults(T result) {
+        debug("Received: results: {0}", result == null ? "<null>" : result.toString());
         Object addition = result == null ? NULL_SIGNAL : result;
 
         if (syncQueue.offer(addition)) {
@@ -102,6 +123,13 @@ public class AsyncResultHandler<T> implements ResultHandler<T> {
      * @param error The error to store in this result handler.
      */
     public void processError(CoreTokenException error) {
+        debug("Received: Error {0}", error.getMessage());
         syncQueue.offer(error);
+    }
+
+    private void debug(String format, String... args) {
+        if (debug.messageEnabled()) {
+            debug.message(MessageFormat.format(CoreTokenConstants.DEBUG_ASYNC_HEADER + format, args));
+        }
     }
 }

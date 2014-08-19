@@ -17,19 +17,22 @@ package org.forgerock.openam.upgrade.steps;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
+import org.forgerock.openam.upgrade.ServerUpgrade;
+import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.upgrade.UpgradeProgress;
+import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.openam.upgrade.UpgradeUtils;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.inject.Inject;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
-import org.forgerock.openam.upgrade.ServerUpgrade;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeProgress;
-import org.forgerock.openam.upgrade.UpgradeStepInfo;
-import org.forgerock.openam.upgrade.UpgradeUtils;
 
 import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_CONFIG;
 import static com.sun.identity.common.configuration.ServerConfiguration.DEFAULT_SERVER_ID;
@@ -53,7 +56,8 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeServerDefaultsStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                     final DataLayerConnectionFactory connectionFactory) {
+                                     @Named(DataLayerConstants.DATA_LAYER_BINDING)
+                                        final ConnectionFactory connectionFactory) {
         super(adminTokenAction, connectionFactory);
     }
 

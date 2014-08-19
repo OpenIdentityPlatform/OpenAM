@@ -23,12 +23,14 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -39,11 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.DEFAULT_SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.DESCRIPTION;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.REDIRECT_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.SCOPES;
+import static org.forgerock.oauth2.core.OAuth2Constants.OAuth2Client.*;
 import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 
@@ -68,8 +66,8 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
 
     @Inject
     public UpgradeOAuth2ClientStep(final PrivilegedAction<SSOToken> adminTokenAction,
-                                   final DataLayerConnectionFactory connectionFactory) {
-        super(adminTokenAction, connectionFactory);
+                                   @Named(DataLayerConstants.DATA_LAYER_BINDING) final ConnectionFactory factory) {
+        super(adminTokenAction, factory);
     }
 
     @Override

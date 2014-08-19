@@ -16,25 +16,26 @@
 
 package org.forgerock.openam.cts.monitoring.impl.connections;
 
-import javax.inject.Inject;
-import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
+import org.forgerock.openam.sm.datalayer.api.DataLayerConstants;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.ResultHandler;
-import org.forgerock.util.thread.listener.ShutdownListener;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * A wrapper for the CTSConnectionFactory which tracks the success/failure
  * of connection attempts requested through this factory. The tracked values are
  * stored in a data structure which is shared by the monitoring system.
  */
-public class MonitoredCTSConnectionFactory implements ConnectionFactory, ShutdownListener {
+public class MonitoredCTSConnectionFactory implements ConnectionFactory {
 
     private final CTSConnectionMonitoringStore monitorStore;
-    private final CTSConnectionFactory connectionFactory;
+    private final ConnectionFactory connectionFactory;
     private final WrappedHandlerFactory handlerFactory;
 
     /**
@@ -44,7 +45,8 @@ public class MonitoredCTSConnectionFactory implements ConnectionFactory, Shutdow
      * @param monitorStore The data structure in which to count connection success/failures
      */
     @Inject
-    public MonitoredCTSConnectionFactory(CTSConnectionFactory connectionFactory,
+    public MonitoredCTSConnectionFactory(@Named(DataLayerConstants.DATA_LAYER_CTS_ASYNC_BINDING)
+                                         ConnectionFactory connectionFactory,
                                          CTSConnectionMonitoringStore monitorStore,
                                          WrappedHandlerFactory handlerFactory) {
         this.connectionFactory = connectionFactory;
@@ -87,10 +89,4 @@ public class MonitoredCTSConnectionFactory implements ConnectionFactory, Shutdow
     public void close() {
         connectionFactory.close();
     }
-
-    @Override
-    public void shutdown() {
-        connectionFactory.shutdown();
-    }
-
 }
