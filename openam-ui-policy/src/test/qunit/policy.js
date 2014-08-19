@@ -320,9 +320,35 @@ define([
 
                 manageAppsView.render([], function () {
                     QUnit.start();
-                    var table = $('#manageApps', manageAppsView.$el);
-                    QUnit.ok(table.jqGrid('getRowData').length > 0, "At least one application listed in the table");
-                    QUnit.ok(table.jqGrid('getRowData').length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
+                    var table = $('#manageApps', manageAppsView.$el),
+                        postedData = table.jqGrid('getGridParam', 'postData'),
+                        rowData = table.jqGrid('getRowData'),
+                        recordsTotal = table.jqGrid('getGridParam', 'records'),
+                        totalNumberOfPages = table.jqGrid('getGridParam', 'lastpage'),
+                        recordsPerPage = table.jqGrid('getGridParam', 'rowNum'),
+                        rowList = table.jqGrid('getGridParam', 'rowList'),
+                        remaining = table.jqGrid('getGridParam', 'userData').remaining;
+
+                    QUnit.ok(rowData.length > 0, "At least one application listed in the table");
+                    QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
+
+                    // Pagination
+                    QUnit.ok($('#appsPager', manageAppsView.$el).length === 1, 'Pager is present');
+
+                    QUnit.ok(rowData.length + postedData._pagedResultsOffset + remaining === recordsTotal,
+                        'Total number of records is calculated correctly');
+
+                    QUnit.ok(recordsPerPage >= rowData.length,
+                        'Number of rows in grid is less than or equal to number of rows requested');
+
+                    if (recordsTotal > recordsPerPage) {
+                        QUnit.ok(totalNumberOfPages === recordsTotal % recordsPerPage === 0 ?
+                            recordsTotal / recordsPerPage : Math.floor(recordsTotal / recordsPerPage) + 1,
+                            'Total number of pages is calculated correctly');
+                    } else {
+                        QUnit.ok(totalNumberOfPages === 1,
+                            'Total number of pages is calculated correctly');
+                    }
                 });
             });
 
@@ -544,11 +570,38 @@ define([
 
                 managePolView.render(['sunIdentityServerLibertyPPService'], function () {
                     QUnit.start();
-                    var table = $('#managePolicies', managePolView.$el);
-                    QUnit.ok(table.jqGrid('getRowData').length > 0, "At least one policy listed in the table");
-                    QUnit.ok(table.jqGrid('getRowData').length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
+
+                    var table = $('#managePolicies', managePolView.$el),
+                        rowData = table.jqGrid('getRowData'),
+                        postedData = table.jqGrid('getGridParam', 'postData'),
+                        recordsTotal = table.jqGrid('getGridParam', 'records'),
+                        totalNumberOfPages = table.jqGrid('getGridParam', 'lastpage'),
+                        recordsPerPage = table.jqGrid('getGridParam', 'rowNum'),
+                        rowList = table.jqGrid('getGridParam', 'rowList'),
+                        remaining = table.jqGrid('getGridParam', 'userData').remaining;
+
+                    QUnit.ok(rowData.length > 0, "At least one policy listed in the table");
+                    QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
 
                     QUnit.ok(managePolView.$el.find('#backToApps').length, "Back button is available");
+
+                    // Pagination
+                    QUnit.ok($('#policiesPager', managePolView.$el).length === 1, 'Pager is present');
+
+                    QUnit.ok(rowData.length + postedData._pagedResultsOffset + remaining === recordsTotal,
+                        'Total number of records is calculated correctly');
+
+                    QUnit.ok(table.jqGrid('getGridParam', 'rowNum') >= rowData.length,
+                        'Number of rows in grid is less than or equal to number of rows requested');
+
+                    if (recordsTotal > recordsPerPage) {
+                        QUnit.ok(totalNumberOfPages === recordsTotal % recordsPerPage === 0 ?
+                            recordsTotal / recordsPerPage : Math.floor(recordsTotal / recordsPerPage) + 1,
+                            'Total number of pages is calculated correctly');
+                    } else {
+                        QUnit.ok(totalNumberOfPages === 1,
+                            'Total number of pages is calculated correctly');
+                    }
                 });
             });
         }

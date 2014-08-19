@@ -29,16 +29,15 @@
 /*global window, define, $, form2js, _, js2form, document, console */
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function (AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function (AbstractView, uiUtils) {
     var ManageApplicationsView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManageApplicationsTemplate.html",
 
         render: function (args, callback) {
-            var self = this,
-
-                appLinkFormatter = function (cellvalue, options, rowObject) {
+            var appLinkFormatter = function (cellvalue, options, rowObject) {
                     return '<a href="#app/' + cellvalue + '">' + cellvalue + '</a>';
                 },
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
@@ -46,12 +45,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 };
 
             this.parentRender(function () {
-                self.$el.find("#manageApps").jqGrid({
+                var options = {
+                    view: this,
+                    id: '#manageApps',
                     url: '/openam/json/applications?_queryFilter=true',
-                    datatype: "json",
-                    loadBeforeSend: function (jqXHR) {
-                        jqXHR.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
-                    },
                     colNames: ['Name', 'Realm', 'Type', 'Last Modified', 'Policies'],
                     colModel: [
                         {name: 'name', formatter: appLinkFormatter},
@@ -60,31 +57,12 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         {name: 'lastModifiedDate'},
                         {name: 'name', formatter: policyLinkFormatter}
                     ],
-                    height: 'auto',
-                    jsonReader: {
-                        root: function (obj) {
-                            return obj.result;
-                        }
-                    },
-                    search: null,
-                    prmNames: {
-                        nd: null,
-                        order: null,
-                        sort: null,
-                        search: null,
-                        rows: null, // number of records to fetch
-                        page: null // page number
-                    },
-                    loadComplete: function (data) {
-                        _.extend(self.data, data);
-                    }
-                });
+                    width: '920',
+                    pager: '#appsPager',
+                    callback: callback
+                };
 
-                self.$el.find("#manageApps").on("jqGridAfterGridComplete", function () {
-                    if (callback) {
-                        callback();
-                    }
-                });
+                uiUtils.buildRestResponseBasedJQGrid(options);
             });
         }
     });

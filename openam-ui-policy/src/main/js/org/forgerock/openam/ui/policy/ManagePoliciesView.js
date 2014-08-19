@@ -30,60 +30,38 @@
 /*global window, define, $, form2js, _, js2form, document, console */
 
 define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function (AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function (AbstractView, uiUtils) {
     var ManagePoliciesView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManagePoliciesTemplate.html",
 
         render: function (args, callback) {
-            var self = this,
-                appName = args[0],
-
+            var appName = args[0],
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
                     return '<a href="#app/' + appName + '/policy/' + cellvalue + '">' + cellvalue + '</a>';
                 };
 
             this.parentRender(function () {
-                self.$el.find('#newPolicy').attr("href", "#app/" + appName + "/policy/");
-                self.$el.find('#managePoliciesTitle').text("Manage " + appName + " Policies");
+                this.$el.find('#newPolicy').attr("href", "#app/" + appName + "/policy/");
+                this.$el.find('#managePoliciesTitle').text("Manage " + appName + " Policies");
 
-                self.$el.find("#managePolicies").jqGrid({
+                var options = {
+                    view: this,
+                    id: '#managePolicies',
                     url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
-                    datatype: "json",
-                    loadBeforeSend: function (jqXHR) {
-                        jqXHR.setRequestHeader('Accept-API-Version', 'protocol=1.0,resource=1.0');
-                    },
                     colNames: ['Name', 'Last Modified'],
                     colModel: [
                         {name: 'name', formatter: policyLinkFormatter},
                         {name: 'lastModified'}
                     ],
-                    height: 'auto',
-                    jsonReader: {
-                        root: function (obj) {
-                            return obj.result;
-                        }
-                    },
-                    search: null,
-                    prmNames: {
-                        nd: null,
-                        order: null,
-                        sort: null,
-                        search: null,
-                        rows: null, // number of records to fetch
-                        page: null // page number
-                    },
-                    loadComplete: function (data) {
-                        _.extend(self.data, data);
-                    }
-                });
+                    width: '920',
+                    pager: '#policiesPager',
+                    callback: callback
+                };
 
-                self.$el.find("#managePolicies").on("jqGridAfterGridComplete", function () {
-                    if (callback) {
-                        callback();
-                    }
-                });
+                uiUtils.buildRestResponseBasedJQGrid(options);
             });
         }
     });
