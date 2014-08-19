@@ -67,7 +67,7 @@
     function validateConfigDir() {
         field = "configDirectory";
         var callUrl = "$context$path?actionLink=validateConfigDir&dir=" +
-            escape($(field).value);
+            encodeURIComponent($(field).value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);
@@ -76,7 +76,7 @@
     function validateCookieDomain() {
 	field = "cookieDomain";
         var callUrl = "$context$path?actionLink=validateCookieDomain&domain=" +
-            escape($(field).value) + "&serverurl=" + escape($("serverURL").value);
+            encodeURIComponent($(field).value) + "&serverurl=" + encodeURIComponent($("serverURL").value);
         ie7fix++;
         callUrl = callUrl + "&ie7fix=" + ie7fix;
         AjaxUtils.call(callUrl, serverFieldValidated);

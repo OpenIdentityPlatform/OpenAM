@@ -24,9 +24,11 @@
  *
  * $Id: StringUtils.java,v 1.3 2009/11/20 00:30:40 exu Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
-
 package com.sun.identity.shared;
+
+import java.util.regex.Matcher;
 
 /**
  * This class provides string related helper methods.
@@ -51,11 +53,11 @@ public class StringUtils {
      *
      * @param orig Original string.
      * @param pattern String substitution matching pattern.
-     * @param str Substituting string.
+     * @param str The literal string to replace the pattern with.
      * @return substituted string.
      */
-    public static String strReplaceAll(String orig, String pattern, String str){
-        return orig.replaceAll(pattern, str.replaceAll("[$]", "\\\\\\$"));
+    public static String strReplaceAll(String orig, String pattern, String str) {
+        return orig.replaceAll(pattern, Matcher.quoteReplacement(str));
     }
 
     /**
