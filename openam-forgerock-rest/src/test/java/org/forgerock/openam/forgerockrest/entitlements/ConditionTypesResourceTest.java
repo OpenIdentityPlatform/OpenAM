@@ -68,29 +68,6 @@ public class ConditionTypesResourceTest {
     }
 
     @Test
-    public void undefinedSubjectShouldFail() {
-        //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
-        ServerContext mockServerContext = new ServerContext(realmContext);
-
-        Subject subject = null;
-        given(mockSubjectContext.getCallerSubject()).willReturn(subject);
-
-        QueryRequest mockRequest = mock(QueryRequest.class);
-        QueryResultHandler mockHandler = mock(QueryResultHandler.class);
-
-        //when
-        testResource.queryCollection(mockServerContext, mockRequest, mockHandler);
-
-        //then
-        ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(mockHandler, times(1)).handleError(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.FORBIDDEN);
-
-    }
-
-    @Test
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
         SubjectContext mockSubjectContext = mock(SubjectContext.class);

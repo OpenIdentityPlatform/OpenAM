@@ -30,7 +30,6 @@ import javax.security.auth.Subject;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -47,7 +46,6 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
-import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**
  * Allows for CREST-handling of stored {@link ApplicationType}s.
@@ -55,7 +53,7 @@ import org.forgerock.openam.rest.resource.SubjectContext;
  * These are unmodfiable - even by an administrator. As such this
  * endpoint only supports the READ and QUERY operations.
  */
-public class ApplicationTypesResource implements CollectionResourceProvider {
+public class ApplicationTypesResource extends SubjectAwareResource {
 
     private final ApplicationTypeManagerWrapper typeManager;
     private final Debug debug;
@@ -134,12 +132,9 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
         //auth
-        final SubjectContext sc = context.asContext(SubjectContext.class);
-        final Subject mySubject = sc.getCallerSubject();
+        final Subject mySubject = getContextSubject(context, handler);
 
         if (mySubject == null) {
-            debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
             return;
         }
 
@@ -223,12 +218,10 @@ public class ApplicationTypesResource implements CollectionResourceProvider {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
 
-        final SubjectContext sc = context.asContext(SubjectContext.class);
-        final Subject mySubject = sc.getCallerSubject();
+        //auth
+        final Subject mySubject = getContextSubject(context, handler);
 
         if (mySubject == null) {
-            debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
             return;
         }
 

@@ -29,7 +29,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -64,7 +64,7 @@ public class ApplicationTypesResourceTest {
     @Test
     public void undefinedSubjectShouldFail() {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 
@@ -80,14 +80,14 @@ public class ApplicationTypesResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler, times(1)).handleError(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.FORBIDDEN);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
 
     }
 
     @Test
     public void readShouldFailOnInvalidApplicationType() {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 
@@ -110,7 +110,7 @@ public class ApplicationTypesResourceTest {
     @Test
     public void shouldReadInstanceCorrectly() throws IllegalAccessException, InstantiationException {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 

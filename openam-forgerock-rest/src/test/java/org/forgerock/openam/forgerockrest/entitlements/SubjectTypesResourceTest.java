@@ -38,7 +38,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -69,32 +69,9 @@ public class SubjectTypesResourceTest {
     }
 
     @Test
-    public void undefinedSubjectShouldFail() {
-        //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
-        RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
-        ServerContext mockServerContext = new ServerContext(realmContext);
-
-        Subject subject = null;
-        given(mockSubjectContext.getCallerSubject()).willReturn(subject);
-
-        QueryRequest mockRequest = mock(QueryRequest.class);
-        QueryResultHandler mockHandler = mock(QueryResultHandler.class);
-
-        //when
-        testResource.queryCollection(mockServerContext, mockRequest, mockHandler);
-
-        //then
-        ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
-        verify(mockHandler, times(1)).handleError(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.FORBIDDEN);
-
-    }
-
-    @Test
     public void shouldThrowErrorWthInvalidCondition() throws JsonMappingException {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 
@@ -119,7 +96,7 @@ public class SubjectTypesResourceTest {
     @Test
     public void testSuccessfulJsonificationAndQuery() throws JsonMappingException {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 
@@ -143,7 +120,7 @@ public class SubjectTypesResourceTest {
     @Test
     public void testSuccessfulJsonificationAndReadAndSubjectNamePropertyRemoved() throws JsonMappingException {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 
@@ -177,7 +154,7 @@ public class SubjectTypesResourceTest {
     @Test
     public void testSuccessfulJsonificationAndLogicalIsCorrect() throws JsonMappingException {
         //given
-        SubjectContext mockSubjectContext = mock(SubjectContext.class);
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
         RealmContext realmContext = new RealmContext(mockSubjectContext, "REALM");
         ServerContext mockServerContext = new ServerContext(realmContext);
 

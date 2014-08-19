@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.inject.Inject;
-import javax.security.auth.Subject;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -50,7 +49,6 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
-import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Reject;
 
 /**
@@ -146,12 +144,6 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
-        final Subject mySubject = getSubject(context, handler);
-
-        if (mySubject == null) {
-            return;
-        }
-
         final Set<String> conditionTypeNames = new TreeSet<String>();
         List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
 
@@ -206,27 +198,6 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     }
 
     /**
-     * Retrieves the {@link Subject} from the {@link ServerContext}.
-     *
-     * @param context The ServerContext containing an appropriate {@link SubjectContext}.
-     * @param handler The handler via which to return any errors or issues.
-     * @return The Subject object, or null.
-     */
-    private Subject getSubject(ServerContext context, ResultHandler handler) {
-
-        final SubjectContext sc = context.asContext(SubjectContext.class);
-        final Subject mySubject = sc.getCallerSubject();
-
-        if (mySubject == null) {
-            debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
-            return null;
-        }
-
-        return mySubject;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition} to return.
@@ -234,12 +205,6 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler) {
-
-        final Subject mySubject = getSubject(context, handler);
-
-        if (mySubject == null) {
-            return;
-        }
 
         final Class<? extends EntitlementCondition> conditionClass = entitlementRegistry.getConditionType(resourceId);
 

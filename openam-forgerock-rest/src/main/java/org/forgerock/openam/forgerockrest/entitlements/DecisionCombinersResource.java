@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.inject.Inject;
-import javax.security.auth.Subject;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -43,7 +42,6 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.RestUtils;
-import org.forgerock.openam.rest.resource.SubjectContext;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementCombiner}s.
@@ -122,12 +120,6 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
-        final Subject mySubject = getSubject(context, handler);
-
-        if (mySubject == null) {
-            return;
-        }
-
         final Set<String> combinerTypeNames = new TreeSet<String>();
         List<JsonValue> combinerTypes = new ArrayList<JsonValue>();
 
@@ -181,38 +173,11 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
     }
 
     /**
-     * Retrieves the {@link Subject} from the {@link ServerContext}.
-     *
-     * @param context The ServerContext containing an appropriate {@link SubjectContext}.
-     * @param handler The handler via which to return any errors or issues.
-     * @return The Subject object, or null.
-     */
-    private Subject getSubject(ServerContext context, ResultHandler handler) {
-
-        final SubjectContext sc = context.asContext(SubjectContext.class);
-        final Subject mySubject = sc.getCallerSubject();
-
-        if (mySubject == null) {
-            debug.error("Error retrieving combiner identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN));
-            return null;
-        }
-
-        return mySubject;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler) {
-
-        final Subject mySubject = getSubject(context, handler);
-
-        if (mySubject == null) {
-            return;
-        }
 
         final Class<? extends EntitlementCombiner> combinerClass = entitlementRegistry.getCombinerType(resourceId);
 

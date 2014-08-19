@@ -17,11 +17,8 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
-import static java.lang.Math.max;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +27,6 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -49,7 +45,6 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManag
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
-import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.util.Reject;
 
 /**
@@ -62,7 +57,7 @@ import org.forgerock.util.Reject;
  * leg for us.
  *
  */
-public class ApplicationsResource implements CollectionResourceProvider {
+public class ApplicationsResource extends SubjectAwareResource {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final ApplicationManagerWrapper appManager;
@@ -446,27 +441,6 @@ public class ApplicationsResource implements CollectionResourceProvider {
         }
 
         return rc.getRealm();
-    }
-
-    /**
-     * Retrieves the {@link Subject} from the {@link ServerContext}. Returns null
-     * if there's no Subject.
-     *
-     * @param context Context of the request made to this resource
-     * @param handler Handler which will handle the response
-     * @return an instance of the Subject in the context, or null
-     */
-    private Subject getContextSubject(ServerContext context, ResultHandler handler) {
-
-        final SubjectContext sc = context.asContext(SubjectContext.class);
-        final Subject mySubject = sc.getCallerSubject();
-
-        if (mySubject == null) {
-            debug.error("Error retrieving Subject identification from request.");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
-        }
-
-        return mySubject;
     }
 
 }

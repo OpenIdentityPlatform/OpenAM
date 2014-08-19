@@ -16,18 +16,15 @@
 
 package org.forgerock.openam.rest.router;
 
-import org.forgerock.openam.rest.RestEndpoints;
-import org.forgerock.openam.rest.resource.CrestRealmRouter;
-import org.forgerock.openam.rest.service.ServiceRouter;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import java.util.HashSet;
 import java.util.Set;
-
+import org.forgerock.openam.rest.RestEndpoints;
+import org.forgerock.openam.rest.service.ServiceRouter;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class RestEndpointManagerImplTest {
 
@@ -37,7 +34,7 @@ public class RestEndpointManagerImplTest {
     public void setUp() {
 
         RestEndpoints restEndpoints = mock(RestEndpoints.class);
-        CrestRealmRouter resourceRouter = mock(CrestRealmRouter.class);
+        VersionRouter resourceRouter = mock(VersionRouter.class);
         ServiceRouter serviceRouter = mock(ServiceRouter.class);
         Set<String> resourceRoutes = new HashSet<String>();
         Set<String> serviceRoutes = new HashSet<String>();
