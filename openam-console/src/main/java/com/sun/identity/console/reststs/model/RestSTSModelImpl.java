@@ -178,7 +178,6 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     Add the url corresponding to the am deployment, and the realm, as this information does not have to be solicited from the user.
      */
     private void addProgrammaticConfigurationState(Map<String, Set<String>> configurationState, String realm) {
-        configurationState.put(SharedSTSConstants.AM_DEPLOYMENT_URL, CollectionUtils.asSet(getAMDeploymentUrl()));
         configurationState.put(SharedSTSConstants.DEPLOYMENT_REALM, CollectionUtils.asSet(realm));
     }
 

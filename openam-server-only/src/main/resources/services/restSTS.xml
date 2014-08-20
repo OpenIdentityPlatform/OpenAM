@@ -38,13 +38,6 @@ provided for required attributes upon service registration.
                     </DefaultValues>
                 </AttributeSchema>
 -->
-                <AttributeSchema name="am-deployment-url"
-                                 type="single" syntax="string" i18nKey="am_deployment_url"
-                                 validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="issuer-name"
                                  type="single" syntax="string" i18nKey="issuer_name"
                                  validator="RequiredValueValidator">
@@ -158,13 +151,6 @@ provided for required attributes upon service registration.
                 Appears to be necessary to have multiple rest STS instances per realm, like authN mdoules.
                 -->
                 <SubSchema name="serverconfig" inheritance="multiple">
-                    <AttributeSchema name="am-deployment-url"
-                                     type="single" syntax="string" i18nKey="am_deployment_url"
-                                     validator="RequiredValueValidator">
-                        <DefaultValues>
-                            <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="issuer-name"
                                      type="single" syntax="string" i18nKey="issuer_name"
                                      validator="RequiredValueValidator">

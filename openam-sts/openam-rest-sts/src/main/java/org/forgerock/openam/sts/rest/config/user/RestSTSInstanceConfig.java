@@ -204,7 +204,6 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
         STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
-                .amDeploymentUrl(baseConfig.getAMDeploymentUrl())
                 .keystoreConfig(baseConfig.getKeystoreConfig())
                 .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())

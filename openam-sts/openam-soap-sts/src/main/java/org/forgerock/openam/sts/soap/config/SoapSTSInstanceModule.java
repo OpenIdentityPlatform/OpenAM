@@ -310,7 +310,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Provides
     @Named (AMSTSConstants.AM_DEPLOYMENT_URL)
     String amDeploymentUrl() {
-        return stsInstanceConfig.getAMDeploymentUrl();
+        return stsInstanceConfig.getDeploymentConfig().getAMDeploymentUrl();
     }
 
 

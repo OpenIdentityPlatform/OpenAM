@@ -114,7 +114,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         Reject.ifNull(keystoreConfig, "KeystoreConfig cannot be null");
         Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
-        Reject.ifNull(amDeploymentUrl, "AM deployment url cannot be null");
 
     }
 
@@ -152,7 +151,6 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         sb.append('\t').append("validateTokenTransformTypes: ").append(validateTokenTransformTypes).append('\n');
         sb.append('\t').append("renewTokenTypes: ").append(renewTokenTypes).append('\n');
         sb.append('\t').append("deploymentConfig: ").append(deploymentConfig).append('\n');
-        sb.append('\t').append("amDeploymentUrl: ").append(amDeploymentUrl).append('\n');
         return sb.toString();
     }
 
@@ -166,8 +164,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
                     validateTokenStatusTypes.equals(otherConfig.getValidateTokenStatusTypes()) &&
                     validateTokenTransformTypes.equals(otherConfig.getValidateTokenTransformTypes())  &&
                     renewTokenTypes.equals(otherConfig.getRenewTokenTypes()) &&
-                    deploymentConfig.equals(otherConfig.getDeploymentConfig()) &&
-                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl());
+                    deploymentConfig.equals(otherConfig.getDeploymentConfig());
         }
         return false;
     }

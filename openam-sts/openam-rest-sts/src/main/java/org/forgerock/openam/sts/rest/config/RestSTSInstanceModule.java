@@ -27,6 +27,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -235,9 +237,16 @@ public class RestSTSInstanceModule extends AbstractModule {
     }
 
     @Provides
+    @Singleton
     @Named (AMSTSConstants.AM_DEPLOYMENT_URL)
     String amDeploymentUrl() {
-        return stsInstanceConfig.getAMDeploymentUrl();
+        /*
+        This information used to be provided from the STSInstanceConfig, but this value needs to correspond to the local
+        deployment so that, in site deployments, the Rest AuthN and the TGS of the local OpenAM instance is consumed, instead
+        of the OpenAM url set when the rest-sts-instance was published.
+         */
+        return SystemProperties.get(Constants.AM_SERVER_PROTOCOL) + "://" + SystemProperties.get(Constants.AM_SERVER_HOST) +
+                ":" + SystemProperties.get(Constants.AM_SERVER_PORT) + SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
     }
 
     /*

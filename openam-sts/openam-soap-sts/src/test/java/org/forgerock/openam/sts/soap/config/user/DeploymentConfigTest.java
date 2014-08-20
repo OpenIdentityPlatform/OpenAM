@@ -22,8 +22,8 @@ import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 public class DeploymentConfigTest {
     @Test
@@ -35,6 +35,7 @@ public class DeploymentConfigTest {
                 .realm("a")
                 .uriElement("b")
                 .wsdlLocation("wsdl_location")
+                .amDeploymentUrl("deployment_url")
                 .serviceQName(new QName("service_namespace", "local_service"))
                 .portQName(new QName("port_namespace", "local_port"))
                 .authTargetMapping(atm)
@@ -44,12 +45,13 @@ public class DeploymentConfigTest {
                 .realm("a")
                 .uriElement("b")
                 .wsdlLocation("wsdl_location")
+                .amDeploymentUrl("deployment_url")
                 .serviceQName(new QName("service_namespace", "local_service"))
                 .portQName(new QName("port_namespace", "local_port"))
                 .authTargetMapping(atm)
                 .build();
-        assertTrue(dc1.equals(dc2));
-        assertTrue(dc1.hashCode() == dc2.hashCode());
+        assertEquals(dc1, dc2);
+        assertEquals(dc1.hashCode(), dc2.hashCode());
     }
 
     @Test
@@ -61,6 +63,7 @@ public class DeploymentConfigTest {
                 .realm("a")
                 .uriElement("b")
                 .wsdlLocation("wsdl_location")
+                .amDeploymentUrl("deployment_url")
                 .serviceQName(new QName("service_namespace", "local_service"))
                 .portQName(new QName("port_namespace", "local_port"))
                 .authTargetMapping(atm)
@@ -70,30 +73,34 @@ public class DeploymentConfigTest {
                 .realm("aa")
                 .uriElement("b")
                 .wsdlLocation("wsdl_location")
+                .amDeploymentUrl("deployment_url")
                 .serviceQName(new QName("service_namespace", "local_service"))
                 .portQName(new QName("port_namespace", "local_port"))
                 .authTargetMapping(atm)
                 .build();
-        assertFalse(dc1.equals(dc2));
-        assertFalse(dc1.hashCode() == dc2.hashCode());
+        assertNotEquals(dc1, dc2);
+        assertNotEquals(dc1.hashCode(), dc2.hashCode());
     }
 
     @Test(expectedExceptions = NullPointerException.class)
-    public void testRejectIfNull() {
+    public void testRejectIfNullIfAuthTargetMappingNotSet() {
+        DeploymentConfig.builder()
+                .realm("a")
+                .amDeploymentUrl("deployment_url")
+                .uriElement("b")
+                .build();
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void testRejectIfNullIfAMDeploymentUrlNotSet() {
         AuthTargetMapping atm = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "module", "untmodule")
                 .build();
 
-        DeploymentConfig dc3 = DeploymentConfig.builder()
+        DeploymentConfig.builder()
                 .realm("a")
                 .uriElement("b")
                 .authTargetMapping(atm)
                 .build();
-
-        DeploymentConfig dc4 = DeploymentConfig.builder()
-                .realm("a")
-                .uriElement("b")
-                .build();
-        assertFalse(dc3.equals(dc4));
     }
 }

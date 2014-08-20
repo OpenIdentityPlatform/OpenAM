@@ -46,29 +46,21 @@ public class STSInstanceConfig {
     entries in restSTS.xml, as this aids in marshalling an instance of this class into the attribute map needed for
     SMS persistence.
      */
-    protected static final String AM_DEPLOYMENT_URL = SharedSTSConstants.AM_DEPLOYMENT_URL;
     protected static final String KEYSTORE_CONFIG =  "keystore-config";
     protected static final String ISSUER_NAME = SharedSTSConstants.ISSUER_NAME;
     protected static final String SAML2_CONFIG = "saml2-config";
 
-    protected final String amDeploymentUrl;
     protected final KeystoreConfig keystoreConfig;
     protected final String issuerName;
     protected final SAML2Config saml2Config;
 
     public static abstract class STSInstanceConfigBuilderBase<T extends STSInstanceConfigBuilderBase<T>> {
-        private String amDeploymentUrl;
         private KeystoreConfig keystoreConfig;
         private String issuerName;
         private SAML2Config saml2Config;
 
 
         protected abstract T self();
-
-        public T amDeploymentUrl(String url) {
-            this.amDeploymentUrl = url;
-            return self();
-        }
 
         public T keystoreConfig(KeystoreConfig keystoreConfig) {
             this.keystoreConfig = keystoreConfig;
@@ -98,13 +90,11 @@ public class STSInstanceConfig {
     }
 
     protected STSInstanceConfig(STSInstanceConfigBuilderBase<?> builder) {
-        amDeploymentUrl = builder.amDeploymentUrl;
         keystoreConfig = builder.keystoreConfig;
         issuerName = builder.issuerName;
         saml2Config = builder.saml2Config;
         Reject.ifNull(keystoreConfig, "KeystoreConfig cannot be null");
         Reject.ifNull(issuerName, "Issuer name cannot be null");
-        Reject.ifNull(amDeploymentUrl, "AM deployment url cannot be null");
     }
 
     /**
@@ -120,14 +110,6 @@ public class STSInstanceConfig {
      */
     public String getIssuerName() {
         return issuerName;
-    }
-
-    /**
-     * @return  The String corresponding to the OpenAM deployment url. (May go away, as the REST-STS will likely be
-     *          co-deployed with OpenAM).
-     */
-    public String getAMDeploymentUrl() {
-        return amDeploymentUrl;
     }
 
     /**
@@ -148,7 +130,6 @@ public class STSInstanceConfig {
         StringBuilder sb = new StringBuilder("STSInstanceConfig instance:\n");
         sb.append('\t').append("KeyStoreConfig: ").append(keystoreConfig).append('\n');
         sb.append('\t').append("issuerName: ").append(issuerName).append('\n');
-        sb.append('\t').append("amDeploymentUrl: ").append(amDeploymentUrl).append('\n');
         sb.append('\t').append("saml2Config: ").append(saml2Config).append('\n');
         return sb.toString();
     }
@@ -159,15 +140,13 @@ public class STSInstanceConfig {
             STSInstanceConfig otherConfig = (STSInstanceConfig)other;
             return keystoreConfig.equals(otherConfig.getKeystoreConfig()) &&
                     issuerName.equals(otherConfig.getIssuerName()) &&
-                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl()) &&
                     ((saml2Config != null ? saml2Config.equals(otherConfig.getSaml2Config()) : (otherConfig.getSaml2Config() == null)));
         }
         return false;
     }
 
     public JsonValue toJson() {
-        JsonValue jsonValue =  json(object(field(AM_DEPLOYMENT_URL, amDeploymentUrl),
-                field(KEYSTORE_CONFIG, keystoreConfig.toJson()), field(ISSUER_NAME, issuerName)));
+        JsonValue jsonValue =  json(object(field(KEYSTORE_CONFIG, keystoreConfig.toJson()), field(ISSUER_NAME, issuerName)));
         if (saml2Config == null) {
             return jsonValue;
         } else {
@@ -178,7 +157,6 @@ public class STSInstanceConfig {
 
     public static STSInstanceConfig fromJson(JsonValue json) {
         STSInstanceConfigBuilderBase builder =  STSInstanceConfig.builder()
-                .amDeploymentUrl(json.get(AM_DEPLOYMENT_URL).asString())
                 .keystoreConfig(KeystoreConfig.fromJson(json.get(KEYSTORE_CONFIG)))
                 .issuerName(json.get(ISSUER_NAME).asString());
         final JsonValue samlConfig = json.get(SAML2_CONFIG);

@@ -36,31 +36,25 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
 public class RestSTSInstanceConfigTest {
     private static final boolean WITH_SAML2_CONFIG = true;
     @Test
     public void testEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
-        assertTrue(ric1.equals(ric2));
-        assertTrue(ric1.hashCode() == ric2.hashCode());
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        assertEquals(ric1, ric2);
+        assertEquals(ric1.hashCode(), ric2.hashCode());
     }
 
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
-        assertFalse(ric1.equals(ric2));
-        assertFalse(ric1.hashCode() == ric2.hashCode());
-
-        RestSTSInstanceConfig ric3 = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_SAML2_CONFIG);
-        RestSTSInstanceConfig ric4 = createInstanceConfig("/bob", "http://localhost:8080/", !WITH_SAML2_CONFIG);
-        assertFalse(ric3.equals(ric4));
-        assertFalse(ric3.hashCode() == ric4.hashCode());
-
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo", WITH_SAML2_CONFIG);
+        assertNotEquals(ric1, ric2);
+        assertNotEquals(ric1.hashCode(), ric2.hashCode());
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -70,18 +64,18 @@ public class RestSTSInstanceConfigTest {
 
     @Test(expectedExceptions = IllegalStateException.class)
     public void testIllegalStateExceptionNoSaml2Config() throws UnsupportedEncodingException {
-        createInstanceConfigWithoutSaml2Config("/bob", "http://localhost:8080/openam");
+        createInstanceConfigWithoutSaml2Config("/bob");
     }
 
     @Test
     public void testJsonMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
         assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(origConfig.toJson())));
     }
 
     @Test
     public void testJsonStringMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -97,7 +91,7 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testOldJacksonJsonStringMarhalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -114,27 +108,27 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
 
-        config = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_SAML2_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
     }
 
     @Test
     public void testJsonMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", "http://localhost:8080/openam", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
         Map<String, Set<String>> attributeMap = config.marshalToAttributeMap();
         JsonValue jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
-        config = createInstanceConfig("/bob", "http://localhost:8080/openam", !WITH_SAML2_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
     }
 
-    private RestSTSInstanceConfig createInstanceConfig(String uriElement, String amDeploymentUrl, boolean withSaml2Config) throws UnsupportedEncodingException {
+    private RestSTSInstanceConfig createInstanceConfig(String uriElement, boolean withSaml2Config) throws UnsupportedEncodingException {
         Map<String,String> oidcContext = new HashMap<String,String>();
         oidcContext.put("context_key_1", "context_value_1");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
@@ -177,7 +171,6 @@ public class RestSTSInstanceConfigTest {
 
         RestSTSInstanceConfig.RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl(amDeploymentUrl)
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(
@@ -219,7 +212,6 @@ public class RestSTSInstanceConfigTest {
                         .build();
 
         return RestSTSInstanceConfig.builder()
-                .amDeploymentUrl("whatever")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(
@@ -240,7 +232,7 @@ public class RestSTSInstanceConfigTest {
     /*
     Create RestSTSInstanceConfig with SAML2 output tokens, but without SAML2Config, to test IllegalStateException
      */
-    private RestSTSInstanceConfig createInstanceConfigWithoutSaml2Config(String uriElement, String amDeploymentUrl) throws UnsupportedEncodingException {
+    private RestSTSInstanceConfig createInstanceConfigWithoutSaml2Config(String uriElement) throws UnsupportedEncodingException {
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
                 .build();
@@ -263,7 +255,6 @@ public class RestSTSInstanceConfigTest {
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl(amDeploymentUrl)
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(

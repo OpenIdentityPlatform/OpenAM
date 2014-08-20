@@ -237,7 +237,6 @@ public class SAML2TokenGenerationImplTest {
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl("http://host.com:8080/openam")
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("idpEntityId")

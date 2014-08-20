@@ -49,12 +49,9 @@ import java.io.UnsupportedEncodingException;
         portName = "STSPublishPort",
         targetNamespace = "http://org.forgerock.openam.sts.publish")
 public class STSPublishImpl implements STSPublish {
-
-
     public STSPublishImpl() {
     }
 
-    @Override
     public void publishSTSEndpoint(String uriElement, String securityPolicyBindingId, String amDeploymentUrl) throws STSInitializationException {
         publishSTS(uriElement, securityPolicyBindingId, amDeploymentUrl);
     }
@@ -96,6 +93,7 @@ public class STSPublishImpl implements STSPublish {
                                         DeploymentConfig.builder()
                                         .portQName(getPortQName(bndId))
                                         .serviceQName(getServiceQName(bndId))
+                                        .amDeploymentUrl(amDeploymentUrl)
                                         .uriElement(uriElement)
                                         .wsdlLocation(getWsdlLocation(bndId))
                                         .authTargetMapping(mapping)
@@ -117,7 +115,6 @@ public class STSPublishImpl implements STSPublish {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl(amDeploymentUrl)
                 .keystoreConfig(keystoreConfig)
                 .issuerName("OpenAM")
                 .addIssueTokenType(TokenType.SAML2)

@@ -26,14 +26,12 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 
 public class STSInstanceConfigTest {
-    private static final String AM_DEPLOYMENT = "am_depl";
     private static final String ISSUER = "cornholio";
     private static final String KEYSTORE = "keystore_stuff";
 
     @Test
     public void testSettings() throws UnsupportedEncodingException {
         STSInstanceConfig instance = buildConfig();
-        assertTrue(AM_DEPLOYMENT.equals(instance.getAMDeploymentUrl()));
         assertTrue(ISSUER.equals(instance.getIssuerName()));
     }
 
@@ -95,7 +93,6 @@ public class STSInstanceConfigTest {
                         .build();
 
         return STSInstanceConfig.builder()
-                .amDeploymentUrl(AM_DEPLOYMENT)
                 .issuerName(ISSUER)
                 .keystoreConfig(keystoreConfig)
                 .build();
@@ -119,7 +116,6 @@ public class STSInstanceConfigTest {
                 .build();
 
         return STSInstanceConfig.builder()
-                .amDeploymentUrl(AM_DEPLOYMENT)
                 .issuerName(ISSUER)
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)

@@ -29,7 +29,6 @@ import org.forgerock.util.Reject;
  * 3. The uri element (e.g. /realm1/accounting/bobo) at which the STS instance will be deployed
  * 4. The realm within which the STS is deployed.
  *
- * @author Dirk Hogan
  */
 public class DeploymentConfig {
     public static class DeploymentConfigBuilder {
@@ -39,6 +38,7 @@ public class DeploymentConfig {
         private String wsdlLocation;
         private String realm = "/"; //default value
         private AuthTargetMapping authTargetMapping;
+        private String amDeploymentUrl;
 
         public DeploymentConfigBuilder serviceQName(QName service)  {
             this.service = service;
@@ -47,6 +47,11 @@ public class DeploymentConfig {
 
         public DeploymentConfigBuilder portQName(QName port)  {
             this.port = port;
+            return this;
+        }
+
+        public DeploymentConfigBuilder amDeploymentUrl(String url) {
+            this.amDeploymentUrl = url;
             return this;
         }
 
@@ -81,6 +86,7 @@ public class DeploymentConfig {
     private final String wsdlLocation;
     private final String realm;
     private final AuthTargetMapping authTargetMapping;
+    private final String amDeploymentUrl;
 
     private DeploymentConfig(DeploymentConfigBuilder builder) {
         this.service = builder.service;
@@ -89,12 +95,14 @@ public class DeploymentConfig {
         this.wsdlLocation = builder.wsdlLocation;
         this.realm = builder.realm;
         this.authTargetMapping = builder.authTargetMapping;
+        this.amDeploymentUrl = builder.amDeploymentUrl;
         Reject.ifNull(service, "Service QName cannot be null");
         Reject.ifNull(port, "Port QName cannot be null");
         Reject.ifNull(uriElement, "UriElement String cannot be null");
         Reject.ifNull(wsdlLocation, "wsdlLocation String cannot be null");
         Reject.ifNull(realm, "Realm String cannot be null");
         Reject.ifNull(authTargetMapping, "AuthTargetMapping cannot be null");
+        Reject.ifNull(amDeploymentUrl, "AM Deployment URL cannot be null");
     }
 
     public static DeploymentConfigBuilder builder() {
@@ -125,6 +133,10 @@ public class DeploymentConfig {
         return authTargetMapping;
     }
 
+    public String getAMDeploymentUrl() {
+        return amDeploymentUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -135,6 +147,7 @@ public class DeploymentConfig {
         sb.append('\t').append("wsdlLocation: ").append(wsdlLocation).append('\n');
         sb.append('\t').append("realm: ").append(realm).append('\n');
         sb.append('\t').append("authTargetMapping: ").append(authTargetMapping).append('\n');
+        sb.append('\t').append("AM Deployment URL: ").append(amDeploymentUrl).append('\n');
         return sb.toString();
     }
 
@@ -147,6 +160,7 @@ public class DeploymentConfig {
                     uriElement.equals(otherConfig.getUriElement()) &&
                     wsdlLocation.equals(otherConfig.getWsdlLocation()) &&
                     realm.equals(otherConfig.getRealm()) &&
+                    amDeploymentUrl.equals(otherConfig.getAMDeploymentUrl()) &&
                     authTargetMapping.equals(otherConfig.authTargetMapping);
 
         }

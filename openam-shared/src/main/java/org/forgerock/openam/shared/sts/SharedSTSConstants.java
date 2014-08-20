@@ -42,12 +42,6 @@ public class SharedSTSConstants {
     public static final String REST_STS_PUBLISH_INSTANCE_STATE = "instance_state";
 
     /*
-    This field referenced in STSInstanceConfig.AM_DEPLOYMENT_URL. It is the name of the key of the json field referencing
-    the OpenAM deployment Url, which also matches the name of the AttributeSchema element defined in restSTS.xml
-     */
-    public static final String AM_DEPLOYMENT_URL = "am-deployment-url";
-
-    /*
     This field referenced in RestDeploymentConfig.DEPLOYMENT_REALM. It is the name of the key of the json field referencing
     the realm in which the rest instance is deployed, which also matches the name of the AttributeSchema element defined in restSTS.xml
      */

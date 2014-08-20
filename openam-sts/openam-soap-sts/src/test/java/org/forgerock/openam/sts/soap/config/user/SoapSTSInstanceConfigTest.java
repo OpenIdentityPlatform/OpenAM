@@ -25,8 +25,8 @@ import javax.xml.namespace.QName;
 
 import java.io.UnsupportedEncodingException;
 
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 /**
  */
@@ -35,8 +35,8 @@ public class SoapSTSInstanceConfigTest {
     public void testEquals() throws UnsupportedEncodingException {
         SoapSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam");
         SoapSTSInstanceConfig ric2 = createInstanceConfig("/bob", "http://localhost:8080/openam");
-        assertTrue(ric1.equals(ric2));
-        assertTrue(ric1.hashCode() == ric2.hashCode());
+        assertEquals(ric1, ric2);
+        assertEquals(ric1.hashCode(), ric2.hashCode());
     }
 
     @Test
@@ -44,13 +44,13 @@ public class SoapSTSInstanceConfigTest {
 
         SoapSTSInstanceConfig ric1 = createInstanceConfig("/bob", "http://localhost:8080/openam");
         SoapSTSInstanceConfig ric2 = createInstanceConfig("/bobo", "http://localhost:8080/openam");
-        assertFalse(ric1.equals(ric2));
-        assertFalse(ric1.hashCode() == ric2.hashCode());
+        assertNotEquals(ric1, ric2);
+        assertNotEquals(ric1.hashCode(), ric2.hashCode());
 
         SoapSTSInstanceConfig ric3 = createInstanceConfig("/bob", "http://localhost:8080/openam");
         SoapSTSInstanceConfig ric4 = createInstanceConfig("/bob", "http://localhost:8080/");
-        assertFalse(ric3.equals(ric4));
-        assertFalse(ric3.hashCode() == ric4.hashCode());
+        assertNotEquals(ric3, ric4);
+        assertNotEquals(ric3.hashCode(), ric4.hashCode());
 
     }
 
@@ -68,6 +68,7 @@ public class SoapSTSInstanceConfigTest {
                         .serviceQName(new QName("service_namespace", "service_local"))
                         .wsdlLocation("wsdl_loc")
                         .realm("realm")
+                        .amDeploymentUrl(amDeploymentUrl)
                         .uriElement(uriElement)
                         .authTargetMapping(mapping)
                         .build();
@@ -84,7 +85,6 @@ public class SoapSTSInstanceConfigTest {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl(amDeploymentUrl)
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();
@@ -96,6 +96,7 @@ public class SoapSTSInstanceConfigTest {
         DeploymentConfig deploymentConfig =
                 DeploymentConfig.builder()
                         .uriElement("whatever")
+                        .amDeploymentUrl("whatever")
                         .build();
 
         KeystoreConfig keystoreConfig =
@@ -110,7 +111,6 @@ public class SoapSTSInstanceConfigTest {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl("whatever")
                 .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();

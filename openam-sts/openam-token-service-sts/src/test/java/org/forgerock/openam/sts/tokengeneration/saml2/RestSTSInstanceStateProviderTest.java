@@ -138,7 +138,6 @@ public class RestSTSInstanceStateProviderTest {
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .amDeploymentUrl("http:/host.com:8080/openam")
                 .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("http://macbook.dirk.internal.forgerock.com:8080/openam")
