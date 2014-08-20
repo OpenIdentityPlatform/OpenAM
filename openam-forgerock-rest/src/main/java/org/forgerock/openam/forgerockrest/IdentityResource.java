@@ -137,6 +137,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String UNIVERSAL_ID = "universalid";
     final static String MAIL = "mail";
     final static String UNIVERSAL_ID_ABBREV = "uid";
+    final static String USERNAME = "username";
     final static String EMAIL = "email";
     final static String USERNAME = "username";
     final static String TOKEN_ID = "tokenId";
@@ -222,7 +223,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @return random string
      */
     static private String generateTokenID(String resource) {
-        if(resource == null || resource.isEmpty()) {
+        if (isNullOrEmpty(resource)) {
             return null;
         }
         return Hash.hash(resource + RandomStringUtils.randomAlphanumeric(32));
@@ -242,7 +243,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         Calendar ttl = Calendar.getInstance();
         org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
-        if(userId != null && !userId.isEmpty()) {
+        if (!isNullOrEmpty(userId)) {
             ctsToken.setUserId(userId);
         }
         ctsToken.setAttribute(CoreTokenField.STRING_ONE, realmName);
@@ -290,7 +291,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
-            if (emailAddress == null || emailAddress.isEmpty()) {
+            if (isNullOrEmpty(emailAddress)){
                 throw new BadRequestException("Email not provided");
             }
 
@@ -314,7 +315,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
             StringBuilder confURLBuilder = new StringBuilder(100);
-            if (confURL == null || confURL.isEmpty()) {
+            if (isNullOrEmpty(confURL)) {
                 confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
             } else {
                 confURLBuilder.append(confURL);
@@ -391,7 +392,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         try {
             // Check if subject has not  been included
-            if (subject == null || subject.isEmpty()) {
+            if (isNullOrEmpty(subject)){
                 // Use default email service subject
                 subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
             }
@@ -401,7 +402,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
         try {
             // Check if Custom Message has been included
-            if (message == null || message.isEmpty()) {
+            if (isNullOrEmpty(message)){
                 // Use default email service message
                 message = mailattrs.get(MAIL_MESSAGE).iterator().next();
             }
@@ -457,46 +458,56 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param request Request from client to confirm registration
      * @param handler Result handler
      */
-    private void confirmRegistration(final ServerContext context, final ActionRequest request,
+    private void confirmationIdCheck(final ServerContext context, final ActionRequest request,
                                      final ResultHandler<JsonValue> handler, final String realm){
+        final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
         String tokenID;
         String confirmationId;
         String email = null;
+        String username = null;
+        //email or username value used to create confirmationId
+        String hashComponent = null;
+        String hashComponentAttr = null;
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
 
         try{
             tokenID = jVal.get(TOKEN_ID).asString();
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
             email = jVal.get(EMAIL).asString();
+            username = jVal.get(USERNAME).asString();
 
-            if (email == null || email.isEmpty()) {
-                throw new BadRequestException("Email not provided");
-            }
-
-            if (confirmationId == null || confirmationId.isEmpty()) {
+            if (isNullOrEmpty(confirmationId)) {
                 throw new BadRequestException("confirmationId not provided");
             }
-
-            if (tokenID == null || tokenID.isEmpty()) {
+            if (isNullOrEmpty(email) && !isNullOrEmpty(username)) {
+                hashComponent = username;
+                hashComponentAttr = USERNAME;
+            } 
+            if (!isNullOrEmpty(email) && isNullOrEmpty(username)) {
+                hashComponent = email;
+                hashComponentAttr = EMAIL;
+            } 
+            if (isNullOrEmpty(hashComponent)) {
+                throw new BadRequestException("Required information not provided");
+            }
+            if (isNullOrEmpty(tokenID)) {
                 throw new BadRequestException("tokenId not provided");
             }
 
-            validateToken(tokenID, realm, email, confirmationId);
+            validateToken(tokenID, realm, hashComponent, confirmationId);
 
             // build resource
-            result.put(EMAIL,email );
+            result.put(hashComponentAttr,hashComponent);
             result.put(TOKEN_ID, tokenID);
             result.put(CONFIRMATION_ID, confirmationId);
             handler.handleResult(result);
 
         } catch (BadRequestException be){
-            debug.error("IdentityResource.confirmRegistration: Cannot confirm registration for : "
-                    + email);
+            debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, be);
             handler.handleError(be);
         } catch (Exception e){
-            debug.error("IdentityResource.confirmRegistration: Cannot confirm registration for : "
-                    + email + e);
+            debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
@@ -531,13 +542,13 @@ public final class IdentityResource implements CollectionResourceProvider {
         // check confirmationId
         if (!confirmationId.equalsIgnoreCase(Hash.hash(tokenID + hashComponent +
                 SystemProperties.get(AM_ENCRYPTION_PWD)))) {
-            debug.error("IdentityResource.confirmRegistration: Invalid confirmationId : " + confirmationId);
+            debug.error("IdentityResource.validateToken: Invalid confirmationId : " + confirmationId);
             throw new BadRequestException("Invalid confirmationId", null);
         }
 
         //check realm
         if (!realm.equals(ctsToken.getValue(CoreTokenField.STRING_ONE))) {
-            debug.error("IdentityResource.confirmRegistration: Invalid realm : " + realm);
+            debug.error("IdentityResource.validateToken: Invalid realm : " + realm);
             throw new BadRequestException("Invalid realm", null);
         }
 
@@ -560,7 +571,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if (action.equalsIgnoreCase("register")){
             createRegistrationEmail(context,request, realm, restSecurity, handler);
         } else if (action.equalsIgnoreCase("confirm")) {
-            confirmRegistration(context, request, handler, realm);
+            confirmationIdCheck(context, request, handler, realm);
         } else if (action.equalsIgnoreCase("anonymousCreate")) {
             anonymousCreate(context, request, realm, handler);
         } else if (action.equalsIgnoreCase("forgotPassword")) {
@@ -1556,4 +1567,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
         return restSecurity;
     }
+
+    private static boolean isNullOrEmpty(final String value) {
+       return value == null || value.isEmpty();
+   }
 }
