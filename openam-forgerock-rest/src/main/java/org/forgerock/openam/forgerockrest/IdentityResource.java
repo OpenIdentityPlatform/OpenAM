@@ -139,7 +139,6 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String UNIVERSAL_ID_ABBREV = "uid";
     final static String USERNAME = "username";
     final static String EMAIL = "email";
-    final static String USERNAME = "username";
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
     final static String CURRENT_PASSWORD = "currentpassword";
