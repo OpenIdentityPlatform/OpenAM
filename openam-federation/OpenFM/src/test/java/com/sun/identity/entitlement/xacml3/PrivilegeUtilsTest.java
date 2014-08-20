@@ -81,12 +81,6 @@ public class PrivilegeUtilsTest {
                 resourceName, actionValues);
         entitlement.setName("ent1");
 
-        Set<String> excludedResources = new HashSet<String>();
-        excludedResources.add("http://www.sun.com:80/hr");
-        excludedResources.add("http://www.sun.com:80/legal");
-        entitlement.setExcludedResourceNames(excludedResources);
-
-
         String user11 = "id=user11,ou=user," + ServiceManager.getBaseDN();
         String user12 = "id=user12,ou=user," + ServiceManager.getBaseDN();
         UserSubject ua1 = new OpenSSOUserSubject();
@@ -98,9 +92,6 @@ public class PrivilegeUtilsTest {
         subjects.add(ua2);
         OrSubject os = new OrSubject(subjects);
 
-        Set<String> excludedResourceNames = new HashSet<String>();
-        entitlement.setExcludedResourceNames(excludedResourceNames);
-        
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         String startIp = "100.100.100.100";
         String endIp = "200.200.200.200";
@@ -109,7 +100,6 @@ public class PrivilegeUtilsTest {
         conditions.add(ipc);
         OrCondition oc = new OrCondition(conditions);
         AndCondition ac = new AndCondition(conditions);
-
 
         StaticAttributes sa1 = new StaticAttributes();
         Set<String> aValues = new HashSet<String>();
@@ -152,16 +142,16 @@ public class PrivilegeUtilsTest {
         privilege.setCreationDate(System.currentTimeMillis());
         privilege.setLastModifiedDate(System.currentTimeMillis());
 
-        UnittestLog.logMessage("PrivilegeUtils.testPrivilegeToXACMLPolicy():" +
-                "Privilege=" + privilege.toString());
-        UnittestLog.logMessage("PrivilegeUtils.testPrivilegeToXACMLPolicy():" +
-                "converting to xacml policy");
+        UnittestLog.logMessage("PrivilegeUtils.testPrivilegeToXACMLPolicy():"
+                + "Privilege=" + privilege.toString());
+        UnittestLog.logMessage("PrivilegeUtils.testPrivilegeToXACMLPolicy():"
+                + "converting to xacml policy");
         // TODO(jtb): not compiling
         String xacmlString = XACMLPrivilegeUtils.toXACML(privilege);
         UnittestLog.logMessage("xacml policy=" + xacmlString);
         } catch (Throwable t) {
-            UnittestLog.logError("Throable:",  t);
-            UnittestLog.logMessage("Thrwoable:" +  t.getMessage());
+            UnittestLog.logError("Throwable:",  t);
+            UnittestLog.logMessage("Throwable:" +  t.getMessage());
             t.printStackTrace();
         }
     }
@@ -171,5 +161,4 @@ public class PrivilegeUtilsTest {
         PrivilegeUtilsTest put = new PrivilegeUtilsTest();
         put.testPrivilegeToXACMLPolicy();
     }
-
 }

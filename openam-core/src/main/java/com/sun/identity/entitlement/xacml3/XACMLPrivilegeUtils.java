@@ -149,7 +149,7 @@ public class XACMLPrivilegeUtils {
         return stringWriter.toString();
     }
 
-    
+
 
     public static Policy privilegeToPolicy(Privilege privilege)  {
         Policy policy = null;
@@ -175,7 +175,7 @@ public class XACMLPrivilegeUtils {
          *
          * entitlement excluded resource names would map to xacml rule target
          *
-         * simple one level entitlement subjects (without or, and etc) 
+         * simple one level entitlement subjects (without or, and etc)
          * would map to policy target
          *
          * all entitlement subjects would also map to xacml rule condition
@@ -184,7 +184,7 @@ public class XACMLPrivilegeUtils {
          *
          * entitlement resource attributes would map to rule advice expression
          *
-         * at present xacml obligation support is out of scope 
+         * at present xacml obligation support is out of scope
          */
 
         if (privilege == null) {
@@ -194,7 +194,7 @@ public class XACMLPrivilegeUtils {
         Policy policy = new Policy();
 
         String privilegeName = privilege.getName();
-        String applicationName = null; 
+        String applicationName = null;
         String entitlementName = null;
         Entitlement entitlement = privilege.getEntitlement();
         if (entitlement != null) {
@@ -209,7 +209,7 @@ public class XACMLPrivilegeUtils {
         String description = privilege.getDescription();
         policy.setDescription(description);
 
-        List<Object> vrList 
+        List<Object> vrList
             = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
         ObjectFactory objectFactory = new ObjectFactory();
@@ -223,7 +223,7 @@ public class XACMLPrivilegeUtils {
             AttributeValue cbv = new AttributeValue();
             cbv.setDataType(XACMLConstants.XS_STRING);
             cbv.getContent().add(applicationName);
-            JAXBElement<AttributeValue> cbve 
+            JAXBElement<AttributeValue> cbve
                     = objectFactory.createAttributeValue(cbv);
             appName.setExpression(cbve);
         }
@@ -235,7 +235,7 @@ public class XACMLPrivilegeUtils {
             AttributeValue cbv = new AttributeValue();
             cbv.setDataType(XACMLConstants.XS_STRING);
             cbv.getContent().add(applicationName);
-            JAXBElement<AttributeValue> cbve 
+            JAXBElement<AttributeValue> cbve
                     = objectFactory.createAttributeValue(cbv);
             entName.setExpression(cbve);
         }
@@ -246,7 +246,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue cbv = new AttributeValue();
         cbv.setDataType(XACMLConstants.XS_STRING);
         cbv.getContent().add(privilege.getCreatedBy());
-        JAXBElement<AttributeValue> cbve 
+        JAXBElement<AttributeValue> cbve
                 = objectFactory.createAttributeValue(cbv);
         createdBy.setExpression(cbve);
 
@@ -256,7 +256,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue lmbv = new AttributeValue();
         lmbv.setDataType(XACMLConstants.XS_STRING);
         lmbv.getContent().add(privilege.getLastModifiedBy());
-        JAXBElement<AttributeValue> lmbve 
+        JAXBElement<AttributeValue> lmbve
                 = objectFactory.createAttributeValue(lmbv);
         lastModifiedBy.setExpression(cbve);
 
@@ -268,7 +268,7 @@ public class XACMLPrivilegeUtils {
         sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         VariableDefinition creationDate = new VariableDefinition();
-        vrList.add(creationDate); 
+        vrList.add(creationDate);
         creationDate.setVariableId(XACMLConstants.PRIVILEGE_CREATION_DATE);
         AttributeValue cdv = new AttributeValue();
         cdv.setDataType(XACMLConstants.XS_DATE_TIME);
@@ -276,12 +276,12 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getCreationDate())
                 + "T"
                 + sdf2.format(privilege.getCreationDate()));
-        JAXBElement<AttributeValue> cdve 
+        JAXBElement<AttributeValue> cdve
                 = objectFactory.createAttributeValue(cdv);
         creationDate.setExpression(cdve);
 
         VariableDefinition lastModifiedDate = new VariableDefinition();
-        vrList.add(lastModifiedDate); 
+        vrList.add(lastModifiedDate);
         lastModifiedDate.setVariableId(
                 XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
         AttributeValue lmdv = new AttributeValue();
@@ -290,7 +290,7 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getLastModifiedDate())
                 + "T"
                 + sdf2.format(privilege.getLastModifiedDate()));
-        JAXBElement<AttributeValue> lmdve 
+        JAXBElement<AttributeValue> lmdve
                 = objectFactory.createAttributeValue(lmdv);
         lastModifiedDate.setExpression(lmdve);
 
@@ -299,7 +299,7 @@ public class XACMLPrivilegeUtils {
         Version version = new Version();
 
         // TODO: use privilege version in future
-        version.setValue(sdf3.format(privilege.getLastModifiedDate())); 
+        version.setValue(sdf3.format(privilege.getLastModifiedDate()));
         policy.setVersion(version);
 
         // Defaults policyDefaults = null; // optional, TODO
@@ -347,7 +347,7 @@ public class XACMLPrivilegeUtils {
         }
 
         Map<String, Boolean> actionValues = entitlement.getActionValues();
-        List<AnyOf> anyOfActionList 
+        List<AnyOf> anyOfActionList
                 = actionNamesToAnyOfList(actionValues.keySet(),
                 applicationName);
         if (anyOfActionList != null) {
@@ -368,10 +368,6 @@ public class XACMLPrivilegeUtils {
             }
         }
 
-        Set<String> excludedResources = entitlement.getExcludedResourceNames();
-        List<AnyOf> anyOfExcludedResourceList
-                = excludedResourceNamesToAnyOfList(
-                excludedResources, applicationName);
         Condition condition = eSubjectConditionToXCondition(
                 privilege.getSubject(), privilege.getCondition());
 
@@ -381,42 +377,31 @@ public class XACMLPrivilegeUtils {
         if (!permitActions.isEmpty()) {
             Rule permitRule = new Rule();
             vrList.add(permitRule);
-            permitRule.setRuleId(entitlement.getName() + ":"
-                    + XACMLConstants.PREMIT_RULE_SUFFIX);
+            permitRule.setRuleId(entitlement.getName() + ":" + XACMLConstants.PREMIT_RULE_SUFFIX);
             permitRule.setDescription(XACMLConstants.PERMIT_RULE_DESCRIPTION);
             permitRule.setEffect(EffectType.PERMIT);
             Target permitTarget = new Target();
             permitRule.setTarget(permitTarget);
             List<AnyOf> permitTargetAnyOfList = permitTarget.getAnyOf();
-            if (anyOfExcludedResourceList != null) {
-                permitTargetAnyOfList.addAll(anyOfExcludedResourceList);
-            }
-            List<AnyOf> anyOfPermitActionList
-                    = actionNamesToAnyOfList(permitActions, applicationName);
+            List<AnyOf> anyOfPermitActionList = actionNamesToAnyOfList(permitActions, applicationName);
             if (anyOfPermitActionList != null) {
                 permitTargetAnyOfList.addAll(anyOfPermitActionList);
             }
             if (condition != null) {
                 permitRule.setCondition(condition);
             }
-            
         }
 
         if (!denyActions.isEmpty()) {
             Rule denyRule = new Rule();
             vrList.add(denyRule);
-            denyRule.setRuleId(entitlement.getName()  + ":"
-                    + XACMLConstants.DENY_RULE_SUFFIX);
+            denyRule.setRuleId(entitlement.getName() + ":" + XACMLConstants.DENY_RULE_SUFFIX);
             denyRule.setDescription(XACMLConstants.DENY_RULE_DESCRIPTION);
             denyRule.setEffect(EffectType.DENY);
             Target denyTarget = new Target();
             denyRule.setTarget(denyTarget);
             List<AnyOf> denyTargetAnyOfList = denyTarget.getAnyOf();
-            if (anyOfExcludedResourceList != null) {
-                denyTargetAnyOfList.addAll(anyOfExcludedResourceList);
-            }
-            List<AnyOf> anyOfDenyActionList
-                    = actionNamesToAnyOfList(denyActions, applicationName);
+            List<AnyOf> anyOfDenyActionList = actionNamesToAnyOfList(denyActions, applicationName);
             if (anyOfDenyActionList != null) {
                 denyTargetAnyOfList.addAll(anyOfDenyActionList);
             }
@@ -424,8 +409,6 @@ public class XACMLPrivilegeUtils {
                 denyRule.setCondition(condition);
             }
         }
-
-
         return policy;
     }
 
@@ -720,7 +703,7 @@ public class XACMLPrivilegeUtils {
     }
 
     public static Condition eSubjectConditionToXCondition(
-            EntitlementSubject es, EntitlementCondition ec) 
+            EntitlementSubject es, EntitlementCondition ec)
             throws JAXBException {
         Condition condition = null;
         if (es != null || ec != null) {
@@ -772,7 +755,7 @@ public class XACMLPrivilegeUtils {
         return XACMLConstants.XACML_RULE_DENY_OVERRIDES;
     }
 
-    public static Set<Privilege> policySetToPrivileges(PolicySet policySet) 
+    public static Set<Privilege> policySetToPrivileges(PolicySet policySet)
             throws EntitlementException {
         if (policySet == null) {
             return null;
@@ -807,10 +790,10 @@ public class XACMLPrivilegeUtils {
         long lastModifiedAt = dateStringToLong(getVariableById(policy,
                 XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
 
-        String entitlementName = getVariableById(policy, 
+        String entitlementName = getVariableById(policy,
                 XACMLConstants.ENTITLEMENT_NAME);
 
-        String applicationName = getVariableById(policy, 
+        String applicationName = getVariableById(policy,
                 XACMLConstants.APPLICATION_NAME);
 
         List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
@@ -828,7 +811,6 @@ public class XACMLPrivilegeUtils {
          * One Rule per value
          */
         Entitlement entitlement = new Entitlement(applicationName, resourceNames, actionValues);
-        entitlement.setExcludedResourceNames(excludedResourceNames);
         if (entitlementName != null) {
             entitlement.setName(entitlementName);
         }
@@ -836,7 +818,6 @@ public class XACMLPrivilegeUtils {
         // FIXME: add support ResourceAttributes
         Set<ResourceAttribute> ras = null;
 
-       
         Privilege privilege = new XACMLOpenSSOPrivilege();
         privilege.setName(privilegeName);
         privilege.setEntitlement(entitlement);
@@ -853,19 +834,16 @@ public class XACMLPrivilegeUtils {
 
     public static String getVariableById(Policy policy, String id) {
         String val = null;
-        List<Object> vrList =
-           policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
+        List<Object> vrList = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
         for (Object obj : vrList) {
             if (obj instanceof VariableDefinition) {
-                VariableDefinition vd =(VariableDefinition)obj;
+                VariableDefinition vd = (VariableDefinition) obj;
                 if (vd.getVariableId().equals(id)) {
-                    JAXBElement<AttributeValue> jav
-                            = (JAXBElement<AttributeValue>)vd.getExpression();
-                    AttributeValue cbav = (AttributeValue)jav.getValue();
-                    val = cbav.getContent().get(0).toString();
-
+                    JAXBElement<AttributeValue> jav = (JAXBElement<AttributeValue>) vd.getExpression();
+                    AttributeValue attributeValue = (AttributeValue) jav.getValue();
+                    val = attributeValue.getContent().get(0).toString();
                 }
-            }  
+            }
         }
         return val;
     }
@@ -894,10 +872,10 @@ public class XACMLPrivilegeUtils {
         } catch (JAXBException je) {
             //TODO: log error, jaxbexception
         }
-        return policySet; 
+        return policySet;
     }
 
-    private static PolicySet privilegesToPolicySetInternal(String realm, 
+    private static PolicySet privilegesToPolicySetInternal(String realm,
             Set<Privilege> privileges) throws JAXBException {
         if (privileges == null) {
             return null;
@@ -908,7 +886,7 @@ public class XACMLPrivilegeUtils {
             policies.add(policy);
         }
         PolicySet policySet = policiesToPolicySetInternal(realm, policies);
-        return policySet; 
+        return policySet;
     }
 
     public static PolicySet newPolicySet(String realm)
@@ -1072,7 +1050,7 @@ public class XACMLPrivilegeUtils {
         }
         return actionNames;
     }
-    
+
     static JSONObject getRealmsAppsResources(List<Match> matches)
             throws JSONException {
         if (matches == null) {
@@ -1092,7 +1070,7 @@ public class XACMLPrivilegeUtils {
                         jsonString =obj.toString();
                         break;
                     }
-                } 
+                }
             }
         }
         if (jsonString != null) {
@@ -1247,7 +1225,7 @@ public class XACMLPrivilegeUtils {
         }
         JAXBContext jc = JAXBContext.newInstance(
                     XACMLConstants.XACML3_CORE_PKG);
-                
+
         Unmarshaller um = jc.createUnmarshaller();
         JAXBElement je = (JAXBElement)um.unmarshal(XMLUtils.createSAXSource(new InputSource(stream)));
         PolicySet ps = (PolicySet)je.getValue();
@@ -1279,7 +1257,7 @@ public class XACMLPrivilegeUtils {
             return null;
         }
         String className =  null;
-        if (dataType.length() 
+        if (dataType.length()
                 > XACMLConstants.JSON_SUBJECT_DATATYPE.length()) {
             className = dataType.substring(
                     XACMLConstants.JSON_SUBJECT_DATATYPE.length() + 1);
@@ -1308,7 +1286,7 @@ public class XACMLPrivilegeUtils {
             return null;
         }
         String className =  null;
-        if (dataType.length() 
+        if (dataType.length()
                 > XACMLConstants.JSON_CONDITION_DATATYPE.length()) {
             className = dataType.substring(
                     XACMLConstants.JSON_CONDITION_DATATYPE.length() + 1);
@@ -1359,9 +1337,9 @@ public class XACMLPrivilegeUtils {
         return policy;
     }
 
-    public static Policy referralToPolicyInternal(ReferralPrivilege privilege) 
+    public static Policy referralToPolicyInternal(ReferralPrivilege privilege)
             throws JAXBException, JSONException {
- 
+
         if (privilege == null) {
             return null;
         }
@@ -1377,7 +1355,7 @@ public class XACMLPrivilegeUtils {
         String description = privilege.getDescription();
         policy.setDescription(description);
 
-        List<Object> vrList 
+        List<Object> vrList
             = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
         ObjectFactory objectFactory = new ObjectFactory();
@@ -1390,7 +1368,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue cbv = new AttributeValue();
         cbv.setDataType(XACMLConstants.XS_STRING);
         cbv.getContent().add(privilege.getCreatedBy());
-        JAXBElement<AttributeValue> cbve 
+        JAXBElement<AttributeValue> cbve
                 = objectFactory.createAttributeValue(cbv);
         createdBy.setExpression(cbve);
 
@@ -1400,7 +1378,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue lmbv = new AttributeValue();
         lmbv.setDataType(XACMLConstants.XS_STRING);
         lmbv.getContent().add(privilege.getLastModifiedBy());
-        JAXBElement<AttributeValue> lmbve 
+        JAXBElement<AttributeValue> lmbve
                 = objectFactory.createAttributeValue(lmbv);
         lastModifiedBy.setExpression(cbve);
 
@@ -1412,7 +1390,7 @@ public class XACMLPrivilegeUtils {
         sdf3.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         VariableDefinition creationDate = new VariableDefinition();
-        vrList.add(creationDate); 
+        vrList.add(creationDate);
         creationDate.setVariableId(XACMLConstants.PRIVILEGE_CREATION_DATE);
         AttributeValue cdv = new AttributeValue();
         cdv.setDataType(XACMLConstants.XS_DATE_TIME);
@@ -1420,12 +1398,12 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getCreationDate())
                 + "T"
                 + sdf2.format(privilege.getCreationDate()));
-        JAXBElement<AttributeValue> cdve 
+        JAXBElement<AttributeValue> cdve
                 = objectFactory.createAttributeValue(cdv);
         creationDate.setExpression(cdve);
 
         VariableDefinition lastModifiedDate = new VariableDefinition();
-        vrList.add(lastModifiedDate); 
+        vrList.add(lastModifiedDate);
         lastModifiedDate.setVariableId(
                 XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
         AttributeValue lmdv = new AttributeValue();
@@ -1434,7 +1412,7 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getLastModifiedDate())
                 + "T"
                 + sdf2.format(privilege.getLastModifiedDate()));
-        JAXBElement<AttributeValue> lmdve 
+        JAXBElement<AttributeValue> lmdve
                 = objectFactory.createAttributeValue(lmdv);
         lastModifiedDate.setExpression(lmdve);
 
@@ -1454,7 +1432,7 @@ public class XACMLPrivilegeUtils {
         Version version = new Version();
 
         // TODO: use privilege version in future
-        version.setValue(sdf3.format(privilege.getLastModifiedDate())); 
+        version.setValue(sdf3.format(privilege.getLastModifiedDate()));
         policy.setVersion(version);
 
         // Defaults policyDefaults = null; // optional, TODO
@@ -1473,7 +1451,7 @@ public class XACMLPrivilegeUtils {
         Set<String> realms = privilege.getRealms();
         Map<String, Set<String>> appsResources
                 = privilege.getOriginalMapApplNameToResources();
-        
+
 
         AnyOf anyOfRealmsAppsResources
                 = realmsAppsResourcesToAnyOf(realms, appsResources);
@@ -1529,7 +1507,7 @@ public class XACMLPrivilegeUtils {
         referral.setCreationDate(createdAt);
         referral.setLastModifiedBy(lastModifiedBy);
         referral.setLastModifiedDate(lastModifiedAt);
- 
+
         return referral;
     }
 
@@ -1553,9 +1531,9 @@ public class XACMLPrivilegeUtils {
         attributeValue.getContent().add(jo.toString());
 
         AttributeDesignator attributeDesignator = new AttributeDesignator();
-        String category = XACMLConstants.REALMS_APPS_RESOURCES_CATEGORY; 
+        String category = XACMLConstants.REALMS_APPS_RESOURCES_CATEGORY;
         attributeDesignator.setCategory(category);
-        String attributeId = XACMLConstants.JSON_REALMS_APPS_RESOURCES_ID; 
+        String attributeId = XACMLConstants.JSON_REALMS_APPS_RESOURCES_ID;
         attributeDesignator.setAttributeId(attributeId);
         attributeDesignator.setDataType(dataType);
         boolean mustBePresent = false;

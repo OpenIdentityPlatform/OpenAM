@@ -51,8 +51,8 @@ import org.json.JSONObject;
  *     Set set = new HashSet();
  *     set.add("GET");
  *     Evaluator evaluator = new Evaluator(adminToken);
- *     boolean isAllowed = evaluator.hasEntitlement(subject, 
- *         new Entitlement("http://www.sun.com/example", set), 
+ *     boolean isAllowed = evaluator.hasEntitlement(subject,
+ *         new Entitlement("http://www.sun.com/example", set),
  *         Collections.EMPTY_MAP);
  * </pre>
  * Or do a sub tree search like this.
@@ -69,10 +69,8 @@ import org.json.JSONObject;
  */
 public class Entitlement {
     private String name;
-    private String applicationName =
-        ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
+    private String applicationName = ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
     private Set<String> resourceNames;
-    private Set<String> excludedResourceNames;
     private Map<String, Boolean> actionValues;
     private Map<String, Set<String>> advices;
     private Map<String, Set<String>> attributes;
@@ -86,10 +84,9 @@ public class Entitlement {
     }
 
     public Entitlement(JSONObject jo) throws JSONException {
-        name = (String)jo.opt("name");
-        applicationName = (String)jo.opt("applicationName");
+        name = (String) jo.opt("name");
+        applicationName = (String) jo.opt("applicationName");
         resourceNames = JSONUtils.getSet(jo, "resourceNames");
-        excludedResourceNames = JSONUtils.getSet(jo, "excludedResourceNames");
         actionValues = JSONUtils.getMapStringBoolean(jo, "actionsValues");
         advices = JSONUtils.getMapStringSetString(jo, "advices");
         attributes = JSONUtils.getMapStringSetString(jo, "attributes");
@@ -124,11 +121,7 @@ public class Entitlement {
      * @param resourceName Resource name.
      * @param actionNames Set of action names.
      */
-    public Entitlement(
-        String applicationName,
-        String resourceName,
-        Set<String> actionNames
-    ) {
+    public Entitlement(String applicationName, String resourceName, Set<String> actionNames) {
         setApplicationName(applicationName);
         setResourceName(resourceName);
         setActionNames(actionNames);
@@ -140,10 +133,7 @@ public class Entitlement {
      * @param resourceName Resource namess.
      * @param actionValues Map of action name to set of values.
      */
-    public Entitlement(
-        String resourceName,
-        Map<String, Boolean> actionValues
-    ) {
+    public Entitlement(String resourceName, Map<String, Boolean> actionValues) {
         setResourceName(resourceName);
         setActionValues(actionValues);
     }
@@ -155,11 +145,7 @@ public class Entitlement {
      * @param resourceName Resource namess.
      * @param actionValues Map of action name to set of values.
      */
-    public Entitlement(
-        String applicationName,
-        String resourceName,
-        Map<String, Boolean> actionValues
-    ) {
+    public Entitlement(String applicationName, String resourceName, Map<String, Boolean> actionValues) {
         setApplicationName(applicationName);
         setResourceName(resourceName);
         setActionValues(actionValues);
@@ -172,11 +158,7 @@ public class Entitlement {
      * @param resourceNames Resource names.
      * @param actionValues Map of action name to set of values.
      */
-    public Entitlement(
-        String applicationName,
-        Set<String> resourceNames,
-        Map<String, Boolean> actionValues
-    ) {
+    public Entitlement(String applicationName, Set<String> resourceNames, Map<String, Boolean> actionValues) {
         setApplicationName(applicationName);
         setResourceNames(resourceNames);
         setActionValues(actionValues);
@@ -237,26 +219,6 @@ public class Entitlement {
             return null;
         }
         return resourceNames.iterator().next();
-    }
-
-    /**
-     * Sets excluded resource names.
-     *
-     * @param excludedResourceNames excluded resource names.
-     */
-    public void setExcludedResourceNames(
-        Set<String> excludedResourceNames) {
-        this.excludedResourceNames = excludedResourceNames;
-    }
-
-    /**
-     * Returns excluded resource names.
-     *
-     * @return excluded resource names.
-     */
-    public Set<String> getExcludedResourceNames() {
-        return (excludedResourceNames == null) ? Collections.EMPTY_SET :
-            excludedResourceNames;
     }
 
     /**
@@ -426,7 +388,8 @@ public class Entitlement {
         Set<String> actionNames,
         Map<String, Set<String>> environment,
         boolean recursive)
-        throws EntitlementException {
+    throws EntitlementException {
+
         for (String a : actionNames) {
             if (actionValues.keySet().contains(a)) {
                 return getMatchingResources(adminSubject, realm,
@@ -448,30 +411,29 @@ public class Entitlement {
             return Collections.EMPTY_SET;
         }
 
-        if (!this.applicationName.endsWith(applicationName)){
+        if (!this.applicationName.endsWith(applicationName)) {
             return Collections.EMPTY_SET;
         }
-        
+
         ResourceName resComparator = getResourceComparator(adminSubject, realm);
 
         Set<String> matched = new HashSet<String>();
 
-        Set<String> resources = (subject != null) ? 
-                tagswapResourceNames(subject, resourceNames) : resourceNames;
-        
+        Set<String> resources = (subject != null)
+                ? tagswapResourceNames(subject, resourceNames) : resourceNames;
+
         for (String r : resources) {
             if (!recursive) {
                 if (resComparator instanceof RegExResourceName) {
                     ResourceMatch match = resComparator.compare(
                         resourceName, r, true);
-                    if (match.equals(ResourceMatch.EXACT_MATCH) ||
-                        match.equals(ResourceMatch.SUPER_RESOURCE_MATCH) ||
-                        match.equals(ResourceMatch.WILDCARD_MATCH)) {
+                    if (match.equals(ResourceMatch.EXACT_MATCH)
+                            || match.equals(ResourceMatch.SUPER_RESOURCE_MATCH)
+                            || match.equals(ResourceMatch.WILDCARD_MATCH)) {
                         matched.add(r);
                     }
                 } else {
-                    ResourceMatch match = resComparator.compare(
-                        r, resourceName, false);
+                    ResourceMatch match = resComparator.compare(r, resourceName, false);
                     if (match.equals(ResourceMatch.EXACT_MATCH)) {
                         matched.add(r);
                     } else {
@@ -483,21 +445,19 @@ public class Entitlement {
                 }
             } else {
                 if (resComparator instanceof RegExResourceName) {
-                    ResourceMatch match = resComparator.compare(
-                        r, resourceName, true);
+                    ResourceMatch match = resComparator.compare(r, resourceName, true);
                     if (!match.equals(ResourceMatch.NO_MATCH)) {
                         matched.add(r);
                     }
                 } else {
-                    ResourceMatch match = resComparator.compare(
-                        resourceName, r, true);
-                    if (match.equals(ResourceMatch.WILDCARD_MATCH) ||
-                        match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
+                    ResourceMatch match = resComparator.compare(resourceName, r, true);
+                    if (match.equals(ResourceMatch.WILDCARD_MATCH)
+                            || match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
                         matched.add(r);
                     } else {
                         match = resComparator.compare(r, resourceName, false);
-                        if (match.equals(ResourceMatch.EXACT_MATCH) ||
-                            match.equals(ResourceMatch.SUPER_RESOURCE_MATCH)) {
+                        if (match.equals(ResourceMatch.EXACT_MATCH)
+                                || match.equals(ResourceMatch.SUPER_RESOURCE_MATCH)) {
                             matched.add(r);
                         }
                     }
@@ -505,33 +465,11 @@ public class Entitlement {
             }
         }
 
-        for (Iterator<String> i = matched.iterator(); i.hasNext(); ) {
-            String r = i.next();
-            if ((excludedResourceNames != null) &&
-                !excludedResourceNames.isEmpty()) {
-
-                Set<String> excludes = tagswapResourceNames(subject,
-                    excludedResourceNames);
-                for (String e : excludes) {
-                    ResourceMatch match = resComparator.compare(r, e, true);
-                    if (match.equals(ResourceMatch.EXACT_MATCH) ||
-                        match.equals(ResourceMatch.WILDCARD_MATCH)) {
-                        i.remove();
-                        break;
-                    } else if (recursive && match.equals(
-                        ResourceMatch.SUB_RESOURCE_MATCH)) {
-                        i.remove();
-                        break;
-                    }
-                }
-            }
-        }
-
         return matched;
     }
-    
-    private Set<String> tagswapResourceNames(Subject sbj, Set<String> set)
-        throws EntitlementException {
+
+    private Set<String> tagswapResourceNames(Subject sbj, Set<String> set) throws EntitlementException {
+
         if (sbj == null) {
             return set;
         }
@@ -543,7 +481,7 @@ public class Entitlement {
         if (!principals.isEmpty()) {
             for (Principal p : principals) {
                 String pName = p.getName();
-                if (DN.isDN(pName)){
+                if (DN.isDN(pName)) {
                     String[] rdns = LDAPDN.explodeDN(pName, true);
                     userIds.add(rdns[0]);
                 } else {
@@ -591,10 +529,6 @@ public class Entitlement {
 
         if (resourceNames != null) {
             jo.put("resourceNames", resourceNames);
-        }
-
-        if (excludedResourceNames != null) {
-            jo.put("excludedResourceNames", excludedResourceNames);
         }
 
         if (actionValues != null) {
@@ -666,62 +600,41 @@ public class Entitlement {
             }
         }
 
-        if ((excludedResourceNames == null) || excludedResourceNames.isEmpty()) {
-            if ((object.excludedResourceNames != null) &&
-                !object.excludedResourceNames.isEmpty()) {
-                return false;
-            }
-        } else {
-            if (object.excludedResourceNames == null) {
-                return false;
-            }
-            if (!excludedResourceNames.equals(
-                object.excludedResourceNames)) {
-                return false;
-            }
-        }
-
         if (actionValues == null) {
-            if ((object.getActionValues() != null) &&
-                !object.getActionValues().isEmpty()) {
+            if ((object.getActionValues() != null) && !object.getActionValues().isEmpty()) {
                 return false;
             }
         } else { // actionValues not null
 
             if ((object.getActionValues()) == null) {
                 return false;
-            } else if (!actionValues.equals(
-                    object.getActionValues())) {
+            } else if (!actionValues.equals(object.getActionValues())) {
                 return false;
             }
         }
 
         if (advices == null) {
-            if ((object.getAdvices() != null) &&
-                !object.getAdvices().isEmpty()) {
+            if ((object.getAdvices() != null) && !object.getAdvices().isEmpty()) {
                 return false;
             }
         } else { // advices not null
 
             if ((object.getAdvices()) == null) {
                 return false;
-            } else if (!advices.equals(
-                    object.getAdvices())) {
+            } else if (!advices.equals(object.getAdvices())) {
                 return false;
             }
         }
 
         if (attributes == null) {
-            if ((object.getAttributes() != null) &&
-                !object.getAttributes().isEmpty()) {
+            if ((object.getAttributes() != null) && !object.getAttributes().isEmpty()) {
                 return false;
             }
         } else { // attributes not null
 
             if ((object.getAttributes()) == null) {
                 return false;
-            } else if (!attributes.equals(
-                    object.getAttributes())) {
+            } else if (!attributes.equals(object.getAttributes())) {
                 return false;
             }
         }
@@ -745,9 +658,6 @@ public class Entitlement {
         if (resourceNames != null) {
             code += resourceNames.hashCode();
         }
-        if (excludedResourceNames != null) {
-            code += excludedResourceNames.hashCode();
-        }
         if (actionValues != null) {
             code += actionValues.hashCode();
         }
@@ -768,15 +678,14 @@ public class Entitlement {
      * @return resource search indexes.
      */
     public ResourceSearchIndexes getResourceSearchIndexes(
-        Subject adminSubject, 
+        Subject adminSubject,
         String realm
     ) throws EntitlementException {
         ResourceSearchIndexes result = null;
-        ApplicationType applType = getApplication(
-            adminSubject, realm).getApplicationType();
+        ApplicationType applicationType = getApplication(adminSubject, realm).getApplicationType();
 
         for (String r : resourceNames) {
-            ResourceSearchIndexes rsi = applType.getResourceSearchIndex(r, realm);
+            ResourceSearchIndexes rsi = applicationType.getResourceSearchIndex(r, realm);
             if (result == null) {
                 result = rsi;
             } else {
@@ -794,23 +703,23 @@ public class Entitlement {
      * @return resource save indexes.
      */
     public ResourceSaveIndexes getResourceSaveIndexes(
-        Subject adminSubject, 
+        Subject adminSubject,
         String realm
     ) throws EntitlementException {
         ResourceSaveIndexes result = null;
-        Application appl = getApplication(adminSubject, realm);
+        Application application1 = getApplication(adminSubject, realm);
 
         // application can be null if the referred privilege is removed.
         // get the application from root realm
-        if (appl == null) {
-            appl = getApplication(adminSubject, "/");
+        if (application1 == null) {
+            application1 = getApplication(adminSubject, "/");
         }
 
-        if (appl != null) {
-            ApplicationType applType = appl.getApplicationType();
+        if (application1 != null) {
+            ApplicationType applicationType = application1.getApplicationType();
 
             for (String r : resourceNames) {
-                ResourceSaveIndexes rsi = applType.getResourceSaveIndex(r);
+                ResourceSaveIndexes rsi = applicationType.getResourceSaveIndex(r);
                 if (result == null) {
                     result = rsi;
                 } else {
@@ -828,27 +737,25 @@ public class Entitlement {
      * @param realm Realm Name
      * @return application for this entitlement.
      */
-    public Application getApplication(Subject adminSubject, String realm) 
+    public Application getApplication(Subject adminSubject, String realm)
         throws EntitlementException {
         if (application == null) {
             application = ApplicationManager.getApplication(
                 PrivilegeManager.superAdminSubject, realm, applicationName);
         }
         if (application == null) {
-            PrivilegeManager.debug.error("Entitlement.getApplication null" +
-                "realm=" + realm + " applicationname=" + applicationName,null);
+            PrivilegeManager.debug.error("Entitlement.getApplication null"
+                    + "realm=" + realm + " applicationname=" + applicationName, null);
         }
         return application;
     }
 
-    ResourceName getResourceComparator(Subject adminSubject, String realm) 
+    ResourceName getResourceComparator(Subject adminSubject, String realm)
         throws EntitlementException {
-        return getApplication(PrivilegeManager.superAdminSubject,
-            realm).getResourceComparator();
+        return getApplication(PrivilegeManager.superAdminSubject, realm).getResourceComparator();
     }
 
-    void validateResourceNames(Subject adminSubject, String realm
-    ) throws EntitlementException {
+    void validateResourceNames(Subject adminSubject, String realm) throws EntitlementException {
         if ((resourceNames != null) && !resourceNames.isEmpty()) {
             Application app = getApplication(adminSubject, realm);
 
@@ -873,8 +780,7 @@ public class Entitlement {
      * @param adminSubject Admin Subject.
      * @param realm Realm Name
      */
-    public void canonicalizeResources(Subject adminSubject, String realm)
-        throws EntitlementException {
+    public void canonicalizeResources(Subject adminSubject, String realm) throws EntitlementException {
         ResourceName resComp = getResourceComparator(adminSubject, realm);
         if ((resourceNames != null) && !resourceNames.isEmpty()) {
             Set<String> temp = new HashSet<String>();
@@ -883,15 +789,5 @@ public class Entitlement {
             }
             resourceNames = temp;
         }
-        
-        if ((excludedResourceNames != null) && !excludedResourceNames.isEmpty())
-        {
-            Set<String> temp = new HashSet<String>();
-            for (String r : excludedResourceNames) {
-                temp.add(resComp.canonicalize(r));
-            }
-            excludedResourceNames = temp;
-        }
-
     }
 }

@@ -65,19 +65,16 @@ public class XACMLExportTest {
     private static final String PRIVILEGE_DESC = "Test Description";
 
     private static final String RESOURCE = "http://www.xacmlexportest.com/*";
-    private static final String EXCLUDED_RESOURCE1 = "http://www.xacmlexportest.com/r1.html";
-    private static final String EXCLUDED_RESOURCE2 = "http://www.xacmlexportest.com/r2.html";
 
     private static final String startIp = "100.100.100.100";
     private static final String endIp = "200.200.200.200";
 
     private Privilege privilege;
-    private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
+    private SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private Subject adminSubject = SubjectUtils.createSubject(adminToken);
     private UserSubject ua;
-    private boolean migrated = EntitlementConfiguration.getInstance(
-        adminSubject, "/").migratedToEntitlementService();
+    private boolean migrated = EntitlementConfiguration.getInstance(adminSubject, "/")
+            .migratedToEntitlementService();
 
     private PrivilegeManager pm;
     private Privilege privilege1;
@@ -86,7 +83,7 @@ public class XACMLExportTest {
     private String policySetXML;
 
     @BeforeClass
-    public void setup() 
+    public void setup()
             throws SSOException, IdRepoException, EntitlementException,
             SMSException, InstantiationException, IllegalAccessException {
         //UnittestLog.logMessage("XACMLExportTest.addPrivilege(), setup");
@@ -94,7 +91,7 @@ public class XACMLExportTest {
         if (!migrated) {
             throw new RuntimeException("Server not in entitlement mode");
         }
-        pm = PrivilegeManager.getInstance("/", 
+        pm = PrivilegeManager.getInstance("/",
                 SubjectUtils.createSubject(adminToken));
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("GET", Boolean.TRUE);
@@ -102,12 +99,6 @@ public class XACMLExportTest {
         Entitlement entitlement = new Entitlement(APPLICATION_NAME,
                 RESOURCE, actionValues);
         entitlement.setName("ent1");
-
-        Set<String> excludedResources = new HashSet<String>();
-        excludedResources.add(EXCLUDED_RESOURCE1);
-        excludedResources.add(EXCLUDED_RESOURCE2);
-        entitlement.setExcludedResourceNames(excludedResources);
-
 
         String user11 = "id=user11,ou=user," + ServiceManager.getBaseDN();
         UserSubject ua1 = new OpenSSOUserSubject();
@@ -175,7 +166,7 @@ public class XACMLExportTest {
     }
 
     @AfterClass
-    public void deletePrivilege() 
+    public void deletePrivilege()
             throws SSOException, IdRepoException, EntitlementException,
             SMSException, InstantiationException, IllegalAccessException {
         //UnittestLog.logMessage("XACMLExportTest.deletePrivilege(), cleanup");
@@ -188,13 +179,12 @@ public class XACMLExportTest {
         Set<Privilege> privileges = new HashSet<Privilege>();
         Privilege privilege = pm.getPrivilege(PRIVILEGE_NAME, adminSubject);
         privileges.add(privilege);
-        PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet(
-                "/", privileges);
+        PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet("/", privileges);
         policySetXML = XACMLPrivilegeUtils.toXML(policySet);
     }
 
     @Test(dependsOnMethods={"testListXACML"})
-    public void testDeleteXACML() 
+    public void testDeleteXACML()
             throws SSOException, IdRepoException, EntitlementException,
             SMSException, InstantiationException, IllegalAccessException {
         //UnittestLog.logMessage("XACMLExportTest.testDeleteXACML()");
@@ -204,7 +194,7 @@ public class XACMLExportTest {
     @Test(dependsOnMethods={"testDeleteXACML"})
     public void testCreateXACML() throws Exception {
         //UnittestLog.logMessage("XACMLExportTest.testCreateXACML()");
-        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): policySetXML:" 
+        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): policySetXML:"
                 //+ policySetXML);
         PolicySet policySet = XACMLPrivilegeUtils.streamToPolicySet(
                 new ByteArrayInputStream(policySetXML.getBytes("UTF-8")));
@@ -213,9 +203,9 @@ public class XACMLExportTest {
             throw new Exception("privielges is null");
         }
         Privilege privilege = privileges.iterator().next();
-        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): original priivilege:" 
+        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): original priivilege:"
                 //+ privilege1.toString());
-        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): recreated priivilege:" 
+        //UnittestLog.logMessage("XACMLExportTest.testCreateXML(): recreated priivilege:"
                 //+ privilege.toString());
         if (privilege == null) {
             throw new Exception("privielge is null");
@@ -223,5 +213,4 @@ public class XACMLExportTest {
         assert privilege.equals(privilege1);
         pm.addPrivilege(privilege);
     }
-
 }

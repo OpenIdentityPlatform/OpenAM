@@ -104,7 +104,6 @@ public class ApplicationTypesResourceTest {
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler, times(1)).handleError(captor.capture());
         assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
-
     }
 
     @Test

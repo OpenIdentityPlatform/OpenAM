@@ -77,13 +77,13 @@ public class JsonEntitlement {
     }
 
     /**
-     * Get the set of included and excluded resource names for this entitlement. We use a ResourceSet wrapper here to
-     * make the JSON clearer.
+     * Since excluded resource names were removed, there are only included resource names.  Since those are just
+     * a set of strings, that is what this function now returns
      *
-     * @return the set of excluded and included resource names.
+     * @return the set of resource names.
      */
-    public ResourceSet getResources() {
-        return new ResourceSet(entitlement.getResourceNames(), entitlement.getExcludedResourceNames());
+    public Set<String> getResources() {
+        return entitlement.getResourceNames();
     }
 
     /**
@@ -91,9 +91,8 @@ public class JsonEntitlement {
      *
      * @param resources the resources to set.
      */
-    public void setResources(ResourceSet resources) {
-        entitlement.setResourceNames(resources.getIncluded());
-        entitlement.setExcludedResourceNames(resources.getExcluded());
+    public void setResources(Set<String> resources) {
+        entitlement.setResourceNames(resources);
     }
 
     /**

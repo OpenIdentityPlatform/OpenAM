@@ -79,7 +79,7 @@ public class PrivilegePolicyMapping {
     @BeforeClass
     public void setup() throws Exception {
         try {
-            UnittestLog.logMessage("PrivilgePOlicyMapping.setUp():" +
+            UnittestLog.logMessage("PrivilegePolicyMapping.setUp():" +
                     "entered");
             ipConditionEnvMap = new HashMap<String, Set<String>>();
             Set<String> set = new HashSet<String>();
@@ -102,8 +102,9 @@ public class PrivilegePolicyMapping {
             policy.addCondition("conditionName1", createIPCondition1(pm));
             pm.addPolicy(policy);
         } catch (Exception e) {
-            UnittestLog.logError("PrivilgePOlicyMapping.setUp();" +
-                    "Exception STACKTRACE:" + e.getMessage());
+            UnittestLog.logError("PrivilegePolicyMapping.setUp();"
+                    + "Exception STACKTRACE:"
+                    + e.getMessage());
             StackTraceElement[] elems = e.getStackTrace();
             for (StackTraceElement elem : elems) {
                 UnittestLog.logMessage(elem.toString());
@@ -130,41 +131,34 @@ public class PrivilegePolicyMapping {
             Rule r = p.getRule(ruleName);
             if (!RES_NAME.equals(r.getResourceName())) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.privilegeToPolicy: resource is incorrect");
+                    "PrivilegePolicyMapping.privilegeToPolicy: resource is incorrect");
             }
             if (!actionValues.equals(r.getActionValues())) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.privilegeToPolicy: action value is incorrect");
+                    "PrivilegePolicyMapping.privilegeToPolicy: action value is incorrect");
             }
-
-            Set<String> excludeRes = r.getExcludedResourceNames();
-            if (!excludeRes.contains(EXCLUDED_RES)) {
-                throw new Exception(
-                    "PriviliegePolicyMapping.privilegeToPolicy: excluded resource is missing");
-            }
-
-
         }
+
         Set<String> subjectNames = p.getSubjectNames();
         for (String subjectName : subjectNames) {
             Subject sbj = p.getSubject(subjectName);
             if (!(sbj instanceof PrivilegeSubject)) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.privilegeToPolicy: not instance of privilege subject");
+                    "PrivilegePolicyMapping.privilegeToPolicy: not instance of privilege subject");
             }
         }
 
         Set<String> conditionNames = p.getConditionNames();
         if (conditionNames.size() != 1) {
             throw new Exception(
-                "PriviliegePolicyMapping.privilegeToPolicy: number of condition is incorrect");
+                "PrivilegePolicyMapping.privilegeToPolicy: number of condition is incorrect");
         }
 
         for (String conditionName : conditionNames) {
             Condition cond = p.getCondition(conditionName);
             if (!(cond instanceof PrivilegeCondition)) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.privilegeToPolicy: not instance of privilege condition");
+                    "PrivilegePolicyMapping.privilegeToPolicy: not instance of privilege condition");
             }
         }
 
@@ -175,7 +169,7 @@ public class PrivilegePolicyMapping {
         Set<IPrivilege> privileges = PrivilegeUtils.policyToPrivileges(policy);
         if (privileges.isEmpty()) {
             throw new Exception(
-                "PriviliegePolicyMapping.policyToPrivilege: cannot get privilege");
+                "PrivilegePolicyMapping.policyToPrivilege: cannot get privilege");
         }
 
         privilege = (Privilege)privileges.iterator().next();
@@ -183,46 +177,42 @@ public class PrivilegePolicyMapping {
         EntitlementCondition cond = privilege.getCondition();
         if (!(cond instanceof OrCondition)) {
             throw new Exception(
-                "PriviliegePolicyMapping.policyToPrivilege: condition is not AND condition");
+                "PrivilegePolicyMapping.policyToPrivilege: condition is not AND condition");
         }
         OrCondition pOrCond = (OrCondition)cond;
 
         for (EntitlementCondition ec : pOrCond.getEConditions()) {
             if (!(ec instanceof PolicyCondition)) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.policyToPrivilege: condition is not policy condition");
+                    "PrivilegePolicyMapping.policyToPrivilege: condition is not policy condition");
             }
-            PolicyCondition pCond = (PolicyCondition)ec;
+            PolicyCondition pCond = (PolicyCondition) ec;
             Map<String, Set<String>> pCondProp = pCond.getProperties();
             if (!pCondProp.equals(ipConditionEnvMap) &&
                 !pCondProp.equals(ipConditionEnvMap1)
             ) {
                 throw new Exception(
-                    "PriviliegePolicyMapping.policyToPrivilege: condition values are not correct");
+                    "PrivilegePolicyMapping.policyToPrivilege: condition values are not correct");
             }
         }
 
         EntitlementSubject sbj = privilege.getSubject();
         if (!(sbj instanceof PolicySubject)) {
             throw new Exception(
-                "PriviliegePolicyMapping.policyToPrivilege: subject is not privilege subject");
+                "PrivilegePolicyMapping.policyToPrivilege: subject is not privilege subject");
         }
         PolicySubject pSbj = (PolicySubject)sbj;
         Set pSbjValue = pSbj.getValues();
         if ((pSbjValue == null) || pSbjValue.isEmpty()) {
             throw new Exception(
-                "PriviliegePolicyMapping.policyToPrivilege: subject value is empty");
+                "PrivilegePolicyMapping.policyToPrivilege: subject value is empty");
         }
         if (!pSbjValue.contains(testUser.getUniversalId())) {
             throw new Exception(
-                "PriviliegePolicyMapping.policyToPrivilege: subject value is incorrect");
+                "PrivilegePolicyMapping.policyToPrivilege: subject value is incorrect");
         }
-
-        Set<String> excludeRes = new HashSet<String>();
-        excludeRes.add(EXCLUDED_RES);
-        privilege.getEntitlement().setExcludedResourceNames(excludeRes);
     }
-    
+
     private Rule createRule() throws PolicyException {
         actionValues = new HashMap<String, Set<String>>();
         {

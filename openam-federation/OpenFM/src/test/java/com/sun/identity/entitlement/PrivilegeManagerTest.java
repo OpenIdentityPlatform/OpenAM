@@ -55,8 +55,7 @@ import org.testng.annotations.BeforeClass;
  */
 public class PrivilegeManagerTest {
     private static final String APPL_NAME = "PrivilegeManagerTestAppl";
-    private static final String REFERRAL_PRIVILEGE_NAME =
-        "PrivilegeManagerTestReferral";
+    private static final String REFERRAL_PRIVILEGE_NAME = "PrivilegeManagerTestReferral";
     private static final String PRIVILEGE_NAME = "PrivilegeManagerTest";
     private static final String PRIVILEGE_NAME1 = "PrivilegeManagerTest1";
     private static final String PRIVILEGE_NAME2 = "PrivilegeManagerTest2";
@@ -76,14 +75,14 @@ public class PrivilegeManagerTest {
         adminSubject, "/").migratedToEntitlementService();
 
     @BeforeClass
-    public void setup() 
+    public void setup()
         throws SSOException, IdRepoException, EntitlementException,
         SMSException, InstantiationException, IllegalAccessException {
 
         if (!migrated) {
             return;
         }
-        
+
         createApplication("/");
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");
@@ -115,22 +114,17 @@ public class PrivilegeManagerTest {
         }
 
         //Sub Realm
-        PrivilegeManager prmSubReam = PrivilegeManager.getInstance(SUB_REALM,
-            SubjectUtils.createSubject(adminToken));
-        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/",
-            SubjectUtils.createSubject(adminToken));
+        PrivilegeManager prmSubReam = PrivilegeManager.getInstance(SUB_REALM, SubjectUtils.createSubject(adminToken));
+        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/", SubjectUtils.createSubject(adminToken));
         prmSubReam.removePrivilege(PRIVILEGE_NAME);
         referralM.delete(REFERRAL_PRIVILEGE_NAME);
 
-        PrivilegeManager prm = PrivilegeManager.getInstance("/",
-            SubjectUtils.createSubject(adminToken));
+        PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.removePrivilege(PRIVILEGE_NAME);
         ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
-        ApplicationManager.deleteApplication(adminSubject, SUB_REALM,
-            APPL_NAME);
-        
-        OrganizationConfigManager orgMgr = new OrganizationConfigManager(
-            adminToken, "/");
+        ApplicationManager.deleteApplication(adminSubject, SUB_REALM, APPL_NAME);
+
+        OrganizationConfigManager orgMgr = new OrganizationConfigManager(adminToken, "/");
         orgMgr.deleteSubOrganization(SUB_REALM, true);
     }
 
@@ -139,18 +133,16 @@ public class PrivilegeManagerTest {
         if (!migrated) {
             return;
         }
-        Application appl = ApplicationManager.getApplication(adminSubject,
-            "/", APPL_NAME);
+        Application application = ApplicationManager.getApplication(adminSubject, "/", APPL_NAME);
 
-        ValidateResourceResult res =
-            appl.validateResourceName("http://www.privilegemanagertest.com/hr");
+        ValidateResourceResult res = application.validateResourceName("http://www.privilegemanagertest.com/hr");
         if (!res.isValid()) {
             throw new Exception(
                 "PrivilegeManagerTest.testResourceValidationPrivilege" +
                 " positive test failed");
         }
 
-        res = appl.validateResourceName("http://www.test1.com:abc/hr");
+        res = application.validateResourceName("http://www.test1.com:abc/hr");
         if (res.isValid()) {
             throw new Exception(
                 "PrivilegeManagerTest.testResourceValidationPrivilege" +
@@ -188,8 +180,7 @@ public class PrivilegeManagerTest {
             }
         }
 
-        throw new Exception(
-            "PrivilegeManagerTest.testNoSubjectInPrivilege failed");
+        throw new Exception("PrivilegeManagerTest.testNoSubjectInPrivilege failed");
     }
 
     private Privilege createPrivilege() throws EntitlementException {
@@ -197,8 +188,7 @@ public class PrivilegeManagerTest {
         actionValues.put("GET", Boolean.TRUE);
         actionValues.put("POST", Boolean.FALSE);
         String resourceName = "http://www.privilegemanagertest.com:80";
-        Entitlement entitlement = new Entitlement(APPL_NAME,
-                resourceName, actionValues);
+        Entitlement entitlement = new Entitlement(APPL_NAME, resourceName, actionValues);
         entitlement.setName("ent1");
 
         String user11 = "id=user11,ou=user," + ServiceManager.getBaseDN();
@@ -211,9 +201,6 @@ public class PrivilegeManagerTest {
         subjects.add(ua1);
         subjects.add(ua2);
         OrSubject os = new OrSubject(subjects);
-
-        Set<String> excludedResourceNames = new HashSet<String>();
-        entitlement.setExcludedResourceNames(excludedResourceNames);
 
         IPCondition ipc = new IPCondition(startIp, endIp);
         ipc.setPConditionName("ipc");
@@ -279,8 +266,7 @@ public class PrivilegeManagerTest {
             //ok
         }
 
-        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/",
-            SubjectUtils.createSubject(adminToken));
+        ReferralPrivilegeManager referralM = new ReferralPrivilegeManager("/", SubjectUtils.createSubject(adminToken));
         Set<String> realms = new HashSet<String>();
         realms.add(SUB_REALM);
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
@@ -293,8 +279,7 @@ public class PrivilegeManagerTest {
 
         if (!referral.getMapApplNameToResources().get(
             APPL_NAME).contains(RESOURCE)) {
-            throw new Exception(
-                "PrivilegeManagerTest.subRealmTest, resource is likely to be canonicalized");
+            throw new Exception("PrivilegeManagerTest.subRealmTest, resource is likely to be canonicalized");
         }
 
         prm.addPrivilege(privilege);
@@ -308,8 +293,7 @@ public class PrivilegeManagerTest {
             return;
         }
         privilege = createPrivilege();
-        PrivilegeManager prm = PrivilegeManager.getInstance("/",
-            SubjectUtils.createSubject(adminToken));
+        PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.addPrivilege(privilege);
         Thread.sleep(1000);
 
@@ -318,16 +302,18 @@ public class PrivilegeManagerTest {
         IPCondition ipc1 = (IPCondition) p.getCondition();
         if (!ipc1.getStartIp().equals(startIp)) {
             throw new Exception(
-                "PrivilegeManagerTest.testAddPrivlege():" + "READ startIp "
+                "PrivilegeManagerTest.testAddPrivilege():"
+                + "READ startIp "
                 + " does not equal set startIp");
         }
         if (!ipc1.getEndIp().equals(endIp)) {
             throw new Exception(
-                "PrivilegeManagerTest.testAddPrivlege():" + "READ endIp "
+                "PrivilegeManagerTest.testAddPrivilege():"
+                + "READ endIp "
                 + " does not equal set endIp");
         }
         if (!privilege.equals(p)) {
-            throw new Exception("PrivilegeManagerTest.testAddPrivlege():"
+            throw new Exception("PrivilegeManagerTest.testAddPrivilege():"
                 + "read privilege not"
                 + "equal to saved privilege");
         }
@@ -339,8 +325,7 @@ public class PrivilegeManagerTest {
                 Set<EntitlementSubject> subjs = orSbj.getESubjects();
                 for (EntitlementSubject sbj : subjs) {
                     if (!sbj.equals(ua1) && !sbj.equals(ua2)) {
-                        throw new Exception(
-            "PrivilegeManagerTest.testAddPrivilege: Subject does not matched.");
+                        throw new Exception("PrivilegeManagerTest.testAddPrivilege: Subject does not matched.");
                     }
                 }
             }
@@ -354,8 +339,7 @@ public class PrivilegeManagerTest {
         }
         privilege = createPrivilege();
         privilege.setName(PRIVILEGE_NAME2);
-        PrivilegeManager prm = PrivilegeManager.getInstance("/",
-            SubjectUtils.createSubject(adminToken));
+        PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.addPrivilege(privilege);
         Thread.sleep(1000);
 
@@ -364,16 +348,18 @@ public class PrivilegeManagerTest {
         IPCondition ipc1 = (IPCondition) p.getCondition();
         if (!ipc1.getStartIp().equals(startIp)) {
             throw new Exception(
-                "PrivilegeManagerTest.testAddPrivlege():" + "READ startIp "
+                "PrivilegeManagerTest.testAddPrivilege():"
+                + "READ startIp "
                 + " does not equal set startIp");
         }
         if (!ipc1.getEndIp().equals(endIp)) {
             throw new Exception(
-                "PrivilegeManagerTest.testAddPrivlege():" + "READ endIp "
+                "PrivilegeManagerTest.testAddPrivilege():"
+                + "READ endIp "
                 + " does not equal set endIp");
         }
         if (!privilege.equals(p)) {
-            throw new Exception("PrivilegeManagerTest.testAddPrivlege():"
+            throw new Exception("PrivilegeManagerTest.testAddPrivilege():"
                 + "read privilege not"
                 + "equal to saved privilege");
         }
@@ -385,8 +371,7 @@ public class PrivilegeManagerTest {
                 Set<EntitlementSubject> subjs = orSbj.getESubjects();
                 for (EntitlementSubject sbj : subjs) {
                     if (!sbj.equals(ua1) && !sbj.equals(ua2)) {
-                        throw new Exception(
-            "PrivilegeManagerTest.testAddPrivilege: Subject does not matched.");
+                        throw new Exception("PrivilegeManagerTest.testAddPrivilege: Subject does not matched.");
                     }
                 }
             }
@@ -412,8 +397,7 @@ public class PrivilegeManagerTest {
         String serialized = privilege.toJSONObject().toString();
         Privilege p = Privilege.getInstance(new JSONObject(serialized));
         if (!p.equals(privilege)) {
-            throw new Exception(
-                    "PrivilegeManagerTest.testSerializePrivilege: failed");
+            throw new Exception("PrivilegeManagerTest.testSerializePrivilege: failed");
         }
     }
 
@@ -455,19 +439,19 @@ public class PrivilegeManagerTest {
         Privilege p = prm.getPrivilege(PRIVILEGE_NAME);
 
         if (p == null) {
-            throw new Exception("PrivilegeManagerTest.testGetPrivilege: " +
-                "failed to get privilege.");
+            throw new Exception("PrivilegeManagerTest.testGetPrivilege: "
+                    + "failed to get privilege.");
         }
 
         if (!p.getDescription().equals(PRIVILEGE_DESC)) {
-            throw new Exception("PrivilegeManagerTest.testGetPrivilege: " +
-                "failed to get privilege description.");
+            throw new Exception("PrivilegeManagerTest.testGetPrivilege: "
+                    + "failed to get privilege description.");
         }
-        
+
         String xml = prm.getPrivilegeXML(PRIVILEGE_NAME);
         if ((xml == null) || (xml.trim().length() == 0)) {
-            throw new Exception("PrivilegeManagerTest.testGetPrivilege: " +
-                "failed to get privilege XML.");
+            throw new Exception("PrivilegeManagerTest.testGetPrivilege: "
+                    + "failed to get privilege XML.");
         }
     }
 
@@ -476,14 +460,13 @@ public class PrivilegeManagerTest {
         if (!migrated) {
             return;
         }
-        PrivilegeManager prm = PrivilegeManager.getInstance("/", 
-            SubjectUtils.createSubject(adminToken));
+        PrivilegeManager prm = PrivilegeManager.getInstance("/", SubjectUtils.createSubject(adminToken));
         prm.modifyPrivilege(privilege);
-        Long cdate = privilege.getCreationDate();
-        Long mdate = privilege.getLastModifiedDate();
-        if (cdate == mdate) {
-            throw new Exception("PrivilegeManagerTest.testLastModifiedDate: " +
-                "creation and last modified date are the same.");
+        Long creationDate = privilege.getCreationDate();
+        Long lastModifiedDate = privilege.getLastModifiedDate();
+        if (creationDate.equals(lastModifiedDate)) {
+            throw new Exception("PrivilegeManagerTest.testLastModifiedDate: "
+                    + "creation and last modified date are the same.");
         }
     }
 }

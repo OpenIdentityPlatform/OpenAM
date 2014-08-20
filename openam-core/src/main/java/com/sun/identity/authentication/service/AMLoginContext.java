@@ -80,7 +80,7 @@ import com.sun.identity.security.AdminTokenAction;
 import java.security.AccessController;
 
 /**
- * <code>AMLoginContext</code> class is the core layer in the authentication 
+ * <code>AMLoginContext</code> class is the core layer in the authentication
  * middle tier which connects user clients to the JAAS <code>LoginModule</code>.
  * The <code>AMLoginContext</code> executes pre and post authentication process
  * based on authentication status.
@@ -94,20 +94,20 @@ import java.security.AccessController;
  * <p>
  * This class actually starts the JAAS login process by instantiating the
  * <code>LoginContext</code> object with the JAAS configuration name and the
- * <code>CallbackHandler</code> followed by calling the 
- * <code>LoginContext::login() method.
+ * <code>CallbackHandler</code> followed by calling the
+ * <code>LoginContext::login()</code> method.
  *
  */
 public class AMLoginContext {
 
     static final String LIST_DELIMITER = "|";
     /**
-     * AuthThreadManager associated with this AMLoginContext
+     * AuthThreadManager associated with this AMLoginContext.
      */
     public static AuthThreadManager authThread  = null;
-    private String exceedRetryLimit=null;
+    private String exceedRetryLimit = null;
     private static final String bundleName = "amAuth";
-    
+
     String configName; // jaas configuration name.
     String orgDN = null;
     javax.security.auth.login.LoginContext lc = null;
@@ -125,7 +125,7 @@ public class AMLoginContext {
     String sid = null;
     boolean accountLocked = false;
     boolean isFailed = false;
-    boolean internalAuthError=false;
+    boolean internalAuthError = false;
     boolean processDone = false;
     private int jaasCheck;
     private Thread jaasThread = null;
@@ -136,17 +136,17 @@ public class AMLoginContext {
     static Configuration defaultConfig = null;
     private static AuthD ad;
     private static Debug debug;
-    
+
     //OPENAM-3959
     private static boolean excludeRequiredOrRequisite = false;
-    
+
     /**
      * Bundle to be used for localized error message. users can be differnt
      * locale. Since we create an  AMLoginContext for each user, we can cache
      * the bundle reference in the class
      */
-    ResourceBundle bundle ;
-    
+    ResourceBundle bundle;
+
 
     static {
         // set the auth configuration programmatically.
@@ -162,16 +162,15 @@ public class AMLoginContext {
         try {
             Configuration.setConfiguration(ISConfig);
         } catch (java.lang.SecurityException e) {
-            System.err.println("AMLoginContext:Set AM config error:"
-                + e.getMessage());
+            System.err.println("AMLoginContext:Set AM config error:" + e.getMessage());
         }
 
         if (MonitoringUtil.isRunning()) {
             authImpl = Agent.getAuthSvcMBean();
         }
-        
-        excludeRequiredOrRequisite = 
-            SystemProperties.getAsBoolean(Constants.AUTH_LEVEL_EXCLUDE_REQUIRED_REQUISITE, false); 
+
+        excludeRequiredOrRequisite =
+            SystemProperties.getAsBoolean(Constants.AUTH_LEVEL_EXCLUDE_REQUIRED_REQUISITE, false);
     }
 
     /**
@@ -181,29 +180,27 @@ public class AMLoginContext {
         try {
             Configuration.setConfiguration(defaultConfig);
         } catch (java.lang.SecurityException e) {
-            System.err.println("AMLoginContext:resetJAASConfig to default:"
-                + e.getMessage());
+            System.err.println("AMLoginContext:resetJAASConfig to default:" + e.getMessage());
         }
     }
 
     /**
-     * Sets the configuration entries
+     * Sets the configuration entries.
      * @param entries configuration entries
      */
     public void setConfigEntries(AppConfigurationEntry[] entries) {
         this.entries = entries;
     }
-    
+
     /**
-     * Creates <code>AMLoginContext</code> object
+     * Creates <code>AMLoginContext</code> object.
      * @param authContext <code>AuthContextLocal</code> object
      */
     public AMLoginContext(AuthContextLocal authContext) {
         ad = AuthD.getAuth();
         debug = AuthD.debug;
         if (debug.messageEnabled()) {
-            debug.message("AMLoginContext:initialThread name is... :"
-            + Thread.currentThread().getName());
+            debug.message("AMLoginContext:initialThread name is... :" + Thread.currentThread().getName());
         }
         this.authContext = authContext;
         st = new LoginStatus();
@@ -211,12 +208,12 @@ public class AMLoginContext {
         bundle = ad.bundle; //default value for bundle until we find out
         //user login locale from LoginState object
     }
-    
+
     /**
      * Starts login process, the map passed to this method is the parameters
      * required to start the login process. These parameters are
      * <code>indexType</code>, <code>indexName</code> , <code>principal</code>,
-     * <code>subject</code>, </code>password</code>,
+     * <code>subject</code>, <code>password</code>,
      * <code>organization name</code>. Based on these parameters Module
      * Configuration name is retrieved using Configuration component. Creates
      * a new LoginContext and starts login process and returns. On error
@@ -227,7 +224,7 @@ public class AMLoginContext {
      */
     public void executeLogin(HashMap loginParamsMap) throws AuthLoginException {
         boolean errorState = false;
-        internalAuthError=false;
+        internalAuthError = false;
         processDone = false;
         isFailed = false;
         setLoginHash();
@@ -240,30 +237,29 @@ public class AMLoginContext {
             st.setStatus(LoginStatus.AUTH_FAILED);
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
-            internalAuthError=true;
-            throw new AuthLoginException(bundleName,
-                AMAuthErrorCode.AUTH_ERROR, null);
+            internalAuthError = true;
+            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_ERROR, null);
         } else {
             String llc = loginState.getLocale();
-            java.util.Locale loc = 
+            java.util.Locale loc =
                 com.sun.identity.shared.locale.Locale.getLocale(llc);
             bundle = AMResourceBundleCache.getInstance().getResBundle(
                 bundleName, loc);
             exceedRetryLimit = AMResourceBundleCache.getInstance().
-                getResBundle("amAuthLDAP",loc).
+                getResBundle("amAuthLDAP", loc).
                 getString(ISAuthConstants.EXCEED_RETRY_LIMIT);
         }
         if (debug.messageEnabled()) {
             debug.message("LoginState : " + loginState);
         }
-        
+
         // check if this is the redirection case
-        String redirectUrl = (String) 
+        String redirectUrl = (String)
             loginParamsMap.get(AuthContextLocal.REDIRECT_URL);
         if (redirectUrl != null) {
             // Resource/IP/Env based auth case with Redirection Advice
             Callback[] redirectCallback = new Callback[1];
-            redirectCallback[0] = 
+            redirectCallback[0] =
                 new RedirectCallback(redirectUrl, null, "GET");
             if (isPureJAAS()) {
                 loginState.setReceivedCallback_NoThread(redirectCallback);
@@ -276,8 +272,8 @@ public class AMLoginContext {
 
         String moduleClassName = null;
         if (indexType == AuthContext.IndexType.MODULE_INSTANCE
-                && !loginState.getEnableModuleBasedAuth() && !indexName.equals(
-                ISAuthConstants.APPLICATION_MODULE)) {
+                && !loginState.getEnableModuleBasedAuth()
+                && !indexName.equals(ISAuthConstants.APPLICATION_MODULE)) {
             try {
                 AMAuthenticationManager authManager = new AMAuthenticationManager(
                         AccessController.doPrivileged(AdminTokenAction.getInstance()), orgDN);
@@ -299,9 +295,8 @@ public class AMLoginContext {
             }
         }
 
-        
-        if ((authContext.getOrgDN() != null) && 
-            ((authContext.getOrgDN()).length() != 0)){
+
+        if ((authContext.getOrgDN() != null) && ((authContext.getOrgDN()).length() != 0)) {
             this.orgDN = authContext.getOrgDN();
             loginState.setQualifiedOrgDN(this.orgDN);
         } else {
@@ -313,15 +308,15 @@ public class AMLoginContext {
             debug.message("orgDN : " + orgDN);
             debug.message("clientType : " + clientType);
         }
-        
+
         AuthContext.IndexType prevIndexType = loginState.getIndexType();
         // get the previous index type and check if it was
         // level based auth. If yes then retreive the
         // key for the localized module name and
         // set that as the indexName
-        if (prevIndexType != null &&
-            (prevIndexType == AuthContext.IndexType.LEVEL ||
-            prevIndexType == AuthContext.IndexType.COMPOSITE_ADVICE)) {
+        if (prevIndexType != null
+                && (prevIndexType == AuthContext.IndexType.LEVEL
+                    || prevIndexType == AuthContext.IndexType.COMPOSITE_ADVICE)) {
             // this is saved for HTTP callback processing.
             loginState.setPreviousIndexType(prevIndexType);
             //if (indexType == AuthContext.IndexType.MODULE_INSTANCE) {
@@ -331,41 +326,41 @@ public class AMLoginContext {
 
         loginState.setIndexType(indexType);
         loginState.setIndexName(indexName);
-        
+
         // do required processing for diff. indexTypes
         try {
-            if (processIndexType(indexType,indexName,orgDN)) {
+            if (processIndexType(indexType, indexName, orgDN)) {
                 return;
             }
         } catch (AuthLoginException le) {
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
-            debug.message("Error  : " ,le);
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
+            debug.message("Error  : ", le);
             throw le;
         } catch (Exception e) {
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
-            debug.message("Error : " , e);
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
+            debug.message("Error : ", e);
             throw new AuthLoginException(e);
         }
-        
+
         // call config component to retrieve configname
         // if null throw exception
-        
-        configName = getConfigName(indexType,indexName,orgDN,clientType);
-        
+
+        configName = getConfigName(indexType, indexName, orgDN, clientType);
+
         // if configName is null then error
         if (configName == null) {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND);
@@ -373,27 +368,26 @@ public class AMLoginContext {
             setErrorMsgAndTemplate();
             internalAuthError = true;
             st.setStatus(LoginStatus.AUTH_FAILED);
-            loginState.logFailed(bundle.getString("noConfig"),"NOCONFIG");
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
-            throw new AuthLoginException(bundleName,
-            AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
+            loginState.logFailed(bundle.getString("noConfig"), "NOCONFIG");
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
+            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
         }
-        
+
         if (debug.messageEnabled()) {
-            debug.message("Creating login context object\n" +
-            "\n orgDN : " + orgDN +
-            "\n configName : " + configName);
+            debug.message("Creating login context object\n"
+                    + "\n orgDN : " + orgDN
+                    + "\n configName : " + configName);
         }
         try {
             jaasCheck = AuthUtils.isPureJAASModulePresent(configName, this);
-            
+
             if (isPureJAAS()) {
                 debug.message("Using pure jaas mode.");
                 if (authThread == null) {
@@ -401,78 +395,76 @@ public class AMLoginContext {
                     authThread.start();
                 }
             }
-            
-            DSAMECallbackHandler dsameCallbackHandler =
-            new DSAMECallbackHandler(this);
-            
+
+            DSAMECallbackHandler dsameCallbackHandler = new DSAMECallbackHandler(this);
+
             if (isPureJAAS()) {
                 if (subject != null)  {
-                    lc = new javax.security.auth.login.LoginContext(configName,
-                    subject,dsameCallbackHandler);
+                    lc = new javax.security.auth.login.LoginContext(configName, subject, dsameCallbackHandler);
                 } else {
-                    lc = new javax.security.auth.login.LoginContext(configName,
-                    dsameCallbackHandler);
+                    lc = new javax.security.auth.login.LoginContext(configName, dsameCallbackHandler);
                 }
             } else {
                 debug.message("Using non pure jaas mode.");
                 if (subject != null)  {
                     jlc = new com.sun.identity.authentication.jaas.LoginContext(
-                    entries, subject,dsameCallbackHandler);
+                            entries, subject, dsameCallbackHandler);
                 } else {
                     jlc = new com.sun.identity.authentication.jaas.LoginContext(
-                    entries, dsameCallbackHandler);
+                            entries, dsameCallbackHandler);
                 }
             }
         } catch (AuthLoginException ae) {
-            debug.error("JAAS module for config: " + configName +
-            ", " + ae.getMessage());
+            debug.error("JAAS module for config: "
+                    + configName
+                    + ", " + ae.getMessage());
             if (debug.messageEnabled()) {
                 debug.message("AuthLoginException", ae);
             }
             /* The user based authentication errors should not be different
-             * for users who exist and who don't, which can lead to 
+             * for users who exist and who don't, which can lead to
              * possiblity of enumerating existing users.
              * The AMAuthErrorCode.AUTH_LOGIN_FAILED error code is used for
              * all user based authentication errors.
-             * Refer issue3278 
+             * Refer issue3278
              */
-            if(indexType == AuthContext.IndexType.USER &&
-            AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND.equals(ae.getErrorCode())){
+            if (indexType == AuthContext.IndexType.USER
+                    && AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND.equals(ae.getErrorCode())) {
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED);
-            }else{
+            } else {
                 loginState.setErrorCode(ae.getErrorCode());
             }
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
-            internalAuthError=true;
+            internalAuthError = true;
             st.setStatus(LoginStatus.AUTH_FAILED);
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
             throw ae;
         } catch (LoginException le) {
             debug.error("in creating LoginContext.");
             if (debug.messageEnabled()) {
-                debug.message("Exception " , le);
+                debug.message("Exception ", le);
             }
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
             setErrorMsgAndTemplate();
             st.setStatus(LoginStatus.AUTH_FAILED);
-            internalAuthError=true;
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
+            internalAuthError = true;
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
             throw new AuthLoginException(bundleName,
             AMAuthErrorCode.AUTH_ERROR, null, le);
         } catch (SecurityException se) {
@@ -483,16 +475,16 @@ public class AMLoginContext {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
-            internalAuthError=true;
+            internalAuthError = true;
             st.setStatus(LoginStatus.AUTH_FAILED);
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
             throw new AuthLoginException(bundleName,
             AMAuthErrorCode.AUTH_ERROR, null);
         } catch (Exception e) {
@@ -500,18 +492,17 @@ public class AMLoginContext {
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
             loginState.logFailed(bundle.getString("loginContextCreateFailed"));
-            internalAuthError=true;
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
+            internalAuthError = true;
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
             st.setStatus(LoginStatus.AUTH_FAILED);
-            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_ERROR,
-            null, e);
+            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_ERROR, null, e);
         }
         try {
             if (isPureJAAS()) {
@@ -531,27 +522,26 @@ public class AMLoginContext {
         } catch (Exception e) {
             errorState = true;
         }
-        
+
         if (errorState) {
             st.setStatus(LoginStatus.AUTH_RESET);
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             setErrorMsgAndTemplate();
-            internalAuthError=true;
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
-            throw new AuthLoginException(bundleName,
-            AMAuthErrorCode.AUTH_ERROR, null);
-            
+            internalAuthError = true;
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
+            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_ERROR, null);
+
         }
         debug.message("AMLoginContext:Thread started... returning.");
     }
-    
+
     /**
      * Starts the login process ,calls JAAS Login Context
      */
@@ -560,7 +550,7 @@ public class AMLoginContext {
         String logFailedMessage =  bundle.getString("loginFailed");
         String logFailedError   =  null;
         AMAccountLockout amAccountLockout = null;
-        boolean loginSuccess=false;
+        boolean loginSuccess = false;
         try {
             if (isPureJAAS()) {
                 lc.login();
@@ -574,27 +564,22 @@ public class AMLoginContext {
 
             if (!loginState.isAuthValidForInternalUser()) {
                 if (debug.warningEnabled()) {
-                    debug.warning(
-                        "AMLoginContext.runLogin():auth failed, "
+                    debug.warning("AMLoginContext.runLogin():auth failed, "
                         +  "using invalid realm name for internal user");
                 }
-                logFailedMessage = AuthUtils.getErrorVal(
-                        AMAuthErrorCode.AUTH_MODULE_DENIED, 
-                        AuthUtils.ERROR_MESSAGE);
+                logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MODULE_DENIED, AuthUtils.ERROR_MESSAGE);
                 logFailedError = "AUTH_MODULE_DENIED";
-                throw new AuthException(
-                        AMAuthErrorCode.AUTH_MODULE_DENIED, null);
+                throw new AuthException(AMAuthErrorCode.AUTH_MODULE_DENIED, null);
             }
 
             debug.message("user authentication successful");
-            
+
             // retrieve authenticated user's profile or create
             // a user profile if dynamic profile creation is
             // is true
-            
+
             debug.message("searchUserProfile for Subject :");
-            boolean profileState = loginState.searchUserProfile(subject,
-            indexType,indexName);
+            boolean profileState = loginState.searchUserProfile(subject, indexType, indexName);
             loginSuccess = true;
             if (!profileState) {
                 debug.error("Profile not found ");
@@ -620,8 +605,7 @@ public class AMLoginContext {
                         debug.message("Account expired!!");
                         logFailedMessage = bundle.getString("accountExpired");
                         logFailedError = "ACCOUNTEXPIRED";
-                        loginState.setErrorCode(
-                            AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED);
+                        loginState.setErrorCode(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED);
                         isFailed = true;
                     } else {
                         // came here successful auth.
@@ -629,19 +613,16 @@ public class AMLoginContext {
                             debug.message("authContext is : " + authContext);
                             debug.message("loginSTate is : " + loginState);
                         }
-                        
-                        updateLoginState(
-                            loginState,indexType,indexName,configName,orgDN);
+
+                        updateLoginState(loginState, indexType, indexName, configName, orgDN);
                         //activate session
                         Object lcInSession = null;
                         if (isPureJAAS()) {
                             lcInSession = lc;
                         } else {
                             lcInSession = jlc;
-                        } 
-                        boolean sessionActivated = 
-                            loginState.activateSession(subject, authContext,
-                            lcInSession);
+                        }
+                        boolean sessionActivated = loginState.activateSession(subject, authContext, lcInSession);
                         if (sessionActivated) {
                             loginState.logSuccess();
                             if (amAccountLockout.isLockoutEnabled()) {
@@ -652,11 +633,10 @@ public class AMLoginContext {
                             loginState.updateSessionForFailover();
                             debug.message("login success");
                         } else {
-                            logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.
-                            AUTH_MAX_SESSION_REACHED,AuthUtils.ERROR_MESSAGE);
+                            logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED,
+                                    AuthUtils.ERROR_MESSAGE);
                             logFailedError = "MAXSESSIONREACHED";
-                            throw new AuthException(
-                            AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, null);
+                            throw new AuthException(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, null);
                         }
                     }
                 }
@@ -666,24 +646,23 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("Exception " , ipe);
             }
-            
+
             String failedUserId = ipe.getTokenId();
-            
+
             if (debug.messageEnabled()) {
                 debug.message("Invalid Password Exception " + failedUserId);
             }
-            
+
             if (failedUserId != null) {
                 amAccountLockout = new AMAccountLockout(loginState);
                 accountLocked = amAccountLockout.isLockedOut(failedUserId);
                 if ((!accountLocked) && (amAccountLockout.isLockoutEnabled())) {
                     amAccountLockout.invalidPasswd(failedUserId);
                     checkWarningCount(amAccountLockout);
-                    accountLocked =
-                    amAccountLockout.isAccountLocked(failedUserId);
+                    accountLocked = amAccountLockout.isAccountLocked(failedUserId);
                 }
             }
-            
+
             logFailedMessage = bundle.getString("invalidPasswd");
             logFailedError = "INVALIDPASSWORD";
             if (accountLocked) {
@@ -703,10 +682,8 @@ public class AMLoginContext {
                 debug.message("LOGINFAILED MessageAuthLoginException....");
                 debug.message("Exception " , me);
             }
-            
-            java.util.Locale locale = 
-                com.sun.identity.shared.locale.Locale.getLocale(
-                    loginState.getLocale());
+
+            java.util.Locale locale = com.sun.identity.shared.locale.Locale.getLocale(loginState.getLocale());
             loginState.setModuleErrorMessage(me.getL10NMessage(locale));
             isFailed = true;
             authContext.setLoginException(me);
@@ -719,15 +696,15 @@ public class AMLoginContext {
                         +  "using invalid auth module name for internal user");
                 }
                 logFailedMessage = AuthUtils.getErrorVal(
-                        AMAuthErrorCode.AUTH_MODULE_DENIED, 
+                        AMAuthErrorCode.AUTH_MODULE_DENIED,
                         AuthUtils.ERROR_MESSAGE);
                 logFailedError = "AUTH_MODULE_DENIED";
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
-            } else if ( AMAuthErrorCode.AUTH_TIMEOUT.equals(le.getMessage())) {
+            } else if (AMAuthErrorCode.AUTH_TIMEOUT.equals(le.getMessage())) {
                 debug.message("LOGINFAILED Error Timed Out....");
             } else if (ISAuthConstants.EXCEED_RETRY_LIMIT.
                     equals(le.getErrorCode())) {
-                ad.debug.message("LOGINFAILED ExceedRetryLimit");
+                debug.message("LOGINFAILED ExceedRetryLimit");
             } else {
                 debug.message("LOGINFAILED Error....");
             }
@@ -739,14 +716,11 @@ public class AMLoginContext {
                 logFailedMessage = bundle.getString("loginTimeout");
                 logFailedError = "LOGINTIMEOUT";
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_TIMEOUT);
-            } else if (ISAuthConstants.EXCEED_RETRY_LIMIT.
-                    equals(le.getErrorCode())) {
+            } else if (ISAuthConstants.EXCEED_RETRY_LIMIT.equals(le.getErrorCode())) {
                 loginState.setErrorMessage(exceedRetryLimit);
-                loginState.setErrorCode(
-                        AMAuthErrorCode.AUTH_USER_LOCKED_IN_DS);
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED_IN_DS);
             } else if (ISAuthConstants.SERVER_UNWILLING.equals(le.getErrorCode())) {
-                loginState.setErrorCode(
-                        AMAuthErrorCode.AUTH_ERROR);
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             }
             authContext.setLoginException(le);
         } catch (AuthException e) {
@@ -764,7 +738,7 @@ public class AMLoginContext {
             if (debug.messageEnabled()) {
                 debug.message("Exception " , e);
             }
-            isFailed =true;
+            isFailed = true;
             loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
             loginState.logFailed(bundle.getString("loginFailed"));
             logFailedError = null;
@@ -776,65 +750,62 @@ public class AMLoginContext {
         }
         debug.message("Came to before if Failed loop");
         if (isFailed) {
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationFailureCount();
-		}
-	    }
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+                if (authImpl != null) {
+                    authImpl.incSsoServerAuthenticationFailureCount();
+                }
+            }
             if (loginSuccess) {
                 // this is the case where authentication to modules
                 // succeeded but framework failed to validate the
                 // user, in this case populate with all module user
                 // successfully authenticated as.
                 loginState.setFailureModuleList(getSuccessModuleString(orgDN));
-                
+
             } else {
                 loginState.setFailureModuleList(getFailureModuleList(orgDN));
             }
-            loginState.logFailed(logFailedMessage,logFailedError);
+            loginState.logFailed(logFailedMessage, logFailedError);
             setErrorMsgAndTemplate();
             st.setStatus(LoginStatus.AUTH_FAILED);
             if (indexType == AuthContext.IndexType.USER) {
                 if (debug.messageEnabled()) {
-                    debug.message("Set failureId in user based auth "
-                    + indexName);
+                    debug.message("Set failureId in user based auth " + indexName);
                 }
                 loginState.setFailedUserId(indexName);
             }
         } else {
-	    if (debug.messageEnabled()) {
-		debug.message("AMLoginContext.runLogin:" +
-		    "calling incSsoServerAuthenticationSuccessCount");
-	    }
-	    if (MonitoringUtil.isRunning()) {
-		if (authImpl == null) {
-		    authImpl = Agent.getAuthSvcMBean();
-		}
-		}
-        if (authImpl != null && !loginState.isNoSession()) {
-            authImpl.incSsoServerAuthenticationSuccessCount();
-	    }
-	}
-        
+            if (debug.messageEnabled()) {
+                debug.message("AMLoginContext.runLogin: calling incSsoServerAuthenticationSuccessCount");
+            }
+            if (MonitoringUtil.isRunning()) {
+                if (authImpl == null) {
+                    authImpl = Agent.getAuthSvcMBean();
+                }
+            }
+            if (authImpl != null && !loginState.isNoSession()) {
+                authImpl.incSsoServerAuthenticationSuccessCount();
+            }
+        }
+
         if (debug.messageEnabled()) {
-            debug.message("finished...login notify all threads\n"+
-            "AMLoginContext:LoginStatus: " + st.getStatus());
+            debug.message("finished...login notify all threads\n"
+                    + "AMLoginContext:LoginStatus: " + st.getStatus());
         }
         if (isPureJAAS()) {
-            authThread.removeFromHash(thread,"timeoutHash");
-            
+            authThread.removeFromHash(thread, "timeoutHash");
+
             // notify possible waiting thread
             loginState.setReceivedCallback(null, this);
         }
-        
-        isFailed=false;
+
+        isFailed = false;
         nullifyUsedVars();
-        return;
     }
-    
+
     /**
      * Logs out.
      *
@@ -853,8 +824,7 @@ public class AMLoginContext {
                 }
             }
             loginState.logLogout();
-            loginState.postProcess(indexType,indexName,
-                    LoginState.POSTPROCESS_LOGOUT);           
+            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_LOGOUT);
             destroySession();
             st.setStatus(LoginStatus.AUTH_COMPLETED);
         } catch (AuthLoginException le) {
@@ -871,16 +841,15 @@ public class AMLoginContext {
             }
         }
     }
-    
+
     /* destroy Session on a logout OR abort */
     void destroySession() {
         if (debug.messageEnabled()) {
             debug.message("AMLoginContext:destroySession: " + loginState);
         }
         loginState.destroySession();
-        return;
     }
-    
+
     /**
      * Returns array of recieved callbacks from module.
      *
@@ -890,10 +859,9 @@ public class AMLoginContext {
         if (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS) {
             return null;
         }
-        if (indexType == AuthContext.IndexType.LEVEL ||
-            indexType == AuthContext.IndexType.COMPOSITE_ADVICE) {
-            debug.message(
-                "IndexType level/composite_advice, send choice callback");
+        if (indexType == AuthContext.IndexType.LEVEL
+                || indexType == AuthContext.IndexType.COMPOSITE_ADVICE) {
+            debug.message("IndexType level/composite_advice, send choice callback");
             // reset indexType since UI will start module based auth
             indexType = null;
         } else {
@@ -903,21 +871,20 @@ public class AMLoginContext {
                 recdCallback = getRequiredInfoCallback_NoThread();
             }
         }
-        
-        if (recdCallback != null ) {
+
+        if (recdCallback != null) {
             for (int i = 0; i < recdCallback.length; i++) {
                 if (debug.messageEnabled()) {
-                    debug.message("Recd Callback in amlc.getRequiredInfo : "
-                    + recdCallback[i]);
+                    debug.message("Recd Callback in amlc.getRequiredInfo : " + recdCallback[i]);
                 }
             }
         } else {
             debug.message("Recd Callback in amlc.getRequiredInfo is NULL");
         }
-        
+
         return recdCallback;
     }
-    
+
     /**
      * Returns array of  required callback information non-JAAS thread mode
      * @return callbacks required <code>Callbacks</code> array to be submitted
@@ -925,8 +892,8 @@ public class AMLoginContext {
     public Callback[] getRequiredInfoCallback_NoThread() {
         return loginState.getReceivedInfo();
     }
-    
-    
+
+
     /**
      * Returns the array of required Callbacks from <code>CallbackHandler</code>
      * waits till <code>loginState::getReceivedInfo()</code> OR
@@ -939,7 +906,7 @@ public class AMLoginContext {
         if (debug.messageEnabled()) {
             debug.message("getRequiredInfo.. " + st.getStatus());
         }
-        if (  isFailed ||  (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS) ){
+        if (isFailed || (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS)) {
             debug.message("no more requirements returning null");
             return null;
         }
@@ -949,13 +916,12 @@ public class AMLoginContext {
         if (debug.messageEnabled()) {
             debug.message("getRequiredInfo. ThreadName is.. :" + thread);
             debug.message("lastCallbackSent : " + lastCallbackSent);
-            debug.message("pageTimeOut : " + pageTimeOut );
+            debug.message("pageTimeOut : " + pageTimeOut);
         }
-        authThread.setHash(thread,pageTimeOut,lastCallbackSent);
+        authThread.setHash(thread, pageTimeOut, lastCallbackSent);
 
-        while ((!isFailed) && (loginState.getReceivedInfo() == null) &&
-            (st.getStatus() == LoginStatus.AUTH_IN_PROGRESS)
-        ) {
+        while ((!isFailed) && (loginState.getReceivedInfo() == null)
+                && (st.getStatus() == LoginStatus.AUTH_IN_PROGRESS)) {
             try {
                 if (debug.messageEnabled()) {
                     debug.message(
@@ -964,10 +930,9 @@ public class AMLoginContext {
                 if (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS) {
                     return null;
                 }
-                if ((!isFailed) &&
-                    (st.getStatus() == LoginStatus.AUTH_IN_PROGRESS) &&
-                    (loginState.getReceivedInfo() == null)
-                ) {
+                if (!isFailed
+                        && st.getStatus() == LoginStatus.AUTH_IN_PROGRESS
+                        && loginState.getReceivedInfo() == null) {
                     this.wait();
                 }
             } catch (InterruptedException e) {
@@ -977,17 +942,17 @@ public class AMLoginContext {
         }
         if (debug.messageEnabled()) {
             debug.message(
-                "Thread woke up... "+ loginState.getReceivedInfo());
+                "Thread woke up... " + loginState.getReceivedInfo());
         }
         Callback[] getRequiredInfo = loginState.getReceivedInfo();
         if (debug.messageEnabled()) {
             debug.message(
                 "Returning getRequiredInfo... :" + getRequiredInfo);
         }
-        authThread.removeFromHash(thread,"timeoutHash");
+        authThread.removeFromHash(thread, "timeoutHash");
         return getRequiredInfo;
     }
-    
+
     /**
      * Sets the submitted requirements, called by
      * <code>AuthContext.submitRequirements</code>
@@ -995,21 +960,21 @@ public class AMLoginContext {
      *
      * @param callback submit the required <code>Callbacks</code>
      */
-    public void submitRequiredInfo(Callback callback[]) {
+    public void submitRequiredInfo(Callback[] callback) {
         if (debug.messageEnabled() && callback != null && callback.length > 0) {
             debug.message("submit required info... :" + callback[0]);
         }
         if (isPureJAAS()) {
-            loginState.setSubmittedCallback(callback,this);
+            loginState.setSubmittedCallback(callback, this);
         } else {
             loginState.setSubmittedCallback_NoThread(callback);
         }
         if (debug.messageEnabled()) {
-            debug.message("Retunring from submitRequiredInfo");
+            debug.message("Returning from submitRequiredInfo");
         }
     }
-    
-    
+
+
     /**
      * <code>CallbackHandler</code> calls this to retrieve the submitted
      * credentials/callbacks waits till
@@ -1020,31 +985,29 @@ public class AMLoginContext {
      */
     public synchronized Callback[] submitCallbackInfo() {
         if (debug.messageEnabled()) {
-            debug.message("submitRequiredInfo. ThreadName is.. :" +
-            Thread.currentThread().getName());
+            debug.message("submitRequiredInfo. ThreadName is.. :"
+                    + Thread.currentThread().getName());
         }
-        
-        if ((st.getStatus() != LoginStatus.AUTH_IN_PROGRESS) || (isFailed)) {
+
+        if (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS || isFailed) {
             debug.message("submitReq no more requirements returning null");
             return null;
         }
-        
+
         Thread thread = Thread.currentThread();
         long lastCallbackSent = loginState.getLastCallbackSent();
         long pageTimeOut = loginState.getPageTimeOut();
         if (debug.messageEnabled()) {
-            debug.message("submitRequiredInfo. ThreadName is.. :" +
-            thread);
+            debug.message("submitRequiredInfo. ThreadName is.. :" + thread);
             debug.message("lastCallbackSent : " + lastCallbackSent);
-            debug.message("pageTimeOut : " + pageTimeOut );
+            debug.message("pageTimeOut : " + pageTimeOut);
         }
-        authThread.setHash(thread,pageTimeOut,lastCallbackSent);
-        while ((loginState.getSubmittedInfo() == null)
-        && (st.getStatus() == LoginStatus.AUTH_IN_PROGRESS) ) {
+        authThread.setHash(thread,pageTimeOut, lastCallbackSent);
+        while (loginState.getSubmittedInfo() == null
+                && st.getStatus() == LoginStatus.AUTH_IN_PROGRESS) {
             try {
                 if (debug.messageEnabled()) {
-                    debug.message(Thread.currentThread() +
-                    " Waiting...." + st.getStatus());
+                    debug.message(Thread.currentThread() + " Waiting...." + st.getStatus());
                 }
                 if (st.getStatus() != LoginStatus.AUTH_IN_PROGRESS) {
                     return null;
@@ -1057,13 +1020,13 @@ public class AMLoginContext {
                 break;
             }
         }
-        debug.message("Threadwaking up go submit info..."  );
-        authThread.removeFromHash(thread,"timeoutHash");
+        debug.message("Threadwaking up go submit info...");
+        authThread.removeFromHash(thread, "timeoutHash");
         Callback[] setSubmittedInfo = loginState.getSubmittedInfo();
         debug.message("Returning submitted info: ");
         return setSubmittedInfo;
     }
-    
+
     /**
      * Returns the authentication status.
      *
@@ -1081,9 +1044,9 @@ public class AMLoginContext {
             debug.message("getStatus : status is... : " + status);
         }
         return status;
-        
+
     }
-    
+
     /**
      * Returns login state for the authentication context.
      *
@@ -1092,22 +1055,22 @@ public class AMLoginContext {
     public LoginState getLoginState() {
         return AuthUtils.getLoginState(authContext);
     }
-    
-    
+
+
     /**
      * Terminates an ongoing login process.
      *
      * @throws AuthLoginException when fails to abort
      */
     public void abort() throws AuthLoginException {
-        
+
         debug.message("in abort");
         try {
             logout();
         } catch (Exception ae) {
             if (debug.messageEnabled()) {
                 debug.message("Error logging out.. :");
-                debug.message("Exception " , ae);
+                debug.message("Exception ", ae);
             }
             try {
                 destroySession();
@@ -1115,16 +1078,16 @@ public class AMLoginContext {
             } catch (Exception e) {
                 debug.message("Error aborting");
                 if (debug.messageEnabled()) {
-                    debug.message("Exception " , e);
+                    debug.message("Exception ", e);
                 }
-                
+
                 // abort this error - since abort will be done
                 throw new AuthLoginException(bundleName, "abortFailed", null);
             }
         }
     }
-    
-    
+
+
     /**
      * Returns authentication modules configured for a given organization.
      *
@@ -1134,21 +1097,21 @@ public class AMLoginContext {
         try {
             LoginState loginState =
             (LoginState) AuthUtils.getLoginState(authContext);
-            
+
             if (loginState != null) {
                 moduleSet = loginState.getModuleInstances();
             }
-            
+
             if (debug.messageEnabled()) {
-                debug.message("moduleSet is : "+ moduleSet);
+                debug.message("moduleSet is : " + moduleSet);
             }
         } catch (Exception e) {
             debug.message("Error : " , e);
         }
-        
+
         return moduleSet;
     }
-    
+
     /**
      * Returns organization/suborganization for a request.
      *
@@ -1157,7 +1120,7 @@ public class AMLoginContext {
     public String getOrganizationName() {
         return loginState.getQueryOrg();
     }
-    
+
     /**
      * Returns Single Sign On Token for authenticated user, returns null if
      * session is inactive.
@@ -1175,7 +1138,7 @@ public class AMLoginContext {
             return null;
         }
     }
-    
+
     /**
      * Returns Login Success URL for authenticated user.
      *
@@ -1186,12 +1149,12 @@ public class AMLoginContext {
             return loginState.getSuccessLoginURL();
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("error getting successURL : " + e.toString() );
+                debug.message("error getting successURL : " + e.toString());
             }
             return null;
         }
     }
-    
+
     /**
      * Returns Login Failure URL for authenticated user.
      *
@@ -1207,7 +1170,7 @@ public class AMLoginContext {
             return null;
         }
     }
-    
+
     /**
      * Returns the current <code>authIdentifier</code> of the authentication
      * process as String Session ID.
@@ -1220,20 +1183,19 @@ public class AMLoginContext {
             sidString = loginState.getSid().toString();
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("Error retreiving sid from LoginState : " +
-                e.getMessage());
+                debug.message("Error retrieving sid from LoginState : " + e.getMessage());
             }
         }
         return sidString;
     }
-    
+
     /**
      * Returns the subject of authenticated user.
      *
      * @return the subject of authenticated user.
      */
     public Subject getSubject() {
-        
+
         try {
             return loginState.getSubject();
         } catch (Exception e) {
@@ -1241,34 +1203,33 @@ public class AMLoginContext {
                 debug.message("error getting Subject :");
                 debug.message("Exception " , e);
             }
-            
+
             return null;
         }
     }
-    
+
     /* retreive login parameters */
     private void parseLoginParams(HashMap loginParamsMap) {
-        
+
         if (debug.messageEnabled()) {
             debug.message("loginParamsMap is.. :" + loginParamsMap);
         }
-        
+
         try {
             indexType = (AuthContext.IndexType) loginParamsMap.get("indexType");
             indexName = (String) loginParamsMap.get("indexName");
-            if (debug.messageEnabled()){
-                debug.message("indexType = " + indexType +
-                "\nindexName = " + indexName);
+            if (debug.messageEnabled()) {
+                debug.message("indexType = " + indexType + "\nindexName = " + indexName);
             }
             //principal = (Principal) loginParamsMap.get("principal");
             //password = (char[]) loginParamsMap.get("password");
-            subject = (Subject)loginParamsMap.get("subject");
+            subject = (Subject) loginParamsMap.get("subject");
             Boolean pCookieObject = (Boolean) loginParamsMap.get("pCookieMode");
             if (pCookieObject != null) {
                 pCookieMode = pCookieObject.booleanValue();
             }
 
-            String locale = (String)loginParamsMap.get("locale");  
+            String locale = (String) loginParamsMap.get("locale");
             if (locale != null && locale.length() > 0) {
                 loginState.setLocale(locale);
             }
@@ -1279,7 +1240,7 @@ public class AMLoginContext {
             }
         }
     }
-    
+
     /* retrieve config name from config component based on the
      * indexType , indexName , orgDN and clientType
      * if indexType , indexName are null then indexType is assumed
@@ -1292,7 +1253,7 @@ public class AMLoginContext {
         String clientType) {
         String configName = null;
         String universalID = null;
-        
+
         // if index type is null assume org based authentication
         if (indexType == null) {
             configName = AMAuthConfigUtils.getAuthConfigName(orgDN, "html");
@@ -1308,8 +1269,7 @@ public class AMLoginContext {
             }
             try {
                 if (universalID != null ) {
-                    configName = AMAuthConfigUtils.getAuthConfigName(indexType,
-                    universalID,orgDN,clientType);
+                    configName = AMAuthConfigUtils.getAuthConfigName(indexType, universalID, orgDN, clientType);
                 }
             } catch (Exception e) {
                 if (debug.messageEnabled()) {
@@ -1320,7 +1280,7 @@ public class AMLoginContext {
         }
         return configName;
     }
-    
+
     /* for indexType level retreive the module names .
      * if the more then 1 modules has the same level
      * then generate choice callback , else if module
@@ -1334,20 +1294,18 @@ public class AMLoginContext {
         String clientType
     ) throws AuthException {
         indexType= AuthContext.IndexType.LEVEL;
-        
+
         java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(
             loginState.getLocale());
-        AuthLevel authLevel = new AuthLevel(indexType,indexName,orgDN,
-        clientType,loc);
+        AuthLevel authLevel = new AuthLevel(indexType, indexName, orgDN, clientType, loc);
         int numberOfModules = authLevel.getNumberOfAuthModules();
         if (debug.messageEnabled()) {
             debug.message("number of Modules : " + numberOfModules);
         }
-        
+
         if (numberOfModules <= 0) {
-            loginState.logFailed(bundle.getString("noConfig"),"NOCONFIG");
-            throw new AuthException(
-                AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
+            loginState.logFailed(bundle.getString("noConfig"), "NOCONFIG");
+            throw new AuthException(AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
         } else if (numberOfModules == 1) {
             this.indexType = AuthContext.IndexType.MODULE_INSTANCE;
             loginState.setIndexType(this.indexType);
@@ -1368,7 +1326,7 @@ public class AMLoginContext {
             }
         }
     }
-    
+
     /* for indexType composite_advice retreive the module names .
      * if there is more then one modules required in composite advice
      * then generate choice callback , else if module
@@ -1384,24 +1342,23 @@ public class AMLoginContext {
         String moduleName = null;
         java.util.Locale loc = com.sun.identity.shared.locale.Locale.getLocale(
         loginState.getLocale());
-        CompositeAdvices compositeAdvice = new CompositeAdvices(indexName,orgDN,
-        clientType,loc);
+        CompositeAdvices compositeAdvice = new CompositeAdvices(indexName, orgDN, clientType, loc);
         int numberOfModules = compositeAdvice.getNumberOfAuthModules();
         if (debug.messageEnabled()) {
-            debug.message("processCompositeAdvice:number of Modules/Services : " 
+            debug.message("processCompositeAdvice:number of Modules/Services : "
                 + numberOfModules);
         }
         loginState.setCompositeAdviceType(compositeAdvice.getType());
-        
+
         if (numberOfModules <= 0) {
             loginState.logFailed(bundle.getString("noConfig"));
             throw new AuthException(AMAuthErrorCode.AUTH_CONFIG_NOT_FOUND, null);
         } else if (numberOfModules == 1) {
             this.indexName = AMAuthUtils.getDataFromRealmQualifiedData(
                 compositeAdvice.getModuleName());
-            String qualifiedRealm = 
+            String qualifiedRealm =
                 AMAuthUtils.getRealmFromRealmQualifiedData(
-                    compositeAdvice.getModuleName());            
+                    compositeAdvice.getModuleName());
             if ((qualifiedRealm != null) && (qualifiedRealm.length() != 0)) {
                 this.orgDN = DNMapper.orgNameToDN(qualifiedRealm);
                 loginState.setQualifiedOrgDN(this.orgDN);
@@ -1410,7 +1367,7 @@ public class AMLoginContext {
                 this.indexType = AuthContext.IndexType.MODULE_INSTANCE;
             } else if (compositeAdvice.getType() == AuthUtils.SERVICE) {
                 this.indexType = AuthContext.IndexType.SERVICE;
-            } else if (compositeAdvice.getType() == AuthUtils.REALM) {                
+            } else if (compositeAdvice.getType() == AuthUtils.REALM) {
                 this.orgDN = DNMapper.orgNameToDN(compositeAdvice.getModuleName());
                 loginState.setQualifiedOrgDN(this.orgDN);
                 this.indexName = AuthUtils.getOrgConfiguredAuthenticationChain(this.orgDN);
@@ -1419,9 +1376,9 @@ public class AMLoginContext {
             loginState.setIndexType(this.indexType);
             loginState.setIndexName(this.indexName);
             if (debug.messageEnabled()) {
-                debug.message("processCompositeAdvice:indexType : " 
+                debug.message("processCompositeAdvice:indexType : "
                     + this.indexType);
-                debug.message("processCompositeAdvice:indexName : " 
+                debug.message("processCompositeAdvice:indexName : "
                     + this.indexName);
             }
             return false;
@@ -1440,7 +1397,7 @@ public class AMLoginContext {
             }
         }
     }
-    
+
     /* update login state with indexType,indexName */
     void updateLoginState(
         LoginState loginState,
@@ -1449,7 +1406,7 @@ public class AMLoginContext {
         String configName,
         String orgDN) {
         // set authLevel in LoginState
-        
+
         String authLevel;
         if (indexType == AuthContext.IndexType.LEVEL) {
             authLevel = indexName;
@@ -1460,39 +1417,38 @@ public class AMLoginContext {
             //authLevel=AMAuthConfigUtils.getAuthLevel(configName);
             authLevel = getAuthLevel(orgDN);
         }
-        
+
         loginState.setAuthLevel(authLevel);
-        
+
         // set the module name
-        String moduleName=null;
-        
+        String moduleName;
+
         if (indexType == AuthContext.IndexType.MODULE_INSTANCE) {
             moduleName = indexName;
         } else {
             moduleName = getSuccessModuleString(orgDN);
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("moduleName : " + moduleName);
         }
-        
+
         loginState.setAuthModuleName(moduleName);
-        
+
         // set username
-        
-        if ((indexType == AuthContext.IndexType.USER) && 
+
+        if ((indexType == AuthContext.IndexType.USER) &&
             (pCookieMode)) {
             loginState.setToken(indexName);
         }
     }
-    
+
     /* check if user exists and is enabled if not return
      * false - login process should not continue
      */
     boolean validateUser(String userName) {
         try {
-            boolean userProfileExists = loginState.getUserProfile(
-                userName,true);
+            boolean userProfileExists = loginState.getUserProfile(userName, true);
             return ((userProfileExists) && (loginState.isUserEnabled()));
         } catch (Exception e) {
             if (debug.messageEnabled()) {
@@ -1501,7 +1457,7 @@ public class AMLoginContext {
             return false;
         }
     }
-    
+
     /**
      * Checks the warning count to determine the lockout message
      * to be displayed to the user.
@@ -1522,19 +1478,19 @@ public class AMLoginContext {
                     params[0] = new Integer(warningCount);
                     lockoutMsg = MessageFormat.format(lockoutMsgFmt, params);
                     loginState.setLockoutMsg(lockoutMsg);
-                    accountLocked=false;
+                    accountLocked = false;
                 }
             }
-            
+
             if (debug.messageEnabled()) {
                 debug.message("WARNING COUNT : " + warningCount);
                 debug.message("WARNING COUNT MESSAGE: " + lockoutMsg);
             }
         } catch (Exception e) {
-            debug.message("Error : " ,e);
+            debug.message("Error : ", e);
         }
     }
-    
+
     /**
      * Sets the error message and template
      */
@@ -1543,70 +1499,64 @@ public class AMLoginContext {
             return;
         }
         String errorCode = loginState.getErrorCode();
-        
+
         if (errorCode != null) {
             String resProperty = bundle.getString(errorCode);
             String errorMsg =  null;
             String templateName =  null;
-            
+
             if (debug.messageEnabled()) {
                 debug.message("resProperty is.. :" + resProperty);
             }
-            errorMsg = AuthUtils.getErrorVal(errorCode,AuthUtils.ERROR_MESSAGE);
-            templateName = AuthUtils.getErrorVal(errorCode,AuthUtils.ERROR_TEMPLATE);
-            
+            errorMsg = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_MESSAGE);
+            templateName = AuthUtils.getErrorVal(errorCode, AuthUtils.ERROR_TEMPLATE);
+
             if (debug.messageEnabled()) {
                 debug.message("Error Message : " + errorMsg);
                 debug.message("Error Template: " + templateName);
             }
-            
+
             loginState.setErrorMessage(errorMsg);
             loginState.setErrorTemplate(templateName);
         }
     }
-    
+
     /* for error handling - methods to return error code , module error
      * template , framework error template , error message
      */
     String getTimedOutTemplate() {
         loginState.setErrorCode(AMAuthErrorCode.AUTH_TIMEOUT);
-        loginState.logFailed(bundle.getString("loginTimeout"),"LOGINTIMEOUT");
-        loginState.setErrorMessage(
-            AuthUtils.getErrorVal(
-                AMAuthErrorCode.AUTH_TIMEOUT,AuthUtils.ERROR_MESSAGE));
-        return AuthUtils.getErrorVal(
-            AMAuthErrorCode.AUTH_TIMEOUT,AuthUtils.ERROR_TEMPLATE);
+        loginState.logFailed(bundle.getString("loginTimeout"), "LOGINTIMEOUT");
+        loginState.setErrorMessage(AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_MESSAGE));
+        return AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_TIMEOUT, AuthUtils.ERROR_TEMPLATE);
     }
-    
+
     String getModuleErrorTemplate() {
-        
         String moduleErrorTemplate = loginState.getModuleErrorTemplate();
         if (debug.messageEnabled()) {
             debug.message("Error Template is : " + moduleErrorTemplate);
         }
         return moduleErrorTemplate;
     }
-    
+
     /**
      * Returns error template.
      *
      * @return error template.
      */
     public String getErrorTemplate() {
-        
+
         String errorTemplate = null;
         if (loginState == null) {
-            errorTemplate = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_ERROR,
-            AuthUtils.ERROR_TEMPLATE);
+            errorTemplate = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_ERROR, AuthUtils.ERROR_TEMPLATE);
             return errorTemplate;
         }
         if (loginState.isTimedOut()) {
             errorTemplate = getTimedOutTemplate();
         } else {
             errorTemplate = loginState.getModuleErrorTemplate();
-            if ((errorTemplate == null) ||
-                (errorTemplate.equals(ISAuthConstants.EMPTY_STRING))
-            ) {
+            if (errorTemplate == null
+                    || errorTemplate.equals(ISAuthConstants.EMPTY_STRING)) {
                 errorTemplate = loginState.getErrorTemplate();
             }
         }
@@ -1616,7 +1566,7 @@ public class AMLoginContext {
         loginState.setErrorTemplate(errorTemplate);
         return errorTemplate;
     }
-    
+
     /**
      * Returns error message.
      *
@@ -1624,44 +1574,43 @@ public class AMLoginContext {
      */
     public String getErrorMessage() {
         String errorMsg = null;
-        
+
         if (loginState == null) {
-            errorMsg = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_ERROR,
-            AuthUtils.ERROR_MESSAGE);
+            errorMsg = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_ERROR, AuthUtils.ERROR_MESSAGE);
             return errorMsg;
         }
-        
+
         errorMsg = loginState.getModuleErrorMessage();
         if (errorMsg == null) {
             errorMsg = loginState.getErrorMessage();
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("Error message is : " + errorMsg);
         }
-        
+
         return errorMsg;
     }
-    
+
     /**
      * Returns error code.
      *
      * @return Authentication error code.
      */
     public String getErrorCode() {
-        
+
         if (loginState == null) {
             return AMAuthErrorCode.AUTH_ERROR;
         }
         String errorCode = loginState.getErrorCode();
-        
+
         if (debug.messageEnabled()) {
             debug.message("Error Code is.. : " + errorCode);
         }
-        
+
         return errorCode;
     }
-    
+
     /**
      * Gets the account lockout message
      * @return account lockout message
@@ -1672,7 +1621,7 @@ public class AMLoginContext {
         }
         return lockoutMsg;
     }
-   
+
     /**
      * Checks if the account is locked
      * @return <code>true</code> if account is locked
@@ -1680,7 +1629,7 @@ public class AMLoginContext {
     public boolean isLockedOut() {
         return accountLocked;
     }
-    
+
     /* get the authlevel
      * gets the module list for a given config for all
      * modules having option REQUIRED, REQUISITE
@@ -1688,7 +1637,7 @@ public class AMLoginContext {
      * the highest level will be set.
      */
     String getAuthLevel(String orgDN) {
-        
+
         AMAuthLevelManager levelManager = AMAuthLevelManager.getInstance();
         int maxLevel = Integer.MIN_VALUE;
         if (moduleSet == null || moduleSet.isEmpty()) {
@@ -1702,27 +1651,27 @@ public class AMLoginContext {
             if (authLevel > maxLevel)  {
                 maxLevel = authLevel;
             }
-            
+
             if (debug.messageEnabled()) {
                 debug.message("AuthLevel is : " + authLevel);
                 debug.message("New AuthLevel is : " + maxLevel);
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("Returning AuthLevel is : " + maxLevel);
         }
-        
+
         return (new Integer(maxLevel)).toString();
     }
-    
+
     /* return the module list
      * this methods gets the configuration list for a given configName
      * retreives all module names which have option REQUIRED , REQUISITE
      * if org.forgerock.openam.authLevel.excludeRequiredOrRequisite is false
      */
     Set getSuccessModuleSet(String orgDN) {
-        
+
         try {
             Set successModuleSet = loginState.getSuccessModuleSet();
             if (excludeRequiredOrRequisite) {
@@ -1734,10 +1683,9 @@ public class AMLoginContext {
                 if (debug.messageEnabled()) {
                     debug.message("retrieve all modules names with option REQUIRED or REQUISITE.");
                 }
-                moduleSet = 
-                        getModuleFromAuthConfiguration(successModuleSet,orgDN);
+                moduleSet = getModuleFromAuthConfiguration(successModuleSet, orgDN);
             }
-            
+
             if (debug.messageEnabled()) {
                 debug.message("ModuleSet is : " + moduleSet);
             }
@@ -1746,41 +1694,40 @@ public class AMLoginContext {
         }
         return moduleSet;
     }
-    
+
     /* constructs a module list string where each module is
      * separated by a "|" e.g module1 | module2 | module3
      */
     String getModuleString(Set moduleSet) {
-        
-        String moduleList=ISAuthConstants.EMPTY_STRING;
-        
+
+        String moduleList = ISAuthConstants.EMPTY_STRING;
+
         if ((moduleSet != null) && (!moduleSet.isEmpty())) {
             Iterator mIterator = moduleSet.iterator();
             StringBuilder moduleString = new StringBuilder();
-            
+
             while (mIterator.hasNext()) {
-                String mClassName = (String)mIterator.next();
-                moduleString.append(mClassName)
-                .append(LIST_DELIMITER);
+                String mClassName = (String) mIterator.next();
+                moduleString.append(mClassName).append(LIST_DELIMITER);
             }
-            
+
             String mString = moduleString.toString();
             int i = mString.lastIndexOf(LIST_DELIMITER);
-            
+
             if (i != -1) {
-                moduleList = mString.substring(0,i);
+                moduleList = mString.substring(0, i);
             } else {
                 moduleList = mString;
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("ModuleList is : " + moduleList);
         }
         return moduleList;
     }
-    
-    
+
+
     /* do the required process for different indextypes
      * return true if needs to return back
      * false if needs to continue
@@ -1792,11 +1739,11 @@ public class AMLoginContext {
     ) throws AuthLoginException {
         boolean ignoreProfile = false;
         AuthContext.IndexType previousType = loginState.getPreviousIndexType();
-        
+
         String normOrgDN = DNUtils.normalizeDN(orgDN);
-        if ((previousType != AuthContext.IndexType.LEVEL &&
-        previousType != AuthContext.IndexType.COMPOSITE_ADVICE) ||
-        indexType != AuthContext.IndexType.MODULE_INSTANCE) {
+        if ((previousType != AuthContext.IndexType.LEVEL
+                && previousType != AuthContext.IndexType.COMPOSITE_ADVICE)
+                || indexType != AuthContext.IndexType.MODULE_INSTANCE) {
             // proceed only when the org in the auth context matches
             // that in the query. otherwise it means a call with a new org.
             HttpServletRequest hreq = loginState.getHttpServletRequest();
@@ -1813,38 +1760,39 @@ public class AMLoginContext {
                     debug.message("ERROR processIndexType/SSOToken validation - "
                     + e.toString());
                 }
-                
+
                 if (!isTokenValid) {
                     debug.message("No existing valid session");
                     Hashtable requestHash = loginState.getRequestParamHash();
                     String newOrgDN = AuthUtils.getDomainNameByRequest(hreq, requestHash);
-                    if (debug.messageEnabled()){
-                        debug.message("orgDN from existing auth context: " +
-                        orgDN + ", orgDN from query string: " + newOrgDN);
+                    if (debug.messageEnabled()) {
+                        debug.message("orgDN from existing auth context: "
+                                + orgDN
+                                + ", orgDN from query string: "
+                                + newOrgDN);
                     }
-                    if (normOrgDN != null ) {
+                    if (normOrgDN != null) {
                         if (!normOrgDN.equals(newOrgDN) && !pCookieMode) {
-	                        st.setStatus(LoginStatus.AUTH_RESET);
-	                        loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
-	                        setErrorMsgAndTemplate();
-	                        internalAuthError=true;
-	                        throw new AuthLoginException(bundleName,
-	                        AMAuthErrorCode.AUTH_ERROR, null);
+                            st.setStatus(LoginStatus.AUTH_RESET);
+                            loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);
+                            setErrorMsgAndTemplate();
+                            internalAuthError = true;
+                            throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_ERROR, null);
                         }
                     }
                 }
-                
+
             }
         }
         if (indexType == AuthContext.IndexType.COMPOSITE_ADVICE)  {
             debug.message("IndexType is COMPOSITE_ADVICE");
-                // Set the Composite Advice in Login State after decoding
-                String compositeAdvice = URLEncDec.decode(indexName);
-                loginState.setCompositeAdvice(compositeAdvice);
+            // Set the Composite Advice in Login State after decoding
+            String compositeAdvice = URLEncDec.decode(indexName);
+            loginState.setCompositeAdvice(compositeAdvice);
             // if is multiple modules are found then return
             // else continue with login process
             try {
-                if (processCompositeAdvice(indexType,indexName,orgDN,clientType)) {
+                if (processCompositeAdvice(indexType, indexName, orgDN, clientType)) {
                     debug.message("multiple modules found");
                     return true;
                 } else {
@@ -1863,7 +1811,7 @@ public class AMLoginContext {
             // if is multiple modules are found then return
             // else continue with login process
             try {
-                if (processLevel(indexType,indexName,orgDN,clientType)) {
+                if (processLevel(indexType, indexName, orgDN, clientType)) {
                     debug.message("multiple modules found");
                     return true;
                 } else {
@@ -1892,25 +1840,23 @@ public class AMLoginContext {
                 return true;
             } else if ((!userValid) && (!ignoreProfile)) {
                 debug.message("User is not active");
-                loginState.logFailed(
-                    bundle.getString("userInactive"),"USERINACTIVE");
+                loginState.logFailed(bundle.getString("userInactive"), "USERINACTIVE");
                 /* The user based authentication errors should not be different
-                 * for users who exist and who don't, which can lead to 
-                 * possiblity of enumerating existing users.
+                 * for users who exist and who don't, which can lead to
+                 * possibility of enumerating existing users.
                  * The AMAuthErrorCode.AUTH_LOGIN_FAILED error code is used for
                  * all user based authentication errors.
-                 * Refer issue3278 
-                 */                
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED) ;
+                 * Refer issue3278
+                 */
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_LOGIN_FAILED);
                 setErrorMsgAndTemplate();
                 //destroySession();
                 st.setStatus(LoginStatus.AUTH_FAILED);
                 throw new AuthLoginException(bundleName,
                 AMAuthErrorCode.AUTH_USER_INACTIVE, null);
             } else if (ignoreProfile) {
-                setAuthError(AMAuthErrorCode.AUTH_PROFILE_ERROR,"loginDenied");
-                throw new AuthLoginException(bundleName,
-                AMAuthErrorCode.AUTH_PROFILE_ERROR, null);
+                setAuthError(AMAuthErrorCode.AUTH_PROFILE_ERROR, "loginDenied");
+                throw new AuthLoginException(bundleName, AMAuthErrorCode.AUTH_PROFILE_ERROR, null);
             } else {
                 return false;
             }
@@ -1919,12 +1865,11 @@ public class AMLoginContext {
             debug.message("indexType is module");
             boolean instanceExists =
             loginState.getDomainAuthenticators().contains(indexName);
-            if (!indexName.equals(ISAuthConstants.APPLICATION_MODULE) &&
-            !instanceExists) {
+            if (!indexName.equals(ISAuthConstants.APPLICATION_MODULE)
+                    && !instanceExists) {
                 debug.message("Module denied!!");
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
-                loginState.logFailed(
-                    bundle.getString("moduleDenied"),"MODULEDENIED");
+                loginState.logFailed(bundle.getString("moduleDenied"), "MODULEDENIED");
                 setErrorMsgAndTemplate();
                 st.setStatus(LoginStatus.AUTH_FAILED);
                 throw new AuthLoginException(bundleName,
@@ -1935,20 +1880,20 @@ public class AMLoginContext {
         } else if (indexType == AuthContext.IndexType.ROLE) {
             debug.message("indexType is Role");
             if (loginState.ignoreProfile()) {
-                setAuthError(AMAuthErrorCode.AUTH_TYPE_DENIED,"loginDenied");
+                setAuthError(AMAuthErrorCode.AUTH_TYPE_DENIED, "loginDenied");
                 throw new AuthLoginException(bundleName,
                 AMAuthErrorCode.AUTH_TYPE_DENIED, null);
             }
         }
-        
+
         return false;
     }
-    
+
     /* do required processing for persistent cookie */
     void processPCookieMode(boolean userValid) throws AuthLoginException {
-        
+
         // check if user account has expired
-        
+
         if (!loginState.ignoreProfile()) {
             if (!userValid) {
                 if (debug.messageEnabled()) {
@@ -1960,10 +1905,10 @@ public class AMLoginContext {
                 throw new AuthLoginException(bundleName,
                 AMAuthErrorCode.AUTH_USER_INACTIVE, null);
             }
-            AMAccountLockout amAccountLockout =new AMAccountLockout(loginState);
+            AMAccountLockout amAccountLockout = new AMAccountLockout(loginState);
             boolean accountLocked = amAccountLockout.isLockedOut();
             if (accountLocked) {
-                loginState.logFailed(bundle.getString("lockOut"),"LOCKEDOUT");
+                loginState.logFailed(bundle.getString("lockOut"), "LOCKEDOUT");
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED);
                 setErrorMsgAndTemplate();
                 st.setStatus(LoginStatus.AUTH_FAILED);
@@ -1973,7 +1918,7 @@ public class AMLoginContext {
             boolean accountExpired = amAccountLockout.isAccountExpired();
             if (accountExpired) {
                 loginState.logFailed(
-                    bundle.getString("accountExpired"),"ACCOUNTEXPIRED");
+                    bundle.getString("accountExpired"), "ACCOUNTEXPIRED");
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED);
                 setErrorMsgAndTemplate();
                 st.setStatus(LoginStatus.AUTH_FAILED);
@@ -1987,7 +1932,7 @@ public class AMLoginContext {
                 loginState.setUserName(indexName);
             } catch (Exception e) {
                 debug.message("Error get default attributes " , e);
-                setAuthError(AMAuthErrorCode.AUTH_ERROR,"loginFailed");
+                setAuthError(AMAuthErrorCode.AUTH_ERROR, "loginFailed");
                 throw new AuthLoginException(bundleName,
                 AMAuthErrorCode.AUTH_ERROR, null);
             }
@@ -1999,8 +1944,8 @@ public class AMLoginContext {
             loginState.setPCookieUserName(indexName);
             return;
         }
-        
-        updateLoginState(loginState,indexType,indexName,configName,orgDN);
+
+        updateLoginState(loginState, indexType, indexName, configName, orgDN);
         Subject subject = new Subject();
         Principal userPrincipal = new UserPrincipal(indexName);
         subject.getPrincipals().add(userPrincipal);
@@ -2014,15 +1959,14 @@ public class AMLoginContext {
             loginState.logSuccess();
         } catch (Exception e) {
             debug.message("Error activating session ");
-            setAuthError(AMAuthErrorCode.AUTH_ERROR,"loginFailed");
+            setAuthError(AMAuthErrorCode.AUTH_ERROR, "loginFailed");
             throw new AuthLoginException(bundleName,
             AMAuthErrorCode.AUTH_ERROR, null);
         }
         st.setStatus(LoginStatus.AUTH_SUCCESS);
         debug.message("login success");
-        return;
     }
-    
+
     /* set sid and loginState */
     void setLoginHash() {
         try {
@@ -2033,84 +1977,76 @@ public class AMLoginContext {
                 debug.message("login state is .. : " + loginState);
             }
         } catch (Exception e) {
-            debug.message("executLogin exception : " ,e);
+            debug.message("executLogin exception : ", e);
         }
     }
-    
-    void setAuthError(String errorCode,String resString) {
+
+    void setAuthError(String errorCode, String resString) {
         loginState.setErrorCode(errorCode);
         setErrorMsgAndTemplate();
         loginState.logFailed(bundle.getString(resString));
         st.setStatus(LoginStatus.AUTH_FAILED);
     }
-    
+
     /**
      * Sets the failure URL and execute the post process login SPI.
      * for <code>internalAutherror</code> and if already executed
      * just skip this,
      */
     public void postProcessOnFail() {
-        if ( (!internalAuthError) && (!processDone) ) {
+        if ( !internalAuthError && !processDone) {
             if (debug.messageEnabled()) {
                 debug.message("postProcessOnFail ");
             }
             //setErrorMsgAndTemplate();
-            loginState.postProcess(indexType,indexName,
-                    LoginState.POSTPROCESS_FAILURE);            
-            loginState.setFailureLoginURL(indexType,indexName);
+            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_FAILURE);
+            loginState.setFailureLoginURL(indexType, indexName);
             processDone = true;
         }
     }
-    
+
     /**
      * Sets the success URL and execute the post process login
      * SPI. for <code>internalAutherror</code> and if already executed
      * just skip this.
      */
     public void postProcessOnSuccess() {
-        if (!processDone ) {
+        if (!processDone) {
             if (debug.messageEnabled()) {
                 debug.message("postProcessOnSuccess ");
             }
-            loginState.postProcess(indexType,indexName,
-                    LoginState.POSTPROCESS_SUCCESS);
+            loginState.postProcess(indexType, indexName, LoginState.POSTPROCESS_SUCCESS);
             processDone = true;
         }
     }
-    
+
     /** This method returns a Set with is the list of
      * modules for a Authentication Configuration.
      * Only modules with control flag REQUIRED and
      * REQUISITE are returned.
-     * @param moduleListSet list of configured auth module 
+     * @param moduleListSet list of configured auth module
      * @return set of configured auth module with control flag REQUIRED and
      *         REQUISITE are returned
      */
-    private Set getModuleFromAuthConfiguration(Set moduleListSet, 
-                                               String orgDN) {
+    private Set getModuleFromAuthConfiguration(Set moduleListSet, String orgDN) {
         Configuration config = Configuration.getConfiguration();
         if (configName == null) {
-            configName = getConfigName(indexType,indexName,
-            orgDN,
-            loginState.getClientType());
+            configName = getConfigName(indexType, indexName, orgDN, loginState.getClientType());
         }
-        AppConfigurationEntry[] moduleList =
-        config.getAppConfigurationEntry(configName);
+        AppConfigurationEntry[] moduleList = config.getAppConfigurationEntry(configName);
         if (debug.messageEnabled()) {
             debug.message("configName is : " + configName);
         }
         String moduleName = null;
         if ((moduleList != null) && (moduleList.length != 0)) {
             if (moduleList.length == 1) {
-                moduleName = (String)moduleList[0].getOptions().get(
-                    ISAuthConstants.MODULE_INSTANCE_NAME);
+                moduleName = (String) moduleList[0].getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME);
                 moduleListSet.add(moduleName);
             } else {
                 for (int i = 0; i < moduleList.length; i++) {
                     AppConfigurationEntry.LoginModuleControlFlag controlFlag =
                     moduleList[i].getControlFlag();
-                    moduleName = (String)moduleList[i].getOptions().get(    
-                        ISAuthConstants.MODULE_INSTANCE_NAME);
+                    moduleName = (String) moduleList[i].getOptions().get(ISAuthConstants.MODULE_INSTANCE_NAME);
                     if (isControlFlagMatchFound(controlFlag)) {
                         moduleListSet.add(moduleName);
                     }
@@ -2120,19 +2056,19 @@ public class AMLoginContext {
         if (debug.messageEnabled()) {
             debug.message("ModuleSet is : " + moduleListSet);
         }
-        
+
         return moduleListSet;
     }
-    
+
     /* return the failure module list */
     String getFailureModuleList(String orgDN) {
-        
-        String moduleList=ISAuthConstants.EMPTY_STRING;
+
+        String moduleList = ISAuthConstants.EMPTY_STRING;
         try {
             Set failureModuleSet = loginState.getFailureModuleSet();
-            Set moduleSet = 
-                getModuleFromAuthConfiguration(failureModuleSet,orgDN);
-            
+            Set moduleSet =
+                getModuleFromAuthConfiguration(failureModuleSet, orgDN);
+
             if (debug.messageEnabled()) {
                 debug.message("ModuleSet is : " + moduleSet);
             }
@@ -2145,8 +2081,8 @@ public class AMLoginContext {
         }
         return moduleList;
     }
-    
-    
+
+
     /* Checks if the control flag matches the JAAS flags,
      * REQUIRED and REQUISITE flags
      */
@@ -2154,16 +2090,12 @@ public class AMLoginContext {
         AppConfigurationEntry.LoginModuleControlFlag controlFlag) {
         boolean isFlagMatchFound = false;
         if (controlFlag != null) {
-            isFlagMatchFound  =
-                ((controlFlag ==
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUIRED) ||
-                (controlFlag ==
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUISITE));
+            isFlagMatchFound  = ((controlFlag == AppConfigurationEntry.LoginModuleControlFlag.REQUIRED)
+                    || (controlFlag == AppConfigurationEntry.LoginModuleControlFlag.REQUISITE));
         }
-        
         return isFlagMatchFound;
     }
-    
+
     /* Returns the successful list of modules names */
     String getSuccessModuleString(String orgDN) {
         if (moduleSet == null || moduleSet.isEmpty()) {
@@ -2179,7 +2111,7 @@ public class AMLoginContext {
     public boolean isPureJAAS() {
         return jaasCheck == 1;
     }
-    
+
     private void nullifyUsedVars() {
         configName = null; // jaas configuration name.
         subject = null;

@@ -51,27 +51,42 @@ public class EntitlementTest {
         Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
         actionValues.put("POST", Boolean.TRUE);
         String resourceName = "http://www.sun.com";
-        Entitlement ent = new Entitlement(SERVICE_NAME,
-                resourceName, actionValues);
-        Set<String> excludedResourceNames = new HashSet<String>();
-        excludedResourceNames.add("http://www.sun.com/hr");
-        excludedResourceNames.add("http://www.sun.com/legal");
-        ent.setExcludedResourceNames(excludedResourceNames);
+        Entitlement ent = new Entitlement(SERVICE_NAME, resourceName, actionValues);
         ent.setName("entitlement1");
 
-        Entitlement ent1 = new Entitlement(SERVICE_NAME,
-                resourceName, actionValues);
+        Entitlement ent1 = new Entitlement(SERVICE_NAME, resourceName, actionValues);
 
         if (ent.equals(ent1)) {
-            throw new Exception("EntitlementTest.testConstruction(): " +
-                    "equality test for false failed.");
+            throw new Exception("EntitlementTest.testConstruction(): "
+                    + "equality test for false failed.");
         }
-        ent1.setExcludedResourceNames(excludedResourceNames);
         ent1.setName("entitlement1");
 
         if (!ent.equals(ent1)) {
             throw new Exception("EntitlementTest.testConstruction(): " +
                     "equality test for true failed.");
+        }
+    }
+
+    @Test
+    public void testHashCode() throws Exception {
+        Map<String, Boolean> actionValues = new HashMap<String, Boolean>();
+        actionValues.put("POST", Boolean.TRUE);
+        String resourceName = "http://www.sun.com";
+        Entitlement ent = new Entitlement(SERVICE_NAME, resourceName, actionValues);
+        ent.setName("entitlement1");
+
+        Entitlement ent1 = new Entitlement(SERVICE_NAME, resourceName, actionValues);
+
+        if (ent.hashCode() == ent1.hashCode()) {
+            throw new Exception("EntitlementTest.testConstruction(): "
+                    + "hashcode test failed (hashcodes were the same, should have been different.");
+        }
+        ent1.setName("entitlement1");
+
+        if (ent.hashCode() != ent1.hashCode()) {
+            throw new Exception("EntitlementTest.testConstruction(): "
+                    + "hashcode test failed (hashcodes were not the same, should have been.");
         }
     }
 
@@ -89,5 +104,4 @@ public class EntitlementTest {
         assertThat(entitlement.getAdvices()).isEqualTo(advices);
         assertThat(entitlement.hasAdvice()).isTrue();
     }
-
 }

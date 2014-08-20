@@ -41,6 +41,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -187,47 +188,29 @@ public class JsonPolicyParserTest {
     }
 
     @Test
-    public void shouldParseResourcesWhenBothSpecified() throws Exception {
+    public void shouldParseResources() throws Exception {
         // Given
         List<String> included = Arrays.asList("one", "two", "three");
-        List<String> excluded = Arrays.asList("four", "five");
-        JsonValue content = json(object(field("resources", object(field("included", included),
-                                                                  field("excluded", excluded)))));
+        JsonValue content = json(object(field("resources", included)));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
         assertThat(result.getEntitlement().getResourceNames()).containsOnly(included.toArray());
-        assertThat(result.getEntitlement().getExcludedResourceNames()).containsOnly(excluded.toArray());
-    }
-
-    @Test
-    public void shouldDefaultExcludedResourcesToEmpty() throws Exception {
-        // Given
-        List<String> included = Arrays.asList("one", "two", "three");
-        JsonValue content = json(object(field("resources", object(field("included", included)))));
-
-        // When
-        Privilege result = parser.parsePolicy(POLICY_NAME, content);
-
-        // Then
-        assertThat(result.getEntitlement().getResourceNames()).containsOnly(included.toArray());
-        assertThat(result.getEntitlement().getExcludedResourceNames()).isNullOrEmpty();
     }
 
     @Test
     public void shouldDefaultIncludedResourcesToEmpty() throws Exception {
         // Given
-        List<String> excluded = Arrays.asList("four", "five");
-        JsonValue content = json(object(field("resources", object(field("excluded", excluded)))));
+        List<String> included = new ArrayList<String>();
+        JsonValue content = json(object(field("resources", included)));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
         assertThat(result.getEntitlement().getResourceNames()).isNullOrEmpty();
-        assertThat(result.getEntitlement().getExcludedResourceNames()).containsOnly(excluded.toArray());
     }
 
     @Test
@@ -581,18 +564,15 @@ public class JsonPolicyParserTest {
         // Given
         Privilege policy = new StubPrivilege();
         Set<String> included = CollectionUtils.asSet("one", "two", "three");
-        Set<String> excluded = CollectionUtils.asSet("four", "five");
         Entitlement resources = new Entitlement();
         resources.setResourceNames(included);
-        resources.setExcludedResourceNames(excluded);
         policy.setEntitlement(resources);
 
         // When
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        assertThat(result.get("resources").get("included").asList()).containsOnly(included.toArray());
-        assertThat(result.get("resources").get("excluded").asList()).containsOnly(excluded.toArray());
+        assertThat(result.get("resources").asList()).containsOnly(included.toArray());
     }
 
     @Test

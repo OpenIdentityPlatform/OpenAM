@@ -135,7 +135,7 @@ public class PrivilegeUtils {
             String[] param = {policyObject.getClass().getName()};
             throw new EntitlementException(329, param);
         }
-        
+
         return privileges;
     }
 
@@ -260,7 +260,7 @@ public class PrivilegeUtils {
         try {
             Set<EntitlementSubject> result = new HashSet<EntitlementSubject>();
             Set<String> values = sbj.getValues();
-            
+
             for (String uuid : values) {
                 AMIdentity amid = IdUtils.getIdentity(adminToken, uuid);
                 IdType type = amid.getType();
@@ -340,7 +340,7 @@ public class PrivilegeUtils {
         return rules;
     }
 
-    private static Map<String, Set<String>> getResources(Policy policy) 
+    private static Map<String, Set<String>> getResources(Policy policy)
         throws NameNotFoundException {
         Map<String, Set<String>> results = new HashMap<String, Set<String>>();
         Set<Rule> rules = getRules(policy);
@@ -359,7 +359,7 @@ public class PrivilegeUtils {
         return results;
     }
 
-    private static Set<String> getReferrals(Policy policy) 
+    private static Set<String> getReferrals(Policy policy)
         throws NameNotFoundException {
         Set<String> results = new HashSet<String>();
         Set<String> names = policy.getReferralNames();
@@ -384,33 +384,25 @@ public class PrivilegeUtils {
 
         for (Rule rule : rules) {
             String serviceName = rule.getServiceTypeName();
-            Map<String, Boolean> actionMap = pavToPrav(rule.getActionValues(), 
+            Map<String, Boolean> actionMap = pavToPrav(rule.getActionValues(),
                 serviceName);
             String entitlementName = rule.getName();
-           
+
             Set<String> resourceNames = new HashSet<String>();
             Set<String> ruleResources = rule.getResourceNames();
             if (ruleResources != null) {
                 resourceNames.addAll(ruleResources);
             }
 
-            Entitlement entitlement = new Entitlement(rule.getApplicationName(),
-                resourceNames, actionMap);
+            Entitlement entitlement = new Entitlement(rule.getApplicationName(), resourceNames, actionMap);
             entitlement.setName(entitlementName);
-            Set<String> excludedResourceNames1 = rule.getExcludedResourceNames();
-            if (excludedResourceNames1 != null) {
-                Set<String> excludedResourceNames = new HashSet<String>();
-                excludedResourceNames.addAll(excludedResourceNames1);
-                entitlement.setExcludedResourceNames(excludedResourceNames);
-            }
             entitlements.add(entitlement);
         }
 
         return entitlements;
     }
 
-    private static EntitlementCondition nConditionsToECondition(Set nConditons)
-    {
+    private static EntitlementCondition nConditionsToECondition(Set nConditons) {
         Set<EntitlementCondition> ecSet = new HashSet<EntitlementCondition>();
         for (Object nConditionObj : nConditons) {
             Object[] nCondition = (Object[]) nConditionObj;
@@ -425,12 +417,10 @@ public class PrivilegeUtils {
             return ecSet.iterator().next();
         }
 
-        Map<String, Set<EntitlementCondition>> cnEntcMap =
-            new HashMap<String, Set<EntitlementCondition>>();
+        Map<String, Set<EntitlementCondition>> cnEntcMap = new HashMap<String, Set<EntitlementCondition>>();
         for (EntitlementCondition ec : ecSet) {
-            String key = (ec instanceof PolicyCondition) ?
-                ((PolicyCondition)ec).getClassName()
-                : ec.getClass().getName();
+            String key = (ec instanceof PolicyCondition)
+                    ? ((PolicyCondition) ec).getClassName() : ec.getClass().getName();
 
             Set<EntitlementCondition> values = cnEntcMap.get(key);
             if (values == null) {
@@ -439,18 +429,17 @@ public class PrivilegeUtils {
             }
             values.add(ec);
         }
-        
+
         Set<String> keySet = cnEntcMap.keySet();
         if (keySet.size() == 1) {
             Set<EntitlementCondition> values =
                 cnEntcMap.get(keySet.iterator().next());
-            return (values.size() == 1) ? values.iterator().next() :
-                new OrCondition(values);
+            return (values.size() == 1) ? values.iterator().next() : new OrCondition(values);
         }
 
         Set andSet = new HashSet();
         for (String key : keySet) {
-            Set values = (Set)cnEntcMap.get(key);
+            Set values = (Set) cnEntcMap.get(key);
             if (values.size() == 1) {
                 andSet.add(values.iterator().next());
             } else {
@@ -465,26 +454,22 @@ public class PrivilegeUtils {
         Subject objSubject,
         boolean exclusive) {
         try {
-            if (objSubject instanceof
-                com.sun.identity.policy.plugins.PrivilegeSubject) {
+            if (objSubject instanceof com.sun.identity.policy.plugins.PrivilegeSubject) {
                 com.sun.identity.policy.plugins.PrivilegeSubject pips =
-                    (com.sun.identity.policy.plugins.PrivilegeSubject)
-                    objSubject;
+                    (com.sun.identity.policy.plugins.PrivilegeSubject) objSubject;
                 Set<String> values = pips.getValues();
                 String val = values.iterator().next();
                 int idx = val.indexOf("=");
                 String className = val.substring(0, idx);
                 String state = val.substring(idx+1);
-                EntitlementSubject es =
-                    (EntitlementSubject)Class.forName(className).newInstance();
+                EntitlementSubject es = (EntitlementSubject) Class.forName(className).newInstance();
                 es.setState(state);
                 return es;
             } else {
-                Subject sbj = (Subject)objSubject;
+                Subject sbj = (Subject) objSubject;
                 Set<String> val = sbj.getValues();
                 String className = sbj.getClass().getName();
-                return new PolicySubject(subjectName,
-                    className, val, exclusive);
+                return new PolicySubject(subjectName, className, val, exclusive);
             }
         } catch (ClassNotFoundException e) {
             PrivilegeManager.debug.error("PrivilegeUtils.mapGenericSubject", e);
@@ -495,23 +480,23 @@ public class PrivilegeUtils {
         }
         return null;
     }
-    
+
     private static Set<ResourceAttribute> mapGenericResponseProvider(
             String responseProviderName, ResponseProvider rp) {
         if (rp instanceof ResponseProvider) {
             Set<ResourceAttribute> results = new HashSet<ResourceAttribute>();
-            
+
             Map<String, Set<String>> props = rp.getProperties();
-            
+
             for (Map.Entry<String, Set<String>> property : props.entrySet()) {
                 String className = rp.getClass().getName();
-                results.add(new PolicyResponseProvider(responseProviderName, className, 
+                results.add(new PolicyResponseProvider(responseProviderName, className,
                                 property.getKey(), property.getValue()));
             }
-            
+
             return results;
         }
-        
+
         return null;
     }
 
@@ -519,24 +504,21 @@ public class PrivilegeUtils {
         Object[] nCondition) {
         try {
             Object objCondition = nCondition[1];
-            if (objCondition instanceof
-                com.sun.identity.policy.plugins.PrivilegeCondition) {
+            if (objCondition instanceof com.sun.identity.policy.plugins.PrivilegeCondition) {
                 com.sun.identity.policy.plugins.PrivilegeCondition pipc =
-                    (com.sun.identity.policy.plugins.PrivilegeCondition)
-                    objCondition;
+                    (com.sun.identity.policy.plugins.PrivilegeCondition) objCondition;
                 Map<String, Set<String>> props = pipc.getProperties();
                 String className = props.keySet().iterator().next();
                 EntitlementCondition ec =
-                    (EntitlementCondition)Class.forName(className).newInstance();
+                    (EntitlementCondition) Class.forName(className).newInstance();
                 Set<String> setValues = props.get(className);
                 ec.setState(setValues.iterator().next());
                 return ec;
             } else if (objCondition instanceof Condition) {
-                Condition cond = (Condition)objCondition;
+                Condition cond = (Condition) objCondition;
                 Map<String, Set<String>> props = cond.getProperties();
                 String className = cond.getClass().getName();
-                return new PolicyCondition((String)nCondition[0], className,
-                    props);
+                return new PolicyCondition((String) nCondition[0], className, props);
             }
         } catch (ClassNotFoundException e) {
             PrivilegeManager.debug.error(
@@ -594,18 +576,18 @@ public class PrivilegeUtils {
         Map<String, Set<String>> map =
             referralPrivilege.getOriginalMapApplNameToResources();
         count = 1;
-        String realmName = (DN.isDN(realm)) ?
-            DNMapper.orgNameToRealmName(realm) : realm;
+        String realmName = (DN.isDN(realm))
+                ? DNMapper.orgNameToRealmName(realm) : realm;
 
         for (String appName : map.keySet()) {
             Set<String> res = map.get(appName);
-            Application appl = ApplicationManager.getApplication(
-                PrivilegeManager.superAdminSubject, realmName, appName);
-            if (appl == null) {
+            Application application = ApplicationManager.getApplication(PrivilegeManager.superAdminSubject,
+                                            realmName, appName);
+            if (application == null) {
                 Object[] params = {appName, realm};
                 throw new EntitlementException(105, params);
             }
-            String serviceName = appl.getApplicationType().getName();
+            String serviceName = application.getApplicationType().getName();
 
             for (String r : res) {
                 Rule rule = new Rule("rule" + count++, serviceName, r,
@@ -616,7 +598,7 @@ public class PrivilegeUtils {
         }
         return policy;
     }
-    
+
     public static Policy privilegeToPolicy(String realm, Privilege privilege)
             throws PolicyException, SSOException, EntitlementException {
         Policy policy = new Policy(privilege.getName());
@@ -650,7 +632,6 @@ public class PrivilegeUtils {
                 policy.addResponseProvider(rpName, responseProvider);
             }
         }
-
         policy.setCreatedBy(privilege.getCreatedBy());
         policy.setCreationDate(privilege.getCreationDate());
         policy.setLastModifiedBy(privilege.getLastModifiedBy());
@@ -665,16 +646,15 @@ public class PrivilegeUtils {
         Set<Rule> rules = new HashSet<Rule>();
         String appName = entitlement.getApplicationName();
 
-        String realmName = (DN.isDN(realm)) ?
-            DNMapper.orgNameToRealmName(realm) : realm;
+        String realmName = (DN.isDN(realm)) ? DNMapper.orgNameToRealmName(realm) : realm;
 
-        Application appl = ApplicationManager.getApplication(
+        Application application = ApplicationManager.getApplication(
             PrivilegeManager.superAdminSubject, realmName, appName);
-        if (appl == null) {
+        if (application == null) {
             Object[] params = {appName, realm};
             throw new EntitlementException(105, params);
         }
-        String serviceName = appl.getApplicationType().getName();
+        String serviceName = application.getApplicationType().getName();
 
         Set<String> resourceNames = entitlement.getResourceNames();
         Map<String, Boolean> actionValues = entitlement.getActionValues();
@@ -685,11 +665,8 @@ public class PrivilegeUtils {
             if (entName == null) {
                 entName = "entitlement";
             }
-
             Rule rule = new Rule(entName, serviceName, null, av);
             rule.setResourceNames(resourceNames);
-            rule.setExcludedResourceNames(
-                entitlement.getExcludedResourceNames());
             rule.setApplicationName(appName);
             rules.add(rule);
         }
@@ -705,9 +682,7 @@ public class PrivilegeUtils {
         return ps;
     }
 
-    private static Condition eConditionToEPCondition(
-        EntitlementCondition ec
-    ) throws PolicyException {
+    private static Condition eConditionToEPCondition(EntitlementCondition ec) throws PolicyException {
         PrivilegeCondition pc = new PrivilegeCondition();
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>(2);
@@ -717,15 +692,14 @@ public class PrivilegeUtils {
         return pc;
     }
 
-    private static Set<ResourceAttribute> nrpsToResourceAttributes(
-        Set nrps) throws EntitlementException {
-        Set<ResourceAttribute> resourceAttributesSet = new HashSet();
+    private static Set<ResourceAttribute> nrpsToResourceAttributes(Set nrps) throws EntitlementException {
+        Set<ResourceAttribute> resourceAttributesSet = new HashSet<ResourceAttribute>();
         if (nrps != null && !nrps.isEmpty()) {
             for (Object nrpObj : nrps) {
                 Object[] nrpa = (Object[]) nrpObj;
                 String nrpName = (String) nrpa[0];
                 ResponseProvider rp = (ResponseProvider) nrpa[1];
-                
+
                 if (rp instanceof IDRepoResponseProvider) {
                     resourceAttributesSet.addAll(nrpsToResourceAttributes(
                         (IDRepoResponseProvider) rp, nrpName));
@@ -745,8 +719,7 @@ public class PrivilegeUtils {
         Map props = irp.getProperties();
 
         if ((props != null) && !props.isEmpty()) {
-            Set<String> sas = (Set<String>) props.get(
-                IDRepoResponseProvider.STATIC_ATTRIBUTE);
+            Set<String> sas = (Set<String>) props.get(IDRepoResponseProvider.STATIC_ATTRIBUTE);
 
             if (sas != null && !sas.isEmpty()) {
                 for (String sat : sas) {
@@ -754,8 +727,7 @@ public class PrivilegeUtils {
                     String name = (i != -1) ? sat.substring(0, i) : sat;
                     String value = (i != -1) ? sat.substring(i + 1) : null;
 
-                    String k = name + "_" +
-                        IDRepoResponseProvider.STATIC_ATTRIBUTE;
+                    String k = name + "_" + IDRepoResponseProvider.STATIC_ATTRIBUTE;
                     StaticAttributes sa = (StaticAttributes) map.get(k);
                     if (sa == null) {
                         sa = new StaticAttributes();
@@ -769,8 +741,7 @@ public class PrivilegeUtils {
                 }
             }
 
-            Set<String> uas = (Set<String>) props.get(
-                IDRepoResponseProvider.DYNAMIC_ATTRIBUTE);
+            Set<String> uas = (Set<String>) props.get(IDRepoResponseProvider.DYNAMIC_ATTRIBUTE);
 
             if (uas != null && !uas.isEmpty()) {
                 for (String uat : uas) {
@@ -778,8 +749,7 @@ public class PrivilegeUtils {
                     String name = (i != -1) ? uat.substring(0, i) : uat;
                     String value = (i != -1) ? uat.substring(i + 1) : null;
 
-                    String k = name + "_" +
-                        IDRepoResponseProvider.DYNAMIC_ATTRIBUTE;
+                    String k = name + "_" + IDRepoResponseProvider.DYNAMIC_ATTRIBUTE;
                     UserAttributes ua = (UserAttributes) map.get(k);
                     if (ua == null) {
                         ua = new UserAttributes();
@@ -800,24 +770,19 @@ public class PrivilegeUtils {
 
 
 
-    private static Map<String, ResponseProvider>
-        resourceAttributesToResponseProviders(
-            Set<ResourceAttribute> resourceAttributes
-    ) throws PolicyException {
-        Map<String, ResponseProvider> results = new
-            HashMap<String, ResponseProvider>();
+    private static Map<String, ResponseProvider> resourceAttributesToResponseProviders(
+            Set<ResourceAttribute> resourceAttributes) throws PolicyException {
+
+        Map<String, ResponseProvider> results = new HashMap<String, ResponseProvider>();
 
         if (resourceAttributes != null) {
-            Map<String, Map<String, Set<String>>> map = new
-                HashMap<String, Map<String, Set<String>>>();
+            Map<String, Map<String, Set<String>>> map = new HashMap<String, Map<String, Set<String>>>();
 
             for (ResourceAttribute ra : resourceAttributes) {
                 if (ra instanceof StaticAttributes) {
-                    resourceAttributesToResponseProviders(
-                        (StaticAttributes)ra, map);
+                    resourceAttributesToResponseProviders((StaticAttributes) ra, map);
                 } else if (ra instanceof UserAttributes) {
-                    resourceAttributesToResponseProviders(
-                        (UserAttributes)ra, map);
+                    resourceAttributesToResponseProviders((UserAttributes) ra, map);
                 }
             }
 
@@ -828,13 +793,10 @@ public class PrivilegeUtils {
                     IDRepoResponseProvider.DYNAMIC_ATTRIBUTE);
 
                 if ((dynValues != null) && !dynValues.isEmpty()) {
-                    Map<String, Set<String>> configParams = new
-                        HashMap<String, Set<String>>();
-                    configParams.put(PolicyConfig.SELECTED_DYNAMIC_ATTRIBUTES,
-                        dynValues);
+                    Map<String, Set<String>> configParams = new HashMap<String, Set<String>>();
+                    configParams.put(PolicyConfig.SELECTED_DYNAMIC_ATTRIBUTES, dynValues);
                     rp.initialize(configParams);
                 }
-
                 rp.setProperties(values);
 
                 results.put(n, rp);
@@ -872,7 +834,7 @@ public class PrivilegeUtils {
         UserAttributes ua,
         Map<String, Map<String, Set<String>>> results) throws PolicyException {
         String pluginName = ua.getPResponseProviderName();
-        
+
         Map<String, Set<String>> map = results.get(pluginName);
         if (map == null) {
             map = new HashMap<String, Set<String>>();
@@ -909,8 +871,7 @@ public class PrivilegeUtils {
         return "" + random.nextInt(10000);
     }
 
-    static Map pravToPav(Map<String, Boolean> actionValues,
-            String serviceName) throws PolicyException, SSOException  {
+    static Map pravToPav(Map<String, Boolean> actionValues, String serviceName) throws PolicyException, SSOException  {
         if (actionValues == null) {
             return null;
         }
@@ -973,7 +934,7 @@ public class PrivilegeUtils {
         for (Object actionObj : keySet) {
             String action = (String) actionObj;
             Set values = (Set) actionValues.get(action);
-            
+
             if ((values == null) || values.isEmpty()) {
                 av.put(action, Boolean.FALSE);
             } else {
@@ -995,14 +956,10 @@ public class PrivilegeUtils {
                             av.put(action + "_" + value, Boolean.TRUE);
                         }
                     } catch (InvalidNameException e) {
-                        av.put(action, Boolean.parseBoolean(
-                            (String) values.iterator().next()));
+                        av.put(action, Boolean.parseBoolean((String) values.iterator().next()));
                     }
                 } else {
-                    if (!values.isEmpty()) {
-                        av.put(action, Boolean.parseBoolean(
-                            (String)values.iterator().next()));
-                    }
+                    av.put(action, Boolean.parseBoolean((String) values.iterator().next()));
                 }
             }
 
@@ -1010,8 +967,7 @@ public class PrivilegeUtils {
         return av;
     }
 
-    public static String policyToXML(Object policy)
-        throws EntitlementException {
+    public static String policyToXML(Object policy) throws EntitlementException {
         String xmlString = "";
         if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy) {
             com.sun.identity.entitlement.xacml3.core.Policy xacmlPolicy =
@@ -1027,13 +983,12 @@ public class PrivilegeUtils {
         return xmlString;
     }
 
-    public static String getPolicyName(Object policy)
-        throws EntitlementException {
+    public static String getPolicyName(Object policy) throws EntitlementException {
         String name = "";
         if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy) {
-            name = ((com.sun.identity.entitlement.xacml3.core.Policy)policy).getPolicyId();
+            name = ((com.sun.identity.entitlement.xacml3.core.Policy) policy).getPolicyId();
         } else if (policy instanceof Policy) {
-            name = ((Policy)policy).getName();
+            name = ((Policy) policy).getName();
         } else {
             String[] param = {policy.getClass().getName()};
             throw new EntitlementException(329, param);
@@ -1041,22 +996,22 @@ public class PrivilegeUtils {
         return name;
     }
 
-    static public Set<IPrivilege> policyObjectToPrivileges(Object policy)
+    public static Set<IPrivilege> policyObjectToPrivileges(Object policy)
             throws EntitlementException, PolicyException, SSOException {
+
         //TODO: implement method, objectToPrivileges(Object object)
         Set<IPrivilege> privileges = null;
         if (policy instanceof com.sun.identity.entitlement.xacml3.core.Policy) {
             Privilege privilege = XACMLPrivilegeUtils.policyToPrivilege(
-                (com.sun.identity.entitlement.xacml3.core.Policy)policy);
+                (com.sun.identity.entitlement.xacml3.core.Policy) policy);
             privileges = new HashSet<IPrivilege>();
             privileges.add(privilege);
         } else if (policy instanceof Policy) {
-             privileges = policyToPrivileges((Policy)policy);
+             privileges = policyToPrivileges((Policy) policy);
         } else {
             String[] param = {policy.getClass().getName()};
             throw new EntitlementException(329, param);
         }
         return privileges;
     }
-
 }
