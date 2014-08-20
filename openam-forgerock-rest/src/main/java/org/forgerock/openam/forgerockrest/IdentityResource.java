@@ -11,9 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2014 ForgeRock AS
+ * Copyright 2012-2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.am.util.SystemProperties;
@@ -102,7 +101,6 @@ import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
-import org.mozilla.jss.crypto.ObjectNotFoundException;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -823,13 +821,13 @@ public final class IdentityResource implements CollectionResourceProvider {
                 }
             }
         } catch (BadRequestException bre){ // For any malformed request.
-            debug.error("Error performing anonymousUpdate" + bre.getMessage());
+            debug.warning("Bad request received for anonymousUpdate " + bre.getMessage());
             handler.handleError(bre);
         } catch (CoreTokenException cte){ // For any unexpected CTS error
-            debug.error("Error performing anonymousUpdate" + cte.getMessage());
+            debug.error("Error performing anonymousUpdate", cte);
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
         } catch (NotFoundException nfe) {
-            debug.error("Error performing anonymousUpdate" + nfe.getMessage());
+            debug.message("Unable to find token for anonymousUpdate " + nfe.getMessage());
             handler.handleError(ResourceException.getException(HttpURLConnection.HTTP_GONE, nfe.getMessage(), nfe));
         }
 
