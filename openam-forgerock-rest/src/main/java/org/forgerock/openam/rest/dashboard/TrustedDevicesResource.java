@@ -137,7 +137,13 @@ public class TrustedDevicesResource implements CollectionResourceProvider {
 
         try {
             for (JsonValue profile : trustedDevicesDao.getDeviceProfiles(context)) {
-                Date lastSelectedDate = DATE_PARSER.parse(profile.get(LAST_SELECTED_DATE_KEY).asString());
+                JsonValue lastSelectedDateJson = profile.get(LAST_SELECTED_DATE_KEY);
+                Date lastSelectedDate;
+                if (lastSelectedDateJson.isString()) {
+                    lastSelectedDate = DATE_PARSER.parse(lastSelectedDateJson.asString());
+                } else {
+                    lastSelectedDate = new Date(lastSelectedDateJson.asLong());
+                }
                 profile.put(LAST_SELECTED_DATE_KEY, DATE_FORMATTER.format(lastSelectedDate));
                 handler.handleResource(new Resource(profile.get("name").asString(), profile.hashCode() + "", profile));
             }

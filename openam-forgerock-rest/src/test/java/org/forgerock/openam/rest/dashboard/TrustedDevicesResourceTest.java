@@ -34,6 +34,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -69,8 +70,8 @@ public class TrustedDevicesResourceTest {
         Connection connection = newInternalConnection(newCollection(resource));
         QueryResultHandler handler = mock(QueryResultHandler.class);
         List<JsonValue> devices = new ArrayList<JsonValue>();
-        devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", "2014-08-05T13:54:12.456Z"))));
-        devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", "2014-08-15T13:54:12.456Z"))));
+        devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
+        devices.add(json(object(field("name", "NAME_2"), field("lastSelectedDate", new Date().getTime() + 1000))));
 
         given(dao.getDeviceProfiles(Matchers.<Context>anyObject())).willReturn(devices);
 
