@@ -16,6 +16,7 @@
  */
 package org.forgerock.openam.sm;
 
+import com.iplanet.am.util.AMPasswordUtil;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
 import org.apache.commons.lang.StringUtils;
@@ -139,7 +140,7 @@ public class ExternalCTSConfig implements ConnectionConfig {
         hostname.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
         port.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PORT));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
-        password.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD));
+        password.set(AMPasswordUtil.decrypt(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD)));
         maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS));
         sslMode.set(SystemProperties.getAsBoolean(CoreTokenConstants.CTS_STORE_SSL_ENABLED, false));
 

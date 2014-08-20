@@ -24,10 +24,12 @@
  *
  * $Id: UpdateServerConfig.java,v 1.6 2009/01/31 04:43:12 veiming Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.cli.serverconfig;
 
+import com.iplanet.am.util.AMPasswordUtil;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AttributeValues;
@@ -40,17 +42,26 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
  * Set attribute values of a realm.
  */
 public class UpdateServerConfig extends ServerConfigBase {
+
+    // These attributes have values that should be encrypted before being saved.
+    private static final String[] PASSWORD_ATTRIBUTES =
+            {CoreTokenConstants.CTS_STORE_PASSWORD, Constants.CRL_CACHE_DIR_PASSWD};
     /**
      * Services a Commandline Request.
      *
@@ -73,8 +84,9 @@ public class UpdateServerConfig extends ServerConfigBase {
                 ExitCodes.INCORRECT_OPTION, rc.getSubCommand().getName());
         }
 
-        Map attributeValues = AttributeValues.parse(
-            getCommandManager(), datafile, attrValues);
+        Map attributeValues = AttributeValues.parse(getCommandManager(), datafile, attrValues);
+        encryptPasswordAttributes(attributeValues);
+
         String[] params = {serverName};
         
         try {
@@ -147,6 +159,20 @@ public class UpdateServerConfig extends ServerConfigBase {
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
                 "FAILED_UPDATE_SERVER_CONFIG", args);
             throw new CLIException(e,ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        }
+    }
+
+    // Replace any password attributes with the original value encrypted
+    private void encryptPasswordAttributes(Map<String, Set<String>> attributeValues) {
+
+        for (String attribute : PASSWORD_ATTRIBUTES) {
+            Set<String> values = attributeValues.get(attribute);
+            if (values != null && !values.isEmpty()) {
+                Set<String> newValue = new HashSet<String>(1);
+                // Only one value is supported so just take the first one.
+                newValue.add(AMPasswordUtil.encrypt(values.iterator().next()));
+                attributeValues.put(attribute, newValue);
+            }
         }
     }
 }

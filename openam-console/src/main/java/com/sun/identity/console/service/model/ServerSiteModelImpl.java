@@ -24,6 +24,7 @@
  *
  * $Id: ServerSiteModelImpl.java,v 1.6 2009/07/07 06:14:13 veiming Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.console.service.model;
@@ -38,9 +39,12 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.common.configuration.UnknownPropertyNameException;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
+import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -57,6 +61,11 @@ import javax.servlet.http.HttpServletRequest;
 public class ServerSiteModelImpl
     extends AMModelBase
     implements ServerSiteModel {
+
+    // These attributes are passwords and should have their values replaced before being provided to the console pages.
+    private static final String[] PASSWORD_ATTRIBUTES =
+            {CoreTokenConstants.CTS_STORE_PASSWORD, Constants.CRL_CACHE_DIR_PASSWD};
+
     /**
      * Creates a simple model using default resource bundle. 
      *
@@ -482,9 +491,9 @@ public class ServerSiteModelImpl
             SSOToken ssoToken = getUserSSOToken();
 
             logEvent("ATTEMPT_GET_SERVER_CONFIG", param);
-            Map attrs = ServerConfiguration.getServerInstance(
-                ssoToken, serverName);
+            Map attrs = ServerConfiguration.getServerInstance(ssoToken, serverName);
             removeHiddenProperties(attrs);
+            replacePasswordValues(attrs);
             logEvent("SUCCEED_GET_SERVER_CONFIG", param);
             return attrs;
         } catch (SMSException e){
@@ -509,6 +518,18 @@ public class ServerSiteModelImpl
         attrs.remove(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
         attrs.remove(Constants.SERVER_MODE);
         attrs.remove(SetupConstants.AMC_OVERRIDE_PROPERTY);
+    }
+
+    // Prevent real passwords being available in the console , swap any known password values with the value from
+    // AMPropertySheetModel.passwordRandom. These will be updated if the user updates the value in the console.
+    private static void replacePasswordValues(Map attrs) {
+
+        for (String attribute : PASSWORD_ATTRIBUTES) {
+            String value = (String)attrs.get(attribute);
+            if (value != null) {
+                attrs.put(attribute, AMPropertySheetModel.passwordRandom);
+            }
+        }
     }
 
     /**
