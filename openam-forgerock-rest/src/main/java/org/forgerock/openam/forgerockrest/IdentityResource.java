@@ -97,6 +97,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static private String UNIVERSAL_ID = "universalid";
     final static private String MAIL = "mail";
 
+    final static String USERNAME = "username";
     final static String EMAIL = "email";
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
@@ -226,7 +227,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
-            if(emailAddress == null || emailAddress.isEmpty()){
+            if (isNullOrEmpty(emailAddress)) {
                 throw new BadRequestException("Email not provided");
             }
 
@@ -249,7 +250,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Build Confirmation URL
             String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
             StringBuilder confURLBuilder = new StringBuilder(100);
-            if(confURL == null || confURL.isEmpty()) {
+            if (isNullOrEmpty(confURL)) {
                 confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
             } else {
                 confURLBuilder.append(confURL);
@@ -315,7 +316,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         try {
             // Check if subject has not  been included
-            if(subject == null || subject.isEmpty()) {
+            if (isNullOrEmpty(subject)) {
                 // Use default email service subject
                 subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
             }
@@ -325,7 +326,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
         try {
             // Check if Custom Message has been included
-            if(message == null || message.isEmpty()){
+            if (isNullOrEmpty(message)) {
                 // Use default email service message
                 message = mailattrs.get(MAIL_MESSAGE).iterator().next();
             }
@@ -344,24 +345,41 @@ public final class IdentityResource implements CollectionResourceProvider {
      * @param request Request from client to confirm registration
      * @param handler Result handler
      */
-    private void confirmRegistration(final ServerContext context, final ActionRequest request,
+    private void confirmationIdCheck(final ServerContext context, final ActionRequest request,
                                      final ResultHandler<JsonValue> handler){
+        final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
         String tokenID;
         String confirmationId;
         String email = null;
+        String username = null;
+        //email or username value used to create confirmationId
+        String hashComponent = null;
+        String hashComponentAttr = null;
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
 
         try{
             tokenID = jVal.get(TOKEN_ID).asString();
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
             email = jVal.get(EMAIL).asString();
+            username = jVal.get(USERNAME).asString();
 
-            if(email == null || email.isEmpty()){
-                throw new BadRequestException("Email not provided");
-            }
-            if(confirmationId == null || confirmationId.isEmpty()){
+            if (isNullOrEmpty(confirmationId)) {
                 throw new BadRequestException("confirmationId not provided");
+            }
+            if (isNullOrEmpty(email) && !isNullOrEmpty(username)) {
+                hashComponent = username;
+                hashComponentAttr = USERNAME;
+            }
+            if (!isNullOrEmpty(email) && isNullOrEmpty(username)) {
+                hashComponent = email;
+                hashComponentAttr = EMAIL;
+            }
+            if (isNullOrEmpty(hashComponent)) {
+                throw new BadRequestException("Required information not provided");
+            }
+            if (isNullOrEmpty(tokenID)) {
+                throw new BadRequestException("tokenId not provided");
             }
 
             // Check Token is still in CTS
@@ -372,24 +390,22 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // check confirmationId
             if(!confirmationId.equalsIgnoreCase(Hash.hash(
-                    tokenID + email+ SystemProperties.get("am.encryption.pwd")))){
+                    tokenID + hashComponent + SystemProperties.get("am.encryption.pwd")))){
                 RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationId : "
                             + confirmationId);
                 throw new BadRequestException("Invalid confirmationId", null);
             }
             // build resource
-            result.put(EMAIL,email );
+            result.put(hashComponentAttr,hashComponent);
             result.put(TOKEN_ID, tokenID);
             result.put(CONFIRMATION_ID, confirmationId);
             handler.handleResult(result);
 
         } catch (BadRequestException be){
-            RestDispatcher.debug.error("IdentityResource.confirmRegistration: Cannot confirm registration for : "
-                    + email);
+            RestDispatcher.debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, be);
             handler.handleError(be);
         } catch (Exception e){
-            RestDispatcher.debug.error("IdentityResource.confirmRegistration: Cannot confirm registration for : "
-                    + email + e);
+            RestDispatcher.debug.error(METHOD + ": Cannot confirm registration/forgotPassword for : " + hashComponent, e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
@@ -406,7 +422,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if(action.equalsIgnoreCase("register")){
             createRegistrationEmail(context,request, handler);
         } else if(action.equalsIgnoreCase("confirm")) {
-            confirmRegistration(context, request, handler);
+            confirmationIdCheck(context, request, handler);
         } else if(action.equalsIgnoreCase("anonymousCreate")) {
             anonymousCreate(context, request, handler);
         } else if(action.equalsIgnoreCase("forgotPassword")){
@@ -1257,4 +1273,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         return restSecurity;
     }
 
+    private static boolean isNullOrEmpty(final String value) {
+       return value == null || value.isEmpty();
+   }
 }
