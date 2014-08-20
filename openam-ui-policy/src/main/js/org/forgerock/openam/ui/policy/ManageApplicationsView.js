@@ -51,11 +51,11 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     url: '/openam/json/applications?_queryFilter=true',
                     colNames: ['Name', 'Realm', 'Type', 'Last Modified', 'Policies'],
                     colModel: [
-                        {name: 'name', formatter: appLinkFormatter},
-                        {name: 'realm'},
-                        {name: 'applicationType'},
-                        {name: 'lastModifiedDate'},
-                        {name: 'name', formatter: policyLinkFormatter}
+                        {name: 'name', formatter: appLinkFormatter, width: 260},
+                        {name: 'realm', width: 70},
+                        {name: 'applicationType', width: 260},
+                        {name: 'lastModifiedDate', width: 260},
+                        {name: 'name', formatter: policyLinkFormatter,  width: 70}
                     ],
                     width: '920',
                     pager: '#appsPager',

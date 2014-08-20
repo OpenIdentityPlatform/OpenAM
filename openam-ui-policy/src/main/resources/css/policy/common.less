@@ -1,6 +1,5 @@
 @active-background-color: #EDFCF5;
 
-// TODO: to be cleaned as part of AME-4245
 .filter-sort-grid {
     position: relative;
     .rounded-corners(5px);
@@ -16,16 +15,6 @@
 
     input[type='text'], select, input.button {
         padding: 2px 5px;
-    }
-
-    .nested-row {
-        & > td {
-            background-color: #eee;
-        }
-
-        .filter-sort-grid {
-            width: 100%;
-        }
     }
 
     tbody tr:hover{
@@ -67,86 +56,14 @@
             text-align: right;
             padding-right: 0;
         }
-
-        .customize-view-flyout {
-            display: none;
-            z-index: 1;
-
-            position: absolute;
-            top: 40px;
-            right: 10px;
-
-            width: 300px;
-            padding: 15px;
-            border: 1px solid #5a646d;
-            .rounded-corners(5px);
-
-            text-align: left;
-            background: #f9f9f9;
-            color: @font-color;
-            .customize-item {
-                float: left;
-                width: 150px;
-                margin: 0 0 5px 0;
-
-                label {
-                    display: inline;
-                }
-            }
-
-            .button.apply-customization {
-                display: block;
-                clear: left;
-            }
-        }
     }
 
-    // Body
+// Body
     tbody {
         background-color: #fff;
 
         td {
             border-bottom: 1px solid #ccc;
-        }
-    }
-
-    // Footer
-    tfoot {
-        color: #fff;
-
-        td {
-            background-color: #5a646d;
-            border: 1px solid #5a646d;
-
-            &:first-child {
-                border-radius: 0 0 0 5px;
-            }
-
-            &:last-child {
-                border-radius: 0 0 5px 0;
-            }
-        }
-
-        .footer-pagination td {
-            text-align: center;
-            height: 30px;
-            padding: 2px;
-            border-radius: 0 0 5px 5px;
-
-            .items-per-page {
-                position: absolute;
-                left: 10px;
-                bottom: 5px;
-
-                input {
-                    width: 20px;
-                    text-align: center;
-                }
-            }
-
-            .pagination-controls {
-                line-height: 30px;
-            }
         }
     }
 }
@@ -245,12 +162,6 @@
         resize: none;
     }
 
-    .prop-description {
-        float: left;
-        margin: 0 0 0 30px;
-        width: 300px;
-    }
-
     .review-row {
 
         background: #ebebeb;
@@ -308,10 +219,6 @@
         width: 430px;
     }
 
-    .resource-exceptions {
-        float: right;
-    }
-
     .actions-grid {
         .group-field-row {
             margin: 0;
@@ -326,36 +233,16 @@
     }
 }
 
-#manageApps .filter-sort-grid, #managePolicies .manage-policies{
-    width: 100%;
-    margin: 20px 0 0 0;
+#cancelButton, #backButton, #addNewApp, #newPolicy {
+    margin: 0 5px 15px;
+}
 
-    .ellipsis-col {
+.ui-jqgrid {
+
+    #manageApps_applicationType, td[aria-describedby="manageApps_applicationType"], td[aria-describedby="manageApps_name"] {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
     }
 
-    .policy-col {
-        width: 50px;
-    }
-
-    .realm-col {
-        max-width: 60px;
-    }
-
-    .type-col {
-        max-width: 150px;
-    }
-
-    .name-col, .resources-col, .lastModBy-col {
-        max-width: 200px;
-    }
-}
-
-#cancelButton, #backButton {
-    margin: 0 15px 15px;
-}
-#backToApps {
-    margin-right: 10px;
 }

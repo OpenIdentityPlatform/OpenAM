@@ -53,8 +53,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
                     colNames: ['Name', 'Last Modified'],
                     colModel: [
-                        {name: 'name', formatter: policyLinkFormatter},
-                        {name: 'lastModified'}
+                        {name: 'name', formatter: policyLinkFormatter, width: 460},
+                        {name: 'lastModified', width: 460}
                     ],
                     width: '920',
                     pager: '#policiesPager',
