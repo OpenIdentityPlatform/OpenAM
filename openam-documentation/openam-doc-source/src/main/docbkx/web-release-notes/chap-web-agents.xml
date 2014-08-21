@@ -576,8 +576,9 @@
     >OpenAM issue tracker</link>.
    </para>
 
-   <!-- List generated at 12:59:00 20140812 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 16:28:19 20140821 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4360" xlink:show="new">OPENAM-4360</link>: WPA does not create agent profile automatically when OpenAM is running with HTTPS</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4285" xlink:show="new">OPENAM-4285</link>: WPA local audit log file is not rotating</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3875" xlink:show="new">OPENAM-3875</link>: 'Encode URL's Special Characters' in Web Agent does not consistently encode the / charater</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3631" xlink:show="new">OPENAM-3631</link>: Renaming of SSO Token Cookie to substring of request URL will cause failed agent evaluation.</para></listitem>
