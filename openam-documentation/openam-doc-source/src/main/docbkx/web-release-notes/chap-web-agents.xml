@@ -159,7 +159,7 @@
    <section xml:id="platform-requirements-web-agents">
     <title>Web Agents Platform Requirements</title>
 
-    <para>Apache HTTP web policy agents have been tested on Linux 2.6 or later,
+    <para>Apache HTTP web policy agents run on Linux 2.6.18 or later,
     and on Oracle Solaris 10 or later.</para>
 
     <para>The Microsoft IIS 6 web policy agent has been tested on Windows Server
@@ -175,6 +175,20 @@
     <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
     later, and on Oracle Solaris 10 or later.</para>
 -->
+
+    <para>
+     Before installing web policy agents on Linux,
+     make sure the system can run <command>gcc</command> 4.4.7.
+     <literal>libc.so.6</literal> must be available
+     and it must support the GLIBC_2.3 ABI.
+     You can check this by running the following command:
+     <command>strings libc.so.6 | grep GLIBC_2</command>.
+     Also, <literal>libstdc++.so.6</literal> must be available
+     and it must support GLIBCXX_3.4 and CXXABI_1.3.
+     You can check this by running the following commands:
+     <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
+     and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
+    </para>
 
     <para>Before installing web policy agents on Solaris 10, make sure you have
     applied the latest shared library patch for C++, at least 119963-16 on SPARC,
@@ -318,6 +332,29 @@
 
    <section xml:id="web-agent-major-changes">
     <title>Important Changes to Web Policy Agent Functionality</title>
+
+    <itemizedlist>
+
+     <para>
+      This change is new in OpenAM web policy agents 3.3.2.
+     </para>
+
+     <listitem>
+      <para>
+       On Linux, library requirements have changed.
+       Make sure the system can run <command>gcc</command> 4.4.7.
+       <literal>libc.so.6</literal> must be available
+       and it must support the GLIBC_2.3 ABI.
+       You can check this by running the following command:
+       <command>strings libc.so.6 | grep GLIBC_2</command>.
+       Also, <literal>libstdc++.so.6</literal> must be available
+       and it must support GLIBCXX_3.4 and CXXABI_1.3.
+       You can check this by running the following commands:
+       <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
+       and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
+      </para>
+     </listitem>
+    </itemizedlist>
 
     <itemizedlist>
 
