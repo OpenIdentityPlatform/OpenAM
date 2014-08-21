@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     return '<a href="#app/' + cellvalue + '">' + cellvalue + '</a>';
                 },
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + cellvalue + '/policies/">View</a>';
+                    return '<a href="#app/' + cellvalue + '/policies/" class="icon-search"></a>';
                 };
 
             this.parentRender(function () {
