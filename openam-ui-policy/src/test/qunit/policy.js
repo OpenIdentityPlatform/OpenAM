@@ -332,6 +332,9 @@ define([
                     QUnit.ok(rowData.length > 0, "At least one application listed in the table");
                     QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
 
+                    QUnit.ok(table.jqGrid('getGridParam', 'colNames').length === table.find("tr[id]")[0].children.length,
+                        'Total number of columns displayed matches number of columns requested');
+
                     // Pagination
                     QUnit.ok($('#appsPager', manageAppsView.$el).length === 1, 'Pager is present');
 
@@ -584,6 +587,9 @@ define([
                     QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
 
                     QUnit.ok(managePolView.$el.find('#backToApps').length, "Back button is available");
+
+                    QUnit.ok(table.jqGrid('getGridParam', 'colNames').length === table.find("tr[id]")[0].children.length,
+                        'Total number of columns displayed matches number of columns requested');
 
                     // Pagination
                     QUnit.ok($('#policiesPager', managePolView.$el).length === 1, 'Pager is present');

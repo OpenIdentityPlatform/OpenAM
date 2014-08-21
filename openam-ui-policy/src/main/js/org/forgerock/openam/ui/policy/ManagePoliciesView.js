@@ -51,10 +51,19 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     view: this,
                     id: '#managePolicies',
                     url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
-                    colNames: ['Name', 'Last Modified'],
+                    colNames: ['Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions',
+                        'Resources', 'Resource Attributes', 'Subject'],
                     colModel: [
                         {name: 'name', formatter: policyLinkFormatter, width: 460},
-                        {name: 'lastModified', width: 460}
+                        {name: 'description'},
+                        {name: 'createdBy'},
+                        {name: 'creationDate', formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                        {name: 'lastModifiedBy'},
+                        {name: 'lastModified', formatter: uiUtils.commonJQGridFormatters.dateFormatter, width: 460},
+                        {name: 'actionValues', formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                        {name: 'resources', formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                        {name: 'resourceAttributes', formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                        {name: 'subject', formatter: uiUtils.commonJQGridFormatters.objectFormatter}
                     ],
                     width: '920',
                     pager: '#policiesPager',
