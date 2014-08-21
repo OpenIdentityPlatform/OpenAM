@@ -1960,16 +1960,22 @@ $ <userinput>curl \
 {
    "type": "NumericAttribute",
    "attributeName": "gidNumber",
-   "caseSensitive": "&lt;=",
+   "operator": "LESS_THAN",
    "value": "1000"
 }
         </programlisting>
 
-        <para><!-- This is my reading of NumericAttributeCondition.java. Looks like a bug. -->
-          <literal>"caseSensitive"</literal> is optional, but if used
-          then it should be set to a comparison operator, one of:
-          <literal>&lt; &lt;= = > >=</literal>.
-          If not specified, then OpenAM checks for equality.
+        <para>
+          <literal>"operator"</literal> is optional, but if used
+          it must be one of the following comparison operators:
+          <literal>LESS_THAN</literal>,
+          <literal>LESS_THAN_OR_EQUAL</literal>,
+          <literal>EQUAL</literal>,
+          <literal>GREATER_THAN_OR_EQUAL</literal>, or
+          <literal>GREATER_THAN</literal>.
+          Note that using symbols such as &lt;, &lt;=,=,&gt;=, or &gt; is not
+         supported.
+          If not specified, then OpenAM checks for equality (<literal>EQUAL</literal>).
          </para>
         </listitem>
 
@@ -7479,7 +7485,8 @@ $ <userinput>curl \
 
    <para>OpenAM REST APIs respond to successful requests with HTTP status codes
    in the 2xx range. OpenAM REST APIs respond to error conditions with HTTP
-   status codes in the 4xx and 5xx range. Status codes used are described in the
+   status codes in the 4xx and 5xx range. Status codes used are described in
+    the
    following list.</para>
 
    <variablelist>
