@@ -53,7 +53,13 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
             return null;
         }
         // For a static call or constructor then the target will be the class, otherwise it will be an object instance
-        final Class<?> clazz = target instanceof Class ? (Class<?>) target : target.getClass();
+        Class<?> clazz = target instanceof Class ? (Class<?>) target : target.getClass();
+
+        // OPENAM-4347: Treat array types as their component type for the purposes of sandboxing.
+        if (clazz.isArray()) {
+            clazz = clazz.getComponentType();
+        }
+
         final String className = clazz.getName();
 
         if (classShutter.visibleToScripts(className)) {
