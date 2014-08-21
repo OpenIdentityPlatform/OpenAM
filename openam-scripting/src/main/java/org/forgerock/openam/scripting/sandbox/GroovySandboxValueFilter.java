@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.scripting.sandbox;
 
+import groovy.lang.Closure;
 import groovy.lang.Script;
 import org.forgerock.util.Reject;
 import org.kohsuke.groovy.sandbox.GroovyValueFilter;
 import org.mozilla.javascript.ClassShutter;
+
+import java.lang.reflect.Method;
 
 /**
  * Applies a sandbox to Groovy script execution. Delegates to a Rhino {@link org.mozilla.javascript.ClassShutter} for
@@ -27,6 +30,7 @@ import org.mozilla.javascript.ClassShutter;
  */
 public final class GroovySandboxValueFilter extends GroovyValueFilter {
     private static final String ERROR_MESSAGE = "Access to Java class \"%s\" is prohibited.";
+    private static final String CLOSURE_CALL_METHOD = "call";
 
     private final ClassShutter classShutter;
 
@@ -61,7 +65,7 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
 
     @Override
     public Object onGetProperty(Invoker invoker, Object receiver, String property) throws Throwable {
-        if (receiver instanceof Script) {
+        if (receiver instanceof Script || receiver instanceof Closure) {
             // Always allow the script to set/get its own properties as this is how global variables are implemented
             return filterReturnValue(invoker.call(receiver, property));
         } else {
@@ -71,11 +75,81 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
 
     @Override
     public Object onSetProperty(Invoker invoker, Object receiver, String property, Object value) throws Throwable {
-        if (receiver instanceof Script) {
+        if (receiver instanceof Script || receiver instanceof Closure) {
             // Always allow the script to set/get its own properties as this is how global variables are implemented
             return filterReturnValue(invoker.call(receiver, property, value));
         } else {
             return super.onSetProperty(invoker, receiver, property, value);
         }
+    }
+
+    @Override
+    public Object onMethodCall(Invoker invoker, Object receiver, String method, Object... args) throws Throwable {
+        if (isClosureCall(receiver, method) || isScriptOwnMethodCall(receiver, method)) {
+            // OPENAM-4278: Allow calls to closures and methods defined by the script itself. Note: we must be careful
+            // here *not* to allow a script to call inherited methods (e.g., Script#evaluate) as these allow bypassing
+            // the sandbox
+            return doCall(invoker, receiver, method, args);
+        }
+        return super.onMethodCall(invoker, receiver, method, args);
+    }
+
+    /**
+     * Determines if this method call is a call to a closure (anonymous method) defined within the script itself.
+     *
+     * @param receiver the object that is the target of the method call being checked.
+     * @param method the method that is being invoked. Note: we only know the name of the method, not the signature.
+     * @return true if this is a call to a Groovy closure.
+     */
+    private boolean isClosureCall(Object receiver, String method) {
+        return receiver instanceof Closure && CLOSURE_CALL_METHOD.equals(method);
+    }
+
+    /**
+     * Determines if this is a method call to a method defined by a Groovy script itself.
+     *
+     * @param receiver the object that is the target of the method call being checked.
+     * @param method the method that is being invoked. Note: we only know the name of the method, not the signature.
+     * @return true if this is a call to a method defined by the script itself.
+     */
+    private boolean isScriptOwnMethodCall(Object receiver, String method) {
+        if (!(receiver instanceof Script)) {
+            return false;
+        }
+        final Method[] scriptOwnMethods = receiver.getClass().getDeclaredMethods();
+        for (Method declaredMethod : scriptOwnMethods) {
+            if (declaredMethod.getName().equals(method)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Performs an actual call to the given method on the given receiver object using the given invoker. The arguments
+     * and return value are filtered according to the sandbox, but the receiver is not.
+     *
+     * @param invoker the invoker to use to invoke the method.
+     * @param receiver the receiver object to invoke the method on.
+     * @param method the method to call.
+     * @param args the arguments to the method. Will be filtered by the sandbox.
+     * @return the (filtered) result of the method call.
+     * @throws Throwable if the method throws an exception or if any of the arguments or result is blocked by the
+     * sandbox.
+     */
+    private Object doCall(Invoker invoker, Object receiver, String method, Object... args) throws Throwable {
+        return filterReturnValue(invoker.call(receiver, method, filterArgs(args)));
+    }
+
+    /**
+     * Copied from super-class as private.
+     * @param args the arguments to filter. May not be null.
+     * @return the filtered arguments array (updated in place).
+     */
+    private Object[] filterArgs(Object[] args) {
+        for (int i = 0; i < args.length; ++i) {
+            args[i] = filterArgument(args[i]);
+        }
+        return args;
     }
 }
