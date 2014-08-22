@@ -20,15 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc
+  !      Copyright 2011-2014 ForgeRock, Inc
   !    
 -->
 <chapter xml:id='chap-tuning'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Tuning OpenAM</title>
  <indexterm><primary>Performance</primary></indexterm>
  <para>This chapter covers key OpenAM tunings to ensure smoothly performing
@@ -84,8 +84,9 @@
   <section xml:id="tuning-ldap-settings">
    <title>LDAP Settings</title>
    
-   <para>Tune both your LDAP data stores and also your LDAP authentication
-   modules.</para>
+   <para>
+    Tune both your LDAP data stores and also your LDAP authentication modules.
+   </para>
    
    <para>To change LDAP data store settings, browse to Access Control &gt;
    <replaceable>Realm Name</replaceable> &gt; Data Stores &gt;

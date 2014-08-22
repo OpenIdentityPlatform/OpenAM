@@ -159,10 +159,17 @@
        <listitem>
         <para><literal>Password</literal></para>
        </listitem>
+
        <listitem>
-        <para><literal>Max Connections</literal></para>
-        <para><literal>20</literal> (arbitrary number)</para>
+        <para>
+         <literal>Max Connections</literal>
+        </para>
+
+        <para>
+         <literal>20</literal> (arbitrary number)
+        </para>
        </listitem>
+
        <listitem>
         <para><literal>Heartbeat</literal></para>
         <para><literal>10</literal> (default, in seconds)</para>
