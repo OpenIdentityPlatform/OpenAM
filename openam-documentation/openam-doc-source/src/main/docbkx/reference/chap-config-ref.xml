@@ -24,12 +24,12 @@
   !    
 -->
 <chapter xml:id='chap-config-ref'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
-                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuration Reference</title>
 
  <indexterm><primary>Configuration</primary></indexterm>
@@ -162,6 +162,73 @@
             Authentication</citetitle></link>.</para>
     <para>This section presents the properties that you can set in the DAS properties file to configure your
           OpenAM instances.</para>
+
+    <itemizedlist>
+     <para>
+      This section describes the following sets of properties.
+     </para>
+
+     <listitem>
+      <para>
+       <xref linkend="das-properties" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="security-credentials-to-read-config-data" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="cache-notifications" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="server-protocol-host-port-descriptor" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="cert-db" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="policy-decision-log" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="das-monitoring" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="general" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="http-header-properties" />
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+       <xref linkend="load-balancer" />
+      </para>
+     </listitem>
+    </itemizedlist>
+
     <variablelist xml:id="das-properties">
         <title>Administration</title>
         <varlistentry>
@@ -711,6 +778,24 @@
   <para>Under Configuration &gt; Console you can customize how the OpenAM
   console appears, and what character sets are used.</para>
 
+  <itemizedlist>
+   <para>
+    This section describes the following sets of properties.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="console-administration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="console-g11n" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
   <variablelist xml:id="console-administration">
    <title>Administration</title>
 
@@ -839,6 +924,42 @@
   <para>Under Configuration &gt; System, you can change OpenAM settings for
   server logging, monitoring, service URL naming, locale, cookie domain, and
   how OpenAM detects specific clients.</para>
+
+  <itemizedlist>
+   <para>
+    This section describes the following sets of properties.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="system-client-detection" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="system-logging" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="system-monitoring" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="system-platform" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="system-platform-attrs" />
+    </para>
+   </listitem>
+  </itemizedlist>
 
   <variablelist xml:id="system-client-detection">
    <title>Client Detection</title>
@@ -1531,6 +1652,96 @@
   <para>Under Configuration &gt; Global you can set defaults for a range of
   federation services, for password reset, for policy configuration, for
   session management, and for dynamic user attributes.</para>
+
+  <itemizedlist>
+   <para>
+    This section describes the following sets of properties.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="common-federation-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="dashboard-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="email-service-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="liberty-id-ff-service-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="multi-federation-protocol-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="oauth2-provider-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="password-reset-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="policy-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="rest-security-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="saml2-service-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="saml2-soap-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="sts-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="session-configuration-attributes" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="user-configuration-attributes" />
+    </para>
+   </listitem>
+  </itemizedlist>
 
   <variablelist xml:id="common-federation-configuration">
    <title>Common Federation Configuration</title>
@@ -3624,6 +3835,60 @@
   <para>After changing server configurations, restart OpenAM or the web
   application container where OpenAM runs for the changes to take
   effect.</para>
+
+  <itemizedlist>
+   <para>
+    This section describes the following sets of properties.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-general-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-security-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-session-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-sdk-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-directory-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-cts" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="servers-advanced-configuration" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="sites-configuration" />
+    </para>
+   </listitem>
+  </itemizedlist>
 
   <variablelist xml:id="servers-general-configuration">
    <title>Servers &gt; General</title>
