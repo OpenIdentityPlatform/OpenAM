@@ -760,7 +760,7 @@
             <term><literal>userDenied.jsp</literal></term>
             <listitem>
                 <para>Associated with role-based authentication. Tells a user when the required role has not been configured
-                    for that user. Message defined by the user.not.inrole parameter, defined in the amAuthUI.prooperties
+                    for that user. Message defined by the user.not.inrole parameter, defined in the amAuthUI.properties
                     file.</para>
             </listitem>
         </varlistentry>
