@@ -574,7 +574,7 @@ $ <userinput>curl \
 
    <para>
     You can use the query string parameter,
-    <literal>sessionUpgrade=<replaceable>tokenId</replaceable></literal>,
+    <literal>sessionUpgradeSSOTokenId=<replaceable>tokenId</replaceable></literal>,
     to request session upgrade.
     For an explanation of session upgrade,
     see the <citetitle>Administration Guide</citetitle> section on,
