@@ -173,24 +173,6 @@ public class PolicyResourceTest {
     }
 
     @Test
-    public void shouldAcceptPolicyNameFromJson() throws Exception {
-        // Given
-        String policyName = "policyName";
-        // Specify policy name in JSON rather than in request URL:
-        JsonValue json = JsonValue.json(JsonValue.object(JsonValue.field("name", policyName)));
-
-        CreateRequest request = mockCreateRequest(null, json);
-        Privilege policy = mockPrivilege(policyName, 123l);
-        given(mockParser.parsePolicy(policyName, json)).willReturn(policy);
-
-        // When
-        policyResource.createInstance(mockServerContext, request, mockResultHandler);
-
-        // Then
-        verify(mockParser).parsePolicy(policyName, json);
-    }
-
-    @Test
     public void shouldAcceptConsistentPolicyNamesFromURLandJSON() throws Exception {
         // Given
         String policyName = "policyName";
@@ -212,21 +194,12 @@ public class PolicyResourceTest {
     public void shouldRejectMismatchedPolicyName() throws Exception {
         // Given
         String policyName = "policyName";
+        String differentPolicyName = "Different!";
         JsonValue json = JsonValue.json(JsonValue.object(JsonValue.field("name", policyName)));
-        CreateRequest request = mockCreateRequest("Different!", json);
+        CreateRequest request = mockCreateRequest(differentPolicyName, json);
 
-        // When
-        policyResource.createInstance(mockServerContext, request, mockResultHandler);
-
-        // Then
-        verify(mockResultHandler).handleError(isA(BadRequestException.class));
-    }
-
-    @Test
-    public void shouldRejectUnspecifiedPolicyName() throws Exception {
-        // Given
-        JsonValue json = new JsonValue("");
-        CreateRequest request = mockCreateRequest(null, json);
+        Privilege policy = mockPrivilege(policyName, 123l);
+        given(mockParser.parsePolicy(differentPolicyName, json)).willReturn(policy);
 
         // When
         policyResource.createInstance(mockServerContext, request, mockResultHandler);
@@ -343,7 +316,7 @@ public class PolicyResourceTest {
         given(request.getContent()).willReturn(content);
         Privilege privilege = mockPrivilege(id, lastModified);
         given(mockParser.parsePolicy(id, content)).willReturn(privilege);
-        given(mockStore.update(privilege)).willReturn(privilege);
+        given(mockStore.update(id, privilege)).willReturn(privilege);
 
         // When
         policyResource.updateInstance(mockServerContext, id, request, mockResultHandler);

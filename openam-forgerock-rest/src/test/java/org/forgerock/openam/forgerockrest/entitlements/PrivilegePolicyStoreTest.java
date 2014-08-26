@@ -110,13 +110,14 @@ public class PrivilegePolicyStoreTest {
     @Test
     public void shouldDelegateUpdatesToPrivilegeManager() throws Exception {
         // Given
+        String name = "test";
         Privilege policy = new StubPrivilege();
 
         // When
-        Privilege response = testStore.update(policy);
+        Privilege response = testStore.update(name, policy);
 
         // Then
-        verify(mockManager).modifyPrivilege(policy);
+        verify(mockManager).modifyPrivilege(name, policy);
         assertThat(response).isSameAs(policy);
     }
 

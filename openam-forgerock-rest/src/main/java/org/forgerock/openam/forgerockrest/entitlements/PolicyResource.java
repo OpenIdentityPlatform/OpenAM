@@ -148,40 +148,19 @@ public final class PolicyResource implements CollectionResourceProvider {
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
         try {
-            Privilege policy = policyParser.parsePolicy(determineNewPolicyName(request), request.getContent());
+            final String providedName = request.getNewResourceId();
+            Privilege policy = policyParser.parsePolicy(providedName, request.getContent());
+
+            if (isNotBlank(providedName) && !providedName.equals(policy.getName())) {
+                // Resource name and json body name do not match.
+                throw new EntitlementException(EntitlementException.POLICY_NAME_MISMATCH);
+            }
+
             policyStoreProvider.getPolicyStore(context).create(policy);
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
-    }
-
-    /**
-     * Determines the policy name to use for a new policy based on either the name specified in the URL (for PUT
-     * requests) or the name specified in the JSON body (for POST requests). If neither is specified then an error is
-     * raised as we do not support auto-generating policy names. If both are specified, and they are different, then
-     * an error is raised indicating client confusion.
-     *
-     * @param request the create request for the policy.
-     * @return the name to use for the new policy.
-     * @throws EntitlementException if the name cannot be determined from the request.
-     */
-    private String determineNewPolicyName(CreateRequest request) throws EntitlementException {
-
-        String requestPolicyName = request.getNewResourceId();
-        String jsonPolicyName = request.getContent().get("name").asString();
-
-        if (isNotBlank(requestPolicyName) && isNotBlank(jsonPolicyName) && !requestPolicyName.equals(jsonPolicyName)) {
-            throw new EntitlementException(EntitlementException.POLICY_NAME_MISMATCH);
-        }
-
-        String policyName = isNotBlank(requestPolicyName) ? requestPolicyName : jsonPolicyName;
-
-        if (isBlank(policyName)) {
-            throw new EntitlementException(EntitlementException.MISSING_PRIVILEGE_NAME);
-        }
-
-        return policyName;
     }
 
     /**
@@ -260,7 +239,7 @@ public final class PolicyResource implements CollectionResourceProvider {
                                ResultHandler<Resource> handler) {
         try {
             Privilege policy = policyParser.parsePolicy(resourceId, request.getContent());
-            Resource result = policyResource(policyStoreProvider.getPolicyStore(context).update(policy));
+            Resource result = policyResource(policyStoreProvider.getPolicyStore(context).update(resourceId, policy));
             handler.handleResult(result);
         } catch (EntitlementException ex) {
             handler.handleError(resourceErrorHandler.handleError(request, ex));

@@ -94,6 +94,19 @@ public final class JsonPolicy {
     }
 
     /**
+     * Set the policy name.
+     *
+     * @param name
+     *         The name of the policy
+     *
+     * @throws EntitlementException
+     *         Should some error occur whilst setting the name
+     */
+    public void setName(String name) throws EntitlementException {
+        privilege.setName(name);
+    }
+
+    /**
      * Returns {@code true} if this policy is active (i.e., in use).
      *
      * @return true if the policy is active, otherwise false.

@@ -102,10 +102,23 @@ public class JsonPolicyParserTest {
     }
 
     @Test
-    public void shouldUsePolicyNameArgument() throws Exception {
+    public void shouldUseJsonNameFirst() throws Exception {
         // Given
         String name = "realName";
-        JsonValue content = json(object(field("name", "fakeName")));
+        JsonValue content = json(object(field("name", name)));
+
+        // When
+        Privilege result = parser.parsePolicy("resourceName", content);
+
+        // Then
+        assertThat(result.getName()).isEqualTo(name);
+    }
+
+    @Test
+    public void shouldUsePassedNameIfJsonNameIsMissing() throws Exception {
+        // Given
+        String name = "resourceName";
+        JsonValue content = json(object());
 
         // When
         Privilege result = parser.parsePolicy(name, content);

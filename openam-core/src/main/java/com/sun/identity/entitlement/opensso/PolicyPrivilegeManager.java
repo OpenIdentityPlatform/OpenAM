@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PolicyPrivilegeManager.java,v 1.9 2010/01/26 20:10:15 dillidorai Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -242,14 +244,15 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         }
     }
 
-    private void updateMetaInfo(Privilege privilege)
+    private void updateMetaInfo(String existingName, Privilege privilege)
         throws EntitlementException {
-        Privilege origPrivilege = getPrivilege(privilege.getName(),
-            PrivilegeManager.superAdminSubject);
+        Privilege origPrivilege = getPrivilege(existingName, PrivilegeManager.superAdminSubject);
+
         if (origPrivilege != null) {
             privilege.setCreatedBy(origPrivilege.getCreatedBy());
             privilege.setCreationDate(origPrivilege.getCreationDate());
         }
+
         Date date = new Date();
         privilege.setLastModifiedDate(date.getTime());
 
@@ -259,18 +262,11 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
         }
     }
 
-    /**
-     * Modifies a privilege
-     * @param privilege the privilege to be modified
-     * @throws com.sun.identity.entitlement.EntitlementException
-     */
     @Override
-    public void modifyPrivilege(Privilege privilege)
-            throws EntitlementException {
+    public void modifyPrivilege(String existingName, Privilege privilege) throws EntitlementException {
         validatePrivilege(privilege);
         privilege.validateResourceNames(dsameUserSubject, realm);
-        updateMetaInfo(privilege);
-        String privilegeName = privilege.getName();
+        updateMetaInfo(existingName, privilege);
 
         try {
             if (!migratedToEntitlementSvc) {
@@ -278,20 +274,32 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
                 pm.addPolicy(PrivilegeUtils.privilegeToPolicy(realm, privilege));
             } else {
                 PolicyDataStore pdb = PolicyDataStore.getInstance();
-                Privilege oldP = getPrivilege(privilegeName, getAdminSubject());
-                pdb.removePrivilege(getAdminSubject(), getRealm(),
-                    privilege);
+                Privilege oldP = getPrivilege(existingName, getAdminSubject());
+
                 String currentRealm = getRealm();
-                pdb.addPolicy(getAdminSubject(), getRealm(), privilege);
+
+                pdb.removePrivilege(getAdminSubject(), currentRealm, oldP);
+
+                pdb.addPolicy(getAdminSubject(), currentRealm, privilege);
                 notifyPrivilegeChanged(currentRealm, oldP, privilege);
             }
         } catch (PolicyException e) {
-            Object[] params = {privilegeName};
+            Object[] params = {existingName};
             throw new EntitlementException(206, params, e);
         } catch (SSOException e) {
-            Object[] params = {privilegeName};
+            Object[] params = {existingName};
             throw new EntitlementException(206, params, e);
         }
+    }
+
+    /**
+     * Modifies a privilege
+     * @param privilege the privilege to be modified
+     * @throws com.sun.identity.entitlement.EntitlementException
+     */
+    @Override
+    public void modifyPrivilege(Privilege privilege) throws EntitlementException {
+        modifyPrivilege(privilege.getName(), privilege);
     }
 
     /**

@@ -69,8 +69,8 @@ final class PrivilegePolicyStore implements PolicyStore {
     }
 
     @Override
-    public Privilege update(Privilege policy) throws EntitlementException {
-        privilegeManager.modifyPrivilege(policy);
+    public Privilege update(String existingName, Privilege policy) throws EntitlementException {
+        privilegeManager.modifyPrivilege(existingName, policy);
         return policy;
     }
 

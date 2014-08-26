@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.TimeZone;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Parses entitlements policies ("privileges") to/from JSON representations.
@@ -73,10 +74,6 @@ public final class JsonPolicyParser implements PolicyParser {
     @Override
     public Privilege parsePolicy(String name, JsonValue json)
             throws EntitlementException {
-
-        if (name == null || name.trim().isEmpty()) {
-            throw new EntitlementException(EntitlementException.MISSING_PRIVILEGE_NAME);
-        }
 
         if (json == null || json.isNull()) {
             throw new EntitlementException(EntitlementException.INVALID_JSON);
@@ -128,14 +125,22 @@ public final class JsonPolicyParser implements PolicyParser {
         }
     }
 
-    private Privilege parsePrivilege(String name, JsonValue jsonValue) throws EntitlementException {
+    private Privilege parsePrivilege(String providedName, JsonValue jsonValue) throws EntitlementException {
         try {
             // Note: this is a bit ugly as we re-serialise the JsonValue back into a JSON String to then parse it
             // again using Jackson. Unfortunately, that appears to be the easiest way as JsonValue does not support
             // data binding.
             JsonPolicy policy = MAPPER.readValue(jsonValue.toString(), JsonPolicy.class);
             Privilege privilege = policy.asPrivilege();
-            privilege.setName(name);
+
+            if (isBlank(privilege.getName())) {
+                privilege.setName(providedName);
+            }
+
+            if (isBlank(privilege.getName())) {
+                throw new EntitlementException(EntitlementException.MISSING_PRIVILEGE_NAME);
+            }
+
             return privilege;
         } catch (UnrecognizedPropertyException ex) {
             throw new EntitlementException(EntitlementException.INVALID_VALUE,

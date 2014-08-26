@@ -50,10 +50,11 @@ public interface PolicyStore {
 
     /**
      * Updates the given policy to match the new definition.
+     * @param existingName the existing policy name
      * @param policy the policy to update.
      * @throws EntitlementException if an error occurs or the policy does not exist.
      */
-    Privilege update(Privilege policy) throws EntitlementException;
+    Privilege update(String existingName, Privilege policy) throws EntitlementException;
 
     /**
      * Deletes the given policy from the policy store.

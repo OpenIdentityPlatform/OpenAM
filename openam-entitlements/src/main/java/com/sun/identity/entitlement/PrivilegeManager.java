@@ -186,6 +186,19 @@ public abstract class PrivilegeManager {
         throws EntitlementException;
 
     /**
+     * Modifies the specified policy.
+     *
+     * @param existingName
+     *         The existing policy name
+     * @param privilege
+     *         The new policy content
+     *
+     * @throws EntitlementException
+     *         When an error occurs during modification
+     */
+    public abstract void modifyPrivilege(String existingName, Privilege privilege) throws EntitlementException;
+
+    /**
      * Returns a set of privilege names for a given search criteria.
      *
      * @param filter Set of search filter.
