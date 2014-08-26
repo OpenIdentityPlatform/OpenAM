@@ -48,29 +48,28 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 this.$el.find('#managePoliciesTitle').text("Manage " + appName + " Policies");
 
                 var options = {
-                    view: this,
-                    id: '#managePolicies',
-                    url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
-                    colNames: ['Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions',
-                        'Resources', 'Resource Attributes', 'Subject'],
-                    colModel: [
-                        {name: 'name', formatter: policyLinkFormatter, width: 460},
-                        {name: 'description'},
-                        {name: 'createdBy'},
-                        {name: 'creationDate', formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                        {name: 'lastModifiedBy'},
-                        {name: 'lastModified', formatter: uiUtils.commonJQGridFormatters.dateFormatter, width: 460},
-                        {name: 'actionValues', formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                        {name: 'resources', formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                        {name: 'resourceAttributes', formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                        {name: 'subject', formatter: uiUtils.commonJQGridFormatters.objectFormatter}
-                    ],
-                    width: '920',
-                    pager: '#policiesPager',
-                    callback: callback
-                };
+                        url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
+                        colNames: ['Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions',
+                            'Resources', 'Resource Attributes', 'Subject'],
+                        colModel: [
+                            {name: 'name', width: 250, frozen: true, formatter: policyLinkFormatter},
+                            {name: 'description', width: 150},
+                            {name: 'createdBy', width: 250},
+                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                            {name: 'lastModifiedBy', width: 250},
+                            {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                            {name: 'actionValues', width: 250, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                            {name: 'resources', width: 250, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'resourceAttributes', width: 150, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'subject', width: 150, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
+                        ],
+                        width: 920,
+                        shrinkToFit: false,
+                        pager: '#policiesPager'
+                    },
+                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, callback);
 
-                uiUtils.buildRestResponseBasedJQGrid(options);
+                grid.jqGrid('setFrozenColumns');
             });
         }
     });

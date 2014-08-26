@@ -238,6 +238,9 @@
 }
 
 .ui-jqgrid {
+    tr.ui-row-ltr td {
+        vertical-align: top;
+    }
 
     #manageApps_applicationType, td[aria-describedby="manageApps_applicationType"], td[aria-describedby="manageApps_name"] {
         text-overflow: ellipsis;
@@ -257,4 +260,8 @@
         color: #fff !important;
     }
 
+}
+
+.frozen-bdiv.ui-jqgrid-bdiv {
+    height: auto !important;
 }
