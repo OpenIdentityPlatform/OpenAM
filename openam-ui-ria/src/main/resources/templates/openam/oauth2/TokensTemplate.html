@@ -1,13 +1,26 @@
-<div id="tokens" class="content-bg">
-    <h2>{{t "templates.oauth.tokenList"}}</h2>
-    <table id="tokensTable" class="radious">
-        <tr>
-            <th width="40"><input type="checkbox" /></th>
-            <th width="210"></th>
-            <th width="210"></th>
-            <th width="210"></th>
-            <th width="210"></th>
-            <th width="210"></th>
-        </tr>
-    </table>
+<div id="oAuthTokens">
+    {{#if tokens}}
+    <h2 class="header">{{t "templates.oauth.tokenList"}}</h2>
+    <div class="content-bg">
+        <table>
+
+            <tr>
+                <th scope="col">{{t "openam.oAuth2.tokens.appName"}}</th>
+                <th scope="col">{{t "openam.oAuth2.tokens.scope"}}</th>
+                <th scope="col">{{t "openam.oAuth2.tokens.expiryDate"}}</th>
+                <th scope="col"></th>
+            </tr>
+
+            {{#each tokens}}
+            <tr>
+                <td>{{this.display_name}} </td>
+                <td>{{this.scopes}} </td>
+                <td>{{this.expireTime}} </td>
+                <td><a class="deleteToken" href="#" id="{{this.id}}">{{t "openam.oAuth2.tokens.deleteToken"}}</a></td>
+            </tr>
+            {{/each}}
+
+        </table>
+    </div>
+    {{/if}}
 </div>

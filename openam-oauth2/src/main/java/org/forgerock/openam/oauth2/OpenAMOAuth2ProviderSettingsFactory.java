@@ -61,6 +61,16 @@ public class OpenAMOAuth2ProviderSettingsFactory implements OAuth2ProviderSettin
     }
 
     /**
+     * Only to be used internally by AM.
+     *
+     * @param realm The realm.
+     * @return The OAuth2ProviderSettings instance.
+     */
+    public OAuth2ProviderSettings get(String realm) {
+        return getInstance(realmNormaliser.normalise(realm), null);
+    }
+
+    /**
      * Gets the instance of the OAuth2ProviderSettings.
      * <br/>
      * Cache each provider settings on the realm it was created for.

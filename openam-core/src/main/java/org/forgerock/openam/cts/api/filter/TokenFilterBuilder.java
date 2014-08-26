@@ -42,6 +42,13 @@ public class TokenFilterBuilder {
     }
 
     /**
+     * @return Moves the builder into mode specified by type.
+     */
+    public FilterAttributeBuilder type(TokenFilter.Type type) {
+        return new FilterAttributeBuilder(tokenFilter, type);
+    }
+
+    /**
      * Moves the TokenFilter into AND mode, and filters the query by the given attribute.
      *
      * @see TokenFilterBuilder.FilterAttributeBuilder#withAttribute(CoreTokenField, Object)

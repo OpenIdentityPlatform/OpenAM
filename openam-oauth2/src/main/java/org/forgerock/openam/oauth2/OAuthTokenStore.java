@@ -114,8 +114,8 @@ public class OAuthTokenStore {
      * @return A JsonValue of the query results.
      * @throws CoreTokenException If there is a problem performing the query.
      */
-    public JsonValue query(Map<String, Object> queryParameters) throws CoreTokenException {
-        Collection<Token> tokens = cts.query(convertRequest(queryParameters));
+    public JsonValue query(Map<String, Object> queryParameters, TokenFilter.Type type) throws CoreTokenException {
+        Collection<Token> tokens = cts.query(convertRequest(queryParameters, type));
         return convertResults(tokens);
     }
 
@@ -123,11 +123,12 @@ public class OAuthTokenStore {
      * Converts the Map of filter parameters into an LDAP filter.
      *
      * @param filters A Map of filter parameters.
+     * @param type The type of filter required (and/or).
      * @return A Mapping of CoreTokenField to Objects to query by.
      */
-    private TokenFilter convertRequest(Map<String, Object> filters) {
+    private TokenFilter convertRequest(Map<String, Object> filters, TokenFilter.Type type) {
+        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().type(type);
 
-        TokenFilterBuilder.FilterAttributeBuilder builder = new TokenFilterBuilder().or();
         for (OAuthTokenField field : OAuthTokenField.values()) {
             if (filters.containsKey(field.getOAuthField())) {
                 builder.withAttribute(field.getField(), filters.get(field.getOAuthField()));

@@ -165,7 +165,7 @@
         },
         "oauth": {
             "clientID" : "Client ID",
-            "tokenList" : "Token List",
+            "tokenList" : "Authorized Apps",
             "remainingTokens" : "remaining tokens",
             "tokenID" : "Token ID",
             "expireDate" : "Expire Date",
@@ -347,6 +347,14 @@
                 "deviceName" : "Name",
                 "lastUsed" : "Last Used",
                 "deleteDevice" : "Delete Device"
+            }
+        },
+        "oAuth2" : {
+            "tokens" : {
+                "appName" : "Application",
+                "scope" : "Scope",
+                "expiryDate" : "Expiry Date",
+                "deleteToken" : "Revoke Access"
             }
         },
         "authentication": {

@@ -30,8 +30,9 @@
 define("org/forgerock/openam/ui/dashboard/DashboardView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/openam/ui/dashboard/MyApplicationsView",
-    "org/forgerock/openam/ui/dashboard/TrustedDevicesView"
-], function(AbstractView, MyApplicationsView, TrustedDevicesView) {
+    "org/forgerock/openam/ui/dashboard/TrustedDevicesView",
+    "org/forgerock/openam/ui/dashboard/OAuthTokensView"
+], function(AbstractView, MyApplicationsView, TrustedDevicesView, OAuthTokensView) {
 
     var Dashboard = AbstractView.extend({
         template: "templates/openam/DashboardTemplate.html",
@@ -41,6 +42,7 @@ define("org/forgerock/openam/ui/dashboard/DashboardView", [
 
                 MyApplicationsView.render();
                 TrustedDevicesView.render();
+                OAuthTokensView.render();
             });
         }
     });

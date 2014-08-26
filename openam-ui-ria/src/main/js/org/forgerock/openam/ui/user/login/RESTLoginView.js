@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
-    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager,restLoginHelper) {
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper",
+    "org/forgerock/commons/ui/common/main/SpinnerManager"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager, restLoginHelper, spinnerManager) {
 
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -100,7 +101,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         render: function(args, callback) {
-            var 
+            var
                 urlParams = {},//deserialized querystring params
                 promise = $.Deferred();
 
@@ -224,34 +225,34 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                             // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
                             uiUtils
                                 .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html",
-                                    _.extend(conf.globalData, this.data),
-                                    _.bind(function (populatedTemplate) {
-                                        if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
-                                            this.template = "templates/openam/authn/" + reqs.stage + ".html";
-                                        } else {
-                                            this.template = this.genericTemplate;
-                                        }
+                                _.extend(conf.globalData, this.data),
+                                _.bind(function (populatedTemplate) {
+                                    if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
+                                        this.template = "templates/openam/authn/" + reqs.stage + ".html";
+                                    } else {
+                                        this.template = this.genericTemplate;
+                                    }
 
-                                        this.data.showForgotPassword = false;
-                                        this.data.showRegister = false;
-                                        this.data.showSpacer = false;
+                                    this.data.showForgotPassword = false;
+                                    this.data.showRegister = false;
+                                    this.data.showSpacer = false;
 
-                                        if(conf.globalData.forgotPassword === "true"){
-                                            this.data.showForgotPassword = true;
+                                    if(conf.globalData.forgotPassword === "true"){
+                                        this.data.showForgotPassword = true;
+                                    }
+                                    if(conf.globalData.selfRegistration === "true"){
+                                        if(this.data.showForgotPassword){
+                                            this.data.showSpacer = true;
                                         }
-                                        if(conf.globalData.selfRegistration === "true"){
-                                            if(this.data.showForgotPassword){
-                                                this.data.showSpacer = true;
-                                            }
-                                            this.data.showRegister = true;
-                                        }
-                                        this.parentRender(_.bind(function() {
-                                            this.reloadData();
-                                            // resolve a promise when all templates will be loaded
-                                            promise.resolve();
-                                        }, this));
-                                    }, this)
-                                );
+                                        this.data.showRegister = true;
+                                    }
+                                    this.parentRender(_.bind(function() {
+                                        this.reloadData();
+                                        // resolve a promise when all templates will be loaded
+                                        promise.resolve();
+                                    }, this));
+                                }, this)
+                            );
                         }
 
                     }
@@ -262,13 +263,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     this.parentRender();
                 }, this));
 
-                promise
-                    .done(function() {
-                        if (cookieHelper.getCookie('invalidRealm')) {
-                            cookieHelper.deleteCookie('invalidRealm');
-                            eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
-                        }
-                    });
+            promise
+                .done(function() {
+                    if (cookieHelper.getCookie('invalidRealm')) {
+                        cookieHelper.deleteCookie('invalidRealm');
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidRealm");
+                    }
+                });
 
         },
         reloadData: function () {
@@ -313,7 +314,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         var result = "",
             cb = this,
             prompt,
-            options;
+            options,
+            hideButton;
 
         prompt = _.find(cb.output, function (o) { return o.name === "prompt"; });
         if (prompt && prompt.value !== undefined && prompt.value.length) {
@@ -339,7 +341,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 options.type = _.find(cb.output, function (o) { return o.name === "messageType"; });
 
                 if (options.type.value === "4") { //4 is our magic number for a <script>, taken from ScriptTextOutputCallback.java
-                    result += '<script type="text/javascript">' + options.message.value + '</script>';
+                    hideButton = "if(document.getElementsByClassName('button')[0] != undefined){document" +
+                        ".getElementsByClassName" +
+                        "('button')[0].style.visibility = 'hidden';}";
+                    result += "<script type='text/javascript'>" + hideButton + options.message.value + "</script>";
                 } else {
                     result += '<div id="callback_' + cb.input.index + '" class="textOutputCallback ' + options.type.value + '">' + options.message.value + '</div>';
                 }

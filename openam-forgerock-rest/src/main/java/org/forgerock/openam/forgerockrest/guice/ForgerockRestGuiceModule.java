@@ -55,6 +55,7 @@ import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.util.SignatureUtil;
 
 import javax.inject.Inject;

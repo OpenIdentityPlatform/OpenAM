@@ -29,5 +29,7 @@ define("org/forgerock/openam/ui/dashboard/main", [
     "./MyApplicationsView",
     "./TrustedDevicesDelegate",
     "./TrustedDevicesView",
-    "./DashboardView"
+    "./DashboardView",
+    "./OAuthTokensDelegate",
+    "./OAuthTokensView"
 ]);
