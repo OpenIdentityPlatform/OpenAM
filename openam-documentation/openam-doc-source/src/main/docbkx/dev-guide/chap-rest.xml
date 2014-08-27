@@ -5576,6 +5576,25 @@ $ <userinput>curl \
 <computeroutput>{}</computeroutput>
     </screen>
 
+    <para>Note that you can also use the <literal>email</literal> attribute
+     to locate the user. If both <literal>username</literal> and <literal>mail</literal>
+     attributes are used, then a request error is issued. If more
+     than one account has been registered with the same email address,
+     the password reset process does not start.</para>
+
+    <screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --data '{
+   "email": "demo@example.com",
+   "subject": "Reset your forgotten password with OpenAM",
+   "message": "Follow this link to reset your password"
+ }' \
+ https://openam.example.com:8443/openam/json/users/?_action=forgotPassword</userinput>
+<computeroutput>{}</computeroutput>
+    </screen>
+
     <para>On success, the response is an empty JSON object <literal>{}</literal>
     as shown in the example.</para>
    </listitem>
@@ -5586,10 +5605,10 @@ $ <userinput>curl \
     but all on one line.</para>
 
     <literallayout class="monospaced"
-    >https://openam.example.com:8443/openam/json/confirmation/forgotPassword
+    >https://openam.example.com:8443/openam/json/XUI/confirm.html
      ?confirmationId=jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=
      &amp;tokenId=M8cVqWqbKtCtpd/UqEAr0x25fxA=
-     &amp;username=demo</literallayout>
+     &amp;username=demo&amp;realm=/</literallayout>
    </listitem>
 
    <listitem>
@@ -5601,7 +5620,9 @@ $ <userinput>curl \
     query string parameters as shown in the following example.</para>
 
     <para>Your POST includes the new password as the value of the "userpassword"
-    field in the JSON payload.</para>
+     field in the JSON payload. You can also use the <literal>email</literal>
+     attribute instead of <literal>username</literal>.
+    </para>
 
     <screen>
 $ <userinput>curl \
@@ -5614,53 +5635,12 @@ $ <userinput>curl \
  "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ="
  }' \
  https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset</userinput>
-<computeroutput>{
-    "name": "demo",
-    "realm": "/",
-    "uid": [
-        "demo"
-    ],
-    "mail": [
-        "demo@example.com"
-    ],
-    "sn": [
-        "demo"
-    ],
-    "userPassword": [
-        "{SSHA}zgeBu4yOAy1i9QAgnldMCzW8LWX36ViVj9leig=="
-    ],
-    "cn": [
-        "demo"
-    ],
-    "inetUserStatus": [
-        "Active"
-    ],
-    "objectClass": [
-        "devicePrintProfilesContainer",
-        "person",
-        "sunIdentityServerLibertyPPService",
-        "inetorgperson",
-        "sunFederationManagerDataStore",
-        "iPlanetPreferences",
-        "iplanet-am-auth-configuration-service",
-        "organizationalperson",
-        "sunFMSAML2NameIdentifier",
-        "inetuser",
-        "forgerock-am-dashboard-service",
-        "iplanet-am-managed-person",
-        "iplanet-am-user-service",
-        "sunAMAuthAccountLockout",
-        "top"
-    ],
-    "universalid": [
-        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
-    ]
-}</computeroutput>
+<computeroutput>{}</computeroutput>
     </screen>
 
-    <para>On success, the response is the JSON representation of the user
-    profile with the new password hashed according to the password storage
-    scheme for the identity repository.</para>
+    <para>On success or failure, the REST call returns an empty message, so that
+     information is not leaked.
+    </para>
    </listitem>
   </orderedlist>
 
