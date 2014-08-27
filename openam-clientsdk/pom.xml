@@ -250,6 +250,7 @@
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSaveIndex*</include>
                                 <include>org/forgerock/openam/entitlement/indextree/TreeSearchIndex*</include>
+                                <include>org/forgerock/openam/entitlement/utils/EntitlementUtils*</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
                                 <include>org/forgerock/openam/security/whitelist/**</include>
                                 <include>org/forgerock/openam/upgrade/UpgradeException*</include>
