@@ -24,9 +24,7 @@
  *
  * $Id: HOTP.java,v 1.1 2009/03/24 23:52:12 pluo Exp $
  *
- */
-/*
- * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2012-2014 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
@@ -52,7 +50,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class HOTP extends AMLoginModule {
-    // local variables
 
     protected static final String amAuthHOTP = "amAuthHOTP";
     protected static final Debug debug = Debug.getInstance(amAuthHOTP);
@@ -66,34 +63,30 @@ public class HOTP extends AMLoginModule {
     public Map currentConfig;
     protected Principal userPrincipal;
 
-    String enteredHOTPCode = null;
+    private String enteredHOTPCode = null;
 
     // Module specific properties
-    private static String AUTHLEVEL = "sunAMAuthHOTPAuthLevel";
-    private static String GATEWAYSMSImplCLASS =
-            "sunAMAuthHOTPSMSGatewayImplClassName";
-    private static String CODEVALIDITYDURATION =
-            "sunAMAuthHOTPPasswordValidityDuration";
-    private static String CODELENGTH = "sunAMAuthHOTPPasswordLength";
-    private static String CODEDELIVERY = "sunAMAuthHOTPasswordDelivery";
-    String gatewaySMSImplClass = null;
-    String codeValidityDuration = null;
-    String codeLength = null;
-    String codeDelivery = null;
-    
-    private int START_STATE = 2;
-   
+    private static final String AUTHLEVEL = "sunAMAuthHOTPAuthLevel";
+    private static final String GATEWAYSMSImplCLASS = "sunAMAuthHOTPSMSGatewayImplClassName";
+    private static final String CODEVALIDITYDURATION = "sunAMAuthHOTPPasswordValidityDuration";
+    private static final String CODELENGTH = "sunAMAuthHOTPPasswordLength";
+    private static final String CODEDELIVERY = "sunAMAuthHOTPasswordDelivery";
+    private static final String ATTRIBUTEPHONE = "openamTelephoneAttribute";
+    private static final String ATTRIBUTECARRIER = "openamSMSCarrierAttribute";
+    private static final String ATTRIBUTEEMAIL = "openamEmailAttribute";
     private static final String AUTO_CLICKING = "sunAMAuthHOTPAutoClicking";
     private static final String SKIP_HOTP = "skipHOTP";
-    boolean skip = false;
-    boolean hotpAutoClicking = false;
-    
-    private static String ATTRIBUTEPHONE = "openamTelephoneAttribute";
-    private static String ATTRIBUTECARRIER = "openamSMSCarrierAttribute";
-    private static String ATTRIBUTEEMAIL = "openamEmailAttribute";
+    private String gatewaySMSImplClass = null;
+    private String codeValidityDuration = null;
+    private String codeLength = null;
+    private String codeDelivery = null;
     private String telephoneAttribute = null;
     private String carrierAttribute = null;
     private String emailAttribute = null;
+    private boolean skip = false;
+    private boolean hotpAutoClicking = false;
+
+    private int START_STATE = 2;
 
     private HOTPService hotpService;
 
@@ -129,18 +122,35 @@ public class HOTP extends AMLoginModule {
         if (debug.messageEnabled()) {
             debug.message("HOTP.init() : " + "HOTP resouce bundle locale=" + locale);
         }
-        try {
-            userName = (String) sharedState.get(getUserKey());
-        } catch (Exception e) {
-            debug.error("HOTP.init() : " + "Unable to set userName : ", e);
+
+        userName = (String) sharedState.get(getUserKey());
+        if (userName == null || userName.isEmpty()) {
+            try {
+                //Session upgrade case. Need to find the user ID from the old session.
+                SSOTokenManager mgr = SSOTokenManager.getInstance();
+                InternalSession isess = getLoginState("HOTP").getOldSession();
+                if (isess == null) {
+                    throw new AuthLoginException("amAuth", "noInternalSession", null);
+                }
+                SSOToken token = mgr.createSSOToken(isess.getID().toString());
+                userUUID = token.getPrincipal().getName();
+                userName = token.getProperty("UserToken");
+                if (debug.messageEnabled()) {
+                    debug.message("HOTP.init() : UserName in SSOToken : " + userName);
+                }
+            } catch (SSOException ssoe) {
+                debug.error("HOTP.init() : Unable to retrieve userName from existing session", ssoe);
+            } catch (AuthLoginException ale) {
+                debug.error("HOTP.init() : Unable to retrieve userName from existing session", ale);
+            }
         }
         this.sharedState = sharedState;
 
-        if(sharedState.containsKey(SKIP_HOTP)) {
+        if (sharedState.containsKey(SKIP_HOTP)) {
             skip = (Boolean) sharedState.get(SKIP_HOTP);
         }
       
-        hotpAutoClicking = CollectionHelper.getMapAttr(options, AUTO_CLICKING).equals("true") ? true : false;
+        hotpAutoClicking = CollectionHelper.getMapAttr(options, AUTO_CLICKING).equals("true");
 
         HOTPParams hotpParams = new HOTPParams(gatewaySMSImplClass, Long.parseLong(codeValidityDuration),
                 telephoneAttribute, carrierAttribute, emailAttribute, codeDelivery, currentConfig,
@@ -149,39 +159,16 @@ public class HOTP extends AMLoginModule {
         hotpService = new HOTPService(getAMIdentityRepository(getRequestOrg()), userName, hotpParams);
     }
 
-    public int process(Callback[] callbacks, int state)
-            throws AuthLoginException {
-        if(skip) {
+    public int process(Callback[] callbacks, int state) throws AuthLoginException {
+        if (skip) {
             debug.message("Skipping HOTP module");
             return ISAuthConstants.LOGIN_SUCCEED;
         }
-        try {
-            if (userName == null || userName.length() == 0) {
-                // session upgrade case. Need to find the user ID from the old
-                // session
-                SSOTokenManager mgr = SSOTokenManager.getInstance();
-                InternalSession isess = getLoginState("HOTP").getOldSession();
-                if (isess == null) {
-                    throw new AuthLoginException("amAuth", "noInternalSession",
-                            null);
-                }
-                SSOToken token = mgr.createSSOToken(isess.getID().toString());
-                userUUID = token.getPrincipal().getName();
-                userName = token.getProperty("UserToken");
-                if (debug.messageEnabled()) {
-                    debug.message("HOTP.process() : " + "UserName in SSOToekn : " + userName);
-                }
+        if (userName == null || userName.length() == 0) {
+            throw new AuthLoginException("amAuth", "noUserName", null);
+        }
 
-                if (userName == null || userName.length() == 0) {
-                    throw new AuthLoginException("amAuth", "noUserName", null);
-                }
-            } 
-        } catch (SSOException e) {
-                debug.error("HOTP.process() : " + "SSOException", e);
-                throw new InvalidPasswordException("amAuth", "invalidPasswd", null);
-            }
-        
-        if( state == 1) {
+        if (state == 1) {
             if(hotpAutoClicking) {
                 debug.message("Auto sending OTP code");
                 try {
