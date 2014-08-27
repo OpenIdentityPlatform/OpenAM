@@ -1193,7 +1193,12 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-            String userpass = jVal.get("userpassword").asString();
+            String userpass = null;
+            for (String attrName : jVal.keys()) {
+                if ("userpassword".equalsIgnoreCase(attrName)) {
+                    userpass = jVal.get(attrName).asString();
+                }
+            }
             // Check that the attribute userpassword is in the json object
             if(userpass != null && !userpass.isEmpty()) {
                 // If so password reset attempt
