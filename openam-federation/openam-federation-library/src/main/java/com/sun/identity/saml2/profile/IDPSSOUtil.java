@@ -1407,20 +1407,18 @@ public class IDPSSOUtil {
                 allowCreate = nameIDPolicy.isAllowCreate();
                 spNameQualifier = nameIDPolicy.getSPNameQualifier();
                 if (spNameQualifier != null && !spNameQualifier.isEmpty()) {
-                    AffiliationDescriptorType affiDesc = metaManager.
-                            getAffiliationDescriptor(realm, spNameQualifier);
+                    AffiliationDescriptorType affiDesc = metaManager.getAffiliationDescriptor(realm, spNameQualifier);
 
                     if (affiDesc != null) {
-                        if (affiDesc.getAffiliateMember().contains(
-                                remoteEntityID)) {
-
+                        if (affiDesc.getAffiliateMember().contains(remoteEntityID)) {
                             isAffiliation = true;
                             remoteEntityID = spNameQualifier;
                         } else {
-                            throw new SAML2Exception(SAML2Utils.bundle.
-                                    getString("spNotAffiliationMember"));
+                            throw new SAML2Exception(SAML2Utils.bundle.getString("spNotAffiliationMember"));
                         }
                     }
+                } else {
+                    spNameQualifier = recipientEntityID;
                 }
             }
         } else {
@@ -1519,8 +1517,7 @@ public class IDPSSOUtil {
 
             IDPAccountMapper idpAccountMapper =
                     SAML2Utils.getIDPAccountMapper(realm, idpEntityID);
-            nameID = idpAccountMapper.getNameID(session, idpEntityID,
-                    spNameQualifier, realm, nameIDFormat);
+            nameID = idpAccountMapper.getNameID(session, idpEntityID, spNameQualifier, realm, nameIDFormat);
 
             // If the IdP has received a request from a remote SP for which it has
             // been configured not to persist the Federation if unspecified NameID
