@@ -336,7 +336,7 @@
     <itemizedlist>
 
      <para>
-      This change is new in OpenAM web policy agents 3.3.2.
+      This change is new in OpenAM web policy agents 3.3.3.
      </para>
 
      <listitem>
@@ -567,8 +567,10 @@
     >OpenAM issue tracker</link>.
    </para>
 
-   <!-- List generated at 09:28:14 20140812 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.3.2"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 13:28:06 20140828 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+in+%28"Agents-3.3.2"%2C+"Agents-3.3.3"%29+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4391" xlink:show="new">OPENAM-4391</link>: WPA does not remove consecutive forward slashes from request URI resulting in invalid policy evaluations</para></listitem>
+    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4390" xlink:show="new">OPENAM-4390</link>: WPA might fail to sort (reorder) query parameters resulting in invalid policy evaluation</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4199" xlink:show="new">OPENAM-4199</link>: Web policy agent might fail to parse URL when there is no port value specified</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4088" xlink:show="new">OPENAM-4088</link>: SJSWS web policy agent does not handle post data preservation in cdsso mode</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4020" xlink:show="new">OPENAM-4020</link>: Web policy agent silently ignores InternalException::AM_INVALID_RESOURCE_FORMAT exception abandoning further not enforced rule evaluation</para></listitem>
@@ -613,7 +615,7 @@
     >OpenAM issue tracker</link>.
    </para>
 
-   <!-- List generated at 16:28:19 20140821 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 13:28:37 20140828 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4360" xlink:show="new">OPENAM-4360</link>: WPA does not create agent profile automatically when OpenAM is running with HTTPS</para></listitem>
     <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4285" xlink:show="new">OPENAM-4285</link>: WPA local audit log file is not rotating</para></listitem>
