@@ -274,6 +274,21 @@ Agreement (yes/no): [no]:</screen>
 
   <listitem>
     <para>
+     <emphasis role="bold">Configurable DN Cache for LDAP Data Stores</emphasis>.
+     OpenAM now has the capability to enable and disable DN caching.
+     DN caching helps avoid DN lookups
+     that can happen in bursts during authentication.
+     (
+     <link
+      xlink:show="new"
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3822"
+     >OPENAM-3822</link>
+     ).
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>
      <emphasis role="bold">Quicker UI Customization</emphasis>.
      While customizing the UI, you can set the advanced server property,
      <literal>org.forgerock.openam.core.resource.lookup.cache.enabled</literal>,

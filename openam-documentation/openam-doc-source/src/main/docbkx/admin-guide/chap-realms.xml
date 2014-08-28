@@ -24,12 +24,12 @@
   !    
 -->
 <chapter xml:id='chap-realms'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook
-                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Realms</title>
  
  <indexterm><primary>Realms</primary></indexterm>
@@ -326,17 +326,75 @@
   <step>
    <para>In the second screen, provide information on how to connect
    to your data store, and then click Finish to save your work.</para>
-   
-   <para>See the <link xlink:href="admin-guide#chap-auth-services"
-   xlink:role="http://docbook.org/xlink/role/olink">chapter on
-   authentication</link> for hints on connecting to
-   <link xlink:href="admin-guide#ad-module-conf-hints"
-   xlink:role="http://docbook.org/xlink/role/olink">Active Directory</link>,
-   <link xlink:href="admin-guide#ldap-module-conf-hints"
-   xlink:role="http://docbook.org/xlink/role/olink">LDAP directory</link>, and
-   <link xlink:href="admin-guide#jdbc-module-conf-hints"
-   xlink:role="http://docbook.org/xlink/role/olink">JDBC</link> data
-   sources.</para>
+
+   <itemizedlist>
+    <para>
+     See the following sections for hints depending on the type of data store.
+    </para>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-active-directory"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-adam"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-db"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-generic-ldapv3"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-opendj"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-dsee"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <link
+       xlink:href="admin-guide#sec-data-stores-tivoli"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       />
+     </para>
+    </listitem>
+   </itemizedlist>
   </step>
   <step>
    <para>Click the Subjects tab, and make sure the connection to your
@@ -393,4 +451,12 @@
    <para>Save your work.</para>
   </step>
  </procedure>
+
+ <xinclude:include href="../shared/sec-data-stores-active-directory.xml" />
+ <xinclude:include href="../shared/sec-data-stores-adam.xml" />
+ <xinclude:include href="../shared/sec-data-stores-db.xml" />
+ <xinclude:include href="../shared/sec-data-stores-generic-ldapv3.xml" />
+ <xinclude:include href="../shared/sec-data-stores-opendj.xml" />
+ <xinclude:include href="../shared/sec-data-stores-dsee.xml" />
+ <xinclude:include href="../shared/sec-data-stores-tivoli.xml" />
 </chapter>

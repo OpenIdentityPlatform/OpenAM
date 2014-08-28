@@ -1,0 +1,538 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2014 ForgeRock AS
+  !
+-->
+<section xml:id="sec-data-stores-db"
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Hints for Configuring Database Repository (Early Access) Data Stores</title>
+
+ <para>
+  Use these hints when configuring Database Repository (Early Access) Data Stores.
+ </para>
+
+ <important>
+  <para>
+   This feature is in Early Access,
+   meaning it is not generally supported for use in production environments.
+   If you expect to use a relational database as an identity repository
+   other than for development or testing purposes,
+   first confirm supportability of your configuration with an expert.
+   You can contact ForgeRock at
+   <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.
+  </para>
+ </important>
+
+ <indexterm>
+  <primary>Data stores</primary>
+  <secondary>Database Repository (Early Access)</secondary>
+ </indexterm>
+
+ <para>
+  <command>ssoadm</command> service name:
+  <literal>sunIdentityRepositoryService</literal>
+ </para>
+
+ <variablelist>
+  <varlistentry>
+   <term>Name</term>
+   <listitem>
+    <para>
+     Name for the data store configuration
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Load schema when finished</term>
+   <listitem>
+    <para>
+     Add the appropriate schema to the database on saving the configuration.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>idRepoLoadSchema</literal>
+    </para>
+
+    <para>
+     Default:
+     false
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database Data Access Object Plugin Class Name</term>
+   <listitem>
+    <para>
+     OpenAM data access implementation
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-dao-class-name</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>com.sun.identity.idm.plugins.database.JdbcSimpleUserDao</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Connection Type</term>
+   <listitem>
+    <para>
+     Whether to connect directly to the database,
+     or to connect through JNDI provided by the container where OpenAM runs
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-dao-JDBCConnectionType</literal>
+    </para>
+
+    <para>
+     Default:
+     Connection is retrieved via programmatic connection
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database DataSource Name</term>
+   <listitem>
+    <para>
+     Data source name from the container configuration when connecting over JNDI
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-DataSourceJndiName</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>java:comp/env/jdbc/openssousersdb</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>JDBC Driver Class Name</term>
+   <listitem>
+    <para>
+     Driver class used when connecting directly
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-JDBCDriver</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>com.mysql.jdbc.Driver</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>JDBC Driver URL</term>
+   <listitem>
+    <para>
+     URL used when connecting directly
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-JDBCUrl</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>jdbc:mysql://127.0.0.1:3306/test</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Connect This User to Database</term>
+   <listitem>
+    <para>
+     Username used when connecting directly
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-JDBCDbuser</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>root</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Password for Connecting to Database</term>
+   <listitem>
+    <para>
+     Password used when connecting directly
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-JDBCDbpassword</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Maximum Results Returned from Search</term>
+   <listitem>
+    <para>
+     A cap for the number of search results to request.
+     For example when using the Subjects tab to view profiles,
+     even if you set
+     Configuration > Console > Administration > Maximum Results Returned from Search
+     to a larger number, OpenAM does not exceed this setting.
+     Rather than raise this number,
+     consider narrowing your search to match fewer profiles.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-config-max-result</literal>
+    </para>
+
+    <para>
+     Default:
+     1000
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database Repository Plugin Class Name</term>
+   <listitem>
+    <para>
+     OpenAM identity repository implementation
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sunIdRepoClass</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>com.sun.identity.idm.plugins.database.DatabaseRepo</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name Mapping</term>
+   <listitem>
+    <para>
+     Map of OpenAM profile attribute names to database column names
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sunIdRepoAttributeMapping</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>iplanet-am-user-account-life=iplanet_am_user_account_life</literal>,
+     <literal>iplanet-am-user-alias-list=iplanet_am_user_alias_list</literal>,
+     <literal>iplanet-am-user-auth-config=iplanet_am_user_auth_config</literal>,
+     <literal>iplanet-am-user-failure-url=iplanet_am_user_failure_url</literal>,
+     <literal>iplanet-am-user-password-reset-force-reset=iplanet_am_user_password_reset_force_reset</literal>,
+     <literal>iplanet-am-user-password-reset-question-answer=iplanet_am_user_password_reset_question_answer</literal>,
+     <literal>iplanet-am-user-password-resetoptions=iplanet_am_user_password_resetoptions</literal>,
+     <literal>iplanet-am-user-success-url=iplanet_am_user_success_url</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database Plug-in Supported Types and Operations</term>
+   <listitem>
+    <para>
+     Map of OpenAM operations that can be performed in the specified OpenAM contexts
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-sunIdRepoSupportedOperations</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>group=read,create,edit,delete</literal>,
+     <literal>user=read,create,edit,delete,service</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database User Table Name</term>
+   <listitem>
+    <para>
+     Table to store user profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-UserTableName</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>opensso_users</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>List of User Attributes Names in Database</term>
+   <listitem>
+    <para>
+     Columns for user profile attributes
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-UserAttrs</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>ChangePassword</literal>,
+     <literal>cn</literal>,
+     <literal>employeenumber</literal>,
+     <literal>givenname</literal>,
+     <literal>inetuserstatus</literal>,
+     <literal>iplanet_am_user_account_life</literal>,
+     <literal>iplanet_am_user_alias_list</literal>,
+     <literal>iplanet_am_user_auth_config</literal>,
+     <literal>iplanet_am_user_failure_url</literal>,
+     <literal>iplanet_am_user_password_reset_force_reset</literal>,
+     <literal>iplanet_am_user_password_reset_question_answer</literal>,
+     <literal>iplanet_am_user_password_resetoptions</literal>,
+     <literal>iplanet_am_user_success_url</literal>,
+     <literal>mail</literal>,
+     <literal>manager</literal>,
+     <literal>postaladdress</literal>,
+     <literal>preferredlocale</literal>,
+     <literal>sn</literal>,
+     <literal>sunIdentityMSISDNNumber</literal>,
+     <literal>telephonenumber</literal>,
+     <literal>uid</literal>,
+     <literal>userpassword</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User Password Attribute Name</term>
+   <listitem>
+    <para>
+     Column for user passwords
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-UserPasswordAttr</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>userpassword</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User ID Attribute Name</term>
+   <listitem>
+    <para>
+     Column for user IDs
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-UserIDAttr</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>uid</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Attribute Name of User Status</term>
+   <listitem>
+    <para>
+     Column to check/set user status
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-UserStatusAttr</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>inetuserstatus</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User Status Active Value</term>
+   <listitem>
+    <para>
+     Active users have the user status set to this value.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-activeValue</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>Active</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>User Status Inactive Value</term>
+   <listitem>
+    <para>
+     Inactive users have the user status set to this value.
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-inactiveValue</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>Inactive</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Users Search Attribute in Database</term>
+   <listitem>
+    <para>
+     Key for looking up user profiles by name
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-config-users-search-attribute</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>cn</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Database Membership table name</term>
+   <listitem>
+    <para>
+     Table to store group profiles
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-MembershipTableName</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>groups</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Membership ID Attribute Name</term>
+   <listitem>
+    <para>
+     Column for group IDs
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-MembershipIDAttr</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>group_name</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+   <term>Membership Search Attribute in Database</term>
+   <listitem>
+    <para>
+     Key for looking up group profiles by name
+    </para>
+
+    <para>
+     <command>ssoadm</command> attribute:
+     <literal>sun-opensso-database-membership-search-attribute</literal>
+    </para>
+
+    <para>
+     Default:
+     <literal>cn</literal>
+    </para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</section>
