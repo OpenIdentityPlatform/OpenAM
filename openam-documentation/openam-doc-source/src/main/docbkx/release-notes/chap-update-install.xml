@@ -32,14 +32,14 @@
  <title>Updating &amp; Installing OpenAM</title>
 
  <para>
-  ForgeRock recommends that you update OpenAM 11.0.0 installations
+  ForgeRock recommends that you update OpenAM 11.0 installations
   to this release.
   If you are installing OpenAM for the first time,
   you can use the same installation instructions as for 11.0.0.
  </para>
 
  <procedure xml:id="update-from-earlier-release">
-  <title>To Update From OpenAM 11.0.0</title>
+  <title>To Update From OpenAM 11.0</title>
 
   <para>If you have already installed OpenAM, follow these steps.</para>
 

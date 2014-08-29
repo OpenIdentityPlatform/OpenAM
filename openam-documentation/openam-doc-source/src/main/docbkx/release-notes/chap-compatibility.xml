@@ -37,10 +37,75 @@
  <section xml:id="changes">
   <title>Important Changes to Existing Functionality</title>
 
+  <!--
+  <para>
+   OpenAM ${serverDocTargetVersion} does not introduce changes
+   that impact compatibility.
+  </para>
+  -->
+
   <itemizedlist>
 
    <para>
     These changes are new in OpenAM ${serverDocTargetVersion}.
+   </para>
+
+   <listitem><!-- OPENAM-3918 -->
+    <para>
+     Valid loginURIs are now set using a property that specifies
+     a whitelist for custom login URIs
+     so that the CDCServlet and the Distributed Authentication UI (DAS)
+     can check login URI values against those in the whitelist.
+    </para>
+
+    <para>
+     For details, see the explanation in
+     <link
+      xlink:show="new"
+      xlink:href="release-notes#product-enhancements"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Product Enhancements</citetitle></link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Attributes names in responses to REST API calls now
+     preserve the original case used in the request (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3159"
+      xlink:show="new"
+     >OPENAM-3159</link>).
+     In other words, if the request asks for <literal>userName</literal>,
+     the response includes <literal>userName</literal>.
+     If the request asks for <literal>username</literal>,
+     the response includes <literal>username</literal>.
+    </para>
+
+    <para>
+     If you prefer that responses always use lower case names,
+     set the advanced server property,
+     <literal>org.forgerock.openam.idm.attribute.names.lower.case</literal>
+     to <literal>true</literal>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The <literal>AttributeQueryUtil</literal> class now uses
+     the configured SP attribute mapper to map received attributes
+     in the same way as they come as part of an assertion (
+     <link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1655"
+      xlink:show="new"
+     >OPENAM-1655</link>).
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
+   <para>
+    The following changes were listed for OpenAM 11.0.1.
    </para>
 
    <listitem>
@@ -57,7 +122,8 @@
       Although the changes introduced by the improvements affect mainly edge cases,
       they do impact deployments relying on previous, inconsistent behaviors.
       The following points describe how OpenAM and policy agents behave
-      following upgrade to OpenAM 11.0.1 and web policy agents 3.3.1.
+      following upgrade to OpenAM 11.0.1 or later
+      and web policy agents 3.3.1 or later.
      </para>
 
      <listitem>
