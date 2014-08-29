@@ -137,7 +137,7 @@
        </listitem>           
        <listitem>
         <para><literal>Directory Name</literal></para>
-        <para><literal>opendj-cts.example.org</literal></para>
+        <para><literal>opendj-cts.example.com</literal></para>
        </listitem>
        <listitem>
         <para><literal>Port</literal></para>
@@ -166,7 +166,17 @@
         </para>
 
         <para>
-         <literal>20</literal> (arbitrary number)
+         When the directory service backing the CTS is external
+         (differs from the directory service backing the OpenAM configuration)
+         then this setting configures the maximum number of connections
+         in the connection pool used to access the directory service for the CTS.
+         One connection is reserved for cleanup of expired tokens.
+         The other connections are available for CTS operations.
+        </para>
+
+        <para>
+         <literal>17</literal>
+         (16 connections for CTS operations, 1 for token cleanup)
         </para>
        </listitem>
 

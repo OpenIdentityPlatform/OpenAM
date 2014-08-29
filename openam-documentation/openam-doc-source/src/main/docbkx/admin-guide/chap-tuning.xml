@@ -85,111 +85,338 @@
    <title>LDAP Settings</title>
    
    <para>
-    Tune both your LDAP data stores and also your LDAP authentication modules.
+    Tune your LDAP data stores, your LDAP authentication modules,
+    and connection pools for CTS and configuration stores.
    </para>
-   
-   <para>To change LDAP data store settings, browse to Access Control &gt;
-   <replaceable>Realm Name</replaceable> &gt; Data Stores &gt;
-   <replaceable>Data Store Name</replaceable> in the OpenAM console.
-   Each data store has its own connection pool and therefore each data store
-   needs its own tuning.</para>
-   
-   <table xml:id="tuning-ldap-data-store-settings" pgwide="1">
-    <title>LDAP Data Store Settings</title>
-    <tgroup cols="3">
-     <colspec colnum="1" colwidth="2*"/>
-     <colspec colnum="2" colwidth="1*"/>
-     <colspec colnum="3" colwidth="3*"/>
-     <thead>
-      <row>
-       <entry>Property</entry>
-       <entry>Default Value</entry>
-       <entry>Suggestions</entry>
-      </row>
-     </thead>
-     <tbody>
-      <row>
-       <entry>LDAP Connection Pool Minimum Size</entry>
-       <entry>1</entry>
-       <entry>
-        <para>The minimum LDAP connection pool size; a good tuning value
-        for this property is 10.</para>
-        <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_min_size</literal>)</para>
-       </entry>
-      </row>
-      <row>
-       <entry>LDAP Connection Pool Maximum Size</entry>
-       <entry>10</entry>
-       <entry>
-        <para>The maximum LDAP connection pool size; a high tuning value
-        for this property is 65, though you might well be able to reduce this
-        for your deployment. Ensure your LDAP server can cope with the maximum
-        number of clients across all the OpenAM servers.</para>
-        <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_max_size</literal>)</para>
-       </entry>
-      </row>
-         <!-- no longer included in the console
-      <row>
-       <entry>Caching</entry>
-       <entry>False</entry>
-       <entry>
-        <para>Turn on the caching feature in the LDAP data store.</para>
-        <para>(<literal>sun-idrepo-ldapv3-config-cache-enabled</literal>)</para>
-       </entry>
-      </row>
-      <row>
-       <entry>Maximum Age of Cached Items</entry>
-       <entry>600</entry>
-       <entry>
-        <para>This is 10 minutes and does not normally need tuning.</para>
-        <para>(<literal>sun-idrepo-ldapv3-config-cache-ttl</literal>)</para>
-       </entry>
-      </row>
-      <row>
-       <entry>Maximum Size of the Cache</entry>
-       <entry>10240</entry>
-       <entry>
-        <para>This is 10k and is very small for a cache. A 1 MB cache (1048576)
-        is a better starting point.</para>
-        <para>(<literal>sun-idrepo-ldapv3-config-cache-size</literal>)</para>
-       </entry>
-      </row>
-      -->
-     </tbody>
-    </tgroup>
-   </table>
-   
-   <para>To change connection pool settings for the LDAP authentication module,
-   browse to Configuration &gt; Authentication &gt; Core in the OpenAM
-   console.</para>
-   
-   <table xml:id="tuning-ldap-authentication-module-settings" pgwide="1">
-    <title>LDAP Authentication Module Setting</title>
-    <tgroup cols="3">
-     <colspec colnum="1" colwidth="2*"/>
-     <colspec colnum="2" colwidth="1*"/>
-     <colspec colnum="3" colwidth="3*"/>
-     <thead>
-      <row>
-       <entry>Property</entry>
-       <entry>Default Value</entry>
-       <entry>Suggestions</entry>
-      </row>
-     </thead>
-     <tbody>
-      <row>
-       <entry>Default LDAP Connection Pool Size</entry>
-       <entry>1:10</entry>
-       <entry>
-        <para>The minimum and maximum LDAP connection pool used by the
-        LDAP authentication module. This should be tuned to 10:65 for
-        production.</para>
-        <para>(<literal>iplanet-am-auth-ldap-connection-pool-default-size</literal>)</para>
-       </entry>
-      </row>
-     </tbody>
-    </tgroup>
-   </table>
+
+   <section xml:id="tuning-ldap-settings-data-stores">
+    <title>Tuning LDAP Data Store Settings</title>
+
+    <para>To change LDAP data store settings, browse to Access Control &gt;
+    <replaceable>Realm Name</replaceable> &gt; Data Stores &gt;
+    <replaceable>Data Store Name</replaceable> in the OpenAM console.
+    Each data store has its own connection pool and therefore each data store
+    needs its own tuning.</para>
+
+    <table xml:id="tuning-ldap-data-store-settings" pgwide="1">
+     <title>LDAP Data Store Settings</title>
+     <tgroup cols="3">
+      <colspec colnum="1" colwidth="2*"/>
+      <colspec colnum="2" colwidth="1*"/>
+      <colspec colnum="3" colwidth="3*"/>
+      <thead>
+       <row>
+        <entry>Property</entry>
+        <entry>Default Value</entry>
+        <entry>Suggestions</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>LDAP Connection Pool Minimum Size</entry>
+        <entry>1</entry>
+        <entry>
+         <para>The minimum LDAP connection pool size; a good tuning value
+         for this property is 10.</para>
+         <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_min_size</literal>)</para>
+        </entry>
+       </row>
+       <row>
+        <entry>LDAP Connection Pool Maximum Size</entry>
+        <entry>10</entry>
+        <entry>
+         <para>The maximum LDAP connection pool size; a high tuning value
+         for this property is 65, though you might well be able to reduce this
+         for your deployment. Ensure your LDAP server can cope with the maximum
+         number of clients across all the OpenAM servers.</para>
+         <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_max_size</literal>)</para>
+        </entry>
+       </row>
+          <!-- no longer included in the console
+       <row>
+        <entry>Caching</entry>
+        <entry>False</entry>
+        <entry>
+         <para>Turn on the caching feature in the LDAP data store.</para>
+         <para>(<literal>sun-idrepo-ldapv3-config-cache-enabled</literal>)</para>
+        </entry>
+       </row>
+       <row>
+        <entry>Maximum Age of Cached Items</entry>
+        <entry>600</entry>
+        <entry>
+         <para>This is 10 minutes and does not normally need tuning.</para>
+         <para>(<literal>sun-idrepo-ldapv3-config-cache-ttl</literal>)</para>
+        </entry>
+       </row>
+       <row>
+        <entry>Maximum Size of the Cache</entry>
+        <entry>10240</entry>
+        <entry>
+         <para>This is 10k and is very small for a cache. A 1 MB cache (1048576)
+         is a better starting point.</para>
+         <para>(<literal>sun-idrepo-ldapv3-config-cache-size</literal>)</para>
+        </entry>
+       </row>
+       -->
+      </tbody>
+     </tgroup>
+    </table>
+   </section>
+
+   <section xml:id="tuning-ldap-settings-auth-modules">
+    <title>Tuning LDAP Authentication Module Settings</title>
+
+    <para>To change connection pool settings for the LDAP authentication module,
+    browse to Configuration &gt; Authentication &gt; Core in the OpenAM
+    console.</para>
+
+    <table xml:id="tuning-ldap-authentication-module-settings" pgwide="1">
+     <title>LDAP Authentication Module Setting</title>
+     <tgroup cols="3">
+      <colspec colnum="1" colwidth="2*"/>
+      <colspec colnum="2" colwidth="1*"/>
+      <colspec colnum="3" colwidth="3*"/>
+      <thead>
+       <row>
+        <entry>Property</entry>
+        <entry>Default Value</entry>
+        <entry>Suggestions</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Default LDAP Connection Pool Size</entry>
+        <entry>1:10</entry>
+        <entry>
+         <para>The minimum and maximum LDAP connection pool used by the
+         LDAP authentication module. This should be tuned to 10:65 for
+         production.</para>
+         <para>(<literal>iplanet-am-auth-ldap-connection-pool-default-size</literal>)</para>
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+   </section>
+
+   <section xml:id="tuning-ldap-settings-cts">
+    <title>Tuning LDAP CTS &amp; Configuration Store Settings</title>
+
+    <para>
+     When tuning LDAP connection pool settings for the Core Token Service (CTS),
+     what you change depends on whether the directory service backing the CTS
+     is the same directory service backing OpenAM configuration.
+    </para>
+
+    <para>
+     When the same directory service backs
+     both the CTS and also OpenAM configuration (the default),
+     then the same connection pool is shared for any LDAP operations requested
+     by the CTS or by a service accessing the OpenAM configuration.
+     In this case, one connection is reserved for cleanup of expired CTS tokens.
+     Roughly half of the connections are allocated for CTS operations,
+     to the nearest power of two.<footnote>
+      <para>
+       To be precise, the number of connections allocated for CTS operations
+       is equal to the power of two that is nearest to
+       half the maximum number of connections in the pool.
+      </para>
+     </footnote>
+     The remaining connections are allocated
+     to services accessing the OpenAM configuration.
+     For a default configuration,
+     where the maximum number of connections in the pool is 10,
+     1 connection is allocated for cleanup of expired CTS tokens,
+     4 connections are allocated for other CTS operations,
+     and 5 connections are allocated for services accessing the configuration.
+     If the Maximum Connection Pool size is 20,
+     1 connection is allocated for cleanup of expired CTS tokens,
+     8 connections are allocated for other CTS operations,
+     and 11 connections are allocated for services accessing the configuration.
+     If the pool size is 65, then the numbers are 1, 32, and 32, and so on.
+    </para>
+
+    <para>
+     The minimum number of connections is 6.
+    </para>
+
+    <para>
+     When the directory service backing the CTS is external
+     (differs from the directory service backing the OpenAM configuration)
+     then the connection pool used to access the directory service for the CTS
+     is separate from the pool used to access the directory service
+     for the OpenAM configuration.
+     One connection is reserved for cleanup of expired CTS tokens.
+     Remaining connections are allocated for CTS operations
+     such that the number of connections allocated is equal to a power of two.
+     In this case, set the maximum number of connections to 2^n+1,
+     as in 9, 17, 33, 65, and so forth.
+    </para>
+
+    <para>
+     If the same directory service backs
+     both the CTS and also OpenAM configuration,
+     then set pool sizes under
+     Configuration > Servers and Sites > <replaceable>server name</replaceable>
+     > Directory Configuration.
+    </para>
+
+    <para>
+     If the directory service backing the CTS is external
+     (differs from the directory service backing the OpenAM configuration),
+     then set the maximum connection pool size under
+     Configuration > Servers and Sites > <replaceable>server name</replaceable>
+     > CTS > External Store Configuration.
+    </para>
+
+    <para>
+     In both cases, if you must change the default connection timeouts,
+     set the advanced properties described below under
+     Configuration > Servers and Sites > <replaceable>server name</replaceable>
+     > Advanced.
+    </para>
+
+    <table xml:id="tuning-ldap-cts-settings" pgwide="1">
+     <title>CTS Store LDAP Connection Pool Settings</title>
+     <tgroup cols="3">
+      <colspec colnum="1" colwidth="2*"/>
+      <colspec colnum="2" colwidth="1*"/>
+      <colspec colnum="3" colwidth="3*"/>
+      <thead>
+       <row>
+        <entry>Property</entry>
+        <entry>Default Value</entry>
+        <entry>Suggestions</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Maximum Connection Pool</entry>
+        <entry>10</entry>
+        <entry>
+         <para>
+          Find this setting in OpenAM console under
+          Configuration > Servers and Sites > <replaceable>server name</replaceable>
+          > Directory Configuration.
+         </para>
+
+         <!--
+          Here is a guesstimate based on the pre-CTS default setting:
+         -->
+
+         <para>
+          When the same directory service backs
+          both the CTS and also OpenAM configuration,
+          consider increasing this to at least 19
+          to allow 9 connections for the CTS,
+          and 10 connections for access to the OpenAM configuration
+          (including for example looking up policies).
+         </para>
+        </entry>
+       </row>
+
+       <row>
+        <entry>Max Connections</entry>
+        <entry>10</entry>
+        <entry>
+         <para>
+          Find this setting in OpenAM console under
+          Configuration > Servers and Sites > <replaceable>server name</replaceable>
+          > CTS > External Store Configuration.
+         </para>
+
+         <para>
+          When the directory service backing the CTS is external
+          and the load on the CTS is high,
+          consider setting this to 2^n+1, where n = 4, 5, 6, and so on.
+          In other words, try setting this to 17, 33, 65, and so on
+          when testing performance under load.
+         </para>
+
+         <para>
+          (<literal>org-forgerock-services-cts-store-max-connections</literal>)
+         </para>
+        </entry>
+       </row>
+
+       <row>
+        <entry>CTS connection timeout (advanced property)</entry>
+        <entry>10 (seconds)</entry>
+        <entry>
+         <para>
+          Most CTS requests to the directory server are handled quickly,
+          so the default timeout is fine for most cases.
+         </para>
+
+         <para>
+          If you choose to vary this setting for performance testing,
+          set the advanced property,
+          <literal>org.forgerock.services.datalayer.connection.timeout.cts.async</literal>,
+          under Configuration > Servers and Sites > <replaceable>server name</replaceable>
+          > Advanced.
+         </para>
+
+         <para>
+          You must restart OpenAM or the container in which it runs
+          for changes to take effect.
+         </para>
+        </entry>
+       </row>
+
+       <row>
+        <entry>CTS reaper timeout (advanced property)</entry>
+        <entry>None</entry>
+        <entry>
+         <para>
+          The CTS token cleanup connection generally should not time out
+          as it is used to request long-running queries
+          that can return many results.
+         </para>
+
+         <para>
+          If you choose to vary this setting for performance testing,
+          set the advanced property,
+          <literal>org.forgerock.services.datalayer.connection.timeout.cts.reaper</literal>,
+          to the number of seconds desired
+          under Configuration > Servers and Sites > <replaceable>server name</replaceable>
+          > Advanced.
+         </para>
+
+         <para>
+          You must restart OpenAM or the container in which it runs
+          for changes to take effect.
+         </para>
+        </entry>
+       </row>
+
+       <row>
+        <entry>Configuration management connection timeout (advanced property)</entry>
+        <entry>10 (seconds)</entry>
+        <entry>
+         <para>
+          Most configuration management requests to the directory server
+          are handled quickly, so the default timeout is fine for most cases.
+         </para>
+
+         <para>
+          If you choose to vary this setting for performance testing,
+          set the advanced property,
+          <literal>org.forgerock.services.datalayer.connection.timeout</literal>,
+          under Configuration > Servers and Sites > <replaceable>server name</replaceable>
+          > Advanced.
+         </para>
+
+         <para>
+          You must restart OpenAM or the container in which it runs
+          for changes to take effect.
+         </para>
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+   </section>
   </section>
 
   <section xml:id="tuning-notification-settings">

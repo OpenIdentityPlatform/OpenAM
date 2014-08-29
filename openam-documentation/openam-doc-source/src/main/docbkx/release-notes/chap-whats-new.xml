@@ -248,6 +248,21 @@ Agreement (yes/no): [no]:</screen>
     </para>
    </listitem>
 
+  <listitem><!-- AME-4028 -->
+   <para>
+    <emphasis role="bold">Fine-Grained Settings for LDAP Connections</emphasis>.
+    OpenAM now provides additional options for tuning
+    LDAP connection pool sizes and timeouts related to the Core Token Service
+    and to other components that use LDAP connections.
+    For details, see the <citetitle>Administration Guide</citetitle> section on
+    <link
+     xlink:show="new"
+     xlink:href="admin-guide#tuning-ldap-settings-cts"
+     xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
+   </para>
+  </listitem>
+
   <listitem><!-- AME-2975 -->
    <para>
      <emphasis role="bold">OAuth 2.0 Scope Conditions</emphasis>.

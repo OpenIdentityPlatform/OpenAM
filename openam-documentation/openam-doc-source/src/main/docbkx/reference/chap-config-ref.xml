@@ -4736,6 +4736,16 @@
       <para>
        Notes the maximum number of remote connections to the external datastore.
       </para>
+
+      <para>
+       For suggested settings,
+       see the <citetitle>Administration Guide</citetitle> section on
+       <link
+        xlink:show="new"
+        xlink:href="admin-guide#tuning-ldap-settings-cts"
+        xlink:role="http://docbook.org/xlink/role/olink"
+       ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
+      </para>
      </listitem>
     </varlistentry>
       
@@ -5618,6 +5628,75 @@
 
      <para>
       Default: <literal>false</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>org.forgerock.services.datalayer.connection.timeout</literal></term>
+    <listitem>
+     <para>
+      Timeout in seconds for LDAP connections to the configuration data store.
+     </para>
+
+     <para>
+      Default: 10 (seconds)
+     </para>
+
+     <para>
+      For suggested settings,
+      see the <citetitle>Administration Guide</citetitle> section on
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#tuning-ldap-settings-cts"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>org.forgerock.services.datalayer.connection.timeout.cts.async</literal></term>
+    <listitem>
+     <para>
+      Timeout in seconds for LDAP connections used for most CTS operations.
+     </para>
+
+     <para>
+      Default: 10 (seconds)
+     </para>
+
+     <para>
+      For suggested settings,
+      see the <citetitle>Administration Guide</citetitle> section on
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#tuning-ldap-settings-cts"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>org.forgerock.services.datalayer.connection.timeout.cts.reaper</literal></term>
+    <listitem>
+     <para>
+      Timeout in seconds for the LDAP connection used for CTS token cleanup.
+     </para>
+
+     <para>
+      Default: None (do not time out)
+     </para>
+
+     <para>
+      For suggested settings,
+      see the <citetitle>Administration Guide</citetitle> section on
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#tuning-ldap-settings-cts"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Tuning LDAP CTS &amp; Configuration Store Settings</citetitle></link>.
      </para>
     </listitem>
    </varlistentry>
