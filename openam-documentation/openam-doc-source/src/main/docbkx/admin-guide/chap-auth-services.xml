@@ -29,7 +29,8 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Defining Authentication Services</title>
  
  <para>An <firstterm>authentication</firstterm> service confirms the identity
@@ -4579,6 +4580,8 @@ ssoadm \
     <primary>Authentication</primary>
     <secondary>WSSAuth</secondary>
    </indexterm>
+
+   <xinclude:include href="../shared/note-old-sts.xml" />
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthWSSAuthModuleService</literal></para>
@@ -4596,8 +4599,8 @@ ssoadm \
     <varlistentry>
      <term>User realm</term>
      <listitem>
-      <para>Specify the realm to which users belong. For the OpenAM Security
-      Token Service, this is <literal>/</literal>.</para>
+      <para>Specify the realm to which users belong. For the OpenAM STS, this
+       is <literal>/</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>sunWebServicesUserRealm</literal></para>
      </listitem>

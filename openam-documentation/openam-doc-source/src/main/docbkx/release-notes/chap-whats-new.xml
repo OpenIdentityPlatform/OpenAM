@@ -128,6 +128,23 @@ Agreement (yes/no): [no]:</screen>
   </listitem>
 
   <listitem>
+   <para>   <!-- Epic: AME-2707 -->
+    <emphasis role="bold">RESTful Security Token Service</emphasis>. OpenAM
+    now include support for the RESTful Security Token Service, inspired by the
+    WS-Trust STS. Given the variety of token types in use today, it can be
+    helpful to have a configurable service that transform tokens.
+   </para>
+
+   <para>
+    For more information, see <link
+    xlink:href="admin-guide#chap-rest-sts"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"><citetitle>The RESTful Security Token Service</citetitle>.
+   </link>
+   </para>
+
+  </listitem>
+  <listitem>
    <para><!-- Enhancement: AME-3299 -->
     <emphasis role="bold">CORS support for OpenAM APIs</emphasis>.
     OpenAM now supports cross-origin resource sharing (CORS)
