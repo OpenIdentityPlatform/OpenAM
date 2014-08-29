@@ -41,7 +41,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     return '<a href="#app/' + cellvalue + '">' + cellvalue + '</a>';
                 },
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + cellvalue + '/policies/" class="icon-search"></a>';
+                    return '<a href="#app/' + rowObject.name + '/policies/" class="icon-search"></a>';
                 };
 
             this.parentRender(function () {
@@ -51,20 +51,21 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                             'Last Modified', 'Actions', 'Conditions', 'Resources', 'Subjects', 'Override Rule', 'Policies'],
                         colModel: [
                             {name: 'name', width: 250, formatter: appLinkFormatter, frozen: true},
-                            {name: 'description', width: 150},
+                            {name: 'description', sortable: false, width: 150},
                             {name: 'realm', width: 150},
                             {name: 'applicationType', width: 250},
                             {name: 'createdBy', width: 250},
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                             {name: 'lastModifiedBy', width: 250},
                             {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'actions', width: 250, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                            {name: 'conditions', width: 150, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resources', width: 250, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'subjects', width: 150, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'actions', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                            {name: 'conditions', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'subjects', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                             {name: 'entitlementCombiner', width: 100},
-                            {name: 'name', width: 30, formatter: policyLinkFormatter}
+                            {name: 'policy', width: 60, sortable: false, formatter: policyLinkFormatter}
                         ],
+                        sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
                         pager: '#appsPager'

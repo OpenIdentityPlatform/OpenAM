@@ -53,16 +53,17 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                             'Resources', 'Resource Attributes', 'Subject'],
                         colModel: [
                             {name: 'name', width: 250, frozen: true, formatter: policyLinkFormatter},
-                            {name: 'description', width: 150},
+                            {name: 'description', sortable: false, width: 150},
                             {name: 'createdBy', width: 250},
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                             {name: 'lastModifiedBy', width: 250},
                             {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'actionValues', width: 250, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                            {name: 'resources', width: 250, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resourceAttributes', width: 150, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'subject', width: 150, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
+                            {name: 'actionValues', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
                         ],
+                        sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
                         pager: '#policiesPager'

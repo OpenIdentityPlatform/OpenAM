@@ -335,6 +335,13 @@ define([
                     QUnit.ok(table.jqGrid('getGridParam', 'colNames').length === table.find("tr[id]")[0].children.length,
                         'Total number of columns displayed matches number of columns requested');
 
+                    // sorting
+                    QUnit.ok(manageAppsView.$el.find('#manageApps_name').find('.s-ico').length === 1,
+                        'Sort icon is present for the name column');
+
+                    QUnit.ok(manageAppsView.$el.find('#manageApps_name').find('span[sort=desc]').hasClass('ui-state-disabled'),
+                        'Name is sorted in ascending order');
+
                     // Pagination
                     QUnit.ok($('#appsPager', manageAppsView.$el).length === 1, 'Pager is present');
 
@@ -590,6 +597,13 @@ define([
 
                     QUnit.ok(table.jqGrid('getGridParam', 'colNames').length === table.find("tr[id]")[0].children.length,
                         'Total number of columns displayed matches number of columns requested');
+
+                    // sorting
+                    QUnit.ok(managePolView.$el.find('#managePolicies_name').find('.s-ico').length === 1,
+                        'Sort icon is present for the name column');
+
+                    QUnit.ok(managePolView.$el.find('#managePolicies_name').find('span[sort=desc]').hasClass('ui-state-disabled'),
+                        'Name is sorted in ascending order');
 
                     // Pagination
                     QUnit.ok($('#policiesPager', managePolView.$el).length === 1, 'Pager is present');
