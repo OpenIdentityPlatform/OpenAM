@@ -360,16 +360,11 @@ public class AMPropertySheetModel
                 CCMapListModel m = new CCMapListModel();
                 view = new CCMapList((ContainerView) parent, m, name);
                 m.setKeyLabel(model.getLocalizedString("maplist.key.label"));
-                m.setValueLabel(model.getLocalizedString(
-                    "maplist.value.label"));
-                m.setMsgInvalidEntry(model.getLocalizedString(
-                    "maplist.msg.invalid.entry"));
-                m.setMsgInvalidKey(model.getLocalizedString(
-                    "maplist.msg.invalid.key"));
-                m.setMsgInvalidValue(model.getLocalizedString(
-                    "maplist.msg.invalid.value"));
-                m.setMsgInvalidNoKey(model.getLocalizedString(
-                    "maplist.msg.invalid.nokey"));
+                m.setValueLabel(model.getLocalizedString("maplist.value.label"));
+                m.setMsgInvalidEntry(model.getLocalizedString("maplist.msg.invalid.entry"));
+                m.setMsgInvalidKey(model.getLocalizedString("maplist.msg.invalid.key"));
+                m.setMsgInvalidValue(model.getLocalizedString("maplist.msg.invalid.value"));
+                m.setMsgInvalidNoKey(model.getLocalizedString("maplist.msg.invalid.nokey"));
                 setModel(name, m);
             } else if (tagName.equals(ADDREMOVE_LIST)) {
                 CCAddRemoveModel m = (CCAddRemoveModel)getModel(name);
@@ -381,17 +376,15 @@ public class AMPropertySheetModel
         
         if (view == null) {
             view = super.createChild(parent, name);
-
-            if (CCEditableList.class.isInstance(view)) {
-                CCEditableList editable = (CCEditableList)view;
-                CCEditableListModel m =(CCEditableListModel)editable.getModel();
-                m.setAddBtnLabel(
-                    model.getLocalizedString("editableList.addButtonLabel"));
-                m.setRemoveBtnLabel(
-                    model.getLocalizedString("editableList.deleteButtonLabel"));
-            }
         }
-        
+
+        if (CCEditableList.class.isInstance(view)) {
+            CCEditableList editable = (CCEditableList)view;
+            CCEditableListModel m =(CCEditableListModel)editable.getModel();
+            m.setAddBtnLabel(model.getLocalizedString("editableList.addButtonLabel"));
+            m.setRemoveBtnLabel(model.getLocalizedString("editableList.deleteButtonLabel"));
+        }
+
         children.add(view);
         return view;
     }
