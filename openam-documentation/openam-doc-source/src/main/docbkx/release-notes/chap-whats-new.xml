@@ -319,17 +319,13 @@ Agreement (yes/no): [no]:</screen>
     </para>
   </listitem>
 
-  <listitem>
+  <listitem><!-- OPENAM-3918 -->
     <para>
      <emphasis role="bold">Whitelist for Custom Login URIs</emphasis>.
      OpenAM now includes a property that specifies
      a whitelist for custom login URIs
      so that the CDCServlet and the Distributed Authentication UI (DAS)
-     can check login URI values against those in the whitelist
-     (<link
-       xlink:show="new"
-       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3918"
-      >OPENAM-3918</link>).
+     can check login URI values against those in the whitelist.
     </para>
 
     <para>
