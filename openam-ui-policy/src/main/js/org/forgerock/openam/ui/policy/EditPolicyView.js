@@ -67,23 +67,12 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise).done(function (policy, app, allSubjects, allEnvironments) {
                 var actions = [],
-                    resources = [],
-                    exceptions = [],
                     subjects = [],
                     environments = [];
 
                 if (policyName) {
-                    _.each(policy.resources.included, function (value) {
-                        resources.push(value);
-                    });
-
-                    _.each(policy.resources.excluded, function (value) {
-                        exceptions.push(value);
-                    });
 
                     policy.actions = policy.actionValues;
-                    policy.resources = resources;
-                    policy.exceptions = exceptions;
 
                     data.entity = policy;
                     data.entityName = policyName;
@@ -201,7 +190,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 persistedPolicy = _.clone(policy);
 
             persistedPolicy.actions = {};
-            persistedPolicy.resources = {};
 
             _.each(policy.actions, function (action) {
                 if (action.selected) {
@@ -210,8 +198,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             });
 
             persistedPolicy.actionValues = persistedPolicy.actions;
-            persistedPolicy.resources.included = policy.resources;
-            persistedPolicy.resources.excluded = policy.exceptions;
 
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy).done(function () {

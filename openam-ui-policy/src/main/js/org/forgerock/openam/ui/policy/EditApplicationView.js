@@ -71,7 +71,7 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                     self.processConditions(data, envConditions[0].result, subjConditions[0].result);
 
                     data.options = {};
-                    data.options.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
+                    data.entity.entitlementCombiner = self.getAvailableDecisionCombiner(decisionCombiners);
 
                     // Available resource patterns are supposed to be defined by the selected application type. For now we
                     // assume any resource might be created, hence we hard code the '*'.

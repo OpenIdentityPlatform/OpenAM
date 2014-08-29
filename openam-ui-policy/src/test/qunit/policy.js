@@ -185,7 +185,7 @@ define([
 
                     // Step 6
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(options.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
+                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
 
                     /*
                     TODO: remove comment and fix tests as part of AME-4287
@@ -244,7 +244,7 @@ define([
                         }
 
                         // Entitlement Combiner
-                        QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === options.entitlementCombiner, "Correct name is displayed in the review step");
+                        QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === app.entitlementCombiner, "Correct name is displayed in the review step");
                     }));
                     */
                 });
@@ -309,7 +309,7 @@ define([
 
                     var options = editAppView.data.options;
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(options.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
+                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
                 });
             });
 
