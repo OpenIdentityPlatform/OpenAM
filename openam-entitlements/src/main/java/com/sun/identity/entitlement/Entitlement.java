@@ -718,12 +718,14 @@ public class Entitlement {
         if (application1 != null) {
             ApplicationType applicationType = application1.getApplicationType();
 
-            for (String r : resourceNames) {
-                ResourceSaveIndexes rsi = applicationType.getResourceSaveIndex(r);
-                if (result == null) {
-                    result = rsi;
-                } else {
-                    result.addAll(rsi);
+            if (resourceNames != null) {
+                for (String r : resourceNames) {
+                    ResourceSaveIndexes rsi = applicationType.getResourceSaveIndex(r);
+                    if (result == null) {
+                        result = rsi;
+                    } else {
+                        result.addAll(rsi);
+                    }
                 }
             }
         }

@@ -356,17 +356,19 @@ public class DataStore {
             Set<String> searchable = new HashSet<String>();
             map.put(SMSEntry.ATTR_XML_KEYVAL, searchable);
 
-            for (String i : indexes.getHostIndexes()) {
-                searchable.add(HOST_INDEX_KEY + "=" + i);
-            }
-            for (String i : indexes.getPathIndexes()) {
-                searchable.add(PATH_INDEX_KEY + "=" + i);
-            }
-            for (String i : indexes.getParentPathIndexes()) {
-                searchable.add(PATH_PARENT_INDEX_KEY + "=" + i);
-            }
-            for (String i : subjectIndexes) {
-                searchable.add(SUBJECT_INDEX_KEY + "=" + i);
+            if (indexes !=null) {
+                for (String i : indexes.getHostIndexes()) {
+                    searchable.add(HOST_INDEX_KEY + "=" + i);
+                }
+                for (String i : indexes.getPathIndexes()) {
+                    searchable.add(PATH_INDEX_KEY + "=" + i);
+                }
+                for (String i : indexes.getParentPathIndexes()) {
+                    searchable.add(PATH_PARENT_INDEX_KEY + "=" + i);
+                }
+                for (String i : subjectIndexes) {
+                    searchable.add(SUBJECT_INDEX_KEY + "=" + i);
+                }
             }
 
             Set<String> setServiceID = new HashSet<String>(2);

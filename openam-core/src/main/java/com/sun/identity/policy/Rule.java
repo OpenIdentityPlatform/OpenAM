@@ -184,9 +184,11 @@ public class Rule extends Object implements Cloneable {
             }
         }
 
-        // Verify the action names
-        //serviceType.validateActionValues(actions);
-        this.actions = new HashMap(actions);
+        if (actions != null) {
+            this.actions = new HashMap(actions);
+        } else {
+            this.actions = new HashMap();
+        }
     }
 
     /**
