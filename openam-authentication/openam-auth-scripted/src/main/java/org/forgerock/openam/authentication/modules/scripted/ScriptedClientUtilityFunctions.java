@@ -31,7 +31,16 @@ public class ScriptedClientUtilityFunctions {
      * @return The anonymous function, supplied with the element with the id.
      */
     public static String createClientSideScriptExecutorFunction(String script, String outputParameterId) {
+        String spinningWheelScript = "if (window.require) {\n" +
+                "    var messenger = require(\"org/forgerock/commons/ui/common/components/Messages\"),\n" +
+                "        spinner =  require(\"org/forgerock/commons/ui/common/main/SpinnerManager\"),\n" +
+                "        message =  {message:\"Collecting Data...\"};\n" +
+                "    spinner.showSpinner();\n" +
+                "    messenger.messages.addMessage( message );\n" +
+                "}";
+
         return String.format(
+                spinningWheelScript +
                 "(function(output) {\n" +
                 "    var autoSubmitDelay = 0,\n" +
                 "        submitted = false;\n" +
