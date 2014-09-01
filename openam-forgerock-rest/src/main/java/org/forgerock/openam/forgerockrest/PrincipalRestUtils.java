@@ -36,6 +36,11 @@ final public class PrincipalRestUtils {
      * @return the authenticated principal associated with this context, or null if not authenticated.
      */
     public static String getPrincipalNameFromServerContext(ServerContext context) {
+
+        if (context == null || !context.containsContext(SubjectContext.class)) {
+            return null;
+        }
+
         Subject subject = context.asContext(SubjectContext.class).getCallerSubject();
 
         return getPrincipalNameFromSubject(subject);
