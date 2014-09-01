@@ -28,6 +28,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
@@ -35,7 +36,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.forgerock.openam.rest.service.VersionRouter.HEADER_X_VERSION_API;
+import static org.forgerock.json.resource.VersionConstants.ACCEPT_API_VERSION;
 
 public class VersionRouterTest {
 
@@ -48,6 +49,7 @@ public class VersionRouterTest {
     private Request request;
     private Response response;
     private HttpServletRequest httpRequest;
+    private HttpServletResponse httpResponse;
 
     @BeforeClass
     public void setUpClass() {
@@ -64,6 +66,10 @@ public class VersionRouterTest {
             HttpServletRequest getHttpRequest(Request request) {
                 return httpRequest;
             }
+            @Override
+            HttpServletResponse getHttpResponse(Response response) {
+                return httpResponse;
+            }
         };
 
         router.addVersion("1.0", handlerOne);
@@ -73,6 +79,7 @@ public class VersionRouterTest {
         request = mock(Request.class);
         response = mock(Response.class);
         httpRequest = mock(HttpServletRequest.class);
+        httpResponse = mock(HttpServletResponse.class);
     }
 
     @DataProvider(name = "data")
@@ -91,7 +98,7 @@ public class VersionRouterTest {
     public void shouldHandleVersionRoute(String requestedVersion, boolean expectedException, Restlet handler) {
 
         //Given
-        given(httpRequest.getHeader(HEADER_X_VERSION_API)).willReturn(requestedVersion);
+        given(httpRequest.getHeader(ACCEPT_API_VERSION)).willReturn(requestedVersion);
         Reference resourceRef = mock(Reference.class);
         given(request.getResourceRef()).willReturn(resourceRef);
 
@@ -111,7 +118,7 @@ public class VersionRouterTest {
     public void shouldNotHandleVersionRouteWithNewerProtocolMinorVersion() {
 
         //Given
-        given(httpRequest.getHeader(HEADER_X_VERSION_API)).willReturn("protocol=1.1,resource=1.0");
+        given(httpRequest.getHeader(ACCEPT_API_VERSION)).willReturn("protocol=1.1,resource=1.0");
 
         //When
         router.handle(request, response);
@@ -125,7 +132,7 @@ public class VersionRouterTest {
     public void shouldNotHandleVersionRouteWithNewerProtocolMajorVersion() {
 
         //Given
-        given(httpRequest.getHeader(HEADER_X_VERSION_API)).willReturn("protocol=2.0,resource=1.0");
+        given(httpRequest.getHeader(ACCEPT_API_VERSION)).willReturn("protocol=2.0,resource=1.0");
 
         //When
         router.handle(request, response);

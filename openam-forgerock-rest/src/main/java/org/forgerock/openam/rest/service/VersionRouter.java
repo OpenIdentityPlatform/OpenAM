@@ -20,6 +20,7 @@ import org.forgerock.json.resource.AcceptAPIVersion;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.Version;
+import org.forgerock.json.resource.VersionRoute;
 import org.forgerock.json.resource.VersionSelector;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -28,8 +29,11 @@ import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.forgerock.json.resource.VersionConstants.*;
 
 /**
  * A router for Restlet service endpoints which routes based on the requested version of a service.
@@ -38,10 +42,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class VersionRouter {
 
-    static final String HEADER_X_VERSION_API = "Accept-API-Version";
+    private static final String EQUALS = "=";
+    private static final String COMMA = ",";
 
     private final VersionSelector versionSelector;
-    private final Map<Version, Restlet> routes = new ConcurrentHashMap<Version, Restlet>();
+    private final Map<Version, VersionRoute> routes = new ConcurrentHashMap<Version, VersionRoute>();
+    private final Version enforcedProtocolVersion = Version.valueOf("1.0");
     private boolean headerWarning = true; //will be used to determine whether to include the warning
 
     /**
@@ -65,7 +71,8 @@ public class VersionRouter {
      * @return This router.
      */
     public VersionRouter addVersion(String version, Restlet resource) {
-        routes.put(Version.valueOf(version), resource);
+        final Version value = Version.valueOf(version);
+        routes.put(value, new VersionRoute(value, resource));
         return this;
     }
 
@@ -108,8 +115,10 @@ public class VersionRouter {
     void handle(Request request, Response response) {
 
         try {
-            AcceptAPIVersion apiVersion = parseAcceptAPIVersion(request);
-            versionSelector.select(apiVersion.getResourceVersion(), routes).handle(request, response);
+            final AcceptAPIVersion apiVersion = parseAcceptAPIVersion(request);
+            final VersionRoute<Restlet> selectedRoute = versionSelector.select(apiVersion.getResourceVersion(), routes);
+            selectedRoute.getRequestHandler().handle(request, response);
+            addContentAPIVersion(response, enforcedProtocolVersion, selectedRoute.getVersion());
         } catch (NotFoundException e) {
             response.setStatus(Status.CLIENT_ERROR_NOT_FOUND, String.format("Version of resource '%s' not found",
                     request.getResourceRef().getLastSegment()));
@@ -126,14 +135,13 @@ public class VersionRouter {
      */
     private AcceptAPIVersion parseAcceptAPIVersion(Request request) throws BadRequestException {
         HttpServletRequest httpRequest = getHttpRequest(request);
-        String versionHeader = httpRequest.getHeader(HEADER_X_VERSION_API);
+        String versionHeader = httpRequest.getHeader(ACCEPT_API_VERSION);
         AcceptAPIVersion apiVersion = AcceptAPIVersion.newBuilder(versionHeader)
                 .withDefaultProtocolVersion("1.0")
                 .expectsProtocolVersion()
                 .build();
 
         Version protocolVersion = apiVersion.getProtocolVersion();
-        Version enforcedProtocolVersion = Version.valueOf("1.0");
 
         if (protocolVersion.getMajor() != enforcedProtocolVersion.getMajor()) {
             throw new BadRequestException("Unsupported major version: " + protocolVersion);
@@ -146,7 +154,29 @@ public class VersionRouter {
         return apiVersion;
     }
 
+    /**
+     * Add the Content API Version header to the given Response.
+     * @param response The response to add the header to.
+     * @param protocolVersion The selected protocol version.
+     * @param resourceVersion The selected resource version.
+     */
+    private void addContentAPIVersion(Response response, Version protocolVersion, Version resourceVersion) {
+        getHttpResponse(response).addHeader(CONTENT_API_VERSION, new StringBuilder()
+                .append(PROTOCOL)
+                .append(EQUALS)
+                .append(protocolVersion.toString())
+                .append(COMMA)
+                .append(RESOURCE)
+                .append(EQUALS)
+                .append(resourceVersion.toString())
+                .toString());
+    }
+
     HttpServletRequest getHttpRequest(Request request) {
         return ServletUtils.getRequest(request);
+    }
+
+    HttpServletResponse getHttpResponse(Response response) {
+        return ServletUtils.getResponse(response);
     }
 }
