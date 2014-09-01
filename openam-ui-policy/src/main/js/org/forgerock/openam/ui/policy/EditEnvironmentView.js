@@ -39,11 +39,28 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
     var EditEnvironmentView = AbstractView.extend({
 
         events: {
-            'change select#selection' : 'changeType',
-            'change .field-float-pattern input':  'changeInput'
+            'change select#selection' :       'changeType',
+            'change select:not(#selection)' : 'changeInput',
+            'change input':                   'changeInput',
+            'keyup  input':                   'changeInput',
+            'autocompletechange input':       'changeInput',
+            'click .buttonControl a.button':  'buttonControlClick',
+            'keyup .buttonControl a.button':  'buttonControlClick',
+            'click .clockpicker':             'clickClockPicker',
+            'click .icon-clock':              'clickClockPicker'
         },
 
         data: {},
+        weekdays:[
+            {value:'mon', title:'Monday'},
+            {value:'tue', title:'Tuesday'},
+            {value:'wed', title:'Wednesday'},
+            {value:'thu', title:'Thursday'},
+            {value:'fri', title:'Friday'},
+            {value:'sat', title:'Saturday'},
+            {value:'sun', title:'Sunday'}
+        ],
+
         mode:'append',
 
         render: function( schema, callback, element, itemID, itemData ) {
@@ -59,6 +76,9 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             this.delegateEvents();
 
             if (itemData) {
+                // Temporay fix, the name attribute is being added by the server after the policy is created.
+                // TODO: Serverside solution required
+                delete itemData.name;
                 this.$el.data('itemData',itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
             }
@@ -87,50 +107,159 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         },
 
         changeInput: function(e) {
-            var label = $(e.currentTarget).prev('label').text();
+
+            e.stopPropagation();
+            var label = $(e.currentTarget).parent().children('label').text(),
+                inputGroup = $(e.currentTarget).closest('div.input-group'),
+                ifPopulated = false;
+
             this.$el.data().itemData[label] = e.currentTarget.value;
+
+            inputGroup.find('input, select').each(function(){
+               if(this.value !== ''){
+                  ifPopulated = true;
+               }
+            });
+
+            inputGroup.find('input, select').each(function(){
+                $(this).prop('required', ifPopulated);
+            });
+        },
+
+        buttonControlClick: function(e){
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var target = $(e.currentTarget),
+                buttonControl = target.closest('ul.buttonControl'),
+                label = buttonControl.prev('label').text();
+            this.$el.data().itemData[ label ] = e.currentTarget.innerText === "true";
+            buttonControl.find('li a').removeClass('selected');
+            target.addClass('selected');
+        },
+
+
+        initDatePickers: function() {
+          this.$el.find( "#startDate" ).datepicker({
+            numberOfMonths: 2,
+            onClose: function( selectedDate ) {
+              $( "#endDate" ).datepicker( "option", "minDate", selectedDate );
+            }
+          });
+          this.$el.find("#endDate" ).datepicker({
+            numberOfMonths: 2,
+            onClose: function( selectedDate ) {
+              $( "#startDate" ).datepicker( "option", "maxDate", selectedDate );
+            }
+          });
+        },
+
+        initClockPickers: function() {
+            this.$el.find('.clockpicker').each(function(){
+
+              var clock = $(this);
+              clock.clockpicker({
+                  placement: 'top',
+                  autoclose: true,
+                  //default: 'now',
+                  afterDone: function() {
+                      clock.trigger('change');
+                  }
+              });
+
+            });
+        },
+
+        clickClockPicker: function(e) {
+            e.stopPropagation();
+            var target = $(e.currentTarget).is('input') ? $(e.currentTarget) : $(e.currentTarget).prev('input');
+            target.clockpicker('show');
+        },
+
+        getTimeZones: function(){
+
+            var self = this,
+                setTimeZones = function(){
+                    self.$el.find('#enforcementTimeZone').autocomplete({
+                        source: self.data.timezones
+                    });
+                };
+
+            if (self.data.timezones) {
+                setTimeZones();
+                return;
+            }
+
+            $.ajax({
+                url: 'timezones.json',
+                dataType: "json",
+                cache: true
+            }).then( function(data){
+                self.data.timezones = data.timezones;
+                setTimeZones();
+            });
+
         },
 
         changeType: function(e) {
             e.stopPropagation();
-
             var self         = this,
                 itemData     = {},
                 schema       = {},
                 html         = '',
+                returnVal    = '',
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
-                buildHTML    = function(properties) {
-                    var count = 0,
-                        returnVal = '';
-                    _.map(properties, function(value, key) {
-                        if(key === 'type') {
-                            return; // the Type is rendered using the template
-                        }
-                        if (_.isString(value)) {
+                buildHTML    = function(schemaProps) {
 
-                            returnVal += '\n'+
-                            '<div class="field-float-pattern data-obj">'+
-                                '<label for="selection_' + (count) + '">' + key + '</label>'+
-                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="' + value + '" readonly=true class="placeholderText" />'+
-                            '</div>';
-                        } else if (_.isArray(value)) {
-                            // TODO ... We are assuming for now that items array will contain strings.
-                            returnVal += '\n'+
-                            '<div class="field-float-pattern data-obj">'+
-                                '<label for="selection_' + (count) + '">' + key + '</label>'+
-                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="TODO: Array UI" readonly=true class="placeholderText" />'+
-                            '</div>';
-                        } else if (_.isObject(value)) {
-                            // TODO ...
-                            console.log('TODO...');
-                        }
-                        count++;
-                    });
+                    var count = 0,
+                        pattern   = null;
+
+                    returnVal = '';
+
+                    if (itemData.type === "Time") {
+
+                        returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
+                            weekdays:self.weekdays,
+                            data:itemData,
+                            id:count
+                        });
+
+                    } else {
+
+                        _.map(schemaProps, function(value, key) {
+
+                            returnVal += '\n';
+
+                            if (value.type === 'string' || value.type === 'number') {
+
+                                if (value["enum"]) {
+
+                                    returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrEnum.html", {data:value, title:key, selected:itemData[key], id:count});
+
+                                } else {
+                                    if (key === 'startIp' || key === 'endIp') {
+                                       pattern="^(((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d)))((\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){3}|(\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){5})";
+                                    } else if( value.type === 'number' ){
+                                       pattern="[-+]?[0-9]*[.,]?[0-9]+";
+                                    } else {
+                                       pattern = null;
+                                    }
+                                    returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count, pattern:pattern});
+                                }
+
+                            } else if (value.type === 'boolean' ) {
+                                // Ignoring the required property and assumming it defaults to false. See AME-4324
+                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html", {data:value, title:key, selected:itemData[key]});
+
+                            } else {
+                                console.error('Unexpected data type:',key,value);
+                            }
+
+                            count++;
+                        });
+                    }
 
                     return returnVal;
                 };
-
 
             schema =  _.findWhere(this.data.environments, {title: selectedType}) || {};
 
@@ -138,44 +267,83 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 itemData = this.$el.data().itemData;
             } else {
                 itemData.type = schema.title;
-                _.map(schema.config.properties, function(value, key) {
-                    itemData[key] = value;
+                _.map(schema.config.properties, function(value,key) {
+                    switch (value.type) {
+                        case 'string':
+                            itemData[key] = '';
+                        break;
+                        case 'number':
+                            itemData[key] = 0;
+                        break;
+                        case 'boolean':
+                            itemData[key] = false;
+                        break;
+                        default:
+                            console.error('Unexpected data type:',key,value);
+                        break;
+                    }
                 });
                 self.$el.data('itemData',itemData);
             }
 
             if (itemData) {
 
-                html = buildHTML(itemData);
+                html = buildHTML(schema.config.properties);
 
-                this.$el.find('.field-float-pattern input')
+                this.$el.find('.field-float-pattern')
+                    .find('label').removeClass('showLabel')
+                    .next('input')
                     .addClass('placeholderText')
-                    .prop('readonly', true)
+                    .prop('readonly', true);
+
+                this.$el.find('.field-float-select select:not(#selection)')
+                    .addClass('placeholderText')
                     .prev('label')
                     .removeClass('showLabel');
 
+
+                this.$el.find('.ruleHelperText').fadeOut(500);
+
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
+
+                    self.$el.find('#conditionAttrTimeDate').remove();
                     self.$el.find('.field-float-pattern').remove();
-                    self.$el.find('.field-float-select').after( html );
+                    self.$el.find('.field-float-select:not(#typeSelector)').remove();
+
+                    self.$el.find('#typeSelector').after( html );
+
+                    if (itemData.type === "Time") {
+                        self.initClockPickers();
+                        self.initDatePickers();
+                        self.getTimeZones();
+                    }
 
                     setTimeout( function() {
 
-                        self.$el.find('.field-float-pattern input')
+                        self.$el.find('.field-float-pattern')
+                            .find('label').addClass('showLabel')
+                            .next('input, div input')
+                            .addClass('placeholderText')
+                            .prop('readonly', false);
+
+                        self.$el.find('.field-float-select select:not(#selection)')
                             .removeClass('placeholderText')
                             .prop('readonly', false)
                             .prev('label')
                             .addClass('showLabel');
 
-                        }, 10);
-                }, delay);
-            }
+                        self.delegateEvents();
 
-            this.delegateEvents();
+
+                    }, 10);
+                }, delay);
+
+            }
         }
 
     });
 
+    return EditEnvironmentView; 
 
-    return EditEnvironmentView;
 });

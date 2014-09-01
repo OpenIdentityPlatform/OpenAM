@@ -101,7 +101,11 @@ define("config/AppConfiguration", function () {
                     templateUrls: [
                         "templates/policy/EditSubjectTemplate.html",
                         "templates/policy/EditEnvironmentTemplate.html",
-                        "templates/policy/OperatorRulesTemplate.html"
+                        "templates/policy/OperatorRulesTemplate.html",
+                        "templates/policy/ConditionAttrTimeDate.html",
+                        "templates/policy/ConditionAttrEnum.html",
+                        "templates/policy/ConditionAttrString.html",
+                        "templates/policy/ConditionAttrBoolean.html"
                     ]
                 }
             },

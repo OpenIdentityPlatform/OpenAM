@@ -33,7 +33,6 @@ define("org/forgerock/openam/ui/policy/ReviewInfoView", [
 ], function (AbstractView) {
     var ReviewInfoView = AbstractView.extend({
         noBaseTemplate: true,
-
         render: function (args, callback, element, template) {
             _.extend(this.data, args);
 

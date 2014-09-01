@@ -91,23 +91,6 @@ define( "org/forgerock/openam/ui/policy/ManageEnvironmentsView", [
 
             _.each(this.data.options.availableEnvironments, function(item) {
 
-                _.map(item.config.properties, function(value, key) {
-                    // needs something a little more specific here
-                    switch(value.type) {
-                        case 'string':
-                            item.config.properties[key] = '';
-                        break;
-
-                        case 'array':
-                            item.config.properties[key] = [];
-                        break;
-
-                        case 'object':
-                            item.config.properties[key] = {};
-                        break;
-                    }
-                });
-
                 if(item.logical === true){
                     self.data.operators.push(item);
                 }else{

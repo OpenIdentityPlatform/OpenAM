@@ -91,22 +91,6 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
 
             _.each(this.data.options.availableSubjects, function(item) {
 
-                _.map(item.config.properties, function(value, key) {
-                    switch(value.type) {
-                        case 'string':
-                            item.config.properties[key] = '';
-                        break;
-
-                        case 'array':
-                            item.config.properties[key] = [];
-                        break;
-
-                        case 'object':
-                            item.config.properties[key] = {};
-                        break;
-                    }
-                });
-
                 if(item.logical === true){
                     self.data.operators.push(item);
                 }else{

@@ -1,0 +1,83 @@
+<div class="clearfix" id="conditionAttrTimeDate">
+
+    <div class="float-left input-group">
+
+
+
+            <div class="field-float-pattern data-obj time-field">
+
+                <label for="startTime">startTime</label>
+                <input type="text" id="startTime" name="startTime" placeholder="HH:MM" value="{{data.startTime}}" readonly=true class="placeholderText clockpicker" pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])" />
+                <span class="inline-right icon-clock"></span>
+
+            </div>
+
+            <div class="field-float-pattern data-obj time-field">
+
+                <label for="endTime">endTime</label>
+                <input type="text" id="endTime" name="endTime" placeholder="HH:MM" value="{{data.endTime}}" readonly=true class="placeholderText clockpicker" pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9])" />
+                <span class="inline-right icon-clock"></span>
+
+            </div>
+
+    </div>
+
+    <div class="float-left input-group">
+
+            <div class="field-float-select data-obj day-field">
+                <label for="startDay" class="showLabel">startDay</label>
+                <select id="startDay" class="" tabindex="0">
+                    <option value="">n/a</option>
+                    {{#each weekdays}}
+                    <option {{#equals ../data.startDay this.value}}selected{{/equals}} value="{{this.value}}">{{this.title}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+
+            <div class="field-float-select data-obj day-field">
+                <label for="endDay" class="showLabel">endDay</label>
+                <select id="endDay" class="" tabindex="0">
+                    <option value="">n/a</option>
+                    {{#each weekdays}}
+                    <option {{#equals ../data.endDay this.value}}selected{{/equals}} value="{{this.value}}">{{this.title}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+    </div>
+
+    <div class="float-left input-group">
+
+            <div class="field-float-pattern data-obj">
+                <label for="startDate">startDate</label>
+                <input type="text" id="startDate" name="startDate" value="{{data.startDate}}" readonly=true class="placeholderText datePicker" {{#if pattern}}pattern="{{pattern}}" {{/if}}/>
+            </div>
+
+            <div class="field-float-pattern data-obj">
+                <label for="endDate">endDate</label>
+                <input type="text" id="endDate" name="endDate" value="{{data.endDate}}" readonly=true class="placeholderText datePicker" {{#if pattern}}pattern="{{pattern}}" {{/if}}/>
+            </div>
+
+    </div>
+
+    <div class="float-left input-group">
+
+        <div class="field-float-select data-obj day-field">
+
+            <label for="timeZones" class="showLabel">enforcementTimeZone</label>
+            <input type="text" name="timeZones"  value="{{data.enforcementTimeZone}}" id="enforcementTimeZone" placeholder="Enter Time Zone">
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+<div class="ruleHelperText">
+    <p>A time condition must contain one or more of the following values: Time (Start and End), Day (Start and End), Date (Start and End) and/or Time Zone.</p>
+</div>
+
+

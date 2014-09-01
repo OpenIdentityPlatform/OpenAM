@@ -60,6 +60,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
 
             if (itemData) {
+                // Temporay fix, the name attribute is being added by the server after the policy is created.
                 this.$el.data('itemData',itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
             }
@@ -94,38 +95,19 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
         changeType: function(e) {
             e.stopPropagation();
-
             var self         = this,
                 itemData     = {},
                 schema       = {},
                 html         = '',
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
-                buildHTML    = function(properties) {
+                buildHTML    = function(schemaProps) {
+
                     var count = 0,
                         returnVal = '';
-                    _.map(properties, function(value, key) {
-                        if(key === 'type') {
-                            return; // the Type is rendered using the template
-                        }
-                        if (_.isString(value)) {
 
-                            returnVal += '\n'+
-                            '<div class="field-float-pattern data-obj">'+
-                                '<label for="selection_' + (count) + '">' + key + '</label>'+
-                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="' + value + '" readonly=true class="placeholderText" />'+
-                            '</div>';
-                        } else if (_.isArray(value)) {
-                            // TODO ... We are assuming for now that items array will contain strings.
-                            returnVal += '\n'+
-                            '<div class="field-float-pattern data-obj">'+
-                                '<label for="selection_' + (count) + '">' + key + '</label>'+
-                                '<input type="text" id="selection_' + (count) + '" name="selection_' + (count) + '" placeholder="" value="TODO: Array UI" readonly=true class="placeholderText" />'+
-                            '</div>';
-                        } else if (_.isObject(value)) {
-                            // TODO ...
-                            console.log('TODO...');
-                        }
+                    _.map(schemaProps, function(value, key) {
+                        returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count});
                         count++;
                     });
 
@@ -139,15 +121,22 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                 itemData = this.$el.data().itemData;
             } else {
                 itemData.type = schema.title;
-                _.map(schema.config.properties, function(value, key) {
-                    itemData[key] = value;
+                _.map(schema.config.properties, function(value,key) {
+                    switch (value.type) {
+                        case 'string':
+                            itemData[key] = '';
+                        break;
+                        default:
+                            console.error('Unexpected data type:',key,value);
+                        break;
+                    }
                 });
                 self.$el.data('itemData',itemData);
             }
 
             if (itemData) {
 
-                html = buildHTML(itemData);
+                html = buildHTML(schema.config.properties);
 
                 this.$el.find('.field-float-pattern input')
                     .addClass('placeholderText')
@@ -168,11 +157,13 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                             .prev('label')
                             .addClass('showLabel');
 
-                        }, 10);
+                        self.delegateEvents();
+
+                    }, 10);
                 }, delay);
             }
 
-            this.delegateEvents();
+            
         }
 
     });

@@ -100,9 +100,8 @@ body.editing{
 				box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
 				background-image:url(@grabber-image);
 				&:not(.dragged){
-					position: absolute;
-					left: 55px;
-					right: 55px;
+					margin-left:5px;
+					margin-right:5px;
 					/*To stop it appearing over accordion. Overridden later*/
 					display: none;
 				}
@@ -185,6 +184,12 @@ body.editing{
 
 	li.operator > span.item-button-panel{
 	  	padding-top: 0;
+	}
+
+	li.editing   span.item-button-panel{
+		position: absolute;
+
+		right: 0;
 	}
 
 	li.dragged{
@@ -282,11 +287,14 @@ body.editing{
 			color: #444;
 			font-size:11px;
 			line-height: 11px;
-			min-width: 150px;
 			border-right: 1px solid #eee;
 			padding-right: 10px;
 			margin-right: 10px;
 			float:left;
+
+			&:last-of-type{
+				border-right: none;
+			}
 
 			&.invalid{
 				color: #888;
@@ -312,28 +320,6 @@ body.editing{
 		padding: 0;
 	}
 
-
-	.field-float-select {
-
-	  	position:relative;
-	  	margin: 5px;
-	  	float:left;
-
-	  	select {
-			min-width:145px;
-			clear:left;
-			float:left;
-			padding:5px 20px 5px 5px;
-			-webkit-appearance: none;
-			background: url('../img/sort_both.png') no-repeat right #fff;
-
-			.placeholderText {
-				color: #aaa;
-			}
-		}
-	}
-
-
 	.field-float-pattern, .field-float-select {
 
 		label {
@@ -348,8 +334,7 @@ body.editing{
 
 	}
 
-
-	.field-float-pattern{
+	.field-float-pattern, .field-float-select{
 
 		margin-top: 18px;
 		position:relative;
@@ -369,7 +354,7 @@ body.editing{
 
 		input{
 
-			margin-top: 13px;
+			margin-top: 15px;
 			width:150px;
 
 			/* Stop chromes autofill adding yellow backgrounds to datalists */
@@ -379,9 +364,30 @@ body.editing{
 					-webkit-box-shadow: 0 0 1px 1px #4481c4,0 0 0 50px white inset;
 				}
 			}
+		}
 
-			&:read-only{
-				display:none;
+		&#typeSelector label{
+			top:0;
+			opacity:1;
+		}
+
+		select {
+
+			margin-top: 15px;
+			min-width:145px;
+			clear:left;
+			float:left;
+			padding:5px 20px 5px 5px;
+			-webkit-appearance: none;
+			background: url('../img/sort_both.png') no-repeat right #fff;
+
+			background-color:#fff;
+
+			&.placeholderText {
+				color: #ddd;
+				background-color:transparent;
+				border-color: transparent;
+				box-shadow: none;
 			}
 		}
 	}
@@ -397,3 +403,122 @@ section.active-step{
 		display: block;
 	}
 }
+
+
+#condition-management ol.condition-management-group ul.buttonControl{
+
+	margin-top: 13px;
+	font-size: 0;
+
+ 	li{
+		border:none;
+		display:inline-block;
+		margin:0;
+		padding:0;
+
+		a.button{
+			border-radius:0;
+			margin-left:0;
+			background-color:lighten(@color-inactive, 5%);
+			transition:background 100ms;
+
+			&:not(.selected){
+				border-color:@color-inactive;
+				background-image:none;
+
+				&:hover{
+					background-color:average(@color-active, @color-inactive)
+				}
+			}
+
+			&.selected:hover{
+				.linear-gradient(top, @color-active, darken(@color-active, 10%));
+			}
+		}
+
+		&:first-of-type{
+			a.button{
+				border-radius:5px 0 0 5px;
+			}
+		}
+
+		&:last-of-type{
+			a.button{
+				border-radius:0 5px 5px 0;
+			}
+		}
+
+
+	}
+}
+
+#condition-management .item-data > div span.inline-right{
+	padding: 0;
+	margin: 0 4px 4px 0;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	color: #ddd;
+}
+
+#condition-management .item-data div.field-float-pattern.time-field{
+	min-width:0;
+	input{
+		width:70px;
+	}
+}
+
+#condition-management .item-data div.field-float-select.day-field{
+	min-width:0;
+	select{
+		width:100px;
+		min-width:0;
+	}
+}
+
+.ruleHelperText{
+	padding: 10px 10px 0 10px;;
+	p {
+		font-size:12px;
+	}
+}
+
+#condition-management .item-data {
+
+	> div#conditionAttrTimeDate, > div.ruleHelperText{
+		border-right: none;
+		margin-right:0;
+
+		div.float-left {
+		float: left;
+			border-right: 1px solid #eee;
+
+			&:last-of-type{
+				border-right: none;
+			}
+		}
+
+		.datePicker{
+			width:100px;
+		}
+	}
+	
+}
+
+
+/* Jquery-UI overrides */
+.ui-widget-content {
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+    z-index:710;
+}
+
+

@@ -128,7 +128,7 @@
             },
             "UserProfileTemplate" : {
                 "changeEmailAddress" : "Change Email Address",
-                "changeSecurityData" : "Change Security Data",
+                "changeSecurityData" : "Change Password",
                 "changeSiteIdentification" : "Change Site Identification"
             },
             "UserRegistrationTemplate" : {
@@ -210,7 +210,7 @@
             "submit" : "Submit",
             "actions" : "Actions",
             "complete" : "Complete",
-            "copyright" : "Copyright (c) 2010-13 ForgeRock, all rights reserved.",
+            "copyright" : "Copyright &copy; 2010-14 ForgeRock AS, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
