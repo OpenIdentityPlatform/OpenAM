@@ -1,0 +1,20 @@
+/* CSS Document */
+	.yui-dt-scrollable {
+        width: 40em;
+        height: 10em;
+    }
+
+    .yui-dt-scrollbody {
+        height: 10em;
+        * height : auto;
+    }
+
+    .yui-dt-scrollable  thead {
+        background: #696969;
+        color: #fff;
+    }
+
+    .yui-dt-scrollable th, .yui-dt-scrollbody td {
+        width: 40em;
+    }
+	

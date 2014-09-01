@@ -1,0 +1,574 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: AMClient.properties,v 1.24 2009/08/12 17:43:03 beomsuk Exp $
+#
+#
+
+#
+# Portions Copyrighted [2010] [ForgeRock AS]
+#
+
+/* The following keys are used to configure the Debug service.
+ * Possible values for the key 'level' are: off | error | warning | message. 
+ * The key 'directory' specifies the output directory where the debug files 
+ * will be created.
+ * Trailing spaces are significant.
+ * Windows: Use forward slashes "/" separate directories, not backslash "\".
+ * Windows: Spaces in the file name are allowed for Windows.
+ */
+com.iplanet.services.debug.level=@DEBUG_LEVEL@
+com.iplanet.services.debug.directory=@DEBUG_DIR@
+
+/*
+ * Server mode should be 'false'
+ */
+com.iplanet.am.serverMode=false
+
+/*
+ * Cache enable / disable properties
+ */
+com.iplanet.am.sdk.caching.enabled=true
+com.sun.identity.idm.cache.enabled=true
+com.sun.identity.sm.cache.enabled=true
+
+/*
+ * Refresh time for appssotoken, value in minutes
+ */
+com.iplanet.am.client.appssotoken.refreshtime=3
+
+/*
+ * Logging status
+ */
+com.iplanet.am.logstatus=ACTIVE
+
+/*
+ * SDK package name
+ */
+com.iplanet.am.sdk.package=com.iplanet.am.sdk.remote
+
+/*
+ * Configure remote plugin classes for configuration (SMS)
+ */
+com.sun.identity.sm.sms_object_class_name=com.sun.identity.sm.jaxrpc.SMSJAXRPCObject
+
+/*
+ * Naming URL
+ */
+com.iplanet.am.naming.url=@NAMING_URL@
+
+/*
+ * Notification URL
+ */
+com.sun.identity.client.notification.url=@NOTIFICATION_URL@
+
+/*
+ * Security Credentails to read the configuration data
+ */
+com.sun.identity.agents.app.username=@APPLICATION_USER@
+com.iplanet.am.service.password=@APPLICATION_PASSWD@
+com.iplanet.am.service.secret=@ENCODED_APPLICATION_PASSWORD@
+
+/*
+ * Encryption key that will be used to encrypt and decypt
+ * data to communicate with the server.
+ * This key is needed to decrypt passwords stored
+ * in the SMS configuration.
+ */
+am.encryption.pwd=@ENCRYPTION_KEY@
+
+/*
+ * Encryption key that will be used to encrypt and decypt
+ * data used locally within the client.
+ */
+com.sun.identity.client.encryptionKey=@ENCRYPTION_KEY_LOCAL@
+
+/*
+ * Encryption: The key "com.iplanet.security.encryptor" specifies
+ * the encrypting class implementation.
+ * Available classes are:
+ *    com.iplanet.services.util.JCEEncryption
+ *    com.iplanet.services.util.JSSEncryption
+ */
+com.iplanet.security.encryptor=com.iplanet.services.util.JCEEncryption
+
+/*
+ * Property to enable/disable the notifications for am.sdk and IdRepo Caches. 
+ * If set to "true" notifications are enabled and disabled if set to "false".
+ */
+com.sun.identity.idm.remote.notification.enabled=false
+
+/*
+ * Property to enable/disable the notifications for service management caches.
+ * If set to "true" notifications are enabled and disabled if set to "false".
+ */
+com.sun.identity.sm.notification.enabled=false
+
+/*
+ * Cache update time (in minutes) for am.sdk & IdRepo Caches
+ * if notification URL is not provided or if notifications are disabled.
+ * Note: 
+ * 1. This property is applicable only if 
+ *    'com.sun.identity.client.notification.url'
+ *    is not provided or if 'com.sun.identity.idm.remote.notification.enabled'
+ *    is set to 'false'.
+ * 2. If the polling time is set as 0, then polling is disabled. 
+ */
+com.iplanet.am.sdk.remote.pollingTime=0
+
+/*
+ * Cache update time (in minutes) for service configutation data,
+ * if notification URL is not provided or if notifications are disabled.
+ * Note: 
+ * 1. This property is applicable only if 
+ * 'com.sun.identity.client.notification.url'
+ *    is not provided or if 'com.sun.identity.sm.notification.enabled' is 
+ *    set to 'false'.
+ * 2. If the cache time is set as 0, then no cache updates will occur.
+ */
+com.sun.identity.sm.cacheTime=10
+
+/*
+* The following are the properties to configure service management Cache for
+* TTL. If the property 'com.sun.identity.sm.cache.ttl.enable' is set to
+* true, the cache entries will expire based on the time specified in the
+* property "com.sun.identity.sm.cache.ttl" (in minutes).
+com.sun.identity.sm.cache.ttl.enable=true
+com.sun.identity.sm.cache.ttl=30
+
+/*
+* The following are the properties to configure IdRepo cache for TTL.
+* If the property 'com.sun.identity.idm.cache.entry.expire.enabled' is set to
+* true, the cache entries will expire based on the time specified in the
+* properties below. The properties 'com.sun.identity.idm.cache.user.expire.time'
+* & 'com.sun.identity.idm.cache.default.expire.time' specify time in minutes
+* for which the user & non-user entries respectively remain valid after their
+* last modification. In other words after this specified period of time
+* elapses (after the last modification/read from the directory), the data
+* for the entry that is cached will expire. At that instant new requests for
+* data for these entries will result in reading it from the IdRepo plugins.
+*/
+com.sun.identity.idm.cache.entry.expire.enabled=true
+com.sun.identity.idm.cache.entry.user.expire.time=1
+com.sun.identity.idm.cache.entry.default.expire.time=1
+
+/*
+* The following are the properties to configure AMSDK plugin Cache for TTL.
+* If the property 'com.iplanet.am.sdk.cache.entry.expire.enabled' is set to
+* true, the cache entries will expire based on the time specified in the
+* properties below. The properties 'com.iplanet.am.sdk.cache.user.expire.time'
+* & 'com.iplanet.am.sdk.cache.default.expire.time' specify time in minutes for
+* which the user & non-user entries respectively remain valid after their last
+* modification. In other words after this specified period of time elapses
+* (after the last modification/read from the directory), the data for the
+* entry that is cached will expire. At that instant new requests for data for
+* these entries will result in reading it from the Directory.
+*/
+com.iplanet.am.sdk.cache.entry.expire.enabled=true
+com.iplanet.am.sdk.cache.entry.user.expire.time=1
+com.iplanet.am.sdk.cache.entry.default.expire.time=1
+
+/*
+ * Server protocol, host and port to be used by Client Services
+ */
+com.iplanet.am.server.protocol=@SERVER_PROTOCOL@
+com.iplanet.am.server.host=@SERVER_HOST@
+com.iplanet.am.server.port=@SERVER_PORT@
+com.iplanet.am.services.deploymentDescriptor=@DEPLOY_URI@
+com.iplanet.am.console.protocol=@CONSOLE_PROTOCOL@
+com.iplanet.am.console.host=@CONSOLE_HOST@
+com.iplanet.am.console.port=@CONSOLE_PORT@
+com.iplanet.am.console.deploymentDescriptor=@CONSOLE_DEPLOY_URI@
+com.iplanet.am.console.remote=@CONSOLE_REMOTE@
+
+com.iplanet.am.cookie.name=@AM_COOKIE_NAME@
+
+/*
+ * Session related properties.
+ */
+com.iplanet.am.session.client.polling.enable=true
+com.iplanet.am.session.client.polling.period=180
+
+/*
+ * Identify cert db directory path, prefix and password file
+ * to initialize JSS Socket Factory when Web Container is configured SSL
+ */
+com.iplanet.am.admin.cli.certdb.dir=@CONTAINER_CERTDB_DIR@
+com.iplanet.am.admin.cli.certdb.prefix=@CONTAINER_CERTDB_PREFIX@
+com.iplanet.am.admin.cli.certdb.passfile=@BASEDIR@/@PRODUCT_DIR@/config/.wtpass
+
+/*
+ * Identify property value for SSL ApprovalCallback / HostnameVerifier
+ *    If com.iplanet.services.comm is configured as protocol handler
+ *    and the checkSubjectAltName or resolveIPAddress feature is enabled, 
+ *    cert8.db and key3.db with the prefix value of 
+ *    com.iplanet.am.admin.cli.certdb.prefix will have to be created under 
+ *    the directory of com.iplanet.am.admin.cli.certdb.dir before server is 
+ *    restarted.
+ */
+com.iplanet.am.jssproxy.trustAllServerCerts=false
+com.iplanet.am.jssproxy.checkSubjectAltName=false
+com.iplanet.am.jssproxy.resolveIPAddress=false
+com.iplanet.am.jssproxy.SSLTrustHostList=
+
+/**************************************************************
+ *              Policy Client parameters
+ **************************************************************/
+/* Policy decision log parameters. Possible values for logging.level
+ * are NONE, ALLOW, DENY, BOTH, and DECISION */
+com.sun.identity.agents.server.log.file.name=amRemotePolicyLog
+com.sun.identity.agents.logging.level=NONE
+
+/* Notification URL for updating cache */
+com.sun.identity.agents.notification.enabled=false
+com.sun.identity.agents.notification.url=@NOTIFICATION_URL@
+
+/* Cache time in minutes */
+com.sun.identity.agents.polling.interval=3
+
+/* Information to cache. Possible value are "subtree" or "self" */
+com.sun.identity.policy.client.cacheMode=subtree
+
+/* Policy client clock skew value in seconds */
+com.sun.identity.policy.client.clockSkew=10 
+
+/*
+* Explicitly disable monitoring services in the client applications.
+*/
+com.sun.identity.monitoring=off
+
+/*
+* Specify if allow to use cached data for HttpURLConnection 
+*/
+com.sun.identity.urlconnection.useCache=false
+
+/**
+ * Property to enable or disable to use the metro implementation
+ * for ws-trust client.
+ */
+com.sun.identity.wss.trustclient.enablemetro=false
+
+/**
+ * Property to use the SOAP version for ws-trust client. The containers
+ * that do not support JavaEE5 should use the version 1.1 but make sure that
+ * the STS service is compatible with 1.1 version. 
+ */ 
+com.sun.identity.wss.soapversion=1.2
+
+/**
+ * This property defines interval in seconds for web services security 
+ * cache timeout.
+ */
+com.sun.identity.wss.security.cache.timeout.interval=300
+
+/**
+ * This property defines an interval in seconds for cleaning up the
+ * web services security cache.
+ */
+com.sun.identity.wss.security.cache.cleanup.interval=60
+
+/**
+ * This property indicates a plugin class for WSSCacheRepository that can be
+ * used for storing web services security cache persistently.
+ */
+com.sun.identity.wss.security.cacherepository.plugin=
+
+/**
+ * This property is used by the standone SAML Tokens in web services security 
+ * for the issuer name. If this property is not set, they will use the server
+ * host name as the default.
+ */
+com.sun.identity.wss.security.samlassertion.issuer=
+
+/**
+ * This property is used to define the time skew in milli seconds used when 
+ * the time stamps are validated.
+ */
+com.sun.identity.wss.security.timeskew=5000
+
+/**
+ * Policy ResourceComparators to be used for different service names
+ */
+serviceType=iPlanetAMWebAgentService|class=com.sun.identity.policy.plugins.HttpURLResourceName|wildcard=*|delimiter=/|caseSensitive=false|oneLevelWildCard=-*-
+
+/*
+ * Protocol handler pkg name for HTTPS protocol.
+ * Default value is none. 
+ * Available impl classes are:
+ *   com.iplanet.services.comm (uses JSS)
+ *   com.sun.identity.protocol (pure Java)
+ */
+opensso.protocol.handler.pkgs=
+
+/**
+ * When the Site monitoring needs to be disabled, set this property to true
+ * When a client SDK application runs in the same container as the OpenAM server
+ * this property might be set to true
+ */
+openam.naming.sitemonitor.disabled=false
+
+#
+# Specify implementation class for
+# com.sun.identity.plugin.configuration.ConfigurationInstance interface.
+com.sun.identity.plugin.configuration.class=@CONFIGURATION_PROVIDER_CLASS@
+
+#
+# Specify implementation class for 
+# com.sun.identity.plugin.datastore.DataStoreProvider interface.
+# This property defines the default datastore provider.
+com.sun.identity.plugin.datastore.class.default=@DATASTORE_PROVIDER_CLASS@
+
+#
+# Specify implementation class for
+# com.sun.identity.plugin.session.SessionProvider interface.
+com.sun.identity.plugin.session.class=@SESSION_PROVIDER_CLASS@
+
+#
+# Specify XML signature provider class  
+com.sun.identity.saml.xmlsig.signatureprovider.class=com.sun.identity.saml.xmlsig.AMSignatureProvider
+
+#
+# Specify XML key provider implementation class 
+com.sun.identity.saml.xmlsig.keyprovider.class=com.sun.identity.saml.xmlsig.JKSKeyProvider
+
+#
+# Identify SAML XML signature keystore file, keystore password file
+# and key password file
+com.sun.identity.saml.xmlsig.keystore=@BASE_DIR@/keystore.jks
+com.sun.identity.saml.xmlsig.storepass=@BASE_DIR@/.storepass
+com.sun.identity.saml.xmlsig.keypass=@BASE_DIR@/.keypass
+com.sun.identity.saml.xmlsig.certalias=test
+
+#
+# Specify type of KeyStore used for saml xml signature. Default is JKS.
+# com.sun.identity.saml.xmlsig.storetype=JKS
+
+#
+# Flag for checking the Certificate which is embedded in the 
+# KeyInfo against the certificates in the keystore (specified
+# by the "com.sun.identity.saml.xmlsig.keystore" property). 
+# Possible values for the key are: on|off. If the flag is "on",
+# the certification must be presented in the keystore for 
+# XML signature validation. If the flag is "off", skip
+# the presence checking.
+com.sun.identity.saml.checkcert=on
+
+#
+# XML cannonicalization algorithm. Used for SAML XML signature generation
+# and verification. When not specified, or value is empty, default value
+# will be used. The following is the list of supported algorithms:
+# http://www.w3.org/2001/10/xml-exc-c14n#	(default)
+# http://www.w3.org/2001/10/xml-exc-c14n#WithComments
+# http://www.w3.org/TR/2001/REC-xml-c14n-20010315
+# http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
+com.sun.identity.saml.xmlsig.c14nMethod=http://www.w3.org/2001/10/xml-exc-c14n#
+
+#
+# XML signature algorithm. Used for SAML XML Signature generation and
+# verification. When not specified, or value is empty, default value will be
+# used. The following is the list of supported algorithms:
+# http://www.w3.org/2000/09/xmldsig#rsa-sha1	(default)
+# http://www.w3.org/2000/09/xmldsig#hmac-sha1
+# http://www.w3.org/2000/09/xmldsig#dsa-sha1
+# http://www.w3.org/2001/04/xmldsig-more#rsa-md5
+# http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160
+# http://www.w3.org/2001/04/xmldsig-more#rsa-sha256
+# http://www.w3.org/2001/04/xmldsig-more#rsa-sha384
+# http://www.w3.org/2001/04/xmldsig-more#rsa-sha512
+# http://www.w3.org/2001/04/xmldsig-more#hmac-md5
+# http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160
+# http://www.w3.org/2001/04/xmldsig-more#hmac-sha256
+# http://www.w3.org/2001/04/xmldsig-more#hmac-sha384
+# http://www.w3.org/2001/04/xmldsig-more#hmac-sha512
+com.sun.identity.saml.xmlsig.xmlSigAlgorithm=
+
+#
+# XML transformation algorithm. Used for SAML XML signature generation
+# and verification. When not specified, or value is empty, default value
+# will be used. The following is the list of supported algorithms:
+# http://www.w3.org/2001/10/xml-exc-c14n#      (default)
+# http://www.w3.org/2001/10/xml-exc-c14n#WithComments
+# http://www.w3.org/TR/2001/REC-xml-c14n-20010315
+# http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
+# http://www.w3.org/TR/1999/REC-xslt-19991116
+# http://www.w3.org/2000/09/xmldsig#base64
+# http://www.w3.org/TR/1999/REC-xpath-19991116
+# http://www.w3.org/2000/09/xmldsig#enveloped-signature
+# http://www.w3.org/TR/2001/WD-xptr-20010108
+# http://www.w3.org/2002/04/xmldsig-filter2
+# http://www.w3.org/2002/06/xmldsig-filter2
+# http://www.nue.et-inf.uni-siegen.de/~geuer-pollmann/#xpathFilter
+com.sun.identity.saml.xmlsig.transformAlg=http://www.w3.org/2001/10/xml-exc-c14n#
+ 
+
+#
+# SAML2 XML Encryption Provider Implementation class 
+com.sun.identity.saml2.xmlenc.EncryptionProvider=com.sun.identity.saml2.xmlenc.FMEncProvider
+
+
+#
+# SAML2 XML Signing Provider Implementation class. 
+com.sun.identity.saml2.xmlsig.SignatureProvider=com.sun.identity.saml2.xmlsig.FMSigProvider
+
+#
+# SAML2 XML Signing Certificate Validation. 
+com.sun.identity.saml2.crl.check=false
+
+#
+# SAML2 XML Signing Certificate Validation. 
+com.sun.identity.saml2.crl.check.ca=false
+
+#
+# Client ceritificate alias that will be used in SSL connection for Liberty
+# SOAP Binding
+com.sun.identity.liberty.ws.soap.certalias=
+
+#
+# If the message timestamp is before current timestamp by this amount
+# (millisec), it is considered a stale message.
+com.sun.identity.liberty.ws.soap.staleTimeLimit=300000
+
+#
+# All the messageID of a valid message will be stored in a cache with the it
+# is received to avoid duplicate messages. If the current time minus the
+# received time is greater than the above staleTimeLimit, it should be removed
+# from the cache. The is property specify the interval(millisec) that a 
+# cleanup thread should check the cache and remove those messageID.
+com.sun.identity.liberty.ws.soap.messageIDCacheCleanupInterval=60000
+
+#
+# Supported SOAP actors. Each actor must be seperated by '|'
+com.sun.identity.liberty.ws.soap.supportedActors=http://schemas.xmlsoap.org/soap/actor/next
+
+#
+# Namespace prefix mapping used when marshalling a JAXB content tree to a
+# DOM tree. The syntax is
+# <prefix>=<namespace>|<prefix>=<namespace>|..........
+com.sun.identity.liberty.ws.jaxb.namespacePrefixMappingList=S=http://schemas.xmlsoap.org/soap/envelope/|sb=urn:liberty:sb:2003-08|pp=urn:liberty:id-sis-pp:2003-08|ispp=http://www.sun.com/identity/liberty/pp|is=urn:liberty:is:2003-08
+
+#
+# JAXB package list used when constructing JAXBContext. Each package must be
+# seperated by ':'.
+com.sun.identity.liberty.ws.jaxb.packageList=
+
+#
+# Liberty ID-WSF security profile,
+# com.sun.identity.liberty.ws.wsc.certalias specifies default certificate
+#     alias for issuing web service security token for this web service client
+# com.sun.identity.liberty.ws.ta.certalias specifies certificate
+#     alias for trusted authority that will be used to sign SAML or SAML
+#     BEARER token of response message.
+# com.sun.identity.liberty.ws.trustedca.certaliases specifies certificate
+#     aliases for trusted CA. SAML or SAML BEARER token of incoming request
+#     message needs to be signed by a trusted CA in this list. The syntax is
+#     <cert alias 1>[:<issuer 1>]|<cert alias 2>[:<issuer 2>]|.....
+#     For example, 'myalias1:myissuer1|myalias2|myalias3:myissuer3
+#     'issuer' is used when the token doesn't have a KeyInfo inside the
+#     signature. The 'issuer' of the token needs to be in this list and the
+#     corresponding cert alias will be used to verify signature. If KeyInfo
+#     exists, the keystore needs to contain a cert alias that matches the
+#     KeyInfo and the cert alias needs to be in this list.
+# com.sun.identity.liberty.ws.security.TokenProviderImpl specifies
+#     implementation for security token provider
+com.sun.identity.liberty.ws.wsc.certalias=test
+com.sun.identity.liberty.ws.ta.certalias=test
+com.sun.identity.liberty.ws.trustedca.certaliases=test:SunSTS|test:@SERVER_HOST@
+com.sun.identity.liberty.ws.security.TokenProviderImpl=com.sun.identity.liberty.ws.security.LibSecurityTokenProvider
+
+
+#
+# URL for WSPRedirectHandlerServlet to handle Liberty WSF WSP-resource owner
+# interactions based on user agent redirects. This should be running in 
+# the same JVM where Liberty SP is running
+com.sun.identity.liberty.interaction.wspRedirectHandler=@SERVER_PROTOCOL@://@SERVER_HOST@:@SERVER_PORT@/@DEPLOY_URI@/WSPRedirectHandler
+
+
+#
+# indicates whether WSC would participate in interaction
+# valid values are interactIfNeeded | doNotInteract | doNotInteractForData
+# default value:interactIfNeeded
+# value used if an invalid value is specified:interactIfNeeded
+com.sun.identity.liberty.interaction.wscSpecifiedInteractionChoice=interactIfNeeded
+
+
+#
+# indicates whether WSC would include userInteractionHeader
+# valid values are yes|no (case ignored)
+# default value:yes
+# value used if no value is specified:yes
+com.sun.identity.liberty.interaction.wscWillInlcudeUserInteractionHeader=yes
+
+
+#
+# indicates whether WSC would redirect user for interaction
+# valid values are yes|no
+# default value:yes
+# value used if no value is specified:yes
+com.sun.identity.liberty.interaction.wscWillRedirect=yes
+
+
+#
+# WSC's preference on the acceptable duration for interaction(in seconds)
+# default value if the value is not specified or a non integer value is
+# specified : 60
+com.sun.identity.liberty.interaction.wscSpecifiedMaxInteractionTime=80
+
+
+#
+# indicates whether WSC would enforce that redirected to URL is https
+# valid values are yes|no (case ignored)
+# liberty specification require the value to be yes
+# default value:yes
+# value used if no value is specified:yes
+com.sun.identity.liberty.interaction.wscWillEnforceHttpsCheck=no
+
+
+#
+# This property is used to determine the Liberty identity web services framework
+# to be used when the framework can not determine from the in-bound message or
+# from the resource offering when AM is acting as the WSC.
+# The default version is 1.1, but the possible values are 1.0 or 1.1
+# com.sun.identity.liberty.wsf.version=1.1
+
+# Web Services Security Client Properties
+# Login URL for WSS end user authentication use cases
+com.sun.identity.loginurl=@SERVER_PROTOCOL@://@SERVER_HOST@:@SERVER_PORT@/@DEPLOY_URI@/UI/Login
+
+# Login URL redirection ("goto") paramter name for WSS end user authentication use cases
+com.sun.identity.loginurl.goto=goto
+
+# Authentication web service URL for WSS Liberty use cases
+com.sun.identity.liberty.authnsvc.url=@SERVER_PROTOCOL@://@SERVER_HOST@:@SERVER_PORT@/@DEPLOY_URI@/Liberty/authnsvc
+
+# STS End User Token Plugin class
+com.sun.identity.wss.sts.clientusertoken=com.sun.identity.wss.sts.STSClientUserToken
+
+# WSS Provider Configuration Plugin class
+com.sun.identity.wss.provider.config.plugin=com.sun.identity.wss.provider.plugins.AgentProvider
+
+# WSS Authenticator Plugin Class
+com.sun.identity.wss.security.authenticator=com.sun.identity.wss.security.handler.DefaultAuthenticator
+
+com.sun.identity.jsr196.authenticated.user=AUTHENTICATED_USERS
+

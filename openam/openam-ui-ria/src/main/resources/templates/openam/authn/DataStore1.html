@@ -1,0 +1,29 @@
+<style>
+#header, .container-shadow {
+    width: 480px;
+}
+</style>
+<div class="container-shadow">
+    <div class="column-layout" style="padding-top: 30px;">
+        <div>
+            <form action="" method="post" class="form">
+                <fieldset>
+    
+                    {{#each reqs.callbacks}}
+                    
+                    {{#if isSubmit}}
+                    <div class="field field-checkbox">
+                        <label><input type="checkbox" name="loginRemember" />{{t "templates.user.LoginTemplate.loginRemember"}}</label>
+                    </div>
+                    {{/if}}
+                    
+                    <div class="field {{#if isSubmit}}field-submit{{/if}}">
+                        {{callbackRender}}
+                    </div>
+                    {{/each}}
+    
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

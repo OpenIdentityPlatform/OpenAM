@@ -1,0 +1,67 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright © 2012 ForgeRock Inc. All rights reserved.
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [2012] [Forgerock AS]"
+#
+
+dn: ou=people,dc=forgerock,dc=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=agents,dc=forgerock,dc=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=groups,dc=forgerock,dc=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=dsame users,dc=forgerock,dc=com
+objectClass: top
+objectClass: organizationalUnit
+
+dn: cn=dsameuser,ou=DSAME Users,dc=forgerock,dc=com
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: dsameuser
+sn: dsameuser
+userPassword: dsameuser-password
+
+dn: cn=amldapuser,ou=DSAME Users,dc=forgerock,dc=com
+objectclass: inetuser
+objectclass: organizationalperson
+objectclass: person
+objectclass: top
+cn: amldapuser
+sn: amldapuser
+userPassword: amldapuser-password
+
+dn:dc=forgerock,dc=com
+changetype:modify
+add:aci
+aci: (target="ldap:///dc=forgerock,dc=com")(targetattr="*") (version 3.0; acl "S1IS special dsame user rights for all under the root suffix"; allow (all) userdn = "ldap:///cn=dsameuser,ou=DSAME Users,dc=forgerock,dc=com"; )
+
+dn:dc=forgerock,dc=com
+changetype:modify
+add:aci
+aci: (target="ldap:///dc=forgerock,dc=com")(targetattr="*")(version 3.0; acl "S1IS special ldap auth user rights"; allow (read,search) userdn = "ldap:///cn=amldapuser,ou=DSAME Users,dc=forgerock,dc=com"; )

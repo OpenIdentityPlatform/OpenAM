@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.2 2009/07/09 17:04:27 veiming Exp $
+
+   Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<project name="CreateProviders" default="all" basedir=".">
+    <description>Configures the WSS providers and set up AMConfig.properties</description>
+    <property file="ProviderConfig.properties"/>
+    <property name="built.dir" value="built"/>
+    <property name="classes.dir" value="${built.dir}/classes"/>
+    <property name="openssodir" location="${glassfish_home}/addons/opensso"/>
+    <dirname property="parent.dir" file="${ant.file}/.." />
+    <property name="pwd_file" value="${glassfish_pwd_file}"/>
+    
+    <available file="${pwd_file}" type="file"
+               property="file.present"/>  
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+    
+    <condition property="asadmin-script-suffix" value=".bat">
+        <os family="windows"/>
+    </condition>
+    <condition property="asadmin-script-suffix" value="">
+        <not>
+            <os family="windows"/>
+        </not>
+    </condition>
+    
+    <echo >
+        glassfish_home = ${glassfish_home}
+        glassfish password file = ${pwd_file}
+        parent dir = ${parent.dir}
+    </echo>
+    
+    <target name ="check_passwordFile">
+        <fail message="*** glassfish password file is missing ***">
+            <condition>
+                <not><isset property="file.present"/></not>
+            </condition>
+        </fail>
+    </target>
+    
+    <target name ="copy_jars">
+        <mkdir dir="${glassfish_home}/addons"/>
+        <mkdir dir="${glassfish_home}/addons/opensso"/>
+        <copy file = "${glassfish_home}/lib/webservices-rt.jar" toFile="${glassfish_home}/lib/webservices-rt.jar.org"/>
+        <copy file = "../lib/webservices-rt.jar" toFile="${glassfish_home}/lib/webservices-rt.jar"/>
+        <copy file = "${glassfish_home}/lib/webservices-tools.jar" toFile="${glassfish_home}/lib/webservices-tools.jar.org"/>
+        <copy file = "../lib/webservices-tools.jar" toFile="${glassfish_home}/lib/webservices-tools.jar"/> 
+        <copy file = "${glassfish_home}/lib/endorsed/webservices-api.jar" toFile="${glassfish_home}/lib/endorsed/webservices-api.jar.org"/>
+        <copy file = "../lib/webservices-api.jar" toFile="${glassfish_home}/lib/endorsed/webservices-api.jar"/> 
+        
+        <copy todir="${openssodir}" >
+            <fileset dir = "../lib" >
+                <include name = "*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${openssodir}" >
+            <fileset dir = "../resources" >
+                <include name = "*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="populate">
+        <replace file="${openssodir}/AMConfig.properties" propertyFile="ProviderConfig.properties">
+            <replacefilter token="@DEBUG_DIR@" value="/tmp/wssclient"/>
+            <replacefilter token="@DEBUG_LEVEL@" value="message"/>
+            <replacefilter token="@AM_COOKIE_NAME@" value="iPlanetDirectoryPro"/>
+            <replacefilter token="@DEBUG_LEVEL@" value="message"/>
+            <replacefilter token="@BASE_DIR@" value="${parent.dir}/resources"/>
+            <replacefilter token="@ENCRYPTION_KEY@" value=""/>
+            <replacefilter token="@APPLICATION_USER@" property="appuser"/>
+            <replacefilter token="@APPLICATION_PASSWD@" property="appuserpassword"/>
+            <replacefilter token="@SERVER_PROTOCOL@" property="server_protocol"/>
+            <replacefilter token="@SERVER_HOST@" property="server_host"/>
+            <replacefilter token="@SERVER_PORT@" property="server_port"/>
+            <replacefilter token="@DEPLOY_URI@" property="deploy_uri"/>
+            <replacefilter token="@NAMING_URL@" value="${server_protocol}://${server_host}:${server_port}/${deploy_uri}/namingservice"/>
+        </replace>
+        
+        <replace file="../samples/glassfish/glassfish.properties" >
+            <replacefilter token="@GLASSFISH_HOME@" value="${glassfish_home}"/>
+            <replacefilter token="@GLASSFISH_PASSWORD_FILE@" value="${glassfish_pwd_file}"/>
+            <replacefilter token="@GLASSFISH_HOST@" value="${glassfish_host}"/>
+            <replacefilter token="@GLASSFISH_ADMIN_PORT@" value="${glassfish_admin_port}"/>
+        </replace> 
+        
+    </target> 
+    
+    <target name="modify_classpath">
+        <exec executable="${glassfish_home}/bin/asadmin${asadmin-script-suffix}">
+            <arg line="set" />
+            <arg line ="--user admin"/>
+            <arg line="--passwordfile ${pwd_file}"/> 
+            <arg line="--host ${glassfish_host}"/>
+            <arg line="--port ${glassfish_admin_port}"/>
+            <arg line="server-config.java-config.classpath-suffix=${openssodir}/openssowssproviders.jar"/>
+        </exec>
+    </target>
+    
+    <target name="createHttpProvider">
+        <exec executable="${glassfish_home}/bin/asadmin${asadmin-script-suffix}">
+            <arg line="create-message-security-provider" />
+            <arg line ="--user admin"/>
+            <arg line="--passwordfile ${pwd_file}"/>
+            <arg line="--host ${glassfish_host}"/>
+            <arg line="--port ${glassfish_admin_port}"/>
+            <arg line="--classname com.sun.identity.wssagents.common.provider.FAMHttpAuthModule"/>
+            <arg line="--providertype server"/>
+            <arg line="--layer HttpServlet"/>
+            <arg line="--property providername=StockService"/>
+            <arg line="FAMHttpProvider"/>
+        </exec>
+    </target>
+    
+    <target name="CreateStockServiceProfile" depends="clean,compile,run"/> 
+    
+    <target name="clean">
+        <delete dir="${classes.dir}"/>
+    </target>
+    
+    <target name="compile">
+        <mkdir dir="${built.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <path id="lib.path.ref">
+            <fileset dir="${openssodir}" includes="*.jar"/>
+        </path>
+        <javac srcdir="src" destdir="${classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}">
+            <classpath refid="lib.path.ref" />
+        </javac>
+    </target>
+    
+    <target name="run">
+        <java classname="com.sun.identity.wssagents.config.CreateStockServiceProfile" fork="true">
+            <classpath refid="lib.path.ref"/>
+            <classpath>
+                <pathelement location="${openssodir}"/>
+                <pathelement location="${classes.dir}"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="all">
+        <antcall target="check_passwordFile" />
+        <antcall target="copy_jars"/>
+        <antcall target="populate"/>
+        <antcall target="modify_classpath"/>
+        <antcall target="createHttpProvider"/> 
+        <antcall target="CreateStockServiceProfile"/>
+    </target>
+</project>

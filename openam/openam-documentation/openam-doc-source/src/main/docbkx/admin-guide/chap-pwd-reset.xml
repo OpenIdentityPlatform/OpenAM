@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-pwd-reset'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Password Reset</title>
+ <indexterm><primary>Password reset</primary></indexterm>
+ <para>This chapter focuses on how to enable users to reset their own
+ passwords in secure fashion.</para>
+ 
+ <section xml:id="about-pwd-reset">
+  <title>About Password Reset</title>
+  <para>Users who know their passwords, but must reset them because for example
+  the password is going to expire, can reset their passwords by successfully
+  authenticating to OpenAM, visiting their end user pages, such as
+  <literal>http://openam.example.com:8080/openam/idm/EndUser</literal>, and
+  clicking Edit next to the Password field to display the change password
+  page.</para>
+  
+  <mediaobject xml:id="figure-console-change-pwd">
+   <alt>The OpenAM Change Password page</alt>
+   <imageobject>
+    <imagedata fileref="images/console-change-pwd.png" format="PNG" />
+   </imageobject>
+   <textobject><para>Authenticated users can change their passwords
+   through the OpenAM console.</para></textobject>
+  </mediaobject>
+  
+  <para>You therefore do not need to configure password reset for users
+  who can remember their current password. Instead, you point them to the
+  <literal>idm/EndUser</literal> page to let them do it themselves.</para>
+ </section>
+ 
+ <section xml:id="forgotten-pwd-reset">
+  <title>Resetting Forgotten Passwords</title>
+  
+  <para>OpenAM can provide self-service password reset for forgotten passwords.
+  To enable self-service password reset, you must configure the password
+  reset service itself, which consists mainly of setting up secret questions,
+  and configuring an SMTP mail server to send reset passwords to the users
+  of the service.</para>
+  
+  <tip>
+   <para>Users must be able to access their mail after the service resets
+   their passwords, or they will not be able to receive the new password.
+   Do not therefore set up the service to reset the password used to access
+   the email account specified in the user's profile.</para>
+  </tip>
+  
+  <procedure xml:id="set-up-pwd-reset-service">
+   <title>To Set Up the Password Reset Service</title>
+
+   <para>You can configure the password reset service for OpenAM, letting
+   each realm inherit the global settings.</para>
+
+   <step performance="optional">
+    <para>When OpenAM is configured with default settings, it uses the
+    <literal>ldapService</literal> authentication chain, which relies on the
+    <literal>DataStore</literal> authentication module. The
+    <literal>DataStore</literal> authentication module provides a generic
+    authentication mechanism for OpenAM data stores, and therefore cannot
+    handle specific data store settings, such as the directory server password
+    policy setting to force password changes on reset. When you use settings
+    the module cannot handle, then authentication can fail.</para>
+
+    <para>If you must configure the directory server to force password changes
+    on reset, then also configure a separate authentication chain for users.
+    The separate authentication chain must require the <literal>LDAP</literal>
+    authentication module rather than the <literal>DataStore</literal>
+    authentication module.</para>
+
+    <para>You can create and configure authentication chains, and assign them
+    in the OpenAM console under Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Authentication.</para>
+
+    <para>The OpenAM administrator, <literal>amadmin</literal>, uses the
+    <literal>DataStore</literal> authentication module. If you set Access
+    Control &gt; /(Top Level Realm) &gt; Authentication &gt;
+    Core &gt; Organization Authentication Configuration to use your
+    <literal>LDAP</literal> based authentication chain for users, let the
+    Administrator Authentication Configuration continue to use the
+    <literal>DataStore</literal> based authentication chain. To login to the
+    OpenAM console as <literal>amadmin</literal>, access the administrator
+    console service instead of the UI login service endpoint. For example:
+    <literal>http://openam.example.com:8080/openam/console</literal>.</para>
+   </step>
+   <step>
+    <para>In the OpenAM console, browse to Configuration &gt; Global &gt;
+    Password Reset in the Global Properties list.</para>
+   </step>
+   <step>
+    <para>In the Password Reset page, use the following hints to adjust
+    settings, and then save your work.</para>
+    <para>In addition to the User Validation and Secret Question values
+    provided, you must configure at least the Bind DN and Bind Password
+    of the user who can reset passwords in the LDAP data store.</para>
+    <variablelist>
+     <varlistentry>
+      <term>User Validation</term>
+      <listitem>
+       <para>OpenAM uses this LDAP attribute and the value entered by the
+       user to look up the user profile in the data store.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Secret Question</term>
+      <listitem>
+       <para>This list corresponds to property values held in the file
+       <filename>WEB-INF/classes/amPasswordReset.properties</filename> under
+       the directory where OpenAM is deployed.</para>
+       <para>For localized versions of this file, copy
+       <filename>WEB-INF/classes/amPasswordReset.properties</filename> to
+       <filename>WEB-INF/classes/amPasswordReset.properties_<replaceable>locale</replaceable></filename>,
+       and localize only the values of the questions. For example if the
+       default properties file contains:</para>
+       <literallayout class="monospaced">favourite-restaurant=What is your favorite restaurant?</literallayout>
+       <para>Then <filename>WEB-INF/classes/amPasswordReset.properties_fr</filename>
+       ought to contain:</para>
+       <literallayout class="monospaced">favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
+       <para>If you change these files, you must restart OpenAM.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Search Filter</term>
+      <listitem>
+       <para>An additional LDAP search filter you specify here is &amp;-ed
+       with the filter constructed for user validation to find the user
+       entry in the data store.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Base DN</term>
+      <listitem>
+       <para>If you specify no base DN for the search, the search for the user
+       entry starts from the base DN for the realm.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Bind DN</term>
+      <listitem>
+       <para>The DN of the user with access to change passwords in the
+       LDAP data store.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Bind Password</term>
+      <listitem>
+       <para>The password of the user with access to change passwords in the
+       LDAP data store.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Option</term>
+      <listitem>
+       <para>Classname of a plugin that implements the
+       <literal>PasswordGenerator</literal> interface.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Change Notification Option</term>
+      <listitem>
+       <para>Classname of a plugin that implements the
+       <literal>NotifyPassword</literal> interface.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset</term>
+      <listitem>
+       <para>Enables the service.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Personal Question</term>
+      <listitem>
+       <para>When enabled, allows the user to create custom secret
+       questions.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Maximum Number of Questions</term>
+      <listitem>
+       <para>Maximum number of questions to ask during password reset.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Force Change Password on Next Login</term>
+      <listitem>
+       <para>When enabled, the user must change her password next time she
+       logs in after OpenAM resets her password.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Failure Lockout</term>
+      <listitem>
+       <para>When enabled, the user only gets the specified number of tries
+       before her account is locked.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Failure Lockout Count</term>
+      <listitem>
+       <para>If Password Reset Failure Lockout is enabled, this specifies the
+       maximum number of tries to reset a password within the specified
+       interval before the user's account is locked.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Failure Lockout Interval</term>
+      <listitem>
+       <para>This interval applies when Password Reset Failure Lockout is
+       enabled, and when Password Reset Failure Lockout Count is set. During
+       this interval, a user can try to reset her password the specified
+       number of times before being locked out. For example, if this interval
+       is 5 minutes and the count is set to 3, a user gets 3 tries during
+       a given 5 minute interval to reset her password.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Email Address to Send Lockout Notification</term>
+      <listitem>
+       <para>This specifies the administrator address(es) which receive(s)
+       notification on user account lockout. Each address must be a full
+       email address such as <literal>admin@example.com</literal>, or
+       <literal>admin@host.domain</literal>.</para>
+       <para>OpenAM must be able to send mail through an SMTP-capable service
+       for this to work. See <xref linkend="set-up-mail-notification" />.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Warn User After N Failures</term>
+      <listitem>
+       <para>If you configure Password Reset Failure Lockout, set this to
+       warn users who are about to use up their count of tries.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Failure Lockout Duration</term>
+      <listitem>
+       <para>If you configure Password Reset Failure Lockout, set this to a
+       number of minutes other than <literal>0</literal> so that lockout is
+       temporary, requiring only that the locked-out user wait to try again
+       to reset her password, rather than necessarily require help from
+       an administrator.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password Reset Lockout Attribute Name</term>
+      <listitem>
+       <para>If you configure Password Reset Failure Lockout, then OpenAM sets
+       sets data store attribute to <literal>inactive</literal> upon
+       lockout.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term></term>
+      <listitem>
+       <para>If set to <literal>inactive</literal>, then a user who is locked
+       out cannot attempt to reset her password if the Password Reset
+       Failure Lockout Duration is <literal>0</literal>.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>If you changed Secret Questions in the
+    <filename>WEB-INF/classes/amPasswordReset.properties</filename> file or in
+    any localized versions, restart OpenAM for the changes to take
+    effect.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="set-up-mail-notification">
+   <title>To Set Up SMTP Mail Notification</title>
+   
+   <para>By default, OpenAM expects the SMTP service to listen on
+   <literal>localhost:25</literal>. You can change these settings.</para>
+   
+   <step>
+    <para>In the OpenAM console, click the Configuration &gt; Servers and
+    Sites &gt; Default Server Settings.</para>
+   </step>
+   <step>
+    <para>In the Edit server-default page, scroll down to Mail Server to
+    change the Mail Server Host Name or Mail Server Port Number.</para>
+   </step>
+   <step>
+    <para>Save your work.</para>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="prepare-users-for-pwd-reset">
+   <title>To Prepare Users to Reset Passwords</title>
+   
+   <para>Before a user can reset her password, she must choose answers for
+   secret questions.</para>
+   
+   <step>
+    <para>When her account is first created, direct the user to her
+    <literal>idm/EndUser</literal> page, such as
+    <literal>http://openam.example.com:8080/openam/idm/EndUser</literal>,
+    where she can provide a valid email address to recover the reset password
+    and can edit Password Reset Options.</para>
+    <mediaobject xml:id="figure-console-end-user">
+     <alt>The OpenAM end user page</alt>
+     <imageobject>
+      <imagedata fileref="images/console-end-user.png" format="PNG" />
+     </imageobject>
+     <textobject><para>Authenticated users can change their email and
+     password reset secret questions through the OpenAM console.</para></textobject>
+    </mediaobject>
+    <para>By default OpenAM console redirects end users to this page when
+    they login.</para>
+   </step>
+   <step>
+    <para>After the user updates her secret questions, she can use the
+    password reset service when necessary.</para>
+
+    <mediaobject xml:id="figure-console-secret-questions">
+     <alt>The OpenAM secret question page</alt>
+     <imageobject>
+      <imagedata fileref="images/console-secret-questions.png" format="PNG" />
+     </imageobject>
+     <textobject><para>Authenticated users can change the answers to secret
+     questions through the OpenAM console.</para></textobject>
+    </mediaobject>
+
+    <note><para>Answers to secret questions are case sensitive.</para></note>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="redirect-to-reset-pwd">
+   <title>To Direct Users to Reset Passwords</title>
+   
+   <para>Having setup her email and answers to secret questions, the user
+   can use the reset password service.</para>
+   <para>Create a test subject and use these steps to validate your
+   configuration.</para>
+   
+   <step>
+    <para>Send the user with a forgotten password to enter her user ID at
+    the password reset URL.</para>
+    <para>If the user is in the default realm use <literal>password</literal>
+    at the end of the URL to OpenAM, as in
+    <literal>http://openam.example.com:8080/openam/password</literal>.</para>
+    <para>If the password reset service is enabled only for the user's realm
+    and not the parent realm, or the realm to reset the password is different
+    from the user's default realm, use <literal>ui/PWResetUserValidation?realm=<replaceable>realm
+    name</replaceable>, as in</literal>
+    <literal>http://openam.example.com:8080/openam/ui/PWResetUserValidation?realm=<replaceable>realm
+    name</replaceable></literal>.</para>
+    <mediaobject xml:id="figure-console-user-validation">
+     <alt>The OpenAM user validation page</alt>
+     <imageobject>
+      <imagedata fileref="images/console-user-validation.png" format="PNG" />
+     </imageobject>
+     <textobject><para>OpenAM validates that the user exists, has an active
+     account, and has set answers to her secret questions.</para></textobject>
+    </mediaobject>
+   </step>
+   <step>
+    <para>The user answers the specified questions, and clicks OK.</para>
+    <para>OpenAM resets the password, sending mail to the SMTP service
+    you configured.</para>
+    <mediaobject xml:id="figure-console-answer-questions">
+     <alt>The OpenAM user validation page</alt>
+     <imageobject>
+      <imagedata fileref="images/console-answer-questions.png" format="PNG" />
+     </imageobject>
+     <textobject><para>OpenAM prompts with secret questions.</para></textobject>
+    </mediaobject>
+    <mediaobject xml:id="figure-console-reset-confirmation">
+     <alt>The page confirming password reset</alt>
+     <imageobject>
+      <imagedata fileref="images/console-reset-confirmation.png" format="PNG" />
+     </imageobject>
+     <textobject><para>OpenAM confirms password reset.</para></textobject>
+    </mediaobject>
+    <para>The user receives the email with a line such as the following.</para>
+    <literallayout class="monospaced">Your OpenAM password was changed to:  647bWluw</literallayout>
+   </step>
+   <step>
+    <para>The user logs in using the new password.</para>
+    <para>If you configured the system to force a change on password reset,
+    then OpenAM requires the user to change her password.</para>
+   </step>
+  </procedure>
+ </section>
+</chapter>

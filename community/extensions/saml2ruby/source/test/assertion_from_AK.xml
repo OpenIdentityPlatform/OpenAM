@@ -1,0 +1,44 @@
+<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="s21cbde4b44b035247296939b06b27b43e537f5e7f" IssueInstant="2007-08-28T22:41:47Z" Version="2.0">
+<saml:Issuer>https://goas-test/IVS-idp</saml:Issuer><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></CanonicalizationMethod>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></SignatureMethod>
+<Reference URI="#s21cbde4b44b035247296939b06b27b43e537f5e7f">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></Transform>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></Transform>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></DigestMethod>
+<DigestValue>Ax0FHVA47mIlODVimueLw94vneY=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>
+FmSSb+YG4yIoOacp3ZRbxS+AUYNfb3Uvi5EUNmHjpONIYL58PQI2Fb6k4TO+t27qPtYPBVF5527X
+o4HZXp5dElyJMBJ3o6GASaiESnkb9zeTW3lWsqU/Wghx4QNALQ2a0l+VwoGLRhmt4ZDe6ZBEaVk6
+yBVQTg8Uec2l/BF9XO4=
+</SignatureValue>
+<KeyInfo>
+<X509Data>
+<X509Certificate>
+MIIB/DCCAWUCBEa3xCUwDQYJKoZIhvcNAQEEBQAwRTELMAkGA1UEBhMCTloxDDAKBgNVBAoTA0RJ
+QTEWMBQGA1UECxMNSVZTIFByb2dyYW1tZTEQMA4GA1UEAxMHYmkxLWl2czAeFw0wNzA4MDcwMTAw
+MjFaFw0wNzExMDUwMTAwMjFaMEUxCzAJBgNVBAYTAk5aMQwwCgYDVQQKEwNESUExFjAUBgNVBAsT
+DUlWUyBQcm9ncmFtbWUxEDAOBgNVBAMTB2JpMS1pdnMwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
+AoGBAJbh3quNpIroem/nUj71o33rfuSkAued6+AmWviqhEd5sykan5tdVe7UzRwP0bYZi5EcmoGA
+/sb6UPHH3CDlurXfvHQzppAb1auS98NIhjVPuEHwRBDsc5JVY8cM6cMf5wrTmRDWybfB80hrH016
+885bB0xuglkqGBaZ+vcJ1fblAgMBAAEwDQYJKoZIhvcNAQEEBQADgYEAPZv7q92PBjBfTmkPta5s
+/CsOIB36M9v5ZL3YU9YWOdswbPw8rps0aAgMZdUyQS3httcwrl1Xee8II2SKdP5ocENtfRsq+U33
+1umMjk+VANOyK1iuTEJjPyD/ItNIovaC/pNZ0XjJN3a/UuCliW3vAytuEjHGp8HYgZ6kOIGo+GA=
+</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature><saml:Subject>
+<saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="https://goas-test/IVS-idp" SPNameQualifier="https://sp.symspdemo.com:8643/sp.xml">8srfh33cpYWprkAZzJCy4t19zezt</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+<saml:SubjectConfirmationData InResponseTo="Rt7udk7K4cu2qmTIae-0U" NotOnOrAfter="2007-08-28T22:51:47Z" Recipient="https://sp.symspdemo.com:8643/SP-P"></saml:SubjectConfirmationData></saml:SubjectConfirmation>
+</saml:Subject>
+<saml:Conditions NotBefore="2007-08-28T22:41:47Z" NotOnOrAfter="2007-08-28T22:51:47Z">
+<saml:AudienceRestriction>
+<saml:Audience>https://sp.symspdemo.com:8643/sp.xml</saml:Audience>
+</saml:AudienceRestriction>
+</saml:Conditions>
+<saml:AuthnStatement AuthnInstant="2007-08-28T22:41:47Z" SessionIndex="s2d1c68c4b890a604f96718a70ac90024803929701"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="name"><saml:AttributeValue>Ben Yeoman</saml:AttributeValue></saml:Attribute><saml:Attribute Name="gender"><saml:AttributeValue>M</saml:AttributeValue></saml:Attribute><saml:Attribute Name="placeOfBirth"><saml:AttributeValue>Palmerston North</saml:AttributeValue></saml:Attribute><saml:Attribute Name="dob"><saml:AttributeValue>1977-06-19</saml:AttributeValue></saml:Attribute></saml:AttributeStatement></saml:Assertion>

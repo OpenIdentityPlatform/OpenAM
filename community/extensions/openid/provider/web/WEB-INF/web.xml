@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!--
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: web.xml,v 1.5 2009/04/24 21:01:59 rparekh Exp $
+
+  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+  Portions Copyrighted 2007 Paul C. Bryan
+-->
+<web-app>
+
+  <!-- suffix to dispatch to for faces requests -->
+  <context-param>
+    <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+    <param-value>.xhtml</param-value>
+  </context-param>
+
+  <!-- set to true to enable facelets debug logging -->
+  <context-param>
+		<param-name>facelets.DEVELOPMENT</param-name>
+		<param-value>false</param-value>
+  </context-param>
+
+  <!-- declare custom tag library for this application -->
+  <context-param>
+    <param-name>facelets.LIBRARIES</param-name>
+    <param-value>/WEB-INF/taglib.xml</param-value>
+  </context-param>
+
+  <!-- don't process or output comments -->
+  <context-param>
+    <param-name>facelets.SKIP_COMMENTS</param-name>
+    <param-value>true</param-value>
+  </context-param>
+
+  <!-- defines where to store view state -->
+  <context-param>
+    <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+    <param-value>client</param-value>
+  </context-param>
+
+  <!--filter>
+    <filter-name>OpenSSO principal filter</filter-name>
+    <filter-class>com.sun.identity.openid.filter.PrincipalFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>OpenSSO principal filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping-->
+
+  <listener>
+    <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>JavaServer Faces servlet</servlet-name>
+    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>OpenID provider servlet</servlet-name>
+    <servlet-class>com.sun.identity.openid.provider.ProviderServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+    <servlet>
+        <servlet-name>AuthenticationServlet</servlet-name>
+        <servlet-class>com.sun.identity.openid.provider.AuthenticationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+    <servlet-name>JavaServer Faces servlet</servlet-name>
+    <url-pattern>*.jsf</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>OpenID provider servlet</servlet-name>
+    <url-pattern>/service</url-pattern>
+  </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AuthenticationServlet</servlet-name>
+        <url-pattern>/authentication</url-pattern>
+    </servlet-mapping>
+    </web-app>

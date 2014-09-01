@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: sun-web.xml,v 1.4 2008/06/25 05:52:09 qcheng Exp $
+
+-->
+<!DOCTYPE sun-web-app PUBLIC '-//Sun Microsystems, Inc.//DTD Application Server 8.1 Servlet 2.4//EN' 'http://www.sun.com/software/appserver/dtds/sun-web-app_2_4-1.dtd'> 
+
+<sun-web-app>
+    <security-role-mapping>
+        <role-name>MANAGER_ROLE</role-name>
+        <group-name>id=manager,ou=group,dc=opensso,dc=java,dc=net</group-name>
+    </security-role-mapping>
+
+    <security-role-mapping>
+        <role-name>EMPLOYEE_ROLE</role-name>
+        <group-name>id=employee,ou=group,dc=opensso,dc=java,dc=net</group-name>
+    </security-role-mapping>
+
+    <security-role-mapping>
+        <role-name>ALL_ROLE</role-name>
+        <group-name>everyone</group-name>
+    </security-role-mapping>
+
+    <session-config>
+        <session-manager/>
+    </session-config>
+
+    <jsp-config/>
+
+</sun-web-app>
+

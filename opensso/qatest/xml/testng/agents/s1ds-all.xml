@@ -1,0 +1,582 @@
+<test name="AgentsSubjectTests 1">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="0"/>
+    <parameter name="setup" value="true"/>
+    <parameter name="cleanup" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.ConfigureUnconfigure"/>
+        <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+    </classes>
+</test>   
+    <test name="AgentsSubjectTests 2">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsSubjectTests 3">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test> 
+  
+    <test name="AgentsSubjectTests 4">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test> 
+    <test name="AgentsSubjectTests 5">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="4"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsSubjectTests 6">
+        <parameter name="TestName" value="AgentsSubjectTests6"/>
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="5"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsSubjectTests 7">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="evaluationIdx" value="6"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+       <test name="AgentsDNSTests 1">
+        <parameter name="policyIdx" value="1"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsDNSTests 2">
+        <parameter name="TestName" value="AgentsDNSTests2"/>
+        <parameter name="policyIdx" value="1"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 1">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 2">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 3">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 4">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 5">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="4"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 6">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="5"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 7">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="6"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 8">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="7"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsIPConditionTests 9">
+        <parameter name="policyIdx" value="2"/>
+        <parameter name="evaluationIdx" value="8"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsInactivePolicyTests 1">
+        <parameter name="policyIdx" value="3"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsRulesTests 1">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsRulesTests 2">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="1"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsRulesTests 3">
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="2"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="AgentsRulesTests 4">
+        <parameter name="TestName" value="AgentsRulesTests4"/>
+        <parameter name="policyIdx" value="4"/>
+        <parameter name="evaluationIdx" value="3"/>
+        <parameter name="setup" value="false"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+    </test>
+    <test name="GeneralAgentsTests">
+        <parameter name="policyIdx" value="0"/>
+        <parameter name="resourcePIdx" value="21"/>
+        <parameter name="resourceNPIdx" value="22"/>
+        <parameter name="resourceCaseIdx" value="23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.GeneralAgentTests"/>
+        </classes>
+    </test>
+     <test name="AgentsConflictPolicyTest 1">
+        <parameter name="TestName" value="AgentsConflictPolicyTest"/>
+        <parameter name="policyIdx" value="5"/>
+        <parameter name="evaluationIdx" value="0"/>
+        <parameter name="setup" value="true"/>
+        <parameter name="cleanup" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.agents.AgentsTests"/>
+        </classes>
+      </test>
+
+<test name="AgentAuthModuleTests LdapRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="0"/>
+    <parameter name="setup" value="true"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests LdapNonRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="1"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+
+<test name="AgentAuthModuleTests AdRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="2"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests AdRealmNonQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="3"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests RadiusRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="4"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests RadiusNonRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="5"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests MembershipRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="6"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests MembershipNonRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="7"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests DataStoreRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="8"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 
+<test name="AgentAuthModuleTests NTRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="9"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test>
+<test name="AgentAuthModuleTests NTNonRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="10"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test>
+<test name="AgentAuthModuleTests JDBCRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="11"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="false"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test>
+<test name="AgentAuthModuleTests JDBC_NonRealmQualified ">
+    <parameter name="policyIdx" value="0"/>
+    <parameter name="evaluationIdx" value="12"/>
+    <parameter name="setup" value="false"/>
+    <parameter name="cleanup" value="true"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test>
+<test name="AgentAuthModuleTests AD_LDAP_SERVICE_RealmQualified ">
+    <parameter name="policyIdx" value="1"/>
+    <parameter name="evaluationIdx" value="0"/>
+    <parameter name="setup" value="true"/>
+    <parameter name="cleanup" value="true"/>
+    <parameter name="peAtOrg" value="/"/>
+    <parameter name="dynamic" value="false"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.agents.AgentAuthModuleTests"/>
+    </classes>
+</test> 

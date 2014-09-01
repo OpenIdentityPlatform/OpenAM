@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.3 2009/07/24 22:03:12 huacui Exp $
+
+-->
+
+<project name="LoanRequestor" default="all" basedir=".">
+    <description>Builds, tests, and runs the project LoanRequestor.</description>
+    <property file="../../glassfish.properties"/>
+    <condition property="wsimport-script-suffix" value=".bat">
+        <os family="windows"/>
+    </condition>
+    <condition property="wsimport-script-suffix" value="">
+        <not>
+           <os family="windows"/>
+        </not>
+    </condition>
+    <path id="build.class.path">
+      <pathelement location="build/classes"/>
+      <fileset dir="${glassfish.home}/lib">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <target name="-pre-compile">
+        <mkdir dir="build/classes"/>
+        <mkdir dir="web/WEB-INF/classes"/>
+        <exec executable="${glassfish.home}/bin/wsimport${wsimport-script-suffix}">
+            <arg line="-verbose -p com.sun.samples.loanprocessor -d build/classes -keep web/WEB-INF/wsdl/client/LoanProcessor/LoanProcessor.wsdl"/>
+        </exec>
+        <exec executable="${glassfish.home}/bin/wsimport${wsimport-script-suffix}">
+            <arg line="-verbose -p com.sun.samples.loanrequestor -d build/classes -keep web/WEB-INF/wsdl/LoanRequestor/LoanRequestor.wsdl"/>
+        </exec>
+    </target>
+    <target name="compile" depends="-pre-compile">
+        <javac fork="true" destdir="build/classes" srcdir="src" debug="on">
+           <classpath refid="build.class.path" />
+        </javac>
+    </target>
+    <target name ="war" depends="compile">
+      <mkdir dir="dist"/>
+      <copy todir="web/WEB-INF/classes">
+         <fileset dir="build/classes" />
+      </copy>
+      <war destfile="dist/LoanRequestor.war" webxml="web/WEB-INF/web.xml">
+         <zipfileset dir="web" />
+      </war>
+    </target>
+    <target name="deploy">
+      <exec executable="${glassfish.home}/bin/asadmin${wsimport-script-suffix}">
+         <arg line=" deploy "/>
+         <arg line=" dist/LoanRequestor.war" />
+       </exec>
+    </target>
+    <target name="all">
+        <antcall target="war" />
+        <antcall target="deploy" />
+    </target>
+    <target name="clean">
+        <delete dir="build"/>
+        <delete dir="dist"/>
+        <delete dir="web/WEB-INF/classes"/>
+    </target>
+</project>

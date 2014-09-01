@@ -1,0 +1,117 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyCreateRemoteIDP.xml,v 1.5 2008/07/24 18:16:56 veiming Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="configure.provider.section.setup">
+    <property required="true">
+        <label name="lblRealm" defaultValue="configure.provider.label.realm" labelFor="tfRealm" />
+        <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onChange" value="realmSelect(this);" />
+        </cc>
+        <cc name="infoRealm" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateRemoteIDP.infoRealm', infoRealm);" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblMetaRadio" defaultValue="configure.provider.label.meta.question" labelFor="radioMeta" />
+        <cc name="radioMeta" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+            <option label="configure.provider.option.url" value="url" />
+            <option label="configure.provider.option.uploadfile" value="file" />
+            <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="metaOptionSelect(this);" />
+        </cc>
+        <cc name="infoMetadataFile" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateRemoteIDP.infoMetadataFile', infoMetadataFile);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblMetadataFile" defaultValue="configure.provider.label.metadata" labelFor="tfMetadataFileURL" />
+        <cc name="tfMetadataFileURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="70" />
+        </cc>
+        <cc name="infoMetadataFileURL" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateRemoteIDP.infoMetadataFileURL', infoMetadataFileURL);" />
+        </cc>
+        <cc name="btnMetadata"
+            tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+            <attribute name="OnClick" value="openWindow('tfMetadataFile_metadatafilename'); return false;" />
+                <attribute name="defaultValue" value="button.upload" />
+        </cc>
+        <cc name="tfMetadataFile" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+	<cc name="tfcot" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    </section>
+    <section name="cot" defaultValue="configure.provider.section.cot">
+    <property span="true">
+        <cc name="txtCotDesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="configure.provider.help.cot" />
+        </cc>
+    </property>
+    <property>
+        <label name="lblCOT" defaultValue="configure.provider.label.cot.question" labelFor="radioCOT" />
+        <cc name="radioCOT" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+            <option label="configure.provider.option.existing" value="yes" />
+            <option label="configure.provider.option.new" value="no" />
+            <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="cotOptionSelect(this);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblCOT" defaultValue="configure.provider.label.cot.existing" labelFor="choiceCOT" />
+        <cc name="choiceCOT" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+    </property>
+    <property required="true">
+        <label name="lblCOT" defaultValue="configure.provider.label.cot" labelFor="tfCOT" />
+        <cc name="tfCOT" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+            <attribute name="size" value="25" />
+        </cc>
+    </property>
+    </section>
+</propertysheet>

@@ -1,0 +1,129 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2SPAdvancedRemote.xml,v 1.4 2008/06/25 05:51:06 qcheng Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2010-2012 ForgeRock Inc
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="SAE" defaultValue="samlv2sp.attribute.label.sae">
+        <property>
+            <label name="lblSAESPUrl" defaultValue="samlv2sp.attribute.label.sae.saeSPUrl" labelFor="saeSPUrl" />
+            <cc name="saeSPUrl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="95" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpSAESPUrl" defaultValue="samlv2sp.attribute.help.SAESPUrl" />
+        </property>       
+        <property>
+            <label name="lblSAESPLogoutUrl" defaultValue="samlv2sp.attribute.label.sae.saeSPLogoutUrl" labelFor="saeSPLogoutUrl" />
+            <cc name="saeSPLogoutUrl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="95" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpsaeSPLogoutUrl" defaultValue="samlv2sp.attribute.help.saeSPLogoutUrl" />
+        </property>
+    </section>
+      
+     <section name="idpproxy" defaultValue="samlv2sp.provider.section.title.idpproxy" >
+        <property>
+            <label name="lblenableIDPProxy"
+                   defaultValue=
+                   "samlv2sp.attribute.label.idpproxy" 
+                   labelFor="enableIDPProxy" />
+            <cc name="enableIDPProxy" 
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+            <fieldhelp name="helpenableIDPProxy" defaultValue="samlv2sp.attribute.help.SPenableIDPProxy" />
+        </property>
+        <property>
+            <label name="lblalwaysIdpProxy" defaultValue="samlv2sp.attribute.label.alwaysIdpProxy" labelFor="alwaysIdpProxy" />
+            <cc name="alwaysIdpProxy" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Enable" />
+            </cc>
+            <fieldhelp name="helpalwaysIdpProxy" defaultValue="samlv2sp.attribute.help.SPalwaysIdpProxy" />
+        </property>
+        <property>
+            <label name="lbluseIntroForIDPProxy"
+                   defaultValue=
+                   "samlv2sp.attribute.label.introidpproxy" 
+                   labelFor="useIntroductionForIDPProxy" />
+            <cc name="useIntroductionForIDPProxy" 
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+        </property>
+        <property>
+            <label name="lbluseIDPProxy"
+                   defaultValue=
+                   "samlv2sp.attribute.label.useproxyidpfinder"
+                   labelFor="useIDPFinder" />
+            <cc name="useIDPFinder"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblidpProxyCount"
+                   defaultValue=
+                   "samlv2sp.attribute.label.idpProxyCount"
+                   labelFor="idpProxyCount" />
+            <cc name="idpProxyCount" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="5" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpidpProxyCount" defaultValue="samlv2sp.attribute.help.SPidpProxyCount" />
+        </property>
+        <property>
+            <label name="lblidpProxyList"
+                   defaultValue="samlv2sp.attribute.label.idpProxyList"
+                   labelFor="idpProxyList" />
+            <ccgroup>
+                <property>
+                    <cc name="idpProxyList" 
+                        tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel" 
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpidpProxyList" defaultValue="samlv2sp.attribute.help.SPidpProxyList" />
+                </property>
+            </ccgroup>                    
+        </property>  
+    </section>
+</propertysheet>

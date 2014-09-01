@@ -1,0 +1,85 @@
+<EntityConfig xmlns="urn:sun:fm:SAML:2.0:entityconfig"
+    xmlns:fm="urn:sun:fm:SAML:2.0:entityconfig"
+    hosted="1"
+    entityID="abc">
+
+    <IDPSSOConfig metaAlias="/xyz">
+        <Attribute name="description">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="signingCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="encryptionCertAlias">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthOn">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="basicAuthUser">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="basicAuthPassword">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="autofedEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="autofedAttribute">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="assertionEffectiveTime">
+            <Value>600</Value>
+        </Attribute>
+        <Attribute name="idpAuthncontextMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPAuthnContextMapper</Value>
+        </Attribute>
+        <Attribute name="idpAuthncontextClassrefMapping">
+            <Value>urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</Value>
+        </Attribute>
+        <Attribute name="idpAccountMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPAccountMapper</Value>
+        </Attribute>
+        <Attribute name="idpAttributeMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</Value>
+        </Attribute>
+        <Attribute name="idpECPSessionMapper">
+            <Value>com.sun.identity.saml2.plugins.DefaultIDPECPSessionMapper</Value>
+        </Attribute>
+        <Attribute name="attributeMap">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantNameIDEncrypted">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantArtifactResolveSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutRequestSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantLogoutResponseSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantMNIRequestSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="wantMNIResponseSigned">
+            <Value></Value>
+        </Attribute>
+        <Attribute name="cotlist">
+        </Attribute>
+        <Attribute name="discoveryBootstrappingEnabled">
+            <Value>false</Value>
+        </Attribute>
+        <Attribute name="assertionNotBeforeTimeSkew">
+            <Value>600</Value>
+        </Attribute>
+        <Attribute name="saeAppSecretList">
+        </Attribute>
+        <Attribute name="saeIDPUrl">
+            <Value>http://owen1.red.iplanet.com:8080/opensso/idpsaehandler/metaAlias/xyz</Value>
+        </Attribute>
+    </IDPSSOConfig>
+</EntityConfig>
+

@@ -1,0 +1,13 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="WSFedSmokeTests">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.wsfed.ConfigureWSFed"/>
+            <class name="com.sun.identity.qatest.wsfed.WSFedSmokeTest"/>
+            <class name="com.sun.identity.qatest.wsfed.UnconfigureWSFed"/> 
+        </classes>
+    </test>

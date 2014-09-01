@@ -1,0 +1,43 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright © 2012 ForgeRock Inc. All rights reserved.
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [2012] [Forgerock AS]"
+#
+
+dn: cn=schema
+changetype: modify
+add: attributeTypes
+attributeTypes: ( 2.16.840.1.113730.3.1.1086 NAME 'sunPreferredDomain' DESC 'The DNS domain name ' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.593 NAME ( 'sunRegisteredServiceName' 'iplanet-am-service-status') DESC 'List of services registered with an organization - used by identity server' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.75 NAME 'sunPreferredOrganization' DESC 'Organization Name' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.76 NAME 'sunAdditionalTemplates' DESC 'Template RDN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.77 NAME 'sunOverrideTemplates' DESC 'Template RDN Override Global Template' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.85 NAME ( 'sunNameSpaceUniqueAttrs' ) DESC 'Attribute to store the key values in xml format' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.79 NAME ( 'sunserviceid' ) DESC 'Attribute to store the reference to the inherited object' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.83 NAME ( 'sunkeyvalue' ) DESC 'Attribute to store the encoded key values of the services' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.81 NAME ( 'sunsmspriority' ) DESC 'To store the priority of the service with respect to its siblings' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.84 NAME ( 'sunxmlkeyvalue' ) DESC 'Attribute to store the key values in xml format' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Sun Java System Identity Management' )
+-
+add: objectClasses
+objectClasses: ( 2.16.840.1.113730.3.2.185 NAME 'sunManagedOrganization' DESC 'Auxiliary class which must be present in an organization entry' SUP top AUXILIARY MAY ( inetDomainStatus $ sunPreferredDomain $ associatedDomain $ sunPreferredOrganization $ sunAdditionalTemplates $ sunOverrideTemplates $ sunRegisteredServiceName $ organizationName  ) X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.75 NAME 'sunManagedSubOrganization' DESC 'Auxiliary class which must be present in an sub organization entry' SUP top AUXILIARY MAY ( inetDomainStatus $ parentOrganization ) X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.29 NAME 'sunNameSpace' DESC 'Auxiliary class which must be present at the root of a subtree representing a namespace' AUXILIARY MAY sunNameSpaceUniqueAttrs X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.27 NAME 'sunservicecomponent' DESC 'Sub-components of the service' SUP top MUST ou MAY ( sunserviceid $ sunsmspriority $ sunkeyvalue $ sunxmlkeyvalue $ description ) X-ORIGIN 'Sun Java System Identity Management' )

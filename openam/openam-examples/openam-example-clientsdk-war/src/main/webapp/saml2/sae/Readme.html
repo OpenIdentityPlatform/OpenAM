@@ -1,0 +1,145 @@
+<html>
+<body>
+<b>Virtual Federation (as known as Secure Attributes Exchange or SAE) : Sample </b>
+<br><br>
+This sample demonstrates usage of Virtual Federation feature.
+<br>
+<br> <b>Actors :</b>
+<br> (1) OpenAM-IDP : OpenAM setup as samlv2 IDP.
+<br> (2) OpenAM-SP : OpenAM setup as samlv2 SP.
+<br> (3) samplesaml2cot : Circle of Trust comprising OpenAM-IDP and OpenAM-SP.
+<br> (4) IDP-App : A web application hosted on IDP end (saeIDPApp.jsp). 
+<br> (5) SP-App : A web application hosted on SP end (saeSPApp.jsp).
+<br>
+<br>
+<br><a><b>IDP-App</b> --- sae --- <b>OpenAM-IDP</b> -|- samlv2 -|- <b>OpenAM-SP</b> --- sae --- <b>SP-App</b></a>
+<br>
+<br> The detailed steps listed below will  help you learn the following aspects of Virtual Federation:
+<br>  - Setting up trust relationship between IDP-App and OpenAM-IDP.
+<br>  - Setting up trust relationship between SP-App and OpenAM-SP.
+<br>  - Passing user Authentication information from IDP-App to OpenAM-IDP.
+<br>  - Passing user attribute information from IDP-App to OpenAM-IDP.
+<br>  - Using OpenAM-IDP as a gateway to access SP-App.
+<br>  - Consuming authentication and attribute data in SP-App.
+<br>
+<br><b>Detailed Steps</b><br>
+<br> <i>Step 1 </i>: Perform initial SAMLv2 install & setup as in OpenAM SAMLv2 Sample <b>Setup</b> section.<br>
+In effect we are creating two domains that will communicate over SAMLv2.
+<br>
+<br> <i>Step 2</i> : Deploy saeAppIDP.jsp and saeAppSP.jsp on the respective domains. 
+For simplicity you may choose to use the predeployed saeAppIDP.jsp on OpenAM-IDP instance and saeAppSP.jsp on OpenAM-SP instances. In this case, assume <br>
+IDP-App_protocol=OpenAM-IDP_protocol<br>
+IDP-App_host=OpenAM-IDP_host<br>
+IDP-App_port=OpenAM-IDP_port<br>
+IDP-App_uri=OpenAM-IDP_uri<br>
+SP-App_protocol=OpenAM-SP_protocol<br>
+SP-App_host=OpenAM-SP_host<br>
+SP-App_port=OpenAM-SP_port<br>
+SP-App_uri=OpenAM-SP_uri<br>
+in the following configuration steps.
+A more common deployment scenario is to install them in their own web applications. 
+<br>
+<br> <i>Step 3</i> : Establish trust between IDP-App and OpenAM-IDP via Symmetric Method or Asymmetric Method.<br>
+<b>Symmetric Method :</b> <br>
+(3a) Choose a shared secret to be used between IDP-App and OpenAM-IDP. If data encryption is used, the same secret is used for data encryption as well. <br>
+(3b) saeIDPApp.jsp is factored as a form that will prompt for these values, but you may choose to edit it to : <br>
+(i) initialize <i>cryptotype</i> variable to "symmetric" <br>
+(ii) initialize the <i>secret</i> variable to shared secret string.<br>
+[ Note - in a real deployment the app should store this secret on disk by encrypting it in a file and keeping the file safe. ]<br>
+(iii) initialize the <i>userid</i> variable to the user id on the OpenAM-IDP. e.g. "demo".<br>
+(iv) initialize the <i>idpAppName</i> variable to a string that uniquely identifies this IDP-App. <br>
+(v) initialize the <i>saeServiceURL</i> parameter to : &lt;OpenAM-IDP_protocol&gt;://&lt;OpenAM-IDP_host&gt;:&lt;OpenAM-IDP_port&gt;/&lt;OpenAM-IDP_uri&gt;/idpsaehandler/metaAlias/idp<br>
+[Note: here we assume the meta alias for OpenAM-IDP is "idp"]<br>
+(vi) initialize the <i>spapp</i> variable to the SP-App URL, e.g.
+&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp<br>
+(vii) If data encryption is used, change <i>encryptionAlg</i> and <i>encryptionStrength</i> if needed. <i>encSecret</i> is set to be the same as <i>secret</i>. <br>
+(3c) Logon to the administration console of OpenAM-IDP, goto "Federation" tab, then click the hosted OpenAM-IDP entity. <br>
+Goto the "Advanced" tab, and add following value to the "Per Application Security Configuration" field:<br>
+url=&lt;IDP-App_URL&gt;|type=symmetric|secret=&lt;encoded_shared_secret&gt;[|encryptionalgorithm=&lt;encAlg&gt;|encryptionkeystrength=&lt;encStrength&gt;]<br> 
+where &lt;IDP-App_URL&gt; is the IDP-App URL, e.g. &lt;IDP-App_protocol&gt;://&lt;IDP-App_host&gt;:&lt;IDP-App_port&gt;/&lt;IDP-App_uri&gt;/samples/saml2/sae/saeIDPApp.jsp, <br>
+&lt;encoded_shared_secret&gt; is the encoded value (using encode.jsp from browser or ampassword from CLI on OpenAM-IDP instance) of the shared secret between IDP-app and OpenAM-IDP,  <br>
+if data encryption is enabled, configure encryptionalgorithm and encryptionkeystrength attributes such as: encryptionalgorithm=DES|encryptionkeystrength=56 <br>
+Click "Save" button to save the change.<br>
+(3d)  Logon to the administration console of OpenAM-IDP, goto "Federation" tab, then click the remote OpenAM-SP entity. <br>
+Goto the "Assertion Processing" tab, and add the attributes to be sent as part of the saml assertion to OpenAM-SP in the "Attribute Map" field. Click "Save" to store the change. <br>
+[Note: one of the attributes configured here will be used as auto federation attribute in step (4c).]<br> 
+Goto the "Advanced" tab, set value for the "SP URL" field as follows:<br>
+&lt;OpenAM-SP_protocol&gt;://&lt;OpenAM-SP_host&gt;:&lt;OpenAM-SP_port&gt;/&lt;OpenAM-SP_uri&gt;/spsaehandler/metaAlias/sp<br>
+[Note: here we assume the meta alias for OpenAM-SP is "sp"]<br>
+
+<b>Asymmetric Method :</b><br>
+(3a) Obtain a private-public key pair to be used between the IDP-App and OpenAM-IDP. Store the key pair in a secure keystore on IDP-App side. <br>
+Add the public key to the keystore in OpenAM-IDP (see saml2 docs), write down the certificate alias which is needed in step (3c). <br>
+If plan to use data encryption, add OpenAM-IDP's public key to the keystore on IDP-App side. Write down the certificate alias which is needed in step (3c). <br>
+(3b)saeIDPApp.jsp is factored as a form that will prompt for these values, but you may choose to edit it to : <br>
+(i) initialize <i>cryptotype</i> variable to "asymmetric" <br>
+(ii) initialize the <i>secret</i> variable to IDP-App private key alias string.<br>
+[Note - in a real deployment the app should store private key in a secure keystore. ]<br>
+(iii) initialize the <i>userid</i> variable to the user id on the OpenAM-IDP. e.g. "demo".<br>
+(iv) initialize the <i>idpAppName</i> variable to a string that uniquely identifies this IDP-App  <br>
+(v) initialize the <i>saeServiceURL</i> parameter to : &lt;OpenAM-IDP_protocol&gt;://&lt;OpenAM-IDP_host&gt;:&lt;OpenAM-IDP_port&gt;/&lt;OpenAM-IDP_uri&gt;/idpsaehandler/metaAlias/idp<br>
+[Note: here we assume the meta alias for OpenAM-IDP is "idp"]<br>
+(vi) initialize the <i>spapp</i> variable to the SP-App URL, e.g.
+&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp<br>
+(vii) If data encryption is used, change <i>encSecret</i>, <i>encryptionAlg</i> and <i>encryptionStrength</i> if needed. <i>encSecret</i> is the public key alias of OpenAM-IDP.<br>
+(3c) Logon to the administration console of OpenAM-IDP, goto "Federation" tab, then click the hosted OpenAM-IDP entity. <br>
+Goto the "Advanced" tab, and add following value to the "Per Application Security Configuration" field:<br>
+url=&lt;IDP-App_URL&gt;|type=asymmetric|pubkeyalias=&lt;IDP-App_public_key_certalias&gt;[|encrytionalgorithm=&lt;encAlg&gt;|encryptionkeystrength=&lt;encStrength&gt;]<br> 
+where &lt;IDP-App_URL&gt; is the IDP-App URL, e.g. "&lt;IDP-App_protocol&gt;://&lt;IDP-App_host&gt;:&lt;IDP-App_port&gt;/&lt;IDP-App_uri&gt;/samples/saml2/sae/saeIDPApp.jsp";<br>
+&lt;IDP-App_public_key_certalias&gt; is the alias name of the IDP-App public certificate stored in the key store of OpenAM-IDP done in step (3a). <br>
+If data encryption is used, configure encryptionalgorithm and encryptionkeystrength attributes.
+Click "Save" button to save the change.<br>
+(3d)  Logon to the administration console of OpenAM-IDP, goto "Federation" tab, then click the remote OpenAM-SP entity. <br>
+Goto the "Assertion Processing" tab, and add the attributes to be sent as part of the saml assertion to OpenAM-SP in the "Attribute Map" field. Click "Save" to store the change. <br>
+Goto the "Advanced" tab, set value for the "SP URL" field as follows:<br>
+&lt;OpenAM-SP_protocol&gt;://&lt;OpenAM-SP_host&gt;:&lt;OpenAM-SP_port&gt;/&lt;OpenAM-SP_uri&gt;/spsaehandler/metaAlias/sp<br>
+[Note: here we assume the meta alias for OpenAM-SP is "sp"]<br>
+
+<br><br> <i>Step 4</i> : Establish trust between SP-App and OpenAM-SP via Symmetric Method or Asymmetric Method.<br>
+<b>Symmetric Method:</b><br>
+(4a) Choose a shared secret to be used between SP-App and OpenAM-SP. If data encryption is used, the same shared secret is used for data encryption as well.
+<br>(4b) Edit saeSPApp.jsp to :<br>
+(i) initialize <i>cryptotype</i> variable to "symmetric" <br>
+(ii) initialize the <i>secret</i> variable to the shared secret string.<br>
+[ Note - in a real deployment the app should store this secret on disk by encrypting it in a file and keeping the file safe. ]. <br>
+(iii) If data encryption is used, modify <i>encAlg</i> and <i>encStrength</i> if needed. <br>
+(4c) Logon to the administration console of OpenAM-SP, goto "Federation" tab, then click the hosted OpenAM-SP entity. <br>
+* Goto the "Assertion Processing" tab, and add the attributes mapping in the "Attribute Map" field. Under "Auto Federation" section, check the "Enabled" box, and enter the auto federation attribute name (e.g. "mail") in the "Attribute" field. Click "Save" to store the change. <br>
+[Note : the value of the auto federation attribute on the IDP and SP user entries must be the same in order for the auto federation feature to work. In case there is no user exist on SP side, you can goto Access Control -> &lt;your realm&gt; -> Authentication -> Advanced Properties page, and set the "User Profile" filed to "Ignore".]  <br> 
+* Goto the "Advanced" tab, add a value in the "Per Application Security Configuration" field as follows:<br>
+url=&lt;SP-App_URL&gt;|type=symmetric|secret=&lt;encoded_shared_secret&gt;[|encryptionalgorithm=&lt;|encryptionkeystrength&gt;]<br>
+where &lt;SP-App_URL&gt; is the SP-App URL, e.g. "&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp";<br>
+&lt;encoded_shared_secret&gt; is the encoded value (using encode.jsp from browser or ampassword from CLI on OpenAM-SP instance) of the shared secret between SP-app and OpenAM-SP.<br>
+If data encryption is used, configure encryptionalgorithm and encryptionkeystrength attributes, such as encryptionalgorithm=DES|encryptionkeystrength=56 <br>
+* Set SP-App logout URL in the "SP Logout URL" field if application logout needed. e.g. "&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp".  Click "Save" button to save the change. .<br> 
+<b>Asymmetric Method:</b><br>
+(4a) Obtain a private-public key pair to be used between SP-App and OpenAM-SP. Store the key pair in a secure keystore on SP-App side. <br>
+Add OpenAM-SP's public key to the keystore on SP-App. Write down the certificate alias which is needed in step (4b).
+If data encryptioned is used, add SP-App public key to the keystore on OpenAM-SP (see saml2 docs), write down the certificate alias which is needed in step (4c). <br>
+<br>(4b) Edit saeSPApp.jsp to :<br>
+(i) initialize <i>cryptotype</i> variable to "asymmetric" <br>
+(ii) initialize the <i>secret</i> variable to the alias of OpenAM-SP's public key. <br>
+(iii) If data encryption is enabled, initialize the <i>encSecret</i> variable to the alias of SP-App's private key. Modify <i>encAlg</i> and <i>encStrength</i> variables if needed. <br>
+(4c) Logon to the administration console of OpenAM-SP, goto "Federation" tab,
+then click the hosted OpenAM-SP entity. <br>
+* Goto the "Assertion Processing" tab, and add the attributes mapping in the "Attribute Map" field. Under "Auto Federation" section, check the "Enabled" box, and enter the auto federation attribute name (e.g. "mail") in the "Attribute" field. Click "Save" to store the change. <br>
+[Note : the value of the auto federation attribute on the IDP and SP user entries must be the same in order for the auto federation feature to work. In case there is no user exist on SP side, you can goto Access Control -> &lt;your realm&gt; -> Authentication -> Advanced Properties page, and set the "User Profile" filed to "Ignore".]  <br> 
+* Goto the "Advanced" tab, add a value in the "Per Application Security Configuration" field as follows:<br>
+url=&lt;SP-App_URL&gt;|type=asymmetric|privatekeyalias=&lt;OpenAM-SP_signing_certalias&gt;[|pubkeyalias=&lt;SP-App_public_certalias&gt;|encryptionalgorithm=&lt;encAlg&gt;|encryptionkeystrength=&lt;encStrength&gt;]<br>
+where &lt;SP-App_URL&gt; is the SP-App URL, e.g. "&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp"; <br>
+&lt;OpenAM-SP_signing_certalias&gt; is the alias name of the OpenAM-SP signing certificate stored in the key store of OpenAM-SP. If you don't configure OpenAM-SP signing certificate here, it will use the signing certificate configured in OpenAM-SP's extended metadata.<br>
+If data encryption is used, configure pubkeyalias, encryptionalgorithm and encryptionkeystrength. pubkeyalias is SP-App's public certificate alias.<br>
+* Set SP-App logout URL in the "SP Logout URL" field if application logout needed. e.g. "&lt;SP-App_protocol&gt;://&lt;SP-App_host&gt;:&lt;SP-App_port&gt;/&lt;SP-App_uri&gt;/samples/saml2/sae/saeSPApp.jsp".  Click "Save" button to save the change. <br> 
+<br>
+<br> <i>Step 5</i> : Execute the sample.
+<br>  Start a browser and access &lt;IDP-App_protocol&gt;://&lt;IDP-App_host&gt;:&lt;IDP-App_port&gt;/&lt;IDP-App_uri&gt;/samples/saml2/sae/saeIDPApp.jsp 
+<br>  Fill up the form with the values you want communicated to OpenAM-IDP :
+<br>    logged in username, attributes (mail, branch).
+<br>  Clicking on "Send Attributes" will securely invoke saeAppSP.jsp on SP-App.
+<br>
+<br> <b>Troubleshooting</b>
+<br> OpenAM Debug files : Virtual Federation and samlv2 on IDP and SP ends.
+<br> dumpcookies.jsp can be deployed on SP/IDP ends to view http headers and OpenAM session.
+<br> --
+</body>
+</html>

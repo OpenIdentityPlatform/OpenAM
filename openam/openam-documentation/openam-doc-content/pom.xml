@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam-documentation</artifactId>
+        <version>10.2.0-SNAPSHOT</version>
+    </parent>
+
+    <name>OpenAM Generated Documentation Content</name>
+    <inceptionYear>2011</inceptionYear>
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>openam-doc-content</artifactId>
+    <packaging>jar</packaging>
+    <description>Tools for creating/generating the core documentation.</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <sourceDirectory>../../</sourceDirectory>
+                            <includes>
+                                <include>openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/cli/definition/AccessManager.java</include>
+                                <include>openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java</include>
+                            </includes>
+                            <processors>
+                                <processor>org.forgerock.openam.docs.ssoadm.SsoadmAP</processor>
+                            </processors>
+                            <options>
+                                <outputFile>openam-documentation/openam-doc-content/target/classes/man-ssoadm-1.xml</outputFile>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-cli-definitions</artifactId>
+        </dependency>
+    </dependencies>
+</project>

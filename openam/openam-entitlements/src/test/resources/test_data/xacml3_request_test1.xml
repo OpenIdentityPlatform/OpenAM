@@ -1,0 +1,28 @@
+<xacml-ctx:request returnpolicyidlist="true" combineddecision="false" xmlns:xacml-ctx="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">
+    <xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
+    </xacml-ctx:attributes>
+    <xacml-ctx:attributes category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+        <xacml-ctx:attribute attributeid="urn:org:apache:tomcat:user-attr:clearance" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">SECRET</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+        <xacml-ctx:attribute attributeid="company" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">Axiomatics</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+        <xacml-ctx:attribute attributeid="urn:org:apache:tomcat:user-role" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">manager</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+    </xacml-ctx:attributes>
+    <xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+        <xacml-ctx:attribute attributeid="urn:oasis:names:tc:xacml:1.0:action:action-id" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">view</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+    </xacml-ctx:attributes>
+    <xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+        <xacml-ctx:attribute attributeid="classification" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">CONFIDENTIAL</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+        <xacml-ctx:attribute attributeid="urn:oasis:names:tc:xacml:1.0:resource:resource-id" includeinresult="true">
+            <xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">document</xacml-ctx:attributevalue>
+        </xacml-ctx:attribute>
+    </xacml-ctx:attributes>
+</xacml-ctx:request>

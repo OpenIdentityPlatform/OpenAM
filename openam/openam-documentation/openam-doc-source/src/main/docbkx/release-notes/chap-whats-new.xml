@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<chapter xml:id='chap-whats-new'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
+
+ <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
+ provides the following additional features.</para>
+
+ <itemizedlist>
+  <title>Major New Features</title>
+
+   <listitem>
+    <para>All of the web policy agents have been updated to include support for Internet
+    Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
+    AME-1134 is closed, which includes removing unused libraries.--></para>
+    <para>IPv6 replaces IPv4 to fix the problems of IPv4 address exhaustion. The new 
+    protocol version increases the number of available internet addresses by using 
+    128-bit addresses instead of the 32-bit addresses of IPv4.</para>
+   </listitem>
+
+  <listitem>
+   <para>REST Authentication Service has been updated to handle Integrated Windows
+   Authentication. IWA is now available through the REST interface by using the new endpoint, 
+   <filename>http://&lt;OpenAM Host&gt;:&lt;Port&gt;/&lt;deploy_uri&gt;/json/auth/1/authenticate</filename>.
+   The legacy REST authentication interface is still available.</para>
+  </listitem>
+
+  <listitem>
+   <para>The policy tree index has been updated so that resources first check the root
+   level of a realm first. The tree will be created from this level, and any subsequent
+   referrals will create another tree specific to the realm where the referral was
+   retrieved. This conserves memory and reduces the amount of time required to load
+   the tree. An intelligent indexing model now assists with quickly identifying relevant
+   policy rules for the resource being authorized.</para>
+  </listitem>
+
+  <listitem>
+   <para>Users and realms can be created, read, edited, and deleted using an 
+   HTTP POST of the JSON representation. See <link
+   xlink:href="dev-guide#rest-api-crud-identity"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Identity Management</citetitle></link>
+   and <link xlink:href="dev-guide#rest-api-crud-realm"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Realm Management</citetitle>
+   </link> for explanations, instructions, and examples.</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now provides further support for OAuth 2.0. In addition
+   to playing the role of client and resource server, OpenAM can now also
+   play the role of OAuth 2.0 authorization server. See <link
+   xlink:href="admin-guide#chap-oauth2"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing OAuth
+   2.0 Authorization</citetitle></link> for explanations, instructions,
+   and examples.</para>
+  </listitem>
+
+  <listitem>
+   <para>Session failover has been modified to be simpler to deploy (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-625"
+   xlink:show="new">OPENAM-625</link>). OpenAM 10.0.1 and earlier required the
+   use of Open Message Queue and Berkeley DB Java Edition, which increased the
+   complexity and amount of time required to get session failover working.
+   OpenAM now writes session data to the configuration data store instead.
+   This implementation also can be used to make sessions persist across restart
+   for single OpenAM servers. The current implementation requires that you use
+   OpenDJ for the configuration data store.</para>
+
+   <para>This new implementation is designed to operate on a local site network.
+   Cross-site session failover and session failover across wide area networks
+   (WANs) are not supported.</para>
+  </listitem>
+
+  <listitem>
+   <para>IBM<superscript>®</superscript> WebSphere<superscript>®</superscript>
+   8.0 is now a supported platform. See <link
+   xlink:href="install-guide#prepare-ibm-websphere"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Preparing IBM
+   WebSphere</citetitle></link> in the <citetitle>Installation Guide</citetitle>
+   for details on how to setup WebSphere 8.0 and 8.5 before deploying 
+   OpenAM.</para>
+  </listitem>
+
+  <listitem>
+   <para>Legacy naming conventions have been changed to conform to the
+   current product name, OpenAM. This includes the OpenAM bootstrap file
+   (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1555"
+   xlink:show="new">OPENAM-1555</link>). <filename>$HOME/.openamcfg/</filename>
+   is the new name for <filename>$HOME/.openssocfg/</filename>. If you upgrade,
+   OpenAM still supports use of <filename>$HOME/.openssocfg/</filename>, and
+   does not rename the folder. For new OpenAM installs, OpenAM creates the
+   directory with the new name, <filename>$HOME/.openamcfg/</filename>, at
+   configuration time. Other files, such as the <filename>openam.war</filename>
+   file, and paths have been modified to ensure consistency with the naming
+   conventions.</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now supports <link xlink:show="new"
+   xlink:href="http://www.openauthentication.org/">Open Authentication</link>
+   (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-727"
+   xlink:show="new">OPENAM-727</link>). The module provides the user with a
+   one-time password based either on a HMAC one-time password or a time-based
+   one-time password. OATH lets you determine which type of one-time password
+   is best for your users when they need to login with a password generating
+   device. Devices can range from a smartphone to a dedicated device, such as
+   YubiKey or any other OATH compliant device.</para>
+
+   <para>With OATH, OpenAM now supports YubiKey<superscript>®</superscript>
+   authentication. The YubiKey simplifies the process of logging in with a One
+   Time Password token as it does not require the user to re-type long pass
+   codes from a display device into the login field of the computer. The
+   YubiKey is inserted in the USB-port of any computer and the OTP is generated
+   and automatically entered with a simple touch of a button on the YubiKey,
+   and without the need of any client software or drivers.</para>
+  </listitem>
+
+  <listitem>
+    <para>OpenAM now supports (<link
+                 xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1375"
+                 xlink:show="new">OPENAM-1375</link>)the Device Print adaptive authentication module.
+             The module can use various characteristics of a system, including installed
+             fonts, screen resolution, timezone, and geolocation to uniquely identify a
+             system. The Device Print module includes all of the functionality associated
+             with the HOTP authentication module.</para>
+  </listitem>
+
+ </itemizedlist>
+
+ <itemizedlist>
+  <title>Additional New Features</title>
+
+  <listitem>
+    <para>OpenID now adds support for OpenID Connect 1.0.</para>
+  </listitem>
+
+  <listitem>
+   <para>The zero page login has been modified so that administrators can disable the
+   functionality. The zero page login process is the ability of the user to login
+   using only GET parameters, which presents a possible security issue. Zero page 
+   login is now disabled by default (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2354"
+   xlink:show="new">OPENAM-2354</link>).</para>
+  </listitem>
+
+  <listitem>
+   <!-- AME-219 and CR-889 -->
+   <para>OpenAM now provides an account expiration post authentication plugin to
+   set an account expiration date on successful login.</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now bundles OpenDJ 2.4.6 (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1954"
+   xlink:show="new">OPENAM-1954</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>The AMLoginModule now lets authentication modules retrieve the list of
+   current session tokens for a user (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1721"
+   xlink:show="new">OPENAM-1721</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM's IDPAdapter now provides additional hooks for customization.
+   This improvement introduces changes to the API that affect custom IDPAdapters
+   (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1623"
+   xlink:show="new">OPENAM-1623</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>When running as a Service Provider, OpenAM no longer requires
+   that you enable module-based authentication (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1470"
+   xlink:show="new">OPENAM-1470</link>).</para>
+  </listitem>
+
+  <!-- Unresolved for Xpress
+  <listitem>
+   <para>The OATH authentication module now implements resynchronization
+   for TOTP (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1462"
+   xlink:show="new">OPENAM-1462</link>).</para>
+  </listitem>
+  -->
+
+  <listitem>
+   <para>OpenAM now has better support for using a reverse proxy for federation
+   when DAS is also deployed (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1454"
+   xlink:show="new">OPENAM-1454</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now allows use of a read-only data store with a non-transient
+   NameID during SAML 2.0 federation (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1427"
+   xlink:show="new">OPENAM-1427</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>The ssoadm command now includes a get-sub-cfg subcommand (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1348"
+   xlink:show="new">OPENAM-1348</link>).</para>
+  </listitem>
+
+   <listitem>
+    <para>The REST authenticate command now has a parameter to specify the
+    client IP address (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1048"
+    xlink:show="new">OPENAM-1048</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM is now built with Maven. Maven artifacts continue to be uploaded
+   to the ForgeRock Maven repository (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-739"
+   xlink:show="new">OPENAM-739</link>).</para>
+  </listitem>
+
+   <listitem>
+    <para>You can now prevent OpenAM from caching subject evaluations for
+    policy decisions (part of the fix for <link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-24"
+    >OPENAM-24</link>).</para>
+    <para>In most cases you do not need to turn off caching, as OpenAM now
+    clears cache when group membership changes. Before turning off caching in
+    production, first test the setting to ensure that the performance impact is
+    acceptable for your deployment.</para>
+    <para>To turn off caching, set Access Control &gt; <replaceable
+    >Realm Name</replaceable> &gt; Services &gt; Policy Configuration &gt;
+    Subjects Result Time to Live to 0. The equivalent
+    <command>ssoadm</command> property for the
+    <literal>iPlanetAMPolicyConfigService</literal> is
+    <literal>iplanet-am-policy-config-subjects-result-ttl</literal>.</para>
+   </listitem>
+ </itemizedlist>
+</chapter>

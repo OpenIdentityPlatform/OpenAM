@@ -1,0 +1,7 @@
+SUNWprivate_1.0 {
+	global:
+		dsame_module;
+
+	local:
+		*;
+};

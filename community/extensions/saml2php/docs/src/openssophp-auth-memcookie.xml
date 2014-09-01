@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<article>
+  <title>Access control in Apache with the OpenSSO PHP extension and Auth
+  MemCookie</title>
+
+  <articleinfo>
+    <date>2007-06-23</date>
+
+    <author>
+      <firstname>Olav</firstname>
+
+      <surname>Morken</surname>
+    </author>
+  </articleinfo>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>This HOWTO describes how to add access control to a web site by
+    using the OpenSSO PHP extension and Auth MemCookie.</para>
+
+    <para>The OpenSSO PHP extension is used to authenticate the user against a
+    SAML 2.0 single signon server and Auth MemCookie is used for access
+    control after the user is authenticated.</para>
+  </section>
+
+  <section>
+    <title>Prerequsites</title>
+
+    <section>
+      <title>Apache 2</title>
+
+      <para>Since Auth MemCookie is an Apache 2 module, the web site you are
+      going to add access control to must be hosted on an Apache 2 web
+      server.</para>
+
+      <para>To protect personal data, which will be sent from the IdP to your
+      web site through a standard HTTP POST request, you should enable SSL on
+      your web site. How to configure SSL for your web site is outside of the
+      scope of this document.</para>
+
+      <para>Since we are going to compile Auth MemCookie from source, we are
+      going to need developement headers and tools for Apache 2. In Debian
+      Etch, these can be installed by running:</para>
+
+      <screen>apt-get install apache2-prefork-dev</screen>
+
+      <para>Other distributions may include the developement tools and headers
+      in the same package as the web server, or they may be in a seperate
+      package.</para>
+
+      <para>You can verify that you have the required developement tools by
+      running:</para>
+
+      <screen>apxs2 -q TARGET</screen>
+
+      <para>This should print out <literal>apache2</literal>. If
+      <literal>apxs2</literal> fails to run, then you can try to replace
+      <literal>apxs2</literal> with <literal>apxs</literal>.</para>
+    </section>
+
+    <section>
+      <title>PHP</title>
+
+      <para>The OpenSSO PHP extension requires a PHP enabled web server which
+      supports OpenSSL.</para>
+
+      <para>On Debian Etch you can install PHP by running:</para>
+
+      <screen>apt-get install php5</screen>
+    </section>
+
+    <section>
+      <title>dev.java.net account</title>
+
+      <para>Currently the source code for the OpenSSO PHP extension is only
+      available through CVS. To access the CVS repository at dev.java.net you
+      must have an account there. You can get a dev.java.net account by
+      registering at <ulink
+      url="https://www.dev.java.net/servlets/Join">https://www.dev.java.net/servlets/Join</ulink>.</para>
+    </section>
+
+    <section>
+      <title>CVS client</title>
+
+      <para>To download the source code for the OpenSSO PHP extension you need
+      a CVS client. On Debian Etch, you can install the standard CVS client by
+      running:</para>
+
+      <screen>apt-get install cvs</screen>
+    </section>
+
+    <section>
+      <title>gcc</title>
+
+      <para>To compile Auth MemCookie you are going to need gcc. On Debian
+      Etch, you can install gcc by running:</para>
+
+      <screen>apt-get install gcc</screen>
+    </section>
+  </section>
+
+  <section>
+    <title>General layout</title>
+
+    <para>In this document we assume that your web site is a service provider
+    located at the <literal>sp.example.com</literal> domain. We assume that
+    the area you want to add access control to is located under
+    <literal>https://sp.example.com/protected/</literal>. We are going to
+    install the OpenSSO PHP extension into the <literal>/openssophp/</literal>
+    directory on the web server. Through this document we are going to assume
+    that the root directory of your web site is located at
+    <literal>/var/www/</literal>.</para>
+  </section>
+
+  <section>
+    <title>memcache</title>
+
+    <para>memcache is a system for storing key-value pairs in a memory
+    database. The system consists of memcached - a server which stores data,
+    and a number of client APIs. We are going to use libmemcache - a C API,
+    and the memcache PHP extension, which allows PHP scripts to access
+    memcached servers.</para>
+
+    <section>
+      <title>memcached</title>
+
+      <para>memcached (<ulink
+      url="http://danga.com/memcached/">http://danga.com/memcached/</ulink>)
+      is used to store data in memory and share this data between multiple
+      processes. Here we are going to use it to store authentication data and
+      share this data between multiple Apache processes.</para>
+
+      <section>
+        <title>Installing memcached</title>
+
+        <para>memcached is in widespread use, and you can most likely install
+        it through your distributions package management interface.</para>
+
+        <para>In the case of Debian Etch you can install memcached by
+        running:</para>
+
+        <screen>apt-get install memcached</screen>
+
+        <para>This will install the server and start it.</para>
+      </section>
+
+      <section>
+        <title>Configuring memcached</title>
+
+        <para>How the configuration of memcached is stored depends on the
+        distribution. In Debian Etch the configuration is stored in
+        <filename>/etc/memcached.conf</filename>.</para>
+
+        <para>memcached has no authentication, and it is therefore important
+        that you limit the ability to connect to the memcache server to
+        trusted computers. If memcached runs on the same computer as the
+        webserver, then you can limit the connections to be from the webserver
+        by configuring memcached to bind to the loopback-address of the
+        computer. To do this you should add the following line to the
+        configuration file:</para>
+
+        <programlisting>-l 127.0.0.1</programlisting>
+
+        <para>If you want to run memcached on a different computer than the
+        webserver, you may have to block connections to memcached by using a
+        firewall. Configuration of a firewall is outside of the scope of this
+        HOWTO.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>libmemcache</title>
+
+      <para>libmemcache is a library which is used to access memcache servers
+      from other applications. libmemcache will be used by Auth
+      MemCookie.</para>
+
+      <para>On Debian Etch you can install libmemcache and the developement
+      header files by running:</para>
+
+      <screen>apt-get install libmemcache0 libmemcache-dev</screen>
+
+      <para>This library is most likely also available in other distributions.
+      Search your distributions package repository for libmemcache.</para>
+
+      <para>If it is not available, then you can download the source code from
+      this web page: <ulink
+      url="http://people.freebsd.org/~seanc/libmemcache/">http://people.freebsd.org/~seanc/libmemcache/</ulink></para>
+    </section>
+
+    <section>
+      <title>memcahce PHP extension</title>
+
+      <para>This is a PHP extension which allows PHP scripts to access
+      memcached servers. It is required by the authmemcookie OpenSSO PHP
+      plugin.</para>
+
+      <para>On Debian Etch, you can install this PHP extension by
+      running:</para>
+
+      <screen>apt-get install php5-memcache</screen>
+
+      <para>It may also be available under a similar name on other
+      distributions. If it is not available in your distribution, then you
+      will have to install it by yourself.</para>
+
+      <para>This extension is part of the PECL repository of PHP extensions.
+      The homepage for this extension can be found at: <ulink
+      url="http://pecl.php.net/package/memcache">http://pecl.php.net/package/memcache</ulink></para>
+
+      <para>For instructions on how to install PECL PHP extensions, please
+      refer to: <ulink
+      url="http://www.php.net/manual/en/install.pecl.php">http://www.php.net/manual/en/install.pecl.php</ulink></para>
+    </section>
+  </section>
+
+  <section>
+    <title>The OpenSSO PHP Extension</title>
+
+    <para>The OpenSSO PHP extension is a set of php files which are used to
+    communicate with a SAML 2.0 Identity Provider.</para>
+
+    <note>
+      <para>This section slightly overlaps the <emphasis>OpenSSO PHP Extension
+      User's Manual</emphasis>. Consequently crosschecking with the User's
+      Manual is a good idea if things are unclear. In the future parts of this
+      section will be merged into the User's Manual.</para>
+    </note>
+
+    <section>
+      <title>Installing the OpenSSO PHP extension</title>
+
+      <para>The OpenSSO PHP extension can be checked out of a CVS repository
+      at <ulink url="http://dev.java.net">dev.java.net</ulink>. First you need
+      a username and password on <ulink
+      url="http://dev.java.net">dev.java.net</ulink>. Then you can use the
+      following commands to check out the source code for the OpenSSO PHP
+      extension:</para>
+
+      <screen>cvs -d :pserver:USERNAME@cvs.dev.java.net:/cvs login
+cvs -d :pserver:USERNAME@cvs.dev.java.net:/cvs checkout \
+    opensso/extensions/saml2php/openssophp</screen>
+
+      <para>Replace USERNAME with your username on dev.java.net, and enter
+      your password when asked for it.</para>
+
+      <para>Afterwards you can find the OpenSSO PHP extension under
+      <filename>opensso/extensions/saml2php/openssophp</filename> in your
+      current working directory. Copy
+      <filename>opensso/extensions/saml2php/openssophp</filename> to a
+      directory on your web site:</para>
+
+      <screen>cp -rv opensso/extensions/saml2php/openssophp /var/www</screen>
+
+      <para>You should change <filename>/var/www</filename> if the root of
+      your web site is not located at <filename>/var/www</filename> or if you
+      don't want the OpenSSO PHP extension to be located under
+      <filename>/openssophp</filename> on your web site.</para>
+    </section>
+
+    <section>
+      <title>Configuring the OpenSSO PHP extension</title>
+
+      <para>There are three template files in
+      <filename>/var/www/openssophp/config/</filename>:
+      <filename>config.php.template</filename>,
+      <filename>saml-metadata-IdP.php.template</filename> and
+      <filename>saml-metadata-SP.php.template</filename>. We are going to use
+      these as a starting point for our configuration. First we copy the files
+      and give them their proper name:</para>
+
+      <screen>cd /var/www/openssophp/config
+cp config.php.template config.php
+cp saml-metadata-IdP.php.template saml-metadata-IdP.php
+cp saml-metadata-SP.php.template saml-metadata-SP.php
+</screen>
+
+      <section>
+        <title>config.php</title>
+
+        <para>Open <filename>config.php</filename> in your favourite text
+        editor. We need to update the following options:
+        <literal>basedir</literal>, <literal>baseurl</literal>,
+        <literal>spi-sessionhandling</literal>,
+        <literal>spi-namemapping</literal> and
+        <literal>defaultLandingPage</literal>.</para>
+
+        <para><literal>basedir</literal> should be set to the full path to the
+        <filename>openssophp</filename> directory. In this example this would
+        be <filename>/var/www/openssophp</filename>.</para>
+
+        <para><literal>baseurl</literal> is the full URL to the
+        <literal>openssophp</literal> directory. This is
+        <literal>https://sp.example.com/openssophp/</literal> in this
+        example.</para>
+
+        <para><literal>spi-sessionhandling</literal> determines which plugin
+        the OpenSSO PHP extension should use for session handling. This should
+        be set to <literal>authmemcookie</literal>.
+        <literal>authmemcookie</literal> is a session handler which stores the
+        session state in a form which is compatible with the requirements of
+        Auth MemCookie.</para>
+
+        <para><literal>spi-namemapping</literal> selects which plugin the
+        OpenSSO PHP extension should use to map NameIDs from the IdP server to
+        local users. In this example we will set this to
+        <literal>transient</literal>.</para>
+
+        <para><literal>defaultLandingPage</literal> is the URL which the user
+        should see after he is authenticated. In this example we will set it
+        to <literal>https://sp.example.com/protected/</literal>, which is the
+        root of our protected area on the web site.</para>
+
+        <para>The <literal>authmemcookie</literal> section contains reasonable
+        defaults if you run the memcache server on the same computer as the
+        webserver. If you run the memcache server on a different computer,
+        then you will have to update the <literal>memcache_servers</literal>
+        option.</para>
+
+        <para>The <literal>userdatabase</literal> section is ignored unless
+        you use the <literal>database</literal> namemapping plugin.</para>
+
+        <para>The final result should look something like this:</para>
+
+        <programlisting>$LIGHTBULB_CONFIG = array (
+  'basedir'             =&gt; '/var/www/openssophp/',
+  'baseurl'             =&gt; 'https://sp.example.com/openssophp/',
+
+  'spi-sessionhandling' =&gt; 'authmemcookie',
+  'spi-namemapping'     =&gt; 'transient',
+
+  /* Configuration for the authmemcookie session handler. */
+  'authmemcookie'       =&gt; array (
+    /* The list of memcache servers. This is a string of
+     * host:port-pairs, separated by ','. The port number is
+     * optional if the server runs on the default port (11211).
+     * Example: 'localhost,remote_a:22122,remote_b'
+     */
+    'memcache_servers'    =&gt; '127.0.0.1:11211',
+
+    /* The name of the cookie. Should match the
+     * Auth_memCookie_CookieName configuration parameter for
+     * Auth MemCookie. The default value for
+     * Auth_memCookie_CookieName is 'AuthMemCookie'.
+     */
+    'cookie_name'         =&gt; 'AuthMemCookie',
+
+    /* The path the cookie is valid under.
+     * This path must include both the OpenSSO PHP installation, and
+     * the pages protected by Auth MemCookie.
+     */
+    'cookie_path'         =&gt; '/',
+
+    /* The domain the cookie is valid for. Use an empty string for
+     * the default value.
+     */
+    'cookie_domain'       =&gt; '',
+   ),
+ 
+   'userdatabase'       =&gt; array (
+     'username'            =&gt; 'openssodemo',
+     'password'            =&gt; '8s732j',
+     'host'                =&gt; 'localhost',
+     'database'            =&gt; 'openssodemo'
+   ),
+
+   'defaultLandingPage'    =&gt; 'https://sp.example.com/protected/'
+);</programlisting>
+      </section>
+
+      <section>
+        <title>saml-metadata-IdP.php</title>
+
+        <para>This is the file where you add configuration for your IdP. The
+        IdP is the identity provider for your service.</para>
+
+        <note>
+          <para>Note that this file can contain configuration for multiple
+          IdPs. Every IdP is identified by an entity ID.</para>
+        </note>
+
+        <para>When making a login request, the OpenSSO PHP extension will use
+        the first IdP in the list by default. When receiving a reply to a
+        login request the OpenSSO PHP extension will look at the issuer of the
+        reply to determine which IdP to validate the reply against. It is
+        therefore important that you remove any untrusted IdPs, from the
+        configuration.</para>
+
+        <para>Every IdP has three options: <literal>SingleSignOnUrl</literal>,
+        <literal>SingleLogOutUrl</literal> and
+        <literal>certFingerprint</literal>. These values should be supplied by
+        your IdP.</para>
+
+        <para>If you received an XML file describing your IdP, then you can
+        find the entity ID of the IdP and the values for
+        <literal>SingleSignOnUrl</literal> and
+        <literal>SingleLogOutUrl</literal> in this file.</para>
+
+        <para>To find the entity ID, look at the first XML element in the
+        file. It should look like this:</para>
+
+        <programlisting>&lt;EntityDescriptor entityID="idp.example.com"
+  xmlns="urn:oasis:names:tc:SAML:2.0:metadata"&gt;</programlisting>
+
+        <para>You can find the entity ID in the <literal>entityID</literal>
+        attribute of this element.</para>
+
+        <para>To find the value for the <literal>SingleSignOnUrl</literal>
+        option you should look for an XML element similar to the
+        following:</para>
+
+        <programlisting>&lt;SingleSignOnService
+ Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+ Location="https://idp.example.com/amserver/SSORedirect/metaAlias/idp"
+ /&gt;</programlisting>
+
+        <para>There may be several similar elements with different values in
+        the <literal>Binding</literal> attribute. We want the element where
+        the binding ends with <literal>HTTP-Redirect</literal>.</para>
+
+        <para>This element gives the value for the
+        <literal>SingleSignOnUrl</literal> in the <literal>Location</literal>
+        attribute.</para>
+
+        <para>For the value of the <literal>SingleLogOutUrl</literal> option,
+        you should find an XML element similar to the following:</para>
+
+        <programlisting>&lt;SingleLogoutService
+ Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+ Location="https://idp.example.com/amserver/IDPSloRedirect/metaAlias/idp"
+ ResponseLocation=
+  "https://idp.example.com/amserver/IDPSloRedirect/metaAlias/idp"
+ /&gt;</programlisting>
+
+        <para>Again, there may be several similar elements, but we want the
+        one where the <literal>Binding</literal> attribute ends with
+        <literal>HTTP-Redirect</literal>.</para>
+
+        <para>The correct value for the <literal>SingleLogOutURL</literal>
+        option is given by the <literal>Location</literal> attribute.</para>
+
+        <para><literal>certFingerprint</literal> is the fingerprint of the
+        IdP's public key. If you received the IdP's public key in the form of
+        a pem-file, then you can use the following command to get the
+        fingerprint:</para>
+
+        <screen>openssl x509 -in idp-public-key.pem -fingerprint</screen>
+
+        <para>Replace <literal>idp-public-key.pem</literal> with the filename
+        of the public key. The fingerprint will be in the first line of
+        output. This line will be similar to the following:</para>
+
+        <screen>SHA1 Fingerprint=&lt;fingerprint&gt;</screen>
+
+        <para>Just copy the text after the equal sign and insert it into the
+        configuration file as the value for
+        <literal>certFingerprint</literal>.</para>
+
+        <para>The result should look similar to this:</para>
+
+        <programlisting>$idpMetadata = array (
+  "idp.example.com" =&gt; array (
+    "SingleSignOnUrl" =&gt;
+      "https://idp.example.com/amserver/SSORedirect/metaAlias/idp",
+    "SingleLogOutUrl" =&gt; 
+      "https://idp.example.com/amserver/IDPSloRedirect/metaAlias/idp",
+    "certFingerprint" =&gt; 
+      "6c:ad:e0:5c:e0:0e:12:b2:93:dd:94:04:33:e3:2e:4c:8e:c4:e5:65"
+  )
+);</programlisting>
+      </section>
+
+      <section>
+        <title>saml-metadata-SP.php</title>
+
+        <para>This file contains the description of your service provider. The
+        service provider is the web site you want to add acces control
+        to.</para>
+
+        <para>You can list several service providers in this file. The OpenSSO
+        PHP extension will use the first one by default.</para>
+
+        <para>There are three parameters which should be set:
+        <literal>assertionConsumerServiceURL</literal>,
+        <literal>issuer</literal> and
+        <literal>spNameQualifier</literal>.</para>
+
+        <para><literal>assertionConsumerServiceURL</literal> is the URL of
+        <filename>AssertionConsumerService.php</filename> in the
+        <filename>openssophp/</filename> directory. In our case this will be
+        <literal>https://sp.example.com/openssophp/AssertionConsumerService.php</literal>.</para>
+
+        <para><literal>issuer</literal> is the entity ID of the service
+        provider. This is typically the hostname of the web site, and would be
+        set to <literal>sp.example.com</literal> in our example.</para>
+
+        <para><literal>spNameQualifier</literal> is used to affiliate multiple
+        service providers. This type of configuration is outside of the scope
+        of this HOWTO. It is recommended to set this option to be equal to the
+        <literal>issuer</literal> option (<literal>sp.example.com</literal> in
+        our case).</para>
+
+        <para>The final result will look like this:</para>
+
+        <programlisting>$spMetadata = array (
+  "/sp" =&gt; array(
+    "assertionConsumerServiceURL" =&gt;
+      "https://sp.example.com/openssophp/AssertionConsumerService.php",
+    "issuer" =&gt; "sp.example.com",
+    "spNameQualifier" =&gt; "sp.example.com"
+  )
+);</programlisting>
+
+        <para><literal>/sp</literal> is the identifier for this service
+        provider, and can be used by the OpenSSO PHP extension to
+        differentiate between different service providers.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Service provider metadata file for IdP</title>
+
+      <para>Next, we need to configure your IdP to work together with the
+      OpenSSO PHP extension installed on your web site. Your IdP will most
+      likely require a XML file which describes the configuration on your
+      site.</para>
+
+      <para>The following text is a template which you may adapt to match your
+      web site:</para>
+
+      <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;EntityDescriptor
+    entityID="sp.example.com"
+    xmlns="urn:oasis:names:tc:SAML:2.0:metadata" &gt;
+
+  &lt;SPSSODescriptor
+      AuthnRequestsSigned="false"
+      WantAssertionsSigned="false"
+      protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" &gt;
+
+    &lt;SingleLogoutService
+        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        Location="https://sp.example.com/openssophp/LogoutListener.php" /&gt;
+
+    &lt;NameIDFormat&gt;
+      urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+    &lt;/NameIDFormat&gt;
+
+    &lt;AssertionConsumerService
+        index="0"
+        isDefault="true"
+        Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        Location=
+          "https://sp.example.com/openssophp/AssertionConsumerService.php"
+        /&gt;
+
+  &lt;/SPSSODescriptor&gt;
+&lt;/EntityDescriptor&gt;
+</programlisting>
+
+      <para>You should change all references to
+      <literal>sp.example.com</literal> to the domain of your web site. The
+      value of the <literal>entityID</literal> attribute specified in the
+      <literal>EntityDescriptor</literal> element must match the value you
+      added as <literal>issuer</literal> in
+      <filename>saml-metadata-SP.php</filename>.</para>
+
+      <para>The value of the <literal>Location</literal> attribute in the
+      <literal>AssertionConsumerService</literal> element should match the
+      value of the <literal>assertionConsumerServiceURL</literal> option in
+      <literal>saml-metadata-SP.php</literal>.</para>
+
+      <para>This file should be added to your IdP. How this is done is outside
+      of the scope of this HOWTO.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Auth MemCookie</title>
+
+    <para>Auth MemCookie is an Apache 2 module for access control. This module
+    uses data stored on a memcache server to authenticate a user. The key to
+    the authentication data is stored in a cookie (by default named
+    <literal>AuthMemCookie</literal>).</para>
+
+    <para>Auth MemCookie only deals with access control. Authentication of the
+    user must be handled by another system. In our case this other system will
+    be the OpenSSO PHP extension.</para>
+
+    <para>When authenticating a request Auth MemCookie walks through the
+    following steps:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>Get the session id. The session id is stored in a cookie (by
+        default named <literal>AuthMemCookie</literal>).</para>
+      </listitem>
+
+      <listitem>
+        <para>Get the session data. Auth MemCookie fetches session data by
+        looking up the session id on the memcache server.</para>
+      </listitem>
+
+      <listitem>
+        <para>Verify the remote ip. Auth MemCookie checks the ip address
+        stored in the session data againstthe ip address of the current
+        request. This step is optional, and can be disabled by setting the
+        <literal>Auth_memCookie_MatchIP</literal> option to
+        <literal>no</literal>.</para>
+      </listitem>
+
+      <listitem>
+        <para>Get username and groups from session data. The username is
+        stored in the <literal>UserName</literal> field in the session data
+        and the groups the user is a member of is stored in the
+        <literal>Groups</literal> field.</para>
+      </listitem>
+
+      <listitem>
+        <para>Check username and groups against <literal>Require</literal>
+        configuration directives. See <ulink
+        url="http://httpd.apache.org/docs/2.0/mod/core.html#require">http://httpd.apache.org/docs/2.0/mod/core.html#require</ulink></para>
+      </listitem>
+    </orderedlist>
+
+    <para>If any of the steps 1-4 fails, then Auth MemCookie will return a
+    <literal>401 Authorization Required</literal> error. A <literal>403
+    Forbidden</literal> error will be returned if the last step fails.</para>
+
+    <para>When a user is successfully authenticated, Auth MemCookie will store
+    all the fields from the session data in environment variables accessible
+    to the web page. Every field will be stored by setting
+    <literal>MCAC_&lt;field-name&gt;</literal> to the value of the field. See
+    section 7 for an example of how to access these fields from a PHP
+    script.</para>
+
+    <section>
+      <title>Installing Auth MemCookie</title>
+
+      <para>Auth Memcookie can be downloaded from: <ulink
+      url="http://authmemcookie.sourceforge.net/">http://authmemcookie.sourceforge.net/</ulink></para>
+
+      <para>First you need to extract the files in the source archive:</para>
+
+      <screen>tar xvzf mod_authmemcookie_v1.0.1.tar.gz</screen>
+
+      <para>The version of Auth MemCookie may have changed since this HOWTO
+      was written, and it is possible that the exact filenames has
+      changed.</para>
+
+      <para>Next, you need to edit the file named <literal>Makefile</literal>.
+      In the beginning of the file you will find a line similar to the
+      following:</para>
+
+      <programlisting>MY_APXS=/product/apache/moteur/2.0.52/bin/apxs</programlisting>
+
+      <para>You need to replace
+      <filename>/product/apache/moteur/2.0.52/bin/apxs</filename> with the
+      path to the apxs executable. On Debian Etch you can replace it with just
+      <filename>apxs2</filename>, but, depending on your distribution, you may
+      have to specify the full path. The executable may be named
+      <filename>apxs</filename> or <filename>apxs2</filename>.</para>
+
+      <note>
+        <para>Note that apxs is part of the Apache distribution. You may be
+        necessary to install developement headers for Apache 2 to get the
+        executable. On Debian Etch you can install the package
+        <literal>apache2-prefork-dev</literal>.</para>
+      </note>
+
+      <para>After updating the makefile, you can compile and install Auth
+      MemCookie by running the following commands:</para>
+
+      <screen>make
+make install</screen>
+    </section>
+
+    <section>
+      <title>Configuring Auth MemCookie</title>
+
+      <para>Now we need to change the Apache 2 configuration to use Auth
+      MemCookie for access control.</para>
+
+      <para>The precise location of the configuration is distribution
+      specific, but in the general case, you should add everything in
+      <filename>/etc/apache2/httpd.conf</filename>, or a similar path. In
+      Debian Etch the configuration is spread into several files stored in
+      <filename>/etc/apache2/mods_available/</filename>.</para>
+
+      <para>We are going to add two files in that directory. If you are
+      running a different distribution, then you should add the text of the
+      files directly into <filename>httpd.conf</filename>.</para>
+
+      <para>First is
+      <filename>/etc/apache2/mods-available/auth_memcookie.load</filename>.
+      This file consists of a single line telling Apache to load the Auth
+      MemCookie module.</para>
+
+      <programlisting>LoadModule mod_auth_memcookie_module 
+  /usr/lib/apache2/modules/mod_auth_memcookie.so</programlisting>
+
+      <note>
+        <para>Note that this should be on a single line. Depending on your
+        distribution, you may have to change the path to
+        <filename>mod_auth_memcookie.so</filename>. To get the path, you can
+        run:</para>
+
+        <programlisting>apxs2 -q LIBEXECDIR</programlisting>
+      </note>
+
+      <para>Next, we are going to add the file
+      <filename>/etc/apache2/mods-available/auth_memcookie.conf</filename>,
+      which contains the configuration for Auth MemCookie:</para>
+
+      <programlisting>&lt;IfModule mod_auth_memcookie.c&gt;
+        # '/protected' is the directory which should require access
+        # control.
+        &lt;Location /protected&gt;
+                # This is a list of memcache servers which Auth MemCookie
+                # should use. It is a ','-separated list of
+                # host:port-pairs.
+                # Note that this list must list the same servers as the
+                # 'memcache_servers'-option in config.php in the
+                # configuration for OpenSSO PHP extension.
+                Auth_memCookie_Memcached_AddrPort "127.0.0.1:11211"
+
+                # This must be set to 'on' to enable Auth MemCookie for
+                # this directory.
+                Auth_memCookie_Authoritative on
+
+                # These two commands are required to enable access control
+                # in Apache.
+                AuthType Cookie
+                AuthName "My Login"
+
+                # This command causes apache to redirect to the given
+                # URL when we receive a '401 Authorization Required'
+                # error. We redirect to "/openssophp/spSSOInit.php",
+                # which initializes a login to the IdP.
+                ErrorDocument 401 "/openssophp/spSSOInit.php"
+
+                # This allows all authenticated users to access the
+                # directory. To learn more about the 'Require' command,
+                # please look at:
+                # http://httpd.apache.org/docs/2.0/mod/core.html#require
+                Require valid-user
+        &lt;/Location&gt;
+&lt;/IfModule&gt;
+</programlisting>
+
+      <para>If you are running Debian Etch, and have created two files in
+      <filename>/etc/apache2/mods-available/</filename>, then you should
+      enable the module by running:</para>
+
+      <screen>a2enmod auth_memcookie</screen>
+
+      <para>If you added the sections directly into
+      <filename>httpd.conf</filename>, then you don't need to do anything else
+      to enable the module. You still need to restart Apache before the
+      configuration changes have any effect.</para>
+
+      <para>You should restart the Apache web server by running:</para>
+
+      <screen>apache2ctl -k restart</screen>
+    </section>
+  </section>
+
+  <section>
+    <title>Testing the final result</title>
+
+    <para>The following code is an example of a test page for Auth MemCookie.
+    It lists all the values which are set by Auth MemCookie. In our example it
+    should be stored as
+    <filename>/var/www/protected/index.php</filename>.</para>
+
+    <programlisting>&lt;html&gt;
+&lt;body&gt;
+&lt;table&gt;
+&lt;?php
+foreach($_SERVER as $key=&gt;$value) {
+  if(substr($key, 0, 5) == 'MCAC_') {
+    echo('&lt;tr&gt;&lt;td&gt;' . $key . '&lt;/td&gt;&lt;td&gt;' . $value . '&lt;/td&gt;&lt;/tr&gt;');
+  }
+}
+?&gt;
+&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</programlisting>
+
+    <para>Now, if you open
+    <filename>https://sp.example.com/protected/</filename> in your web
+    browser, you should be redirected to the login page on your IdP. After you
+    log in, you should be redirected back to
+    <literal>https://sp.example.com/protected/</literal> and your login
+    information should be listed in the table on that page.</para>
+
+    <note>
+      <para>Note that the authmemcookie-plugin of the OpenSSO PHP extension
+      urlencodes the values, and your IdP may have base64 encoded the data
+      before returning them to you. It may therefore be necessary to first
+      urldecode the values, and thereafter base64 decode them. Base64 encoding
+      attributes is not normal procedure, but at the time this is written, the
+      Feide federation is doing that.</para>
+    </note>
+  </section>
+
+  <section>
+    <title>Logging out</title>
+
+    <para>To log a user out from your web site, you will have to redirect the
+    user to the IdP. The precise url may be different on different IdPs. It
+    may be similar to the following URL:</para>
+
+    <literallayout>https://idp.example.com/amserver/IDPSloInit?binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect&amp;RelayState=https%3A%2F%2Fsp.example.com%2Floggedout.html
+</literallayout>
+
+    <note>
+      <para>Note that this URL should be on one line. The RelayState parameter
+      tells the IdP which page you want the user to be redirected to after he
+      logs out.</para>
+    </note>
+  </section>
+</article>

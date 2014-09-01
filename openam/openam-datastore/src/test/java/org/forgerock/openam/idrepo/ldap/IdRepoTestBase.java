@@ -1,0 +1,96 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013 ForgeRock Inc.
+ */    
+package org.forgerock.openam.idrepo.ldap;
+
+import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdRepoListener;
+import org.forgerock.opendj.ldap.Connection;
+import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.Connections;
+import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.FutureResult;
+import org.forgerock.opendj.ldap.MemoryBackend;
+import org.forgerock.opendj.ldap.ResultHandler;
+import org.forgerock.opendj.ldap.schema.Schema;
+import org.forgerock.opendj.ldif.LDIFEntryReader;
+import static org.mockito.Mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+
+@PrepareForTest(value = {IdRepoListener.class, WebtopNaming.class})
+public abstract class IdRepoTestBase extends PowerMockTestCase {
+
+    protected MemoryBackend memoryBackend;
+    protected IdRepoListener idRepoListener;
+    protected DJLDAPv3Repo idrepo = new DJLDAPv3Repo() {
+        @Override
+        protected ConnectionFactory createConnectionFactory(String username, char[] password, int maxPoolSize) {
+            return new FakeConnectionFactory();
+        }
+
+        @Override
+        protected Schema getSchema() throws IdRepoException {
+            return Schema.getCoreSchema().asStrictSchema();
+        }
+    };
+
+    @BeforeClass
+    public void setUpSuite() throws Exception {
+        PowerMockito.mockStatic(WebtopNaming.class);
+        idRepoListener = PowerMockito.mock(IdRepoListener.class);
+        when(WebtopNaming.getAMServerID()).thenReturn("01");
+        when(WebtopNaming.getSiteID(eq("01"))).thenReturn("02");
+        memoryBackend = new MemoryBackend(getDirectoryContent());
+    }
+
+    @BeforeMethod
+    public void resetMocks() {
+        reset(idRepoListener);
+    }
+
+    @AfterClass
+    public void tearDown() {
+        idrepo.shutdown();
+    }
+
+    protected abstract LDIFEntryReader getDirectoryContent();
+
+    private class FakeConnectionFactory implements ConnectionFactory {
+
+        private ConnectionFactory cf;
+
+        public FakeConnectionFactory() {
+            cf = Connections.newInternalConnectionFactory(memoryBackend);
+        }
+
+        public void close() {
+            cf.close();
+        }
+
+        public FutureResult<Connection> getConnectionAsync(ResultHandler<? super Connection> handler) {
+            return cf.getConnectionAsync(handler);
+        }
+
+        public Connection getConnection() throws ErrorResultException {
+            return cf.getConnection();
+        }
+    }
+}

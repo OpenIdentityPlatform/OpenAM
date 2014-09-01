@@ -1,0 +1,117 @@
+
+
+<div style="margin-left:10px;">
+    <h1>$page.getLocalizedString("summary.title")</h1>
+    <p>$page.getLocalizedString("summary.description")</p>
+    
+    <div class="summaryPanel" style="width:570px">
+        <b class="xtop">
+            <b class="xt1"></b>
+            <b class="xt2"></b>
+            <b class="xt3"></b>
+            <b class="xt4"></b>
+        </b>
+        <div class="headerBox">$page.getLocalizedString("summary.title")</div>
+        <div class="bodyBox" style="height:340px">
+            <span>
+                <b>$page.getLocalizedString("step3.sub.title")</b>
+                <a href="#" onclick="showTab(3); return false;">$page.getLocalizedString("edit.label")</a>
+                <div style="margin-left:10px">
+                <table class="temp">
+                    <tr>
+                        <td>
+                            $page.getLocalizedString("ssl.label") <br>
+                            $page.getLocalizedString("host.name.label") <br>
+                            $page.getLocalizedString("local.port.label") <br>
+                            #if ($embedded)
+                            $page.getLocalizedString("local.admin.port.label") <br>
+                            $page.getLocalizedString("local.jmx.port.label") <br>
+                            #end
+                            $page.getLocalizedString("root.suffix.label") <br>
+                            $page.getLocalizedString("user.name.label") <br>
+                            $page.getLocalizedString("directory.name.label")
+                        </td>
+                        <td>
+                            $displayConfigStoreSSL <br>
+                            $configStoreHost <br>
+                            $configStorePort <br>
+                            #if ($embedded)
+                            $configStoreAdminPort <br>
+                            $configStoreJmxPort <br>
+                            #end
+                            $rootSuffix <br>
+                            $configStoreLoginId <br>
+                            $configDirectory
+                        </td>                   
+                    </tr>
+                </table>
+                </div>
+
+                #if ($firstInstance)
+                <b>$page.getLocalizedString("step4.sub.title")</b>
+                <a href="#" onclick="showTab(4); return false;">$page.getLocalizedString("edit.label")</a>
+                <div style="margin-left:10px">
+                    <table class="temp">
+                        <tr>
+                            #if ($displayUserHostName)
+                            <td>
+                                $page.getLocalizedString("ssl.label")<br>
+                                $page.getLocalizedString("host.name.label")<br>
+                                $page.getLocalizedString("local.port.label")<br>
+                                $page.getLocalizedString("root.suffix.label")<br>
+                                $page.getLocalizedString("user.name.label")<br>
+                                $page.getLocalizedString("store.type.label")
+                            </td>
+                            <td>
+                                $xuserHostSSL<br>
+                                $displayUserHostName<br>
+                                $userHostPort<br>
+                                $userRootSuffix<br>
+                                $userLoginID<br>
+                                $userStoreType
+                            </td>            
+                            #else 
+                            <td colspan="2">
+                                $page.getLocalizedString("default.user.store")
+                            </td>  
+                            #end
+                        </tr>
+                    </table>
+                </div>
+                #end
+
+                <b>$page.getLocalizedString("step5.sub.title")</b>
+                <a href="#" onclick="showTab(5); return false;">$page.getLocalizedString("edit.label")</a>
+                <div style="margin-left:10px">
+                    <table class="temp">
+                        <tr>                        
+                            #if ($loadBalancerHost)
+                            <td>
+                                $page.getLocalizedString("site.name.label")<br>
+                                $page.getLocalizedString("primary.url.label")<br>
+                                $page.getLocalizedString("session.ha.sfo.enabled.label")
+                            </td>                    
+                            <td>
+                                $loadBalancerHost<br>
+                                $loadBalancerPort<br>
+                                $loadBalancerSessionHASFO
+                            </td>
+                            #else
+                            <td colspan="2">
+                                $page.getLocalizedString("site.configure.label")
+                            </td>
+                            #end
+                        </tr>  
+                    </table>
+                </div>
+            </span>
+        </div>
+        <b class="xbottom">
+            <b class="xbGray1"></b>
+            <b class="xbGray2"></b>
+            <b class="xbGray3"></b>
+            <b class="xbGray4"></b>
+        </b>
+    </div>
+</div>
+

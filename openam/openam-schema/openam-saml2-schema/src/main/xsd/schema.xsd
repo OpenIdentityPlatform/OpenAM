@@ -1,0 +1,11 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.w3.org/2001/XMLSchema"
+xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+jaxb:version="1.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jaxb:schemaBindings>
+        <jaxb:package name="com.sun.identity.saml2.jaxb.schema" />
+      </jaxb:schemaBindings>
+    </xs:appinfo>
+  </xs:annotation>
+</xs:schema>

@@ -1,0 +1,136 @@
+<!--
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: build.xml,v 1.2 2007/12/11 23:35:07 qcheng Exp $
+
+  Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+  Portions Copyright 2007 Paul C. Bryan
+-->
+
+<project name="saml2ecp" default="usage">
+
+  <description>OpenID provider</description>
+
+  <!-- library dependencies -->
+  <property name="extlib.dir" value="../../products/extlib"/>
+
+  <!-- source directories -->  
+  <property name="source.dir" value="source"/>
+  <property name="resources.dir" value="resources"/>
+
+  <!-- directory to store intermediate files for build -->
+  <property name="built.dir" value="built"/>
+  <property name="classes.dir" value="${built.dir}/classes"/>
+  <property name="dist.dir" value="${built.dir}/dist"/>
+  <property name="library.classes.dir" value="../../products/federation/library/built/classes"/>
+  <property name="library.locale.dir" value="../../products/federation/library/resources/locale"/>
+  <property name="shared.classes.dir" value="../../products/shared/built/classes"/>
+  <property name="amserver.classes.dir" value="../../products/amserver/built/classes"/>
+  <property name="openfm.dist.dir" value="../../products/federation/openfm/built/dist"/>
+  <property name="war.package.dir" value="${built.dir}/war"/>
+  <property name="war.packageweb.dir" location="${built.dir}/packageweb"/>
+
+  <!-- overridable properties -->
+  <property name="build.debug" value="on"/>
+  <property name="build.debuglevel" value="lines,vars,source"/>
+
+  <!-- build class path -->
+  <path id="build.classpath">
+    <pathelement location="${classes.dir}"/>
+    <pathelement location="${library.classes.dir}"/>
+    <pathelement location="${shared.classes.dir}"/>
+    <pathelement location="${amserver.classes.dir}"/>
+    <pathelement location="${library.locale.dir}"/>
+    <fileset dir="${extlib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- clean any directories created during build -->
+  <target name="clean">
+    <delete dir="${built.dir}"/>
+  </target>
+
+  <!-- compile java files -->
+  <target name="build">
+
+    <mkdir dir="${built.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+
+    <!-- compile classes into the target package -->
+    <javac memoryInitialSize="256m" memoryMaximumSize="512m" fork="true"
+     destdir="${classes.dir}" source="1.4" target="1.4" 
+     debug="${build.debug}" debuglevel="${build.debuglevel}">
+      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-Xlint:deprecation"/>
+      <src path="${source.dir}"/>
+      <classpath refid="build.classpath"/>
+    </javac>
+
+    <mkdir dir="${war.package.dir}"/>
+    <unjar src="${openfm.dist.dir}/opensso.war" dest="${war.package.dir}" />
+
+    <java classname="InsertContent" fork="true">
+        <classpath refid="build.classpath"/>
+        <arg value="web/WEB-INF/web.xml" />
+        <arg value="${war.package.dir}/WEB-INF/web.xml" />
+        <arg value="&lt;filter-mapping&gt;" />
+    </java>
+
+    <mkdir dir="${war.package.dir}/ecp" />
+    <copy file="web/ecp/index.html" todir="${war.package.dir}/ecp"/>
+    <copy file="${classes.dir}/ECPFilter.class" todir="${war.package.dir}/WEB-INF/classes"/>
+
+    <mkdir dir="${dist.dir}"/>
+
+    <mkdir dir="${war.packageweb.dir}" />
+    <move file="${war.package.dir}/WEB-INF/web.xml" tofile="${war.packageweb.dir}/web.xml" />
+
+    <war destfile="${dist.dir}/opensso.war" webxml="${war.packageweb.dir}/web.xml">
+        <zipfileset dir="${war.package.dir}" />
+    </war>
+    <move file="${war.packageweb.dir}/web.xml" tofile="${war.package.dir}/WEB-INF/web.xml" />
+    <delete dir="${war.packageweb.dir}" />
+  </target>
+
+  <target name="ecp">
+    <java classname="LEPStart">
+      <classpath refid="build.classpath"/>
+    </java>
+
+  </target>
+
+  <!-- display usage message (default task) -->
+  <target name="usage">
+    <echo message=" "/>
+    <echo message="The following targets are available:"/>
+    <echo message=" "/>
+    <echo message="  clean : cleans any generated files"/>
+    <echo message="  usage : displays this usage message"/>
+    <echo message="  build : compiles all the java source files"/>
+    <echo message="  ecp : start ECP"/>
+    <echo message=" "/>
+    <echo message="To run a target, issue the following command:"/>
+    <echo message=" "/>
+    <echo message="  ant (target-name)"/>
+    <echo message=" "/>
+  </target>
+
+</project>

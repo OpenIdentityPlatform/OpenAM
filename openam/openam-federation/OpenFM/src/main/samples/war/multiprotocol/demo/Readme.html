@@ -1,0 +1,166 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: Readme.html,v 1.7 2008/08/19 19:12:15 veiming Exp $
+
+-->
+
+<html>
+<head>
+<title>Setting up Multi-Federation Protocols demo sample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="../../../com_sun_web_ui/css/css_ns6up.css" />
+</head>
+<body class="DefBdy">
+
+<div class="MstDiv"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblTop" title="">
+<tbody><tr>
+<td nowrap="nowrap">&nbsp;</td>
+<td nowrap="nowrap">&nbsp;</td>
+</tr></tbody></table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
+<tbody><tr>
+<td class="MstTdTtl" width="99%">
+<div class="MstDivTtl"><img name="ProdName" src="../../../console/images/PrimaryProductName.png" alt="" /></div></td><td class="MstTdLogo" width="1%"><img name="RMRealm.mhCommon.BrandLogo" src="../../../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td></tr></tbody></table>
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td><img name="RMRealm.mhCommon.EndorserLogo" src="../../../com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></table></div><div class="SkpMedGry1"><a name="SkipAnchor2089" id="SkipAnchor2089"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4928"><img src="../../../com_sun_web_ui/images/other/dot.gif" alt="Jump Over Tab Navigation Area. Current Selection is: Access Control" border="0" height="1" width="1" /></a></div>
+
+<body>
+<h1 style="text-align: center;">Multi-Federation Protocol demo sample</h1>
+<h2>Introduction</h2>
+<br>
+<p>
+This sample illustrates the following use cases in&nbsp; a
+circle
+of trust having one hub Identity Provider and multiple 
+Service Providers speaking different federation protocols, namely 
+SAMLv2, ID-FF and WS-Federation.
+<br>
+<br>
+The sample demonstrates following scenarios among different federation protocols (namely ID-FF, SAMLv2 and WS-Federation): 
+<ul>
+  <li>SP initiated Single Sign On/Federation cross different federation protocols<br></li>
+  <li>SP initiated Single Log out cross different federation protocols</li>
+  <li>IDP initiated Single Log out cross different federation protocols</li>
+</ul>
+<br>
+
+<h2>Trying demo use cases</h2>
+<br>
+This document assumes that you have four OpenAM instances configured: <br>
+<ul>
+  <li>SAMLv2/ID-FF/WS-Federation Identity Providers configured at http://idp-host/idp/</li>
+  <li>SAMLv2 Service Provider configured at http://samlv2-sp-host/sp/. </li>
+  <li>ID-FF Service Provider configured at http://idff-sp-host/sp/. </li>
+  <li>WS-Federation Service Provider configured at http://wsfed-sp-host/sp/. </li>
+</ul>
+<br> 
+Please correct the URLs used in the following text to reflect your&nbsp; actual
+installation URLs.&nbsp; 
+<br>
+<br>
+You also need to create one user on each instance to be used as demo user for each protocol. For example, "idpuser" on the IDP instance, "saml2spuser" on the SAMLv2 SP instance, "idffspuser" on the ID-FF SP instance, "idpuser" on the WS-Federation SP instance (<b>Note</b> : demo user id on the IDP and the WS-Federation SP must be the same unless a non-default SP account mapper is provided on the WS-Federation side).
+<br>
+<br>
+<h3>SAMLv2 Service Provider initiated Single Sign-on and Single Logout</h3>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://saml2-sp-host/sp/samples/multiprotocol/demo/home.jsp</a>.</li>
+  <li>Click on link&nbsp; "Login, provided by SAMLv2 Identity Provider (Multi-Federation Protocol Identity Provider)". This link would initiate Single Sign-on Request to the IDP. </li>
+  <li>IDP would prompt you to authenticate. Enter your user name (e.g. "idpuser") and password.</li>
+  <li>SP would prompt you to login locally if you have&nbsp; not yet federated accounts at IDP and SP. Enter your user name (e.g. "saml2spuser") and password.</li>
+  <li>SP would then automatically log you in based on the Assertion from
+IDP and you would be shown the sample demo page by SP.</li>
+  <li>This completes SP initiated Single Sign On and Federation.</li>
+  <li>You would see links allowing you to Logout.</li>
+  <li>Click on "Logout" link. 
+  <li>SP&nbsp; would&nbsp; initiate a Single Log
+Out&nbsp; and&nbsp; log you out SAMLv2 SP, IDP and any other service provider sessions which share the same IDP session. <br>You could verify
+that you are logged out by visiting demo home page at the IDP and each every SP.
+The pages would show you "Login" link.</li>
+</ul>
+<br>
+<h3>ID-FF Service Provider initiated Single Sign-on and Single Logout</h3>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://idff-sp-host/sp/samples/multiprotocol/demo/home.jsp</a>.</li> Two links will be shown, one for Local Login, one for Single Sign-on throw remote ID-FF IDP.
+  <li>If federation is not done yet between the ID-FF SP and IDP:
+    <ul>
+      <li>Click on the "local Login" link.</li>
+      <li>You will be presented the local login page. Enter your user name (e.g. "idffspuser") and password. Click "Log In", you will be brought to the home page.</li>
+       <li>This time, click the "Federate with ID-FF Identity Provider (Multi-Federation Protocol Identity Provider)" link.</li>
+       <li>You will be presented with IDP side login page. Enter your user name (e.g. "idpuser") and password. Click "Login In" again, this will complete the federation process.</li>
+    </ul> 
+  <li>If federation is done already, click on link&nbsp; "Login, provided by ID-FF Identity Provider (Multi-Federation Protocol Identity Provider)". This link would initiate Single Sign-on Request to the IDP. </li>
+  <li>IDP would prompt you to authenticate. Enter your user name (e.g. "idpuser") and password.</li>
+  <li>SP would then automatically log you in based on the Assertion from
+IDP and you would be shown the sample demo page by SP.</li>
+  <li>This completes SP initiated Single Sign On and Federation.</li>
+  <li>You would see links allowing you to Logout.</li>
+  <li>Click on "Logout" link.
+  <li>SP&nbsp; would&nbsp; initiate a Single Log
+Out&nbsp; and&nbsp; log you out ID-FF SP, IDP and any other service provider sessions which share the same IDP session. <br>You could verify
+that you are logged out by visiting demo home page at the IDP and each every SP.The pages would show you "Login" link.</li>
+</ul>
+<br>
+<h3>WS-Federation Service Provider Initiated Single Sign-on and Single Logout</h3>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://wsfed-sp-host/sp/samples/multiprotocol/demo/home.jsp</a>.</li>
+  <li>Click on link&nbsp; " Login provided by WS-Federation Identity Provider (Multi-Federation Protocol Identity Provider)". This link would initiate Single Sign-on Request to the IDP. </li>
+  <li>IDP would prompt you to authenticate. Enter your user name (e.g. "idpuser") and password.</li>
+  <li>SP would complete the single sign-on process, and automatically log you in based on the Assertion from IDP and you would be shown the sample demo page by SP. This completes the SP initiated Single Sign-on process.</li>
+  <li>You would see links allowing you to Logout.</li>
+  <li>Click on "Logout" link. 
+  <li>SP&nbsp; would&nbsp; initiate a Single Log
+Out&nbsp; and&nbsp; log you out WS-Federation SP, IDP and any other service provider sessions which share the same IDP session. <br>You could verify
+that you are logged out by visiting demo home page at the IDP and each every SP.
+The pages would show you "Login" link.<br>
+<b>Note:</b> you will see a framed JSP page showing that you have signed out WS-Federation, SAMLv2 and ID-FF service providers, you must click the link which is displayed as "Click here to continue". This is needed until issue 800 is fixed. 
+  </li>
+</ul>
+<br>
+<br>
+<h3>Multi-Federation Protocol Identity Provider Initiated Single Logout</h3>
+<ul>
+  <li>Complete Service Provider initiated Single Sign-on using SAMLv2, ID-FF and WS-Federation respectively by following this readme without performing Single Logout task.
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://idp-host/idp/samples/multiprotocol/demo/home.jsp</a>.</li>
+  <li>Three links will be shown:
+    <ul>
+      <li>Logout initiated using SAMLv2 protocol.</li>
+      <li>Logout initiated using ID-FF protocol.</li>
+      <li>Logout initiated using WS-Federation protocol.</li>
+    </ul>
+  </li>
+  <li>Click any of the logout links will initiated single logout using the selected protocol, and continue to logout rest of sessions in all other service provider instances using corresponding federation protocols.</li>
+</ul>
+<br>
+<p>
+<br>
+</body>
+</html>

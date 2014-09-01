@@ -1,0 +1,265 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: AuthSampleLoginModule.html,v 1.6 2009/01/06 21:51:51 bigfatrat Exp $
+
+-->
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OpenAM</title>
+
+<link rel="stylesheet" type="text/css" href="../../com_sun_web_ui/css/css_ns6up.css" />
+<link rel="shortcut icon" href="../../com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon"></link>
+</head>
+<body class="DefBdy">
+<div class="SkpMedGry1"><a href="#SkipAnchor2019"><img src="../../com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></div>
+<div class="MstDiv">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblTop" title="">
+<tbody><tr>
+<td nowrap="nowrap">&nbsp;</td>
+<td nowrap="nowrap">&nbsp;</td>
+</tr></tbody></table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
+<tbody><tr>
+<td class="MstTdTtl" width="99%">
+<div class="MstDivTtl"><img src="../../console/images/PrimaryProductName.png" alt="" /></div></td>
+<td class="MstTdLogo" width="1%"><img src="../../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td>
+</tr></tbody></table>
+
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td><img name="RMRealm.mhCommon.EndorserLogo" src="../../com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></table></div>
+
+<div class="SkpMedGry1"><a name="SkipAnchor2019" id="SkipAnchor2019"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4161"><img src="../../com_sun_web_ui/images/other/dot.gif" alt="Jump Over Tab Navigation Area. Current Selection is: Access Control" border="0" height="1" width="1" /></a></div>
+
+<table bgcolor="#FFFFFF" cellspacing="8" cellpadding="4" border="0" width="100%">
+<tr>
+<td>
+<p></p>
+<h2>OpenAM Server - Authentication Samples</h2>
+<p>
+<hr noshade="yes" size="1">
+<h3>1. Sample Login Module</h3>
+<p>
+    
+<b>How to Write Sample Login Module using  AMLoginModule SPI (Service 
+    Provider Interface)?</b>
+    
+</p>
+<p>
+    Create Module properties XML file with the same name of the class 
+    (no package name) and have the extension .xml. Based on this configuration
+    file, Authentication UI will dynamically generate page. 
+    </p>
+<p>
+    Note : create XML file with above naming convention even if no states
+    required.
+    </p>
+<p>
+    Page states can be defined in module properties file as shown below, 
+    each Callbacks Element corresponds to one login page state. When an 
+    authentication process is invoked, there will be <code>Callback[]</code> 
+    generated from user's Login Module for each state. All login state starts 
+    with 1, then module control the login process, and decides what's the next 
+    state to go. 
+    <pre>
+        &lt;ModuleProperties moduleName="LoginModuleSample" version="1.0" &gt;
+        &lt;Callbacks length="2" order="1" timeout="60" 
+            header="This is a sample login page" &gt;
+            &lt;NameCallback&gt;
+            &lt;Prompt&gt; User Name &lt;/Prompt&gt;
+        &lt;/NameCallback&gt;
+        &lt;NameCallback&gt;
+            &lt;Prompt&gt; Last Name &lt;/Prompt&gt;
+        &lt;/NameCallback&gt;
+        &lt;/Callbacks&gt;
+        &lt;Callbacks length="1" order="2" timeout="60" 
+            header="You made it to page 2" &gt;
+            &lt;PasswordCallback echoPassword="false" &gt;
+            &lt;Prompt&gt; Just enter any password &lt;/Prompt&gt;
+            &lt;/PasswordCallback&gt;
+        &lt;/Callbacks&gt;
+    &lt;/ModuleProperties&gt;
+    </pre>
+    
+</p>
+<p>
+    In the sample module configuration shown above, page state one has two
+    Callbacks, first callback is for user ID and second is for Last Name. When
+    the user fills in the Callbacks, those Callback[] will be sent to the
+    module, where the module writer gets the submitted Callbacks, validates
+    them and returns. Module writer will set the next page state to 2. Page
+    state two has one Callback to request user to enter password. The
+    <code>process()</code> routine is again called after user submits the
+    Callback[]. If the module writer throws an <code>LoginException</code>, an
+    'authentication failed' page will be sent to the user. If no exception is
+    thrown, the user will be redirected to their default page.
+    </p>
+<p>
+    Click <a href="../../xml/LoginModuleSample.xml">here</a> to view XML.
+    </p>
+</p>
+<p>
+<hr noshade="yes" size="1">
+<h3>2. Principal Object</h3>
+<p>
+    This object is created by the Authentication framework if authentication 
+    succeeded. <a href="../../source/com/sun/identity/samples/authentication/spi/providers/SamplePrincipal.java">Source code</a>
+    
+</p>
+</p>
+<p>
+<hr noshade="yes" size="1">
+<h3>3. Login Module</h3>
+<p>
+    Login Module writers must subclass <code>AMLoginModule</code> class and
+    implement <code>init()</code>, <code>process()</code>,
+    <code>getPrincipal()</code> methods. <code>AMLoginModule</code> is an
+    abstract class which implements JAAS <code>LoginModule</code>, it provides
+    methods to access OpenAM services and the module
+    XML configuration. Refer javadocs for complete list of methods. 
+    <pre>
+    public void init(Subject subject,Map sharedState, Map options);
+    </pre>
+    This method initializes the login module. If the module does not understand
+    any of the data stored in <code>sharedState</code> or options parameters,
+    they can be ignored. This method is called by a <code>AMLoginModule</code>
+    immediately after the login module is instantiated. This method may
+    additionally peruse the provided <code>sharedState</code> to determine
+    what are additional authentication state that was provided by other
+    login modules; and may also traverse through the provided options to
+    determine what configuration options were specified to affect the
+    login module's behavior. It may save option values in variables for
+    future use. 
+    <pre>
+    public int process(
+        javax.security.auth.callback.Callback[] callbacks,
+        int state
+    ) throws LoginException;
+    </pre>
+    This method is called to authenticate a subject. For example, it prompts
+    for a user name and password, and then attempt to verify the password
+    against a database. If the login module requires some form of user
+    interaction (e.g. retrieving a user name and password), it should not do
+    so directly. That is because there are various ways of communicating with
+    a user, and it is desirable for login module to remain independent of the
+    different types of user interaction. Rather, this method should invoke
+    the handle method of the the <code>CallbackHandler</code> which deals with
+    user interaction; and then send the results back to this process method. 
+    For instance, user name and password are modeled as <code>NameCallback</code>
+    and <code>PasswordCallback</code> respectively. The <code>CallbackHandler</code> 
+    then set the name and password values for these callbacks respectively; and
+    call this process method again to perform authentication.
+    </p>
+<p>
+    Consider following steps while writing preocess() method.  
+    </p>
+<p>
+<ol>
+<li>Perform the authentication.</li>
+<li>If Authentication succeeded, track the principal who has
+    successfully authenticated.  </li>
+<li>Return -1 if authentication succeeds, or throw a login exception
+    such as <code>AuthLoginException</code> if authentication fails or
+    return relevant state specified in module configuration XML file.</li>
+<li>If multiple states are available to the user, the Callback array
+    from a previous state may be retrieved by using the
+    <code>getCallbak(int state)</code> methods. The underlying login module
+    keeps the <code>Callback[]</code> from the previous states until thes
+    login process is completed.  </li>
+<li>If a module writer need to substitute dynamic text in next state,
+    the writer could use the <code>getCallback()</code> method to get the
+    <code>Callback[]</code> for the next state, modify the output text or
+    prompt, then call <code>replaceCallback()</code> to update the Callback
+    array. This allows a module writer to dynamically generate challenges,
+    passwords or user IDs. Note: Each authentication session will create a
+    new instance of your Login Module Java class. The reference to the
+    class will be released once the authentication session has either
+    suceeded or failed. It is important to note that any static data or
+    reference to any static data in your Login module must be thread-safe.
+    </li>
+</ol>
+</p>
+<p>
+    
+<pre>
+    public Principal getPrincipal();
+    </pre>
+    This method should be called once at the end of a successful
+    authentication session. A login session is deemed successful when all
+    pages in the Module properties XML file have been sent and the module
+    has not thrown an exception. The method retrieves the authenticated
+    token string that the authenticated user will be known by in the
+    OpenAM environment.
+    </p>
+<p>
+    
+<a href="../../source/com/sun/identity/samples/authentication/spi/providers/LoginModuleSample.java">Source code</a>
+    
+</p>
+</p>
+<p>
+<hr noshade="yes" size="1">
+<h3>4. Setup</h3>
+<p>
+    Perform the following steps
+    </p>
+<p>
+<ol>
+<li>Login to OpenAM Console as amadmin. [<a target="console" href="../../UI/Login">here</a>]</li>
+<li>Click on "Configuration" tab.</li>
+<li>Select "Core" under the Authentication table.</li>
+<li>Add <code>com.sun.identity.samples.authentication.spi.providers.LoginModuleSample</code> to "Pluggable Auth Modules Classes" attribute.</li>
+<li>Click on save button to save the changes</li>
+</ol>
+</p>
+<p>
+    Followings are already set up for you.
+    </p>
+<p>
+<ol>
+<li>Compile LoginModuleSample.java and SamplePrincipal.java</li>
+<li>Copy the compiled classes to web application's WEB-INF/classes directory</li>
+<li>Copy this <a target="console" href="../../xml/LoginModuleSample.xml">XML</a> to web application's config/auth/default directory.</li>
+</ol>
+</p>
+</p>
+<p>
+<hr noshade="yes" size="1">
+<h3>5. Run the sample</h3>
+<p>
+    Click <a target="console" href="../../UI/Login?module=LoginModuleSample">here</a>.
+    (If you choose to use a realm other than the root realm, add &amp;org= and 
+    the realm name to this URL).
+    </p>
+</p>
+<hr noshade="yes" size="1">
+</td>
+</tr>
+</table>
+</body>
+</html>

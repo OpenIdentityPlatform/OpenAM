@@ -1,0 +1,802 @@
+    <test name="Modify_log_config">
+        <parameter name="testName" value="LogToFileTest0"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest">
+                <methods>
+                    <exclude name="logMessage"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_1">
+        <parameter name="testName" value="LogToFileTest1"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_2">
+        <parameter name="testName" value="LogToFileTest2"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_3">
+        <parameter name="testName" value="LogToFileTest3"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_4">
+        <parameter name="testName" value="LogToFileTest4"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_5">
+        <parameter name="testName" value="LogToFileTest5"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_6">
+        <parameter name="testName" value="LogToFileTest6"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_7">
+        <parameter name="testName" value="LogToFileTest7"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_8">
+        <parameter name="testName" value="LogToFileTest8"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_9">
+        <parameter name="testName" value="LogToFileTest9"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_10">
+        <parameter name="testName" value="LogToFileTest10"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_11">
+        <parameter name="testName" value="LogToFileTest11"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_12">
+        <parameter name="testName" value="LogToFileTest12"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_13">
+        <parameter name="testName" value="LogToFileTest13"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_14">
+        <parameter name="testName" value="LogToFileTest14"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_15">
+        <parameter name="testName" value="LogToFileTest15"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_16">
+        <parameter name="testName" value="LogToFileTest16"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_17">
+        <parameter name="testName" value="LogToFileTest17"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_18">
+        <parameter name="testName" value="LogToFileTest18"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_19">
+        <parameter name="testName" value="LogToFileTest19"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_20">
+        <parameter name="testName" value="LogToFileTest20"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_21">
+        <parameter name="testName" value="LogToFileTest21"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_22">
+        <parameter name="testName" value="LogToFileTest22"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_23">
+        <parameter name="testName" value="LogToFileTest23"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_24">
+        <parameter name="testName" value="LogToFileTest24"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_25">
+        <parameter name="testName" value="LogToFileTest25"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_26">
+        <parameter name="testName" value="LogToFileTest26"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_27">
+        <parameter name="testName" value="LogToFileTest27"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_28">
+        <parameter name="testName" value="LogToFileTest28"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_29">
+        <parameter name="testName" value="LogToFileTest29"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_30">
+        <parameter name="testName" value="LogToFileTest30"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_31">
+        <parameter name="testName" value="LogToFileTest31"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_32">
+        <parameter name="testName" value="LogToFileTest32"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_33">
+        <parameter name="testName" value="LogToFileTest33"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_34">
+        <parameter name="testName" value="LogToFileTest34"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_35">
+        <parameter name="testName" value="LogToFileTest35"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_36">
+        <parameter name="testName" value="LogToFileTest36"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_37">
+        <parameter name="testName" value="LogToFileTest37"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_38">
+        <parameter name="testName" value="LogToFileTest38"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_39">
+        <parameter name="testName" value="LogToFileTest39"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_40">
+        <parameter name="testName" value="LogToFileTest40"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_41">
+        <parameter name="testName" value="LogToFileTest41"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_42">
+        <parameter name="testName" value="LogToFileTest42"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_43">
+        <parameter name="testName" value="LogToFileTest43"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_44">
+        <parameter name="testName" value="LogToFileTest44"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_45">
+        <parameter name="testName" value="LogToFileTest45"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_46">
+        <parameter name="testName" value="LogToFileTest46"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_47">
+        <parameter name="testName" value="LogToFileTest47"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_48">
+        <parameter name="testName" value="LogToFileTest48"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_49">
+        <parameter name="testName" value="LogToFileTest49"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_50">
+        <parameter name="testName" value="LogToFileTest50"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_51">
+        <parameter name="testName" value="LogToFileTest51"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_52">
+        <parameter name="testName" value="LogToFileTest52"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_53">
+        <parameter name="testName" value="LogToFileTest53"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_54">
+        <parameter name="testName" value="LogToFileTest54"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_55">
+        <parameter name="testName" value="LogToFileTest55"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>
+    <test name="Write_log_to_file_56">
+        <parameter name="testName" value="LogToFileTest56"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="true"/>
+        <parameter name="modifyServConfig" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.log.LogToFileTest"/>
+        </classes>
+    </test>

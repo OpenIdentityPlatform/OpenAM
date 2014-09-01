@@ -1,0 +1,85 @@
+
+    <test name="RedirectTestLDAPRootRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestLDAPSubRealm">
+        <parameter name="testModule" value="ldap"/>
+        <parameter name="testRealm" value="gotoldaprealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+    <test name="RedirectTestDataStoreRootRealm">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestDataStoreSubRealm">
+        <parameter name="testModule" value="datastore"/>
+        <parameter name="testRealm" value="gotodsrealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+    <test name="RedirectTestMembershipRootRealm">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testRealm" value="/"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>
+     <test name="RedirectTestMembershipSubRealm">
+        <parameter name="testModule" value="membership"/>
+        <parameter name="testRealm" value="gotomemrealm"/>
+        <parameter name="instanceIndex" value="1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ConfigUnconfig"/>
+            <class name="com.sun.identity.qatest.authentication.RedirectTest"/>
+        </classes>
+    </test>

@@ -1,0 +1,144 @@
+READ THIS SOFTWARE LICENSE AGREEMENT CAREFULLY. BY DOWNLOADING OR INSTALLING
+THE FORGEROCK SOFTWARE, YOU, ON BEHALF OF YOURSELF AND YOUR COMPANY, AGREE TO
+BE BOUND BY THIS SOFTWARE LICENSE AGREEMENT. IF YOU DO NOT AGREE TO THESE
+TERMS, DO NOT DOWNLOAD OR INSTALL THE FORGEROCK SOFTWARE.
+
+1. Software License.
+
+1.1. Development Right to Use. If Company intends to or does use the ForgeRock
+Software only for the purpose(s) of developing, testing, prototyping and
+demonstrating its application software, then ForgeRock hereby grants Company a
+nonexclusive, nontransferable, limited license to use the ForgeRock Software
+only for those purposes, solely at Company's facilities and only in a
+non-production environment. ForgeRock may audit Company's use of the ForgeRock
+Software to confirm that a production license is not required upon reasonable
+written notice to Company. If Company intends to use the ForgeRock Software in
+a live environment, Company must purchase a production license and may only use
+the ForgeRock Software licensed thereunder in accordance with the terms and
+conditions of that subscription agreement.
+
+1.2. Restrictions. Except as expressly set forth in this ForgeRock Software
+License Agreement (the "Agreement"), Company shall not, directly or indirectly:
+(a) sublicense, resell, rent, lease, distribute or otherwise transfer rights or
+usage in the ForgeRock Software, including without limitation to Company
+subsidiaries and affiliates; (b) remove or alter any copyright, trademark or
+proprietary notices in the ForgeRock Software; or (c) use the ForgeRock
+Software in any way that would subject the ForgeRock Software, in whole in or
+in part, to a Copyleft License. As used herein, "Copyleft License" means a
+software license that requires that information necessary for reproducing and
+modifying such software must be made available publicly to recipients of
+executable versions of such software (see, e.g., GNU General Public License and
+http://www.gnu.org/copyleft/).
+
+2. Proprietary Rights.
+
+2.1. ForgeRock Intellectual Property. Title to and ownership of all copies of
+the ForgeRock Software whether in machine-readable (source, object code or
+other format) or printed form, and all related technical know-how and all
+rights therein (including without limitation all intellectual property rights
+applicable thereto), belong to ForgeRock and its licensors and shall remain the
+exclusive property thereof. ForgeRock's name, logo, trade names and trademarks
+are owned exclusively by ForgeRock and no right is granted to Company to use
+any of the foregoing except as expressly permitted herein. All rights not
+expressly granted to Company are reserved by ForgeRock and its licensors.
+
+2.2. Suggestions. Company hereby grants to ForgeRock a royalty-free, worldwide,
+transferable, sublicensable and irrevocable right and license to use, copy,
+modify and distribute, including by incorporating into any product or service
+owned by ForgeRock, any suggestions, enhancements, recommendations or other
+feedback provided by Company relating to any product or service owned or
+offered by ForgeRock.
+
+2.3. Source Code. The source code underlying the ForgeRock Software is
+available at www.forgerock.org.
+
+3. Term and Termination. The terms of this Agreement shall commence on the
+Effective Date and shall continue in force unless earlier terminated in
+accordance this Section. This Agreement shall terminate without notice to
+Company in the event Company is in material breach of any of the terms and
+conditions of this Agreement. As used herein, "Effective Date" means the date
+on which Company first accepted this Agreement and downloads the ForgeRock
+Software.
+
+4. Disclaimer of Warranties. THE FORGEROCK SOFTWARE LICENSED HEREUNDER IS
+LICENSED "AS IS" AND WITHOUT WARRANTY OF ANY KIND. FORGEROCK AND IT'S LICENSORS
+EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY,
+INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND ANY WARRANTY OF NON-INFRINGEMENT.
+
+5. General Indemnification. Company shall defend, indemnify and hold ForgeRock
+harmless from and against any and all liabilities, damages, losses, costs and
+expenses (including but not limited to reasonable fees of attorneys and other
+professionals) payable to third parties based upon any claim arising out of or
+related to the use of Company's products, provided that ForgeRock: (a) promptly
+notifies Company of the claim; (b) provides Company with all reasonable
+information and assistance, at Company's expense, to defend or settle such a
+claim; and (c) grants Company authority and control of the defense or
+settlement of such claim. Company shall not settle any such claim, without
+ForgeRock's prior written consent, if such settlement would in any manner
+effect ForgeRock's rights in the ForgeRock Software or otherwise. ForgeRock
+reserves the right to retain counsel, at ForgeRock's expense, to participate in
+the defense and settlement of any such claim.
+
+6. Limitation of Liability. IN NO EVENT SHALL FORGEROCK BE LIABLE FOR THE COST
+OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, ANY LOST PROFITS, REVENUE, OR
+DATA, INTERRUPTION OF BUSINESS OR FOR ANY INCIDENTAL, SPECIAL, CONSEQUENTIAL OR
+INDIRECT DAMAGES OF ANY KIND, AND WHETHER ARISING OUT OF BREACH OF WARRANTY,
+BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE OR IF SUCH DAMAGE COULD HAVE
+BEEN REASONABLY FORESEEN. IN NO EVENT SHALL FORGEROCK'S LIABILITY ARISING OUT
+OF OR RELATED TO THIS AGREEMENT WHETHER IN CONTRACT, TORT OR UNDER ANY OTHER
+THEORY OF LIABILITY, EXCEED IN THE AGGREGATE $1,000 USD.
+
+7. General.
+
+7.1. Governing Law. This Agreement shall be governed by and interpreted in
+accordance with the laws of the State of California without reference to its
+conflicts of law provisions.
+
+7.2. Assignment. Company may not assign any of its rights or obligations under
+this Agreement without the prior written consent of ForgeRock, which consent
+shall not be unreasonably withheld. Any assignment not in conformity with this
+Section shall be null and void.
+
+7.3. Waiver. A waiver on one occasion shall not be construed as a waiver of any
+right on any future occasion. No delay or omission by a party in exercising any
+of its rights hereunder shall operate as a waiver of such rights.
+
+7.4. Compliance with Law. The ForgeRock Software is subject to U.S. export
+control laws, including the U.S. Export Administration Act and its associated
+regulations, and may be subject to export or import regulations in other
+countries. Company agrees to comply with all laws and regulations of the United
+States and other countries ("Export Laws") to assure that neither the ForgeRock
+Software, nor any direct products thereof are; (a) exported, directly or
+indirectly, in violation of Export Laws, either to any countries that are
+subject to U.S. export restrictions or to any end user who has been prohibited
+from participating in the U.S. export transactions by any federal agency of the
+U.S. government or (b) intended to be used for any purpose prohibited by Export
+Laws, including, without limitation, nuclear, chemical, or biological weapons
+proliferation.
+
+7.5. US Government Restrictions. Company acknowledges that the ForgeRock
+Software consists of "commercial computer software" and "commercial computer
+software documentation" as such terms are defined in the Code of Federal
+Regulations. No Government procurement regulations or contract clauses or
+provisions shall be deemed a part of any transaction between the parties unless
+its inclusion is required by law, or mutually agreed in writing by the parties
+in connection with a specific transaction. Use, duplication, reproduction,
+release, modification, disclosure or transfer of the ForgeRock Software is
+restricted in accordance with the terms of this Agreement.
+
+7.6. Provision Severability. In the event that it is determined by a court of
+competent jurisdiction that any provision of this Agreement is invalid,
+illegal, or otherwise unenforceable, such provision shall be enforced as nearly
+as possible in accordance with the stated intention of the parties, while the
+remainder of this Agreement shall remain in full force and effect and bind the
+parties according to its terms. To the extent any provision cannot be enforced
+in accordance with the stated intentions of the parties, such terms and
+conditions shall be deemed not to be a part of this Agreement.
+
+7.7. Entire Agreement. This Agreement constitutes the entire and exclusive
+agreement between the parties with respect to the subject matter hereof and
+supersede any prior agreements between the parties with respect to such subject
+matter
+

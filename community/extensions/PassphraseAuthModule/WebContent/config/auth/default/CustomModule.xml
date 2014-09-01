@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding="UTF-8"?>
+
+<!--
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [Forgerock AS]"
+ */
+-->
+
+<!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN" "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
+
+<ModuleProperties moduleName="CustomModule" version="1.0">
+	<Callbacks order="1" length="0" template="Redirect.jsp"/>
+
+	<Callbacks order="2" length="3" timeout="@INVALID_SESSION_TIMEOUT@" template="PasswordReset.jsp" header="#REPLACE#">
+		<PasswordCallback echoPassword="false">
+			<Prompt>New Password</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>Confirm Password</Prompt>
+		</PasswordCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>3</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>4</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>5</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>6</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+
+	<Callbacks order="3" length="3" timeout="@INVALID_SESSION_TIMEOUT@" template="PassphraseEntry.jsp" header="#REPLACE#">
+		<PasswordCallback echoPassword="false">
+			<Prompt>New Passphrase</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>Confirm Passphrase</Prompt>
+		</PasswordCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>3</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>4</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>5</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>6</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+
+	<Callbacks order="4" length="5" timeout="@INVALID_SESSION_TIMEOUT@" template="PassphraseAuthentication.jsp" header="#REPLACE#">
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<ConfirmationCallback>
+			<OptionValues>
+				<OptionValue>
+					<Value>Submit</Value>
+				</OptionValue>
+			</OptionValues>
+		</ConfirmationCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>3</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>4</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>5</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>6</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+
+	<Callbacks order="5" length="3" timeout="@INVALID_SESSION_TIMEOUT@" template="PassphraseReset.jsp" header="#REPLACE#">
+		<PasswordCallback echoPassword="false">
+			<Prompt>New Passphrase</Prompt>
+		</PasswordCallback>
+		<PasswordCallback echoPassword="false">
+			<Prompt>Confirm Passphrase</Prompt>
+		</PasswordCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>3</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>4</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>5</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>6</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+
+	<Callbacks order="6" length="16" timeout="@INVALID_SESSION_TIMEOUT@" template="ResetAnswersEntry.jsp" header="#REPLACE#">
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+		<PasswordCallback>
+			<Prompt>-</Prompt>
+		</PasswordCallback>
+        <ChoiceCallback>
+			<Prompt>state</Prompt>
+			<ChoiceValues>
+				<ChoiceValue>
+					<Value>1</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>2</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>3</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>4</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>5</Value>
+				</ChoiceValue>
+				<ChoiceValue>
+					<Value>6</Value>
+				</ChoiceValue>
+			</ChoiceValues>
+        </ChoiceCallback>
+	</Callbacks>
+	<Callbacks order="7" length="0" template="ProfileChanged.jsp"/>
+</ModuleProperties>

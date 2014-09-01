@@ -1,0 +1,20 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelpe/"><soapenv:Body><samlp:ArtifactResponse ID="e0cdfbad8b0dae4bdaea6e0d0146e638" InResponseTo="RgwYEdMb5piNix8bSBqo0" IssueInstant="2007-08-03T01:43:18Z" Version="2.0" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><saml:Issuer Format="urn:oasis:names:tc:SAML:2.0:nameid-format:entity">http://goas-server-01:7001/glssaml2</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><samlp:Response Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" Destination="https://sp.symspdemo.com:8643/SP-A" ID="fcf38ffc035d69c54b6b16b10babf6d6" InResponseTo="RwjVCxBFbfVOZ5CdJk9Ro" IssueInstant="2007-08-03T01:43:18Z" Version="2.0"><saml:Issuer>http://goas-server-01:7001/glssaml2</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion ID="edd94c3a080734699609eadbeccd9e64" IssueInstant="2007-08-03T01:43:18Z" Version="2.0"><saml:Issuer>http://goas-server-01:7001/glssaml2</saml:Issuer>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#edd94c3a080734699609eadbeccd9e64">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>Ys6aqr5MS2FXvgya3hEOktaawDQ=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+LcRw+WMWwz7C/HxHNC/4IJ6KPUtjyCgzWmCqHKK/FqQt8HvzVcC2T4s1RAXZTJcWMTMH0lXe6QFw
+unWRg9JX0A6QcmkxyqeO2y5yRICJIybl04Q3vO1JQIeUPRbNjj1aWnny93nj/9Ipxd0PNpfcnvZR
+hoPcpTrXvX2aJFKrFPs=
+</ds:SignatureValue>
+</ds:Signature><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://goas-server-01:7001/glssaml2" SPNameQualifier="https://sp.symspdemo.com:8643/sp.xml">FEDID_ben</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData InResponseTo="RwjVCxBFbfVOZ5CdJk9Ro" NotOnOrAfter="2007-08-03T01:53:18Z" Recipient="https://sp.symspdemo.com:8643/SP-A"/></saml:SubjectConfirmation></saml:Subject><saml:Conditions NotBefore="2007-08-03T01:38:18Z" NotOnOrAfter="2007-08-03T01:53:18Z"><saml:AudienceRestriction><saml:Audience>https://sp.symspdemo.com:8643/sp.xml</saml:Audience></saml:AudienceRestriction></saml:Conditions><saml:AuthnStatement AuthnInstant="2007-08-03T01:43:00Z" SessionIndex="edd94c3a080734699609eadbeccd9e64"><saml:SubjectLocality Address="192.168.1.104" DNSName="goas-pc-04.goas.net"/><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement></saml:Assertion></samlp:Response></samlp:ArtifactResponse></soapenv:Body></soapenv:Envelope>

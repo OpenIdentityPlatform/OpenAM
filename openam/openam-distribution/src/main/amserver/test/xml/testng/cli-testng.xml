@@ -1,0 +1,149 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+ 
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+ 
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+ 
+   $Id: cli-testng.xml,v 1.7 2008/06/25 05:44:24 qcheng Exp $
+ 
+-->
+<!--
+   Portions Copyrighted 2012 ForgeRock Inc
+-->
+
+<suite name="OpenAM_CLI" verbose="1">
+    <test name="CLI Framework">
+        <groups>
+            <run>
+                <include name="cli-framework" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.CLIFrameworkTest"/>
+        </classes>
+    </test>
+    <test name="CLI Resource Bundle">
+        <parameter name="bundle-name" value="testbundle" />
+        <parameter name="bundle-file-name" 
+            value="mock/cli/testbundle.properties" />
+        <parameter name="locale" value="" />
+        <groups>
+            <run>
+                <include name="cli-resource-bundle" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.ResourceBundleTest"/>
+        </classes>
+    </test>
+    <test name="CLI JP Resource Bundle">
+        <parameter name="bundle-name" value="testbundle" />
+        <parameter name="bundle-file-name" 
+            value="mock/cli/testbundle_jp.properties" />
+        <parameter name="locale" value="jp" />
+        <groups>
+            <run>
+                <include name="cli-resource-bundle" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.ResourceBundleTest"/>
+        </classes>
+    </test>
+
+    <test name="CLI Schema">
+        <parameter name="subschema" value="" />
+        <groups>
+            <run>
+                <include name="cli" />
+                <include name="schema" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.schema.SchemaTest"/>
+        </classes>
+    </test>
+    <test name="CLI SubSchema">
+        <parameter name="subschema" value="subschemaY" />
+        <groups>
+            <run>
+                <include name="cli" />
+                <include name="subschema" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.schema.SchemaTest"/>
+        </classes>
+    </test>
+    <test name="CLI Realm">
+        <parameter name="realm" value="/clitest" />
+        <parameter name="parent-realm" value="/" />
+        <parameter name="service-name" value="iPlanetAMSessionService" />
+        <parameter name="attribute-value" value="iplanet-am-session-max-session-time=150" />
+        <parameter name="modify-attribute-value" value="iplanet-am-session-max-session-time=100" />
+        <groups>
+            <run>
+                <include name="cli-realm" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.realm.RealmTest"/>
+        </classes>
+    </test>
+    <test name="CLI IdRepo">
+        <parameter name="realm" value="/" />
+        <parameter name="uid" value="devtestidrepo" />
+        <parameter name="attrs" value="sn=Test cn=Dev userpassword=passwordx inetuserstatus=Active" />
+        <groups>
+            <run>
+                <include name="cli-idrepo" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.idrepo.IdRepoTest"/>
+        </classes>
+    </test>
+    <test name="CLI Authentication Configuration">
+        <parameter name="realm" value="/" />
+        <groups>
+            <run>
+                <include name="cli-authconfig" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.authentication.AuthConfigTest"/>
+        </classes>
+    </test>
+    <test name="CLI DataStore">
+        <parameter name="realm" value="/" />
+        <groups>
+            <run>
+                <include name="cli-datastore" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.cli.datastore.DataStoreTest"/>
+        </classes>
+    </test>
+</suite>
+

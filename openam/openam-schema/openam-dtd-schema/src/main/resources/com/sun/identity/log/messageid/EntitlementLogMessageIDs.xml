@@ -1,0 +1,277 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: EntitlementLogMessageIDs.xml,v 1.1 2009/10/22 21:04:05 veiming Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="ENTITLEMENT">
+
+    <logmessage name="ATTEMPT_ADD_PRIVILEGE" id="1"
+	loglevel="LL_INFO"
+	description="Attempt to add privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Add privilege API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_ADD_PRIVILEGE" id="2"
+	loglevel="LL_INFO"
+	description="Privilege is added.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Add privilege API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_ADD_PRIVILEGE" id="3"
+	loglevel="LL_INFO"
+	description="Failed to add privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Add privilege API is called.</item>
+	</triggers>
+	<actions>
+            <item>Privilege might already exists.</item>
+            <item>Administrator might not have the permission to add privilege.</item>
+	</actions>
+    </logmessage>
+
+    <logmessage name="ATTEMPT_ADD_REFERRAL" id="11"
+	loglevel="LL_INFO"
+	description="Attempt to add referral privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Add referral privilege API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_ADD_REFERRAL" id="12"
+	loglevel="LL_INFO"
+	description="Referral Privilege is added.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Add referral privilege API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_ADD_REFERRAL" id="13"
+	loglevel="LL_INFO"
+	description="Failed to add referral privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Add referral privilege API is called.</item>
+	</triggers>
+	<actions>
+            <item>Privilege might already exists.</item>
+            <item>Administrator might not have the permission to add referral privilege.</item>
+	</actions>
+    </logmessage>
+
+    <logmessage name="ATTEMPT_REMOVE_PRIVILEGE" id="21"
+	loglevel="LL_INFO"
+	description="Attempt to remove privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Remove privilege API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_REMOVE_PRIVILEGE" id="22"
+	loglevel="LL_INFO"
+	description="Privilege is removed.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed privilege API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_REMOVE_PRIVILEGE" id="23"
+	loglevel="LL_INFO"
+	description="Failed to removed privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed privilege API is called.</item>
+	</triggers>
+	<actions>
+            <item>Administrator might not have the permission to remove privilege.</item>
+	</actions>
+    </logmessage>
+
+    <logmessage name="ATTEMPT_REMOVE_REFERRAL" id="31"
+	loglevel="LL_INFO"
+	description="Attempt to remove referral privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Remove referral privilege API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_REMOVE_REFERRAL" id="32"
+	loglevel="LL_INFO"
+	description="Referral privilege is removed.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed referral privilege API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_REMOVE_REFERRAL" id="33"
+	loglevel="LL_INFO"
+	description="Failed to removed referral privilege.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>privilege name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Removed referral privilege API is called.</item>
+	</triggers>
+	<actions>
+            <item>Administrator might not have the permission to remove privilege.</item>
+	</actions>
+    </logmessage>
+
+    <logmessage name="ATTEMPT_SAVE_APPLICATION" id="101"
+	loglevel="LL_INFO"
+	description="Attempt to save application.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	</datainfo>
+	<triggers>
+	    <item>Save application API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_SAVE_APPLICATION" id="102"
+	loglevel="LL_INFO"
+	description="Application is saved.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	</datainfo>
+	<triggers>
+	    <item>Save application API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_SAVE_APPLICATION" id="103"
+	loglevel="LL_INFO"
+	description="Failed to save application.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Save application API is called.</item>
+	</triggers>
+	<actions>
+            <item>Administrator might not have the permission to save application.</item>
+	</actions>
+    </logmessage>
+
+    <logmessage name="ATTEMPT_REMOVE_APPLICATION" id="111"
+	loglevel="LL_INFO"
+	description="Attempt to remove application.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	</datainfo>
+	<triggers>
+	    <item>Remove application API is called.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SUCCEEDED_REMOVE_APPLICATION" id="112"
+	loglevel="LL_INFO"
+	description="Application is removed.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	</datainfo>
+	<triggers>
+	    <item>Remove application API is called.</item>
+	</triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_REMOVE_APPLICATION" id="113"
+	loglevel="LL_INFO"
+	description="Failed to remove application.">
+	<datainfo>
+	    <item>realm</item>
+	    <item>application name</item>
+	    <item>error message</item>
+	</datainfo>
+	<triggers>
+	    <item>Remove application API is called.</item>
+	</triggers>
+	<actions>
+            <item>Administrator might not have the permission to remove application.</item>
+	</actions>
+    </logmessage>
+</logmessages>

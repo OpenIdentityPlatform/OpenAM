@@ -1,0 +1,4 @@
+<project name="wssagents">
+    <dirname property="wssagents.basedir" file="${ant.file.wssagents}"/>
+    <property file="${wssagents.basedir}/wssagents.properties"/>
+</project>

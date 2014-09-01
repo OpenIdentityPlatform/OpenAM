@@ -1,0 +1,245 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyCreateHostedIDP.xml,v 1.7 2008/07/24 18:16:56 veiming Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="question" defaultValue="configure.provider.section.setup">
+    <property>
+	<label name="lblHasMetaData" defaultValue="configure.provider.label.hasMetaData" labelFor="tfHasMetaData" />
+	<cc name="radioHasMetaData" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option label="configure.provider.option.hasMetaData.yes" value="yes" />
+	    <option label="configure.provider.option.hasMetaData.no" value="no" />
+	    <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="metadataOptionSelect(this);" />
+	</cc>
+        <cc name="infoHasMetaData" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoHasMetaData', infoHasMetaData);" />
+        </cc>
+    </property>
+    </section>
+
+    <section name="meta" defaultValue="configure.provider.section.meta">
+    <property>
+	<label name="lblMetaRadio" defaultValue="configure.provider.label.meta.question" labelFor="radioMeta" />
+	<cc name="radioMeta" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option label="configure.provider.option.url" value="url" />
+	    <option label="configure.provider.option.uploadfile" value="file" />
+	    <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="metaOptionSelect(this);" />
+	</cc>
+        <cc name="infoRadioMeta" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoRadioMeta', infoRadioMeta);" />
+        </cc>
+    </property>
+    <property required="true">
+	<label name="lblMetadataFile" defaultValue="configure.provider.label.metadata" labelFor="tfMetadataFileURL" />
+	<cc name="tfMetadataFileURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="70" />
+	</cc>
+        <cc name="btnMetadata"
+            tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+            <attribute name="OnClick" value="openWindow('tfMetadataFile_metadatafilename'); return false;" />
+                <attribute name="defaultValue" value="button.upload" />
+        </cc>
+	<cc name="tfMetadataFile" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    <property>
+	<label name="lblExtendedDataRadio" defaultValue="configure.provider.label.extendeddata.question" labelFor="radioExtendedData" />
+	<cc name="radioExtendedData" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option label="configure.provider.option.url" value="url" />
+	    <option label="configure.provider.option.uploadfile" value="file" />
+	    <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="extendedOptionSelect(this);" />
+	</cc>
+        <cc name="infoExtendedDataRadio" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoExtendedDataRadio', infoExtendedDataRadio);" />
+        </cc>
+    </property>
+    <property required="true">
+	<label name="lblExtendedFile" defaultValue="configure.provider.label.extendeddata" labelFor="tfExtendedFile" />
+	<cc name="tfExtendedFileURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="70" />
+	    <attribute name="onBlur" value="getCircleOfTrustFromExt();" />
+	</cc>
+        <cc name="btnExtendedFile"
+            tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+            <attribute name="OnClick" value="openWindow('tfExtendedFile_extendedfilename_getCircleOfTrustFromExt'); return false;" />
+                <attribute name="defaultValue" value="button.upload" />
+        </cc>
+	<cc name="tfExtendedFile" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+
+    <property required="true">
+	<label name="lblRealm" defaultValue="configure.provider.label.realm" labelFor="tfRealm" />
+	<cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onChange" value="realmSelect(this);" />
+        </cc>
+        <cc name="infoRealm" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoRealm', infoRealm);" />
+        </cc>
+    </property>
+    <property required="true">
+	<label name="lblEntityId" defaultValue="configure.provider.label.entityId" labelFor="tfEntityId" />
+	<cc name="tfEntityId" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="75" />
+	</cc>
+        <cc name="infoEntityId" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoEntityId', infoEntityId);" />
+        </cc>
+    </property>
+    <property>
+	<label name="lblSigningKey" defaultValue="configure.provider.label.signing.key" labelFor="tfSigningKey" />
+	<cc name="tfSigningKey" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onChange" value="signKeySelect(this);" />
+        </cc>
+        <cc name="txtSigningKeyText" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="configure.provider.help.signing.key.test" />
+        </cc>
+        <cc name="infoSigningKey" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('CreateHostedIDP.infoSigningKey', infoSigningKey);" />
+        </cc>
+    </property>
+    </section>
+    <section name="cot" defaultValue="configure.provider.section.cot">
+    <property span="true">
+        <cc name="txtCotDesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="configure.provider.help.cot" />
+        </cc>
+    </property>
+    <property>
+	<label name="lblCOT" defaultValue="configure.provider.label.cot.question" labelFor="radioCOT" />
+	<cc name="radioCOT" tagclass="com.sun.web.ui.taglib.html.CCRadioButtonTag">
+	    <option label="configure.provider.option.existing" value="yes" />
+	    <option label="configure.provider.option.new" value="no" />
+	    <attribute name="layout" value="horizontal" />
+            <attribute name="onClick" value="cotOptionSelect(this);" />
+	</cc>
+    </property>
+    <property required="true">
+	<label name="lblCOT" defaultValue="configure.provider.label.cot.existing" labelFor="choiceCOT" />
+	<cc name="choiceCOT" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
+    </property>
+    <property required="true">
+	<label name="lblCOT" defaultValue="configure.provider.label.cot" labelFor="tfCOT" />
+	<cc name="tfCOT" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	    <attribute name="size" value="25" />
+	</cc>
+    </property>
+    </section>
+    <section name="attrmapping" defaultValue="configure.provider.section.attributesmapping">
+        <property span="true">
+            <cc name="txtattrmappingdesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="configure.provider.attributesmapping.help" />
+            <attribute name="escape" value="false" />
+            </cc>
+            <cc name="tblattrmapping"
+                tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                <attribute name="title" value="configure.provider.attributesmapping.title" />
+                <attribute name="empty" value="configure.provider.attributesmapping.title.empty" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="selectionType" value="multiple" />
+                <attribute name="selectionJavascript" value="toggleTblButtonState('CreateHostedIDP', 'CreateHostedIDP.tblattrmapping', 'tblButton', 'CreateHostedIDP.deleteAttrMappingBtn', this)"/>
+                <attribute name="showAdvancedSortingIcon" value="false" />
+                <attribute name="showLowerActions" value="false" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="showPaginationIcon" value="false" />
+                <attribute name="showSelectionIcons" value="false" />
+                <attribute name="showSelectionSortIcon" value="false" />
+                <attribute name="showSortingRow" value="false" />
+            </cc>
+        </property>
+        <property span="true">
+	    <cc name="tfAttrMappingAssertion" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+	        <attribute name="size" value="50" />
+	    </cc>
+	    <cc name="tfAttrMappingName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="localizeDisplayFieldValue" value="false" />
+	        <attribute name="size" value="50" />
+	    </cc>
+            <cc name="btnAddAttrMapping"
+                tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+                <attribute name="OnClick" value="addAttrMapping(); return false;" />
+                <attribute name="defaultValue" value="configure.provider.attributesmapping.add.button" />
+            </cc>
+	    <cc name="menuUserAttributes" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <attribute name="onChange" value="userAttrSelect(this);" />
+            </cc>
+            <cc name="infoMenuUserAttributes" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+                <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+                <attribute name="title" value="click.to.see.info" />
+                <attribute name="alt" value="click.to.see.info" />
+                <attribute name="border" value="0" />
+                <attribute name="height" value="18" />
+                <attribute name="width" value="18" />
+                <attribute name="onClick" value="showHelp('CreateHostedIDP.infoMenuUserAttributes', infoMenuUserAttributes);" />
+            </cc>
+        </property>
+    </section>
+</propertysheet>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  !
+  !      Copyright 2013 ForgeRock Inc.
+  !
+  !      (Final license TBD)
+  !
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Source Control -->
+    <scm>
+        <connection>scm:svn:https://svn.forgerock.org/openam/fr-branches/docs/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam//fr-branches/docs/</developerConnection>
+        <url>http://sources.forgerock.org/browse/commons/forgerock-parent/branches/</url>
+    </scm>
+
+    <!-- License (currently TBD) -->
+
+    <licenses>
+        <license>
+            <name>To be determined</name>
+            <url>http://example.com/license</url>
+            <distribution>repo</distribution>
+            <comments>Keep private until license is determined</comments>
+        </license>
+    </licenses>
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.1.0</version>
+    </parent>
+
+    <!-- Documentation Module -->
+    <groupId>org.forgerock.openam</groupId>
+    <artifactId>openam-documentation</artifactId>
+    <!-- <version>10.2.0-SNAPSHOT</version>         -->
+
+
+    <name>OpenAM Documentation</name>
+
+    <inceptionYear>2011</inceptionYear>
+    <packaging>pom</packaging>
+    <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated
+        from OpenAM source code.
+    </description>
+
+    <modules>
+        <module>openam-doc-content</module>
+        <module>openam-doc-source</module>
+    </modules>
+
+</project>
