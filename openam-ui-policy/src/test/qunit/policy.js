@@ -186,67 +186,79 @@ define([
                     // Step 6
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
                     QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
-
-                    /*
-                    TODO: remove comment and fix tests as part of AME-4287
+                    
                     // Step 7
                     $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                         QUnit.ok(editAppView.$el.find('#reviewName').html() === app.name, "Correct name is displayed in the review step");
-                        if (editAppView.$el.find('#reviewDescr').length) {
-                            QUnit.ok(editAppView.$el.find('#reviewDescr').html() === (app.description ? app.description : ''), "Correct description is displayed in the review step");
-                        }
-                        QUnit.ok(editAppView.$el.find('#reviewType').html() === app.applicationType, "Correct application type is displayed in the review step");
-                        if (editAppView.$el.find('#reviewRealm').length) {
-                            QUnit.ok(editAppView.$el.find('#reviewRealm').html() === app.realm, "Correct realm is displayed in the review step");
-                        }
-                        // Resources
-                        if (editAppView.$el.find('#reviewRes').length) {
-                            var resources = _.initial(editAppView.$el.find('#reviewRes').html().split('<br>'));
-                        _.each(resources, function (value, key) {
-                            resources[key] = value.trim();
-                        });
-                        QUnit.ok(_.isEqual(resources, app.resources), "Correct resources are displayed in the review step");
+
+                        if ((!editAppView.$el.find('#reviewDescr').html()) && (!app.description)) {
+                            // both are undefined.
+                            QUnit.ok(true, "Correct description is displayed in the review step");
+                        } else {
+                            QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (app.description ? app.description : ''), "Correct description is displayed in the review step");
                         }
 
-                        // Subject Conditions
-                        if (editAppView.$el.find('#reviewSubj').length) {
-                            var subjects = _.initial(editAppView.$el.find('#reviewSubj').html().split('<br>'));
-                            _.each(subjects, function (value, key) {
-                                subjects[key] = value.trim();
+                        QUnit.ok(editAppView.$el.find('#reviewType').html() === app.applicationType, "Correct application type is displayed in the review step");
+                         
+                        // Realms
+                        if (app.realm.length) {
+                            var realms = [];
+                             _.each(editAppView.$el.find('ul#reviewRealm').find('li'), function (value, key) {
+                                realms[key] = value.innerHTML;
                             });
-                            QUnit.ok(_.isEqual(subjects, app.subjects), "Correct subject conditions are displayed in the review step");
+                             // Currently only one realm, so hardcoded to [0];
+                            QUnit.ok(realms[0] === app.realm, "Correct realm is displayed in the review step");
+                        }
+                    
+                        // Resources
+                        if (app.resources.length) {
+                            var resources = [];
+                            _.each(editAppView.$el.find('ul#reviewRes').find('li'), function (value, key) {
+                                resources[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(resources, app.resources), "Correct resources are displayed in the review step");
                         }
 
                         // Actions
-                        if (editAppView.$el.find('#reviewActions').length) {
-                            var actionsDisplayed = _.initial(editAppView.$el.find('#reviewActions').html().split('<br>')),
-                                actions = [],
-                                actionPair,
-                                appSelectedActions = [];
-                            _.each(app.actions, function (value) {
-                                if (value.selected) {
-                                    appSelectedActions.push(value);
-                                }
+                        if (app.actions.length) {
+                            var actions = [],
+                                appSelectedActions = _.where(app.actions, {selected: true}),
+                                actionPair;
+
+                            _.each(editAppView.$el.find('ul#reviewActions').find('li'), function (value) {
+                                actionPair = value.innerHTML.split(':');
+                                actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
                             });
-                            _.each(actionsDisplayed, function (value, key) {
-                                actionPair = value.split(':');
-                                actions.push({action: actionPair[0].trim(), selected: true, value: actionPair[1].trim() === 'Allowed'});
-                            });
+                  
                             QUnit.ok(_.isEqual(actions, appSelectedActions), "Correct actions are displayed in the review step");
                         }
-                        // Environment Conditions
-                        if (editAppView.$el.find('#reviewEnv').length) {
-                            var envConditions = _.initial(editAppView.$el.find('#reviewEnv').html().split('<br>'));
-                            _.each(envConditions, function (value, key) {
-                                envConditions[key] = value.trim();
+
+                        // Subject Conditions
+                        if (app.subjects.length) {
+                            var subjects = [];
+                            _.each(editAppView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
+                                subjects[key] = value.innerHTML;
                             });
-                            QUnit.ok(_.isEqual(envConditions, app.conditions), "Correct environment conditions are displayed in the review step");
+
+                            QUnit.ok(_.isEqual(subjects, app.subjects), "Correct subject conditions are displayed in the review step");
                         }
 
+                        // Environment Conditions
+                        if (app.conditions.length) {
+                            var envConditions = [];
+                            _.each(editAppView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
+                                envConditions[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(envConditions, app.conditions), "Correct environment conditions are displayed in the review step");
+                        }
+                       
                         // Entitlement Combiner
                         QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === app.entitlementCombiner, "Correct name is displayed in the review step");
+                        
                     }));
-                    */
+                   
                 });
             });
 
@@ -495,37 +507,64 @@ define([
                         $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data));
                     });
 
-                    /*
-                     TODO: remove comment and fix tests as part of AME-4287
-                    // Step 6
                     $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data, function () {
-                        QUnit.ok(editPolView.$el.find('#reviewPolName').html() === pol.name, "Correct name is displayed in the review step");
-                        QUnit.ok(editPolView.$el.find('#reviewPolDescr').html() === (pol.description ? pol.description : ''), "Correct description is displayed in the review step");
+                        QUnit.ok(editPolView.$el.find('#reviewName').html() === pol.name, "Correct name is displayed in the review step");
+                        if ((!editPolView.$el.find('#reviewDesc').html()) && (!pol.description)) {
+                            // both are undefined.
+                            QUnit.ok(true, "Correct description is displayed in the review step");
+                        } else {
+                            QUnit.ok(editPolView.$el.find('#reviewDesc').html() === (pol.description ? pol.description : ''), "Correct description is displayed in the review step");
+                        }
 
                         // Resources
-                        var resources = _.initial(editPolView.$el.find('#reviewPolRes').html().split('<br>'));
-                        _.each(resources, function (value, key) {
-                            resources[key] = value.trim();
-                        });
-                        QUnit.ok(_.isEqual(resources, pol.resources), "Correct resources are displayed in the review step");
+                        if (pol.resources.length) {
+                            var resources = [];
+                            _.each(editPolView.$el.find('ul#reviewRes').find('li'), function (value, key) {
+                                resources[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(resources, pol.resources), "Correct resources are displayed in the review step");
+                        }
+
 
                         // Actions
-                        var actionsDisplayed = _.initial(editPolView.$el.find('#reviewPolActions').html().split('<br>')),
-                            actions = [],
-                            actionPair,
-                            SelectedActions = [];
-                        _.each(pol.actions, function (value) {
-                            if (value.selected) {
-                                SelectedActions.push(value);
-                            }
-                        });
-                        _.each(actionsDisplayed, function (value, key) {
-                            actionPair = value.split(':');
-                            actions.push({action: actionPair[0].trim(), selected: true, value: actionPair[1].trim() === 'Allowed'});
-                        });
-                        QUnit.ok(_.isEqual(actions, SelectedActions), "Correct actions are displayed in the review step");
+                        if (pol.actions.length) {
+                            var actions = [],
+                                polSelectedActions = _.where(pol.actions, {selected: true}),
+                                actionPair;
+
+                            _.each(editPolView.$el.find('#reviewActions').find('li'), function (value) {
+                                actionPair = value.innerHTML.split(':');
+                                actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
+                            });
+                  
+                            QUnit.ok(_.isEqual(actions, polSelectedActions), "Correct actions are displayed in the review step");
+                        }
+
+                        /* TODO
+                        // Subject Conditions
+                        if (pol.subjects.length) {
+                            var subjects = [];
+                            _.each(editPolView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
+                                subjects[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(subjects, pol.subjects), "Correct subject conditions are displayed in the review step");
+                        }
+
+                        // Environment Conditions
+                        if (pol.conditions.length) {
+                            var envConditions = [];
+                            _.each(editPolView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
+                                envConditions[key] = value.innerHTML;
+                            });
+
+                            QUnit.ok(_.isEqual(envConditions, pol.conditions), "Correct environment conditions are displayed in the review step");
+                        }
+                        */
+
                     }));
-                    */
+                    
                 });
             });
 

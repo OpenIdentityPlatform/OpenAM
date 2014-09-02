@@ -1,28 +1,27 @@
+{{! The IDs are used for testing }}
 <div class="col2">
-
     <div class="review-row clearfix" tabindex="0" >
-        <h2>{{entity.name}}</h2>
-        <span class="icon-pencil"></span>
-        {{#if entity.description}}<p>{{entity.description}}</p>{{/if}}
+        <h2>Name</h2> 
+        <p id="reviewName">{{entity.name}}</p>
+        {{#if entity.description}}<p id="reviewDesc">{{entity.description}}</p>{{/if}}
+
     </div>
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Resources</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.resources}}
-        <ul>
+        <ul id="reviewRes">
             {{#each entity.resources}}
             <li>{{this}}</li>
             {{/each}}
-        </ul>
+        </ul> 
         {{/if}}
     </div>
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Actions</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.actions}}
-        <ul>
+        <ul id="reviewActions">
             {{#each entity.actions}}
             {{#if selected}}
             <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
@@ -38,7 +37,6 @@
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Subjects</h2>
-        <span class="icon-pencil"></span>
         {{#if subjectString}}
         <pre>{{subjectString}}</pre>
         {{/if}}
@@ -46,7 +44,6 @@
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Environments</h2>
-        <span class="icon-pencil"></span>
         {{#if environmentString}}
         <pre>{{environmentString}}</pre>
         {{/if}}

@@ -131,7 +131,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
         expand(this.$activeSection);
 
         this.$headers.removeClass('step-active');
-        $(this.$headers[id]).addClass('step-active');
+        $(this.$headers[id]).addClass('step-active').focus();
     };
 
     return Accordion;

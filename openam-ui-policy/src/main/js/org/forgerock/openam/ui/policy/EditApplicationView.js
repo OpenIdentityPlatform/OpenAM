@@ -45,7 +45,9 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
         events: {
             'change #appType': 'handleAppTypeChange',
             'click input[name=nextButton]': 'openNextStep',
-            'click input[name=submitForm]': 'submitForm'
+            'click input[name=submitForm]': 'submitForm',
+            'click .review-row': 'reviewRowClick',
+            'keyup .review-row': 'reviewRowClick'
         },
         data: {},
         REVIEW_INFO_STEP: 6,
@@ -235,6 +237,19 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
          */
         openNextStep: function (e) {
             this.accordion.setActive(this.accordion.getActive() + 1);
+        },
+
+        reviewRowClick:function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var reviewRows = this.$el.find('.review-row'),
+                targetIndex = -1;
+                _.find(reviewRows, function(reviewRow, index){
+                    if(reviewRow === e.currentTarget){
+                        targetIndex = index;
+                    }
+                });
+
+            this.accordion.setActive(targetIndex);
         },
 
         submitForm: function () {

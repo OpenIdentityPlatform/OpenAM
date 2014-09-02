@@ -201,7 +201,7 @@ define([
                     "Content-Length": "442",
                     "Content-Type": "application/json;charset=UTF-8"
                 },
-                "{\"name\":\"qwwqqw\",\"active\":true,\"description\":\"rewr\",\"resources\":{\"included\":[\"rerew\"],\"excluded\":[]},\"applicationName\":\"sunIdentityServerLibertyPPService\",\"actionValues\":{\"QUERY_deny\":false,\"MODIFY_deny\":false},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-08-08T13:03:36Z\",\"createdBy\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-07-30T10:09:45Z\"}"
+                "{\"name\":\"qwwqqw\",\"active\":true,\"description\":\"rewr\",\"resources\":[\"rerew\"],\"applicationName\":\"sunIdentityServerLibertyPPService\",\"actionValues\":{\"QUERY_deny\":false,\"MODIFY_deny\":false},\"resourceAttributes\":[],\"lastModifiedBy\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModified\":\"2014-08-08T13:03:36Z\",\"createdBy\":\"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org\",\"creationDate\":\"2014-07-30T10:09:45Z\"}"
             ]
         );
 

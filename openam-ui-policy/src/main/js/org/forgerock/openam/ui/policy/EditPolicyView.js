@@ -49,7 +49,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
         template: "templates/policy/EditPolicyTemplate.html",
         events: {
             'click input[name=nextButton]': 'openNextStep',
-            'click input[name=submitForm]': 'submitForm'
+            'click input[name=submitForm]': 'submitForm',
+            'click .review-row': 'reviewRowClick',
+            'keyup .review-row': 'reviewRowClick'
         },
         data:{},
 
@@ -183,6 +185,19 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
          */
         openNextStep: function (e) {
             this.accordion.setActive(this.accordion.getActive() + 1);
+        },
+
+        reviewRowClick:function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var reviewRows = this.$el.find('.review-row'),
+                targetIndex = -1;
+                _.find(reviewRows, function(reviewRow, index){
+                    if(reviewRow === e.currentTarget){
+                        targetIndex = index;
+                    }
+                });
+
+            this.accordion.setActive(targetIndex);
         },
 
         submitForm: function () {

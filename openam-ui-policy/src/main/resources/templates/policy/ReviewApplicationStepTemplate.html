@@ -1,16 +1,17 @@
+{{! The IDs are used for testing }}
 <div class="col2">
+
     <div class="review-row clearfix" tabindex="0" >
-        <h2>Name</h2>
-        <span class="icon-pencil"></span>
-        <p>{{entity.name}}</p>
+        <h2>Name</h2> 
+        <p id="reviewName">{{entity.name}}</p>
 
         <h2>Application Type</h2>
-        <p>{{entity.applicationType}}</p>
-        {{#if entity.description}}<p>{{entity.description}}</p>{{/if}}
+        <p id="reviewType">{{entity.applicationType}}</p>
+        {{#if entity.description}}<p id="reviewDesc">{{entity.description}}</p>{{/if}}
 
         <h2>Realms</h2>
         {{#if entity.realm}}
-        <ul>
+        <ul id="reviewRealm">
             {{#each entity.realm}}
             <li>{{this}}</li>
             {{/each}}
@@ -20,9 +21,8 @@
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Resources</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.resources}}
-        <ul>
+        <ul id="reviewRes">
             {{#each entity.resources}}
             <li>{{this}}</li>
             {{/each}}
@@ -32,9 +32,8 @@
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Actions</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.actions}}
-        <ul>
+        <ul id="reviewActions">
             {{#each entity.actions}}
             {{#if selected}}
             <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
@@ -50,9 +49,8 @@
 
     <div class="review-row clearfix" tabindex="0" >
         <h2>Subjects</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.subjects}}
-        <ul>
+        <ul id="reviewSubjects">
             {{#each entity.subjects}}
             <li>{{this}}</li>
             {{/each}}
@@ -60,11 +58,10 @@
         {{/if}}
     </div>
 
-    <div class="review-row clearfix">
+    <div class="review-row clearfix" tabindex="0" >
         <h2>Environments</h2>
-        <span class="icon-pencil"></span>
         {{#if entity.conditions}}
-        <ul>
+        <ul id="reviewEnvConditions">
             {{#each entity.conditions}}
             <li>{{this}}</li>
             {{/each}}
@@ -72,10 +69,9 @@
         {{/if}}
     </div>
 
-    <div class="review-row clearfix" tabindex="0" >
+      <div class="review-row clearfix" tabindex="0" >
         <h2>Override Rules</h2>
-        <span class="icon-pencil"></span>
-        <p>{{entity.entitlementCombiner}}: Allow</p>
+        <p id="reviewEntComb">{{entity.entitlementCombiner}}: Allow</p>
     </div>
 
 </div>
