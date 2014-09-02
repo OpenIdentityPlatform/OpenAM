@@ -44,7 +44,6 @@ import org.forgerock.util.Reject;
 import javax.inject.Inject;
 import java.util.List;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;

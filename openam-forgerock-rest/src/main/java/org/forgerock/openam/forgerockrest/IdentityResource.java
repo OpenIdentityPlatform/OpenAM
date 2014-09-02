@@ -41,27 +41,9 @@ import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -90,8 +72,6 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
@@ -101,6 +81,26 @@ import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
+
+import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -727,6 +727,10 @@ public final class IdentityResource implements CollectionResourceProvider {
 
                 // Send Registration
                 sendNotification(email, subject, message, realm, confirmationLink);
+
+                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                debug.message("IdentityResource.generateNewPasswordEmail :: ACTION of generate new password email " +
+                        " for username " + username + " in realm " + realm + " performed by " + principalName);
             }
             handler.handleResult(result);
         } catch (ResourceException re) {
@@ -861,6 +865,8 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
+            debug.message("IdentityResource.updateInstance :: Anonymous UPDATE in realm " + realm + " for " +
+                    resourceId);
             // read updated identity back to client
             IdentityDetails checkIdent = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
             // handle updated resource
@@ -912,6 +918,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             Token admin = new Token();
             admin.setId(tok.getTokenID().toString());
             if (createInstance(admin, jVal, realm, handler)) {
+
                 // Only remove the token if the create was successful, errors will be set in the handler.
                 try {
                     // Even though the generated token will eventually timeout, delete it after a successful read
@@ -972,6 +979,9 @@ public final class IdentityResource implements CollectionResourceProvider {
                         field(USER_PASSWORD, userPassword))), realm);
                 identityDetails.setName(resourceId);
                 idsvc.update(identityDetails, admin);
+                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+                debug.message("IdentityResource.actionInstance :: ACTION of change password for " + resourceId +
+                        " in realm " + realm + " performed by " + principalName);
                 handler.handleResult(json(object()));
                 return;
 
@@ -1019,6 +1029,9 @@ public final class IdentityResource implements CollectionResourceProvider {
         IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
 
         if (dtls != null) {
+            debug.message("IdentityResource.createInstance :: Anonymous CREATE in realm " + realm + " for " +
+                    resourceId);
+
             handler.handleResult(identityDetailsToJsonValue(dtls));
             successfulCreate = true;
         }
@@ -1062,6 +1075,10 @@ public final class IdentityResource implements CollectionResourceProvider {
         IdentityDetails dtls = attemptResourceCreation(handler, realm, admin, identity, resourceId);
 
         if (dtls != null) {
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.createInstance :: CREATE of " + resourceId + " in realm " + realm +
+                    " performed by " + principalName);
+
             Resource resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
         }
@@ -1125,6 +1142,9 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // delete the resource
             DeleteResponse success = idsvc.delete(dtls, admin);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.deleteInstance :: DELETE of " + resourceId + " in realm " + realm +
+                    " performed by " + principalName);
 
             result.put("success", "true");
             resource = new Resource(resourceId, "0", result);
@@ -1259,6 +1279,9 @@ public final class IdentityResource implements CollectionResourceProvider {
             }
             IdentityServicesImpl id = new IdentityServicesImpl();
             List<String> users = id.search(queryFilter, getIdentityServicesAttributes(realm), admin);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.queryCollection :: QUERY performed on realm " + realm +
+                    " by " + principalName);
 
             for (final String user : users) {
                 JsonValue val = new JsonValue(user);
@@ -1292,6 +1315,9 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             idsvc = new IdentityServicesImpl();
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.readInstance :: READ of " + resourceId + " in realm " + realm +
+                    " performed by " + principalName);
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
         } catch (final NeedMoreCredentials needMoreCredentials) {
@@ -1476,6 +1502,9 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("IdentityResource.updateInstance :: UPDATE of " + resourceId + " in realm " + realm +
+                    " performed by " + principalName);
             // read updated identity back to client
             IdentityDetails checkIdent = idsvc.read(dtls.getName(), getIdentityServicesAttributes(realm), admin);
             // handle updated resource

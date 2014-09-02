@@ -133,6 +133,9 @@ public final class RealmResource implements CollectionResourceProvider {
 
             Map defaultValues = createServicesMap(jVal);
             ocm.createSubOrganization(childRealm, defaultValues);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("RealmResource.createInstance :: CREATE of realm " +
+                    childRealm + " in realm " + parentRealm + " performed by " + principalName);
 
             // handle response
             // create a resource for handler to return
@@ -170,11 +173,11 @@ public final class RealmResource implements CollectionResourceProvider {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         } catch (SSOException sso){
-            debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + sso);
             handler.handleError(new PermanentException(401, "Access Denied", null));
         } catch (ForbiddenException fe){
-            debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+            debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + fe);
             handler.handleError(fe);
         } catch (BadRequestException be){
@@ -257,6 +260,9 @@ public final class RealmResource implements CollectionResourceProvider {
             }
             OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), holdResourceId);
             ocm.deleteSubOrganization(null, recursive);
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("RealmResource.deleteInstance :: DELETE of realm " + holdResourceId + " performed by " +
+                    principalName);
             // handle resource
             resource = new Resource(resourceId, "0", createJsonMessage("success", "true"));
             handler.handleResult(resource);
@@ -326,6 +332,8 @@ public final class RealmResource implements CollectionResourceProvider {
                 Resource resource = new Resource("0", "0", val);
                 handler.handleResource(resource);
             }
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("RealmResource.queryCollection :: QUERY of realms performed by " + principalName);
             handler.handleResult(new QueryResult());
         } catch (SSOException sso){
             debug.error("RealmResource.queryCollection()" + "Cannot QUERY "
@@ -366,6 +374,10 @@ public final class RealmResource implements CollectionResourceProvider {
             // get associated services for this realm , include mandatory service names.
             Set serviceNames = ocm.getAssignedServices();
             jval = createJsonMessage(SERVICE_NAMES, serviceNames);
+
+            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+            debug.message("RealmResource.readInstance :: READ of realms performed by " + principalName);
+
             resource = new Resource(resourceId, "0", jval);
             handler.handleResult(resource);
 
@@ -608,6 +620,8 @@ public final class RealmResource implements CollectionResourceProvider {
         OrganizationConfigManager ocm = null;
         OrganizationConfigManager realmCreatedOcm = null;
 
+        String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         try {
 
             hasPermission(context);
@@ -632,6 +646,10 @@ public final class RealmResource implements CollectionResourceProvider {
             }
             // READ THE REALM
             realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
+
+            debug.message("RealmResource.updateInstance :: UPDATE of realm " + realm + " performed by " +
+                    principalName);
+
             // create a resource for handler to return
             resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
                     realmCreatedOcm.getOrganizationName()));
@@ -653,6 +671,10 @@ public final class RealmResource implements CollectionResourceProvider {
                     // handle response
                     // read the realm to make sure that it has been created...
                     realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
+
+                    debug.message("RealmResource.updateInstance :: UPDATE of realm " + realm + " performed by " +
+                            principalName);
+
                     resource = new Resource(childRealm, "0", createJsonMessage("realmCreated",
                             realmCreatedOcm.getOrganizationName()));
                     handler.handleResult(resource);
