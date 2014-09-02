@@ -232,134 +232,7 @@
     likely to be removed in a future release.</para>
    </listitem>
 
-   <listitem>
-    <para>Older REST services relying on the following end points are
-    deprecated.</para>
 
-    <simplelist type="vert" columns="2">
-     <member>/identity/attributes</member>
-     <member>/identity/authenticate</member>
-     <member>/identity/authorize</member>
-     <member>/identity/create</member>
-     <member>/identity/delete</member>
-     <member>/identity/isTokenValid</member>
-     <!-- Pending replacement <member>/identity/log</member> -->
-     <member>/identity/logout</member>
-     <member>/identity/read</member>
-     <member>/identity/search</member>
-     <member>/identity/update</member>
-     <member>/ws/1/entitlement/decision</member>
-     <member>/ws/1/entitlement/decisions</member>
-     <member>/ws/1/entitlement/entitlement</member>
-     <member>/ws/1/entitlement/entitlements</member>
-    </simplelist>
-
-    <para>The following table shows how legacy and newer end points
-    correspond.</para>
-
-    <table>
-     <title>REST End Points</title>
-
-     <tgroup cols="2">
-      <colspec colnum="1" colwidth="1*"/>
-      <colspec colnum="2" colwidth="1*"/>
-
-      <thead>
-       <row>
-        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
-        xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
-        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
-        xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
-       </row>
-      </thead>
-
-      <tbody>
-       <row>
-        <entry>/identity/attributes</entry>
-        <entry>/json/users</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/applications</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/applicationtypes</entry>
-       </row>
-
-       <row>
-        <entry>/identity/authenticate</entry>
-        <entry>/json/authenticate</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/conditiontypes</entry>
-       </row>
-
-       <row>
-        <entry>/identity/authorize</entry>
-        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
-       </row>
-
-       <row>
-        <entry>/identity/create, /identity/delete, /identity/read,
-        /identity/search, /identity/update</entry>
-        <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
-       </row>
-
-       <row>
-        <entry>/identity/isTokenValid</entry>
-        <entry>/json/sessions/<replaceable>tokenId</replaceable>?_action=validate</entry>
-       </row>
-
-       <!--
-       <row>
-        <entry>/identity/log</entry>
-        <entry>Pending replacement</entry>
-       </row>
-       -->
-
-       <row>
-        <entry>/identity/logout</entry>
-        <entry>/json/sessions/?_action=logout</entry>
-       </row>
-
-       <row>
-        <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
-        /ws/1/entitlement/entitlement, /ws/1/entitlement/entitlements</entry>
-        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/dashboard</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/policies</entry>
-       </row>
-
-       <row>
-        <entry>N/A</entry>
-        <entry>/json/serverinfo</entry>
-       </row>
-      </tbody>
-     </tgroup>
-    </table>
-
-    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on <link
-    xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
-    xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link> in
-    OpenAM.</para>
-
-    <para>Support for the older REST services is likely to be removed in a
-    future release in favor of the newer REST services. Older REST services
-    will be removed only after replacement REST services are introduced.</para>
-   </listitem>
 
    <listitem>
     <para>
@@ -440,4 +313,192 @@
    </listitem>
   </itemizedlist>
  </section>
+ <section xml:id="rest-changes">
+  <title>REST API Changes &amp; Deprecated Functionality</title>
+
+  <para>This section covers changes to existing REST API
+   functionality, and also deprecated and removed REST API functionality.</para>
+
+  <para>OpenAM <?eval ${serverDocTargetVersion}?> contains the following
+   changes to the REST API.</para>
+
+  <itemizedlist>
+   <listitem>
+    <para><literal>/json/authenticate</literal></para>
+    <para>The response returned when submitting incorrect credentials has
+     changed.</para>
+    <table>
+     <title>REST End Points</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="1*"/>
+      <colspec colnum="2" colwidth="1*"/>
+
+      <thead>
+       <row>
+        <entry>OpenAM 11.0.1</entry>
+        <entry>OpenAM 12.0.0</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>
+         <screen>
+          <computeroutput>{
+           "errorMessage": "Authentication Failed!!",
+           "failureUrl": "https://openam.example.com:8443"
+           }</computeroutput>
+         </screen>
+        </entry>
+        <entry>
+         <screen>
+          <computeroutput>{
+           "code": 401,
+           "reason": "Unauthorized",
+           "message": "Authentication Failed!!",
+           "detail": {
+           "failureUrl": "https://openam.example.com:8443"
+           }
+           }</computeroutput>
+         </screen>
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+   </listitem>
+
+   <listitem>
+    <para>Older REST services relying on the following end points are
+     deprecated.</para>
+
+    <simplelist type="vert" columns="2">
+     <member>/identity/attributes</member>
+     <member>/identity/authenticate</member>
+     <member>/identity/authorize</member>
+     <member>/identity/create</member>
+     <member>/identity/delete</member>
+     <member>/identity/isTokenValid</member>
+     <!-- Pending replacement <member>/identity/log</member> -->
+     <member>/identity/logout</member>
+     <member>/identity/read</member>
+     <member>/identity/search</member>
+     <member>/identity/update</member>
+     <member>/ws/1/entitlement/decision</member>
+     <member>/ws/1/entitlement/decisions</member>
+     <member>/ws/1/entitlement/entitlement</member>
+     <member>/ws/1/entitlement/entitlements</member>
+    </simplelist>
+
+    <para>The following table shows how legacy and newer end points
+     correspond.</para>
+
+    <table>
+     <title>REST End Points</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="1*"/>
+      <colspec colnum="2" colwidth="1*"/>
+
+      <thead>
+       <row>
+        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                     xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+                           xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>/identity/attributes</entry>
+        <entry>/json/users</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/applications</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/applicationtypes</entry>
+       </row>
+
+       <row>
+        <entry>/identity/authenticate</entry>
+        <entry>/json/authenticate</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/conditiontypes</entry>
+       </row>
+
+       <row>
+        <entry>/identity/authorize</entry>
+        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
+       </row>
+
+       <row>
+        <entry>/identity/create, /identity/delete, /identity/read,
+         /identity/search, /identity/update</entry>
+        <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
+       </row>
+
+       <row>
+        <entry>/identity/isTokenValid</entry>
+        <entry>/json/sessions/<replaceable>tokenId</replaceable>?_action=validate</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/identity/log</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>/identity/logout</entry>
+        <entry>/json/sessions/?_action=logout</entry>
+       </row>
+
+       <row>
+        <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
+         /ws/1/entitlement/entitlement, /ws/1/entitlement/entitlements</entry>
+        <entry>/json/policies?_action=evaluate, /json/policies?_evaluateTree</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/dashboard</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/policies</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/serverinfo</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on <link
+     xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link> in
+     OpenAM.</para>
+
+    <para>Support for the older REST services is likely to be removed in a
+     future release in favor of the newer REST services. Older REST services
+     will be removed only after replacement REST services are introduced.</para>
+   </listitem>
+
+  </itemizedlist>
+ </section>
+
 </chapter>

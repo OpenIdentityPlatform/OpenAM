@@ -63,7 +63,7 @@
    Native OpenAM REST APIs in version 11.0.0 and later use the CREST verbs.
    (In contrast, OAuth 2.0 and OpenID Connect 1.0 APIs follow the standards.)
    APIs covered in sections labelled (Legacy API) predate CREST,
-   and there do not use the CREST verbs.
+   and do not use the CREST verbs.
   </para>
 
   <para>
@@ -197,7 +197,7 @@
   </para>
 
   <para>
-   In CREST, you can explicitly request APIs versions.
+   In CREST, you can explicitly request API versions.
    This means that OpenAM can continue to support older API versions
    as well as newer API versions as developers migrate their applications
    to take advantage of capabilities provided by newer APIs.
@@ -264,10 +264,218 @@
    </listitem>
   </itemizedlist>
 
-  <para>This chapter also includes a section on <xref linkend="rest-api-status-codes" />.</para>
+  <para>This chapter also includes a section on <link
+   linkend="rest-api-status-codes">REST Status Codes</link>.</para>
 
   <para>In this chapter, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>
+ </section>
+
+ <section xml:id="rest-api-versioning">
+  <title>REST API Versioning</title>
+
+  <para>
+   In OpenAM 12.0.0 and later, REST API features are assigned version numbers.
+  </para>
+
+  <para>Providing version numbers in the REST API helps ensure compatibility
+   between OpenAM releases. The version number of a feature increases when OpenAM
+   introduces a non-backwards-compatible change that affects clients making use
+   of the feature.</para>
+
+  <variablelist>
+  <para>
+   OpenAM provides versions for the following aspects of the REST API.
+  </para>
+
+  <varlistentry>
+   <term><emphasis>resource</emphasis></term>
+   <listitem>
+    <para>
+     Any changes to the structure or syntax of a returned response will incur
+     a <emphasis>resource</emphasis> version change. For example changing
+     <literal>"errorMessage"</literal> to <literal>"message"</literal> in a
+     JSON response.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><emphasis>protocol</emphasis></term>
+   <listitem>
+    <para>
+     Any changes to the methods used to make REST API calls will incur
+     a <emphasis>protocol</emphasis> version change. For example changing <literal>_action</literal>
+     to <literal>$action</literal> in the required parameters of an API feature.
+    </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <section xml:id="rest-api-versioning-supported-versions">
+   <title>Supported REST API Versions</title>
+
+   <para>The REST API version numbers supported in OpenAM 12.0.0
+    are as follows.</para>
+<variablelist>
+   <varlistentry>
+    <term><emphasis>Supported protocol versions</emphasis></term>
+    <listitem>
+     <para>The <emphasis>protocol</emphasis> versions supported in OpenAM 12.0.0
+      are:</para>
+      <simplelist>
+       <member><literal>1.0</literal></member>
+      </simplelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><emphasis>Supported resource versions</emphasis></term>
+    <listitem>
+     <para>The <emphasis>resource</emphasis> versions supported in OpenAM 12.0.0
+      are shown in the following table.</para>
+     <table xml:id="rest-api-supported-resource-versions" pgwide="1">
+      <title>Supported <emphasis>resource</emphasis> Versions</title>
+      <tgroup cols="3">
+       <thead>
+        <row>
+         <entry>Base</entry>
+         <entry>End Point</entry>
+         <entry>Supported Versions</entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry>/json</entry>
+         <entry>/authenticate</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/users</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/groups</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/agents</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/realms</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/dashboard</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/sessions</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/tokens</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/serverinfo</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/users/<emphasis>{user-id}</emphasis>/devices/trusted</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/applications</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/policies</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/applicationtypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/conditiontypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/subjecttypes</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/decisioncombiners</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry>/frrest</entry>
+         <entry>/token</entry>
+         <entry>1.0</entry>
+        </row>
+        <row>
+         <entry> </entry>
+         <entry>/client</entry>
+         <entry>1.0</entry>
+        </row>
+       </tbody>
+      </tgroup>
+     </table>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+    <para>The <citetitle>OpenAM Release Notes</citetitle> section,
+     <link
+      xlink:show="new"
+      xlink:href="release-notes#chap-compatibility"
+      xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>OpenAM Changes &amp; Deprecated Functionality</citetitle></link>
+     describes the differences between API versions.</para>
+  </section>
+
+  <section xml:id="rest-api-explicit-version">
+   <title>Specifying an Explicit REST API Version</title>
+
+   <para>You can specify which version of the REST API to use by adding an
+    <literal>Accept-API-Version</literal> header to the request, as in the
+    following example, which is requesting <emphasis>resource</emphasis> version
+    1.0 and <emphasis>protocol</emphasis> version 1.0.</para>
+
+   <screen>
+   $ <userinput>curl \
+    --request POST \
+    --header "Content-Type: application/json" \
+    --header "X-OpenAM-Username: demo" \
+    --header "X-OpenAM-Password: changeit" \
+    --header "Accept-API-Version: resource=1.0, protocol=1.0" \
+    https://openam.example.com:8443/openam/json/authenticate</userinput>
+  </screen>
+
+   <para>You can configure the default behavior OpenAM will take when a REST
+    call does not specify explicit version information. For more
+    information, see <link
+     xlink:show="new"
+     xlink:href="admin-guide#chap-rest"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Configuring REST APIs</citetitle></link>
+    in the <citetitle>OpenAM Administration Guide</citetitle>.</para>
+  </section>
+
  </section>
 
  <section xml:id="c66-encoding">

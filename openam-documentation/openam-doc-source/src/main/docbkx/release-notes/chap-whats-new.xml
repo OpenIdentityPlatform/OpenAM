@@ -195,6 +195,20 @@ Agreement (yes/no): [no]:</screen>
    </para>
   </listitem>
 
+
+  <listitem>
+   <para>
+    <emphasis role="bold">REST API Versioning</emphasis>.
+    OpenAM now assigns REST API features version numbers, to help with
+    backwards-compatibility. For details, see the <citetitle>Developer Guide</citetitle>
+    section on
+    <link
+     xlink:href="dev-guide#rest-api-versioning"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"><citetitle>REST API Versioning</citetitle></link>.
+   </para>
+  </listitem>
+
   <listitem>
    <para>
     <emphasis role="bold">Scripted Authentication Modules</emphasis>.
