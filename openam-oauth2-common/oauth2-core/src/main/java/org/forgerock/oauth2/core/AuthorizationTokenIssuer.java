@@ -123,13 +123,10 @@ public class AuthorizationTokenIssuer {
             tokenMap.putAll(additionalData);
         }
 
-        final Set<String> scopeBefore = Utils.splitScope(request.<String>getParameter("scope"));
-        if (!scopeBefore.containsAll(authorizationScope)) {
-            final Set<String> checkedScope = providerSettings.validateAccessTokenScope(clientRegistration, scopeBefore,
-                    request);
-            if (!Utils.isEmpty(checkedScope)) {
-                tokenMap.put("scope", Utils.joinScope(checkedScope));
-            }
+        // Only add the scope to the response if not identical to the scope requested by the client
+        if (!Utils.isEmpty(validatedScope) &&
+                (Utils.isEmpty(authorizationScope) || authorizationScope.size() > validatedScope.size())) {
+            tokenMap.put("scope", Utils.joinScope(validatedScope));
         }
 
         if (request.getParameter("state") != null) {

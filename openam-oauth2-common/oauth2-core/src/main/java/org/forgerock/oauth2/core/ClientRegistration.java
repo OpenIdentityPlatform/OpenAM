@@ -79,12 +79,12 @@ public interface ClientRegistration {
     String getDisplayDescription(String locale);
 
     /**
-     * Gets the display descriptions for the allowed scopes, in the specified locale.
+     * Gets the display descriptions for the allowed and default scopes combined, in the specified locale.
      *
      * @param locale The locale.
-     * @return The allowed scope descriptions.
+     * @return The descriptions of the allowed and default scopes combined.
      */
-    Map<String, String> getAllowedScopeDescriptions(String locale);
+    Map<String, String> getScopeDescriptions(String locale);
 
     /**
      * Gets the default scopes configured for the client.

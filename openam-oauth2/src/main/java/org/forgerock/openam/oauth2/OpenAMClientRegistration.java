@@ -193,29 +193,26 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> getAllowedScopeDescriptions(String locale) {
+    public Map<String, String> getScopeDescriptions(String locale) {
         final String DELIMITER = "\\|";
         final Map<String, String> scopeDescriptions = new LinkedHashMap<String, String>();
-        for (final String scopeDescription : getAllowedGrantScopes()) {
+        final Set<String> combinedScopes = new HashSet<String>();
+        combinedScopes.addAll(getAllowedGrantScopes());
+        combinedScopes.addAll(getDefaultGrantScopes());
+        for (final String scopeDescription : combinedScopes) {
             final String[] parts = scopeDescription.split(DELIMITER);
             if (parts != null) {
                 //no description or locale
-                if (parts.length == 1){
+                if (parts.length == 1) {
                     continue;
-                } else if (parts.length == 2){
+                } else if (parts.length == 2) {
                     //no locale add description
                     scopeDescriptions.put(parts[0], parts[1]);
-                } else if (parts.length == 3){
+                } else if (parts.length == 3) {
                     //locale and description
                     if (parts[1].equalsIgnoreCase(locale)){
                         scopeDescriptions.put(parts[0], parts[2]);
-                    } else {
-                        //not the right locale
-                        continue;
                     }
-                } else {
-//                        OAuth2Utils.DEBUG.warn("Scope was input into the client settings in the wrong format for scope: " + scopeDescription);
-                    continue;
                 }
             }
         }

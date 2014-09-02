@@ -28,6 +28,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
@@ -142,36 +143,46 @@ public class ScopeImpl implements Scope {
      * {@inheritDoc}
      */
     public Map<String, Object> evaluateScope(CoreToken token) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        Set<String> scopes = token.getScope();
-        String resourceOwner = token.getUserID();
+        final Map<String, Object> map = new HashMap<String, Object>();
+        final Set<String> scopes = token.getScope();
+        final String clientId = token.getClientID();
+        final String resourceOwner = token.getUserID();
+        final String grantType = token.getGrantType();
 
-        if ((resourceOwner != null) && (scopes != null) && (!scopes.isEmpty())){
-            try {
-                final AMIdentity id = identityManager.getResourceOwnerIdentity(resourceOwner, token.getRealm());
-                if (id != null) {
-                    for (final String scope : scopes){
-                            final Set<String> attributes = id.getAttribute(scope);
-                            if (attributes != null || !attributes.isEmpty()) {
-                                final Iterator<String> iter = attributes.iterator();
-                                final StringBuilder builder = new StringBuilder();
-                                while (iter.hasNext()) {
-                                    builder.append(iter.next());
-                                    if (iter.hasNext()) {
-                                        builder.append(MULTI_ATTRIBUTE_SEPARATOR);
-                                    }
-                                }
-                                map.put(scope, builder.toString());
-                            }
-                    }
-                }
-            } catch (UnauthorizedClientException e) {
-                logger.error("Unable to get user identity", e);
-            } catch (SSOException e) {
-                logger.error("Unable to get attribute", e);
-            } catch (IdRepoException e) {
-                logger.error("Unable to get attribute", e);
+        AMIdentity id = null;
+        try {
+            if (clientId != null && OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS.equals(grantType) ) {
+                id = identityManager.getClientIdentity(clientId, token.getRealm());
+            } else if (resourceOwner != null) {
+                id = identityManager.getResourceOwnerIdentity(resourceOwner, token.getRealm());
             }
+        } catch (UnauthorizedClientException e) {
+            logger.error("Unable to get user identity", e);
+        }
+
+        if (id == null || scopes.isEmpty()) {
+            return map;
+        }
+
+        try {
+            for (final String scope : scopes) {
+                final Set<String> attributes = id.getAttribute(scope);
+                if (attributes != null) {
+                    final Iterator<String> iter = attributes.iterator();
+                    final StringBuilder builder = new StringBuilder();
+                    while (iter.hasNext()) {
+                        builder.append(iter.next());
+                        if (iter.hasNext()) {
+                            builder.append(MULTI_ATTRIBUTE_SEPARATOR);
+                        }
+                    }
+                    map.put(scope, builder.toString());
+                }
+            }
+        } catch (SSOException e) {
+            logger.error("Unable to get attribute", e);
+        } catch (IdRepoException e) {
+            logger.error("Unable to get attribute", e);
         }
 
         return map;

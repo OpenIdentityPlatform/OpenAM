@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.forgerock.oauth2.core.Utils.splitResponseType;
-
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
  * client by a specific resource owner.
@@ -116,11 +114,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
             final Set<String> scopeDescriptions = getScopeDescriptions(validatedScope,
-                    clientRegistration.getAllowedScopeDescriptions(locale));
+                    clientRegistration.getScopeDescriptions(locale));
             throw new ResourceOwnerConsentRequired(clientName, clientDescription, scopeDescriptions);
         }
 
-        return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, validatedScope, providerSettings);
+        return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);
     }
 
     /**
@@ -168,9 +166,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
         final ClientRegistration clientRegistration =
                 clientRegistrationStore.get(request.<String>getParameter("client_id"), request);
+        final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope);
 
         if (saveConsent) {
-            providerSettings.saveConsent(resourceOwner, clientRegistration.getClientId(), scope);
+            providerSettings.saveConsent(resourceOwner, clientRegistration.getClientId(), validatedScope);
         }
 
         return tokenIssuer.issueTokens(request, clientRegistration, resourceOwner, scope, providerSettings);

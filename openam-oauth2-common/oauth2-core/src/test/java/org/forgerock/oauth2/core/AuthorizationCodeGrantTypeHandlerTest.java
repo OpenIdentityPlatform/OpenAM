@@ -298,8 +298,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
                 anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
                 .willReturn(accessToken);
-        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
-                .willReturn(validatedScope);
+        given(authorizationCode.getScope()).willReturn(validatedScope);
 
         //When
         AccessToken actualAccessToken = grantTypeHandler.handle(request);

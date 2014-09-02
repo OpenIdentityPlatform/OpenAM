@@ -116,18 +116,18 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
         }
 
         final String grantType = request.getParameter("grant_type");
-        final Set<String> scope = authorizationCode.getScope();
+        final Set<String> authorizationScope = authorizationCode.getScope();
         final String resourceOwnerId = authorizationCode.getResourceOwnerId();
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         RefreshToken refreshToken = null;
         if (providerSettings.issueRefreshTokens()) {
             refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
-                    resourceOwnerId, redirectUri, scope, request);
+                    resourceOwnerId, redirectUri, authorizationScope, request);
         }
 
         final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", code,
-                resourceOwnerId, clientRegistration.getClientId(), redirectUri, scope, refreshToken,
+                resourceOwnerId, clientRegistration.getClientId(), redirectUri, authorizationScope, refreshToken,
                 authorizationCode.getNonce(), request);
 
         authorizationCode.setIssued();
@@ -141,10 +141,9 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
         accessToken.addExtraData("nonce", nonce);
         providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken, request);
 
-        final Set<String> validatedScope = providerSettings.validateAccessTokenScope(clientRegistration, scope, request);
-
-        if (validatedScope != null && !validatedScope.isEmpty()) {
-            accessToken.addExtraData("scope", joinScope(validatedScope));
+        // We should report the scope originally consented to and not the scope added to this request
+        if (authorizationScope != null && !authorizationScope.isEmpty()) {
+            accessToken.addExtraData("scope", joinScope(authorizationScope));
         }
 
         return accessToken;
