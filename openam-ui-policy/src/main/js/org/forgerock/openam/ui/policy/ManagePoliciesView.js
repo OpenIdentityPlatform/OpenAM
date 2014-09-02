@@ -38,9 +38,11 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         template: "templates/policy/ManagePoliciesTemplate.html",
 
         render: function (args, callback) {
-            var appName = args[0],
+            var appName = decodeURI(args[0]),
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + appName + '/policy/' + cellvalue + '">' + cellvalue + '</a>';
+                    var url = '#app/' + appName + '/policy/' + cellvalue,
+                        encodedUrl = encodeURI(url);
+                    return '<a href="' + encodedUrl + '">' + cellvalue + '</a>';
                 };
 
             this.parentRender(function () {

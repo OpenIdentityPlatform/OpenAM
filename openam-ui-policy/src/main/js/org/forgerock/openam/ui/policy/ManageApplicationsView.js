@@ -38,10 +38,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
         render: function (args, callback) {
             var appLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + cellvalue + '">' + cellvalue + '</a>';
+                    return '<a href="#app/' + encodeURI(cellvalue) + '">' + cellvalue + '</a>';
                 },
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + rowObject.name + '/policies/" class="icon-search"></a>';
+                    return '<a href="#app/' + encodeURI(rowObject.name) + '/policies/" class="icon-search"></a>';
                 };
 
             this.parentRender(function () {

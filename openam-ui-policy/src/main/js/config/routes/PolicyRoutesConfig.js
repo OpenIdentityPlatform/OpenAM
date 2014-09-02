@@ -33,19 +33,19 @@ define("config/routes/PolicyRoutesConfig", function () {
         },
         "editApp": {
             view: "org/forgerock/openam/ui/policy/EditApplicationView",
-            url: /^app\/([A-Za-z0-9]*)(?:\/){0,1}$/,
+            url: /^app\/([%A-Za-z0-9]*)(?:\/){0,1}$/,
             role: "ui-admin",
             pattern: "app/?"
         },
         "managePolicies": {
             view: "org/forgerock/openam/ui/policy/ManagePoliciesView",
-            url: /^app\/([A-Za-z0-9]+)\/policies\//,
+            url: /^app\/([%A-Za-z0-9]+)\/policies\//,
             role: "ui-admin",
             pattern: "app/?/policies/"
         },
         "editPolicy": {
             view: "org/forgerock/openam/ui/policy/EditPolicyView",
-            url: /^app\/([A-Za-z0-9]+)\/policy\/([A-Za-z0-9]*)(?:\/){0,1}$/,
+            url: /^app\/([%A-Za-z0-9]+)\/policy\/([%A-Za-z0-9]*)(?:\/){0,1}$/,
             role: "ui-admin",
             pattern: "app/?/policy/?"
         }

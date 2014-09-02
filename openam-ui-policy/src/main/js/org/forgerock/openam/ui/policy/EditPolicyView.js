@@ -58,7 +58,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
         render: function (args, callback) {
             var self = this,
                 data = self.data,
-                appName = args[0],
+                appName = decodeURI(args[0]),
                 policyName = args[1],
                 policyPromise = this.getPolicy(policyName),
                 appPromise = policyDelegate.getApplicationByName(appName),
@@ -201,12 +201,12 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy).done(function () {
-                    router.routeTo(router.configuration.routes.managePolicies, {args: [persistedPolicy.applicationName], trigger: true});
+                    router.routeTo(router.configuration.routes.managePolicies, {args: [encodeURI(persistedPolicy.applicationName)], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyUpdated");
                 });
             } else {
                 policyDelegate.createPolicy(persistedPolicy).done(function () {
-                    router.routeTo(router.configuration.routes.managePolicies, {args: [persistedPolicy.applicationName], trigger: true});
+                    router.routeTo(router.configuration.routes.managePolicies, {args: [encodeURI(persistedPolicy.applicationName)], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreated");
                 });
             }
