@@ -322,7 +322,7 @@
                 <configuration>
                     <projectName>${projectName}</projectName>
                     <projectVersion>${serverDocTargetVersion}</projectVersion>
-                    <latestJson>http://mcraig.org/fr/latest.php</latestJson><!-- Temporary workaround pending #QOZ-985-23233 -->
+                    <latestJson>http://docs.forgerock.org/latest.json</latestJson>
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
                     <runLinkTester>false</runLinkTester>
                 </configuration>
