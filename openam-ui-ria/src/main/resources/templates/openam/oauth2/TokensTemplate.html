@@ -2,17 +2,17 @@
     {{#if tokens}}
     <h2 class="header">{{t "templates.oauth.tokenList"}}</h2>
     <div class="content-bg">
-        <table>
+        <table id="oAuthTokensTable">{
 
             <tr>
-                <th scope="col">{{t "openam.oAuth2.tokens.appName"}}</th>
-                <th scope="col">{{t "openam.oAuth2.tokens.scope"}}</th>
-                <th scope="col">{{t "openam.oAuth2.tokens.expiryDate"}}</th>
-                <th scope="col"></th>
+                <th id="oAuthTokensAppName"     scope="col">{{t "openam.oAuth2.tokens.appName"}}</th>
+                <th id="oAuthTokensScope"       scope="col">{{t "openam.oAuth2.tokens.scope"}}</th>
+                <th id="oAuthTokensExpiryDate"  scope="col">{{t "openam.oAuth2.tokens.expiryDate"}}</th>
+                <th id="oAuthTokensDeleteBtn"   scope="col"></th>
             </tr>
 
             {{#each tokens}}
-            <tr>
+            <tr id="oAuthToken_{{@index}}">
                 <td>{{this.display_name}} </td>
                 <td>{{this.scopes}} </td>
                 <td>{{this.expireTime}} </td>
