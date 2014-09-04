@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.rest.service;
 
+import org.forgerock.json.resource.VersionConstants;
 import org.forgerock.json.resource.VersionSelector;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -36,6 +37,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.never;
 import static org.forgerock.json.resource.VersionConstants.ACCEPT_API_VERSION;
 
 public class VersionRouterTest {
@@ -62,10 +64,12 @@ public class VersionRouterTest {
     public void setUp() {
 
         router = new VersionRouter(new VersionSelector()) {
+
             @Override
             HttpServletRequest getHttpRequest(Request request) {
                 return httpRequest;
             }
+
             @Override
             HttpServletResponse getHttpResponse(Response response) {
                 return httpResponse;
@@ -85,12 +89,13 @@ public class VersionRouterTest {
     @DataProvider(name = "data")
     private Object[][] dataProvider() {
         return new Object[][]{
-                {"resource=3.0", true, null},
-                {"resource=1.0", false, handlerTwo},
-                {"resource=1.1", false, handlerTwo},
-                {"resource=1.9", true, null},
-                {"resource=2.1", false, handlerThree},
-                {null, false, handlerThree}
+                { "",             false, handlerThree },
+                { "resource=3.0", true,  null },
+                { "resource=1.0", false, handlerTwo },
+                { "resource=1.1", false, handlerTwo },
+                { "resource=1.9", true,  null },
+                { "resource=2.1", false, handlerThree },
+                { null,           false, handlerThree },
         };
     }
 
@@ -107,8 +112,7 @@ public class VersionRouterTest {
 
         //Then
         if (expectedException) {
-            verify(response).setStatus(eq(Status.CLIENT_ERROR_NOT_FOUND), anyString());
-            verifyZeroInteractions(handlerOne, handlerTwo, handlerThree);
+            verify(response).setStatus(eq(Status.CLIENT_ERROR_NOT_ACCEPTABLE), anyString());
         } else {
             verify(handler).handle(request, response);
         }
@@ -124,8 +128,7 @@ public class VersionRouterTest {
         router.handle(request, response);
 
         //Then
-        verify(response).setStatus(eq(Status.CLIENT_ERROR_BAD_REQUEST), anyString());
-        verifyZeroInteractions(handlerOne, handlerTwo, handlerThree);
+        verify(response).setStatus(eq(Status.CLIENT_ERROR_NOT_ACCEPTABLE), anyString());
     }
 
     @Test
@@ -138,8 +141,7 @@ public class VersionRouterTest {
         router.handle(request, response);
 
         //Then
-        verify(response).setStatus(eq(Status.CLIENT_ERROR_BAD_REQUEST), anyString());
-        verifyZeroInteractions(handlerOne, handlerTwo, handlerThree);
+        verify(response).setStatus(eq(Status.CLIENT_ERROR_NOT_ACCEPTABLE), anyString());
     }
 
     @Test
@@ -153,5 +155,94 @@ public class VersionRouterTest {
 
         //Then
         verify(handlerOne).handle(request, response);
+    }
+
+    /**
+     * When warnings are wanted, we should say if we use a version that was not exactly specified by the user.
+     */
+    @Test
+    public void shouldWarnWithOldestBehaviourWhenWarningsWanted() {
+
+        //Given
+        router.defaultToLatest();
+        router.setHeaderWarning(true);
+
+        //When
+        router.handle(request, response);
+
+        //Then
+        verify(httpResponse).addHeader(eq("Warning"), anyString());
+    }
+
+    /**
+     * When warnings are NOT wanted, we should not place a warning in the response headers even if the version we
+     * got was not what we exactly specified
+     */
+    @Test
+    public void shouldNotWarnWithOldestBehaviourWhenWarningsNotWanted() {
+
+        //Given
+        router.defaultToLatest();
+        router.setHeaderWarning(false);
+
+        //When
+        router.handle(request, response);
+
+        //Then
+        verify(httpResponse, never()).addHeader(eq("Warning"), anyString());
+    }
+
+    /**
+     * When warnings are wanted, we should get a warning in the response headers to say if the version we got was not
+     * exactly the same as we specified
+     */
+    @Test
+    public void shouldWarnWhenVersionsDoNotMatchExactlyAndWarningsWanted() {
+
+        //Given
+        given(httpRequest.getHeader(VersionConstants.ACCEPT_API_VERSION)).willReturn("protocol=1.0,resource=1.4");
+        router.setHeaderWarning(true);
+
+        //When
+        router.handle(request, response);
+
+        //Then
+        verify(httpResponse).addHeader(eq("Warning"), anyString());
+    }
+
+    /**
+     * When warnings are wanted, we should NOT get a warning in the response headers if the version we got was
+     * exactly the same as we specified
+     */
+    @Test
+    public void shouldNotWarnWhenVersionsMatchExactlyAndWarningsWanted() {
+
+        //Given
+        given(httpRequest.getHeader(VersionConstants.ACCEPT_API_VERSION)).willReturn("protocol=1.0,resource=1.5");
+        router.setHeaderWarning(true);
+
+        //When
+        router.handle(request, response);
+
+        //Then
+        verify(httpResponse, never()).addHeader(eq("Warning"), anyString());
+    }
+
+    /**
+     * When warnings are not wanted, we should not get a warning in the response headers even if the version we got
+     * was not exactly the same as we specified
+     */
+    @Test
+    public void shouldNotWarnWhenVersionsDoNotMatchExactlyAndWarningsNotWanted() {
+
+        //Given
+        given(httpRequest.getHeader(VersionConstants.ACCEPT_API_VERSION)).willReturn("protocol=1.0,resource=1.4");
+        router.setHeaderWarning(false);
+
+        //When
+        router.handle(request, response);
+
+        //Then
+        verify(httpResponse, never()).addHeader(eq("Warning"), anyString());
     }
 }
