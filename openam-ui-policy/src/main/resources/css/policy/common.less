@@ -238,19 +238,28 @@
         white-space: nowrap;
         overflow: hidden;
     }
-    #manageApps td[aria-describedby="manageApps_name"] {
-        text-align: center;
-        .icon-search{
-            text-decoration: none;
-            font-size: 16px;
-            vertical-align: middle;
-            color: #80b7ab;
+
+    #manageApps {
+        cursor: pointer;
+
+        td[aria-describedby="manageApps_name"] {
+            text-align: center;
+            .icon-search {
+                text-decoration: none;
+                font-size: 16px;
+                vertical-align: middle;
+                color: #80b7ab;
+            }
         }
     }
+
+    #manageApps_frozen {
+        cursor: pointer;
+    }
+
     .ui-state-hover a{
         color: #fff !important;
     }
-
 }
 
 .frozen-bdiv.ui-jqgrid-bdiv {

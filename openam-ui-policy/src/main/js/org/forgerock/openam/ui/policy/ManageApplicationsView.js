@@ -30,14 +30,16 @@
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function (AbstractView, uiUtils) {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/Router"
+], function (AbstractView, uiUtils, router) {
     var ManageApplicationsView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManageApplicationsTemplate.html",
 
         render: function (args, callback) {
-            var appLinkFormatter = function (cellvalue, options, rowObject) {
+            var self = this,
+                appLinkFormatter = function (cellvalue, options, rowObject) {
                     return '<a href="#app/' + encodeURI(cellvalue) + '">' + cellvalue + '</a>';
                 },
                 policyLinkFormatter = function (cellvalue, options, rowObject) {
@@ -68,8 +70,11 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
-                        pager: '#appsPager'
-
+                        pager: '#appsPager',
+                        onSelectRow: function (rowid, status, e) {
+                            router.routeTo(router.configuration.routes.managePolicies,
+                                {args: [encodeURI(self.data.result[rowid - 1].name)], trigger: true});
+                        }
                     },
                     grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, callback);
 
