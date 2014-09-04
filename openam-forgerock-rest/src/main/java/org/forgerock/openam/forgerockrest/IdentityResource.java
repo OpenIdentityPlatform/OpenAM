@@ -532,7 +532,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         //check expiry
         org.forgerock.openam.cts.api.tokens.Token ctsToken = CTSHolder.getCTS().read(tokenID);
 
-        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < System.currentTimeMillis()) {
+        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < TimeUtils.currentUnixTime()) {
             throw new NotFoundException("Cannot find tokenID: " + tokenID);
         }
 

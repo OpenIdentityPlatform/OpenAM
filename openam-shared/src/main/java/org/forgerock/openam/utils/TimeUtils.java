@@ -65,6 +65,8 @@ public class TimeUtils {
      * @return A long representing seconds from the epoch.
      */
     public static long currentUnixTime() {
-        return toUnixTime(Calendar.getInstance());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        return toUnixTime(calendar);
     }
 }
