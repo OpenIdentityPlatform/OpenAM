@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-web-config-properties'
@@ -193,22 +193,6 @@
     </listitem>
    </varlistentry>
 
-   <varlistentry>
-    <term><literal>com.sun.identity.agents.config.certdb.password</literal></term>
-    <listitem>
-     <para>When SSL is configured, set this to the password for the certificate
-     database.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>com.sun.identity.agents.config.certdb.prefix</literal></term>
-    <listitem>
-     <para>When SSL is configured, set this property if the certificate
-     databases in the directory specified by
-     <literal>com.sun.identity.agents.config.sslcert.dir</literal> have a
-     prefix.</para>
-    </listitem>
-   </varlistentry>
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.certificate.alias</literal></term>
     <listitem>
@@ -407,13 +391,6 @@
               <para>When there are multiple agents on a single system, set this to a unique numeric value.</para>
           </listitem>
    </varlistentry>
-<!--
-      <varlistentry>
-          <term><literal>com.forgerock.agents.config.cert.key.password</literal></term>
-          <listitem>
-              <para>Reserved for future use.</para>
-          </listitem>
-      </varlistentry> -->
   </variablelist>
  </section>
 
@@ -523,6 +500,34 @@
                   For a web server, that should point to the Local Machine or Service certificate
                   store, depending on the account associated with the Web server.</para>
           </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.config.cert.key.password</literal></term>
+    <listitem>
+     <para>
+      Set this property to the obfuscated private key password
+      by using the <command>crypt_util</command> command
+      as in the following example to generate the value.
+     </para>
+
+     <screen>
+$ <userinput>cd /path/to/web_agents/<replaceable>agent-type</replaceable>/bin</userinput>
+$ <userinput>crypt_util <replaceable>password</replaceable> <replaceable>key</replaceable></userinput>
+     </screen>
+
+     <para>
+      Here, <replaceable>agent-type</replaceable> corresponds to
+      the file system directory for the particular agent type,
+      such as <literal>apache24_agent</literal>,
+      <replaceable>password</replaceable> is the private key password,
+      and <replaceable>key</replaceable> is the obfuscation key.
+     </para>
+
+     <para>
+      This property is not used on Microsoft Windows systems.
+     </para>
+    </listitem>
    </varlistentry>
 
    <varlistentry>
