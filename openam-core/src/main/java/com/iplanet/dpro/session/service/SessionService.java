@@ -731,7 +731,7 @@ public class SessionService {
                     domain);
 
         } while (sessionTable.get(sid) != null
-                || sessionHandleTable.get(sid) != null);
+                || sessionHandleTable.get(sid.toString()) != null);
         return sid;
     }
 
@@ -834,7 +834,7 @@ public class SessionService {
     public boolean isSessionPresent(SessionID sid) {
         boolean isPresent = sessionTable.get(sid) != null
                 || restrictedTokenMap.get(sid) != null
-                || sessionHandleTable.get(sid) != null;
+                || sessionHandleTable.get(sid.toString()) != null;
 
         return isPresent;
     }
