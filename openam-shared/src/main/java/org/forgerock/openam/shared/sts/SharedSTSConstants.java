@@ -66,6 +66,27 @@ public class SharedSTSConstants {
      */
     public static final String DEPLOYMENT_URL_ELEMENT = "deployment-url-element";
 
+    /**
+     * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
+     * instance must be invoked via a two-way TLS exchange (i.e. where the client presents their certificate). If OpenAM
+     * is deployed behind a tls-offloading engine, the client certificate won't be set as a HttpServetRequest attribute
+     * referenced by the javax.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
+     * with the name of the http header where the tls-offloading engine will store the client certificate prior to invoking
+     * OpenAM.
+     */
+    public static final String OFFLOADED_TWO_WAY_TLS_HEADER_KEY = "deployment-offloaded-two-way-tls-header-key";
+
+    /**
+     * If a rest-sts instance is configured to support a token transformation with an x509 token as an input token type, the
+     * instance must be invoked via a two-way TLS exchange (i.e. where the client presents their certificate). If OpenAM
+     * is deployed behind a tls-offloading engine, the client certificate won't be set as a HttpServetRequest attribute
+     * referenced by the javax.servlet.request.X509Certificate key, but rather the rest sts instance must be configured
+     * with the name of the http header where the tls-offloading engine will store the client certificate prior to invoking
+     * OpenAM. The rest-sts instance will undertake the further check to determine if the ip address invoking the rest-sts
+     * corresponds to the set of IP-addresses corresponding to the TLS-offload-engine hosts.
+     */
+    public static final String TLS_OFFLOAD_ENGINE_HOSTS = "deployment-tls-offload-engine-hosts";
+
     /*
     This field referenced in STSInstanceConfig.ISSUER_NAME. It is the name of the key of the json field referencing
     the token issuer name, which also matches the name of the AttributeSchema element defined in restSTS.xml

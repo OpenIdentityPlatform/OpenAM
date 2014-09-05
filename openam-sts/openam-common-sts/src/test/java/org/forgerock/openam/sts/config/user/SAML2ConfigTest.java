@@ -21,9 +21,11 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SAML2ConfigTest {
     private static final String NAME_ID_FORMAT = "nameidformat";
@@ -155,7 +157,7 @@ public class SAML2ConfigTest {
             builder.attributeMap(attrMap);
         }
         if (withAudiences) {
-            List<String> audiences = new ArrayList<String>();
+            Set<String> audiences = new HashSet<String>();
             audiences.add("sp_acs1");
             audiences.add("sp_acs2");
             builder.audiences(audiences);

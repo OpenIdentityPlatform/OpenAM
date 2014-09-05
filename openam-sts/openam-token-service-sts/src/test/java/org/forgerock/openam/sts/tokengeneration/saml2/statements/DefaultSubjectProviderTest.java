@@ -40,8 +40,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -103,7 +105,7 @@ public class DefaultSubjectProviderTest {
         Map<String, String> attributeMap = new HashMap<String, String>();
         attributeMap.put("email", "mail");
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder();
-        List<String> audiences = new ArrayList<String>();
+        Set<String> audiences = new HashSet<String>();
         audiences.add("http://macbook.dirk.internal.forgerock.com:8080/openam/sp");
         return builder
                 .attributeMap(attributeMap)

@@ -80,7 +80,7 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(ReceivedToken.STATE.INVALID);
         response.setToken(validateTarget);
-        OpenIdConnectIdToken idToken = null;
+        OpenIdConnectIdToken idToken;
         /*
         We will be dealing with the XML representation of the OpenIdConnectIdToken, as the Rest STS facade, or the
         SOAP client, will have created an XML representation of the OpenIdConnectIdToken class, so we just have to
@@ -108,7 +108,7 @@ public class OpenIdConnectIdTokenValidator implements TokenValidator {
             response.setPrincipal(principal);
             validateTarget.setState(ReceivedToken.STATE.VALID);
         } catch (TokenValidationException e) {
-            throw new AMSTSRuntimeException(ResourceException.FORBIDDEN,
+            throw new AMSTSRuntimeException(e.getCode(),
                     "Exception caught validating OIDC token with authentication handler: " + e, e);
         } catch (TokenCreationException e) {
             throw new AMSTSRuntimeException(ResourceException.INTERNAL_ERROR,

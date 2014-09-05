@@ -533,6 +533,10 @@
             <param-name>connection-factory-class</param-name>
             <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceConnectionFactoryProvider</param-value>
         </init-param>
+        <init-param>
+            <param-name>context-factory-class</param-name>
+            <param-value>org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContextFactoryProvider</param-value>
+        </init-param>
     </servlet>
 
     <servlet>

@@ -27,10 +27,12 @@ import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.restlet.data.MediaType;
+import org.restlet.engine.header.Header;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,12 +47,15 @@ import static org.forgerock.openam.sts.service.invocation.TokenGenerationService
  */
 public class TokenGenerationServiceConsumerImpl implements TokenGenerationServiceConsumer {
     private final String tokenGenerationServiceEndpoint;
+    private final String crestVersion;
 
     @Inject
     TokenGenerationServiceConsumerImpl(UrlConstituentCatenator urlConstituentCatenator,
                                        @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
-                                       @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT) String tokenGenServiceUriElement) {
+                                       @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT) String tokenGenServiceUriElement,
+                                       @Named(AMSTSConstants.CREST_VERSION) String crestVersion) {
         tokenGenerationServiceEndpoint = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, tokenGenServiceUriElement);
+        this.crestVersion = crestVersion;
     }
 
     public String getSAML2BearerAssertion(String ssoTokenString,
@@ -116,6 +121,13 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     private String makeInvocation(String invocationString) throws TokenCreationException {
         final ClientResource resource = new ClientResource(tokenGenerationServiceEndpoint);
+        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
+        if (headers == null) {
+            headers = new Series<Header>(Header.class);
+            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
+        }
+        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+
         try {
             final Representation representation = resource.post(
                     new StringRepresentation(invocationString, MediaType.APPLICATION_JSON));

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,18 +42,21 @@ import static org.testng.AssertJUnit.assertTrue;
 
 public class RestSTSInstanceConfigTest {
     private static final boolean WITH_SAML2_CONFIG = true;
+    private static final boolean WITH_TLS_OFFLOAD_CONFIG = true;
+    private static final String TLS_OFFLOAD_HOST_IP = "16.34.22.23";
+    private static final String TLS_CLIENT_CERT_HEADER = "client_cert";
     @Test
     public void testEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         assertEquals(ric1, ric2);
         assertEquals(ric1.hashCode(), ric2.hashCode());
     }
 
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
-        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
-        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig ric1 = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
+        RestSTSInstanceConfig ric2 = createInstanceConfig("/bobo", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         assertNotEquals(ric1, ric2);
         assertNotEquals(ric1.hashCode(), ric2.hashCode());
     }
@@ -69,13 +73,22 @@ public class RestSTSInstanceConfigTest {
 
     @Test
     public void testJsonMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
-        assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(origConfig.toJson())));
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
+
+        origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
+
+        origConfig = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
+
+        origConfig = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(origConfig.toJson()));
     }
 
     @Test
     public void testJsonStringMarshalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -86,12 +99,12 @@ public class RestSTSInstanceConfigTest {
         JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
         final Object content = parser.readValueAs(Object.class);
 
-        Assert.assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(new JsonValue(content))));
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(new JsonValue(content)));
     }
 
     @Test
     public void testOldJacksonJsonStringMarhalling() throws IOException {
-        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig origConfig = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         /*
         This is how the Crest HttpServletAdapter ultimately constitutes a JsonValue from a json string. See the
         org.forgerock.json.resource.servlet.HttpUtils.parseJsonBody (called from HttpServletAdapter.getJsonContent)
@@ -103,44 +116,74 @@ public class RestSTSInstanceConfigTest {
                 new org.codehaus.jackson.map.ObjectMapper().getJsonFactory().createJsonParser(origConfig.toJson().toString());
         final Object content = parser.readValueAs(Object.class);
 
-        Assert.assertTrue(origConfig.equals(RestSTSInstanceConfig.fromJson(new JsonValue(content))));
+        assertEquals(origConfig, RestSTSInstanceConfig.fromJson(new JsonValue(content)));
     }
 
     @Test
     public void testMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
 
-        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
+
+        config = createInstanceConfig("/bob", WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
+        assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
+
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         assertEquals(config, RestSTSInstanceConfig.marshalFromAttributeMap(config.marshalToAttributeMap()));
     }
 
     @Test
     public void testJsonMapMarshalRoundTrip() throws IOException {
-        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG);
+        RestSTSInstanceConfig config = createInstanceConfig("/bob", WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
         Map<String, Set<String>> attributeMap = config.marshalToAttributeMap();
         JsonValue jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
 
-        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG);
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
         attributeMap = config.marshalToAttributeMap();
         jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
         assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
+
+        config = createInstanceConfig("/bob", !WITH_SAML2_CONFIG, WITH_TLS_OFFLOAD_CONFIG);
+        attributeMap = config.marshalToAttributeMap();
+        jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
+        assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
+
+        config = createInstanceConfig("/bob", WITH_SAML2_CONFIG, !WITH_TLS_OFFLOAD_CONFIG);
+        attributeMap = config.marshalToAttributeMap();
+        jsonMap = new JsonValue(marshalSetValuesToListValues(attributeMap));
+        assertEquals(config, RestSTSInstanceConfig.marshalFromJsonAttributeMap(jsonMap));
+
     }
 
-    private RestSTSInstanceConfig createInstanceConfig(String uriElement, boolean withSaml2Config) throws UnsupportedEncodingException {
+    private RestSTSInstanceConfig createInstanceConfig(String uriElement, boolean withSaml2Config,
+                                                       boolean withTlsOffloadConfig) throws UnsupportedEncodingException {
         Map<String,String> oidcContext = new HashMap<String,String>();
         oidcContext.put("context_key_1", "context_value_1");
         AuthTargetMapping mapping = AuthTargetMapping.builder()
                 .addMapping(TokenType.USERNAME, "service", "ldapService")
                 .addMapping(TokenType.OPENIDCONNECT, "module", "oidc", oidcContext)
                 .build();
-
-        RestDeploymentConfig deploymentConfig =
-                RestDeploymentConfig.builder()
-                        .uriElement(uriElement)
-                        .authTargetMapping(mapping)
-                        .build();
+        Set<String> offloadHosts = new HashSet<String>(1);
+        offloadHosts.add(TLS_OFFLOAD_HOST_IP);
+        RestDeploymentConfig deploymentConfig = null;
+        if (withTlsOffloadConfig) {
+            deploymentConfig =
+                    RestDeploymentConfig.builder()
+                            .uriElement(uriElement)
+                            .authTargetMapping(mapping)
+                            .tlsOffloadEngineHostIpAddrs(offloadHosts)
+                            .offloadedTwoWayTLSHeaderKey(TLS_CLIENT_CERT_HEADER)
+                            .build();
+        } else {
+            deploymentConfig =
+                    RestDeploymentConfig.builder()
+                            .uriElement(uriElement)
+                            .authTargetMapping(mapping)
+                            .build();
+        }
 
         KeystoreConfig keystoreConfig =
                 KeystoreConfig.builder()
@@ -154,7 +197,7 @@ public class RestSTSInstanceConfigTest {
 
         SAML2Config saml2Config = null;
         if (withSaml2Config) {
-            List<String> audiences = new ArrayList<String>();
+            Set<String> audiences = new HashSet<String>();
             audiences.add("bobo_entity_id");
             audiences.add("dodo_entity_id");
             Map<String,String> attributeMap = new HashMap<String, String>();
@@ -273,6 +316,11 @@ public class RestSTSInstanceConfigTest {
                         TokenType.OPENIDCONNECT,
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
+                .addSupportedTokenTranslation(
+                        TokenType.X509,
+                        TokenType.SAML2,
+                        AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION
+                )
                 .build();
     }
 

@@ -26,8 +26,10 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 
@@ -72,7 +74,7 @@ public class DefaultConditionsProviderTest {
         attributeMap.put("email", "mail");
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder();
         if (addAudiences) {
-            List<String> audiences = new ArrayList<String>();
+            Set<String> audiences = new HashSet<String>();
             audiences.add(AM_SP_AUDIENCE);
             return builder
                     .attributeMap(attributeMap)

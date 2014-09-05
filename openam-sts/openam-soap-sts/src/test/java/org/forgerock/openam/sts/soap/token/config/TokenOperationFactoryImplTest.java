@@ -140,7 +140,11 @@ public class TokenOperationFactoryImplTest {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
 
-
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION)
+        String getCrestVersion() {
+            return "protocol=1.0, resource=1.0";
+        }
     }
     @BeforeTest
     public void getTokenOperationFactory() {

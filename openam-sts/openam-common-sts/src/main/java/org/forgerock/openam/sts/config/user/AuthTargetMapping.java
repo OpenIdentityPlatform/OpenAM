@@ -112,7 +112,7 @@ public class AuthTargetMapping {
                     return addMapping(OpenIdConnectIdToken.class, authIndexType, authIndexValue, NULL_MAP);
                 case USERNAME:
                     return addMapping(UsernameToken.class, authIndexType, authIndexValue, NULL_MAP);
-                case X509CERT:
+                case X509:
                     return addMapping(X509Certificate[].class, authIndexType, authIndexValue, NULL_MAP);
                 default:
                     throw new IllegalArgumentException("Illegal TokenType provided to AuthTargetMappingBuilder.addMapping: "
@@ -126,7 +126,7 @@ public class AuthTargetMapping {
                     return addMapping(OpenIdConnectIdToken.class, authIndexType, authIndexValue, context);
                 case USERNAME:
                     return addMapping(UsernameToken.class, authIndexType, authIndexValue, context);
-                case X509CERT:
+                case X509:
                     return addMapping(X509Certificate[].class, authIndexType, authIndexValue, context);
                 default:
                     throw new IllegalArgumentException("Illegal TokenType provided to AuthTargetMappingBuilder.addMapping: "
@@ -372,7 +372,7 @@ public class AuthTargetMapping {
         } else if (OpenIdConnectIdToken.class.equals(clazz)) {
             return TokenType.OPENIDCONNECT;
         } else if (X509Certificate[].class.equals(clazz)) {
-            return TokenType.X509CERT;
+            return TokenType.X509;
         } else {
             throw new IllegalArgumentException("The class to be mapped to a TokenType, " + clazz + " is unexpected.");
         }

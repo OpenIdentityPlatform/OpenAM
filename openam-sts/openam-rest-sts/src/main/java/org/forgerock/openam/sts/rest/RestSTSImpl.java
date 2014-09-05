@@ -19,16 +19,14 @@ package org.forgerock.openam.sts.rest;
 import javax.inject.Inject;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
-
-import org.slf4j.Logger;
 
 /**
  * See {@link org.forgerock.openam.sts.rest.RestSTS}
@@ -42,10 +40,11 @@ public class RestSTSImpl implements RestSTS {
         this.translateOperation = translateOperation;
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
     }
-    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext, SecurityContext securityContext)
+    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext,
+                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         try {
-            return translateOperation.translateToken(invocationState, httpContext, securityContext);
+            return translateOperation.translateToken(invocationState, httpContext, restSTSServiceHttpServletContext);
         } finally {
             threadLocalAMTokenCache.clearAMToken();
         }

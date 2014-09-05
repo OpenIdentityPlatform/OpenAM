@@ -28,6 +28,7 @@ import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.rest.config.user.TokenTransformConfig;
 import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidator;
+import org.forgerock.openam.sts.rest.token.validator.RestCertificateTokenValidator;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.rest.token.provider.AMSAMLTokenProvider;
 import org.forgerock.openam.sts.rest.token.provider.AMSessionInvalidatorImpl;
@@ -45,6 +46,7 @@ import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
 
 import org.slf4j.Logger;
 
@@ -65,11 +67,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
     private final ThreadLocalAMTokenCache threadLocalAMTokenCache;
     private final PrincipalFromSession principalFromSession;
     private final AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler;
+    private final AuthenticationHandler<X509Certificate[]> x509TokenAuthenticationHandler;
     private final UrlConstituentCatenator urlConstituentCatenator;
     private final XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller;
     private final XMLUtilities xmlUtilities;
     private final TokenGenerationServiceConsumer tokenGenerationServiceConsumer;
     private final AuthnContextMapper authnContextMapper;
+    private final String crestVersion;
     private final Logger logger;
 
     @Inject
@@ -85,11 +89,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             ThreadLocalAMTokenCache threadLocalAMTokenCache,
             PrincipalFromSession principalFromSession,
             AuthenticationHandler<OpenIdConnectIdToken> openIdConnectIdTokenAuthenticationHandler,
+            AuthenticationHandler<X509Certificate[]> x509TokenAuthenticationHandler,
             UrlConstituentCatenator urlConstituentCatenator,
             XmlMarshaller<OpenIdConnectIdToken> idTokenXmlMarshaller,
             XMLUtilities xmlUtilities,
             TokenGenerationServiceConsumer tokenGenerationServiceConsumer,
             AuthnContextMapper authnContextMapper,
+            @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
             Logger logger) {
 
         this.amDeploymentUrl = amDeploymentUrl;
@@ -103,11 +109,13 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
         this.threadLocalAMTokenCache = threadLocalAMTokenCache;
         this.principalFromSession = principalFromSession;
         this.openIdConnectIdTokenAuthenticationHandler = openIdConnectIdTokenAuthenticationHandler;
+        this.x509TokenAuthenticationHandler = x509TokenAuthenticationHandler;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.idTokenXmlMarshaller = idTokenXmlMarshaller;
         this.xmlUtilities = xmlUtilities;
         this.tokenGenerationServiceConsumer = tokenGenerationServiceConsumer;
         this.authnContextMapper = authnContextMapper;
+        this.crestVersion = crestVersion;
         this.logger = logger;
     }
 
@@ -122,6 +130,8 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             tokenValidator = buildOpenAMTokenValidator();
         } else if (TokenType.OPENIDCONNECT.equals(inputTokenType)) {
             tokenValidator = buildOpenIdConnectValidator();
+        } else if (TokenType.X509.equals(inputTokenType)) {
+            tokenValidator = buildX509TokenValidator();
         }
         else {
             String message = "Unexpected input token type of: " + inputTokenType;
@@ -154,6 +164,10 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
                 threadLocalAMTokenCache, principalFromSession, logger);
     }
 
+    private TokenValidator buildX509TokenValidator() {
+        return new RestCertificateTokenValidator(x509TokenAuthenticationHandler, threadLocalAMTokenCache, principalFromSession);
+    }
+
     /*
     The AMTokenProvider does not need the state from the TokenTransformConfig on whether the interimOpenAMSessionToken
     should be invalidated - if it is issuing an OpenAM token, then obviously this token should not be invalidated.
@@ -171,7 +185,7 @@ public class TokenTransformFactoryImpl implements TokenTransformFactory {
             try {
                 final AMSessionInvalidator sessionInvalidator =
                         new AMSessionInvalidatorImpl(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement,
-                                amSessionCookieName, urlConstituentCatenator, logger);
+                                amSessionCookieName, urlConstituentCatenator, crestVersion, logger);
                 return new AMSAMLTokenProvider(tokenGenerationServiceConsumer, sessionInvalidator,
                         threadLocalAMTokenCache, stsInstanceId, realm, xmlUtilities, authnContextMapper, logger);
             } catch (URISyntaxException e) {

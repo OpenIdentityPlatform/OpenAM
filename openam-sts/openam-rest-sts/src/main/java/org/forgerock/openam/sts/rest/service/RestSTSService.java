@@ -27,7 +27,6 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
@@ -57,7 +56,7 @@ public class RestSTSService implements SingletonResourceProvider {
 
     public void actionInstance(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
         if (TRANSLATE.equals(request.getAction())) {
-            SecurityContext securityContext = context.asContext(SecurityContext.class);
+            RestSTSServiceHttpServletContext servletContext = context.asContext(RestSTSServiceHttpServletContext.class);
             HttpContext httpContext = context.asContext(HttpContext.class);
             RestSTSServiceInvocationState invocationState;
             try {
@@ -67,7 +66,7 @@ public class RestSTSService implements SingletonResourceProvider {
                 return;
             }
             try {
-                JsonValue result = restSts.translateToken(invocationState, httpContext, securityContext);
+                JsonValue result = restSts.translateToken(invocationState, httpContext, servletContext);
                 handler.handleResult(result);
             } catch (ResourceException e) {
                 /*
@@ -77,10 +76,11 @@ public class RestSTSService implements SingletonResourceProvider {
                 handler.handleError(e);
             } catch (AMSTSRuntimeException e) {
                 /*
-                RuntimeException thrown by the AM implementation of CXF-STS-defined interfaces
+                RuntimeException thrown by the AM implementation of CXF-STS-defined interfaces, including the Authentication
+                handlers.
                  */
                 logger.error("AMSTSException caught in the RestSTSService: " + e, e);
-                handler.handleError(new InternalServerErrorException(e.getMessage()));
+                handler.handleError(ResourceException.getException(e.getCode(), e.getMessage(), e));
             } catch (STSException e) {
                 /*
                 RuntimeException thrown by the CXF-STS engine

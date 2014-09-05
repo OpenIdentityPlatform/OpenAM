@@ -61,7 +61,7 @@ public class SAML2Config {
          * element of the Conditions element, as required for bearer tokens.
          * http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf
          */
-        private List<String> audiences;
+        private Set<String> audiences;
         private String customConditionsProviderClassName;
         private String customSubjectProviderClassName;
         private String customAuthenticationStatementsProviderClassName;
@@ -89,8 +89,8 @@ public class SAML2Config {
             return this;
         }
 
-        public SAML2ConfigBuilder audiences(List<String> audiences) {
-            this.audiences = new ArrayList<String>(audiences);
+        public SAML2ConfigBuilder audiences(Set<String> audiences) {
+            this.audiences = new LinkedHashSet<String>(audiences);
             return this;
         }
 
@@ -182,7 +182,7 @@ public class SAML2Config {
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
     private final long tokenLifetimeInSeconds;
-    private final List<String> audiences;
+    private final Set<String> audiences;
     private final String customConditionsProviderClassName;
     private final String customSubjectProviderClassName;
     private final String customAuthenticationStatementsProviderClassName;
@@ -202,9 +202,9 @@ public class SAML2Config {
             attributeMap = Collections.emptyMap();
         }
         if (builder.audiences != null) {
-            this.audiences = Collections.unmodifiableList(builder.audiences);
+            this.audiences = Collections.unmodifiableSet(builder.audiences);
         } else {
-            audiences = Collections.emptyList();
+            audiences = Collections.emptySet();
         }
         tokenLifetimeInSeconds = builder.tokenLifetimeInSeconds; //will be set to default if not explicitly set
         customConditionsProviderClassName = builder.customConditionsProviderClassName;
@@ -238,7 +238,7 @@ public class SAML2Config {
         return tokenLifetimeInSeconds;
     }
 
-    public List<String> getAudiences() {
+    public Set<String> getAudiences() {
         return audiences;
     }
 
@@ -358,7 +358,7 @@ public class SAML2Config {
     as strings as well.
      */
     public JsonValue toJson() {
-        JsonValue jsonValue = json(object(
+        return json(object(
                 field(NAME_ID_FORMAT, nameIdFormat),
                 field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
                 field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
@@ -370,22 +370,13 @@ public class SAML2Config {
                 field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
                 field(SIGNATURE_ALGORITHM, signatureAlgorithm),
                 field(SIGN_ASSERTION, String.valueOf(signAssertion)),
-                field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm)));
-
-        JsonValue jsonValueAttributeMap = new JsonValue(new HashMap<String, Object>());
-        Map<String, Object> jsonAttributeMap = jsonValueAttributeMap.asMap();
-        jsonAttributeMap.putAll(attributeMap);
-        jsonValue.add(ATTRIBUTE_MAP, jsonAttributeMap);
-
-        JsonValue jsonAudiences = new JsonValue(new ArrayList<Object>());
-        List<Object> audienceList = jsonAudiences.asList();
-        audienceList.addAll(audiences);
-        jsonValue.add(AUDIENCES, jsonAudiences);
-        return jsonValue;
+                field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm),
+                field(AUDIENCES, audiences),
+                field(ATTRIBUTE_MAP, attributeMap)));
     }
 
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
-        SAML2ConfigBuilder builder = SAML2Config.builder()
+        return SAML2Config.builder()
                 .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
                 //because we have to go to the SMS Map representation, where all values are Set<String>, I need to
                 // pull the value from Json as a string, and then parse out a Long.
@@ -399,33 +390,10 @@ public class SAML2Config {
                 .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
                 .signatureAlgorithm(json.get(SIGNATURE_ALGORITHM).asString())
                 .signAssertion(Boolean.valueOf(json.get(SIGN_ASSERTION).asString()))
-                .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString());
-
-        JsonValue jsonAttributes = json.get(ATTRIBUTE_MAP);
-        if (!jsonAttributes.isMap()) {
-            throw new IllegalStateException("Unexpected value for the " + ATTRIBUTE_MAP + " field: "
-                    + jsonAttributes);
-        }
-        Map<String, String> toBeSetAttrMap = new HashMap<String, String>();
-        Map<String, Object> jsonAttrMap = jsonAttributes.asMap();
-        for (Map.Entry<String, Object> entry : jsonAttrMap.entrySet()) {
-            toBeSetAttrMap.put(entry.getKey(), entry.getValue().toString());
-        }
-        builder.attributeMap(toBeSetAttrMap);
-
-        JsonValue jsonAudiences = json.get(AUDIENCES);
-        if (!jsonAudiences.isList()) {
-            throw new IllegalStateException("Unexpected value for the " + AUDIENCES + " field: "
-                    + jsonAudiences);
-        }
-        List<String> toBeSetAudiences = new ArrayList<String>();
-        Iterator<Object> iter = jsonAudiences.asList().iterator();
-        while (iter.hasNext()) {
-            toBeSetAudiences.add(iter.next().toString());
-        }
-        builder.audiences(toBeSetAudiences);
-
-        return builder.build();
+                .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString())
+                .audiences(json.get(AUDIENCES).asSet(String.class))
+                .attributeMap(json.get(ATTRIBUTE_MAP).asMap(String.class))
+                .build();
     }
 
     /*
@@ -450,17 +418,13 @@ public class SAML2Config {
         }
 
         Object audiencesObject = preMap.get(AUDIENCES);
-        if ((audiencesObject instanceof JsonValue) && ((JsonValue) audiencesObject).isList()) {
-            finalMap.remove(AUDIENCES);
-            Set<String> audienceValues = new LinkedHashSet<String>();
-            finalMap.put(AUDIENCES, audienceValues);
-            for (Object obj : ((JsonValue)audiencesObject).asList()) {
-                audienceValues.add(obj.toString());
-            }
+        if (audiencesObject instanceof Set) {
+            finalMap.put(AUDIENCES, (Set)audiencesObject);
         } else {
             throw new IllegalStateException("Type corresponding to " + AUDIENCES + " key unexpected. Type: "
                     + (audiencesObject != null ? audiencesObject.getClass().getName() :" null"));
         }
+
         return finalMap;
     }
 
@@ -489,14 +453,7 @@ public class SAML2Config {
         }
         jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));
 
-        /*
-        AUDIENCES is a Set<String> in the smsAttributeMap, but fromJson expects a List.
-         */
-        jsonAttributes.remove(AUDIENCES);
-        JsonValue jsonAudiences = new JsonValue(new ArrayList<Object>());
-        List<Object> audienceList = jsonAudiences.asList();
-        audienceList.addAll(smsAttributeMap.get(AUDIENCES));
-        jsonAttributes.put(AUDIENCES, jsonAudiences);
+        jsonAttributes.put(AUDIENCES, new JsonValue(smsAttributeMap.get(AUDIENCES)));
 
         return fromJson(new JsonValue(jsonAttributes));
     }

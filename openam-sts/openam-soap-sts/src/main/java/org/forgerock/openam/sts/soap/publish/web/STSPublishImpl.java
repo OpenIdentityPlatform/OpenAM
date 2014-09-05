@@ -79,11 +79,11 @@ public class STSPublishImpl implements STSPublish {
         an interface, and inject a Provider<List<STSInstanceConfig>> into this instance - that would get me closer to the final
         deployment.
          */
-        AuthTargetMapping mapping = null;
+        AuthTargetMapping mapping;
         if (AMSTSConstants.SYMMETRIC_ENDORSING_CERT_BINDING.equals(bndId)) {
             mapping = AuthTargetMapping
                                         .builder()
-                                        .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
+                                        .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, "X509")
                                         .build();
         } else {
             mapping = AuthTargetMapping.builder().build();
@@ -99,7 +99,7 @@ public class STSPublishImpl implements STSPublish {
                                         .authTargetMapping(mapping)
                                         .build();
 
-        KeystoreConfig keystoreConfig = null;
+        KeystoreConfig keystoreConfig;
         try {
             keystoreConfig = KeystoreConfig.builder()
                     .fileName("stsstore.jks")

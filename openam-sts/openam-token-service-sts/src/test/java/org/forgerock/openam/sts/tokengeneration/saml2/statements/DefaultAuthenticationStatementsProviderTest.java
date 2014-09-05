@@ -23,8 +23,10 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 
@@ -42,7 +44,7 @@ public class DefaultAuthenticationStatementsProviderTest {
         Map<String, String> attributeMap = new HashMap<String, String>();
         attributeMap.put("email", "mail");
 
-        List<String> audiences = new ArrayList<String>();
+        Set<String> audiences = new HashSet<String>();
         audiences.add("http://macbook.dirk.internal.forgerock.com:8080/openam/sp");
         return SAML2Config.builder()
                 .attributeMap(attributeMap)

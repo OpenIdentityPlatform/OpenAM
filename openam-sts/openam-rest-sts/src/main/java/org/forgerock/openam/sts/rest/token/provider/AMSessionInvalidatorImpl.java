@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
     private final URI logoutUri;
     private final String amSessionCookieName;
+    private final String crestVersion;
     private final Logger logger;
 
     public AMSessionInvalidatorImpl(String amDeploymentUrl,
@@ -43,9 +44,11 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
                                     String restLogoutUriElement,
                                     String amSessionCookieName,
                                     UrlConstituentCatenator urlConstituentCatenator,
+                                    String crestVersion,
                                     Logger logger) throws URISyntaxException {
         this.logoutUri = constituteLogoutUri(amDeploymentUrl, jsonRestRoot, realm, restLogoutUriElement, urlConstituentCatenator);
         this.amSessionCookieName = amSessionCookieName;
+        this.crestVersion = crestVersion;
         this.logger = logger;
     }
 
@@ -73,6 +76,7 @@ public class AMSessionInvalidatorImpl implements AMSessionInvalidator {
         }
         headers.set(amSessionCookieName, sessionId);
         headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
         try {
             resource.post(null);
         } catch (ResourceException e) {

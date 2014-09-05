@@ -20,5 +20,5 @@ package org.forgerock.openam.sts;
  * This enum represents the types of transformed tokens.
  */
 public enum TokenType {
-    SAML2, USERNAME, OPENAM, OPENIDCONNECT, X509CERT
+    SAML2, USERNAME, OPENAM, OPENIDCONNECT, X509
 }

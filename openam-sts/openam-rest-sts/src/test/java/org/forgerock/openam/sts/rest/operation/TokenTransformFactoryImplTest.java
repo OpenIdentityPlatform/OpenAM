@@ -47,6 +47,7 @@ import org.forgerock.openam.sts.token.validator.PrincipalFromSessionImpl;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
+import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
@@ -57,6 +58,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import javax.inject.Named;
+
+import java.security.cert.X509Certificate;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -80,6 +83,12 @@ public class TokenTransformFactoryImplTest {
             bind(new TypeLiteral<AuthenticationHandler<OpenIdConnectIdToken>>(){})
                     .to(new TypeLiteral<AuthenticationHandlerImpl<OpenIdConnectIdToken>>() {
                     });
+            bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<X509Certificate[]>>(){})
+                    .to(CertificateAuthenticationRequestDispatcher.class);
+            bind(new TypeLiteral<AuthenticationHandler<X509Certificate[]>>(){})
+                    .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {
+                    });
+
             bind(AuthenticationUriProvider.class)
                     .to(AuthenticationUriProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
@@ -137,6 +146,18 @@ public class TokenTransformFactoryImplTest {
         @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT)
         String getTokenGenServiceUriElement() {
             return "/token-gen/issue?_action=issue";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.OFFLOADED_TWO_WAY_TLS_HEADER_KEY)
+        String getOffloadedTwoWayTLSHeaderKey() {
+            return "client_cert";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION)
+        String getCrestVersion() {
+            return "protocol=1.0, resource=1.0";
         }
     }
 

@@ -28,6 +28,7 @@ import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider
@@ -49,7 +50,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     "Exception caught setting token lifetime state in SAML2TokenGenerationImpl: " + e, e);
 
         }
-        List<String> audiences = saml2Config.getAudiences();
+        Set<String> audiences = saml2Config.getAudiences();
         /*
          Section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf specifies that
          Audiences specifying the entity ids of SPs, must be contained in the AudienceRestriction for bearer tokens.
@@ -62,7 +63,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         if (!audiences.isEmpty()) {
             try {
                 AudienceRestriction audienceRestriction = AssertionFactory.getInstance().createAudienceRestriction();
-                audienceRestriction.setAudience(audiences);
+                audienceRestriction.setAudience(new ArrayList<String>(audiences));
                 List<AudienceRestriction> audienceRestrictionList = new ArrayList<AudienceRestriction>(1);
                 audienceRestrictionList.add(audienceRestriction);
                 conditions.setAudienceRestrictions(audienceRestrictionList);

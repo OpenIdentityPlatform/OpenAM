@@ -14,18 +14,17 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.validator.wss;
+package org.forgerock.openam.sts.soap.token.validator.wss;
 
 import com.google.inject.Inject;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.validate.Credential;
 import org.apache.ws.security.validate.SignatureTrustValidator;
-import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
-
 
 import java.security.cert.X509Certificate;
+
+import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler;
 import org.slf4j.Logger;
 
 /**
@@ -36,14 +35,19 @@ import org.slf4j.Logger;
  * This validation functionality will only augment the existing CXF validation functionality to determine whether the
  * included certs are present in the OpenAM LDAP certificate store.
  *
- * @author Dirk Hogan
+ * In the soap-sts, the validity of the caller asserting its identity via presenting a x509 cert
+ * (SecurityPolicyExamples 2.2.1 and 2.2.2) will be insured because messages sent to the caller will be encrypted using the
+ * caller's public key. In this case, only trust needs to be established - something which this class, by virtue of
+ * extending the SignatureTrustValidator, provides. It may be a configuration option whether this class should
+ * consume the OpenAM Certificate module, so that the additional invocation against the OpenAM Certificate module, performed
+ * by the AuthenticationHandler<X509Certificate>, should be performed.
  */
-public class CertificateTokenValidator extends SignatureTrustValidator {
+public class SoapCertificateTokenValidator extends SignatureTrustValidator {
     private final AuthenticationHandler<X509Certificate[]> authenticationHandler;
     private final Logger logger;
 
     @Inject
-    public CertificateTokenValidator(Logger logger, AuthenticationHandler<X509Certificate[]> authenticationHandler) {
+    public SoapCertificateTokenValidator(Logger logger, AuthenticationHandler<X509Certificate[]> authenticationHandler) {
         this.logger = logger;
         this.authenticationHandler = authenticationHandler;
     }

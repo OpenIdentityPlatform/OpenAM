@@ -16,10 +16,9 @@
 
 package org.forgerock.openam.sts.rest.marshal;
 
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 
 /**
@@ -29,6 +28,12 @@ import javax.xml.ws.WebServiceContext;
  * context, where the container creates this instance, a factory must provide this functionality.
  */
 public interface WebServiceContextFactory {
-    //public WebServiceContext getWebServiceContext(HttpServletRequest request);
-    public WebServiceContext getWebServiceContext(HttpContext httpContext, SecurityContext securityContext);
+    /**
+     * Provides the WebServiceContext expected by the TokenValidatorParameter and TokenProviderParameter classes.
+     * @param httpContext The http-protocol specific values
+     * @param restSTSServiceHttpServletContext The rest-st encapsulation of the HttpServiceRequest
+     * @return a WebServiceContext instance
+     */
+    public WebServiceContext getWebServiceContext(HttpContext httpContext,
+                                                  RestSTSServiceHttpServletContext restSTSServiceHttpServletContext);
 }

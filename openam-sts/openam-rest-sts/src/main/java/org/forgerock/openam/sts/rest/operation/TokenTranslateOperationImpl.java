@@ -26,7 +26,6 @@ import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
@@ -42,6 +41,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.ws.WebServiceContext;
 
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
@@ -97,7 +97,8 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         tokenTransforms = Collections.unmodifiableSet(interimTransforms);
     }
 
-    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext, SecurityContext securityContext)
+    public JsonValue translateToken(RestSTSServiceInvocationState invocationState, HttpContext httpContext,
+                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
             throws TokenMarshalException, TokenValidationException, TokenCreationException {
         TokenType inputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getInputTokenState());
         TokenType outputTokenType = tokenRequestMarshaller.getTokenType(invocationState.getOutputTokenState());
@@ -114,8 +115,9 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
                     ", is not a supported token translation.";
             throw new TokenValidationException(ResourceException.BAD_REQUEST, message);
         }
-        ReceivedToken receivedToken = tokenRequestMarshaller.marshallInputToken(invocationState.getInputTokenState());
-        WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(httpContext, securityContext);
+        ReceivedToken receivedToken = tokenRequestMarshaller.marshallInputToken(invocationState.getInputTokenState(), httpContext,
+                restSTSServiceHttpServletContext);
+        WebServiceContext webServiceContext = webServiceContextFactory.getWebServiceContext(httpContext, restSTSServiceHttpServletContext);
         TokenValidatorParameters validatorParameters = buildTokenValidatorParameters(receivedToken, webServiceContext);
         TokenProviderParameters providerParameters = buildTokenProviderParameters(inputTokenType,
                 invocationState.getInputTokenState(), outputTokenType, invocationState.getOutputTokenState(), webServiceContext);

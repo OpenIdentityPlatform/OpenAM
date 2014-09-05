@@ -26,6 +26,8 @@ import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
 import org.restlet.util.Series;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 
 /**
@@ -34,6 +36,13 @@ import java.net.URI;
  * it references the ID Token value with the same header value.
  */
 public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken> {
+    private final String crestVersion;
+
+    @Inject
+    OpenIdConnectAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion) {
+        this.crestVersion = crestVersion;
+    }
+
     @Override
     public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, OpenIdConnectIdToken token) throws TokenValidationException {
         ClientResource resource = new ClientResource(uri);
@@ -57,10 +66,12 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
                             " which specifies the header name which will reference the OIDC ID Token.");
         }
         headers.set((String)headerKey, token.getTokenValue());
+        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
         try {
             return resource.post(null);
         } catch (ResourceException e) {
-            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting to json client: " + e, e);
+            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting OpenIdConnectIdToken " +
+                    "to rest authN: " + e, e);
         }
     }
 }

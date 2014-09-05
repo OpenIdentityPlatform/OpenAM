@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import javax.inject.Named;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -113,7 +114,17 @@ public class TokenTranslateOperationImplTest {
         Logger getSlf4jLogger() {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
+        @Provides
+        @Named(AMSTSConstants.OFFLOADED_TWO_WAY_TLS_HEADER_KEY)
+        String getOffloadedTwoWayTLSHeaderKey() {
+            return "client_cert";
+        }
 
+        @Provides
+        @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS)
+        Set<String> getTlsOffloadEngineHosts() {
+            return Collections.EMPTY_SET;
+        }
     }
 
     @Test(expectedExceptions = TokenValidationException.class)

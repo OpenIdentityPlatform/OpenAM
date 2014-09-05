@@ -59,12 +59,12 @@ public class AuthTargetMappingTest {
 
         AuthTargetMapping mapping3 = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         AuthTargetMapping mapping4 = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         assertEquals(mapping3, mapping4);
@@ -88,7 +88,7 @@ public class AuthTargetMappingTest {
                 .build();
         AuthTargetMapping mapping2 = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         assertNotEquals(mapping1, mapping2);
@@ -98,7 +98,7 @@ public class AuthTargetMappingTest {
                 .build();
         AuthTargetMapping mapping4 = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         assertNotEquals(mapping3, mapping4);
@@ -108,7 +108,7 @@ public class AuthTargetMappingTest {
     public void testLookup() {
         AuthTargetMapping mapping1 = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .build();
         AuthTargetMapping.AuthTarget at1 = new AuthTargetMapping.AuthTarget(AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509);
         assertEquals(mapping1.getAuthTargetMapping(X509Certificate[].class), at1);
@@ -133,7 +133,7 @@ public class AuthTargetMappingTest {
         AuthTargetMapping mapping = AuthTargetMapping
                 .builder()
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .build();
         assertEquals(mapping, AuthTargetMapping.fromJson(mapping.toJson()));
     }
@@ -142,7 +142,7 @@ public class AuthTargetMappingTest {
     public void testJsonStringRoundTrip() throws IOException {
         AuthTargetMapping mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         /*
@@ -162,7 +162,7 @@ public class AuthTargetMappingTest {
     public void testOlderJacksonJsonStringRoundTrip() throws IOException {
         AuthTargetMapping mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         /*
@@ -183,7 +183,7 @@ public class AuthTargetMappingTest {
     public void testAttributeMappingRoundTrip() {
         AuthTargetMapping mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509)
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         assertEquals(mapping, AuthTargetMapping.marshalFromAttributeMap(mapping.marshalToAttributeMap()));
@@ -200,20 +200,20 @@ public class AuthTargetMappingTest {
     public void testAttributeMappingRoundTripWithContext() {
         AuthTargetMapping mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME)
                 .build();
         assertEquals(mapping, AuthTargetMapping.marshalFromAttributeMap(mapping.marshalToAttributeMap()));
 
         mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
                 .build();
         assertEquals(mapping, AuthTargetMapping.marshalFromAttributeMap(mapping.marshalToAttributeMap()));
 
         mapping = AuthTargetMapping
                 .builder()
-                .addMapping(TokenType.X509CERT, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
+                .addMapping(TokenType.X509, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, X509, buildContext())
                 .addMapping(TokenType.USERNAME, AMSTSConstants.AUTH_INDEX_TYPE_MODULE, USERNAME, buildContext())
                 .build();
         assertEquals(mapping, AuthTargetMapping.marshalFromAttributeMap(mapping.marshalToAttributeMap()));

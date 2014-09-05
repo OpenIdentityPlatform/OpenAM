@@ -47,6 +47,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
     private final String realm;
     private final String amRestIdFromSessionUriElement;
     private final String amSessionCookieName;
+    private final String crestVersion;
     private final Logger logger;
 
     @Inject
@@ -55,7 +56,8 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
             @Named(AMSTSConstants.AM_REST_AUTHN_JSON_ROOT) String jsonRestBase,
             @Named(AMSTSConstants.REST_ID_FROM_SESSION_URI_ELEMENT) String idFromSessionUriElement,
             @Named(AMSTSConstants.AM_SESSION_COOKIE_NAME) String amSessionCookieName,
-            @Named (AMSTSConstants.REALM) String realm,
+            @Named(AMSTSConstants.REALM) String realm,
+            @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
             UrlConstituentCatenator urlConstituentCatenator,
             Logger logger) {
         this.amDeploymentUrl = amDeploymentUrl;
@@ -63,6 +65,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         this.amRestIdFromSessionUriElement = idFromSessionUriElement;
         this.amSessionCookieName = amSessionCookieName;
         this.realm = realm;
+        this.crestVersion = crestVersion;
         this.urlConstituentCatenator = urlConstituentCatenator;
         this.logger = logger;
     }
@@ -101,6 +104,7 @@ public class PrincipalFromSessionImpl implements PrincipalFromSession {
         headers.set(AMSTSConstants.COOKIE, amSessionCookieName + AMSTSConstants.EQUALS + sessionId);
         headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
         headers.set(AMSTSConstants.ACCEPT, AMSTSConstants.APPLICATION_JSON);
+        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
         Representation representation;
         try {
             representation = resource.post(null);

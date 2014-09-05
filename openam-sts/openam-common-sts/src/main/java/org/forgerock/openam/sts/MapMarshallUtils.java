@@ -39,6 +39,14 @@ public class MapMarshallUtils {
     /**
      * Marshals from a Map<String,Object> produced by jsonValue.asMap to the Map<String, Set<String>> expected by the
      * SMS.
+     * It is tempting to make this generic much more generic, and change the parameter to a JsonValue, as that would
+     * preserve the types of the values, and then handle each of the Values differently, depending upon whether the
+     * the JsonValue corresponding to the keys is a List, a Set, or a Map (a Map would entail a recursive call). The
+     * problem with this approach is that this method cannot know the types of the List and Set, and that many of these
+     * types implement custom string parsing schemes, as they must be entered in the AdminConsole. So this method is
+     * pretty basic, and works correctly for the primitive value types, but all custom value types must be handled
+     * specifically by the marshalToAttributeMap callers.
+
      * @param jsonMap
      * @return the Map<String, Set<String>> attributes expected by the SMS
      */

@@ -17,11 +17,11 @@
 package org.forgerock.openam.sts.rest;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.TokenValidationException;
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.service.invocation.RestSTSServiceInvocationState;
 
 /**
@@ -35,14 +35,16 @@ public interface RestSTS {
      *
      * @param invocationState An object encapsulating the input and output token state specifications
      * @param httpContext The HttpContext
-     * @param securityContext The SecurityContex
+     * @param restSTSServiceHttpServletContext The RestSTSServiceHttpServletContext, which can be consulted to
+     *                                         obtain the X509Certificate[] set by the container following a two-way-tls
+     *                                         handshake
      * @return A JsonValue with a 'issued_token' key and the value corresponding to the issued token
      * @throws TokenValidationException if the input token could not be validated
      * @throws TokenCreationException if the desired token could not be produced
      */
     public JsonValue translateToken(RestSTSServiceInvocationState invocationState,
                                     HttpContext httpContext,
-                                    SecurityContext securityContext)
+                                    RestSTSServiceHttpServletContext restSTSServiceHttpServletContext)
                                     throws TokenMarshalException, TokenValidationException, TokenCreationException;
 
 }

@@ -58,8 +58,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -225,7 +227,7 @@ public class SAML2TokenGenerationImplTest {
 
         Map<String, String> attributes = new HashMap<String, String>();
         attributes.put("email", "mail");
-        List<String> audiences = new ArrayList<String>();
+        Set<String> audiences = new HashSet<String>();
         audiences.add("spEntityId");
         SAML2Config saml2Config =
                 SAML2Config.builder()

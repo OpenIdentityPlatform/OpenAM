@@ -34,12 +34,14 @@
                    labelFor="supported-token-transforms"/>
             <cc name="supported-token-transforms"
                 tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
-                <option label="rest.sts.tranform.unt.saml2.true" value="USERNAME|SAML2|true"/>
-                <option label="rest.sts.tranform.unt.saml2.false" value="USERNAME|SAML2|false"/>
-                <option label="rest.sts.tranform.oidc.saml2.true" value="OPENIDCONNECT|SAML2|true"/>
-                <option label="rest.sts.tranform.oidc.saml2.false" value="OPENIDCONNECT|SAML2|false"/>
-                <option label="rest.sts.tranform.openam.saml2.true" value="OPENAM|SAML2|true"/>
-                <option label="rest.sts.tranform.openam.saml2.false" value="OPENAM|SAML2|false"/>
+                <option label="rest.sts.transform.unt.saml2.true" value="USERNAME|SAML2|true"/>
+                <option label="rest.sts.transform.unt.saml2.false" value="USERNAME|SAML2|false"/>
+                <option label="rest.sts.transform.oidc.saml2.true" value="OPENIDCONNECT|SAML2|true"/>
+                <option label="rest.sts.transform.oidc.saml2.false" value="OPENIDCONNECT|SAML2|false"/>
+                <option label="rest.sts.transform.openam.saml2.true" value="OPENAM|SAML2|true"/>
+                <option label="rest.sts.transform.openam.saml2.false" value="OPENAM|SAML2|false"/>
+                <option label="rest.sts.transform.x509.saml2.true" value="X509|SAML2|true"/>
+                <option label="rest.sts.transform.x509.saml2.false" value="X509|SAML2|false"/>
                 <attribute name="multiple" value="true" />
             </cc>
             <fieldhelp name="helpTokenTransforms" defaultValue="rest.sts.tokentransforms.help" />
@@ -70,6 +72,28 @@
             <fieldhelp name="helpAuthTargetMappings" defaultValue="rest.sts.deployment.AuthTargetMappings.help" />
         </property>
 
+        <property>
+            <label name="lblDeploymentTwoWayTLSHeaderKey"
+                   defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey"
+                   labelFor="deployment-offloaded-two-way-tls-header-key"/>
+            <cc name="deployment-offloaded-two-way-tls-header-key"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpDeploymentTwoWayTLSHeaderKey" defaultValue="rest.sts.deployment.TwoWayTLSHeaderKey.help" />
+        </property>
+
+        <property>
+            <label name="lblDeploymentTLSOffloadEngineHosts"
+                   defaultValue="rest.sts.deployment.TLSOffloadEngineHosts"
+                   labelFor="deployment-tls-offload-engine-hosts"/>
+            <cc name="deployment-tls-offload-engine-hosts"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpDeploymentTLSOffloadEngineHosts" defaultValue="rest.sts.deployment.TLSOffloadEngineHosts.help" />
+        </property>
     </section>
 
     <section name="Keystore" defaultValue="rest.sts.keystore.section.title">

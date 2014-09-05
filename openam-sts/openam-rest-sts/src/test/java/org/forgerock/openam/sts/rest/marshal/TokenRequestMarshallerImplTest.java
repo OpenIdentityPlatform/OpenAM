@@ -20,15 +20,19 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.sun.identity.shared.encode.Base64;
 import org.apache.cxf.sts.request.ReceivedToken;
+import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenType;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenMarshalException;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.SAML2TokenState;
+import org.forgerock.openam.sts.service.invocation.X509TokenState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
@@ -39,10 +43,16 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.forgerock.json.fluent.JsonValue.field;
 import static org.forgerock.json.fluent.JsonValue.json;
@@ -51,6 +61,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
+import static org.mockito.Mockito.*;
 
 public class TokenRequestMarshallerImplTest {
     private final String SP_ACS_URL = "http://sp.acs.com/consume";
@@ -70,6 +81,24 @@ public class TokenRequestMarshallerImplTest {
             return LoggerFactory.getLogger(AMSTSConstants.REST_STS_DEBUG_ID);
         }
 
+        //Must be empty for the testX509CertificateTokenMarshalling() to reference cert from ServletRequest attribute
+        @Provides
+        @Named(AMSTSConstants.OFFLOADED_TWO_WAY_TLS_HEADER_KEY)
+        String getOffloadedTwoWayTLSHeaderKey() {
+            return "";
+        }
+
+        @Provides
+        @Named(AMSTSConstants.TLS_OFFLOAD_ENGINE_HOSTS)
+        Set<String> getTlsOffloadEngineHosts() {
+            return Collections.EMPTY_SET;
+        }
+
+        @Provides
+        @Named(AMSTSConstants.CREST_VERSION)
+        String getCrestVersion() {
+            return "protocol=1.0, resource=1.0";
+        }
     }
 
     @BeforeTest
@@ -81,7 +110,7 @@ public class TokenRequestMarshallerImplTest {
     public void marshallUsernameToken() throws TokenMarshalException {
         JsonValue jsonUnt = json(object(field("token_type", "USERNAME"),
                 field("username", "bobo"), field("password", "cornholio")));
-        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonUnt);
+        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonUnt, null, null);
         assertTrue(token.isUsernameToken());
         assertFalse(token.isBinarySecurityToken());
         assertFalse(token.isDOMElement());
@@ -92,7 +121,7 @@ public class TokenRequestMarshallerImplTest {
     public void marshallOpenAMToken() throws TokenMarshalException {
         JsonValue jsonOpenAM = json(object(field("token_type", "OPENAM"),
                 field("session_id", "super_random")));
-        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonOpenAM);
+        ReceivedToken token = tokenMarshaller.marshallInputToken(jsonOpenAM, null, null);
         assertFalse(token.isUsernameToken());
         assertFalse(token.isBinarySecurityToken());
         assertTrue(token.isDOMElement());
@@ -139,6 +168,28 @@ public class TokenRequestMarshallerImplTest {
         assertEquals(proofTokenState, tokenMarshaller.getProofTokenState(tokenState.toJson()));
     }
 
+    @Test
+    public void testX509CertificateTokenMarshalling() throws Exception {
+        HttpServletRequest mockServletRequest = mock(HttpServletRequest.class);
+        RestSTSServiceHttpServletContext mockServletContext = mock(RestSTSServiceHttpServletContext.class);
+        when(mockServletContext.getHttpServletRequest()).thenReturn(mockServletRequest);
+        X509Certificate certificate = getCertificate();
+        X509Certificate[] certificates = new X509Certificate[] {certificate};
+        when(mockServletRequest.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certificates);
+        ReceivedToken receivedToken = tokenMarshaller.marshallInputToken(new X509TokenState().toJson(), null, mockServletContext);
+        X509Certificate roundTripCert = marshalBinarySecurityTokenToCertArray((BinarySecurityTokenType)receivedToken.getToken());
+        assertEquals(certificate.getEncoded(), roundTripCert.getEncoded());
+    }
+
+    private X509Certificate marshalBinarySecurityTokenToCertArray(BinarySecurityTokenType binarySecurityType)
+            throws CertificateException, UnsupportedEncodingException {
+        return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
+                    new ByteArrayInputStream(Base64.decode(binarySecurityType.getValue().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))));
+    }
+
+    private String getEncodedCertificate() throws IOException, CertificateException {
+        return Base64.encode(getCertificate().getEncoded());
+    }
     private X509Certificate getCertificate() throws IOException, CertificateException {
         return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(getClass().getResourceAsStream("/cert.jks"));
     }

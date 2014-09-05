@@ -16,13 +16,10 @@
 
 package org.forgerock.openam.sts.rest.marshal;
 
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.sts.STSPrincipal;
-import org.slf4j.Logger;
+import org.forgerock.openam.sts.rest.service.RestSTSServiceHttpServletContext;
 import org.w3c.dom.Element;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
@@ -139,12 +136,12 @@ public class CrestWebServiceContextFactoryImpl implements WebServiceContextFacto
 
     static final class WebServiceContextImpl implements WebServiceContext {
         private final HttpContext httpContext;
-        private final SecurityContext securityContext;
+        private final RestSTSServiceHttpServletContext restSTSServiceHttpServletContext;
         private final MessageContext messageContext;
 
-        WebServiceContextImpl(HttpContext httpContext, SecurityContext securityContext) {
+        WebServiceContextImpl(HttpContext httpContext, RestSTSServiceHttpServletContext restSTSServiceHttpServletContext) {
             this.httpContext = httpContext;
-            this.securityContext = securityContext;
+            this.restSTSServiceHttpServletContext = restSTSServiceHttpServletContext;
             messageContext = new MessageContextImpl(httpContext);
         }
 
@@ -161,8 +158,7 @@ public class CrestWebServiceContextFactoryImpl implements WebServiceContextFacto
 
         @Override
         public Principal getUserPrincipal() {
-            //don't throw exception here - this request can be satisfied in straightforward fashion.
-            return new STSPrincipal(securityContext.getAuthenticationId());
+            throw new IllegalStateException("getUserPrincipal called on the faux WebServiceContext.");
         }
 
         @Override
@@ -182,7 +178,8 @@ public class CrestWebServiceContextFactoryImpl implements WebServiceContextFacto
     }
 
     @Override
-    public WebServiceContext getWebServiceContext(HttpContext httpContext, SecurityContext securityContext) {
-        return new WebServiceContextImpl(httpContext, securityContext);
+    public WebServiceContext getWebServiceContext(HttpContext httpContext, RestSTSServiceHttpServletContext
+            restSTSServiceHttpServletContext) {
+        return new WebServiceContextImpl(httpContext, restSTSServiceHttpServletContext);
     }
 }
