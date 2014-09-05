@@ -80,7 +80,7 @@
     <term>_create</term>
     <listitem>
      <para>
-      Add a new resource
+      Add a new resource.
      </para>
 
      <para>
@@ -93,7 +93,7 @@
     <term>_read</term>
     <listitem>
      <para>
-      Retrieve a single resource
+      Retrieve a single resource.
      </para>
 
      <para>
@@ -106,7 +106,7 @@
     <term>_update</term>
     <listitem>
      <para>
-      Replace an existing resource
+      Replace an existing resource.
      </para>
 
      <para>
@@ -119,7 +119,7 @@
     <term>_delete</term>
     <listitem>
      <para>
-      Remove an existing resource
+      Remove an existing resource.
      </para>
 
      <para>
@@ -145,7 +145,7 @@
     <term>_action</term>
     <listitem>
      <para>
-      Perform a predefined action
+      Perform a predefined action.
      </para>
 
      <para>
@@ -164,7 +164,7 @@
     <term>_query</term>
     <listitem>
      <para>
-      Search a collection of resources
+      Search a collection of resources.
      </para>
 
      <para>
@@ -315,8 +315,9 @@
    <title>Supported REST API Versions</title>
 
    <para>The REST API version numbers supported in OpenAM 12.0.0
-    are as follows.</para>
-<variablelist>
+    are as follows:</para>
+
+  <variablelist>
    <varlistentry>
     <term><emphasis>Supported protocol versions</emphasis></term>
     <listitem>
@@ -439,7 +440,8 @@
     </listitem>
    </varlistentry>
   </variablelist>
-    <para>The <citetitle>OpenAM Release Notes</citetitle> section,
+
+  <para>The <citetitle>OpenAM Release Notes</citetitle> section,
      <link
       xlink:show="new"
       xlink:href="release-notes#chap-compatibility"
@@ -728,7 +730,7 @@ $ <userinput>curl \
     <literal>authIndexValue</literal> query string parameters as a pair
     to provide additional information about how you are authenticating.
     The <literal>authIndexType</literal> can be one of the following
-    types.</para>
+    types:</para>
 
     <varlistentry>
      <term>composite</term>
@@ -975,7 +977,7 @@ string=amlbcookie</computeroutput>
     to the resource URL,
     <literal>/json/sessions/<replaceable>tokenId</replaceable></literal>,
     using the <literal>validate</literal> action
-    as shown in the following example.
+    as shown in the following example:
    </para>
 
    <screen>
@@ -1006,7 +1008,7 @@ $ <userinput>curl \
    xlink:href="admin-guide#interface-stability"
    xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
 
-   <para>You check whether a token is valid as follows.</para>
+   <para>You check whether a token is valid as follows:</para>
 
    <screen>
 $ <userinput>curl \
@@ -1026,15 +1028,15 @@ $ <userinput>curl \
 <computeroutput>boolean=false</computeroutput>
    </screen>
 
-  <para>With a valid token, you can retrieve attributes about the subject.
-  OpenAM returns a series of <replaceable>name</replaceable>,
-  <replaceable>value</replaceable> pairs.</para>
+   <para>With a valid token, you can retrieve attributes about the subject.
+    OpenAM returns a series of <replaceable>name</replaceable>,
+    <replaceable>value</replaceable> pairs.</para>
 
-  <para>The newer API for retrieving user information is demonstrated in
-  <xref linkend="rest-api-read-identity" />. What follows describes the
-  legacy API.</para>
+   <para>The newer API for retrieving user information is demonstrated in
+    <xref linkend="rest-api-read-identity" />. What follows describes the
+    legacy API.</para>
 
-  <screen>
+   <screen>
 $ <userinput>curl \
  --request POST \
  --data "subjectid=AQIC5w...*AAJTSQACMDE.*" \
@@ -1084,8 +1086,8 @@ userdetails.attribute.value=bjensen@example.com</computeroutput>
    </screen>
 
    <para>When retrieving attributes, you can refresh the session thus setting
-   the idle time to 0, by adding the boolean parameter
-   <literal>refresh=true</literal> to the query string.</para>
+    the idle time to 0, by adding the boolean parameter
+    <literal>refresh=true</literal> to the query string.</para>
 
    <screen>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/attributes?\
@@ -1157,7 +1159,8 @@ userdetails.attribute.value=6319</computeroutput>
      Under <literal>/json[/<replaceable>realm</replaceable>]/policies</literal>,
      you find the newer JSON-based APIs.
     </para>
-
+   </listitem>
+   <listitem>
     <para>
      Under
      <literal>/json[/<replaceable>realm</replaceable>]/applications</literal>
@@ -1165,28 +1168,29 @@ userdetails.attribute.value=6319</computeroutput>
      you find JSON-based APIs
      for administering applications and reading application types.
     </para>
-
+   </listitem>
+   <listitem>
     <para>
      Under <literal>/json/conditiontypes</literal> you find a JSON-based API
      for viewing what types of conditions you can use when defining policies.
     </para>
-
+   </listitem>
+   <listitem>
     <para>
      Under <literal>/json/subjecttypes</literal> you find a JSON-based API
      for viewing what types of subjects you can use when defining policies.
     </para>
-
+   </listitem>
+   <listitem>
     <para>
      Under <literal>/json/decisioncombiners</literal> you find a JSON-based API
      for viewing implementations you can use when defining policies
      to specify how to combine results when multiple policies apply.
     </para>
-
     <para>
      See <xref linkend="rest-api-authz-json" /> below.
     </para>
    </listitem>
-
    <listitem>
     <para>
      Under <literal>/identity/authorize</literal>
@@ -1199,11 +1203,12 @@ userdetails.attribute.value=6319</computeroutput>
     </para>
    </listitem>
   </itemizedlist>
+ </section>
 
-  <section xml:id="rest-api-authz-json">
-   <title>Authorization</title>
+ <section xml:id="rest-api-authz-json">
+  <title>Authorization</title>
    
-   <itemizedlist>
+  <itemizedlist>
     <para>
      This section covers the following topics.
     </para>
@@ -1251,7 +1256,7 @@ userdetails.attribute.value=6319</computeroutput>
     </listitem>
    </itemizedlist>
 
-   <section xml:id="rest-api-authz-policy-decisions">
+  <section xml:id="rest-api-authz-policy-decisions">
     <title>Requesting Policy Decisions</title>
 
     <para>
@@ -1321,7 +1326,7 @@ userdetails.attribute.value=6319</computeroutput>
 
     <variablelist>
      <para>
-      The values for the fields shown above are explained below.
+      The values for the fields shown above are explained below:
      </para>
 
      <varlistentry>
@@ -1447,7 +1452,7 @@ $ <userinput>curl \
       <term><literal>"resource"</literal></term>
       <listitem>
        <para>
-        A resource specified in the request
+        A resource specified in the request.
        </para>
 
        <para>
@@ -1468,7 +1473,7 @@ $ <userinput>curl \
         to Boolean values that indicate whether
         the action is allowed (<literal>true</literal>)
         or denied (<literal>false</literal>)
-        for the specified resource
+        for the specified resource.
        </para>
 
        <para>
@@ -1485,7 +1490,7 @@ $ <userinput>curl \
        <para>
         A map of attribute names to their values,
         if any resource attributes are returned
-        according to applicable policies
+        according to applicable policies.
        </para>
 
        <para>
@@ -1502,7 +1507,7 @@ $ <userinput>curl \
       <listitem>
        <para>
         A map of advice names to their values,
-        if any advice is returned according to applicable policies
+        if any advice is returned according to applicable policies.
        </para>
 
        <para>
@@ -1580,7 +1585,7 @@ $ <userinput>curl \
 
     <variablelist>
      <para>
-      The values for the fields shown above are explained below.
+      The values for the fields shown above are explained below:
      </para>
 
      <varlistentry>
@@ -1732,7 +1737,7 @@ $ <userinput>curl \
       <term><literal>"resource"</literal></term>
       <listitem>
        <para>
-        A resource name whose root is the resource specified in the request
+        A resource name whose root is the resource specified in the request.
        </para>
 
        <para>
@@ -1751,7 +1756,7 @@ $ <userinput>curl \
         to Boolean values that indicate whether
         the action is allowed (<literal>true</literal>)
         or denied (<literal>false</literal>)
-        for the specified resource
+        for the specified resource.
        </para>
 
        <para>
@@ -1767,7 +1772,7 @@ $ <userinput>curl \
        <para>
         A map of attribute names to their values,
         if any resource attributes are returned
-        according to applicable policies
+        according to applicable policies.
        </para>
 
        <para>
@@ -1783,7 +1788,7 @@ $ <userinput>curl \
       <listitem>
        <para>
         A map of advice names to their values,
-        if any advice is returned according to applicable policies
+        if any advice is returned according to applicable policies.
        </para>
 
        <para>
@@ -1873,7 +1878,7 @@ $ <userinput>curl \
 
    <variablelist>
     <para>
-     The values for the fields shown in the example are explained below.
+     The values for the fields shown in the example are explained below:
     </para>
 
     <varlistentry>
@@ -1882,7 +1887,7 @@ $ <userinput>curl \
       <para>
        String matching the name
        in the URL used when creating the policy by HTTP PUT
-       or in the body when creating the policy by HTTP POST
+       or in the body when creating the policy by HTTP POST.
       </para>
      </listitem>
     </varlistentry>
@@ -1892,7 +1897,7 @@ $ <userinput>curl \
      <listitem>
       <para>
        Boolean indicating whether OpenAM considers the policy active
-       for evaluation purposes, defaults to <literal>false</literal>
+       for evaluation purposes, defaults to <literal>false</literal>.
       </para>
      </listitem>
     </varlistentry>
@@ -1901,7 +1906,7 @@ $ <userinput>curl \
      <term><literal>"description"</literal></term>
      <listitem>
       <para>
-       String describing the policy
+       String describing the policy.
       </para>
      </listitem>
     </varlistentry>
@@ -1912,7 +1917,7 @@ $ <userinput>curl \
       <para>
        List of the resource name pattern strings
        to which the policy applies (<literal>"included"</literal>)
-       and does not apply (<literal>"excluded"</literal>)
+       and does not apply (<literal>"excluded"</literal>).
       </para>
      </listitem>
     </varlistentry>
@@ -1924,7 +1929,7 @@ $ <userinput>curl \
        String application name,
        such as <literal>"iPlanetAMWebAgentService"</literal>,
        <literal>"crestPolicyService"</literal>,
-       or some other application name
+       or some other application name.
       </para>
      </listitem>
     </varlistentry>
@@ -1934,7 +1939,7 @@ $ <userinput>curl \
      <listitem>
       <para>
        Set of string action names,
-       each set to a boolean indicating whether the action is allowed
+       each set to a boolean indicating whether the action is allowed.
       </para>
 
       <para>
@@ -1954,7 +1959,7 @@ $ <userinput>curl \
        where subjects can be combined by using the built-in types
        <literal>"AND"</literal>, <literal>"OR"</literal>,
        and <literal>"NOT"</literal>,
-       and where subject implementations are pluggable
+       and where subject implementations are pluggable.
       </para>
 
       <para>
@@ -1968,14 +1973,14 @@ $ <userinput>curl \
       <itemizedlist>
        <listitem>
         <para>
-         <literal>"AnyUser"</literal>, meaning any authenticated user
+         <literal>"AnyUser"</literal>, meaning any authenticated user.
         </para>
        </listitem>
 
        <listitem>
         <para>
          <literal>"Attribute"</literal> to specify attributes
-         of the subject's profile as in the following example.
+         of the subject's profile as in the following example:
         </para>
 
         <programlisting language="java">
@@ -1992,7 +1997,7 @@ $ <userinput>curl \
        <listitem>
         <para>
          <literal>"Group"</literal> to specify a particular group
-         as in the following example.
+         as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2007,14 +2012,14 @@ $ <userinput>curl \
 
        <listitem>
         <para>
-         <literal>"NONE"</literal>, meaning no subject
+         <literal>"NONE"</literal>, meaning no subject.
         </para>
        </listitem>
 
        <listitem>
         <para>
          <literal>"Role"</literal> to specify a particular OpenAM role
-         as in the following example.
+         as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2030,7 +2035,7 @@ $ <userinput>curl \
        <listitem>
         <para>
          <literal>"User"</literal> to specify a particular user
-         as in the following example.
+         as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2047,7 +2052,7 @@ $ <userinput>curl \
       <para>
        <literal>"Policy"</literal> subject types can be used
        to correspond to the subject configured for policies
-       as in the following example.
+       as in the following example:
       </para>
 
       <programlisting language="java">
@@ -2101,7 +2106,7 @@ $ <userinput>curl \
        Specifies additional conditions, where conditions can be combined
        by using the built-in types <literal>"AND"</literal>,
        <literal>"OR"</literal>, and <literal>"NOT"</literal>,
-       and where condition implementations are pluggable
+       and where condition implementations are pluggable.
       </para>
 
       <para>
@@ -2116,7 +2121,7 @@ $ <userinput>curl \
        <listitem>
         <para>
          <literal>"AttributeLookup"</literal> to specify
-         a value to match in the resource as in the following example.
+         a value to match in the resource as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2131,7 +2136,7 @@ $ <userinput>curl \
        <listitem>
         <para>
          <literal>"DNSName"</literal> to specify domain names
-         where the request originated as in the following example.
+         where the request originated as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2145,7 +2150,7 @@ $ <userinput>curl \
        <listitem>
         <para>
          <literal>"IP"</literal> to specify an IP address range
-         as in the following example.
+         as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2161,7 +2166,7 @@ $ <userinput>curl \
         <para>
          <literal>"NumericAttribute"</literal> to specify a value or range
          for a numeric attribute from the subject's user profile
-         as in the following example.
+         as in the following example:
         </para>
 
         <programlisting language="java">
@@ -2191,7 +2196,7 @@ $ <userinput>curl \
          <para>
           <literal>"StringAttribute"</literal> to specify a value
           for a string-valued attribute from the subject's user profile
-          as in the following example.
+          as in the following example:
          </para>
 
          <programlisting language="java">
@@ -2207,7 +2212,7 @@ $ <userinput>curl \
         <listitem>
          <para>
           <literal>"Time"</literal> to specify a time range,
-          where type is the only required field in the following example.
+          where type is the only required field in the following example:
          </para>
 
          <programlisting language="java">
@@ -2228,7 +2233,7 @@ $ <userinput>curl \
        <para>
         <literal>"Policy"</literal> condition types can be used
         to correspond to the conditions configured for policies
-        as in the following example.
+        as in the following example:
        </para>
 
        <programlisting language="java">
@@ -2285,7 +2290,7 @@ $ <userinput>curl \
       <listitem>
        <para>
         List of resource attributes to return with decisions,
-        where resource attribute implementations are pluggable
+        where resource attribute implementations are pluggable.
        </para>
 
        <para>The default implementations provide
@@ -2308,15 +2313,15 @@ $ <userinput>curl \
      </varlistentry>
     </variablelist>
 
-    <para>
-     The examples above do not show the fields added to a policy by OpenAM
-     to indicate when the policy was created and last updated, and by whom.
-     Those field are
-     <literal>"createdBy"</literal> and <literal>"lastModifiedBy"</literal>,
-     which take strings holding universal identifier DNs as their values,
-     and <literal>"creationDate"</literal> and <literal>"lastModified"</literal>,
-     which take strings holding ISO-8601 timestamps.
-    </para>
+   <para>
+    The examples above do not show the fields added to a policy by OpenAM
+    to indicate when the policy was created and last updated, and by whom.
+    Those field are
+    <literal>"createdBy"</literal> and <literal>"lastModifiedBy"</literal>,
+    which take strings holding universal identifier DNs as their values,
+    and <literal>"creationDate"</literal> and <literal>"lastModified"</literal>,
+    which take strings holding ISO-8601 timestamps.
+   </para>
 
     <section xml:id="rest-api-authz-policies-create">
      <title>Creating Policies</title>
@@ -2650,7 +2655,7 @@ $ <userinput>curl \
       <replaceable>operator</replaceable> is the operator code,
       <replaceable>value</replaceable> is the value to match,
       and the entire filter is URL encoded.
-      Supported operators are as follows.
+      Supported operators are as follows:
      </para>
 
      <itemizedlist>
@@ -2714,7 +2719,7 @@ $ <userinput>curl \
      <itemizedlist>
       <para>
        The <literal><replaceable>field</replaceable></literal> value
-       can take the following values.
+       can take the following values:
       </para>
 
       <listitem>
@@ -2895,7 +2900,7 @@ $ <userinput>curl \
 
     <variablelist>
      <para>
-      The values for the fields shown in the description are explained below.
+      The values for the fields shown in the description are explained below:
      </para>
 
      <varlistentry>
@@ -2904,7 +2909,7 @@ $ <userinput>curl \
        <para>
         String matching the name
         in the URL used when creating the application by HTTP PUT
-        or in the body when creating the application by HTTP POST
+        or in the body when creating the application by HTTP POST.
        </para>
       </listitem>
      </varlistentry>
@@ -2913,7 +2918,7 @@ $ <userinput>curl \
       <term><literal>"resources"</literal></term>
       <listitem>
        <para>
-        Strings specifying resource name patterns as in the following example
+        Strings specifying resource name patterns as in the following example:
        </para>
 
        <programlisting language="java">
@@ -2933,7 +2938,7 @@ $ <userinput>curl \
        <para>
         Set of string action names,
         each set to a boolean indicating whether the action is allowed
-        in the context of this application as in the following example
+        in the context of this application as in the following example:
        </para>
 
        <programlisting language="java">
@@ -2956,11 +2961,11 @@ $ <userinput>curl \
       <term><literal>"conditions"</literal></term>
       <listitem>
        <para>
-        Condition types allowed in the context of this application
+        Condition types allowed in the context of this application.
        </para>
 
        <para>
-        The following condition types are available.
+        The following condition types are available:
        </para>
 
        <simplelist>
@@ -2987,7 +2992,7 @@ $ <userinput>curl \
       <term><literal>"realm"</literal></term>
       <listitem>
        <para>
-        Name of the realm where this application is defined
+        Name of the realm where this application is defined.
        </para>
       </listitem>
      </varlistentry>
@@ -2996,7 +3001,7 @@ $ <userinput>curl \
       <term><literal>"applicationType"</literal></term>
       <listitem>
        <para>
-        Name of the application type used as a template for this application
+        Name of the application type used as a template for this application.
        </para>
       </listitem>
      </varlistentry>
@@ -3005,7 +3010,7 @@ $ <userinput>curl \
       <term><literal>"description"</literal></term>
       <listitem>
        <para>
-        String describing the application
+        String describing the application.
        </para>
       </listitem>
      </varlistentry>
@@ -3015,11 +3020,11 @@ $ <userinput>curl \
       <listitem>
        <para>
         Class name of the resource comparator implementation used
-        in the context of this application
+        in the context of this application.
        </para>
 
        <para>
-        The following implementations are available.
+        The following implementations are available:
        </para>
 
        <simplelist>
@@ -3035,11 +3040,11 @@ $ <userinput>curl \
       <term><literal>"subjects"</literal></term>
       <listitem>
        <para>
-        Subject types allowed in the context of this application
+        Subject types allowed in the context of this application.
        </para>
 
        <para>
-        The following subject types are available.
+        The following subject types are available:
        </para>
 
        <simplelist>
@@ -3082,7 +3087,7 @@ $ <userinput>curl \
        <para>
         Class name of the implementation for creating indexes for resource names,
         such as <literal>"com.sun.identity.entitlement.util.ResourceNameIndexGenerator"</literal>
-        for URL resource names
+        for URL resource names.
        </para>
       </listitem>
      </varlistentry>
@@ -3093,7 +3098,7 @@ $ <userinput>curl \
        <para>
         Class name of the implementation for searching indexes for resource names,
         such as <literal>"com.sun.identity.entitlement.util.ResourceNameSplitter"</literal>
-        for URL resource names
+        for URL resource names.
        </para>
       </listitem>
      </varlistentry>
@@ -3104,7 +3109,7 @@ $ <userinput>curl \
        <para>
         Class names of implementations for getting attributes such as
         <literal>"com.sun.identity.entitlement.StaticAttributes"</literal>,
-        and <literal>"com.sun.identity.entitlement.UserAttributes"</literal>
+        and <literal>"com.sun.identity.entitlement.UserAttributes"</literal>.
        </para>
       </listitem>
      </varlistentry>
@@ -3664,7 +3669,7 @@ $ <userinput>curl \
       <replaceable>operator</replaceable> is the operator code,
       <replaceable>value</replaceable> is the value to match,
       and the entire filter is URL encoded.
-      Supported operators are as follows.
+      Supported operators are as follows:
      </para>
 
      <itemizedlist>
@@ -3702,7 +3707,7 @@ $ <userinput>curl \
      <itemizedlist>
       <para>
        The <literal><replaceable>field</replaceable></literal> value
-       can take the following values.
+       can take the following values:
       </para>
 
       <listitem>
@@ -3810,7 +3815,7 @@ $ <userinput>curl \
 
     <variablelist>
      <para>
-      The values for the fields shown in the description are explained below.
+      The values for the fields shown in the description are explained below:
      </para>
 
      <varlistentry>
@@ -3819,7 +3824,7 @@ $ <userinput>curl \
        <para>
         String matching the name
         in the URL used when creating the application type by HTTP PUT
-        or in the body when creating the application type by HTTP POST
+        or in the body when creating the application type by HTTP POST.
        </para>
       </listitem>
      </varlistentry>
@@ -3830,7 +3835,7 @@ $ <userinput>curl \
        <para>
         Set of string action names,
         each set to a boolean indicating whether the action is allowed
-        as in the following example
+        as in the following example:
        </para>
 
        <programlisting language="java">
@@ -3854,11 +3859,11 @@ $ <userinput>curl \
       <listitem>
        <para>
         Class name of the resource comparator implementation used
-        in the context of this application
+        in the context of this application.
        </para>
 
        <para>
-        The following implementations are available.
+        The following implementations are available:
        </para>
 
        <simplelist>
@@ -3875,11 +3880,11 @@ $ <userinput>curl \
       <listitem>
        <para>
         Class name of the resource comparator implementation used
-        in the context of this application
+        in the context of this application.
        </para>
 
        <para>
-        The following implementations are available.
+        The following implementations are available:
        </para>
 
        <simplelist>
@@ -3897,7 +3902,7 @@ $ <userinput>curl \
        <para>
         Class name of the implementation for creating indexes for resource names,
         such as <literal>"com.sun.identity.entitlement.util.ResourceNameIndexGenerator"</literal>
-        for URL resource names
+        for URL resource names.
        </para>
       </listitem>
      </varlistentry>
@@ -3908,7 +3913,7 @@ $ <userinput>curl \
        <para>
         Class name of the implementation for searching indexes for resource names,
         such as <literal>"com.sun.identity.entitlement.util.ResourceNameSplitter"</literal>
-        for URL resource names
+        for URL resource names.
        </para>
       </listitem>
      </varlistentry>
@@ -3918,7 +3923,7 @@ $ <userinput>curl \
       <listitem>
        <para>
         Class name of the application implementation,
-        such as <literal>"com.sun.identity.entitlement.Application"</literal>
+        such as <literal>"com.sun.identity.entitlement.Application"</literal>.
        </para>
       </listitem>
      </varlistentry>
@@ -3974,7 +3979,7 @@ $ <userinput>curl \
      <para>
       To list application types, perform an HTTP GET on the endpoint,
       setting at least the <literal>_queryFilter</literal> query string parameter
-      as in the following example.
+      as in the following example:
      </para>
 
      <screen>
@@ -4054,7 +4059,7 @@ $ <userinput>curl \
       that an IP condition has two properties, "startIp" and "endIp",
       each of which take a string value.
       In other words, a concrete IP condition specification
-      is represented in a policy definition as in the following example.
+      is represented in a policy definition as in the following example:
      </para>
 
      <programlisting language="java">
@@ -4156,7 +4161,7 @@ $ <userinput>curl \
      <para>
       To list all condition types, perform an HTTP GET on the endpoint,
       setting the query string parameter, <literal>_queryFilter=true</literal>,
-      as in the following example.
+      as in the following example:
      </para>
 
      <screen>
@@ -4238,7 +4243,7 @@ $ <userinput>curl \
       that a User subject has one property,
       an "Id", which takes a string value.
       In other words, a concrete User subject specification
-      is represented in a policy definition as in the following example.
+      is represented in a policy definition as in the following example:
      </para>
 
      <programlisting language="java">
@@ -4298,7 +4303,7 @@ $ <userinput>curl \
      <para>
       To list all subject types, perform an HTTP GET on the endpoint,
       setting the query string parameter, <literal>_queryFilter=true</literal>,
-      as in the following example.
+      as in the following example:
      </para>
 
      <screen>
@@ -4338,7 +4343,7 @@ $ <userinput>curl \
     <para>
      To list all decision combiners, perform an HTTP GET on the endpoint,
      setting the query string parameter, <literal>_queryFilter=true</literal>,
-     as in the following example.
+     as in the following example:
     </para>
 
     <screen>
@@ -4373,9 +4378,10 @@ $ <userinput>curl \
 }</computeroutput>
     </screen>
    </section>
+
   </section>
 
-  <section xml:id="rest-api-authz-legacy">
+ <section xml:id="rest-api-authz-legacy">
    <title>Authorization (Legacy API)</title>
 
    <para>You can call on OpenAM to decide whether to authorize access to a
@@ -4414,22 +4420,22 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
      <para>The policy decision interfaces use the following path suffixes and
      query string parameters.</para>
 
-     <para>Path suffixes for policy decision requests include the following.</para>
+     <para>Path suffixes for policy decision requests include the following:</para>
      <listitem>
-      <para><literal>ws/1/entitlement/decision</literal>: request a decision
-      pertaining to a single resource</para>
+      <para><literal>ws/1/entitlement/decision</literal>. Request a decision
+      pertaining to a single resource.</para>
      </listitem>
      <listitem>
-      <para><literal>ws/1/entitlement/decisions</literal>: request decisions
-      pertaining to multiple resources</para>
+      <para><literal>ws/1/entitlement/decisions</literal>. Request decisions
+      pertaining to multiple resources.</para>
      </listitem>
      <listitem>
-      <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
-      for a specified resource URL</para>
+      <para><literal>ws/1/entitlement/entitlement</literal>. Request decisions
+      for a specified resource URL.</para>
      </listitem>
      <listitem>
-      <para><literal>ws/1/entitlement/entitlements</literal>: request decisions
-      for a specified resource URL and all resources underneath</para>
+      <para><literal>ws/1/entitlement/entitlements</literal>. Request decisions
+      for a specified resource URL and all resources underneath.</para>
      </listitem>
     </itemizedlist>
 
@@ -4492,7 +4498,7 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
     <xref linkend="rest-api-auth" />.</para>
 
     <para>To request a decision for a single resource, use an HTTP GET on
-    <literal>/ws/1/entitlement/decision</literal> as in the following example.</para>
+    <literal>/ws/1/entitlement/decision</literal> as in the following example:</para>
 
     <screen>
 $ <userinput>curl \
@@ -4508,7 +4514,7 @@ $ <userinput>curl \
     <para>If access is denied, the result is <literal>deny</literal>.</para>
 
     <para>To request decisions for multiple resources, use an HTTP GET on
-    <literal>/ws/1/entitlement/decisions</literal> as in the following example.</para>
+    <literal>/ws/1/entitlement/decisions</literal> as in the following example:</para>
 
     <screen>
 $ <userinput>curl \
@@ -4550,7 +4556,7 @@ $ <userinput>curl \
     <para>
      To request decisions for a given resource,
      use an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal>
-     as in the following example.
+     as in the following example:
     </para>
 
     <screen>
@@ -4579,7 +4585,7 @@ $ <userinput>curl \
     <para>
      To request decisions for all resources underneath a given resource,
      use an HTTP GET on <literal>/ws/1/entitlement/entitlements</literal>
-     as in the following example.
+     as in the following example:
     </para>
 
     <screen>
@@ -4879,7 +4885,6 @@ $ <userinput>curl \
     </section>
    </section>
   </section>
- </section>
 
  <section xml:id="rest-api-oauth2">
   <title>OAuth 2.0 Authorization</title>
@@ -4952,7 +4957,7 @@ $ <userinput>curl \
    registered with OpenAM.</para>
 
    <para>The following example shows OpenAM issuing an access token, and
-   then returning token information.</para>
+   then returning token information:</para>
 
    <screen>
 $ <userinput>curl \
@@ -5044,7 +5049,7 @@ $ <userinput>curl https://openam.example.com:8443/openam/oauth2/tokeninfo\
 
    <para>To get a token, perform an HTTP GET on
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
-   as in the following example.</para>
+   as in the following example:</para>
 
    <screen>
 $ <userinput>curl \
@@ -5197,7 +5202,7 @@ $ <userinput>curl \
 
    <para>To delete a token, perform an HTTP DELETE on
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
-   as in the following example.</para>
+   as in the following example:</para>
 
    <screen>
 $ <userinput>curl \
@@ -5354,7 +5359,7 @@ $ <userinput>curl \
 
    <para>To delete an OAuth 2.0 client, perform an HTTP DELETE on
    <literal>/frrest/oauth2/client/<replaceable>client-id</replaceable></literal>,
-   as in the following example.</para>
+   as in the following example:</para>
 
    <screen>
 $ <userinput>curl \
@@ -5597,7 +5602,7 @@ $ <userinput>curl \
 
     <para>Your application must use the confirmation link to construct an HTTP
     POST to <literal>/json/users?_action=confirm</literal> from the query string
-    parameters as shown in the following example.</para>
+    parameters as shown in the following example:</para>
 
     <screen>
 $ <userinput>curl \
@@ -5624,7 +5629,7 @@ $ <userinput>curl \
    <step>
     <para>Using the confirmation, your application must make an authenticated
     HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
-    create the user as shown in the following example.</para>
+    create the user as shown in the following example:</para>
 
     <screen>
 $ <userinput>curl \
@@ -6035,7 +6040,7 @@ $ <userinput>curl \
     <para>Alternatively, administrators can create user profiles with specific
     user IDs by doing an HTTP PUT of the JSON representation of the changes to
     <literal>/json/users/<replaceable>user-id</replaceable></literal>, as
-    shown in the following example.</para>
+    shown in the following example:</para>
 
     <screen>
 $ <userinput>curl \
@@ -7364,7 +7369,7 @@ $ <userinput>curl \
     <para>Alternatively, administrators can create realms by the specific realm
     name using the HTTP PUT of the JSON representation of the changes to 
     <literal>/json/realms/<replaceable>realm-id</replaceable></literal>, as
-    shown in the following example.</para>
+    shown in the following example:</para>
    
      <screen>
 $ <userinput>curl \
@@ -7668,7 +7673,7 @@ $ <userinput>curl \
    
   </section>
 
-  <section xml:id="rest-api-status-codes">
+ <section xml:id="rest-api-status-codes">
    <title>REST Status Codes</title>
 
    <para>OpenAM REST APIs respond to successful requests with HTTP status codes
@@ -7825,7 +7830,7 @@ $ <userinput>curl \
      <listitem>
       <para>The requested resource is no longer available, and will not
        become available again. The URI returned for resetting a password may
-       have expired as in the following example.</para>
+       have expired as in the following example:</para>
 
 <screen>
 $ <userinput>curl \
