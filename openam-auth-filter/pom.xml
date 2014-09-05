@@ -35,7 +35,6 @@
         <module>openam-authfilter-shared</module>
         <module>openam-authn-filter-config</module>
         <module>openam-authn-filter-modules</module>
-        <module>openam-authz-filter</module>
     </modules>
 
     <dependencies>

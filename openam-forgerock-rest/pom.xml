@@ -128,7 +128,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
-            <artifactId>forgerock-util</artifactId>
+            <artifactId>authz-framework</artifactId>
         </dependency>
 
         <!-- OAuth2 Dependencies -->

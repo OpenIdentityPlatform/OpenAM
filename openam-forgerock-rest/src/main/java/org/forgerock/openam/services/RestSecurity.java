@@ -114,11 +114,11 @@ public class RestSecurity {
         final String forgotPasswordConfirmationUrl;
         final Boolean selfRegistration;
         final Boolean forgotPassword;
-        final Set protectedUserAttributes;
+        final Set<String> protectedUserAttributes;
         final String successfulUserRegistrationDestination;
 
         private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl, Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, 
-        		Boolean selfRegistration, Boolean forgotPassword, Set protectedUserAttributes, String successfulUserRegistrationDestination) {
+        		Boolean selfRegistration, Boolean forgotPassword, Set<String> protectedUserAttributes, String successfulUserRegistrationDestination) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
@@ -139,7 +139,7 @@ public class RestSecurity {
             String forgotPasswordConfirmationUrl = ServiceConfigUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
             Long selfRegTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
             Long forgotPassTokLifeTime = ServiceConfigUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
-            Set protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
+            Set<String> protectedUserAttributes = ServiceConfigUtils.getSetAttribute(serviceConfig, PROTECTED_USER_ATTRIBUTES);
             String successfulUserRegistrationDestination = ServiceConfigUtils.getStringAttribute(serviceConfig, SUCCESSFUL_USER_REGISTRATION_DESTINATION);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
@@ -226,7 +226,7 @@ public class RestSecurity {
         }
     }
     
-    public Set getProtectedUserAttributes() {
+    public Set<String> getProtectedUserAttributes() {
         return restSecurityConfiguration.protectedUserAttributes;
     }
     

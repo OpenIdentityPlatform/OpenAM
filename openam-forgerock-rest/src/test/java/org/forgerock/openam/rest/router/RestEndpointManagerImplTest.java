@@ -18,6 +18,7 @@ package org.forgerock.openam.rest.router;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.forgerock.openam.rest.CrestRouter;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import static org.mockito.BDDMockito.given;
@@ -34,7 +35,7 @@ public class RestEndpointManagerImplTest {
     public void setUp() {
 
         RestEndpoints restEndpoints = mock(RestEndpoints.class);
-        VersionRouter resourceRouter = mock(VersionRouter.class);
+        CrestRouter resourceRouter = mock(CrestRouter.class);
         ServiceRouter serviceRouter = mock(ServiceRouter.class);
         Set<String> resourceRoutes = new HashSet<String>();
         Set<String> serviceRoutes = new HashSet<String>();

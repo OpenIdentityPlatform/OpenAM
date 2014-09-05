@@ -14,14 +14,12 @@
  * Copyright 2014 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest;
+package org.forgerock.openam.forgerockrest.utils;
 
-import com.sun.identity.authentication.internal.server.AuthSPrincipal;
+import java.security.Principal;
+import javax.security.auth.Subject;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
-
-import javax.security.auth.Subject;
-import java.security.Principal;
 
 /**
  * A collection of ForgeRock-REST based utility functions that do not rely on an application SSO token existing.
@@ -56,7 +54,7 @@ final public class PrincipalRestUtils {
             return null;
         }
 
-        AuthSPrincipal[] principalArray = (subject.getPrincipals().toArray(new AuthSPrincipal[0]));
+        Principal[] principalArray = (subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]));
         if (principalArray.length == 0) {
             return null;
         }

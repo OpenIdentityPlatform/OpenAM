@@ -11,9 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2014 ForgeRock Inc.
  */
 
 /**
- * This package contains classes for authorizing rest calls to protected rest resources via a filter.
+ * This package contains classes for the handling of CREST routers in a fluent fashion.
  */
+package org.forgerock.openam.rest.fluent;

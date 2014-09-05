@@ -16,12 +16,14 @@
 
 package org.forgerock.openam.rest.resource;
 
+import javax.inject.Inject;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.RouterContext;
 import static org.forgerock.json.resource.RoutingMode.STARTS_WITH;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.rest.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
-import org.forgerock.openam.rest.router.VersionRouter;
+import org.forgerock.openam.rest.router.VersionedRouter;
 
 /**
  * A CREST request handler which will route to resource endpoints, dynamically handling realm URI parameters.
@@ -31,7 +33,7 @@ import org.forgerock.openam.rest.router.VersionRouter;
  *
  * @since 12.0.0
  */
-public class CrestRealmRouter extends VersionRouter {
+public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements VersionedRouter<CrestRealmRouter> {
 
     private final RestRealmValidator realmValidator;
 
@@ -40,9 +42,10 @@ public class CrestRealmRouter extends VersionRouter {
      *
      * @param realmValidator An instance of the RestRealmValidator.
      */
+    @Inject
     public CrestRealmRouter(RestRealmValidator realmValidator) {
         this.realmValidator = realmValidator;
-        router.addRoute(STARTS_WITH, "/{realm}", this);
+        getRouter().addRoute(STARTS_WITH, "/{realm}", this);
     }
 
     /**

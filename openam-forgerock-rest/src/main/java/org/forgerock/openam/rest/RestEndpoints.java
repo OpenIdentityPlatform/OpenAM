@@ -16,15 +16,9 @@
 
 package org.forgerock.openam.rest;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-import java.util.HashSet;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.forgerockrest.IdentityResource;
 import org.forgerock.openam.forgerockrest.RealmResource;
@@ -38,13 +32,15 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
+import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.authz.SessionResourceAuthzModule;
 import org.forgerock.openam.rest.dashboard.DashboardResource;
 import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
-import org.forgerock.openam.rest.resource.CrestRealmRouter;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.rest.fluent.FluentRealmRouter;
+import org.forgerock.openam.rest.fluent.FluentRouter;
+import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
-import org.forgerock.openam.rest.router.VersionRouter;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -62,7 +58,7 @@ public class RestEndpoints {
 
     private final RestRealmValidator realmValidator;
     private final VersionSelector versionSelector;
-    private final VersionRouter resourceRouter;
+    private final CrestRouter resourceRouter;
     private final ServiceRouter serviceRouter;
 
     /**
@@ -84,7 +80,7 @@ public class RestEndpoints {
      * Gets the CREST resource router.
      * @return The router.
      */
-    public VersionRouter getResourceRouter() {
+    public CrestRouter getResourceRouter() {
         return resourceRouter;
     }
 
@@ -102,103 +98,65 @@ public class RestEndpoints {
      *
      * @return A {@code RealmRouter}.
      */
-    private VersionRouter createResourceRouter() {
+    private CrestRouter createResourceRouter() {
 
-        final CrestRealmRouter cr = getRealmRouter();
-        final VersionRouter vr = getRootRouter();
+        FluentRouter rootRealmRouter = InjectorHolder.getInstance(LoggingFluentRouter.class);
+        FluentRealmRouter dynamicRealmRouter = rootRealmRouter.dynamically();
 
-        //Initial RequestHandler for OpenAM, which ensures an SSOTokenContext is accessible
-        //and advertises the routes of its two chained routers
-        VersionRouter openAMRequestHandler = new VersionRouter() {
+        //not protected
+        dynamicRealmRouter.route("/dashboard")
+                .forVersion("1.0").to(DashboardResource.class);
 
-            protected ServerContext transformContext(ServerContext context) throws BadRequestException {
-                return new SSOTokenContext(context);
-            }
+        dynamicRealmRouter.route("/serverinfo")
+                .forVersion("1.0").to(ServerInfoResource.class);
 
-            public Set<String> getRoutes() {
-                final HashSet<String> myRoutes = new HashSet<String>();
-                myRoutes.addAll(vr.getRoutes());
-                myRoutes.addAll(cr.getRoutes());
-                return myRoutes;
-            }
-        };
+        dynamicRealmRouter.route("/users")
+                .forVersion("1.0").to(IdentityResource.class, "UsersResource");
 
-        //if the openAMRequestHandler can't handle them, they will fall through to here
-        vr.setDefaultRoute(cr);
+        dynamicRealmRouter.route("/groups")
+                .forVersion("1.0").to(IdentityResource.class, "GroupsResource");
 
-        //all requests will default to the openAMRequestHandler first
-        openAMRequestHandler.setDefaultRoute(vr);
+        dynamicRealmRouter.route("/agents")
+                .forVersion("1.0").to(IdentityResource.class, "AgentsResource");
 
-        //no need to register the anonymous handler as a listener
-        return openAMRequestHandler;
-    }
+        dynamicRealmRouter.route("/users/{user}/devices/trusted")
+                .forVersion("1.0").to(TrustedDevicesResource.class);
 
-    /**
-     * Provides a realm-aware router with endpoints registered which
-     */
-    private CrestRealmRouter getRealmRouter() {
-        final CrestRealmRouter cr = new CrestRealmRouter(realmValidator);
+        //protected
+        dynamicRealmRouter.route("/policies")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(PolicyResource.class);
 
-        cr.addRoute("/users")
-                .addVersion("1.0", get(Key.get(IdentityResource.class, Names.named("UsersResource"))));
+        dynamicRealmRouter.route("/realms")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(RealmResource.class);
 
-        cr.addRoute("/users/{user}/devices/trusted")
-                .addVersion("1.0", get(TrustedDevicesResource.class));
+        dynamicRealmRouter.route("/sessions")
+                .through(SessionResourceAuthzModule.class).forVersion("1.0").to(SessionResource.class);
 
-        cr.addRoute("/groups")
-                .addVersion("1.0", get(Key.get(IdentityResource.class, Names.named("GroupsResource"))));
+        dynamicRealmRouter.route("/applications")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ApplicationsResource.class);
 
-        cr.addRoute("/agents")
-                .addVersion("1.0", get(Key.get(IdentityResource.class, Names.named("AgentsResource"))));
+        rootRealmRouter.route("/applicationtypes")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ApplicationTypesResource.class);
 
-        cr.addRoute("/realms")
-                .addVersion("1.0", get(RealmResource.class));
+        rootRealmRouter.route("/decisionCombiners")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(DecisionCombinersResource.class);
 
-        cr.addRoute("/dashboard")
-                .addVersion("1.0", get(DashboardResource.class));
+        rootRealmRouter.route("/conditiontypes")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ConditionTypesResource.class);
 
-        cr.addRoute("/serverinfo")
-                .addVersion("1.0", get(ServerInfoResource.class));
+        rootRealmRouter.route("/subjecttypes")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(SubjectTypesResource.class);
 
-        cr.addRoute("/policies")
-                .addVersion("1.0", get(PolicyResource.class));
+        rootRealmRouter.route("/tokens")
+                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(CoreTokenResource.class);
 
-        cr.addRoute("/applications")
-                .addVersion("1.0", get(ApplicationsResource.class));
+        rootRealmRouter.route("/sessions")
+                .through(SessionResourceAuthzModule.class).forVersion("1.0").to(SessionResource.class);
 
-        VersionBehaviourConfigListener.bindToServiceConfigManager(cr);
+        VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
+        VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
 
-        return cr;
-    }
-
-    /**
-     * Provide a router which only handles requests for root-resources, and does not fancy realm-mapping
-     */
-    private VersionRouter getRootRouter() {
-
-        final VersionRouter vr = new VersionRouter();
-
-        vr.addRoute("/applicationtypes")
-                .addVersion("1.0", get(ApplicationTypesResource.class));
-
-        vr.addRoute("/conditiontypes")
-                .addVersion("1.0", get(ConditionTypesResource.class));
-
-        vr.addRoute("/subjecttypes")
-                .addVersion("1.0", get(SubjectTypesResource.class));
-
-        vr.addRoute("/decisioncombiners")
-                .addVersion("1.0", get(DecisionCombinersResource.class));
-
-        vr.addRoute("/tokens")
-                .addVersion("1.0", get(CoreTokenResource.class));
-
-        vr.addRoute("/sessions")
-                .addVersion("1.0", get(SessionResource.class));
-
-        VersionBehaviourConfigListener.bindToServiceConfigManager(vr);
-
-        return vr;
+        return rootRealmRouter;
     }
 
     /**
@@ -216,14 +174,6 @@ public class RestEndpoints {
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
         return router;
-    }
-
-    private <T> T get(Class<T> resourceClass) {
-        return InjectorHolder.getInstance(resourceClass);
-    }
-
-    private <T> T get(Key<T> resourceKey) {
-        return InjectorHolder.getInstance(resourceKey);
     }
 
     private Restlet wrap(final Class<? extends ServerResource> resource) {

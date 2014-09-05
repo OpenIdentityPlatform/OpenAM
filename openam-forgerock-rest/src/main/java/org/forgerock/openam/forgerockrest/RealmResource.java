@@ -47,6 +47,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 
 import java.security.AccessController;
 import java.util.HashMap;

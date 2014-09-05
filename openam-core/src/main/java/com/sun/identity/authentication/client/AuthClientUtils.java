@@ -1316,10 +1316,10 @@ public class AuthClientUtils {
         }
     }
 
-    public static Set getCookieDomains() {
-        Set cookieDomains = Collections.EMPTY_SET;
+    public static Set<String> getCookieDomains() {
+        Set<String> cookieDomains = Collections.EMPTY_SET;
         try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(
+            SSOToken token = AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
             try {
                 ServiceSchemaManager scm  = new ServiceSchemaManager(
@@ -1341,12 +1341,11 @@ public class AuthClientUtils {
         }
         if (utilDebug.messageEnabled() && (!cookieDomains.isEmpty())) {
             utilDebug.message("CookieDomains : ");
-            Iterator iter = cookieDomains.iterator();
-            while (iter.hasNext()) {
-                utilDebug.message("  " + (String)iter.next());
+            for (String cookieDomain : cookieDomains) {
+                utilDebug.message("  " + cookieDomain);
             }
         }
-        return (cookieDomains);
+        return cookieDomains;
     }
 
     /**

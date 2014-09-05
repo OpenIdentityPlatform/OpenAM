@@ -29,34 +29,9 @@ public interface RestEndpointManager {
     String USERS = "/users";
 
     /**
-     * The groups resource endpoint.
-     */
-    String GROUPS = "/groups";
-
-    /**
-     * The agents resource endpoint.
-     */
-    String AGENTS = "/agents";
-
-    /**
-     * The realms resource endpoint.
-     */
-    String REALMS = "/realms";
-
-    /**
-     * The dashboard resource endpoint.
-     */
-    String DASHBOARD = "/dashboard";
-
-    /**
      * The sessions resource endpoint.
      */
     String SESSIONS = "/sessions";
-
-    /**
-     * The tokens resource endpoint.
-     */
-    String TOKENS = "/tokens";
 
     /**
      * The serverinfo resource endpoint.
@@ -64,39 +39,10 @@ public interface RestEndpointManager {
     String SERVER_INFO = "/serverinfo";
 
     /**
-     * The applicationtype resource endpoint.
-     */
-    String APPLICATIONTYPES = "/applicationtypes";
-
-    /**
-     * The conditiontype resource endpoint.
-     */
-    String CONDITIONTYPES = "/conditiontypes";
-
-    /**
-     * The subjecttype resource endpoint.
-     */
-    String SUBJECTTYPES = "/subjecttypes";
-
-    /**
-     * The decisioncombiners resource endpoint.
-     */
-    String DECISIONCOMBINERS = "decisioncombiners";
-
-    /**
-     * The applications resource endpoint.
-     */
-    String APPLICATIONS = "/applications";
-
-    /**
      * The authenticate service endpoint.
      */
     String AUTHENTICATE = "/authenticate";
 
-    /**
-     * The policies service endpoint.
-     */
-    String POLICIES = "/policies";
 
     /**
      * Returns the type of endpoint of the given endpoint.

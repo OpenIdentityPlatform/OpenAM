@@ -121,7 +121,7 @@
         <opendj.sdk.version>2.6.9</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.3.5-SNAPSHOT</commons.forgerock-util.version>
-        <commons.authfilter.version>1.4.0-SNAPSHOT</commons.authfilter.version>
+        <commons.authfilter.version>1.5.0-SNAPSHOT</commons.authfilter.version>
         <forgerock.json.version>2.4.0-SNAPSHOT</forgerock.json.version>
         <forgerock-ui.version>1.0.17-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.7</restlet.version>
@@ -1601,12 +1601,12 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-authz-filter</artifactId>
+                <artifactId>authz-framework-api</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-authz-oauth2-module</artifactId>
+                <artifactId>authz-framework</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
