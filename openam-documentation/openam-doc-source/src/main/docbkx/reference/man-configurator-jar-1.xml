@@ -547,7 +547,7 @@ existingserverid=http://server1.example.com:8080/openam</programlisting>
 DEPLOYMENT_URI=/openam
 ACCEPT_LICENSES=true</programlisting>
 
-  <para>The following example uses a configuration file and then uses the
+  <para>The following example uses a configuration file with the
    <option>--acceptLicense</option> option on the command line.</para>
 
     <screen>
