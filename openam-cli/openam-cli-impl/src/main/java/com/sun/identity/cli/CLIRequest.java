@@ -27,13 +27,13 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.setup.Bootstrap;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -233,8 +233,7 @@ public class CLIRequest {
     private void processVersion(CommandManager mgr)
         throws CLIException {
         IOutput outputWriter = mgr.getOutputWriter();
-        String basedir = System.getProperty(Bootstrap.JVM_OPT_BOOTSTRAP);
-        String version = CLIUtil.getFileContent(mgr, basedir + "/.version");
+        String version = System.getProperty("am.version.expected");
         outputWriter.printlnMessage("");
         outputWriter.printlnMessage(mgr.getProductName() + " " + version);
         outputWriter.printlnMessage("");

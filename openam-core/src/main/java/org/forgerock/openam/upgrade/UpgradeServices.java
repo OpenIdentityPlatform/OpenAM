@@ -50,7 +50,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -191,6 +190,10 @@ public class UpgradeServices {
         writeReport(adminToken);
         UpgradeProgress.reportEnd("upgrade.success");
 
+        UpgradeProgress.reportStart("upgrade.writingversionfile");
+        updateDotVersionFile();
+        UpgradeProgress.reportEnd("upgrade.success");
+        
         if (debug.messageEnabled()) {
             debug.message("Upgrade complete.");
         }
@@ -380,5 +383,27 @@ public class UpgradeServices {
             content = content.replace(contents.getKey(), contents.getValue().toString());
         }
         return content;
+    }
+
+    /**
+     * Update the .version file.
+     * 
+     * @throws UpgradeException
+     *             If there was an error while updating the .version file.
+     */
+    private void updateDotVersionFile() throws UpgradeException {
+        try {
+            String baseDir = SystemProperties.get(SystemProperties.CONFIG_PATH);
+            String version = UpgradeUtils.getWarFileVersion();
+            String dotVersionFilePath = baseDir + "/.version";
+            File dotVersionFile = new File(dotVersionFilePath);
+            // if does not exist then there has been an error
+            if (!dotVersionFile.exists()) {
+                debug.error("File " + dotVersionFile.getName() + " does not exist!");
+            }
+            AMSetupServlet.writeToFile(dotVersionFilePath, version);
+        } catch (IOException ioe) {
+            throw new UpgradeException(ioe);
+        }
     }
 }
