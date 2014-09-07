@@ -1838,14 +1838,9 @@ $ <userinput>curl \
    "name": "test",
    "active": true,
    "description": "A test policy",
-   "resources": {
-       "included": [
+   "resources": [
            "http://www.example.com:80/*"
-       ],
-       "excluded": [
-           "http://www.example.com:80/images/*"
-       ]
-   },
+   ],
    "applicationName": "application name",
    "actionValues": {
        "read": true,
@@ -1916,8 +1911,7 @@ $ <userinput>curl \
      <listitem>
       <para>
        List of the resource name pattern strings
-       to which the policy applies (<literal>"included"</literal>)
-       and does not apply (<literal>"excluded"</literal>).
+       to which the policy applies.
       </para>
      </listitem>
     </varlistentry>
@@ -2354,13 +2348,10 @@ $ <userinput>curl \
     "name": "example",
     "active": true,
     "description": "Example Policy",
-    "resources": {
-        "included": [
-            "http://www.example.com:80/*",
-            "http://www.example.com:80/*?*"
-        ],
-        "excluded": []
-    },
+    "resources": [
+        "http://www.example.com:80/*",
+        "http://www.example.com:80/*?*"
+    ],
     "actionValues": {
         "POST": false,
         "GET": true
@@ -2376,11 +2367,10 @@ $ <userinput>curl \
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : {
-    "included" : [ "http://www.example.com:80/*",
-                   "http://www.example.com:80/*?*" ],
-    "excluded" : [ ]
-  },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
@@ -2426,13 +2416,10 @@ $ <userinput>curl \
     "name": "example",
     "active": true,
     "description": "Example Policy",
-    "resources": {
-        "included": [
-            "http://www.example.com:80/*",
-            "http://www.example.com:80/*?*"
-        ],
-        "excluded": []
-    },
+    "resources": [
+        "http://www.example.com:80/*",
+        "http://www.example.com:80/*?*"
+    ],
     "actionValues": {
         "POST": false,
         "GET": true
@@ -2447,11 +2434,10 @@ $ <userinput>curl \
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : {
-    "included" : [ "http://www.example.com:80/*",
-                   "http://www.example.com:80/*?*" ],
-    "excluded" : [ ]
-  },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
@@ -2493,11 +2479,10 @@ $ <userinput>curl \
   "name" : "example",
   "active" : true,
   "description" : "Example Policy",
-  "resources" : {
-    "included" : [ "http://www.example.com:80/*",
-                   "http://www.example.com:80/*?*" ],
-    "excluded" : [ ]
-  },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : false,
@@ -2550,13 +2535,10 @@ $ <userinput>curl \
     "name": "example",
     "active": true,
     "description": "Updated example policy",
-    "resources": {
-        "included": [
-            "http://www.example.com:80/*",
-            "http://www.example.com:80/*?*"
-        ],
-        "excluded": []
-    },
+    "resources": [
+        "http://www.example.com:80/*",
+        "http://www.example.com:80/*?*"
+    ],
     "actionValues": {
         "POST": true,
         "GET": true
@@ -2572,11 +2554,10 @@ $ <userinput>curl \
   "name" : "example",
   "active" : true,
   "description" : "Updated example policy",
-  "resources" : {
-    "included" : [ "http://www.example.com:80/*",
-                   "http://www.example.com:80/*?*" ],
-    "excluded" : [ ]
-  },
+  "resources" : [
+    "http://www.example.com:80/*",
+    "http://www.example.com:80/*?*"
+  ],
   "applicationName" : "iPlanetAMWebAgentService",
   "actionValues" : {
     "POST" : true,
@@ -3202,8 +3183,8 @@ $ <userinput>curl \
 <computeroutput>{
   "name" : "crest",
   "resources" : [
-   "http://www.example.com:8080/*",
-   "http://www.example.com:8080/*?*"
+    "http://www.example.com:8080/*",
+    "http://www.example.com:8080/*?*"
   ],
   "actions" : {
     "UPDATE" : true,
@@ -3323,8 +3304,8 @@ $ <userinput>curl \
 <computeroutput>{
   "name" : "crest",
   "resources" : [
-   "http://www.example.com:8080/*",
-   "http://www.example.com:8080/*?*"
+    "http://www.example.com:8080/*",
+    "http://www.example.com:8080/*?*"
   ],
   "actions" : {
     "UPDATE" : true,
@@ -3402,15 +3383,15 @@ $ <userinput>curl \
     "HEAD" : true
   },
   "conditions" : [
-   "not",
-   "dateRange",
-   "timezone",
-   "timeRange",
-   "or",
-   "dnsName",
-   "ipRange",
-   "daysOfWeek",
-   "and"
+    "not",
+    "dateRange",
+    "timezone",
+    "timeRange",
+    "or",
+    "dnsName",
+    "ipRange",
+    "daysOfWeek",
+    "and"
   ],
   "realm" : "/realm",
   "creationDate" : 1398760362341,
@@ -3421,14 +3402,14 @@ $ <userinput>curl \
   "description" : null,
   "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
   "subjects" : [
-   "com.sun.identity.admin.model.IdRepoUserViewSubject",
-   "com.sun.identity.admin.model.NotViewSubject",
-   "com.sun.identity.admin.model.AndViewSubject",
-   "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-   "com.sun.identity.admin.model.OrViewSubject",
-   "com.sun.identity.admin.model.VirtualViewSubject",
-   "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-   "com.sun.identity.admin.model.AttributeViewSubject"
+    "com.sun.identity.admin.model.IdRepoUserViewSubject",
+    "com.sun.identity.admin.model.NotViewSubject",
+    "com.sun.identity.admin.model.AndViewSubject",
+    "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+    "com.sun.identity.admin.model.OrViewSubject",
+    "com.sun.identity.admin.model.VirtualViewSubject",
+    "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+    "com.sun.identity.admin.model.AttributeViewSubject"
   ],
   "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
   "saveIndex" : null,
@@ -3516,8 +3497,8 @@ $ <userinput>curl \
 <computeroutput>{
   "name" : "crest",
   "resources" : [
-   "http://www.example.com:8080/*",
-   "http://www.example.com:8080/*?*"
+    "http://www.example.com:8080/*",
+    "http://www.example.com:8080/*?*"
   ],
   "actions" : {
     "UPDATE" : false,
@@ -3620,15 +3601,15 @@ $ <userinput>curl \
       "HEAD" : true
     },
     "conditions" : [
-     "not",
-     "dateRange",
-     "timezone",
-     "timeRange",
-     "or",
-     "dnsName",
-     "ipRange",
-     "daysOfWeek",
-     "and"
+      "not",
+      "dateRange",
+      "timezone",
+      "timeRange",
+      "or",
+      "dnsName",
+      "ipRange",
+      "daysOfWeek",
+      "and"
     ],
     "realm" : "/realm",
     "creationDate" : 1398760362341,
@@ -3639,14 +3620,14 @@ $ <userinput>curl \
     "description" : null,
     "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
     "subjects" : [
-     "com.sun.identity.admin.model.IdRepoUserViewSubject",
-     "com.sun.identity.admin.model.NotViewSubject",
-     "com.sun.identity.admin.model.AndViewSubject",
-     "com.sun.identity.admin.model.IdRepoRoleViewSubject",
-     "com.sun.identity.admin.model.OrViewSubject",
-     "com.sun.identity.admin.model.VirtualViewSubject",
-     "com.sun.identity.admin.model.IdRepoGroupViewSubject",
-     "com.sun.identity.admin.model.AttributeViewSubject"
+      "com.sun.identity.admin.model.IdRepoUserViewSubject",
+      "com.sun.identity.admin.model.NotViewSubject",
+      "com.sun.identity.admin.model.AndViewSubject",
+      "com.sun.identity.admin.model.IdRepoRoleViewSubject",
+      "com.sun.identity.admin.model.OrViewSubject",
+      "com.sun.identity.admin.model.VirtualViewSubject",
+      "com.sun.identity.admin.model.IdRepoGroupViewSubject",
+      "com.sun.identity.admin.model.AttributeViewSubject"
     ],
     "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
     "saveIndex" : null,
