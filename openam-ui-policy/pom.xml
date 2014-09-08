@@ -71,6 +71,12 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons.ui.libs</groupId>
+            <artifactId>ui.multiselect</artifactId>
+            <version>0.3</version>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons.ui.libs</groupId>
             <artifactId>jquery.jqGrid</artifactId>
             <version>4.5.4</version>
             <classifier>min</classifier>
@@ -153,7 +159,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/dependency/libs</outputDirectory>
-                            <includeArtifactIds>jquery-sortable,jquery.jqGrid</includeArtifactIds>
+                            <includeArtifactIds>jquery-sortable,jquery.jqGrid, ui.multiselect</includeArtifactIds>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>

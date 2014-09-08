@@ -57,13 +57,7 @@
         </dependencySet>
         <dependencySet>
             <includes>
-                <include>org.forgerock.commons.ui.libs:jquery-sortable</include>
-            </includes>
-            <outputDirectory>/libs</outputDirectory>
-        </dependencySet>
-        <dependencySet>
-            <includes>
-                <include>org.forgerock.commons.ui.libs:jquery.jqGrid</include>
+                <include>org.forgerock.commons.ui.libs:*</include>
             </includes>
             <outputDirectory>/libs</outputDirectory>
         </dependencySet>

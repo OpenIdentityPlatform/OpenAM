@@ -76,7 +76,11 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                                 {args: [encodeURI(self.data.result[rowid - 1].name)], trigger: true});
                         }
                     },
-                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, callback);
+                    columnChooserOptions = {
+                        width: 501,
+                        height: 300
+                    },
+                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, columnChooserOptions, callback);
 
                 grid.jqGrid('setFrozenColumns');
             });

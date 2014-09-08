@@ -186,7 +186,7 @@ define([
                     // Step 6
                     QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
                     QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
-                    
+
                     // Step 7
                     $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                         QUnit.ok(editAppView.$el.find('#reviewName').html() === app.name, "Correct name is displayed in the review step");
@@ -199,7 +199,7 @@ define([
                         }
 
                         QUnit.ok(editAppView.$el.find('#reviewType').html() === app.applicationType, "Correct application type is displayed in the review step");
-                         
+
                         // Realms
                         if (app.realm.length) {
                             var realms = [];
@@ -209,7 +209,7 @@ define([
                              // Currently only one realm, so hardcoded to [0];
                             QUnit.ok(realms[0] === app.realm, "Correct realm is displayed in the review step");
                         }
-                    
+
                         // Resources
                         if (app.resources.length) {
                             var resources = [];
@@ -230,7 +230,7 @@ define([
                                 actionPair = value.innerHTML.split(':');
                                 actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
                             });
-                  
+
                             QUnit.ok(_.isEqual(actions, appSelectedActions), "Correct actions are displayed in the review step");
                         }
 
@@ -253,12 +253,12 @@ define([
 
                             QUnit.ok(_.isEqual(envConditions, app.conditions), "Correct environment conditions are displayed in the review step");
                         }
-                       
+
                         // Entitlement Combiner
                         QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === app.entitlementCombiner, "Correct name is displayed in the review step");
-                        
+
                     }));
-                   
+
                 });
             });
 
@@ -371,6 +371,9 @@ define([
                         QUnit.ok(totalNumberOfPages === 1,
                             'Total number of pages is calculated correctly');
                     }
+
+                    // Show/hide columns
+                    QUnit.ok($('.navtable', manageAppsView.$el).length === 1, 'Columns Button is available');
                 });
             });
 
@@ -537,7 +540,7 @@ define([
                                 actionPair = value.innerHTML.split(':');
                                 actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
                             });
-                  
+
                             QUnit.ok(_.isEqual(actions, polSelectedActions), "Correct actions are displayed in the review step");
                         }
 
@@ -564,7 +567,7 @@ define([
                         */
 
                     }));
-                    
+
                 });
             });
 
@@ -661,6 +664,9 @@ define([
                         QUnit.ok(totalNumberOfPages === 1,
                             'Total number of pages is calculated correctly');
                     }
+
+                    // Show/hide columns
+                    QUnit.ok($('.navtable', managePolView.$el).length === 1, 'Columns Button is available');
                 });
             });
         }

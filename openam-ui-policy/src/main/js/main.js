@@ -38,8 +38,9 @@ require.config({
         doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
         handlebars: "libs/handlebars-1.0.rc.1",
         moment: "libs/moment-1.7.2-min",
-        clockPicker: "libs/jquery-clockpicker.0.0.7.min",
         jqueryui: "libs/jquery-ui-1.10.4.custom.min",
+        clockPicker: "libs/jquery-clockpicker.0.0.7.min",
+        multiselect: "libs/ui.multiselect-0.3",
         jqgrid: "libs/jquery.jqGrid-4.5.4-min",
         LoginDialog: "org/forgerock/commons/ui/common/LoginDialog",
         LoginView: "org/forgerock/commons/ui/common/LoginView",
@@ -82,15 +83,20 @@ require.config({
         moment: {
             exports: "moment"
         },
-        clockPicker: {
-            exports: "clockPicker"
-        },
         jqueryui: {
             exports: "jqueryui"
         },
+        clockPicker: {
+            exports: "clockPicker"
+        },
+        multiselect: {
+            deps: ["jqueryui"],
+            exports: "multiselect"
+        },
         jqgrid: {
-            deps: ["i18nGrid"]
+            deps: ["i18nGrid", "multiselect"]
         }
+
     }
 });
 
@@ -110,8 +116,9 @@ require([
     "handlebars",
     "i18next",
     "sortable",
-    "jqgrid",
     "jqueryui",
+    "multiselect",
+    "jqgrid",
     "clockPicker",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -121,7 +128,8 @@ require([
     "org/forgerock/openam/ui/policy/main", 
     "ThemeManager",
     "config/main"
-], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqgrid, jqueryui, clockPicker, i18nManager, constants, eventManager) {
+], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker,
+            i18nManager, constants, eventManager) {
 
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });
