@@ -179,8 +179,9 @@
    >OpenAM issue tracker</link>.
   </para>
 
-  <!-- List generated at 16:44:28 20140908 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=labels+%3D+release-notes+AND+project+%3D+OpenAM+AND+%28resolution+%3D+unresolved+OR+%28fixVersion+not+in+%28%2210.0.0%22%2C+%2210.1.0-Xpress%22%2C+%2211.0.0%22%2C%2211.0.1%22%2C%2211.0.2%22%29+AND+fixVersion+in+%28%2211.0.3%22%2C+%2212.0.0%22%29%29%29+AND+type+%3D+bug+AND+%28component+is+EMPTY+OR+component+not+in+%28QA%2C+Documentation%2C+%22web+agents%22%2C+%22j2ee+agents%22%29%29&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 16:51:46 20140908 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=labels+%3D+release-notes+AND+project+%3D+OpenAM+AND+%28resolution+%3D+unresolved+OR+%28fixVersion+not+in+%28%2210.0.0%22%2C+%2210.1.0-Xpress%22%2C+%2211.0.0%22%2C%2211.0.1%22%2C%2211.0.2%22%29+AND+fixVersion+in+%28%2211.0.3%22%2C+%2212.0.0%22%29%29%29+AND+type+%3D+bug+AND+%28component+is+EMPTY+OR+component+not+in+%28QA%2C+Documentation%2C+%22web+agents%22%2C+%22j2ee+agents%22%29%29&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4430" xlink:show="new">OPENAM-4430</link>: Upgrade wizard is not actual and not the same for the others languages than EN</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4320" xlink:show="new">OPENAM-4320</link>: NotificationServlet does not check for null before closing writer in finally block</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4262" xlink:show="new">OPENAM-4262</link>: IDP Proxy should set destination depending on the Binding</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4252" xlink:show="new">OPENAM-4252</link>: StatusCode SAML response missing space</para></listitem>
