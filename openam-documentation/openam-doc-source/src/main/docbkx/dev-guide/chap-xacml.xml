@@ -264,7 +264,7 @@ com.iplanet.am.server.port=8080
 com.iplanet.am.services.deploymentDescriptor=openam</programlisting>
 
    <para>
-    For the purpose of this example, the XACML policy decision point (PEP)
+    For the purpose of this example, the XACML policy decision point (PDP)
     and the XACML policy enforcement point (PEP) are configured on this server.
    </para>
   </listitem>
