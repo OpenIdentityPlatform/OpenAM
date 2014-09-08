@@ -850,6 +850,7 @@ public class AMAuthenticationManager {
      * definition.
      * @param serviceName String value for the name of the named configuration.
      * @param moduleInstance String value for the name of the module instance.
+     * @return <code>true</code> if the module instance is in the service.
      */
     private boolean serviceContains(String serviceName, String moduleInstance) {
         boolean returnValue = false;
@@ -882,7 +883,8 @@ public class AMAuthenticationManager {
                         Set values = XMLUtils.getAttributeValuePair(vPair);
                         for (Iterator it=values.iterator(); it.hasNext(); ) {
                             String value = (String)it.next();
-                            if (value.startsWith(moduleInstance)) {
+                            String[] moduleInfo = value.split(" ");
+                            if (moduleInfo.length > 0 && moduleInfo[0].equals(moduleInstance)) {
                                 returnValue = true;
                                 break;
                             }
