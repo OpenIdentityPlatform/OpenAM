@@ -26,13 +26,15 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 
 package com.sun.identity.authentication.service;
 
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,15 +76,15 @@ public class ConfiguredAuthServices extends ChoiceValues {
      * @return the choice values from configured environment params.
      */
     public Map getChoiceValues(Map envParams) {
-        String orgDN = null;
+        String org = null;
         SSOToken adminToken = null;
         
         if (envParams != null) {
-            orgDN = (String)envParams.get(Constants.ORGANIZATION_NAME);
+            org = (String)envParams.get(Constants.ORGANIZATION_NAME);
             adminToken = (SSOToken)envParams.get(Constants.SSO_TOKEN);
         }
-        if (orgDN == null || orgDN.length() == 0) {
-            orgDN = SMSEntry.getRootSuffix();
+        if (org == null || org.length() == 0) {
+            org = SMSEntry.getRootSuffix();
         }
         if (adminToken == null) {
             adminToken = (SSOToken)AccessController.doPrivileged(
@@ -90,15 +92,14 @@ public class ConfiguredAuthServices extends ChoiceValues {
         }
 
         Set namedConfigs = Collections.EMPTY_SET;
+        ServiceConfig namedConfig = null;
         Map answer = new HashMap();
         try {
             // Get the named config node
-            ServiceConfigManager scm = new ServiceConfigManager(
-                SERVICE_NAME, adminToken);
-            ServiceConfig oConfig = scm.getOrganizationConfig(orgDN, null);
+            ServiceConfigManager scm = new ServiceConfigManager(SERVICE_NAME, adminToken);
+            ServiceConfig oConfig = scm.getOrganizationConfig(org, null);
             if (oConfig != null) {
-                ServiceConfig namedConfig = oConfig.getSubConfig(
-                    NAMED_CONFIGURATION);
+                namedConfig = oConfig.getSubConfig(NAMED_CONFIGURATION);
                 if (namedConfig != null) {
                     // get all sub config names
                     namedConfigs = namedConfig.getSubConfigNames("*");
@@ -109,8 +110,8 @@ public class ConfiguredAuthServices extends ChoiceValues {
         }
 
         if (namedConfigs != null && !namedConfigs.isEmpty()) {
-            for (Iterator it = namedConfigs.iterator(); it.hasNext(); ) {
-                String config = (String) it.next();
+            Set<String> configs = filterConfigs(namedConfigs, namedConfig, org, adminToken);
+            for (String config : configs) {
                 answer.put(config, config);
             }
         }
@@ -120,7 +121,20 @@ public class ConfiguredAuthServices extends ChoiceValues {
         //return the choice values map
         return (answer);
     }
-    
+
+    /**
+     * Extensions will want to restrict the list of auth services. The default implementation just returns all.
+     * @param namedConfigs The auth services that have been found.
+     * @param parentConfig The ServiceConfig parent of all auth services.
+     * @param realm The current realm.
+     * @param adminToken The current SSO token.
+     * @return The filtered list of auth services.
+     */
+    protected Set<String> filterConfigs(Set<String> namedConfigs, ServiceConfig parentConfig, String realm,
+            SSOToken adminToken) {
+        return namedConfigs;
+    }
+
     protected static final String SERVICE_NAME = "iPlanetAMAuthConfiguration";
     protected static final String NAMED_CONFIGURATION = "Configurations";
 }

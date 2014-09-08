@@ -479,7 +479,7 @@ public class AMAuthenticationManager {
      * Returns the type of the authentication module instance with the 
      * specified instance name.
      */
-    private String getAuthInstanceType(String authName) {
+    public String getAuthInstanceType(String authName) {
         String returnValue = null;
         if (GLOBAL_MODULE_NAMES.contains(authName)) {
             returnValue = authName;

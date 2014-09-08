@@ -23,7 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AMPropertySheetModel.java,v 1.12 2009/10/19 18:17:37 asyhuang Exp $
- *
  */
 
 /*
@@ -37,7 +36,6 @@ import com.iplanet.jato.view.ContainerViewBase;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.DisplayFieldImpl;
 import com.iplanet.jato.view.html.OptionList;
-import com.sun.identity.console.property.PropertyTemplate;
 import com.sun.identity.console.ui.model.CCMapListModel;
 import com.sun.identity.console.ui.model.CCOrderedListModel;
 import com.sun.identity.console.ui.model.CCUnOrderedListModel;
@@ -67,9 +65,12 @@ import java.util.Map;
 import java.util.Set;
 import javax.servlet.ServletContext;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import static com.sun.identity.console.property.PropertyTemplate.*;
 
 /* - NEED NOT LOG - */
 
@@ -115,6 +116,7 @@ public class AMPropertySheetModel
         "com.sun.web.ui.taglib.addremove.CCAddRemoveTag";
     public static final String passwordRandom =
         "KmhUnWR1MYWDYW4xuqdF5nbm+CXIyOVt";
+    private Map<String, OptionList> mapOptionList;
 
     public AMPropertySheetModel() {
         super();
@@ -190,6 +192,7 @@ public class AMPropertySheetModel
     private void parseNodeList(NodeList nodeList) {
         if (nodeList != null) {
             int length = nodeList.getLength();
+            mapOptionList = new HashMap<String, OptionList>();
             for (int i = 0; i < length; i++) {
                 Node node = nodeList.item(i);
 
@@ -204,9 +207,8 @@ public class AMPropertySheetModel
                         String name = nameNode.getNodeValue();
                         String v = tagclassNode.getNodeValue();
 
-                        if (name.startsWith(PropertyTemplate.DATE_MARKER_NAME)){
-                            String dateName = name.substring(
-                                PropertyTemplate.DATE_MARKER_NAME.length());
+                        if (name.startsWith(DATE_MARKER_NAME)) {
+                            String dateName = name.substring(DATE_MARKER_NAME.length());
                             dateComponents.add(dateName);
                         } else if (v != null) {
                             if (v.equals(CCTagClass.EDITABLELIST)) {
@@ -220,12 +222,27 @@ public class AMPropertySheetModel
                                 }
                             }
                             childMap.put(name, v);
+                            NodeList optionElements = ((Element) node).getElementsByTagName(VALUE_OPTION_TAG_NAME);
+                            if (optionElements.getLength() > 0) {
+                                OptionList optionList = new OptionList();
+                                int numOptions = optionElements.getLength();
+                                for (int j = 0; j < numOptions; j++) {
+                                    Node option = optionElements.item(j);
+                                    if (option.hasAttributes()) {
+                                        NamedNodeMap optAttrs = option.getAttributes();
+                                        optionList.add(j, optAttrs.getNamedItem(OPTION_LABEL_ATTR_NAME).getNodeValue(),
+                                                optAttrs.getNamedItem(OPTION_VALUE_ATTR_NAME).getNodeValue());
+                                    }
+                                }
+                                mapOptionList.put(name, optionList);
+                            }
                         }
 
                         if (name.equals(TBL_SUB_CONFIG)) {
                             hasSubConfigTable = true;
                         }
-                    }
+
+                   }
                 }
             }
         }
@@ -285,12 +302,10 @@ public class AMPropertySheetModel
             }
 
             if (bRandom) {
-                super.setValue(name + PropertyTemplate.PWD_CONFIRM_SUFFIX,
-                    passwordRandom);
+                super.setValue(name + PWD_CONFIRM_SUFFIX, passwordRandom);
                 super.setValue(name, passwordRandom);
             } else {
-                super.setValues(name + PropertyTemplate.PWD_CONFIRM_SUFFIX,
-                    values);
+                super.setValues(name + PWD_CONFIRM_SUFFIX, values);
                 super.setValues(name, values);
             }
         } else if (dateComponents.contains(name)) {
@@ -359,6 +374,7 @@ public class AMPropertySheetModel
             ) {
                 CCMapListModel m = new CCMapListModel();
                 view = new CCMapList((ContainerView) parent, m, name);
+                m.setValueOptionList(mapOptionList.get(name));
                 m.setKeyLabel(model.getLocalizedString("maplist.key.label"));
                 m.setValueLabel(model.getLocalizedString("maplist.value.label"));
                 m.setMsgInvalidEntry(model.getLocalizedString("maplist.msg.invalid.entry"));

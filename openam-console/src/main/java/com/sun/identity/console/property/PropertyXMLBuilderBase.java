@@ -539,6 +539,7 @@ public abstract class PropertyXMLBuilderBase
                     } else if (mapList) {
                         xml.append(MessageFormat.format(
                             COMPONENT_MAP_LIST_START_TAG, param));
+                        appendChoiceValues(as, xml, model, serviceBundle);
                     } else if (globalMapList) {
                         xml.append(MessageFormat.format(
                             COMPONENT_GLOBAL_MAP_LIST_START_TAG, param));
@@ -822,7 +823,9 @@ public abstract class PropertyXMLBuilderBase
                 xml.append(MessageFormat.format(OPTION_TAG, p2));
             }
         } else if (type.equals(AttributeSchema.Type.SINGLE_CHOICE)) {
-            appendChoiceValueForSelectableComponent(as, xml, serviceBundle);
+            appendChoiceValueForSelectableComponent(as, xml, serviceBundle, true, OPTION_TAG);
+        } else if (type.equals(AttributeSchema.Type.LIST)) {
+            appendChoiceValueForSelectableComponent(as, xml, serviceBundle, false, VALUE_OPTION_TAG);
         }
     }
 
@@ -948,7 +951,9 @@ public abstract class PropertyXMLBuilderBase
     private void appendChoiceValueForSelectableComponent(
         AttributeSchema as,
         StringBuffer xml,
-        ResourceBundle serviceBundle
+        ResourceBundle serviceBundle,
+        boolean includeDefault,
+        String template
     ) {
         Map map = new HashMap();
         boolean defaultValue = false;
@@ -959,13 +964,13 @@ public abstract class PropertyXMLBuilderBase
             String value = (String)map.get(localizedName);
             Object[] params = {escapeSpecialChars(localizedName),
                 escapeSpecialChars(value)};
-            if (!defaultValue) {
+            if (includeDefault && !defaultValue) {
                 xml.append("<attribute name=\"defaultValue\" value=\"")
                     .append(escapeSpecialChars(value))
                     .append("\" />");
                 defaultValue = true;
             }
-            xml.append(MessageFormat.format(OPTION_TAG, params));
+            xml.append(MessageFormat.format(template, params));
         }
     }
 

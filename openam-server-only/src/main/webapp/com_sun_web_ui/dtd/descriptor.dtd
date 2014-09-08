@@ -5,6 +5,8 @@
  *
  * Copyright 2003 Sun Microsystems, Inc. All rights reserved.
  * Use is subject to license terms.
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 -->
 
@@ -24,7 +26,7 @@ option: The option associated with a menu, radiobutton, etc.
 optionGroup: The option group associated with a menu, radiobutton, etc.
 optionSeparator: The option list separator.
 -->
-<!ELEMENT cc (#PCDATA | attribute | cc |
+<!ELEMENT cc (#PCDATA | attribute | cc | value-option |
 	option | optionGroup | optionSeparator)*>
 <!ATTLIST cc
     name CDATA #IMPLIED
@@ -63,6 +65,21 @@ disabled: The disabled state "true" or "false".
     title CDATA #IMPLIED
     titleDisabled CDATA #IMPLIED
     disabled CDATA #IMPLIED
+>
+
+<!-- This is the descriptor for a tag value-option.
+
+The option element is used to specify menu options for components such as maps where
+the value is limited to a drop down.. This is useful if the options are static and
+can be specified statically.
+
+label: The option label.
+value: The option value.
+-->
+<!ELEMENT value-option EMPTY>
+<!ATTLIST value-option
+    label CDATA #REQUIRED
+    value CDATA #REQUIRED
 >
 
 <!-- This is the descriptor for a tag option group.

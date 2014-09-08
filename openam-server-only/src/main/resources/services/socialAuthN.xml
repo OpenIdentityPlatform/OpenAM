@@ -48,8 +48,7 @@
                                  i18nKey="a102">
                     <ChoiceValues>
                         <ChoiceValuesClassName
-                                className=
-                                        "com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+                                className="com.sun.identity.authentication.service.ConfiguredSocialAuthServices"/>
                     </ChoiceValues>
                 </AttributeSchema>
                 <AttributeSchema name="socialAuthNIcon"

@@ -25,6 +25,10 @@
  * $Id: CCMapListModel.java,v 1.2 2008/07/28 23:43:36 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.ui.model;
 
 import com.iplanet.jato.view.html.OptionList;
@@ -40,6 +44,7 @@ public class CCMapListModel extends CCEditableListModel {
     private String msgInvalidValue;
     private String msgInvalidNoKey;
     private String msgInvalidEntry;
+    private OptionList valueOptionList;
 
     /**
      * Returns invalid entry message.
@@ -151,11 +156,26 @@ public class CCMapListModel extends CCEditableListModel {
     }
 
     /**
-     * Returns option list.
-     *
-     * @return option list.
+     * Set a list of options for the value of the map.
+     * @param optionList The options.
      */
-    public OptionList getOptionList() {
-        return super.getOptionList();
+    public void setValueOptionList(OptionList optionList) {
+        this.valueOptionList = optionList;
+    }
+
+    /**
+     * Get a list of options for the value of the map.
+     * @return The option list.
+     */
+    public OptionList getValueOptionList() {
+        return valueOptionList;
+    }
+
+    /**
+     * Has a non-zero size list of options.
+     * @return If the value option list size is present and has 1 or more entries.
+     */
+    public boolean hasValueOptionList() {
+        return valueOptionList != null && valueOptionList.size() > 0;
     }
 }

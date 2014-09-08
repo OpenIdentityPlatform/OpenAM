@@ -25,13 +25,20 @@
  * $Id: CCMapList.java,v 1.1 2008/07/02 17:21:46 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.ui.view;
 
 import com.iplanet.jato.view.ContainerView;
 import com.iplanet.jato.view.View;
+import com.iplanet.jato.view.html.OptionList;
 import com.iplanet.jato.view.html.TextField;
+import com.sun.identity.console.ui.model.CCMapListModel;
 import com.sun.web.ui.model.CCEditableListModelInterface;
 import com.sun.web.ui.view.editablelist.CCEditableList;
+import com.sun.web.ui.view.html.CCSelect;
 
 /**
  * This class is designed to be used use with CCMapListTag.
@@ -43,6 +50,7 @@ import com.sun.web.ui.view.editablelist.CCEditableList;
  */
 public class CCMapList extends CCEditableList {
     public static final String VALUE_TEXTFIELD = "valueTextField";
+    private CCMapListModel model;
 
     /**
      * Construct a minimal instance using the parent's default model
@@ -59,13 +67,22 @@ public class CCMapList extends CCEditableList {
     ) {
         super(parent, model, name);
     }
-    
+
+    @Override
+    public void setModel(CCEditableListModelInterface model) throws IllegalArgumentException {
+        if (!(model instanceof CCMapListModel)) {
+            throw new IllegalArgumentException("CCMapList should have CCMapListModel");
+        }
+        super.setModel(model);
+        this.model = (CCMapListModel) model;
+    }
+
     /**
      * Register child views.
      */
     protected void registerChildren() {
         super.registerChildren();
-        registerChild(VALUE_TEXTFIELD, TextField.class);
+        registerChild(VALUE_TEXTFIELD, model.hasValueOptionList() ? CCSelect.class : TextField.class);
     }
 
     /**
@@ -76,7 +93,11 @@ public class CCMapList extends CCEditableList {
      */
     protected View createChild(String name) {
         if (name.equals(VALUE_TEXTFIELD)) {
-            return new TextField(this, name, null);
+            if (model.getValueOptionList() == null) {
+                return new TextField(this, name, null);
+            } else {
+                return new CCSelect(this, name, (Object) null, model.getValueOptionList());
+            }
         } else {
             return super.createChild(name);
         }

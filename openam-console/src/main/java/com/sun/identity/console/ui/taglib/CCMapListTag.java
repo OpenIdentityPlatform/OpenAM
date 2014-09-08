@@ -25,12 +25,20 @@
  * $Id: CCMapListTag.java,v 1.2 2008/07/28 23:43:36 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.console.ui.taglib;
 
 import com.iplanet.jato.view.View;
+import com.iplanet.jato.view.html.SelectableGroup;
 import com.sun.identity.console.ui.model.CCMapListModel;
 import com.sun.identity.console.ui.view.CCMapList;
+import com.sun.web.ui.taglib.common.CCDisplayFieldTagBase;
 import com.sun.web.ui.taglib.editablelist.CCEditableListTag;
+import com.sun.web.ui.taglib.html.CCDropDownMenuTag;
+import com.sun.web.ui.taglib.html.CCSelectTag;
 import com.sun.web.ui.taglib.html.CCTextFieldTag;
 import com.sun.web.ui.view.editablelist.CCEditableList;
 import javax.servlet.jsp.JspException;
@@ -40,9 +48,9 @@ import javax.servlet.jsp.tagext.Tag;
 /**
  * This is the corresponding tag for <code>CCMapListView</code>.
  */
-public class CCMapListTag extends CCEditableListTag  {
+public class CCMapListTag extends CCEditableListTag {
     private CCMapListModel model;
-    private CCTextFieldTag valueTextfieldTag;
+    private CCDisplayFieldTagBase valueTag;
     private View valueTextfield;
     private String valueTextfieldString;
     
@@ -60,7 +68,7 @@ public class CCMapListTag extends CCEditableListTag  {
     
     public void reset() {
         super.reset();
-        valueTextfieldTag = null;
+        valueTag = null;
     }
 
     protected String getHTMLStringInternal(
@@ -75,7 +83,7 @@ public class CCMapListTag extends CCEditableListTag  {
         int idxBtnStart = strHTML.indexOf("<input ", idx+5);
         int idxBtnEnd = strHTML.indexOf("/>", idxBtnStart) +2;
         
-        valueTextfieldString = valueTextfieldTag.getHTMLString(parent,
+        valueTextfieldString = valueTag.getHTMLString(parent,
             pageContext, valueTextfield);
         strHTML = strHTML.substring(0, idx) +
             "<table border=0 cellpadding=0 cellspacing=0>" +
@@ -117,7 +125,7 @@ public class CCMapListTag extends CCEditableListTag  {
     
     protected void initTags() {
         super.initTags();
-        valueTextfieldTag = new CCTextFieldTag();
+        valueTag = model.hasValueOptionList() ? new CCDropDownMenuTag() : new CCTextFieldTag();
     }
 
     protected void initChildViews(CCEditableList field) {
@@ -134,4 +142,6 @@ public class CCMapListTag extends CCEditableListTag  {
     protected boolean isGlobal() {
         return false;
     }
+
+
 }

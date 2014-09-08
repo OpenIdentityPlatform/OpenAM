@@ -568,7 +568,8 @@ public class AttributeSchemaImpl {
 
         // Get choice values, if applicable
         if (type.equals(AttributeSchema.Type.SINGLE_CHOICE)
-                || type.equals(AttributeSchema.Type.MULTIPLE_CHOICE)) {
+                || type.equals(AttributeSchema.Type.MULTIPLE_CHOICE)
+                || type.equals(AttributeSchema.Type.LIST)) {
             Node choiceValueNode = XMLUtils.getChildNode(n,
                     SMSUtils.ATTRIBUTE_CHOICE_VALUES_ELEMENT);
             if (choiceValueNode != null) {

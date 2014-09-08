@@ -134,7 +134,15 @@ public interface PropertyTemplate {
         "<attribute name=\"multiple\" value=\"true\" />\n";
     String LIST_SIZE_TAG =
         "<attribute name=\"size\" value=\"8\" />\n";
-    String OPTION_TAG = "<option label=\"{0}\" value=\"{1}\" />\n";
+
+    String OPTION_TAG_NAME = "option";
+    String VALUE_OPTION_TAG_NAME = "value-option";
+    String OPTION_LABEL_ATTR_NAME = "label";
+    String OPTION_VALUE_ATTR_NAME = "value";
+    String OPTION_TAG = "<" + OPTION_TAG_NAME + " " + OPTION_LABEL_ATTR_NAME + "=\"{0}\" " +
+            OPTION_VALUE_ATTR_NAME + "=\"{1}\" />\n";
+    String VALUE_OPTION_TAG = "<" + VALUE_OPTION_TAG_NAME + " " + OPTION_LABEL_ATTR_NAME + "=\"{0}\" " +
+            OPTION_VALUE_ATTR_NAME + "=\"{1}\" />\n";
 
     String HELP_TAG = " <fieldhelp name=\"help{0}\" defaultValue=\"{1}\" />\n";
 
