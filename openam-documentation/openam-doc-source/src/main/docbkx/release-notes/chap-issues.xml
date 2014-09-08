@@ -60,7 +60,7 @@
    >OpenAM issue tracker</link>.
   </para>
 
-  <!-- List generated at 12:17:53 20140829 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+fixVersion+%3D+"11.0.2"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 16:46:20 20140908 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+fixVersion+%3D+"11.0.2"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4235" xlink:show="new">OPENAM-4235</link>: RestAuthorizationDispatcherFilter is not thread-safe in its usage of the AuthZFilter</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4176" xlink:show="new">OPENAM-4176</link>: Concurrent access of non-thread safe objects possible in DelegationPolicyImpl</para></listitem>
@@ -105,7 +105,6 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3239" xlink:show="new">OPENAM-3239</link>: OAuth 2 client properties randomly disappears after upgrade from OpenAM 10.1 to OpenAM 11</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3207" xlink:show="new">OPENAM-3207</link>: PLLRequestServlet should log an error if the configured maximum request size is exceeded</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3184" xlink:show="new">OPENAM-3184</link>: Insufficient error logging when 'agent profile' can not be found by CDCServlet</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3159" xlink:show="new">OPENAM-3159</link>: Difference in case between results of identity/json/attributes REST API between first and subsequent calls</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3065" xlink:show="new">OPENAM-3065</link>: Working with realms/sub-realms in site setup is not working properly. </para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2712" xlink:show="new">OPENAM-2712</link>: Adaptive.getIdentity prints 'More than one user found' when no user was found</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2532" xlink:show="new">OPENAM-2532</link>: deleting ActiveDirectory DataStore from subrealm deleting parent's referrals too.</para></listitem>
@@ -180,7 +179,7 @@
    >OpenAM issue tracker</link>.
   </para>
 
-  <!-- List generated at 08:27:23 20140829 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=labels+%3D+release-notes+AND+project+%3D+OpenAM+AND+%28resolution+%3D+unresolved+OR+%28fixVersion+not+in+%28%2210.0.0%22%2C+%2210.1.0-Xpress%22%2C+%2211.0.0%22%2C%2211.0.1%22%2C%2211.0.2%22%29+AND+fixVersion+in+%28%2211.0.3%22%2C+%2212.0.0%22%29%29%29+AND+type+%3D+bug+AND+%28component+is+EMPTY+OR+component+not+in+%28QA%2C+Documentation%2C+%22web+agents%22%2C+%22j2ee+agents%22%29%29&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 16:44:28 20140908 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=labels+%3D+release-notes+AND+project+%3D+OpenAM+AND+%28resolution+%3D+unresolved+OR+%28fixVersion+not+in+%28%2210.0.0%22%2C+%2210.1.0-Xpress%22%2C+%2211.0.0%22%2C%2211.0.1%22%2C%2211.0.2%22%29+AND+fixVersion+in+%28%2211.0.3%22%2C+%2212.0.0%22%29%29%29+AND+type+%3D+bug+AND+%28component+is+EMPTY+OR+component+not+in+%28QA%2C+Documentation%2C+%22web+agents%22%2C+%22j2ee+agents%22%29%29&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4320" xlink:show="new">OPENAM-4320</link>: NotificationServlet does not check for null before closing writer in finally block</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-4262" xlink:show="new">OPENAM-4262</link>: IDP Proxy should set destination depending on the Binding</para></listitem>
@@ -199,6 +198,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3243" xlink:show="new">OPENAM-3243</link>: The Core Auth Module persistent cookie options are different from the Persistent Cookie Module</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3223" xlink:show="new">OPENAM-3223</link>: Policy Wildcard Matches doesn't work after OpenAM upgrade with an ODSEE</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3205" xlink:show="new">OPENAM-3205</link>: Missing labels in OAuth2 "Register a Client" page</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3159" xlink:show="new">OPENAM-3159</link>: Difference in case between results of identity/json/attributes REST API between first and subsequent calls</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3152" xlink:show="new">OPENAM-3152</link>: CTS -- External Store Passwords configured in default server settings shown in clear text elsewhere</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3109" xlink:show="new">OPENAM-3109</link>: Token conflicts can occur if OpenDJ servers are replicated</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3056" xlink:show="new">OPENAM-3056</link>: Retrieving roles may fail when using more than one data store</para></listitem>
@@ -218,6 +218,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2168" xlink:show="new">OPENAM-2168</link>: Authentication Success Rate and Authentication Failure Rate are always 0</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2155" xlink:show="new">OPENAM-2155</link>: Non printable characters in some files.  Looks like most should be copyright 0xA9</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2137" xlink:show="new">OPENAM-2137</link>: DSConfigMgr can hide exception root causes</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2090" xlink:show="new">OPENAM-2090</link>: OPENAM_HOME/.version file is not updated</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2085" xlink:show="new">OPENAM-2085</link>: Unreliable policy evaluation results with com.sun.identity.agents.config.fetch.from.root.resource enabled</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2023" xlink:show="new">OPENAM-2023</link>: Federation Connectivity Test fails with Account termination is not working </para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1946" xlink:show="new">OPENAM-1946</link>: Password change with AD does not work when old password is provided</para></listitem>
@@ -226,7 +227,6 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1892" xlink:show="new">OPENAM-1892</link>: Only Accept certificate for authentication if KeyUsage is correct</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1886" xlink:show="new">OPENAM-1886</link>: Session invalidated on OpenAM server is not deleted from SFO datastore</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1852" xlink:show="new">OPENAM-1852</link>: Oauth2 auth-module can not be used with DistAuth</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1839" xlink:show="new">OPENAM-1839</link>: LDAPConnectionPool is not recovered</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1831" xlink:show="new">OPENAM-1831</link>: OpenAM 10.0 subrealm DNS alias doesn't work as expected unless setting com.sun.identity.server.fqdnMap</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1811" xlink:show="new">OPENAM-1811</link>: DAS response serialization is not working as expected when using PAP</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1660" xlink:show="new">OPENAM-1660</link>: Read-access to SubjectEvaluationCache is not synchronized</para></listitem>
