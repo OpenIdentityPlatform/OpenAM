@@ -18,21 +18,24 @@ package com.iplanet.dpro.session.operations;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.monitoring.SessionOperationsBuilder;
+import com.iplanet.dpro.session.monitoring.MonitoredOperations;
+import com.iplanet.dpro.session.monitoring.SessionMonitorType;
+import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
 import com.iplanet.dpro.session.operations.strategies.CTSOperations;
 import com.iplanet.dpro.session.operations.strategies.LocalOperations;
 import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class ServerSessionOperationStrategyTest {
 
@@ -40,10 +43,10 @@ public class ServerSessionOperationStrategyTest {
     private SessionService mockSessionService;
     private LocalOperations mockLocal;
     private RemoteOperations mockRemote;
-    private SessionOperationsBuilder mockOpsBuilder;
     private CTSOperations mockCTS;
     private WebtopNamingQuery mockNamingQuery;
     private Session mockSession;
+    private SessionMonitoringStore mockStore;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -55,15 +58,14 @@ public class ServerSessionOperationStrategyTest {
         mockLocal = mock(LocalOperations.class);
         mockRemote = mock(RemoteOperations.class);
         mockCTS = mock(CTSOperations.class);
-        mockOpsBuilder = mock(SessionOperationsBuilder.class);
-
-        given(mockOpsBuilder.createMonitoredCTSOperations()).willReturn(mockCTS);
-        given(mockOpsBuilder.createMonitoredLocalOperations()).willReturn(mockLocal);
-        given(mockOpsBuilder.createMonitoredRemoteOperations()).willReturn(mockRemote);
+        mockStore = mock(SessionMonitoringStore.class);
 
         strategy = new ServerSessionOperationStrategy(
                 mockSessionService,
-                mockOpsBuilder,
+                mockStore,
+                mockLocal,
+                mockCTS,
+                mockRemote,
                 mockNamingQuery,
                 mock(Debug.class));
 
@@ -83,30 +85,22 @@ public class ServerSessionOperationStrategyTest {
         SessionOperations operation = strategy.getOperation(mockSession);
 
         // Then
-        assertThat(operation).isEqualTo(mockLocal);
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockLocal, SessionMonitorType.LOCAL, mockStore));
     }
 
     @Test
-    public void shouldUseRemoteForRemoteSessions() throws Exception {
+    public void shouldUseRemoteForRemoteSessionsWhenCrossTalkIsEnabled() throws Exception {
         // Given
         given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
-        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
-
-        // The Session is a Site
-        given(mockNamingQuery.isSite(anyString())).willReturn(true);
-
-        // The Site is up.
-        given(mockSessionService.checkSiteUp(anyString())).willReturn(true);
 
         // Cross-talk is enabled
-        given(mockSessionService.isCrossTalkEnabled()).willReturn(true);
+        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(false);
 
         // When
         SessionOperations operation = strategy.getOperation(mockSession);
 
         // Then
-        verify(mockSessionService).checkSiteUp(anyString());
-        assertThat(operation).isEqualTo(mockRemote);
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
     }
 
     @Test
@@ -115,37 +109,70 @@ public class ServerSessionOperationStrategyTest {
         given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
         given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
 
+        // Cross-talk is enabled
+        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(false);
+
         // The Session is a Site
         given(mockNamingQuery.isSite(anyString())).willReturn(true);
 
         // The Site is down.
         given(mockSessionService.checkSiteUp(anyString())).willReturn(false);
 
+        // And Session is in CTS
+        given(mockCTS.hasSession(mockSession)).willReturn(true);
+
         // When
         SessionOperations operation = strategy.getOperation(mockSession);
 
         // Then
-        assertThat(operation).isEqualTo(mockCTS);
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
     }
 
     @Test
-    public void shouldUseCTSWhenCrossTalkDisabledAndSessionIsRemote() throws SessionException {
+    public void shouldUseRemoteWhenSessionIsNotInCTS() throws SessionException {
         // Given
         given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
         given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
 
-        // Session is part of a site.
-        given(mockNamingQuery.isSite(anyString())).willReturn(true);
-        // The site is up
-        given(mockSessionService.checkSiteUp(anyString())).willReturn(true);
-
-        // Cross talk is disabled.
-        given(mockSessionService.isCrossTalkEnabled()).willReturn(false);
+        // And Session is in CTS
+        given(mockCTS.hasSession(mockSession)).willReturn(false);
 
         // When
         SessionOperations operation = strategy.getOperation(mockSession);
 
         // Then
-        assertThat(operation).isEqualTo(mockCTS);
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
+    }
+
+    @Test
+    public void shouldUseRemoteWhenFailoverIsDisabled() throws SessionException {
+        // Given
+        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
+        given(mockSessionService.isSessionFailoverEnabled()).willReturn(false);
+
+        // When
+        SessionOperations operation = strategy.getOperation(mockSession);
+
+        // Then
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockRemote, SessionMonitorType.REMOTE, mockStore));
+    }
+
+    @Test
+    public void shouldUseCTSWhenCrossTalkDisabledCTSContainsSession() throws SessionException {
+        // Given
+        given(mockSessionService.checkSessionLocal(any(SessionID.class))).willReturn(false);
+        given(mockSessionService.isSessionFailoverEnabled()).willReturn(true);
+
+        // Cross talk is disabled.
+        given(mockSessionService.isReducedCrossTalkEnabled()).willReturn(true);
+
+        // And Session is in CTS
+        given(mockCTS.hasSession(mockSession)).willReturn(true);
+
+        // When
+        SessionOperations operation = strategy.getOperation(mockSession);
+
+        // Then
+        assertThat(operation).isEqualTo(new MonitoredOperations(mockCTS, SessionMonitorType.CTS, mockStore));
     }
 }

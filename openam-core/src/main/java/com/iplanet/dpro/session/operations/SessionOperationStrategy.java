@@ -16,6 +16,7 @@
 package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 
 /**
  * Responsible for providing an appropriate implementation of the SessionOperationStrategy
@@ -31,5 +32,5 @@ public interface SessionOperationStrategy {
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
      */
-    public SessionOperations getOperation(Session session);
+    public SessionOperations getOperation(Session session) throws SessionException;
 }

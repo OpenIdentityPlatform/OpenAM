@@ -39,6 +39,7 @@ import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.dpro.session.share.SessionInfo;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.HeadTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
@@ -53,6 +54,9 @@ import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -1290,11 +1294,66 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Returns the URL of the Session events and the associated master and
-     * restricted token ids
-     * @return Map of session event URLs
+     * restricted token ids.
+     * @return Map of session event URLs and their associated SessionIDs.
      */
-    ConcurrentMap<String, Set<SessionID>> getSessionEventURLs() {
-        return sessionEventURLs;
+    Map<String, Set<SessionID>> getSessionEventURLs(int eventType, SessionBroadcastMode logoutDestroyBroadcast) {
+        Map<String, Set<SessionID>> urls = new HashMap<String, Set<SessionID>>();
+
+        if ((eventType == SessionEvent.DESTROY || eventType == SessionEvent.LOGOUT) &&
+                logoutDestroyBroadcast != SessionBroadcastMode.OFF) {
+            try {
+                String localServer = WebtopNaming.getLocalServer();
+                Collection<String> servers;
+                if (logoutDestroyBroadcast == SessionBroadcastMode.ALL_SITES) {
+                    servers = WebtopNaming.getPlatformServerList();
+                } else {
+                    servers = new ArrayList<String>();
+                    for (String serverID : WebtopNaming.getSiteNodes(WebtopNaming.getAMServerID())) {
+                        servers.add(WebtopNaming.getServerFromID(serverID));
+                    }
+                }
+                for (String url : servers) {
+                    if (!localServer.equals(url)) {
+                        urls.put(url + "/notificationservice", new HashSet<SessionID>(Arrays.asList(this.getID())));
+                    }
+                }
+            } catch (Exception e) {
+                debug.warning("Unable to get list of servers", e);
+            }
+        }
+
+        for (Map.Entry<String,Set<SessionID>> entry : sessionEventURLs.entrySet()) {
+            Set<SessionID> sessionIDs = urls.get(entry.getKey());
+            if (sessionIDs != null) {
+                sessionIDs.addAll(entry.getValue());
+            } else {
+                urls.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return urls;
+    }
+
+    /**
+     * Adds a listener for the associated session ID.
+     * @param url The listening URL.
+     * @param sid The associated SessionID.
+     */
+    void addSessionEventURL(String url, SessionID sid) {
+
+        Set<SessionID> sids = sessionEventURLs.get(url);
+        if (sids == null) {
+            sids = Collections.newSetFromMap(new ConcurrentHashMap<SessionID, Boolean>());
+            Set<SessionID> previousValue = sessionEventURLs.putIfAbsent(url, sids);
+            if (previousValue != null) {
+                sids = previousValue;
+            }
+        }
+
+        if (sids.add(sid))  {
+            updateForFailover();
+        }
     }
 
     /**
@@ -1601,9 +1660,8 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /**
      * Update for the session failover
-     *
      */
-    protected void updateForFailover() {
+    private void updateForFailover() {
         if (SessionService.getSessionService().isSessionFailoverEnabled()
                 && isISStored) {
             if (sessionState != Session.VALID) {

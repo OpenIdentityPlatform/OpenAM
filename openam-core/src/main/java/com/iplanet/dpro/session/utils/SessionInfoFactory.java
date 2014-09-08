@@ -96,7 +96,7 @@ public class SessionInfoFactory {
      * @throws IllegalAccessException If this method has not been called in-conjunction with
      * SessionInfoFactory#validateSession
      */
-    private SessionInfo makeSessionInfo(InternalSession internalSession, SessionID sid)
+    public SessionInfo makeSessionInfo(InternalSession internalSession, SessionID sid)
             throws SessionException {
         SessionInfo info = internalSession.toSessionInfo();
         TokenRestriction restriction = internalSession.getRestrictionForToken(sid);

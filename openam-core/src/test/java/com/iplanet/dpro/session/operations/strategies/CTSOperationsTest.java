@@ -29,8 +29,11 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.cts.exceptions.ReadFailedException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -46,6 +49,7 @@ public class CTSOperationsTest {
     private CTSOperations ctsOperations;
     private Session mockRequester;
     private Session mockSession;
+    private RemoteOperations mockRemote;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -56,13 +60,14 @@ public class CTSOperationsTest {
         mockIdFactory = mock(TokenIdFactory.class);
         mockInfoFactory = mock(SessionInfoFactory.class);
         mockSessionService = mock(SessionService.class);
+        mockRemote = mock(RemoteOperations.class);
 
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
 
         given(mockIdFactory.toSessionTokenId(any(SessionID.class))).willReturn("TEST");
 
-        ctsOperations = new CTSOperations(mockCTS, mockAdapter, mockIdFactory, mockInfoFactory, mockSessionService, mock(Debug.class));
+        ctsOperations = new CTSOperations(mockCTS, mockAdapter, mockIdFactory, mockInfoFactory, mockSessionService, mockRemote, mock(Debug.class));
 
     }
 
@@ -77,6 +82,21 @@ public class CTSOperationsTest {
 
         SessionInfo mockSessionInfo = mock(SessionInfo.class);
         given(mockInfoFactory.getSessionInfo(eq(mockInternalSession), any(SessionID.class))).willReturn(mockSessionInfo);
+
+        // When
+        SessionInfo result = ctsOperations.refresh(mockSession, false);
+
+        // Then
+        assertThat(result).isEqualTo(mockSessionInfo);
+    }
+
+    @Test
+    public void shouldReadTokenFromRemoteWhenCTSFails() throws CoreTokenException, SessionException {
+        // Given
+        given(mockCTS.read(anyString())).willThrow(new ReadFailedException("id", new IOException()));
+
+        SessionInfo mockSessionInfo = mock(SessionInfo.class);
+        given(mockRemote.refresh(mockSession, false)).willReturn(mockSessionInfo);
 
         // When
         SessionInfo result = ctsOperations.refresh(mockSession, false);

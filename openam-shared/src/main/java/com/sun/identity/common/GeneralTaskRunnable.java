@@ -129,7 +129,16 @@ public abstract class GeneralTaskRunnable implements TaskRunnable {
         }
         return -1;
     }
-    
+
+    /**
+     * Returns true if this TaskRunnable is scheduled to run; otherwise returns false.
+     *
+     * @return A boolean value indicating whether or not this TaskRunnable is scheduled.
+     */
+    public boolean isScheduled() {
+        return scheduledExecutionTime() != -1;
+    }
+
     /**
      * Implements for TaskRunnable interface.
      *

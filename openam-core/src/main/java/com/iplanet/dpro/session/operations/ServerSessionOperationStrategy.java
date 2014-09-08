@@ -17,7 +17,12 @@ package com.iplanet.dpro.session.operations;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.monitoring.SessionOperationsBuilder;
+import com.iplanet.dpro.session.monitoring.MonitoredOperations;
+import com.iplanet.dpro.session.monitoring.SessionMonitorType;
+import com.iplanet.dpro.session.monitoring.SessionMonitoringStore;
+import com.iplanet.dpro.session.operations.strategies.CTSOperations;
+import com.iplanet.dpro.session.operations.strategies.LocalOperations;
+import com.iplanet.dpro.session.operations.strategies.RemoteOperations;
 import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
@@ -51,28 +56,36 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
 
     private final SessionOperations local;
     private final SessionOperations remote;
-    private final SessionOperations cts;
+    private final CTSOperations cts;
     private final WebtopNamingQuery queryUtils;
     private final Debug debug;
+    private final SessionMonitoringStore store;
 
     /**
      * Guice initialised constructor.
      *
      * @param service Required for local server decisions.
-     * @param opsBuilder Required to generate appropriate operations
+     * @param local Required strategy.
+     * @param remote Required strategy.
+     * @param cts Required strategy.
+     * @param store The store for session monitoring information.
      * @param queryUtils Required for Server availability decisions.
      * @param debug Required for logging.
      */
     @Inject
     public ServerSessionOperationStrategy(SessionService service,
-                                          SessionOperationsBuilder opsBuilder,
-                                          WebtopNamingQuery queryUtils,
-                                          @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
+            SessionMonitoringStore store,
+            LocalOperations local,
+            CTSOperations cts,
+            RemoteOperations remote,
+            WebtopNamingQuery queryUtils,
+            @Named(SessionConstants.SESSION_DEBUG) Debug debug) {
 
         this.service = service;
-        this.local = opsBuilder.createMonitoredLocalOperations();
-        this.remote = opsBuilder.createMonitoredRemoteOperations();
-        this.cts = opsBuilder.createMonitoredCTSOperations();
+        this.store = store;
+        this.local = local;
+        this.remote = remote;
+        this.cts = cts;
         this.queryUtils = queryUtils;
         this.debug = debug;
     }
@@ -88,24 +101,24 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * @param session Non null Session to use.
      * @return A non null SessionOperations implementation to use.
      */
-    public SessionOperations getOperation(Session session) {
+    public SessionOperations getOperation(Session session) throws SessionException {
         if (isLocalServer(session)) {
-            return log(session, local);
+            return logAndWrap(session, local, SessionMonitorType.LOCAL);
         }
 
-        if (service.isSessionFailoverEnabled()) {
-            // Cross talk is disabled.
-            if (!service.isCrossTalkEnabled()) {
-                return log(session, cts);
+        if (service.isSessionFailoverEnabled() && cts.hasSession(session)) {
+            // Cross talk is reduced.
+            if (service.isReducedCrossTalkEnabled()) {
+                return logAndWrap(session, cts, SessionMonitorType.CTS);
             }
 
             // Remote Site which is known to be down
             if (!isLocalSite(session) && !isSiteUp(getSiteId(session))) {
-                return log(session, cts);
+                return logAndWrap(session, cts, SessionMonitorType.CTS);
             }
         }
 
-        return log(session, remote);
+        return logAndWrap(session, remote, SessionMonitorType.REMOTE);
     }
 
     /**
@@ -166,12 +179,13 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
      * Inline logging function.
      * @param session Non null.
      * @param op Non null operation selected.
-     * @return op.
+     * @param type
+     * @return {code op}, wrapped in a MonitoredOperations.
      */
-    private SessionOperations log(Session session, SessionOperations op) {
+    private SessionOperations logAndWrap(Session session, SessionOperations op, SessionMonitorType type) {
         if (debug.messageEnabled()) {
             debug.message(session + ": " + op.getClass().getSimpleName() + " selected.");
         }
-        return op;
+        return new MonitoredOperations(op, type, store);
     }
 }

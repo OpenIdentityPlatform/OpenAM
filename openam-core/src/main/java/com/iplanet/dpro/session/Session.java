@@ -61,6 +61,8 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.util.Reject;
 import org.forgerock.util.thread.listener.ShutdownListener;
 import org.forgerock.util.thread.listener.ShutdownManager;
 
@@ -75,6 +77,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The <code>Session</code> class represents a session. It contains session
@@ -118,7 +121,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Used for uniquely referencing this Session object.
      */
-    private SessionID sessionID;
+    private final SessionID sessionID;
 
     /**
      * Defines the type of Session that has been created. Where 0 for User
@@ -169,16 +172,39 @@ public class Session extends GeneralTaskRunnable {
     private volatile long timedOutAt = 0;
 
     /**
-     * Four possible values for the state of the session 0 - Invalid 1 - 
-     * Valid 2 - Inactive 3 - Destroyed
+     * Four possible values for the state of the session:
+     * <ul>
+     *     <li>0 - Invalid</li>
+     *     <li>1 - Valid</li>
+     *     <li>2 - Inactive</li>
+     *     <li>3 - Destroyed</li>
+     * </ul>
      */
     private int sessionState;
+
+    /**
+     * This is the time value (computed as System.currentTimeMillis()) when a DESTROYED
+     * session should be removed from the {@link #sessionTable}.
+     *
+     * It will be set to {@link SessionService#getReducedCrosstalkPurgeDelay() } minutes after the time
+     * {@link #removeRemoteSID } is called.
+     *
+     * Value zero means the session has not been destroyed or cross-talk is not being reduced.
+     */
+    private volatile long purgeAt = 0;
+
+    /**
+     * If this is a Remote session that has been destroyed but not yet removed from the
+     * sessionTable, this flag is used to avoid repeated notification of the DESTROY event
+     * to session listeners.
+     */
+    private AtomicBoolean removed = new AtomicBoolean(false);
 
     /**
      * All session related properties are stored as key-value pair in this
      * table.
      */
-    private Hashtable sessionProperties = new Hashtable();
+    private Hashtable<String, String> sessionProperties = new Hashtable<String, String>();
 
     /**
      * URL of the Session Server, where this session resides.
@@ -199,9 +225,8 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Session Tracking Cookie Name
      */
-    private static final String httpSessionTrackingCookieName = SystemProperties
-            .get(Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME,
-                    "JSESSIONID");
+    private static final String httpSessionTrackingCookieName =
+            SystemProperties.get(Constants.AM_SESSION_HTTP_SESSION_TRACKING_COOKIE_NAME, "JSESSIONID");
 
     /**
      * Indicates whether the latest access time need to be reset on the session.
@@ -234,16 +259,14 @@ public class Session extends GeneralTaskRunnable {
 
     public static final String SESSION_SERVICE = "session";
 
-    private static String cookieName = 
-	SystemProperties.get("com.iplanet.am.cookie.name");
+    private static String cookieName =
+	        SystemProperties.get("com.iplanet.am.cookie.name");
 
-    public static String lbCookieName = 
-        SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
+    public static String lbCookieName =
+            SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
 
-    private static final boolean resetLBCookie = 
-        Boolean.valueOf(SystemProperties.
-                 get("com.sun.identity.session.resetLBCookie", "false"))
-                  .booleanValue();
+    private static final boolean resetLBCookie =
+            SystemProperties.getAsBoolean("com.sun.identity.session.resetLBCookie", false);
     
     private String cookieStr;
 
@@ -270,16 +293,14 @@ public class Session extends GeneralTaskRunnable {
     
     private static boolean pollerPoolInitialized = false;
     
-    private static final String ENABLE_POLLING_PROPERTY = 
+    private static final String ENABLE_POLLING_PROPERTY =
         "com.iplanet.am.session.client.polling.enable";
     
     /**
      * Indicates whether to enable or disable the session cleanup thread.
      */
-    private static boolean sessionCleanupEnabled = 
-        Boolean.valueOf(SystemProperties.
-                get("com.iplanet.am.session.client.cleanup.enable", "true"))
-                .booleanValue();
+    private static boolean sessionCleanupEnabled =
+            SystemProperties.getAsBoolean("com.iplanet.am.session.client.cleanup.enable", true);
 
     /**
      * The session table indexed by Session ID objects.
@@ -290,19 +311,17 @@ public class Session extends GeneralTaskRunnable {
      * The session service URL table indexed by server address contained in the
      * Session ID object.
      */
-    private static Hashtable sessionServiceURLTable = new Hashtable();
+    private static Hashtable<String, URL> sessionServiceURLTable = new Hashtable<String, URL>();
 
     /**
      * Set of session event listeners for THIS session only
      */
-    private Set<SessionListener> sessionEventListeners = 
-            new HashSet<SessionListener>();
+    private Set<SessionListener> sessionEventListeners = new HashSet<SessionListener>();
 
     /**
      * Set of session event listeners for ALL sessions
      */
-    private static Set<SessionListener> allSessionEventListeners = 
-            new HashSet<SessionListener>();
+    private static Set<SessionListener> allSessionEventListeners = new HashSet<SessionListener>();
 
     /**
      * This is used only in polling mode to find the polling state of this
@@ -310,47 +329,32 @@ public class Session extends GeneralTaskRunnable {
      */
     private volatile boolean isPolling = false;
 
-    static private ThreadPool threadPool = null;
+    private static ThreadPool threadPool = null;
     private static final int DEFAULT_POOL_SIZE = 5;
     private static final int DEFAULT_THRESHOLD = 10000;
-    private static boolean cacheBasedPolling = Boolean.valueOf(
-            SystemProperties
-                    .get("com.iplanet.am.session.client.polling.cacheBased",
-                            "false")).booleanValue();
+    private static boolean cacheBasedPolling =
+            SystemProperties.getAsBoolean("com.iplanet.am.session.client.polling.cacheBased", false);
 
     private static long appSSOTokenRefreshTime;
     
     private SessionPollerSender sender = null;    
 
     static {
-        String purgeDelayProperty = SystemProperties.get(
-                "com.iplanet.am.session.purgedelay", "120");
-        try {
-            purgeDelay = Long.parseLong(purgeDelayProperty);
-        } catch (Exception le) {
-            purgeDelay = 120;
-        }        
-        String appSSOTokenRefreshTimeProperty = SystemProperties.get(
-            "com.iplanet.am.client.appssotoken.refreshtime", "3");
-        try {
-            appSSOTokenRefreshTime = Long.parseLong(
-                appSSOTokenRefreshTimeProperty);
-        } catch (Exception le) {
-            appSSOTokenRefreshTime = 3;
-        }
+        purgeDelay = SystemProperties.getAsLong("com.iplanet.am.session.purgedelay", 120);
+        appSSOTokenRefreshTime = SystemProperties.getAsLong("com.iplanet.am.client.appssotoken.refreshtime", 3);
     }
 
     private Requests requests;
 
     static private String getAMServerID() {
         String serverid = null;
-        
+
         try {
             serverid = WebtopNaming.getAMServerID();
         } catch (Exception le) {
             serverid = null;
         }
-        
+
         return serverid;
     }
     
@@ -379,10 +383,7 @@ public class Session extends GeneralTaskRunnable {
         // implementation for making the session properties
         // hot-swappable is in place    	
         if (!isServerMode()) {
-            pollingEnabled = 
-                Boolean.valueOf(SystemProperties
-                    .get(ENABLE_POLLING_PROPERTY, 
-                        "false")).booleanValue();
+            pollingEnabled = SystemProperties.getAsBoolean(ENABLE_POLLING_PROPERTY, false);
         }
         if (sessionDebug.messageEnabled()) {
             sessionDebug.message("Session.isPollingEnabled is "
@@ -391,23 +392,10 @@ public class Session extends GeneralTaskRunnable {
         
         if(!pollerPoolInitialized){
             if (pollingEnabled) {
-                int poolSize;
-                int threshold;
-                try {
-                    poolSize = Integer.parseInt(SystemProperties.get(
-                        Constants.POLLING_THREADPOOL_SIZE));
-                } catch (Exception e) {
-                    poolSize = DEFAULT_POOL_SIZE;
-                }
-                try {
-                    threshold = Integer.parseInt(SystemProperties.get(
-                        Constants.POLLING_THREADPOOL_THRESHOLD));
-                } catch (Exception e) {
-                    threshold = DEFAULT_THRESHOLD;
-                }
+                int poolSize = SystemProperties.getAsInt(Constants.POLLING_THREADPOOL_SIZE, DEFAULT_POOL_SIZE);
+                int threshold = SystemProperties.getAsInt(Constants.POLLING_THREADPOOL_THRESHOLD, DEFAULT_THRESHOLD);
                 ShutdownManager shutdownMan = com.sun.identity.common.ShutdownManager.getInstance();
-                threadPool = new ThreadPool("amSessionPoller", poolSize,
-                    threshold, true, sessionDebug);
+                threadPool = new ThreadPool("amSessionPoller", poolSize, threshold, true, sessionDebug);
                 shutdownMan.addShutdownListener(
                     new ShutdownListener() {
                         public void shutdown() {
@@ -482,21 +470,16 @@ public class Session extends GeneralTaskRunnable {
     
     public void run() {
         if (isPollingEnabled()) {
-            final SessionID sid = getID();
             try {
                 if (!getIsPolling()) {
-                    long expectedTime = -1;
-                    if (maxIdleTime < (Long.MAX_VALUE / 60)) {
-                        expectedTime = (latestRefreshTime +
-                            (maxIdleTime * 60)) * 1000;
+                    long expectedTime;
+                    if (willExpire(maxIdleTime)) {
+                        expectedTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
                         if (cacheBasedPolling) {
-                            expectedTime = Math.min(expectedTime,
-                                (latestRefreshTime + (maxCachingTime * 60))
-                                * 1000);
+                            expectedTime = Math.min(expectedTime, (latestRefreshTime + (maxCachingTime * 60)) * 1000);
                         }
                     } else {
-                        expectedTime = (latestRefreshTime + 
-                            (appSSOTokenRefreshTime * 60)) * 1000;
+                        expectedTime = (latestRefreshTime + (appSSOTokenRefreshTime * 60)) * 1000;
                     }
                     if (expectedTime > scheduledExecutionTime()) {
                         // Get an instance as required otherwise it causes issues on container restart.
@@ -514,40 +497,59 @@ public class Session extends GeneralTaskRunnable {
                                     threadPool.run(sender);
                                 } catch (ThreadPoolException e) {
                                     setIsPolling(false);
-                                    sessionDebug.error("Send Polling Error: ",
-                                        e);
+                                    sessionDebug.error("Send Polling Error: ", e);
                                 }
                                 return null;
                             }
                     });
                 }
             } catch (SessionException se) {
-                Session.removeSID(sid);
-                sessionDebug.message(
-                    "session is not in timeout state so clean it", se);
+                Session.removeSID(sessionID);
+                sessionDebug.message("session is not in timeout state so clean it", se);
             } catch (Exception ex) {
                 sessionDebug.error("Exception encountered while polling", ex);
             }
         } else {
-            // schedule at the max session time
-            long expectedTime = -1;
-            if (maxSessionTime < (Long.MAX_VALUE / 60)) {
-                expectedTime = (latestRefreshTime + (maxSessionTime * 60))
-                    * 1000;
+
+            String sessionRemovalDebugMessage;
+            if (purgeAt > 0) {
+                /**
+                 * Reduced crosstalk protection.
+                 *
+                 * In order to prevent sessions from being (re)created from CTS on remote servers before
+                 * the destroyed state has been propagated, remote sessions are kept in memory for a configurable
+                 * amount of time {@link CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY }.
+                 *
+                 * This delay introduced to cover the CTS replication lag is only required when running as an
+                 * OpenAM server with a 'remote' copy of a session; therefore, this feature is not required
+                 * when polling is enabled - since polling is only ever used by non-OpenAM clients.
+                 */
+                // destroyed session scheduled for purge
+                if (purgeAt > scheduledExecutionTime()) {
+                    SystemTimerPool.getTimerPool().schedule(this, new Date(purgeAt));
+                    return;
+                }
+                sessionRemovalDebugMessage = "Session Removed, Reduced Crosstalk Purge Time complete";
+            } else {
+                // schedule at the max session time
+                long expectedTime = -1;
+                if (willExpire(maxSessionTime)) {
+                    expectedTime = (latestRefreshTime + (maxSessionTime * 60)) * 1000;
+                }
+                if (expectedTime > scheduledExecutionTime()) {
+                    SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
+                    return;
+                }
+                sessionRemovalDebugMessage = "Session Destroyed, Caching time exceeded the Max Session Time";
             }
-            if (expectedTime > scheduledExecutionTime()) {
-                SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
-                return;
-            }
+
             try {
-                Session.removeSID(getID());
+                Session.removeSID(sessionID);
                 if (sessionDebug.messageEnabled()) {
-                    sessionDebug.message("Session Destroyed, Caching "
-                        + "time exceeded the Max Session Time");
+                    sessionDebug.message(sessionRemovalDebugMessage);
                 }
             } catch (Exception ex) {
-                sessionDebug.error("Exception occured while cleaning "
-                    + "up Session Cache", ex);
+                sessionDebug.error("Exception occured while cleaning up Session Cache", ex);
             }
         }
     }
@@ -573,20 +575,19 @@ public class Session extends GeneralTaskRunnable {
     public static String getLBCookie(SessionID sid)
              throws SessionException {
         String cookieValue = null;
-        lbCookieName = 
-            SystemProperties.get(Constants.AM_LB_COOKIE_NAME,"amlbcookie");
+        lbCookieName = SystemProperties.get(Constants.AM_LB_COOKIE_NAME, "amlbcookie");
         if(sessionDebug.messageEnabled()){
             sessionDebug.message("Session.getLBCookie()" +
                 "lbCookieName is:" + lbCookieName);
         }
         
-        if(sid == null || sid.toString() == null || 
+        if(sid == null || sid.toString() == null ||
             sid.toString().length() == 0) {
-            throw new SessionException(SessionBundle.rbName, 
+            throw new SessionException(SessionBundle.rbName,
         	    "invalidSessionID", null);
         }
          
-        if(isServerMode() && 
+        if(isServerMode() &&
             !SessionService.getSessionService().isSiteEnabled()) {
                 cookieValue = WebtopNaming.getLBCookieValue(
                                   sid.getSessionServerID());
@@ -601,7 +602,7 @@ public class Session extends GeneralTaskRunnable {
                         ss.getCurrentHostServer(sid));
                 }    
             } else {            
-                Session sess = (Session) sessionTable.get(sid);
+                Session sess = readSession(sid);
                 if (sess != null) {
                     cookieValue = sess.getProperty(lbCookieName);
                 }
@@ -817,7 +818,7 @@ public class Session extends GeneralTaskRunnable {
                 refresh(false);
             }
         }    
-        return (String) sessionProperties.get(name);
+        return sessionProperties.get(name);
     }
 
     /**
@@ -865,7 +866,7 @@ public class Session extends GeneralTaskRunnable {
      */
     public String getPropertyWithoutValidation(String name) {
         if (isServerMode()) {
-            return (String) sessionProperties.get(name);
+            return sessionProperties.get(name);
         }
         return null;
     }
@@ -966,25 +967,88 @@ public class Session extends GeneralTaskRunnable {
     }
 
     /**
+     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
+     * destruction from the home server.
+     *
+     * This method should only be called when the identified session has another instance
+     * of OpenAM as its home server.
+     *
+     * @param info Current state of session on home server
+     */
+    static void removeRemoteSID(SessionInfo info) {
+        SessionID sessionID = new SessionID(info.sid);
+
+        long purgeDelay = getPurgeDelayForReducedCrosstalk();
+
+        if (purgeDelay > 0) {
+
+            Session session = readSession(sessionID);
+            if (session == null) {
+                /**
+                 * Reduced crosstalk protection.
+                 *
+                 * As the indicated session has not yet been loaded, it will be created and added to the
+                 * {@link #sessionTable} so that it can remain there in a DESTROYED state until it is purged.
+                 */
+                session = new Session(sessionID);
+                try {
+                    session.update(info);
+                    writeSession(session);
+                } catch (SessionException e) {
+                    sessionDebug.error("Exception reading remote SessionInfo", e);
+                }
+            }
+
+            session.purgeAt = System.currentTimeMillis() + (purgeDelay * 60 * 1000);
+            session.cancel();
+            if (!session.isScheduled()) {
+                SystemTimerPool.getTimerPool().schedule(session, new Date(session.purgeAt));
+            } else {
+                sessionDebug.error("Unable to schedule destroyed session for purging");
+            }
+
+        }
+
+        removeSID(sessionID);
+    }
+
+    private static long getPurgeDelayForReducedCrosstalk() {
+        if (isServerMode()) {
+            SessionService ss = InjectorHolder.getInstance(SessionService.class);
+            if (ss.isReducedCrossTalkEnabled()) {
+                return ss.getReducedCrosstalkPurgeDelay();
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Removes the <code>SessionID</code> from session table.
      *
      * @param sid Session ID.
      */
     public static void removeSID(SessionID sid) {
-        Session session = null;
-        session = (Session) sessionTable.remove(sid);
-
+        Session session = readSession(sid);
         if (session != null) {
-            session.cancel();
-            session.setState(Session.DESTROYED);            
+
             long eventTime = System.currentTimeMillis();
-            SessionEvent event = new SessionEvent(session,
-                    SessionEvent.DESTROY, eventTime);
-            invokeListeners(event);
+
+            // remove from sessionTable if there is no purge delay or it has elapsed
+            if (session.purgeAt <= eventTime) {
+                deleteSession(sid);
+                session.cancel();
+            }
+
+            // ensure session has destroyed state and observers are notified (exactly once)
+            if (session.removed.compareAndSet(false, true)) {
+                session.setState(Session.DESTROYED);
+                SessionEvent event = new SessionEvent(session, SessionEvent.DESTROY, eventTime);
+                invokeListeners(event);
+            }
         }
     }
 
-   /** 
+    /**
     * Invokes the Session Listener.
     * @param evt Session Event.
     */
@@ -1023,14 +1087,11 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException if the session state is not valid.
      */
     public void addSessionListener(SessionListener listener, boolean force) throws SessionException {
-
         if (!force && sessionState != Session.VALID) {
-        throw new SessionException(SessionBundle.rbName,
-                "invalidSessionState", null);
+            throw new SessionException(SessionBundle.rbName, "invalidSessionState", null);
+        }
+        sessionEventListeners.add(listener);
     }
-
-    sessionEventListeners.add(listener);
-}
 
     /**
      * Returns a session based on a Session ID object.
@@ -1064,8 +1125,21 @@ public class Session extends GeneralTaskRunnable {
                     "invalidSessionID", null);
         }
 
-        Session session = sessionTable.get(sessionID);
+        Session session = readSession(sessionID);
         if (session != null) {
+
+            /**
+             * Reduced crosstalk protection.
+             *
+             * When a user logs out, or the Session is destroyed and crosstalk is reduced, it is possible
+             * for a destroyed session to be recovered by accessing it on a remote server. Instead the
+             * session will be left in the {@link #sessionTable} until it is purged. This check will
+             * detect this condition and indicate to the caller their SessionID is invalid.
+             */
+            if (session.getState(false) == DESTROYED && getPurgeDelayForReducedCrosstalk() > 0) {
+                throw new SessionException("Session is in a destroyed state");
+            }
+
             TokenRestriction restriction = session.getRestriction();
                     /*
                      * In cookie hijacking mode...
@@ -1100,7 +1174,7 @@ public class Session extends GeneralTaskRunnable {
         }
         session.context = RestrictedTokenContext.getCurrent();
 
-        sessionTable.put(sessionID, session);
+        writeSession(session);
         if (!isPollingEnabled()) {
             session.addInternalSessionListener();
         }
@@ -1111,29 +1185,35 @@ public class Session extends GeneralTaskRunnable {
         if (isPollingEnabled()) {
             long timeoutTime = (latestRefreshTime + (maxIdleTime * 60)) * 1000;
             if (cacheBasedPolling) {
-                timeoutTime = Math.min((latestRefreshTime +
-                    (maxCachingTime * 60)) * 1000, timeoutTime);
+                timeoutTime = Math.min((latestRefreshTime + (maxCachingTime * 60)) * 1000, timeoutTime);
             }
             if (scheduledExecutionTime() > timeoutTime) {
                 cancel();
             }
-            if (scheduledExecutionTime() == -1) {
+            if (!isScheduled()) {
                 SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
             }
         } else {
-            if ((sessionCleanupEnabled) && (maxSessionTime < (Long.MAX_VALUE / 60))) {
+            if ((sessionCleanupEnabled) && willExpire(maxSessionTime)) {
                 long timeoutTime = (latestRefreshTime + (maxSessionTime * 60)) * 1000;
 
                 if (scheduledExecutionTime() > timeoutTime) {
                     cancel();
                 }
-                if (scheduledExecutionTime() == -1) {
+                if (!isScheduled()) {
                     SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
                 }
             }
         }
     }
-    
+
+    /**
+     * Returns true if the provided time is less than Long.MAX_VALUE seconds.
+     */
+    private boolean willExpire(long minutes) {
+        return minutes < Long.MAX_VALUE / 60;
+    }
+
     /**
      * Returns a Session Response object based on the XML document received from
      * remote Session Server. This is in response to a request that we send to
@@ -1145,8 +1225,7 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException if there was an error in sending the XML
      *            document or if the response has multiple components.
      */
-    public static SessionResponse sendPLLRequest(URL svcurl, 
-            SessionRequest sreq) throws SessionException {
+    public static SessionResponse sendPLLRequest(URL svcurl, SessionRequest sreq) throws SessionException {
         try {
 
             String cookies = cookieName + "=" + sreq.getSessionID();
@@ -1160,8 +1239,7 @@ public class Session extends GeneralTaskRunnable {
             set.addRequest(req);
             Vector responses = PLLClient.send(svcurl, cookies, set);
             if (responses.size() != 1) {
-                throw new SessionException(SessionBundle.rbName,
-                        "unexpectedResponse", null);
+                throw new SessionException(SessionBundle.rbName, "unexpectedResponse", null);
             }
             Response res = (Response) responses.elementAt(0);
             return SessionResponse.parseXML(res.getContent());
@@ -1293,7 +1371,7 @@ public class Session extends GeneralTaskRunnable {
         String uri
     ) throws SessionException {
         String key = protocol + "://" + server + ":" + port + uri;
-        URL url = (URL) sessionServiceURLTable.get(key);
+        URL url = sessionServiceURLTable.get(key);
         if (url == null) {
             try {
                 url = WebtopNaming.getServiceURL(SESSION_SERVICE, protocol,
@@ -1465,9 +1543,8 @@ public class Session extends GeneralTaskRunnable {
         long oldMaxIdleTime = maxIdleTime;
         long oldMaxSessionTime = maxSessionTime;
         update(info);
-        if ((scheduledExecutionTime() == -1) || (oldMaxCachingTime >
-            maxCachingTime) || (oldMaxIdleTime > maxIdleTime) ||
-            (oldMaxSessionTime > maxSessionTime)) {
+        if ((!isScheduled()) || (oldMaxCachingTime > maxCachingTime) ||
+                (oldMaxIdleTime > maxIdleTime) || (oldMaxSessionTime > maxSessionTime)) {
             scheduleToTimerPool();
         }
     }
@@ -1499,8 +1576,7 @@ public class Session extends GeneralTaskRunnable {
             sessionState = DESTROYED;
         sessionProperties = info.properties;
         if (timedOutAt <= 0) {
-            String sessionTimedOutProp = (String) sessionProperties
-                    .get("SessionTimedOut");
+            String sessionTimedOutProp = sessionProperties.get("SessionTimedOut");
             if (sessionTimedOutProp != null) {
                 try {
                     timedOutAt = Long.parseLong(sessionTimedOutProp);
@@ -1514,8 +1590,7 @@ public class Session extends GeneralTaskRunnable {
         // note : do not use getProperty() call here to avoid unexpected
         // recursion via
         // refresh()
-        String restrictionProp = (String) sessionProperties
-                .get(TOKEN_RESTRICTION_PROP);
+        String restrictionProp = sessionProperties.get(TOKEN_RESTRICTION_PROP);
         if (restrictionProp != null) {
             try {
                 restriction = TokenRestrictionFactory
@@ -1631,8 +1706,7 @@ public class Session extends GeneralTaskRunnable {
     private void addInternalSessionListener() {
         try {
             if (SessionNotificationHandler.handler == null) {
-                SessionNotificationHandler.handler = 
-                    new SessionNotificationHandler(sessionTable);
+                SessionNotificationHandler.handler = new SessionNotificationHandler();
                 PLLClient.addNotificationHandler(Session.SESSION_SERVICE,
                         SessionNotificationHandler.handler);
             }
@@ -1833,7 +1907,7 @@ public class Session extends GeneralTaskRunnable {
      * Set the cookie Mode based on whether the request has cookies or not. This
      * method is called from <code>createSSOToken(request)</code> method in
      * <code>SSOTokenManager</code>.
-     * 
+     *
      * @param cookieMode whether request has cookies or not.
      */
     public void setCookieMode(Boolean cookieMode) {
@@ -1862,7 +1936,7 @@ public class Session extends GeneralTaskRunnable {
      * @param sid session ID.
      */
     public static void markNonLocal(SessionID sid) {
-        Session sess = (Session) sessionTable.get(sid);
+        Session sess = readSession(sid);
         if (sess != null) {
             sess.sessionIsLocal = false;
         }
@@ -2035,7 +2109,7 @@ public class Session extends GeneralTaskRunnable {
                         long oldMaxIdleTime = session.maxIdleTime;
                         long oldMaxSessionTime = session.maxSessionTime;
                         session.update(info);
-                        if ((scheduledExecutionTime() == -1) ||
+                        if ((!isScheduled()) ||
                             (oldMaxCachingTime > session.maxCachingTime) ||
                             (oldMaxIdleTime > session.maxIdleTime) ||
                             (oldMaxSessionTime > session.maxSessionTime)) {
@@ -2052,5 +2126,46 @@ public class Session extends GeneralTaskRunnable {
             }
             session.setIsPolling(false);
         }
+    }
+
+    /**
+     * Checks for a Session in the Session table.
+     * @param sessionID Non null sessionID of the Session to lookup.
+     * @return boolean true indicates Session is present.
+     */
+    private static boolean hasSession(SessionID sessionID) {
+        Reject.ifNull(sessionID);
+        return sessionTable.get(sessionID) != null;
+    }
+
+    /**
+     * Reads a Session from the Session table.
+     * @param sessionID Non null sessionID of the Session to lookup.
+     * @return Null indicates no Session present, otherwise non null.
+     */
+    static Session readSession(SessionID sessionID) {
+        Reject.ifNull(sessionID);
+        return sessionTable.get(sessionID);
+    }
+
+    /**
+     * Store a Session in the table.
+     *
+     * @param session The Session to store. Non null.
+     */
+    private static void writeSession(Session session) {
+        Reject.ifNull(session);
+        Reject.ifNull(session.getID());
+        sessionTable.put(session.getID(), session);
+    }
+
+    /**
+     * Delete the Session from the table.
+     * @param sessionID The SessionID of the Session to delete. Non null.
+     * @return A possibly null Session if none was matched, otherwise non null.
+     */
+    private static Session deleteSession(SessionID sessionID) {
+        Reject.ifNull(sessionID);
+        return sessionTable.remove(sessionID);
     }
 }

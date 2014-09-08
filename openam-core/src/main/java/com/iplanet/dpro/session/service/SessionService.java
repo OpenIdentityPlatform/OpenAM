@@ -115,8 +115,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -280,13 +278,14 @@ public class SessionService {
 
     private static SecureRandom secureRandom = null;
 
-    private static Hashtable sessionTable = null;
+    private static Hashtable<SessionID, InternalSession> sessionTable = null;
 
     private static Set remoteSessionSet = null;
 
     private static final Hashtable<String, InternalSession> sessionHandleTable = new Hashtable<String, InternalSession>();
 
-    private static Map restrictedTokenMap = Collections.synchronizedMap(new HashMap());
+    private static Map<SessionID, SessionID> restrictedTokenMap =
+            Collections.synchronizedMap(new HashMap<SessionID, SessionID>());
 
     private static String sessionServer;
 
@@ -353,7 +352,18 @@ public class SessionService {
      * Indicates whether to use crosstalk or session persistence to resolve remote sessions. Always true when session
      * persistence/SFO is disabled.
      */
-    private static volatile boolean isCrosstalkEnabled = true;
+    private static volatile boolean isReducedCrosstalkEnabled = true;
+
+    /**
+     * The number of minutes to retain {@link Session} objects in DESTROYED state while waiting
+     * for delete replication to occur if reduced cross-talk is enabled.
+     */
+    private static volatile long reducedCrosstalkPurgeDelay = 5;
+
+    /**
+     * Indicates what broadcast to undertake on session logout/destroy
+     */
+    private static volatile SessionBroadcastMode logoutDestroyBroadcast = SessionBroadcastMode.OFF;
 
     // Must be True to permit Session Failover HA to be available.
     private static boolean isSiteEnabled = false;  // If this is set to True and no Site is found, issues will arise
@@ -545,7 +555,7 @@ public class SessionService {
                                   TokenRestriction restriction) throws SessionException {
 
         // locate master session
-        InternalSession session = (InternalSession) sessionTable.get(masterSid);
+        InternalSession session = sessionTable.get(masterSid);
         if (session == null) {
             session = sessionService.recoverSession(masterSid);
 
@@ -748,7 +758,7 @@ public class SessionService {
         boolean isSessionStored = false;
         if (sid == null)
             return null;
-        InternalSession session = (InternalSession) sessionTable.remove(sid);
+        InternalSession session = sessionTable.remove(sid);
 
         if (session != null) {
             remoteSessionSet.remove(sid);
@@ -820,10 +830,18 @@ public class SessionService {
     }
 
     /**
-     * Returns true if crosstalk is enabled (or is session failover is disabled).
+     * Returns true if crosstalk is reduced (and if session failover is enabled).
      */
-    public boolean isCrossTalkEnabled() {
-        return !isSessionFailoverEnabled || isCrosstalkEnabled;
+    public boolean isReducedCrossTalkEnabled() {
+        return isSessionFailoverEnabled && isReducedCrosstalkEnabled;
+    }
+
+    /**
+     * The number of minutes to retain {@link Session} objects in DESTROYED state while waiting
+     * for delete replication to occur if reduced cross-talk is enabled.
+     */
+    public long getReducedCrosstalkPurgeDelay() {
+        return reducedCrosstalkPurgeDelay;
     }
 
     /**
@@ -951,12 +969,22 @@ public class SessionService {
             return null;
         // check if sid is actually a handle return null
         // (in order to prevent from assuming recovery case)
-        if (sid.toString().startsWith(SHANDLE_SCHEME_PREFIX)) {
+        if (isSessionHandle(sid)) {
             return null;
         }
 
-        InternalSession is = (InternalSession) sessionTable.get(sid);
+        InternalSession is = sessionTable.get(sid);
         return is;
+    }
+
+    /**
+     * Checks if the provided SessionID actually represents a session handle.
+     *
+     * @param sid A SessionID that may represent a standard session id or a session handle.
+     * @return true if SessionID is actually a session handle.
+     */
+    public static boolean isSessionHandle(SessionID sid) {
+        return sid.toString().startsWith(SHANDLE_SCHEME_PREFIX);
     }
 
     /**
@@ -997,7 +1025,7 @@ public class SessionService {
      */
     private InternalSession resolveToken(SessionID token)
             throws SessionException {
-        InternalSession sess = (InternalSession) sessionTable.get(token);
+        InternalSession sess = sessionTable.get(token);
         if (sess == null) {
             sess = resolveRestrictedToken(token, true);
         }
@@ -1012,10 +1040,10 @@ public class SessionService {
 
     private InternalSession resolveRestrictedToken(SessionID token,
                                                    boolean checkRestriction) throws SessionException {
-        SessionID sid = (SessionID) restrictedTokenMap.get(token);
+        SessionID sid = restrictedTokenMap.get(token);
         if (sid == null)
             return null;
-        InternalSession session = (InternalSession) sessionTable.get(sid);
+        InternalSession session = sessionTable.get(sid);
         if (session == null) {
             // orphaned restricted token
             restrictedTokenMap.remove(token);
@@ -1213,20 +1241,7 @@ public class SessionService {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            ConcurrentMap<String, Set<SessionID>> urls = session.getSessionEventURLs();
-
-            Set<SessionID> sids = urls.get(url);
-            if (sids == null) {
-                sids = Collections.newSetFromMap(new ConcurrentHashMap<SessionID, Boolean>());
-                Set<SessionID> previousValue = urls.putIfAbsent(url, sids);
-                if (previousValue != null) {
-                    sids = previousValue;
-                }
-            }
-
-            if (sids.add(sid)) {
-                session.updateForFailover();
-            }
+            session.addSessionEventURL(url, sid);
         }
     }
 
@@ -1390,7 +1405,7 @@ public class SessionService {
      * @throws SessionException
      */
     public void logout(SessionID sid) throws SessionException {
-        if (sid == null || sid.toString().startsWith(SHANDLE_SCHEME_PREFIX)) {
+        if (sid == null || isSessionHandle(sid)) {
             throw new SessionException(SessionBundle.getString("invalidSessionID") + sid);
         }
         //if the provided sid was a restricted token, resolveToken will always validate the restriction, so there is no
@@ -1816,7 +1831,7 @@ public class SessionService {
                 secureRandom = SecureRandom.getInstance("SHA1PRNG");
             }
 
-            sessionTable = new Hashtable();
+            sessionTable = new Hashtable<SessionID, InternalSession>();
             remoteSessionSet = Collections.synchronizedSet(new HashSet());
             if (stats.isEnabled()) {
                 maxSessionStats = new SessionMaxStats(sessionTable);
@@ -2231,8 +2246,16 @@ public class SessionService {
                     useInternalRequestRouting = true;
 
                     // Determine whether crosstalk is enabled or disabled (default to false in SFO case).
-                    isCrosstalkEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs,
-                            CoreTokenConstants.IS_CROSSTALK_ENABLED, false);
+                    isReducedCrosstalkEnabled = CollectionHelper.getBooleanMapAttr(sessionAttrs,
+                            CoreTokenConstants.IS_REDUCED_CROSSTALK_ENABLED, true);
+
+                    if (isReducedCrosstalkEnabled) {
+                        logoutDestroyBroadcast = SessionBroadcastMode.valueOf(CollectionHelper.getMapAttr(sessionAttrs,
+                                CoreTokenConstants.LOGOUT_DESTROY_BROADCAST, SessionBroadcastMode.OFF.name()));
+                    }
+
+                    reducedCrosstalkPurgeDelay = CollectionHelper.getLongMapAttr(sessionAttrs,
+                            CoreTokenConstants.REDUCED_CROSSTALK_PURGE_DELAY, 5, sessionDebug);
 
                     // Obtain Site Ids
                     Set<String> serverIDs = WebtopNaming.getSiteNodes(sessionServerID);
@@ -2402,6 +2425,13 @@ public class SessionService {
     }
 
     /**
+     * Indicates what broadcast to undertake on session logout/destroy
+     */
+    public SessionBroadcastMode getLogoutDestroyBroadcast() {
+        return logoutDestroyBroadcast;
+    }
+
+    /**
      * Inner Session Notification Publisher Class Thread.
      */
     class SessionNotificationSender implements Runnable {
@@ -2411,6 +2441,7 @@ public class SessionService {
         private InternalSession session;
 
         private int eventType;
+        private Map<String, Set<SessionID>> urls;
 
         SessionNotificationSender(SessionService ss, InternalSession sess,
                                   int evttype) {
@@ -2424,21 +2455,20 @@ public class SessionService {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();   
+            this.urls = session.getSessionEventURLs(eventType, logoutDestroyBroadcast);
             // CHECK THE GLOBAL URLS FIRST
             if (!sessionService.sessionEventURLs.isEmpty()) {
                 Enumeration aenum = sessionService.sessionEventURLs.elements();
 
-                SessionNotification snGlobal = new SessionNotification(session
-                        .toSessionInfo(), eventType, System.currentTimeMillis());
+                SessionNotification snGlobal = new SessionNotification(session.toSessionInfo(), eventType,
+                        System.currentTimeMillis());
 
                 while (aenum.hasMoreElements()) {
                     String url = (String) aenum.nextElement();
                     try {
                         URL parsedUrl = new URL(url);
                         if (sessionService.isLocalSessionService(parsedUrl)) {
-                            SessionNotificationHandler.handler
-                                    .processNotification(snGlobal);
+                            SessionNotificationHandler.handler.processNotification(snGlobal);
                             // remove this URL from the individual url list
                             urls.remove(url);
                         } else {
@@ -2448,8 +2478,7 @@ public class SessionService {
                         // than no need to send individual notification.
 
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error(
-                                "Local Global notification to " + url, e);
+                        sessionService.sessionDebug.error("Local Global notification to " + url, e);
                     }
                 }
             }
@@ -2465,17 +2494,16 @@ public class SessionService {
 
                         if (sessionService.isLocalSessionService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
-                                SessionInfo info = sessionInfoFactory.getSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
-                                        info, eventType, System.currentTimeMillis());
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionNotification sn = new SessionNotification(info, eventType,
+                                        System.currentTimeMillis());
                                 SessionNotificationHandler.handler.processNotification(sn);
                             }
                         } else {
                             remoteURLExists = true;
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error(
-                            "Local Individual notification to " + url, e);
+                        sessionService.sessionDebug.error("Local Individual notification to " + url, e);
                     }
                 }
             }
@@ -2486,13 +2514,14 @@ public class SessionService {
          * Thread which sends the Session Notification.
          */
         public void run() {
-            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
+            if (urls == null) {
+                throw new IllegalStateException("Must call sendToLocal before starting thread");
+            }
             if (!sessionService.sessionEventURLs.isEmpty()) {
 
-                SessionNotification snGlobal = new SessionNotification(session
-                        .toSessionInfo(), eventType, System.currentTimeMillis());
-                Notification notGlobal = new Notification(snGlobal
-                        .toXMLString());
+                SessionNotification snGlobal = new SessionNotification(session.toSessionInfo(), eventType,
+                        System.currentTimeMillis());
+                Notification notGlobal = new Notification(snGlobal.toXMLString());
                 NotificationSet setGlobal = new NotificationSet(SESSION_SERVICE);
                 setGlobal.addNotification(notGlobal);
 
@@ -2506,12 +2535,9 @@ public class SessionService {
                         // ONLY SEND TO REMOTE URL
                         if (!sessionService.isLocalSessionService(parsedUrl)) {
                             PLLServer.send(parsedUrl, setGlobal);
-                            //remove this url from the indvidual url list.
-                            urls.remove(url);
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error(
-                                "Remote Global notification to " + url, e);
+                        sessionService.sessionDebug.error("Remote Global notification to " + url, e);
                     }
                 }
             }
@@ -2526,9 +2552,9 @@ public class SessionService {
 
                         if (!sessionService.isLocalSessionService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
-                                SessionInfo info = sessionInfoFactory.getSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
-                                    info, eventType, System.currentTimeMillis());
+                                SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
+                                SessionNotification sn = new SessionNotification(info, eventType,
+                                        System.currentTimeMillis());
                                 Notification not = new Notification(sn.toXMLString());
                                 NotificationSet set = new NotificationSet(SESSION_SERVICE);
                                 set.addNotification(not);
@@ -2536,8 +2562,7 @@ public class SessionService {
                             }
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error(
-                            "Remote Individual notification to " + url, e);
+                        sessionService.sessionDebug.error("Remote Individual notification to " + url, e);
                     }
                 }
             }
@@ -2683,7 +2708,7 @@ public class SessionService {
             }
 
             SessionID sid = new SessionID(in.readUTF());
-            return (InternalSession) sessionTable.get(sid);
+            return sessionTable.get(sid);
 
         } catch (Exception ex) {
             sessionDebug.error("Failed to retrieve new session", ex);
@@ -2829,7 +2854,7 @@ public class SessionService {
         // switch to non-local mode for cached cient side session
         // image
         Session.markNonLocal(sid);
-        InternalSession is = (InternalSession) sessionTable.remove(sid);
+        InternalSession is = sessionTable.remove(sid);
         if (is != null) {
             is.cancel();
             removeSessionHandle(is);
@@ -2913,7 +2938,7 @@ public class SessionService {
                 HttpURLConnection conn = invokeRemote(url, sid, null);
                 in = new DataInputStream(conn.getInputStream());
 
-                sess = (InternalSession) sessionTable.get(sid);
+                sess = sessionTable.get(sid);
                 if (sess == null) {
                     sess = resolveRestrictedToken(sid, false);
                 }
@@ -3135,7 +3160,7 @@ public class SessionService {
         if (!isSessionFailoverEnabled) {
             return HttpURLConnection.HTTP_NOT_IMPLEMENTED;
         }
-        InternalSession is = (InternalSession) sessionTable.get(sid);
+        InternalSession is = sessionTable.get(sid);
 
         if (is == null) {
             sessionDebug.error("handleSaveSession: session not found " + sid);

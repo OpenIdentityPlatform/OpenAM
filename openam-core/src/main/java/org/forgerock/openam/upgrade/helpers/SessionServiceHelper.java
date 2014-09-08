@@ -72,7 +72,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
     private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
 
-    private final static String CROSSTALK_ENABLED = CoreTokenConstants.IS_CROSSTALK_ENABLED;
+    private final static String REDUCED_CROSSTALK_ENABLED = CoreTokenConstants.IS_REDUCED_CROSSTALK_ENABLED;
 
     public SessionServiceHelper() {
         attributes.add(SFO_USER_ATTR);
@@ -102,8 +102,8 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
                     break;
                 }
             }
-        } else if (CROSSTALK_ENABLED.equals(newAttr.getName())) {
-            updateDefaultValues(newAttr, asSet("true"));
+        } else if (REDUCED_CROSSTALK_ENABLED.equals(newAttr.getName())) {
+            updateDefaultValues(newAttr, asSet("false"));
         }
 
         return newAttr;

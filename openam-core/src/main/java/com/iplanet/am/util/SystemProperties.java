@@ -392,6 +392,24 @@ public class SystemProperties {
     }
 
     /**
+     * @param key The System Property key to lookup.
+     * @param defaultValue If the property was not set, or could not be parsed to a long.
+     * @return Either the defaultValue, or the numeric value assigned to the System Property.
+     */
+    public static long getAsLong(String key, long defaultValue) {
+        String value = get(key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Returns all the properties defined and their values.
      * 
      * @return Properties object with all the key value pairs.

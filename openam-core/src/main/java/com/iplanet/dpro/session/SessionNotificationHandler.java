@@ -36,18 +36,15 @@ import com.iplanet.dpro.session.share.SessionNotification;
 import com.iplanet.services.comm.client.NotificationHandler;
 import com.iplanet.services.comm.share.Notification;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Hashtable;
+
 import java.util.Vector;
 
 /**
  * <code>SessionNotificationHandler</code> implements
- * <code>NotificationHandler</code> processes the notifications for a session 
+ * <code>NotificationHandler</code> processes the notifications for a session
  * object
- *
  */
 public class SessionNotificationHandler implements NotificationHandler {
-
-    private Hashtable sessionTable;
 
     public static SessionNotificationHandler handler = null;
 
@@ -56,22 +53,14 @@ public class SessionNotificationHandler implements NotificationHandler {
     static {
         sessionDebug = Debug.getInstance("amSession");
     }
-    
+
+
     /**
-     * Constructs <code>SessionNotificationHandler</code>
-     * @param table Session table
+     * Process the notification.
+     *
+     * @param notifications array of notifications to be processed.
      */
-    public SessionNotificationHandler(Hashtable table) {
-        sessionTable = table;
-
-    }
-
-   /**
-    * Process the notification.
-    *
-    * @param notifications array of notifications to be processed.
-    */
-   public void process(Vector notifications) {
+    public void process(Vector notifications) {
         for (int i = 0; i < notifications.size(); i++) {
             Notification not = (Notification) notifications.elementAt(i);
             SessionNotification snot = SessionNotification.parseXML(not
@@ -82,27 +71,23 @@ public class SessionNotificationHandler implements NotificationHandler {
         }
     }
 
-   /**
-    * Process the notification.
-    *
-    * @param snot Session Notification object.
-    */
-   public void processNotification(SessionNotification snot) {
+    /**
+     * Process the notification.
+     *
+     * @param snot Session Notification object.
+     */
+    public void processNotification(SessionNotification snot) {
         SessionInfo info = snot.getSessionInfo();
 
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
-        SessionID sid = new SessionID(info.sid);
-        Session session = null;
-        session = (Session) sessionTable.get(sid);
-        if (session != null) {
-            if (!info.state.equals("valid")) {
-                Session.removeSID(sid);
-                return;
-            }
+        if (!info.state.equals("valid")) {
+            Session.removeRemoteSID(info);
+            return;
         }
 
-
+        SessionID sid = new SessionID(info.sid);
+        Session session = Session.readSession(sid);
         try {
             if (session == null) {
                 // a new session is created

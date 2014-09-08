@@ -69,10 +69,10 @@ public class CoreTokenConstants {
     public static final String IS_SFO_ENABLED =
             "iplanet-am-session-sfo-enabled";
     /**
-     * System property for checking whether session crosstalk is enabled/disabled. See
-     * {@link com.iplanet.dpro.session.service.SessionService#isCrossTalkEnabled()}.
+     * System property for checking whether session crosstalk is reduced. See
+     * {@link com.iplanet.dpro.session.service.SessionService#isReducedCrossTalkEnabled()}.
      */
-    public static final String IS_CROSSTALK_ENABLED = "iplanet-am-session-crosstalk-enabled";
+    public static final String IS_REDUCED_CROSSTALK_ENABLED = "iplanet-am-session-reduced-crosstalk-enabled";
     public static final String OBJECT_CLASS = "objectClass";
 
     public static final String FR_CORE_TOKEN = "frCoreToken";
@@ -135,4 +135,14 @@ public class CoreTokenConstants {
      * The size of each asynchronous work queue.
      */
     public static final String CTS_ASYNC_QUEUE_SIZE = "org.forgerock.services.cts.async.queue.size";
+
+    /**
+     * Where to broadcast session logout/destroy to.
+     */
+    public static final String LOGOUT_DESTROY_BROADCAST = "iplanet-am-session-logout-destroy-broadcast";
+
+    /**
+     * The number of minutes to retain Sessions in DESTROYED state while waiting for delete replication to occur.
+     */
+    public static final String REDUCED_CROSSTALK_PURGE_DELAY = "iplanet-am-session-reduced-crosstalk-purge-delay";
 }

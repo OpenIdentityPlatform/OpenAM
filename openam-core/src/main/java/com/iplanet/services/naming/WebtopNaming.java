@@ -571,7 +571,7 @@ public class WebtopNaming {
      * @throws Exception if an error occurs when updating the
      *     nameing table
      */
-    public static Vector getPlatformServerList() throws Exception {
+    public static Vector<String> getPlatformServerList() throws Exception {
          return getPlatformServerList(true);
     }
 
@@ -587,7 +587,7 @@ public class WebtopNaming {
      *     nameing table
      */
 
-    public static Vector getPlatformServerList(boolean update)
+    public static Vector<String> getPlatformServerList(boolean update)
              throws Exception {
          getNamingProfile(update);
          return platformServers;
