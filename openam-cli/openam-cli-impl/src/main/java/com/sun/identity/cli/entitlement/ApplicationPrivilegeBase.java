@@ -25,6 +25,10 @@
  * $Id: ApplicationPrivilegeBase.java,v 1.2 2009/11/19 01:02:02 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
 package com.sun.identity.cli.entitlement;
 
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -42,6 +46,8 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdType;
+
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -120,8 +126,8 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
         ApplicationPrivilege.PossibleAction action = mapActionsToEnum.get(actions);
         if (action == null) {
             String[] param = {actions};
-            throw new CLIException("privilege-application-action-invalid",
-                param, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            throw new CLIException(MessageFormat.format(getResourceString("privilege-application-action-invalid"),
+                    (Object[])param), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
         return action;
     }
@@ -157,8 +163,8 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
             subject, realm, appName);
         if (application == null) {
             String[] param = {appName};
-            throw new CLIException("privilege-application-application-invalid",
-                param, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            throw new CLIException(MessageFormat.format(getResourceString("privilege-application-application-invalid"),
+                    (Object[])param), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
         
         Set<String> delResources = new HashSet<String>();
@@ -186,8 +192,8 @@ public abstract class ApplicationPrivilegeBase extends AuthenticatedCommand {
             return false;
         }
         String[] param = {subjectType};
-        throw new CLIException("privilege-application-subject-type-invalid",
-            param, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        throw new CLIException(MessageFormat.format(getResourceString("privilege-application-subject-type-invalid"),
+                (Object[])param), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
     }
 
     protected String getDisplayAction(ApplicationPrivilege appPrivilege) {

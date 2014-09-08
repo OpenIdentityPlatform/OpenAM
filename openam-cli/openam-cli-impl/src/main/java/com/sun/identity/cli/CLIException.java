@@ -27,7 +27,8 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.cli;
 
@@ -40,11 +41,6 @@ import java.util.Locale;
 public class CLIException extends Exception {
     private int exitCode = 0;
     private String subcommandName;
-
-    public CLIException(String string, String[] param,
-        int REQUEST_CANNOT_BE_PROCESSED) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
     /**
      * Constructs a CLI Exception.
