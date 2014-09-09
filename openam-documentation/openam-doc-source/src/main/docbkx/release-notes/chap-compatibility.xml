@@ -198,6 +198,14 @@
      before deployment.
     </para>
    </listitem>
+
+   <listitem>
+    <para>
+     The class hierarchy for the <literal>ResourceName</literal> interfaces has
+     changed. Previous implementations should be source-compatible, but will not
+     be binary-compatible, and will need recompiling.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
