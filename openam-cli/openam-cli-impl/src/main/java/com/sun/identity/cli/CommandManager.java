@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.cli;
@@ -113,10 +114,8 @@ public class CommandManager {
                 Bootstrap.load();
                 // Initialize AdminTokenAction
                 AdminTokenAction.getInstance().authenticationInitialized();
-		System.setProperty("java.util.logging.config.class",
-		    "com.sun.identity.log.s1is.LogConfigReader");
-		System.setProperty("java.util.logging.manager",
-		    "com.sun.identity.log.LogManager");
+                System.setProperty("java.util.logging.config.class", "com.sun.identity.log.s1is.LogConfigReader");
+                System.setProperty("java.util.logging.manager", "com.sun.identity.log.LogManager");
             } catch (ConfiguratorException ex) {
                 bBootstrapped = false;
                 if ((argv.length > 0) &&
@@ -182,6 +181,13 @@ public class CommandManager {
                     "remaining-unprocessed-requests"), (Object[])arg);
             }
             String msg = e.getL10NMessage(getLocale());
+            if (msg == null) {
+                // If cannot get L10N Message, then get the detail message.
+                msg = e.getMessage();
+                if (msg == null) {
+                    msg = "An unknown error has occurred. Please check the debug logs.";
+                }
+            }
 
             if (outputWriter != null) {
                 outputWriter.printlnError(msg);
@@ -762,7 +768,7 @@ public class CommandManager {
      */
     public void registerSSOToken(SSOToken ssoToken) {
         ssoTokens.add(ssoToken);
-	Logger.token.set(ssoToken);
+        Logger.token.set(ssoToken);
     }
 
     private void destroySSOTokens() {

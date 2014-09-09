@@ -26,7 +26,8 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.policy;
 
@@ -1120,11 +1121,11 @@ public class PolicyUtils {
                 }
             }
         } catch (IOException e) {
-            throw new PolicyException(e);
+            throw  new PolicyException(ResBundleUtils.rbName, "xml_parsing_error", null, e);
         } catch (SAXException e) {
-            throw new PolicyException(e);
+            throw  new PolicyException(ResBundleUtils.rbName, "xml_parsing_error", null, e);
         } catch (ParserConfigurationException e) {
-            throw new PolicyException(e);
+            throw  new PolicyException(ResBundleUtils.rbName, "xml_parsing_error", null, e);
         }
     }
 
