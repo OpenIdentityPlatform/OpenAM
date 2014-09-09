@@ -14,6 +14,10 @@
  * Copyright 2014 ForgeRock AS.
  */
 
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
+
 package org.forgerock.openam.oauth2;
 
 import com.sun.identity.authentication.AuthContext;
@@ -106,11 +110,11 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
         } finally {
             if (auditLogger.isAuditLogEnabled()) {
                 if (authenticated) {
-                    String[] obs = {"FAILED_AUTHENTICATE_CLIENT", clientCredentials.clientId};
-                    auditLogger.logErrorMessage("FAILED_AUTHENTICATE_CLIENT", obs, null);
-                } else {
-                    String[] obs = {"AUTHENTICATED_CLIENT", clientCredentials.clientId};
+                    String[] obs = {clientCredentials.clientId};
                     auditLogger.logAccessMessage("AUTHENTICATED_CLIENT", obs, null);
+                } else {
+                    String[] obs = {clientCredentials.clientId};
+                    auditLogger.logErrorMessage("FAILED_AUTHENTICATE_CLIENT", obs, null);
                 }
             }
         }

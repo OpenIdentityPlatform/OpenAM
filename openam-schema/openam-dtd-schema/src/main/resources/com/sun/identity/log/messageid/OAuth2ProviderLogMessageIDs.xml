@@ -95,7 +95,6 @@
                 loglevel="LL_INFO"
                 description="Authenticated an oauth 2.0 client">
         <datainfo>
-            <item>message</item>
             <item>client id</item>
         </datainfo>
         <triggers>
@@ -106,7 +105,9 @@
     <logmessage name="FAILED_AUTHENTICATE_CLIENT" id="16"
                 loglevel="LL_INFO"
                 description="Failed authenticating an oauth 2.0 client">
-        <datainfo />
+        <datainfo>
+            <item>client id</item>
+        </datainfo>
         <triggers>
             <item>Failed authenticating an oauth 2.0 client</item>
         </triggers>
