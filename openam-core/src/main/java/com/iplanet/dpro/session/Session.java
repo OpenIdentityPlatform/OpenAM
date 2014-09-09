@@ -968,6 +968,17 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
+     * destruction that has this server as its home server.
+     *
+     * @param info Current state of session
+     */
+    static void removeLocalSID(SessionInfo info) {
+        SessionID sessionID = new SessionID(info.sid);
+        removeSID(sessionID);
+    }
+
+    /**
+     * Wrapper method for {@link #removeSID} only to be called when receiving notification of session
      * destruction from the home server.
      *
      * This method should only be called when the identified session has another instance

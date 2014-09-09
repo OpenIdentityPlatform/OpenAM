@@ -99,6 +99,7 @@ public class SessionRequest {
 
     public static final int GetSessionCount = 7;
 
+
     static final char QUOTE = '\"';
 
     static final char NL = '\n';

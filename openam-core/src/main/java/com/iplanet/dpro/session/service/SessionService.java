@@ -380,7 +380,7 @@ public class SessionService {
      * The URL Vector for ALL session events : SESSION_CREATION, IDLE_TIMEOUT,
      * MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY.
      */
-    private static Vector sessionEventURLs = new Vector();
+    private static final Vector<String> sessionEventURLs = new Vector<String>();
 
     private static URL sessionServiceID = null;
 
@@ -1620,8 +1620,7 @@ public class SessionService {
     public void sendEvent(InternalSession sess, int evttype) {
         sessionDebug.message("Running sendEvent, type = " + evttype);
         try {
-            SessionNotificationSender sns =
-                    new SessionNotificationSender(this, sess, evttype);
+            SessionNotificationSender sns = new SessionNotificationSender(sess, evttype);
             // First send local notification. sendToLocal will return
             // true if remote URL's exists than add the notification 
             // to the thread pool to process remote notifications.
@@ -2456,18 +2455,13 @@ public class SessionService {
      */
     class SessionNotificationSender implements Runnable {
 
-        private SessionService sessionService;
-
         private InternalSession session;
-
         private int eventType;
         private Map<String, Set<SessionID>> urls;
 
-        SessionNotificationSender(SessionService ss, InternalSession sess,
-                                  int evttype) {
-            sessionService = ss;
-            session = sess;
-            eventType = evttype;
+        SessionNotificationSender(InternalSession session, int eventType) {
+            this.session = session;
+            this.eventType = eventType;
         }
 
         /**
@@ -2476,54 +2470,54 @@ public class SessionService {
         boolean sendToLocal() {
             boolean remoteURLExists = false;
             this.urls = session.getSessionEventURLs(eventType, logoutDestroyBroadcast);
-            // CHECK THE GLOBAL URLS FIRST
-            if (!sessionService.sessionEventURLs.isEmpty()) {
-                Enumeration aenum = sessionService.sessionEventURLs.elements();
 
-                SessionNotification snGlobal = new SessionNotification(session.toSessionInfo(), eventType,
-                        System.currentTimeMillis());
+            // Check global URLs first
+            if (!sessionEventURLs.isEmpty()) {
 
-                while (aenum.hasMoreElements()) {
-                    String url = (String) aenum.nextElement();
+                SessionNotification globalNotification =
+                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
+
+                Enumeration<String> globalUrls = sessionEventURLs.elements();
+                while (globalUrls.hasMoreElements()) {
+                    String globalUrl = globalUrls.nextElement();
                     try {
-                        URL parsedUrl = new URL(url);
-                        if (sessionService.isLocalNotificationService(parsedUrl)) {
-                            SessionNotificationHandler.handler.processNotification(snGlobal);
-                            // remove this URL from the individual url list
-                            urls.remove(url);
+                        URL parsedGlobalUrl = new URL(globalUrl);
+                        if (isLocalNotificationService(parsedGlobalUrl)) {
+                            SessionNotificationHandler.handler.processLocalNotification(globalNotification);
+                            // If the Global notification is processed successfully
+                            // than no need to send individual notification.
+                            urls.remove(globalUrl);
                         } else {
+                            // If the Global notification is for a remote URL, it should be handled from run()
+                            // - This allows remote notification to be handled asynchronously from another thread
                             remoteURLExists = true;
                         }
-                        // If the Global notification is processed successfully
-                        // than no need to send individual notification.
-
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error("Local Global notification to " + url, e);
+                        sessionDebug.error("Local Global notification to " + globalUrl, e);
                     }
                 }
             }
 
-            // CHECK THE INDVIDUAL URL LIST
+            // The check individual URLs
             if (!urls.isEmpty()) {
                 for (Map.Entry<String, Set<SessionID>> entry : urls.entrySet()) {
-                    // ONLY SEND ONCE TO ONE LOCATION
                     String url = entry.getKey();
-
                     try {
                         URL parsedUrl = new URL(url);
-
-                        if (sessionService.isLocalNotificationService(parsedUrl)) {
+                        if (isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(info, eventType,
-                                        System.currentTimeMillis());
-                                SessionNotificationHandler.handler.processNotification(sn);
+                                SessionNotification notification =
+                                        new SessionNotification(info, eventType, System.currentTimeMillis());
+                                SessionNotificationHandler.handler.processLocalNotification(notification);
                             }
                         } else {
+                            // If the Global notification is for a remote URL, it should be handled from run()
+                            // - This allows remote notification to be handled asynchronously from another thread
                             remoteURLExists = true;
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error("Local Individual notification to " + url, e);
+                        sessionDebug.error("Local Individual notification to " + url, e);
                     }
                 }
             }
@@ -2537,52 +2531,53 @@ public class SessionService {
             if (urls == null) {
                 throw new IllegalStateException("Must call sendToLocal before starting thread");
             }
-            if (!sessionService.sessionEventURLs.isEmpty()) {
 
-                SessionNotification snGlobal = new SessionNotification(session.toSessionInfo(), eventType,
-                        System.currentTimeMillis());
-                Notification notGlobal = new Notification(snGlobal.toXMLString());
-                NotificationSet setGlobal = new NotificationSet(SESSION_SERVICE);
-                setGlobal.addNotification(notGlobal);
+            // Check global URLs first
+            if (!sessionEventURLs.isEmpty()) {
 
-                // CHECK THE GLOBAL URLS FIRST
-                Enumeration aenum = sessionService.sessionEventURLs.elements();
+                SessionNotification globalNotification =
+                        new SessionNotification(session.toSessionInfo(), eventType, System.currentTimeMillis());
+                Notification globalNotificationXml = new Notification(globalNotification.toXMLString());
+                NotificationSet globalNotificationSet = new NotificationSet(SESSION_SERVICE);
+                globalNotificationSet.addNotification(globalNotificationXml);
 
-                while (aenum.hasMoreElements()) {
-                    String url = (String) aenum.nextElement();
+                Enumeration<String> globalUrls = sessionEventURLs.elements();
+                while (globalUrls.hasMoreElements()) {
+                    String globalUrl = globalUrls.nextElement();
                     try {
-                        URL parsedUrl = new URL(url);
-                        // ONLY SEND TO REMOTE URL
-                        if (!sessionService.isLocalNotificationService(parsedUrl)) {
-                            PLLServer.send(parsedUrl, setGlobal);
+                        URL parsedGlobalUrl = new URL(globalUrl);
+                        // Only send to remote URLs, local URLs should be handled by sendToLocal
+                        if (!isLocalNotificationService(parsedGlobalUrl)) {
+                            PLLServer.send(parsedGlobalUrl, globalNotificationSet);
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error("Remote Global notification to " + url, e);
+                        sessionDebug.error("Remote Global notification to " + globalUrl, e);
                     }
                 }
             }
-            // CHECK THE INDIVIDUAL URLS LIST
+
+            // The check individual URLs
             if (!urls.isEmpty()) {
                 for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
                     String url = entry.getKey();
-                    // ONLY SEND ONCE TO ONE LOCATION
-
                     try {
                         URL parsedUrl = new URL(url);
-
-                        if (!sessionService.isLocalNotificationService(parsedUrl)) {
+                        // Only send to remote URLs, local URLs should be handled by sendToLocal
+                        if (!isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
+
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(info, eventType,
-                                        System.currentTimeMillis());
-                                Notification not = new Notification(sn.toXMLString());
-                                NotificationSet set = new NotificationSet(SESSION_SERVICE);
-                                set.addNotification(not);
-                                PLLServer.send(parsedUrl, set);
+                                SessionNotification notification =
+                                        new SessionNotification(info, eventType, System.currentTimeMillis());
+                                Notification notificationXml = new Notification(notification.toXMLString());
+                                NotificationSet notificationSet = new NotificationSet(SESSION_SERVICE);
+                                notificationSet.addNotification(notificationXml);
+
+                                PLLServer.send(parsedUrl, notificationSet);
                             }
                         }
                     } catch (Exception e) {
-                        sessionService.sessionDebug.error("Remote Individual notification to " + url, e);
+                        sessionDebug.error("Remote Individual notification to " + url, e);
                     }
                 }
             }

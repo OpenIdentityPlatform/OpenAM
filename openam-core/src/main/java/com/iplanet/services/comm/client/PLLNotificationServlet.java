@@ -24,13 +24,11 @@
  *
  * $Id: PLLNotificationServlet.java,v 1.6 2008/08/19 19:08:43 veiming Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.iplanet.services.comm.client;
 
+import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
 import com.iplanet.services.comm.share.PLLBundle;
 import com.sun.identity.common.ISLocaleContext;
@@ -128,28 +126,24 @@ public class PLLNotificationServlet extends HttpServlet {
     }
 
     /*
-     * This methid is used by doPost method. It gets the corresponding
-     * notification handler and passes the Notification objects to it for
-     * processing. @param notificationXML The XML String for the NotificationSet
-     * object.
+     * This method is used by doPost method. It gets the corresponding notification handler and passes the Notification
+     * objects to it for processing.
+     *
+     * @param notificationXML The XML String for the NotificationSet object.
      */
     private void handleNotification(String notificationXML)
             throws ServletException {
-        NotificationSet set = NotificationSet.parseXML(notificationXML);
-        Vector nots = set.getNotifications();
-        if (!nots.isEmpty()) {
+        NotificationSet notificationSet = NotificationSet.parseXML(notificationXML);
+        Vector<Notification> notifications = notificationSet.getNotifications();
+        if (!notifications.isEmpty()) {
             // Each notification in this set shall have the same service id
-            String serviceid = set.getServiceID();
+            String serviceID = notificationSet.getServiceID();
 
-            // Get the notification handler ...
-            NotificationHandler ns = PLLClient
-                    .getNotificationHandler(serviceid);
-            if (ns == null) {
-                throw new ServletException(PLLBundle
-                        .getString("noNotificationHandler")
-                        + serviceid);
+            NotificationHandler notificationHandler = PLLClient.getNotificationHandler(serviceID);
+            if (notificationHandler == null) {
+                throw new ServletException(PLLBundle.getString("noNotificationHandler") + serviceID);
             }
-            ns.process(nots);
+            notificationHandler.process(notifications);
         }
     }
 }

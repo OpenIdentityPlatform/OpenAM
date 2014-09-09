@@ -24,10 +24,8 @@
  *
  * $Id: SessionNotificationHandler.java,v 1.5 2008/07/23 18:13:55 ww203982 Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.iplanet.dpro.session;
 
@@ -62,13 +60,29 @@ public class SessionNotificationHandler implements NotificationHandler {
      */
     public void process(Vector notifications) {
         for (int i = 0; i < notifications.size(); i++) {
-            Notification not = (Notification) notifications.elementAt(i);
-            SessionNotification snot = SessionNotification.parseXML(not
-                    .getContent());
-            if (snot != null) {
-                processNotification(snot);
-            }
+            processRemoteNotification((Notification) notifications.elementAt(i));
         }
+    }
+
+    /**
+     * Process the notification.
+     *
+     * @param notification An XML Notification object describing changes to a remote Session
+     */
+    public void processRemoteNotification(Notification notification) {
+        SessionNotification snot = SessionNotification.parseXML(notification.getContent());
+        if (snot != null) {
+            processNotification(snot, false);
+        }
+    }
+
+    /**
+     * Process the notification.
+     *
+     * @param sessionNotification A SessionNotification object describing changes to a local Session
+     */
+    public void processLocalNotification(SessionNotification sessionNotification) {
+        processNotification(sessionNotification, true);
     }
 
     /**
@@ -76,13 +90,17 @@ public class SessionNotificationHandler implements NotificationHandler {
      *
      * @param snot Session Notification object.
      */
-    public void processNotification(SessionNotification snot) {
+    private void processNotification(SessionNotification snot, boolean isLocal) {
         SessionInfo info = snot.getSessionInfo();
 
         sessionDebug.message("SESSION NOTIFICATION : " + info.toXMLString());
 
         if (!info.state.equals("valid")) {
-            Session.removeRemoteSID(info);
+            if (isLocal) {
+                Session.removeLocalSID(info);
+            } else {
+                Session.removeRemoteSID(info);
+            }
             return;
         }
 
@@ -103,8 +121,7 @@ public class SessionNotificationHandler implements NotificationHandler {
             Session.removeSID(sid);
             return;
         }
-        SessionEvent evt = new SessionEvent(session,
-                snot.getNotificationType(), snot.getNotificationTime());
+        SessionEvent evt = new SessionEvent(session, snot.getNotificationType(), snot.getNotificationTime());
         Session.invokeListeners(evt);
     }
 

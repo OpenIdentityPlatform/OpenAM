@@ -24,10 +24,7 @@
  *
  * $Id: NotificationSet.java,v 1.2 2008/06/25 05:41:35 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.iplanet.services.comm.share;
 
@@ -82,7 +79,7 @@ public class NotificationSet {
 
     private String notificationSetID;
 
-    private Vector notificationVector = new Vector();
+    private final Vector<Notification> notificationVector = new Vector<Notification>();
 
     private static int notificationCount = 0;
 
@@ -136,7 +133,7 @@ public class NotificationSet {
      * 
      * @return A Vector of Notification objects.
      */
-    public Vector getNotifications() {
+    public Vector<Notification> getNotifications() {
         return notificationVector;
     }
 
@@ -172,7 +169,7 @@ public class NotificationSet {
 
         int numNotifications = notificationVector.size();
         for (int i = 0; i < numNotifications; i++) {
-            Notification notif = (Notification) notificationVector.elementAt(i);
+            Notification notif = notificationVector.elementAt(i);
             xml.append("<Notification");
             if (notif.getDtdID() != null) {
                 xml.append(" dtdid=").append(QUOTE).append(notif.getDtdID())
