@@ -41,6 +41,7 @@ import com.sun.identity.shared.encode.Hash;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceNotFoundException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
@@ -571,7 +572,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if (action.equalsIgnoreCase("confirm")) {
             confirmationIdCheck(context, request, handler, realm);
         } else if (action.equalsIgnoreCase("anonymousCreate")) {
-            anonymousCreate(context, request, realm, handler);
+            anonymousCreate(context, request, realm, handler, restSecurity);
         } else if (action.equalsIgnoreCase("forgotPassword")) {
             generateNewPasswordEmail(context, request, realm, restSecurity, handler);
         } else if (action.equalsIgnoreCase("forgotPasswordReset")) {
@@ -884,7 +885,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
 
     private void anonymousCreate(final ServerContext context, final ActionRequest request, final String realm,
-            final ResultHandler<JsonValue> handler) {
+            final ResultHandler<JsonValue> handler, RestSecurity restSecurity) {
 
         final JsonValue jVal = request.getContent();
         String tokenID = null;
@@ -892,6 +893,10 @@ public final class IdentityResource implements CollectionResourceProvider {
         String email;
 
         try{
+            if (!restSecurity.isSelfRegistration()) {
+                throw new BadRequestException("Self-registration disabled");
+            }
+
             tokenID = jVal.get(TOKEN_ID).asString();
             jVal.remove(TOKEN_ID);
             confirmationId = jVal.get(CONFIRMATION_ID).asString();
@@ -943,6 +948,11 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (CoreTokenException cte){ // For any unexpected CTS error
             debug.error("IdentityResource.anonymousCreate(): CTS Error : " + cte.getMessage());
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, cte.getMessage(), cte));
+        } catch (ServiceNotFoundException e) {
+            // Failure from RestSecurity
+            debug.error("Internal error", e);
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e));
+            return;
         }
     }
 
