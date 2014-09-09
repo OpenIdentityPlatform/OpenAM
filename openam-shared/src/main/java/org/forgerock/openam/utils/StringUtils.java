@@ -78,7 +78,7 @@ public final class StringUtils {
      * Encodes the passed String using an algorithm that's compatible
      * with JavaScript's <code>encodeURIComponent</code> function. Returns
      * <code>null</code> if the String is <code>null</code>.
-     * 
+     *
      * @param component String to be encoded.
      * @param encoding The name of character encoding.
      * @return the same value as JavaScript encodeURIComponent function
@@ -97,5 +97,37 @@ public final class StringUtils {
                 .replaceAll("\\%21", "!")
                 .replaceAll("\\%7E", "~");
         return result;
+    }
+
+    /**
+     * @param s string to test
+     * @return true if the specified string is null or zero length.
+     */
+    public static boolean isEmpty(final String s) {
+        return (s == null || s.length() == 0);
+    }
+
+    /**
+     * @param s string to test
+     * @return true if the specified string is null or when trimmed is empty (i.e. when trimmed it has zero length)
+     */
+    public static boolean isBlank(final String s) {
+        return (s == null || s.trim().length() == 0);
+    }
+
+    /**
+     * @param s string to test
+     * @return test if the specified string is not null and not empty (i.e. is greater than zero length).
+     */
+    public static boolean isNotEmpty(final String s) {
+        return (s != null && s.length() > 0);
+    }
+
+    /**
+     * @param s string to test
+     * @return true if the specified string is not null and when trimmed has greater than zero length.
+     */
+    public static boolean isNotBlank(final String s) {
+        return (s != null && s.trim().length() > 0);
     }
 }

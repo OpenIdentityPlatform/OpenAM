@@ -64,4 +64,41 @@ public class StringUtilsTest {
         assertThat(value).isEqualTo("Hello%20!'()~%20World");
     }
 
+    @Test
+    private void shouldBeEmpty() {
+        assertThat(StringUtils.isEmpty(null)).isTrue();
+        assertThat(StringUtils.isEmpty("")).isTrue();
+
+        assertThat(StringUtils.isEmpty("blah")).isFalse();
+        assertThat(StringUtils.isEmpty("    ")).isFalse();
+    }
+
+    @Test
+    public void shouldBeBlank() {
+        assertThat(StringUtils.isBlank(null)).isTrue();
+        assertThat(StringUtils.isBlank("")).isTrue();
+        assertThat(StringUtils.isBlank("             ")).isTrue();
+
+        assertThat(StringUtils.isBlank("abc")).isFalse();
+        assertThat(StringUtils.isBlank("   abc   ")).isFalse();
+    }
+
+    @Test
+    public void shouldNotBeEmpty() {
+        assertThat(StringUtils.isNotEmpty("abc")).isTrue();
+        assertThat(StringUtils.isNotEmpty("   ")).isTrue();
+
+        assertThat(StringUtils.isNotEmpty(null)).isFalse();
+        assertThat(StringUtils.isNotEmpty("")).isFalse();
+    }
+
+    @Test
+    public void shouldNotBeBlank() {
+        assertThat(StringUtils.isNotBlank("abc")).isTrue();
+        assertThat(StringUtils.isNotBlank("     abc     ")).isTrue();
+
+        assertThat(StringUtils.isNotBlank(null)).isFalse();
+        assertThat(StringUtils.isNotBlank("")).isFalse();
+        assertThat(StringUtils.isNotBlank("             ")).isFalse();
+    }
 }
