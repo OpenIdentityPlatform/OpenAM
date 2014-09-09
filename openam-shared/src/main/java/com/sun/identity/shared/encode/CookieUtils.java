@@ -26,15 +26,23 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.shared.encode;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -369,7 +377,7 @@ public class CookieUtils {
 
         // Once JavaEE6 is available, the following code can be simplified
         // to be one line response.addCookie(cookie)
-        StringBuffer sb = new StringBuffer(150);
+        StringBuilder sb = new StringBuilder();
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();
         if (path != null && path.length() > 0) {
@@ -383,7 +391,12 @@ public class CookieUtils {
         }
         int age = cookie.getMaxAge();
         if (age > -1) {
+            Date date = new Date(System.currentTimeMillis() + age * 1000l);
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz", Locale.UK);
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             sb.append(";max-age=").append(age);
+            // set Expires as < IE 8 does not support max-age
+            sb.append(";Expires=").append(sdf.format(date));
         }
         if (CookieUtils.isCookieSecure()) {
             sb.append(";secure");
