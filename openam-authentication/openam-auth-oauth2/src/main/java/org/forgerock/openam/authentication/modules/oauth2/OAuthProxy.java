@@ -66,7 +66,21 @@ public class OAuthProxy  {
         
         StringBuilder html = new StringBuilder();
         
-        try {        
+        try {
+            String code = req.getParameter(PARAM_CODE);
+            if (code != null && !OAuthUtil.isEmpty(code)) {
+                if (!ESAPI.validator().isValidInput(PARAM_CODE, code, "HTTPParameterValue", 512, true)) {
+                    OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
+                            + " is not valid!! : " + code);
+                    return getError("Request not valid");
+                }
+            }
+            if (action.contains("?")) {
+                action = action + "&code=" + code;
+            } else {
+                action = action + "?code=" + code;
+            }
+
             String onLoad = "document.postform.submit()";
 
             html.append("<html>\n").append("<body onLoad=\"")
@@ -74,19 +88,6 @@ public class OAuthProxy  {
             html.append("<form name=\"postform\" action=\"")
                 .append(action).append("\" method=\"post\">\n");
 
-           
-            String code = req.getParameter(PARAM_CODE);
-            if (code != null && !OAuthUtil.isEmpty(code)) {
-                if (ESAPI.validator().isValidInput(PARAM_CODE, code,
-                        "HTTPParameterValue", 512, true)) {
-                    html.append(input(PARAM_CODE, code));
-                } else {
-                    OAuthUtil.debugError("OAuthProxy.toPostForm: Parameter " + PARAM_CODE
-                            + " is not valid!! : " + code);
-                    return getError("Request not valid");
-                }
-            }
-            
             String activation = req.getParameter(PARAM_ACTIVATION);
             if (activation != null && !OAuthUtil.isEmpty(activation)) {
                 if (ESAPI.validator().isValidInput(PARAM_ACTIVATION, activation,

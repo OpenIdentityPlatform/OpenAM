@@ -38,7 +38,15 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.owasp.esapi.ESAPI;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,16 +64,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.owasp.esapi.ESAPI;
+import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
@@ -130,6 +130,12 @@ public class OAuth extends AMLoginModule {
                     requestedURI += "?" + requestedQuery;
                 }
 
+                // Bit of a hack but required for when the XUI is using the OAuth module so the redirect goes back to
+                // the XUI to handle the next authentication stage and not straight to the authenticate REST endpoint
+                if (requestedURI.contains("/json/authenticate")) {
+                    requestedURI = requestedURI.replace("/json/authenticate", "");
+                }
+
                 // Find the domains for which we are configured
                 Set<String> domains = AuthClientUtils.getCookieDomains();
                 
@@ -186,15 +192,14 @@ public class OAuth extends AMLoginModule {
                     OAuthUtil.debugMessage("OAuth.process(): code parameter: " + code);
 
                     String tokenSvcResponse = getContent(
-                            config.getTokenServiceUrl(code, proxyURL));
+                            config.getTokenServiceUrl(code, proxyURL), null);
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
                     String token = extractToken(tokenSvcResponse);
 
                     setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
 
-                    String profileSvcResponse = getContent(
-                            config.getProfileServiceUrl(token));
+                    String profileSvcResponse = getContent(config.getProfileServiceUrl(), "Bearer " + token);
 
                     OAuthUtil.debugMessage("OAuth.process(): Profile Svc "
                             + "response: " + profileSvcResponse);
@@ -451,15 +456,15 @@ public class OAuth extends AMLoginModule {
         }
         return dynamicUser;
     }
-    
-    
+
+
     // Obtain the user profile information from the OAuth 2.0 Identity Provider
     // Profile service configured for this module, either using first GET and
     // POST as a fall back
-    private String getContent(String serviceUrl) throws LoginException {
+    private String getContent(String serviceUrl, String authorizationHeader) throws LoginException {
 
         BufferedReader in = new BufferedReader(new InputStreamReader(
-                getContentStreamByGET(serviceUrl)));
+                getContentStreamByGET(serviceUrl, authorizationHeader)));
         StringBuilder buf = new StringBuilder();
         try {
             String str;
@@ -504,10 +509,8 @@ public class OAuth extends AMLoginModule {
                 return null;      
             }     
     }
-    
-    
-    // Obtain the Profile Service information using GET
-    public InputStream getContentStreamByGET(String serviceUrl)
+
+    public InputStream getContentStreamByGET(String serviceUrl, String authorizationHeader)
             throws LoginException {
 
         OAuthUtil.debugMessage("service url: " + serviceUrl);
@@ -518,6 +521,9 @@ public class OAuth extends AMLoginModule {
             HttpURLConnection connection = HttpURLConnectionManager.getConnection(urlC);
             connection.setDoOutput(true);
             connection.setRequestMethod("GET");
+            if (authorizationHeader != null) {
+                connection.setRequestProperty("Authorization", authorizationHeader);
+            }
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -526,13 +532,13 @@ public class OAuth extends AMLoginModule {
             } else {
                 // Server returned HTTP error code.
                 String errorStream = getErrorStream(connection);
-                if (OAuthUtil.debugMessageEnabled()) { 
-                  OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn Error:\n" + 
-                        " Response code: " + connection.getResponseCode() + "\n " + 
-                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                if (OAuthUtil.debugMessageEnabled()) {
+                  OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn Error:\n" +
+                        " Response code: " + connection.getResponseCode() + "\n " +
+                        " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + errorStream + "\n");
                 }
-                is = getContentStreamByPOST(serviceUrl);
+                is = getContentStreamByPOST(serviceUrl, authorizationHeader);
             }
 
             return is;
@@ -568,10 +574,9 @@ public class OAuth extends AMLoginModule {
             }
             return buf.toString();
         }
-    }   
-    
-    // Obtain the Profile Service information using POST
-    public InputStream getContentStreamByPOST(String serviceUrl)
+    }
+
+    public InputStream getContentStreamByPOST(String serviceUrl, String authorizationHeader)
             throws LoginException {
 
         InputStream is = null;
@@ -587,6 +592,9 @@ public class OAuth extends AMLoginModule {
             HttpURLConnection connection = HttpURLConnectionManager.getConnection(url);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
+            if (authorizationHeader != null) {
+                connection.setRequestProperty("Authorization", authorizationHeader);
+            }
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(query);
             writer.close();
@@ -596,9 +604,9 @@ public class OAuth extends AMLoginModule {
                 is = connection.getInputStream();
             } else { // Error Code
                 String data2[] = {String.valueOf(connection.getResponseCode())};
-                OAuthUtil.debugError("OAuth.getContentStreamByPOST: HTTP Conn Error:\n" + 
-                        " Response code: " + connection.getResponseCode() + "\n" + 
-                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                OAuthUtil.debugError("OAuth.getContentStreamByPOST: HTTP Conn Error:\n" +
+                        " Response code: " + connection.getResponseCode() + "\n" +
+                        " Response message: " + connection.getResponseMessage() + "\n" +
                         " Error stream: " + getErrorStream(connection) + "\n");
                 throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data2);
             }
@@ -609,7 +617,6 @@ public class OAuth extends AMLoginModule {
         }
 
         return is;
-
     }
 
     // Extract the Token from the OAuth 2.0 response

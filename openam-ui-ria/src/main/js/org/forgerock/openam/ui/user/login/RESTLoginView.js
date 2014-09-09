@@ -179,6 +179,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         cleaned.callbacks = [];
                         _.each(reqs.callbacks, function(element) {
 
+                            if (element.type === "RedirectCallback") {
+                                window.location.replace(element.output[0].value);
+                            }
+
                             if (element.type === "ConfirmationCallback") {
                                 implicitConfirmation = false;
                             }
@@ -372,6 +376,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 break;
             case "HiddenValueCallback" :
                 result += '<input type="hidden" id="' + cb.input.value + '" name="callback_' + cb.input.index + '" value="" data-validator="required" required data-validator-event="keyup" />';
+                break;
+            case "RedirectCallback":
+                result += 'Redirecting...';
                 break;
             default:
                 result += '<input type="text" name="callback_' + cb.input.index + '" value="' + cb.input.value + '" data-validator="required" required data-validator-event="keyup" />';

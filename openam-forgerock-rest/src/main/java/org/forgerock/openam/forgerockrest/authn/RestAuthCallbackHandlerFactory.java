@@ -18,16 +18,15 @@ package org.forgerock.openam.forgerockrest.authn;
 
 import com.google.inject.Singleton;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthHiddenValueCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthConfirmationCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthChoiceCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthConfirmationCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthHiddenValueCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthHttpCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthLanguageCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthNameCallbackHandler;
@@ -104,7 +103,7 @@ public class RestAuthCallbackHandlerFactory {
         } else if (LanguageCallback.class.isAssignableFrom(callbackClass)) {
             return new RestAuthLanguageCallbackHandler();
         } else if (RedirectCallback.class.isAssignableFrom(callbackClass)) {
-            return new RestAuthRedirectCallbackHandler(new RedirectCallbackHandler());
+            return new RestAuthRedirectCallbackHandler();
         } else if (TextInputCallback.class.isAssignableFrom(callbackClass)) {
             return new RestAuthTextInputCallbackHandler();
         } else if (TextOutputCallback.class.isAssignableFrom(callbackClass)) {

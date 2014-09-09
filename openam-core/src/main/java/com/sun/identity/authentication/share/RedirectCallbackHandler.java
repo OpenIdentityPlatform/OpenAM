@@ -38,29 +38,34 @@ public class RedirectCallbackHandler {
      * @param response The HttpServletResponse.
      * @param redirectCallback The RedirectCallback.
      * @param loginURL The url used to login o be set as a cookie on the response.
-     * @throws IOException If a problem occurs when sending the redirect.
      */
-    public void handleRedirectCallback(HttpServletRequest request, HttpServletResponse response,
-            RedirectCallback redirectCallback, String loginURL) throws IOException {
+    public void setRedirectCallbackCookie(HttpServletRequest request, HttpServletResponse response,
+            RedirectCallback redirectCallback, String loginURL) {
 
-        if (debug.messageEnabled()){
+        if (debug.messageEnabled()) {
             debug.message("Redirect to external web site...");
             debug.message("RedirectUrl : " + redirectCallback.getRedirectUrl()
                     + ", RedirectMethod : " + redirectCallback.getMethod()
                     + ", RedirectData : " + redirectCallback.getRedirectData());
         }
 
-        String qString = AuthClientUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
-
         // Create Cookie
         try {
             AuthClientUtils.setRedirectBackServerCookie(redirectCallback.getRedirectBackUrlCookieName(),
-            		loginURL, request, response);
+                    loginURL, request, response);
         } catch (Exception e) {
-            if (debug.messageEnabled()){
+            if (debug.messageEnabled()) {
                 debug.message("Could not set RedirectBackUrlCookie!" + e.toString());
             }
         }
+    }
+
+    public void handleRedirectCallback(HttpServletRequest request, HttpServletResponse response,
+            RedirectCallback redirectCallback, String loginURL) throws IOException {
+
+        setRedirectCallbackCookie(request, response, redirectCallback, loginURL);
+        
+        String qString = AuthClientUtils.getQueryStrFromParameters(redirectCallback.getRedirectData());
 
         StringBuilder redirectUrl = new StringBuilder(redirectCallback.getRedirectUrl());
         if (qString != null && qString.length() != 0) {

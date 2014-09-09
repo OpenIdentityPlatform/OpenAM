@@ -271,6 +271,10 @@ public class OAuthConf {
         }
     }
 
+    String getProfileServiceUrl() {
+        return profileServiceUrl;
+    }
+
     String getProfileServiceUrl(String token) {
 
         if (profileServiceUrl.indexOf("?") == -1) {

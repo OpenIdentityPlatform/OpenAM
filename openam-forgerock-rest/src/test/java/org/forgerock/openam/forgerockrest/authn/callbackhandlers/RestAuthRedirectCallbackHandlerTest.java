@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
-import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
@@ -26,7 +25,12 @@ import org.testng.annotations.Test;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Collections;
+
 import static junit.framework.Assert.fail;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 
@@ -34,14 +38,10 @@ public class RestAuthRedirectCallbackHandlerTest {
 
     private RestAuthCallbackHandler<RedirectCallback> restAuthRedirectCallbackHandler;
 
-    private RedirectCallbackHandler redirectCallbackHandler;
-
     @BeforeClass
     public void setUp() {
 
-        redirectCallbackHandler = mock(RedirectCallbackHandler.class);
-
-        restAuthRedirectCallbackHandler = new RestAuthRedirectCallbackHandler(redirectCallbackHandler);
+        restAuthRedirectCallbackHandler = new RestAuthRedirectCallbackHandler();
     }
 
     @Test
@@ -73,27 +73,42 @@ public class RestAuthRedirectCallbackHandlerTest {
         assertEquals(originalRedirectCallback, redirectCallback);
     }
 
-    @Test (expectedExceptions = RestAuthException.class)
+    @Test
     public void shouldFailConvertToJson() throws RestAuthException {
 
         //Given
+        RedirectCallback redirectCallback = mock(RedirectCallback.class);
+
+        given(redirectCallback.getRedirectUrl()).willReturn("REDIRECT_URL");
+        given(redirectCallback.getMethod()).willReturn("REDIRECT_METHOD");
+        given(redirectCallback.getRedirectData()).willReturn(Collections.emptyMap());
 
         //When
-        restAuthRedirectCallbackHandler.convertToJson(null, 1);
+        JsonValue json = restAuthRedirectCallbackHandler.convertToJson(redirectCallback, 1);
 
         //Then
-        fail();
+        assertThat(json.asMap()).hasSize(2);
+        assertThat(json.get("type").asString()).isEqualTo("RedirectCallback");
+        assertThat(json.get("output").asList()).hasSize(3);
+        assertThat(json.get("output").get(0).get("name").asString()).isEqualTo("redirectUrl");
+        assertThat(json.get("output").get(0).get("value").asString()).isEqualTo("REDIRECT_URL");
+        assertThat(json.get("output").get(1).get("name").asString()).isEqualTo("redirectMethod");
+        assertThat(json.get("output").get(1).get("value").asString()).isEqualTo("REDIRECT_METHOD");
+        assertThat(json.get("output").get(2).get("name").asString()).isEqualTo("redirectData");
+        assertThat(json.get("output").get(2).get("value").asMap()).hasSize(0);
     }
 
-    @Test (expectedExceptions = RestAuthException.class)
+    @Test
     public void shouldFailToConvertFromJson() throws RestAuthException {
 
         //Given
+        RedirectCallback redirectCallback = mock(RedirectCallback.class);
+        JsonValue jsonValue = json(object(field("type", "RedirectCallback")));
 
         //When
-        restAuthRedirectCallbackHandler.convertFromJson(null, null);
+        RedirectCallback redirectCb = restAuthRedirectCallbackHandler.convertFromJson(redirectCallback, jsonValue);
 
         //Then
-        fail();
+        assertThat(redirectCb).isEqualTo(redirectCallback);
     }
 }
