@@ -22,6 +22,10 @@
  * "Portions copyright [year] [name of copyright owner]"
  */
 
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
+
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOException;
@@ -65,6 +69,8 @@ public class ScopeImpl implements Scope {
 
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
 
+    private static final String OPENID_SCOPE = "openid";
+    
     private static Map<String, Object> scopeToUserUserProfileAttributes;
 
     static {
@@ -194,7 +200,7 @@ public class ScopeImpl implements Scope {
     public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token) {
         final Map<String, Object> map = new HashMap<String, Object>();
         final Set<String> scope = token.getScope();
-        if (scope != null && scope.contains("openid")) {
+        if (scope != null && scope.contains(OPENID_SCOPE)) {
             final Map.Entry<String, String> tokenEntry;
             try {
                 tokenEntry = openIDTokenIssuer.issueToken(new AccessTokenToLegacyAdapter(token), requestFactory.create(Request.getCurrent()));
@@ -238,6 +244,9 @@ public class ScopeImpl implements Scope {
         response.put("sub", token.getUserID());
         for (String scope: scopes) {
 
+            if (OPENID_SCOPE.equals(scope)) {
+                continue;
+            }
             //get the attribute associated with the scope
             Object attributes = scopeToUserUserProfileAttributes.get(scope);
             if (attributes == null) {
@@ -249,9 +258,9 @@ public class ScopeImpl implements Scope {
                 try {
                     attr = id.getAttribute((String)attributes);
                 } catch (IdRepoException e) {
-                    logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                    logger.warning("ScopeImpl.getUserInfo(): Unable to retrieve attribute= " + attributes, e);
                 } catch (SSOException e) {
-                    logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                    logger.warning("ScopeImpl.getUserInfo(): Unable to retrieve attribute= " + attributes, e);
                 }
 
                 //add a single object to the response.
@@ -261,7 +270,8 @@ public class ScopeImpl implements Scope {
                     response.put(scope, attr);
                 } else {
                     //attr is null or attr is empty
-                    logger.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                    logger.warning("ScopeImpl.getUserInfo(): Got an empty result for attribute="
+                                    + attributes + " of scope=" + scope);
                 }
             } else if (attributes instanceof Map) {
 
@@ -277,9 +287,9 @@ public class ScopeImpl implements Scope {
                         try {
                             attr = id.getAttribute(attribute);
                         } catch (IdRepoException e) {
-                            logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                            logger.warning("ScopeImpl.getUserInfo(): Unable to retrieve attribute", e);
                         } catch (SSOException e) {
-                            logger.error("ScopeImpl.getUserInfo(): Unable to retrieve atrribute", e);
+                            logger.warning("ScopeImpl.getUserInfo(): Unable to retrieve attribute", e);
                         }
 
                         //add the attribute value(s) to the response
@@ -289,7 +299,7 @@ public class ScopeImpl implements Scope {
                             response.put(entry.getKey(), attr);
                         } else {
                             //attr is null or attr is empty
-                            logger.error("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
+                            logger.warning("ScopeImpl.getUserInfo(): Got an empty result for scope=" + scope);
                         }
                     }
                 }
