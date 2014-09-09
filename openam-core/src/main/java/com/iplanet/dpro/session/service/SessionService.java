@@ -45,6 +45,7 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
+import com.iplanet.services.naming.URLNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.Crypt;
 import com.iplanet.sso.SSOException;
@@ -888,13 +889,32 @@ public class SessionService {
     }
 
     /**
-     * Returns true if URL is a URL of the local service local to this instance
+     * Returns true if URL is the URL of the local session service.
      *
-     * @param url
+     * @param url the url to check
+     * @return true if the url represents the local session service.
      */
     public boolean isLocalSessionService(URL url) {
         URL localURL = isSiteEnabled ? thisSessionServiceURL : sessionServiceID;
+       return urlEquals(localURL, url);
+    }
 
+    /**
+      * Returns true if the url is the URL of the local notification service.
+      *
+      * @param url the url to check
+      * @return true if the url represents the local notification service.
+      */
+    boolean isLocalNotificationService(URL url) {
+        try {
+            URL localURL = WebtopNaming.getNotificationURL();
+            return urlEquals(localURL, url);
+        } catch (URLNotFoundException ex) {
+            return false;
+        }
+    }
+
+    private boolean urlEquals(URL localURL, URL url) {
         return localURL != null
                 && localURL.getProtocol().equalsIgnoreCase(url.getProtocol())
                 && localURL.getHost().equalsIgnoreCase(url.getHost())
@@ -2467,7 +2487,7 @@ public class SessionService {
                     String url = (String) aenum.nextElement();
                     try {
                         URL parsedUrl = new URL(url);
-                        if (sessionService.isLocalSessionService(parsedUrl)) {
+                        if (sessionService.isLocalNotificationService(parsedUrl)) {
                             SessionNotificationHandler.handler.processNotification(snGlobal);
                             // remove this URL from the individual url list
                             urls.remove(url);
@@ -2492,7 +2512,7 @@ public class SessionService {
                     try {
                         URL parsedUrl = new URL(url);
 
-                        if (sessionService.isLocalSessionService(parsedUrl)) {
+                        if (sessionService.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification sn = new SessionNotification(info, eventType,
@@ -2533,7 +2553,7 @@ public class SessionService {
                     try {
                         URL parsedUrl = new URL(url);
                         // ONLY SEND TO REMOTE URL
-                        if (!sessionService.isLocalSessionService(parsedUrl)) {
+                        if (!sessionService.isLocalNotificationService(parsedUrl)) {
                             PLLServer.send(parsedUrl, setGlobal);
                         }
                     } catch (Exception e) {
@@ -2550,7 +2570,7 @@ public class SessionService {
                     try {
                         URL parsedUrl = new URL(url);
 
-                        if (!sessionService.isLocalSessionService(parsedUrl)) {
+                        if (!sessionService.isLocalNotificationService(parsedUrl)) {
                             for (SessionID sid : entry.getValue()) {
                                 SessionInfo info = sessionInfoFactory.makeSessionInfo(session, sid);
                                 SessionNotification sn = new SessionNotification(info, eventType,
