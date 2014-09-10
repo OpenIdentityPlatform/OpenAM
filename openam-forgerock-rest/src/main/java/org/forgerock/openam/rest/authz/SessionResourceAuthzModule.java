@@ -16,7 +16,6 @@
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.dpro.session.service.SessionService;
-import java.util.Map;
 import javax.inject.Inject;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
@@ -81,11 +80,10 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
      */
     Promise<AuthorizationResult, ResourceException> authorize(Request request, ServerContext context) {
 
-        Map<String, String> parameterMap = request.getAdditionalParameters();
-
-        if (parameterMap != null && parameterMap.containsKey("_action")) {
-            String value = parameterMap.get("_action");
-            if ("logout".equals(value) || "validate".equals(value)) {
+        if ((request instanceof ActionRequest)) {
+            ActionRequest actionRequest = (ActionRequest) request;
+            if ("logout".equals(actionRequest.getAction()) ||
+                    "validate".equals(actionRequest.getAction())) {
                 return Promises.newSuccessfulPromise(AuthorizationResult.success());
             }
         }

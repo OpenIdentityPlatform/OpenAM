@@ -16,10 +16,9 @@
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.dpro.session.service.SessionService;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
@@ -47,11 +46,9 @@ public class SessionResourceAuthzModuleTest {
     public void shouldAllowLogoutAction() throws ExecutionException, InterruptedException {
         //given
         ServerContext mockContext = mock(ServerContext.class);
-        Request mockRequest = mock(Request.class);
-        Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("_action", "logout");
+        ActionRequest mockRequest = mock(ActionRequest.class);
 
-        given(mockRequest.getAdditionalParameters()).willReturn(parameterMap);
+        given(mockRequest.getAction()).willReturn("logout");
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorize(mockRequest, mockContext);
@@ -65,11 +62,9 @@ public class SessionResourceAuthzModuleTest {
     public void shouldAllowValidateAction() throws ExecutionException, InterruptedException {
         //given
         ServerContext mockContext = mock(ServerContext.class);
-        Request mockRequest = mock(Request.class);
-        Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("_action", "validate");
+        ActionRequest mockRequest = mock(ActionRequest.class);
 
-        given(mockRequest.getAdditionalParameters()).willReturn(parameterMap);
+        given(mockRequest.getAction()).willReturn("validate");
 
         //when
         Promise<AuthorizationResult, ResourceException> result = testModule.authorize(mockRequest, mockContext);
@@ -83,10 +78,6 @@ public class SessionResourceAuthzModuleTest {
         //given
         ServerContext mockContext = mock(ServerContext.class);
         Request mockRequest = mock(Request.class);
-        Map<String, String> parameterMap = new HashMap<String, String>();
-        parameterMap.put("_action", "notValidateOrLogout");
-
-        given(mockRequest.getAdditionalParameters()).willReturn(parameterMap);
 
         //when
         testModule.authorize(mockRequest, mockContext);
