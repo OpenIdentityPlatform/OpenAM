@@ -6749,13 +6749,9 @@ $ <userinput>curl \
  }' \
  https://openam.example.com:8443/openam/json/groups?_action=create</userinput>
 <computeroutput>{
-    "name": "newGroup",
-    "realm": "/",
+    "username": "newGroup",
     "uniqueMember": [
         "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
-    ],
-    "cn": [
-        "newGroup"
     ],
     "objectclass": [
         "groupofuniquenames",
@@ -6778,13 +6774,9 @@ $ <userinput>curl \
  }' \
  https://openam.example.com:8443/openam/json/groups/anotherGroup</userinput>
 <computeroutput>{
-    "name": "anotherGroup",
-    "realm": "/",
+    "username": "anotherGroup",
     "uniqueMember": [
         "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
-    ],
-    "cn": [
-        "anotherGroup"
     ],
     "objectclass": [
         "groupofuniquenames",
