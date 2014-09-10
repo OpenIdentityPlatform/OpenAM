@@ -138,7 +138,7 @@ public class RestEndpoints {
         rootRealmRouter.route("/applicationtypes")
                 .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ApplicationTypesResource.class);
 
-        rootRealmRouter.route("/decisionCombiners")
+        rootRealmRouter.route("/decisioncombiners")
                 .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(DecisionCombinersResource.class);
 
         rootRealmRouter.route("/conditiontypes")
