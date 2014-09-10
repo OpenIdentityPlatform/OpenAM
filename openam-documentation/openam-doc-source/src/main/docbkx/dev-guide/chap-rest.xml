@@ -1531,6 +1531,10 @@ $ <userinput>curl \
     }
 }
         </programlisting>
+
+        <para>
+         See <xref linkend="rest-api-authz-policy-decision-advice" /> for details.
+        </para>
        </listitem>
       </varlistentry>
      </variablelist>
@@ -1541,6 +1545,334 @@ $ <userinput>curl \
       and <literal>_fields=<replaceable>field-name</replaceable>[,<replaceable>field-name</replaceable>...]</literal>
       to limit the fields returned in the output.
      </para>
+
+     <section xml:id="rest-api-authz-policy-decision-advice">
+      <title>Policy Decision Advice</title>
+
+      <para>
+       When OpenAM returns a policy decision,
+       the JSON for the decision can include an "advices" field.
+       This field contains hints for the policy enforcement point.
+      </para>
+
+        <programlisting language="javascript">
+{
+    "advices": {
+        "<replaceable>type</replaceable>": [
+            "<replaceable>advice</replaceable>"
+        ]
+    }
+}
+        </programlisting>
+
+      <para>
+       The "advices" returned depend on policy conditions.
+       This section shows examples of the many different types
+       of policy decision advice
+       and the conditions that cause OpenAM to return the advice.
+      </para>
+
+      <para>
+       An "AttributeLookup" condition failure can result in advice
+       showing the value and attribute expected.
+       For example, failure against a policy with the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "AttributeLookup",
+    "key": "postaladdress",
+    "value": "33 New Montgomery St."
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "com.sun.identity.entitlement.AttributeLookupCondition": [
+        "33 New Montgomery St.=postaladdress"
+    ]
+}
+      </programlisting>
+
+      <para>
+       A "DNSName" condition failure can result in advice
+       showing the domain name mask.
+       For example, the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "DNSName",
+    "domainNameMask": "*.example.org"
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "com.sun.identity.entitlement.DNSNameCondition": [
+        "requestDnsName=*.example.org"
+    ]
+}
+      </programlisting>
+
+      <para>
+       An "IP" condition failure can result in advice
+       showing the request IP address range allowed.
+       For example, the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "IP",
+    "startIp": "127.0.0.1",
+    "endIp": "127.0.1.255"
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "com.sun.identity.entitlement.IPCondition": [
+        "requestIp=127.0.0.1-127.0.1.255"
+    ]
+}
+      </programlisting>
+
+      <para>
+       A "NumericAttribute" condition failure can result in advice
+       showing the expectations about the attribute value,
+       where the operator is one of <literal>&lt; &lt;= = >= ></literal>.
+       For example, the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+   "type": "NumericAttribute",
+   "attributeName": "gidNumber",
+   "operator": "LESS_THAN",
+   "value": "1000"
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "com.sun.identity.entitlement.NumericAttributeCondition": [
+        "gidNumber&lt;1000.0"
+    ]
+}
+      </programlisting>
+
+      <para>
+       A "StringAttribute" condition failure can result in advice
+       showing the expectation about the value of the attribute.
+       For example, the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "StringAttribute",
+    "attributeName": "location",
+    "caseSensitive": false,
+    "value": "Bristol"
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "com.sun.identity.entitlement.StringAttributeCondition": [
+    "location=Bristol"
+    ]
+}
+      </programlisting>
+
+      <para>
+       If "caseSensitive" in the policy condition is true,
+       then OpenAM appends <literal>(casesensitive)</literal> to the value
+       in the advice.
+      </para>
+
+      <para>
+       A "Time" condition evaluation returns advice
+       showing the window during which the condition is satisfied.
+       If the condition is satisfied, then
+       "timeToLive" specifies the time in milliseconds until the end of the window.
+       "maxTime" specifies the date in milliseconds at the end of the window.
+       If the condition is not satisfied, then
+       "timeToLive" specifies the time in milliseconds until the start of the window.
+       "maxTime" specifies the date in milliseconds at the start of the window.
+       For example, given the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "Time",
+    "startTime": "10:00",
+    "endTime": "16:30"
+}
+      </programlisting>
+
+      <para>
+       The following example shows advice returned:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "maxTime": [
+        "1410273000000"
+    ],
+    "timeToLive": [
+        "19648817"
+    ]
+}
+      </programlisting>
+
+      <para>
+       If it is necessary to authenticate again,
+       OpenAM can return the following advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "ForceAuth": [
+        "true"
+    ]
+}
+      </programlisting>
+
+      <para>
+       Failure against a policy with the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "Policy",
+    "className": "com.sun.identity.policy.plugins.AuthenticateToRealmCondition",
+    "name": "realm",
+    "properties": {
+        "AuthenticateToRealm": [
+            "/realm"
+        ]
+    }
+}      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "AuthenticateToRealmConditionAdvice": [
+        "/realm"
+    ]
+}
+      </programlisting>
+
+      <para>
+       Failure against a policy with the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "Policy",
+    "className": "com.sun.identity.policy.plugins.AuthenticateToServiceCondition",
+    "name": "Require MyAuthnChain",
+    "properties": {
+        "AuthenticateToService": [
+            "MyAuthnChain"
+        ]
+    }
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "AuthenticateToServiceConditionAdvice": [
+        "MyAuthnChain"
+    ]
+}
+      </programlisting>
+
+      <para>
+       Failure against a policy with the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "Policy",
+    "className": "com.sun.identity.policy.plugins.AuthLevelCondition",
+    "name": "AuthnLevelAtLeast5",
+    "properties": {
+        "AuthLevel": [
+            "5"
+        ]
+    }
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "AuthLevelConditionAdvice": [
+        "5"
+    ]
+}
+      </programlisting>
+
+      <para>
+       Failure against a policy with the following condition:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "type": "Policy",
+    "className": "com.sun.identity.policy.plugins.AuthSchemeCondition",
+    "name": "RequireHOTP",
+    "properties": {
+        "AuthScheme": [
+            "HOTP"
+        ]
+    }
+}
+      </programlisting>
+
+      <para>
+       Leads to this advice:
+      </para>
+
+      <programlisting language="javascript">
+{
+    "AuthSchemeConditionAdvice": [
+        "HOTP"
+    ]
+}
+      </programlisting>
+     </section>
     </section>
 
     <section xml:id="rest-api-authz-policy-decision-subtree">
