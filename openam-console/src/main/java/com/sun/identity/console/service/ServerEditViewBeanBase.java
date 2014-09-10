@@ -49,6 +49,7 @@ import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.service.model.ServerSiteModel;
 import com.sun.identity.console.service.model.ServerSiteModelImpl;
 import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.web.ui.model.CCNavNode;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
@@ -183,7 +184,7 @@ public abstract class ServerEditViewBeanBase
                         String v = (val.equals(trueValue)) ? "true" : "false";
                         propertySheetModel.setValue(name, v);
                     } else {
-                        propertySheetModel.setValue(name, val);
+                        propertySheetModel.setValue(name, XMLUtils.escapeSpecialCharacters(val));
                     }
                 }
             }
@@ -297,14 +298,14 @@ public abstract class ServerEditViewBeanBase
             int idx = xml.indexOf("<cc name=\"" + name + "\"");
             if (idx != -1) {
                 int endIdx = xml.indexOf("</cc>", idx);
-                String[] params = {name, value};
                 // If we find a Password field, obfuscate the value before it is shown.
                 if (xml.substring(idx, endIdx).contains(PASSWORD_FIELD_TAG)) {
-                    params[1] = "********";
+                    value = "********";
+                } else {
+                    value = XMLUtils.escapeSpecialCharacters(value);
                 }
-                String xmlComponent = MessageFormat.format(TEXT_TEMPLATE, params);
-                xml = xml.substring(0, idx) + xmlComponent +
-                    xml.substring(endIdx+5);
+                String xmlComponent = MessageFormat.format(TEXT_TEMPLATE, name, value);
+                xml = xml.substring(0, idx) + xmlComponent + xml.substring(endIdx + 5);
             }
         }
         return xml;
