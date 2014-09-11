@@ -19,14 +19,14 @@ package org.forgerock.openam.rest.service;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.AcceptAPIVersion;
 import org.forgerock.json.resource.AdviceWarning;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Version;
 import org.forgerock.json.resource.VersionConstants;
 import org.forgerock.json.resource.VersionRoute;
 import org.forgerock.json.resource.VersionSelector;
-import org.forgerock.json.resource.exception.AcceptApiVersionException;
-import org.forgerock.json.resource.exception.AcceptApiVersionNoRoutesException;
-import org.forgerock.json.resource.exception.AcceptApiVersionProtocolException;
-import org.forgerock.json.resource.exception.NoAcceptApiVersionSpecifiedException;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -143,14 +143,14 @@ public class VersionRouter {
             if (headerWarning) {
                 if (versionHeader == null) {
                     // If no version specified at all, we can warn about that
-                    warningHeader = AdviceWarning.generateWarning(AGENT_NAME,
+                    warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME,
                             "No " + VersionConstants.ACCEPT_API_VERSION + " specified");
 
                 } else if (!selectedVersion.equals(apiVersion.getResourceVersion())) {
                     // alternatively, if the user requested one version and we gave them a slightly different one
                     // then warn them about that
                     Version headerResourceVersion = apiVersion.getResourceVersion();
-                    warningHeader = AdviceWarning.generateWarning(AGENT_NAME,
+                    warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME,
                             VersionConstants.ACCEPT_API_VERSION
                                     + ": Requested version '%s', resolved version '%s'",
                             headerResourceVersion == null ? "null" : headerResourceVersion.toString(),
@@ -158,32 +158,33 @@ public class VersionRouter {
                 }
             }
 
-        } catch (AcceptApiVersionNoRoutesException e) {
+        } catch (InternalServerErrorException e) {
             logger.error("Internal configuration error: no routes available", e);
-            response.setStatus(Status.SERVER_ERROR_INTERNAL,
-                    "Could not route request because of an internal configuration error");
-            warningHeader = AdviceWarning.generateWarning(AGENT_NAME, e.getMessage());
+            response.setStatus(new Status(e.getCode()), "Could not route request because of an internal config error");
+            warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME, e.getMessage());
 
-        } catch (NoAcceptApiVersionSpecifiedException e) {
+        } catch (BadRequestException e) {
             // The user didn't specify an accept API version and the default behaviour is set to NONE.
             String text = "No " + VersionConstants.ACCEPT_API_VERSION + " found and behaviour set to NONE";
             logger.error(text, e);
-            response.setStatus(Status.CLIENT_ERROR_BAD_REQUEST, text);
-            warningHeader = AdviceWarning.generateWarning(AGENT_NAME, e.getMessage());
+            response.setStatus(new Status(e.getCode()), text);
+            warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME, e.getMessage());
 
-        } catch (AcceptApiVersionException e) {
-            // The user specified an unknown version in "accept API version"
-            logger.error(VersionConstants.ACCEPT_API_VERSION + " version error: " + e.getMessage(), e);
+        } catch (NotFoundException e) {
+            // Either the version or protocol specified was not valid.  The error
+            // message will tell us which.
+            logger.error(VersionConstants.ACCEPT_API_VERSION + " error: " + e.getMessage(), e);
             response.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
-                    VersionConstants.ACCEPT_API_VERSION + " bad version");
-            warningHeader = AdviceWarning.generateWarning(AGENT_NAME, e.getMessage());
+                    VersionConstants.ACCEPT_API_VERSION + ": " + e.getMessage());
+            warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME, e.getMessage());
 
-        } catch (AcceptApiVersionProtocolException e) {
-            // The user specified an unknown protocol in "accept API version"
-            logger.error(VersionConstants.ACCEPT_API_VERSION + " protocol error: " + e.getMessage(), e);
-            response.setStatus(Status.CLIENT_ERROR_NOT_ACCEPTABLE,
-                    VersionConstants.ACCEPT_API_VERSION + " bad protocol");
-            warningHeader = AdviceWarning.generateWarning(AGENT_NAME, e.getMessage());
+        } catch (ResourceException e) {
+            // This is to keep the compiler happy.  ResourceException.getException is declared to throw
+            // ResourceException, although it should only throw one of the exceptions above.
+            logger.error("Internal configuration error: unexpected exception while attempting to route request", e);
+            response.setStatus(Status.SERVER_ERROR_INTERNAL,
+                    "Unexpected exception while attempting to route request");
+            warningHeader = AdviceWarning.newAdviceWarning(AGENT_NAME, e.getMessage());
 
         } finally {
             if (headerWarning && warningHeader != null) {
@@ -197,9 +198,9 @@ public class VersionRouter {
      *
      * @param versionHeader the value of Accept-API-Version from the headers.
      * @return An {@link AcceptAPIVersion} object containing the requested resource version.
-     * @throws {@link AcceptApiVersionProtocolException} if the specified protocol is invalid.
+     * @throws {@link NotFoundException} if the specified protocol is invalid.
      */
-    private AcceptAPIVersion parseAcceptAPIVersion(String versionHeader) throws AcceptApiVersionProtocolException {
+    private AcceptAPIVersion parseAcceptAPIVersion(String versionHeader) throws NotFoundException {
 
         AcceptAPIVersion apiVersion = AcceptAPIVersion.newBuilder(versionHeader)
                 .withDefaultProtocolVersion("1.0")
@@ -209,11 +210,11 @@ public class VersionRouter {
         Version protocolVersion = apiVersion.getProtocolVersion();
 
         if (protocolVersion.getMajor() != enforcedProtocolVersion.getMajor()) {
-            throw new AcceptApiVersionProtocolException("Unsupported major version: " + protocolVersion);
+            throw new NotFoundException("Unsupported major version: " + protocolVersion);
         }
 
         if (protocolVersion.getMinor() > enforcedProtocolVersion.getMinor()) {
-            throw new AcceptApiVersionProtocolException("Unsupported minor version: " + protocolVersion);
+            throw new NotFoundException("Unsupported minor version: " + protocolVersion);
         }
 
         return apiVersion;

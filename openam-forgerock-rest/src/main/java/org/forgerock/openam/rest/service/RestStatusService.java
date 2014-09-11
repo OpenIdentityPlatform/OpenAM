@@ -16,20 +16,15 @@
 
 package org.forgerock.openam.rest.service;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
-import org.forgerock.openam.utils.JsonValueBuilder;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.service.StatusService;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -48,32 +43,22 @@ public class RestStatusService extends StatusService {
     public Representation getRepresentation(Status status, Request request, Response response) {
 
         final JsonValue jsonResponse;
+        Throwable throwable = status.getThrowable();
 
-        if (status.getThrowable() != null && status.getThrowable().getMessage() != null) {
+        if (throwable != null && throwable.getMessage() != null) {
 
             //by checking resourceException explicitly, we can include the Details segment in the response
-            if (status.getThrowable() instanceof ResourceException) {
-                jsonResponse = ((ResourceException) status.getThrowable()).toJsonValue();
+            if (throwable instanceof ResourceException) {
+                jsonResponse = ((ResourceException) throwable).toJsonValue();
             } else {
-                jsonResponse = ResourceException.getException(status.getCode(), status.getThrowable().getMessage()).toJsonValue();
+                jsonResponse = ResourceException.getException(status.getCode(), throwable.getMessage()).toJsonValue();
             }
 
         } else if (status.getDescription() != null) {
-            jsonResponse =
-                    ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();
+            jsonResponse = ResourceException.getException(status.getCode(), status.getDescription()).toJsonValue();
         } else {
             jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
         }
-
-        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
-        try {
-            return new JacksonRepresentation<Map>(mapper.readValue(jsonResponse.toString(), Map.class));
-        } catch (IOException e) {
-            Map<String, Object> rep = new HashMap<String, Object>();
-            rep.put("code", 500);
-            rep.put("reason", "IOException");
-            rep.put("message", e.getMessage());
-            return new JsonRepresentation(rep);
-        }
+        return new JacksonRepresentation<Map>(jsonResponse.asMap());
     }
 }
