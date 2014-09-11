@@ -129,8 +129,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
             authNDelegate.getRequirements()
                 .done(_.bind(function (reqs) {
-                    var cleaned = _.clone(reqs),
-                        implicitConfirmation = true;
+                    var _this = this;
 
                     //clear out existing session if instructed
                     if (reqs.hasOwnProperty("tokenId") && urlParams.arg === 'newsession') {
@@ -161,7 +160,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                         router.navigate(conf.gotoURL, {trigger: true});
                                         delete conf.gotoURL;
                                     } else {
-                                        router.navigate("", {trigger: true});
+                                        _this.renderForm(reqs, urlParams);
                                     }
                                 });
                             }
@@ -175,90 +174,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         });
 
                     } else { // we aren't logged in yet, so render a form...
-
-                        cleaned.callbacks = [];
-                        _.each(reqs.callbacks, function(element) {
-
-                            if (element.type === "RedirectCallback") {
-                                window.location.replace(element.output[0].value);
-                            }
-
-                            if (element.type === "ConfirmationCallback") {
-                                implicitConfirmation = false;
-                            }
-
-                            cleaned.callbacks.push({
-                                input: {
-                                    index: cleaned.callbacks.length,
-                                    name: element.input ? element.input[0].name : null,
-                                    value: element.input ? element.input[0].value : null
-                                },
-                                output: element.output,
-                                type: element.type,
-                                isSubmit: element.type === "ConfirmationCallback"
-                            });
-                        });
-
-                        if (implicitConfirmation) {
-                            cleaned.callbacks.push({
-                                "input": {
-                                    index: cleaned.callbacks.length,
-                                    name: "loginButton",
-                                    value: 0
-                                },
-                                output: [
-                                    {
-                                        name: "options",
-                                        value: [ $.t("common.user.login") ]
-                                    }
-                                ],
-                                type: "ConfirmationCallback",
-                                isSubmit: true
-                            });
-                        }
-
-                        this.reqs = reqs;
-                        this.data.reqs = cleaned;
-
-                        //is there an attempt at autologin happening?
-                        //if yes then don't render the form until it fails one time
-                        if(urlParams.IDToken1 && conf.globalData.auth.autoLoginAttempts === 1){
-                            conf.globalData.auth.autoLoginAttempts++;
-                        }
-                        else{
-                            // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                            uiUtils
-                                .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html",
-                                _.extend(conf.globalData, this.data),
-                                _.bind(function (populatedTemplate) {
-                                    if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
-                                        this.template = "templates/openam/authn/" + reqs.stage + ".html";
-                                    } else {
-                                        this.template = this.genericTemplate;
-                                    }
-
-                                    this.data.showForgotPassword = false;
-                                    this.data.showRegister = false;
-                                    this.data.showSpacer = false;
-
-                                    if(conf.globalData.forgotPassword === "true"){
-                                        this.data.showForgotPassword = true;
-                                    }
-                                    if(conf.globalData.selfRegistration === "true"){
-                                        if(this.data.showForgotPassword){
-                                            this.data.showSpacer = true;
-                                        }
-                                        this.data.showRegister = true;
-                                    }
-                                    this.parentRender(_.bind(function() {
-                                        this.reloadData();
-                                        // resolve a promise when all templates will be loaded
-                                        promise.resolve();
-                                    }, this));
-                                }, this)
-                            );
-                        }
-
+                        this.renderForm(reqs, urlParams);
                     }
                 }, this))
                 .fail(_.bind(function () {
@@ -275,6 +191,89 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     }
                 });
 
+        },
+        renderForm: function(reqs, urlParams){
+            var cleaned = _.clone(reqs),
+                implicitConfirmation = true,
+                promise = $.Deferred();
+            cleaned.callbacks = [];
+            _.each(reqs.callbacks, function (element) {
+
+                if (element.type === "ConfirmationCallback") {
+                    implicitConfirmation = false;
+                }
+
+                cleaned.callbacks.push({
+                    input: {
+                        index: cleaned.callbacks.length,
+                        name: element.input ? element.input[0].name : null,
+                        value: element.input ? element.input[0].value : null
+                    },
+                    output: element.output,
+                    type: element.type,
+                    isSubmit: element.type === "ConfirmationCallback"
+                });
+            });
+
+            if (implicitConfirmation) {
+                cleaned.callbacks.push({
+                    "input": {
+                        index: cleaned.callbacks.length,
+                        name: "loginButton",
+                        value: 0
+                    },
+                    output: [
+                        {
+                            name: "options",
+                            value: [ $.t("common.user.login") ]
+                        }
+                    ],
+                    type: "ConfirmationCallback",
+                    isSubmit: true
+                });
+            }
+
+            this.reqs = reqs;
+            this.data.reqs = cleaned;
+
+            //is there an attempt at autologin happening?
+            //if yes then don't render the form until it fails one time
+            if (urlParams.IDToken1 && conf.globalData.auth.autoLoginAttempts === 1) {
+                conf.globalData.auth.autoLoginAttempts++;
+            } else {
+                // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
+                uiUtils
+                    .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html",
+                    _.extend(conf.globalData, this.data),
+                    _.bind(function (populatedTemplate) {
+                        if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
+                            this.template = "templates/openam/authn/" + reqs.stage + ".html";
+                        } else {
+                            this.template = this.genericTemplate;
+                        }
+
+                        this.data.showForgotPassword = false;
+                        this.data.showRegister = false;
+                        this.data.showSpacer = false;
+
+                        if (conf.globalData.forgotPassword === "true") {
+                            this.data.showForgotPassword = true;
+                        }
+                        if (conf.globalData.selfRegistration === "true") {
+                            if (this.data.showForgotPassword) {
+                                this.data.showSpacer = true;
+                            }
+                            this.data.showRegister = true;
+                        }
+                        this.parentRender(_.bind(function () {
+                            this.reloadData();
+                            // resolve a promise when all templates will be loaded
+                            promise.resolve();
+                        }, this));
+                    }, this)
+                );
+            }
+            return promise;
         },
         reloadData: function () {
             // This function is useful for adding logic that is used by stage-specific custom templates.

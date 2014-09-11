@@ -23,7 +23,7 @@
  */
 
 /**
- * "Portions Copyrighted 2011-2013 ForgeRock Inc"
+ * "Portions Copyrighted 2011-2014 ForgeRock Inc"
  */
 
 /*global document, $, define, _, window */
@@ -35,8 +35,9 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/main/i18nManager"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager) {
+    "org/forgerock/commons/ui/common/main/i18nManager",
+    "org/forgerock/openam/ui/user/delegates/SessionDelegate"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager, sessionDelegate) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
         requirementList = [],
@@ -137,6 +138,15 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 }
 
             };
+
+            // In case user has logged in already update session
+            if (requirements.hasOwnProperty("tokenId")) {
+                sessionDelegate.isSessionValid(requirements.tokenId).done(function (sessionToken) {
+                    if (sessionToken.valid) {
+                        requirements.sessionUpgradeSSOTokenId = requirements.tokenId;
+                    }
+                });
+            }
 
             obj.serviceCall({
                 type: "POST",
