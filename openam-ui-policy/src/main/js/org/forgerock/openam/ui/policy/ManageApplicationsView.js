@@ -37,44 +37,37 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManageApplicationsTemplate.html",
 
+        events: {
+            'click .icon-pencil': 'editApplication',
+            'click .icon-file': 'viewPolicies'
+        },
+
         render: function (args, callback) {
             var self = this,
-                appLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + encodeURI(cellvalue) + '">' + cellvalue + '</a>';
-                },
-                policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    return '<a href="#app/' + encodeURI(rowObject.name) + '/policies/" class="icon-search"></a>';
+                actionsFormatter = function (cellvalue, options, rowObject) {
+                    return uiUtils.fillTemplateWithData("templates/policy/ApplicationTableActionsTemplate.html",
+                        {appName: encodeURI(rowObject.name)});
                 };
 
             this.parentRender(function () {
                 var options = {
                         url: '/openam/json/applications?_queryFilter=true',
-                        colNames: ['Name', 'Description', 'Realm', 'Type', 'Author', 'Created', 'Modified By',
-                            'Last Modified', 'Actions', 'Conditions', 'Resources', 'Subjects', 'Override Rule', 'Policies'],
+                        colNames: ['', 'Name', 'Description', 'Realm', 'Resources', 'Author', 'Created', 'Last Modified'],
                         colModel: [
-                            {name: 'name', width: 250, formatter: appLinkFormatter, frozen: true},
-                            {name: 'description', sortable: false, width: 150},
+                            {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
+                            {name: 'name', width: 230, frozen: true},
+                            {name: 'description', sortable: false},
                             {name: 'realm', width: 150},
-                            {name: 'applicationType', width: 250},
+                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                             {name: 'createdBy', width: 250},
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'lastModifiedBy', width: 250},
-                            {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'actions', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                            {name: 'conditions', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'subjects', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'entitlementCombiner', width: 100},
-                            {name: 'policy', width: 60, sortable: false, formatter: policyLinkFormatter}
+                            {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter}
                         ],
+                        multiselect: true,
                         sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
-                        pager: '#appsPager',
-                        onSelectRow: function (rowid, status, e) {
-                            router.routeTo(router.configuration.routes.managePolicies,
-                                {args: [encodeURI(self.data.result[rowid - 1].name)], trigger: true});
-                        }
+                        pager: '#appsPager'
                     },
                     columnChooserOptions = {
                         width: 501,
@@ -84,6 +77,16 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 grid.jqGrid('setFrozenColumns');
             });
+        },
+
+        editApplication: function (e) {
+            router.routeTo(router.configuration.routes.editApp,
+                {args: [e.target.getAttribute('data-app-name')], trigger: true});
+        },
+
+        viewPolicies: function (e) {
+            router.routeTo(router.configuration.routes.managePolicies,
+                {args: [e.target.getAttribute('data-app-name')], trigger: true});
         }
     });
 

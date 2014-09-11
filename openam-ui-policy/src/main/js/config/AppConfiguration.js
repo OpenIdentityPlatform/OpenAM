@@ -105,7 +105,8 @@ define("config/AppConfiguration", function () {
                         "templates/policy/ConditionAttrTimeDate.html",
                         "templates/policy/ConditionAttrEnum.html",
                         "templates/policy/ConditionAttrString.html",
-                        "templates/policy/ConditionAttrBoolean.html"
+                        "templates/policy/ConditionAttrBoolean.html",
+                        "templates/policy/ApplicationTableActionsTemplate.html"
                     ]
                 }
             },

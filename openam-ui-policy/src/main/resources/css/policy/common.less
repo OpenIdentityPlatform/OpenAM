@@ -70,6 +70,7 @@
 
 // Accordion
 .accordion {
+    margin: 15px 0 0 0;
     background-color: #fff;
     border: 1px solid #BCBEC0;
     border-bottom: none;
@@ -224,45 +225,76 @@
     }
 }
 
-#cancelButton, #backButton, #addNewApp, #newPolicy {
-    margin: 0 5px 15px;
-}
-
 .ui-jqgrid {
-    tr.ui-row-ltr td {
-        vertical-align: top;
-    }
+    margin: 15px 0 0 0;
 
-    #manageApps_applicationType, td[aria-describedby="manageApps_applicationType"], td[aria-describedby="manageApps_name"] {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-    }
+    span.item-button-panel {
+        > span {
+            font-size: 16px;
+            padding: 0 3px;
 
-    #manageApps {
-        cursor: pointer;
-
-        td[aria-describedby="manageApps_name"] {
-            text-align: center;
-            .icon-search {
-                text-decoration: none;
-                font-size: 16px;
-                vertical-align: middle;
-                color: #80b7ab;
+            &.tooltips {
+                &:hover span, &:focus span {
+                    margin-left: -36px;
+                    width: 60px;
+                }
             }
         }
     }
 
-    #manageApps_frozen {
+    .ui-state-hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .ui-state-highlight {
+        background: #d7f8e9;
+        border-color: rgba(0, 0, 0, 0.2);
+        color: inherit;
+    }
+
+    tr.ui-widget-content {
+        box-shadow: none;
+        td {
+            vertical-align: middle;
+        }
+    }
+
+    #manageApps {
         cursor: pointer;
     }
 
-    .ui-state-hover a{
-        color: #fff !important;
+    #manageApps_frozen {
+        cursor: pointer;
+
+        td[aria-describedby="manageApps_name"] {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        td[aria-describedby="manageApps_actions"] {
+            cursor: default;
+            background-color: #ebebeb;
+            overflow: visible;
+            white-space: normal;
+            text-align: center;
+        }
+
+        .ui-state-hover, .ui-state-highlight {
+            td[aria-describedby="manageApps_actions"] {
+                background-color: inherit;
+            }
+        }
     }
 }
 
-.frozen-bdiv.ui-jqgrid-bdiv {
+#gview_manageApps {
+    .frozen-bdiv {
+        overflow: visible !important;
+    }
+}
+
+.frozen-bdiv {
     height: auto !important;
 }
 
@@ -301,6 +333,62 @@
     .search {
         width: 130px;
     }
+}
 
+span.item-button-panel {
 
+    > span {
+        opacity:0.5;
+        transition:opacity 200ms linear;
+
+        &.icon-checkmark {
+            display:none;
+        }
+
+        &:hover, &:focus {
+            opacity:1;
+            box-shadow: none;
+        }
+
+        &.tooltips {
+            position: relative;
+            display: inline;
+
+            span {
+                position: absolute;
+                width: 0;
+                color: #fff;
+                background-color:#000;
+                background-image:-webkit-linear-gradient(top, #555, #000);
+                text-align: center;
+                visibility: hidden;
+                border-radius: 3px;
+                font-size: 13px;
+                padding: 6px 5px 10px;
+                box-shadow: 0px 1px 3px #666;
+                bottom: 25px;
+                transition:bottom 200ms ease-out, opacity 500ms ease-in;
+
+                &:after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    margin-left: -8px;
+                    width: 0; height: 0;
+                    border-top: 8px solid #000;
+                    border-right: 8px solid transparent;
+                    border-left: 8px solid transparent;
+                }
+            }
+
+            &:hover span, &:focus span {
+                visibility: visible;
+                opacity: 0.8;
+                bottom: 30px;
+                left: 50%;
+                z-index: 999;
+            }
+        }
+    }
 }

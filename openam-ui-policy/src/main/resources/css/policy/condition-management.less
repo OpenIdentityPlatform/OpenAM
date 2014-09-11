@@ -116,71 +116,21 @@ body.editing{
 
 	}
 
-	span.item-button-panel {
+    span.item-button-panel {
+        float:right;
+        padding: 8px 3px;
 
-		float:right;
-	  	padding: 8px 3px;
+        > span {
+            padding: 0 5px;
 
-		> span {
-
-			padding: 0 5px;
-			opacity:0.5;
-			transition:opacity 200ms linear;
-
-			&.icon-checkmark {
-				display:none;
-			}
-
-	    	&:hover, &:focus {
-	    		opacity:1;
-				box-shadow: none;
-	    	}
-
-	    	&.tooltips {
-			  	position: relative;
-			  	display: inline;
-
-			  	span {
-				 	position: absolute;
-					width: 0;
-					color: #fff;
-					background-color:#000;
-					background-image:-webkit-linear-gradient(top, #555, #000);
-					text-align: center;
-					visibility: hidden;
-					border-radius: 3px;
-					font-size: 13px;
-					padding: 6px 5px 10px;
-					box-shadow: 0px 1px 3px #666;
-					bottom: 25px;
-					transition:bottom 200ms ease-out, opacity 500ms ease-in;
-
-					&:after {
-						content: '';
-						position: absolute;
-						top: 100%;
-						left: 50%;
-						margin-left: -8px;
-						width: 0; height: 0;
-						border-top: 8px solid #000;
-						border-right: 8px solid transparent;
-						border-left: 8px solid transparent;
-					}
-				}
-
-				&:hover span, &:focus span {
-					visibility: visible;
-					opacity: 0.8;
-					bottom: 30px;
-					left: 50%;
-					margin-left: -53px;
-					z-index: 999;
-					width: 100px;
-				}
-			}
-		}
-
-	}
+            &.tooltips {
+                &:hover span, &:focus span {
+                    margin-left: -53px;
+                    width: 100px;
+                }
+            }
+        }
+    }
 
 	li.operator > span.item-button-panel{
 	  	padding-top: 0;
