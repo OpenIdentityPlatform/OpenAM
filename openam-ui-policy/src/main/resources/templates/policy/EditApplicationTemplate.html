@@ -1,6 +1,9 @@
 <div class="content-bg">
-    <h1>Create Applications</h1>
-
+    {{#if entity.name}}
+    <h1>{{t "config.messages.PolicyMessages.edit"}}{{appName}}</h1>
+    {{else}}
+    <h1>{{t "config.messages.PolicyMessages.createApp"}}</h1>
+    {{/if}}
     <div class="clearfix">
         <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
             service. This template is then used when policies are created for the service. To create an application, begin

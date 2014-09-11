@@ -1,5 +1,9 @@
 <div class="content-bg">
-    <h1>Create Policy</h1>
+    {{#if entity.name}}
+    <h1>{{t "config.messages.PolicyMessages.edit"}}{{entity.name}}</h1>
+    {{else}}
+    <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
+    {{/if}}
     <div class="clearfix">
         <p>To designate the conditions that define access to a protected resource, begin with Step 1 and
             progress through step 6. Modifications can be made after it has been created.

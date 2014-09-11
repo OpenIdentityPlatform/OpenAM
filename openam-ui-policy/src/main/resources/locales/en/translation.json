@@ -39,7 +39,10 @@
                 "applicationCreated": "Application created successfully",
                 "applicationUpdated": "Application updated successfully",
                 "policyCreated": "Policy created successfully",
-                "policyUpdated": "Policy updated successfully"
+                "policyUpdated": "Policy updated successfully",
+                "edit": "Edit ",
+                "createApp": "Create Application",
+                "createPol": "Create Policy"
             }
         },
         "AppConfiguration" : {
