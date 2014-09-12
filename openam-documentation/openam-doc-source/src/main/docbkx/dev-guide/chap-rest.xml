@@ -6132,18 +6132,46 @@ $ <userinput>curl \
 
     <literallayout class="monospaced"
     >https://openam.example.com:8443/openam/json/XUI/confirm.html
-     ?confirmationId=jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=
-     &amp;tokenId=M8cVqWqbKtCtpd/UqEAr0x25fxA=
+     ?confirmationId=sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY=
+     &amp;tokenId=vkm+5v58cTs1yQcQl5HCQGOsuQk=
      &amp;username=demo&amp;realm=/</literallayout>
    </listitem>
 
    <listitem>
     <para>Intercept the HTTP GET request to this URL when the user clicks the
-    link.</para>
+     link.</para>
 
     <para>Your application must use the confirmation link to construct an HTTP
-    POST to <literal>/json/users?_action=forgotPasswordReset</literal> from the
-    query string parameters as shown in the following example.</para>
+     POST to <literal>/json/users?_action=confirm</literal> from the query string
+     parameters as shown in the following example:</para>
+
+    <screen>
+     $ <userinput>curl \
+     --request POST \
+     --header "Content-Type: application/json" \
+     --data \
+     '{
+     "username":"demo",
+     "tokenId":"vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+     "confirmationId":"sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
+     }' \
+     https://openam.example.com:8443/openam/json/users?_action=confirm</userinput>
+     <computeroutput>{
+      "username": "demo",
+      "tokenId": "vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+      "confirmationId": "sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
+      }</computeroutput>
+    </screen>
+
+    <para>The response is a further confirmation that the request is
+     valid, has not expired, and the password can be reset.</para>
+   </listitem>
+
+
+   <listitem>
+    <para>Using the confirmation, your application must construct an HTTP
+    POST to <literal>/json/users?_action=forgotPasswordReset</literal> to
+     reset the password as shown in the following example.</para>
 
     <para>Your POST includes the new password as the value of the "userpassword"
      field in the JSON payload. You can also use the <literal>email</literal>
@@ -6157,8 +6185,8 @@ $ <userinput>curl \
  --data '{
  "username":"demo",
  "userpassword":"password",
- "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=",
- "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ="
+ "tokenId":"vkm+5v58cTs1yQcQl5HCQGOsuQk=",
+ "confirmationId":"sdfsfeM+URcWVQ7vvCDnx4N5Vut7SBIY="
  }' \
  https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset</userinput>
 <computeroutput>{}</computeroutput>
