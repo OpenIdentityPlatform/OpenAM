@@ -700,6 +700,7 @@ function compareDevicePrintProfiles(attributeConfig, devicePrint, devicePrintPro
         return null;
     }
 
+    results.sort(ComparisonResult.compare);
     selectedComparisonResult = results[0].key;
     if (logger.messageEnabled()) {
         logger.message("Selected comparison result: successful=" + selectedComparisonResult.isSuccessful()
