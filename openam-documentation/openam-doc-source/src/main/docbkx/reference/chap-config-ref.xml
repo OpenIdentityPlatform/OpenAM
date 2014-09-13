@@ -5226,20 +5226,23 @@
       Whether to perform an HTTP GET on
       <literal>com.sun.identity.urlchecker.targeturl</literal>
       as a health check against another server in the same site.
-      If <literal>false</literal>,
+     </para>
+
+     <para>
+      If set to <literal>false</literal>,
       then OpenAM only checks the Socket connection,
       and does not perform an HTTP GET.
      </para>
 
      <para>
       If each OpenAM server runs behind a reverse proxy,
-      then setting this property to <literal>true</literal>
+      then the default setting of <literal>true</literal>
       means the health check actually runs against the OpenAM instance,
       rather than checking only the Socket to the reverse proxy.
      </para>
 
      <para>
-      Default: <literal>false</literal>
+      Default: <literal>true</literal>
      </para>
     </listitem>
    </varlistentry>
