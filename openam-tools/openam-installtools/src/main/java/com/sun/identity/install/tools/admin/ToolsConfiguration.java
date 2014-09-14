@@ -30,14 +30,11 @@
 package com.sun.identity.install.tools.admin;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import com.sun.identity.install.tools.launch.IAdminTool;
 import com.sun.identity.install.tools.util.Debug;
-import com.sun.identity.shared.encode.URLEncDec;
 
 /**
  * Class that provides means to obtain the bootstrap configuration information
@@ -52,31 +49,23 @@ public class ToolsConfiguration {
 
     private static synchronized void initializeConfiguration() {
         if (!isInitialized()) {
-            URL resUrl = ClassLoader.getSystemResource(TOOLSCONFIG_FILE_NAME);
-            if (resUrl == null) {
-                ClassLoader cl = Thread.currentThread()
-                    .getContextClassLoader();
-
+            InputStream instream = ClassLoader.getSystemResourceAsStream(TOOLSCONFIG_FILE_NAME);
+            if (instream == null) {
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 if (cl != null) {
-                    resUrl = cl.getResource(TOOLSCONFIG_FILE_NAME);
+                    instream = cl.getSystemResourceAsStream(TOOLSCONFIG_FILE_NAME);
                 }
             }
 
-            if (resUrl == null) {
-                throw new RuntimeException("Failed to get configuration file:"
-                        + TOOLSCONFIG_FILE_NAME);
+            if (instream == null) {
+                throw new RuntimeException("Failed to get configuration file:" + TOOLSCONFIG_FILE_NAME);
             }
 
-            // Cope with paths that have spaces, URL will return an encoded string value
-            String configFile = URLEncDec.decode(resUrl.getPath());
-            InputStream instream = null;
             try {
-                instream = new BufferedInputStream(new FileInputStream(configFile));
-                getProperties().load(instream);
+                getProperties().load(new BufferedInputStream(instream));
             } catch (Exception ex) {
-                Debug.log("Failed to load configuration from " + configFile, ex);
-                throw new RuntimeException("Failed to load configuration: "
-                        + ex.getMessage());
+                Debug.log("Failed to load configuration from " + TOOLSCONFIG_FILE_NAME, ex);
+                throw new RuntimeException("Failed to load configuration: " + ex.getMessage());
             } finally {
                 if (instream != null) {
                     try {
