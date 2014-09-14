@@ -53,7 +53,7 @@ public class ToolsConfiguration {
             if (instream == null) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 if (cl != null) {
-                    instream = cl.getSystemResourceAsStream(TOOLSCONFIG_FILE_NAME);
+                    instream = cl.getResourceAsStream(TOOLSCONFIG_FILE_NAME);
                 }
             }
 
