@@ -212,6 +212,18 @@ describe("ScreenComparator test suite", function() {
 
     it("should compare screens that are null", function() {
         // Given
+        var currentValue = null;
+        var storedValue = null;
+        var config = {"penaltyPoints": 10};
+        // When
+        var comparisonResult = ScreenComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
+    it("should compare screens with null values", function() {
+        // Given
         var currentValue = {"screenWidth": null, "screenHeight": null, "screenColourDepth": null};
         var storedValue = {"screenWidth": null, "screenHeight": null, "screenColourDepth": null};
         var config = {"penaltyPoints": 10};
@@ -310,6 +322,19 @@ describe("MultiValueComparator test suite", function() {
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
     });
 
+    it("should compare multi value strings when both are null", function() {
+        // Given
+        var currentValue = null;
+        var storedValue = null;
+        var config = {"maxPercentageDifference": 20, "maxDifferences": 1, "penaltyPoints": 111};
+        // When
+        var comparisonResult = MultiValueComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
     it("should compare multi value strings when both are empty", function() {
         // Given
         var currentValue = "";
@@ -321,6 +346,32 @@ describe("MultiValueComparator test suite", function() {
         expect(comparisonResult.isSuccessful()).toBe(true);
         expect(comparisonResult.penaltyPoints).toEqual(0);
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
+    it("should compare multi value strings when current value is null", function() {
+        // Given
+        var currentValue = null;
+        var storedValue = "VALUE_A; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
+        var config = {"maxPercentageDifference": 20, "maxDifferences": 1, "penaltyPoints": 111};
+        // When
+        var comparisonResult = MultiValueComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(false);
+        expect(comparisonResult.penaltyPoints).toEqual(111);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
+    it("should compare multi value strings when stored value is null", function() {
+        // Given
+        var currentValue = "VALUE_A; VALUE_B; VALUE_C; VALUE_D; VALUE_E";
+        var storedValue = null;
+        var config = {"maxPercentageDifference": 20, "maxDifferences": 1, "penaltyPoints": 111};
+        // When
+        var comparisonResult = MultiValueComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
     });
 
     it("should compare multi value strings when both are equal", function() {
@@ -399,6 +450,7 @@ describe("UserAgentComparator test suite", function() {
         // When
         var comparisonResult = UserAgentComparator.compare(currentValue, storedValue, config);
         //Then
+        expect(comparisonResult.isSuccessful()).toBe(false);
         expect(comparisonResult.penaltyPoints).toEqual(10);
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
     });
@@ -411,14 +463,64 @@ describe("UserAgentComparator test suite", function() {
         // When
         var comparisonResult = UserAgentComparator.compare(currentValue, storedValue, config);
         //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
         expect(comparisonResult.penaltyPoints).toEqual(0);
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
     });
+
+    it("should compare user agents when both are null", function () {
+        // Given
+        var currentValue = null;
+        var storedValue = null;
+        var config = {"ignoreVersion": true, "penaltyPoints": 10};
+        // When
+        var comparisonResult = UserAgentComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+    });
+
+    it("should compare user agents when current value is null", function () {
+        // Given
+        var currentValue = null;
+        var storedValue = "1234USER_.567890AGENT_";
+        var config = {"ignoreVersion": true, "penaltyPoints": 10};
+        // When
+        var comparisonResult = UserAgentComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(false);
+        expect(comparisonResult.penaltyPoints).toEqual(10);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
+    it("should compare user agents when stored value is null", function () {
+        // Given
+        var currentValue = "USER_AGENT_1234567890.";
+        var storedValue = null;
+        var config = {"ignoreVersion": true, "penaltyPoints": 10};
+        // When
+        var comparisonResult = UserAgentComparator.compare(currentValue, storedValue, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
+    });
+
 });
 
 describe("GeolocationComparator test suite", function() {
 
-    it("should compare location when both Xs are null", function () {
+    it("should compare location when both locations are null", function () {
+        // Given
+        var current = null;
+        var stored = null;
+        var config =  {"allowedRange": 100, "penaltyPoints": 111};
+        // When
+        var comparisonResult = GeolocationComparator.compare(current, stored, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+    });
+
+    it("should compare location when both latitudes are null", function () {
         // Given
         var current = {"latitude": null, "longitude": 2.0};
         var stored = {"latitude": null, "longitude": 2.0};
@@ -429,7 +531,7 @@ describe("GeolocationComparator test suite", function() {
         expect(comparisonResult.isSuccessful()).toBe(true);
     });
 
-    it("should compare location when both Ys are null", function () {
+    it("should compare location when both longitudes are null", function () {
         // Given
         var current = {"latitude": 2.0, "longitude": null};
         var stored = {"latitude": 2.0, "longitude": null};
@@ -440,7 +542,20 @@ describe("GeolocationComparator test suite", function() {
         expect(comparisonResult.isSuccessful()).toBe(true);
     });
 
-    it("should compare location when current X is null", function () {
+    it("should compare location when current location is null", function () {
+        // Given
+        var current = null;
+        var stored = {"latitude": 2.0, "longitude": 2.0};
+        var config =  {"allowedRange": 100, "penaltyPoints": 111};
+        // When
+        var comparisonResult = GeolocationComparator.compare(current, stored, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(false);
+        expect(comparisonResult.penaltyPoints).toEqual(111);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
+    });
+
+    it("should compare location when current latitude is null", function () {
         // Given
         var current = {"latitude": null, "longitude": 2.0};
         var stored = {"latitude": 2.0, "longitude": 2.0};
@@ -453,7 +568,7 @@ describe("GeolocationComparator test suite", function() {
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
     });
 
-    it("should compare location when current Y is null", function () {
+    it("should compare location when current longitude is null", function () {
         // Given
         var current = {"latitude": 2.0, "longitude": null};
         var stored = {"latitude": 2.0, "longitude": 2.0};
@@ -466,20 +581,33 @@ describe("GeolocationComparator test suite", function() {
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(false);
     });
 
-    it("should compare location when stored X is null", function () {
+    it("should compare location when stored location is null", function () {
         // Given
         var current = {"latitude": 2.0, "longitude": 2.0};
-        var stored = {"latitude": null, "longitude": 2.0};
+        var stored = null;
         var config =  {"allowedRange": 100, "penaltyPoints": 111};
         // When
         var comparisonResult = GeolocationComparator.compare(current, stored, config);
         //Then
-        expect(comparisonResult.isSuccessful()).toBe(false);
-        expect(comparisonResult.penaltyPoints).toEqual(111);
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
     });
 
-    it("should compare location when stored Y is null", function () {
+    it("should compare location when stored latitude is null", function () {
+        // Given
+        var current = {"latitude": 2.0, "longitude": 2.0};
+        var stored = {"latitude": null, "longitude": 2.0};
+        var config =  {"allowedRange": 100, "penaltyPoints": 111};
+        // When
+        var comparisonResult = GeolocationComparator.compare(current, stored, config);
+        //Then
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
+        expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
+    });
+
+    it("should compare location when stored longitude is null", function () {
         // Given
         var current = {"latitude": 2.0, "longitude": 2.0};
         var stored = {"latitude": 2.0, "longitude": null};
@@ -487,8 +615,8 @@ describe("GeolocationComparator test suite", function() {
         // When
         var comparisonResult = GeolocationComparator.compare(current, stored, config);
         //Then
-        expect(comparisonResult.isSuccessful()).toBe(false);
-        expect(comparisonResult.penaltyPoints).toEqual(111);
+        expect(comparisonResult.isSuccessful()).toBe(true);
+        expect(comparisonResult.penaltyPoints).toEqual(0);
         expect(comparisonResult.additionalInfoInCurrentValue).toBe(true);
     });
 

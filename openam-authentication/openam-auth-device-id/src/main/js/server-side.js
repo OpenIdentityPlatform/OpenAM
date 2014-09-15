@@ -33,7 +33,7 @@ var ScalarComparator = {}, ScreenComparator = {}, MultiValueComparator = {}, Use
 var config = {
     profileExpiration: 30,              //in days
     maxProfilesAllowed: 5,
-    maxPenaltyPoints: 200,
+    maxPenaltyPoints: 0,
     attributes: {
         screen: {
             required: true,
@@ -58,6 +58,8 @@ var config = {
                 required: false,
                 comparator: MultiValueComparator,
                 args: {
+                    maxPercentageDifference: 10,
+                    maxDifferences: 5,
                     penaltyPoints: 100
                 }
             }
@@ -94,7 +96,8 @@ var config = {
 //                           Comparator functions                            //
 //---------------------------------------------------------------------------//
 
-var all, any, calculateDistance, calculateIntersection, calculatePercentage, splitAndTrim;
+var all, any, calculateDistance, calculateIntersection, calculatePercentage, nullOrUndefined, splitAndTrim,
+    undefinedLocation;
 
 // ComparisonResult
 
@@ -153,11 +156,11 @@ ComparisonResult.additionalInfoInCurrentValue =  function(comparisonResult) {
  * Comparison function that can be provided as an argument to array.sort
  */
 ComparisonResult.compare = function(first, second) {
-    if (first === null && second === null) {
+    if (nullOrUndefined(first) && nullOrUndefined(second)) {
         return 0;
-    } else if (first === null) {
+    } else if (nullOrUndefined(first)) {
         return -1;
-    } else if (second === null) {
+    } else if (nullOrUndefined(second)) {
         return 1;
     } else {
         if (first.penaltyPoints !== second.penaltyPoints) {
@@ -186,7 +189,7 @@ ComparisonResult.prototype.addComparisonResult = function(comparisonResult) {
  * @return boolean true if the comparison was successful.
  */
 ComparisonResult.prototype.isSuccessful = function() {
-    return this.penaltyPoints === null || this.penaltyPoints === 0;
+    return nullOrUndefined(this.penaltyPoints) || this.penaltyPoints === 0;
 };
 
 /**
@@ -210,11 +213,11 @@ ScalarComparator.compare = function (currentValue, storedValue, config) {
         return ComparisonResult.ZERO_PENALTY_POINTS;
     }
 
-    if (storedValue !== null) {
-        if (currentValue === null || currentValue !== storedValue) {
+    if (!nullOrUndefined(storedValue)) {
+        if (nullOrUndefined(currentValue) || currentValue !== storedValue) {
             return new ComparisonResult(config.penaltyPoints);
         }
-    } else if (currentValue !== null) {
+    } else if (!nullOrUndefined(currentValue)) {
         return new ComparisonResult(true);
     }
 
@@ -247,9 +250,11 @@ ScreenComparator.compare = function (currentValue, storedValue, config) {
         logger.message("ScreenComparator.compare:config: " + JSON.stringify(config));
     }
 
-    // if comparing against old profile
-    if (storedValue === undefined) {
-        return new ComparisonResult(config.penaltyPoints);
+    if (nullOrUndefined(currentValue)) {
+        currentValue = {screenWidth: null, screenHeight: null, screenColourDepth: null};
+    }
+    if (nullOrUndefined(storedValue)) {
+        storedValue = {screenWidth: null, screenHeight: null, screenColourDepth: null};
     }
 
     var comparisonResults = [
@@ -299,7 +304,7 @@ MultiValueComparator.compare = function (currentValue, storedValue, config) {
         numberOfDifferences = maxNumberOfElements - numberOfTheSameElements,
         percentageOfDifferences = calculatePercentage(numberOfDifferences, maxNumberOfElements);
 
-    if (storedValue === null && currentValue !== null && currentValues.length === 0) {
+    if (nullOrUndefined(storedValue) && !nullOrUndefined(currentValue)) {
         return new ComparisonResult(true);
     }
 
@@ -363,8 +368,8 @@ UserAgentComparator.compare = function (currentValue, storedValue, config) {
 
     if (config.ignoreVersion) {
         // remove version number
-        currentValue = currentValue.replace(/[\d\.]+/g, "").trim();
-        storedValue = storedValue.replace(/[\d\.]+/g, "").trim();
+        currentValue = nullOrUndefined(currentValue) ? null : currentValue.replace(/[\d\.]+/g, "").trim();
+        storedValue = nullOrUndefined(storedValue) ? null : storedValue.replace(/[\d\.]+/g, "").trim();
     }
 
     return ScalarComparator.compare(currentValue, storedValue, config);
@@ -394,30 +399,20 @@ GeolocationComparator.compare = function (currentValue, storedValue, config) {
         logger.message("GeolocationComparator.compare:config: " + JSON.stringify(config));
     }
 
-    // if comparing against old profile
-    if (storedValue === undefined) {
-        return new ComparisonResult(config.penaltyPoints);
-    }
+    // Check for undefined stored or current locations
 
-    // both null
-    if ((currentValue.latitude === null || currentValue.longitude === null)
-        && (storedValue.latitude === null || storedValue.longitude === null)) {
+    if (undefinedLocation(currentValue) && undefinedLocation(storedValue)) {
         return ComparisonResult.ZERO_PENALTY_POINTS;
     }
-
-    // current null, stored not null
-    if ((currentValue.latitude === null || currentValue.longitude === null)
-        && (storedValue.latitude !== null && storedValue.longitude !== null)) {
+    if (undefinedLocation(currentValue) && !undefinedLocation(storedValue)) {
         return new ComparisonResult(config.penaltyPoints);
     }
-
-    // current not null, stored null
-    if ((currentValue.latitude !== null && currentValue.longitude !== null)
-        && (storedValue.latitude === null || storedValue.longitude === null)) {
-        return new ComparisonResult(config.penaltyPoints, true);
+    if (!undefinedLocation(currentValue) && undefinedLocation(storedValue)) {
+        return new ComparisonResult(true);
     }
 
-    // both have values, therefore perform comparison
+    // Both locations defined, therefore perform comparison
+
     var distance = calculateDistance(currentValue, storedValue);
 
     if (logger.messageEnabled()) {
@@ -482,6 +477,29 @@ any = function(a, f) {
         }
     }
     return false;
+};
+
+/**
+ * Returns true if the provided location is null or has undefined longitude or latitude values.
+ *
+ * @param location: {
+ *            "latitude": (Number) The latitude.
+ *            "longitude": (Number) The longitude.
+ *        }
+ * @return boolean
+ */
+undefinedLocation = function(location) {
+    return nullOrUndefined(location) || nullOrUndefined(location.latitude) || nullOrUndefined(location.longitude);
+};
+
+/**
+ * Returns true if the provided value is null or undefined.
+ *
+ * @param value: a value of any type
+ * @return boolean
+ */
+nullOrUndefined = function(value) {
+    return value === null || value === undefined;
 };
 
 /**
