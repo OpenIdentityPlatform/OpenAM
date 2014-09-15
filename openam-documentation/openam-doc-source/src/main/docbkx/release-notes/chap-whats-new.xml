@@ -253,6 +253,12 @@ Agreement (yes/no): [no]:</screen>
  <itemizedlist>
   <title>Additional New Features</title>
 
+  <listitem>
+   <para>
+    TODO: Update for next version
+   </para>
+  </listitem>
+
   <listitem><!-- Enhancement: AME-2210 -->
    <para><emphasis role="bold">Persistent Cookie from Client IP Issued</emphasis>.
     The Persistent Cookie module has been enhanced to enforce
@@ -467,9 +473,7 @@ Agreement (yes/no): [no]:</screen>
     user to enter a one-time password, which will be sent to the user via email or SMS.
     The user also has the option to request a one-time password.</para>
 
-   <figure xml:id="figure-device-print-otp">
-    <title>OTP Page</title>
-    <mediaobject>
+    <mediaobject xml:id="figure-device-print-otp">
      <alt>One-Time Password Page</alt>
      <imageobject>
       <imagedata fileref="images/device-print-hotp.png"
@@ -480,16 +484,14 @@ Agreement (yes/no): [no]:</screen>
       </para>
      </textobject>
     </mediaobject>
-   </figure>
+
 
    <para>
     Next, OpenAM presents the user with a "Add to Trusted Devices?" page,
     asking if she wants to add the device to the list of trusted device profiles.
    </para>
 
-   <figure xml:id="figure-device-print-trust-dialog">
-    <title>Add Device to Trusted Devices Dialog</title>
-    <mediaobject>
+    <mediaobject xml:id="figure-device-print-trust-dialog">
      <alt>Add Device to Trusted Devices Dialog</alt>
      <imageobject>
       <imagedata fileref="images/device-print-trust-dialog.png"
@@ -500,16 +502,13 @@ Agreement (yes/no): [no]:</screen>
       </para>
      </textobject>
     </mediaobject>
-   </figure>
 
    <para>
     If the user clicks "Yes", OpenAM prompts the user to enter a descriptive name
     for the trusted device.
    </para>
 
-   <figure xml:id="figure-device-print-trust-name">
-    <title>Trusted Device Name page</title>
-    <mediaobject>
+    <mediaobject xml:id="figure-device-print-trust-name">
      <alt>Trusted Device Name page</alt>
      <imageobject>
       <imagedata fileref="images/device-print-trust-name.png"
@@ -520,7 +519,6 @@ Agreement (yes/no): [no]:</screen>
       </para>
      </textobject>
     </mediaobject>
-   </figure>
 
    <para>OpenAM presents the user with the User Profile page, where the
     user can click the Dashboard link in the upper left corner to access the My
@@ -529,9 +527,7 @@ Agreement (yes/no): [no]:</screen>
     Delete Device link.
    </para>
 
-   <figure xml:id="figure-trusted-device-mgmt">
-    <title>Trusted Device Management on the Dashboard</title>
-    <mediaobject>
+    <mediaobject xml:id="figure-trusted-device-mgmt">
      <alt>Trusted Device Management</alt>
      <imageobject>
       <imagedata fileref="images/trusted-device-mgmt.png"
@@ -542,13 +538,121 @@ Agreement (yes/no): [no]:</screen>
       </para>
      </textobject>
     </mediaobject>
-   </figure>
+
   </listitem>
 
   <listitem>
     <para>
-     TODO: Update for next version
+     <emphasis role="bold">User Management of OAuth 2.0 Tokens</emphasis>.
+     OAuth 2.0 clients can now manage their OAuth 2.0 tokens
+     on their user pages via the OpenAM console.
+     For example, log in to the OpenAM
+     console as <literal>demo</literal>, and then click the Dashboard link on the
+     Profile page.
+     In the Authorized Apps section, view your OAuth 2.0 tokens or
+     remove them by clicking the Revoke Access link.
     </para>
+
+
+    <mediaobject xml:id="figure-xui-oauth2-self-service-2">
+     <alt>OAuth2 Self-Service</alt>
+     <imageobject>
+      <imagedata fileref="images/xui-oauth2-self-service-2.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>XUI OAuth 2.0 Self-Service
+      </para>
+     </textobject>
+    </mediaobject>
+
   </listitem>
+
+  <!-- We'll need to re-sort these features and re-consider if all these images
+       are necessary. -->
+  <listitem>
+   <para>
+    <emphasis role="bold">User Self-Registration</emphasis>. The OpenAM now offers its
+    user self-registration service through its XUI interface. Users can click
+    a Register link on the Login page to add themselves to the system.
+   </para>
+
+    <mediaobject xml:id="figure-user-self-register-login-xui">
+     <alt>User Self-Registation Link</alt>
+     <imageobject >
+      <imagedata fileref="images/user-self-register-login-xui.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>User Self Registration Login link
+      </para>
+     </textobject>
+    </mediaobject>
+
+   <para>When the user clicks the Register link, OpenAM responds by sending a
+    Register your account page where the user enters his or her email address.</para>
+
+   <mediaobject xml:id="figure-register-your-acct">
+    <alt>User Self-Registation Register Your Account</alt>
+    <imageobject>
+     <imagedata fileref="images/register-your-acct.png"
+                format="PNG" />
+    </imageobject>
+    <textobject>
+     <para>User Self Registration Register Your Account
+     </para>
+    </textobject>
+   </mediaobject>
+
+   <para>OpenAM responds by sending a confirmation email to the user's email
+    address. The user clicks the link in the email.</para>
+
+
+    <mediaobject xml:id="figure-user-self-registration-email">
+     <alt>User Self-Registation Email</alt>
+     <imageobject>
+      <imagedata fileref="images/user-self-registration-email.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>User Self Registration Email
+      </para>
+     </textobject>
+    </mediaobject>
+
+
+   <para>After the user clicks the email link, OpenAM presents the user with a
+    Register Your Account page, where the user enters his or her account information.
+    The user clicks Submit and can now log in to the system.
+   </para>
+
+    <mediaobject xml:id="figure-user-self-registration-xui">
+     <alt>User Self-Registation Account</alt>
+     <imageobject>
+      <imagedata fileref="images/user-self-registration-xui.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>User Self Registration Account Entry
+      </para>
+     </textobject>
+    </mediaobject>
+
+   <para>
+    For more information on configuring the User Self-Registration, see <link
+    xlink:show="new"
+    xlink:href="admin-guide#user-self-registration"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>User Self-Registration</citetitle></link>.
+   </para>
+   <para>
+    For more information on the User Self-Registration using REST, see <link
+    xlink:show="new"
+    xlink:href="dev-guide#rest-api-self-registration"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>User Self-Registration</citetitle></link>.
+   </para>
+  </listitem>
+
  </itemizedlist>
 </chapter>

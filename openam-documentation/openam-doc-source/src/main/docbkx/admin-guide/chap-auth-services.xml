@@ -1840,6 +1840,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
   
   <section xml:id="datastore-module-conf-hints">
    <title>Hints For the Data Store Authentication Module</title>
+
    <para>The Data Store authentication module allows a login using the Identity
    Repository of the realm to authenticate users. Using the Data Store module
    removes the requirement to write an authentication plug-in module, load,
@@ -1847,6 +1848,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    against the same data store repository. Additionally, you do not need to
    write a custom authentication module where flat-file authentication is
    needed for the corresponding repository in that realm.</para>
+
    <para>Yet, the Data Store module is generic. It does not implement data
    store-specific capabilities such as the password policy and password reset
    features provided by LDAP modules. Therefore the Data Store module returns
@@ -2756,65 +2758,66 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </varlistentry>
    </variablelist>
   </section>
-  
-  <section xml:id="membership-module-conf-hints">
+
+
+  <!--section xml:id="membership-module-conf-hints">
    <title>Hints For the Membership Authentication Module</title>
    <para>The Membership module permits self-registration for new users. You
-   can then have OpenAM create new user profiles in the identity
-   repository.</para>
+    can then have OpenAM create new user profiles in the identity
+    repository.</para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>Membership (&amp; self-registration)</secondary>
    </indexterm>
-   
+
    <para><command>ssoadm</command> service name:
-   <literal>iPlanetAMAuthMembershipService</literal></para>
-   
+    <literal>iPlanetAMAuthMembershipService</literal></para>
+
    <variablelist>
     <varlistentry>
      <term>Minimum Password Length</term>
      <listitem>
       <para>Specify the minimum acceptable number of characters in the password
-      provided during self-registration.</para>
+       provided during self-registration.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-membership-min-password-length</literal></para>
+       <literal>iplanet-am-auth-membership-min-password-length</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Default User Roles</term>
      <listitem>
       <para>Specifies the Distinguished Name (DN) of a role to be assigned to
-      a new user whose profile is created. There are no default values. The
-      role specified must be within the realm for which the authentication
-      process is configured.</para>
+       a new user whose profile is created. There are no default values. The
+       role specified must be within the realm for which the authentication
+       process is configured.</para>
       <para>This role can be either an OpenAM or Sun DSEE role, but it cannot
-      be a filtered role. If you wish to automatically assign specific services
-      to the user, you have to configure the Required Services attribute in
-      the User Profile.</para>
+       be a filtered role. If you wish to automatically assign specific services
+       to the user, you have to configure the Required Services attribute in
+       the User Profile.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-membership-default-roles</literal></para>
+       <literal>iplanet-am-auth-membership-default-roles</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>User Status After Registration</term>
      <listitem>
       <para>If you choose Inactive, then the new user has no access to services
-      until an administrator activates the account.</para>
+       until an administrator activates the account.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-membership-default-user-status</literal></para>
+       <literal>iplanet-am-auth-membership-default-user-status</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
       <para>Sets the authentication level used to indicate the level of security
-      associated with the module. The value can range from 0 to any positive integer.</para>
+       associated with the module. The value can range from 0 to any positive integer.</para>
       <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-auth-membership-auth-level</literal></para></listitem>
+       <literal>iplanet-am-auth-membership-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
-  </section>
-  
+  </section-->
+
   <section xml:id="msisdn-module-conf-hints">
    <title>Hints For the MSISDN Authentication Module</title>
    <para>The Mobile Station Integrated Services Digital Network (MSISDN)

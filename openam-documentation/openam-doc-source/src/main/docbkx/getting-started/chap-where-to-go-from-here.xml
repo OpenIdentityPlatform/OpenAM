@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-where-to-go-from-here'
@@ -54,52 +54,59 @@
 
   <itemizedlist>
    <listitem>
-    <para>OpenAM provides user self-registration as an authentication module
-    and also as a feature of OpenAM's REST APIs. New users can safely sign up
-    in OpenAM without your administrators or help desk having to get
-    involved.</para>
+    <para><emphasis role="bold">User Self-Registration</emphasis>.
+     OpenAM provides user self-registration as
+     a feature of OpenAM's REST APIs. New users can safely sign up
+     in OpenAM without your administrators or help desk having to get
+     involved.
+    </para>
 
-    <para>For information on configuring self-registration as an authentication
-    module, see the <citetitle>Administration Guide</citetitle> section,
-    <link xlink:show="new" xlink:href="admin-guide#membership-module-conf-hints"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
-    Membership Authentication Module</citetitle></link>. You then specify
-    the module in the link to your "sign up" page.</para>
+    <para>
+     For information on configuring self-registration, see the
+     <link xlink:show="new" xlink:href="admin-guide#user-self-registration"
+           xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>User Self-Registration</citetitle></link> section in the
+     <citetitle>OpenAM Administration Guide</citetitle>.
+    </para>
 
     <para>For details on building your own self-registration application using
-    the REST API, see the <citetitle>Developer's Guide</citetitle> section,
+    the REST API, see the
     <link xlink:show="new" xlink:href="dev-guide#rest-api-self-registration"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>User
-    Self-Registration</citetitle></link>.</para>
+    Self-Registration</citetitle></link> section in the
+     <citetitle>OpenAM Developer's Guide</citetitle>.</para>
    </listitem>
 
    <listitem>
-    <para>OpenAM can help users reset their passwords on their own. OpenAM
-    handles both the case where a user knows their password and wants to change
-    it, and also the case where the user has forgotten their password and needs
-    to reset it, possibly after answering security questions.</para>
+    <para><emphasis role="bold">Password Reset</emphasis>.
+     OpenAM can help users reset their passwords on their own. OpenAM
+     handles both the case where a user knows their password and wants to change
+     it, and also the case where the user has forgotten their password and needs
+     to reset it, possibly after answering security questions.</para>
 
     <para>For details on setting up password reset capabilities, see the
-    <citetitle>Administration Guide</citetitle> chapter, <link xlink:show="new"
-    xlink:href="admin-guide#chap-pwd-reset"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
-    Password Reset</citetitle></link>.</para>
+     <link xlink:show="new" xlink:href="admin-guide#forgotten-pwd-reset"
+           xlink:role="http://docbook.org/xlink/role/olink">
+      <citetitle>Resetting Forgotten Passwords</citetitle></link> chapter in
+     the <citetitle>OpenAM Administration Guide</citetitle>.</para>
 
     <para>For details on building your own application to handle password reset
-    using the REST API, see the <citetitle>Developer's Guide</citetitle> section,
-    <link xlink:show="new" xlink:href="dev-guide#rest-api-password-reset"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Resetting
-    Forgotten Passwords</citetitle></link>.</para>
+     using the REST API, see the
+     <link xlink:show="new" xlink:href="dev-guide#rest-api-password-reset"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Resetting
+     Forgotten Passwords</citetitle></link> section in the
+     <citetitle>OpenAM Developer's Guide</citetitle>.</para>
    </listitem>
 
    <listitem>
-    <para>Users often have a number of applications assigned to them, especially
-    if your organization has standardized on software as a service, for example
-    for email, document sharing, support ticketing, customer relationship
-    management, web conferencing, and so forth. It can be handy to present these
-    applications on a user's web-based dashboard with the user's profile, and
-    to assign applications to the user's dashboard automatically based on the
-    user's profile.</para>
+    <para><emphasis role="bold">Dashboard Service</emphasis>.
+     Users often have a number of applications assigned to them, especially
+     if your organization has standardized on software as a service, for example
+     for email, document sharing, support ticketing, customer relationship
+     management, web conferencing, and so forth. It can be handy to present these
+     applications on a user's web-based dashboard with the user's profile, and
+     to assign applications to the user's dashboard automatically based on the
+     user's profile.</para>
 
     <para>The OpenAM cloud dashboard service makes this relatively easy to
     set up. For basic information on using the service, see the

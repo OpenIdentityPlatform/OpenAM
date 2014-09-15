@@ -30,32 +30,100 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
- <title>Configuring Password Reset</title>
+
+ <title>Configuring User Self-Service Features</title>
+
  <indexterm><primary>Password reset</primary></indexterm>
- <para>This chapter focuses on how to enable users to reset their own
- passwords in secure fashion.</para>
- 
+
+ <para>This chapter focuses on how to enable OpenAM features that allow users
+  to self register from the Login page and reset their own
+  passwords in secure fashion.
+ </para>
+
+ <section xml:id="user-self-registration">
+  <title>Configuring User Self-Registration</title>
+  <para>
+   OpenAM provides a self-registration feature that allows users to add
+   themselves to the system.
+   On the Login page, the user clicks a Register link, which sends a request to
+   the OpenAM server. OpenAM responds to request by sending a
+   Register Your Account page where the user enters his or her email address.
+  </para>
+  <para>
+   After the user enters his or her email, OpenAM responds by sending a
+   notification containing a confirmation link to the user's email address.
+   When the user clicks the link, OpenAM confirms the operation and presents the user
+   with a registration page where the user enters their account information.
+  </para>
+
+  <procedure xml:id="configure-user-self-registration">
+   <title>To Configure User Self-Registration</title>
+
+   <step>
+    <para>Configure the Email Service to send mail
+     notifications to users who self-register.
+    </para>
+    <para>
+     You can configure these globally
+     in OpenAM console at Configuration &gt; Global &gt; Email Service.
+     Alternatively, you can configure them for an individual realm under
+     Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+   </step>
+
+   <step>
+    <para>Configure REST Security to enable self-registration.
+    </para>
+    <para>
+     You can configure these globally in OpenAM console at
+     Configure &gt; Global &gt; REST Security. On the REST Security page, click
+     the <literal>Enabled</literal> checkbox next to Self-Registration for Users,
+     and then click Save.
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   At this point users can self-register by clicking a Register link on the
+   Login page.
+  </para>
+
+  <mediaobject xml:id="figure-user-self-register-login">
+   <alt>User Self-Registration link</alt>
+   <imageobject>
+    <imagedata fileref="images/user-self-register-login.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM allows users to register themselves by clicking
+    the Register link.
+   </para>
+   </textobject>
+  </mediaobject>
+
+ </section>
+
  <section xml:id="about-pwd-reset">
   <title>About Password Reset</title>
+
   <para>Users who know their passwords, but must reset them because for example
-  the password is going to expire, can reset their passwords by successfully
-  authenticating to OpenAM, visiting their end user pages, such as
-  <literal>http://openam.example.com:8080/openam/idm/EndUser</literal>, and
-  clicking Edit next to the Password field to display the change password
-  page.</para>
-  
-  <mediaobject xml:id="figure-console-change-pwd">
-   <alt>The OpenAM Change Password page</alt>
-   <imageobject>
-    <imagedata fileref="images/console-change-pwd.png" format="PNG" />
-   </imageobject>
-   <textobject><para>Authenticated users can change their passwords
-   through the OpenAM console.</para></textobject>
-  </mediaobject>
-  
+   the password is going to expire, can reset their passwords by successfully
+   authenticating to OpenAM, visiting their end user pages, such as
+   <literal>http://openam.example.com:8080/openam/XUI/#profile/</literal>, and
+   clicking Change Security Data to display the change password page.</para>
+
+  <figure  xml:id="figure-console-change-pwd-xui">
+   <title>OpenAM Security Data Change page</title>
+   <mediaobject>
+    <alt>OpenAM Change Password page</alt>
+    <imageobject>
+     <imagedata fileref="images/console-change-pwd-xui.png" format="PNG" />
+    </imageobject>
+    <textobject><para>Authenticated users can change their passwords
+    through the OpenAM console.</para></textobject>
+   </mediaobject>
+  </figure>
+
   <para>You therefore do not need to configure password reset for users
   who can remember their current password. Instead, you point them to the
-  <literal>idm/EndUser</literal> page to let them do it themselves.</para>
+  <literal>XUI/#profile</literal> page to let them do it themselves.</para>
  </section>
  
  <section xml:id="forgotten-pwd-reset">
@@ -70,7 +138,7 @@
   <tip>
    <para>Users must be able to access their mail after the service resets
    their passwords, or they will not be able to receive the new password.
-   Do not therefore set up the service to reset the password used to access
+   Therefore, do not set up the service to reset the password used to access
    the email account specified in the user's profile.</para>
   </tip>
   
