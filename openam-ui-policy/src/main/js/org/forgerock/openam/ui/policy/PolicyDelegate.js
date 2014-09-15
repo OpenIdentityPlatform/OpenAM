@@ -91,6 +91,20 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
+    obj.deleteApplication = function (name, successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/applications/" + encodeURI(name),
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "DELETE",
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
     obj.getDecisionCombiners = function (successCallback, errorCallback) {
         return obj.serviceCall({
             url: "/decisioncombiners/?_queryId=&_fields=title",

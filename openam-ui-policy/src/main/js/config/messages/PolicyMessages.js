@@ -38,6 +38,14 @@ define("config/messages/PolicyMessages", [], function () {
             msg: "config.messages.PolicyMessages.applicationUpdated",
             type: "info"
         },
+        "deleteApplicationsSuccess": {
+            msg: "config.messages.PolicyMessages.deleteApplicationsSuccess",
+            type: "info"
+        },
+        "deleteApplicationsFail": {
+            msg: "config.messages.PolicyMessages.deleteApplicationsFail",
+            type: "error"
+        },
         "policyCreated": {
             msg: "config.messages.PolicyMessages.policyCreated",
             type: "info"

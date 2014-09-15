@@ -38,6 +38,8 @@
             "PolicyMessages": {
                 "applicationCreated": "Application created successfully",
                 "applicationUpdated": "Application updated successfully",
+                "deleteApplicationsSuccess": "Applications deleted successfully",
+                "deleteApplicationsFail": "Failed to delete some applications",
                 "policyCreated": "Policy created successfully",
                 "policyUpdated": "Policy updated successfully",
                 "edit": "Edit ",

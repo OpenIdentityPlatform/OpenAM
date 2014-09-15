@@ -26,30 +26,47 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, form2js, _, js2form, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractView, uiUtils, router) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/openam/ui/policy/PolicyDelegate"
+], function (AbstractView, uiUtils, router, constants, eventManager, policyDelegate) {
     var ManageApplicationsView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/ManageApplicationsTemplate.html",
 
         events: {
             'click .icon-pencil': 'editApplication',
-            'click .icon-file': 'viewPolicies'
+            'click .icon-file': 'viewPolicies',
+            'click #deleteApp': 'deleteApplications'
         },
+
+        grid: null,
+        gridButtonSet: null,
+
+        selectedApps: [],
+        storageSelectedAppsKey: 'fr-openam-policy-manage-apps-selected',
 
         render: function (args, callback) {
             var self = this,
                 actionsFormatter = function (cellvalue, options, rowObject) {
-                    return uiUtils.fillTemplateWithData("templates/policy/ApplicationTableActionsTemplate.html",
+                    return uiUtils.fillTemplateWithData("templates/policy/ApplicationTableCellActionsTemplate.html",
                         {appName: encodeURI(rowObject.name)});
-                };
+                },
+                storedApps = JSON.parse(sessionStorage.getItem(self.storageSelectedAppsKey));
+
+            if (storedApps) {
+                self.selectedApps = storedApps;
+            }
 
             this.parentRender(function () {
+                self.gridButtonSet = self.$el.find('#appsActions');
+
                 var options = {
                         url: '/openam/json/applications?_queryFilter=true',
                         colNames: ['', 'Name', 'Description', 'Realm', 'Resources', 'Author', 'Created', 'Last Modified'],
@@ -63,6 +80,18 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                             {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter}
                         ],
+                        onSelectRow: function (rowid, status, e) {
+                            if (!$(e.target).is('[class*="icon"]')) {
+                                if (status) {
+                                    self.selectedApps.push(self.data.result[rowid - 1].name);
+                                } else {
+                                    self.selectedApps = _.without(self.selectedApps, self.data.result[rowid - 1].name);
+                                }
+
+                                sessionStorage.setItem(self.storageSelectedAppsKey, JSON.stringify(self.selectedApps));
+                                self.reloadGlobalTableActionsTemplate();
+                            }
+                        },
                         multiselect: true,
                         sortname: 'name',
                         width: 920,
@@ -72,10 +101,21 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     columnChooserOptions = {
                         width: 501,
                         height: 300
-                    },
-                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, columnChooserOptions, callback);
+                    };
 
-                grid.jqGrid('setFrozenColumns');
+                self.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, columnChooserOptions, callback);
+
+                self.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
+                    if (self.selectedApps) {
+                        if (self.selectedApps.indexOf(rowdata.name) !== -1) {
+                            self.grid.jqGrid('setSelection', rowid, false);
+                        }
+                    }
+                });
+
+                self.grid.jqGrid('setFrozenColumns');
+
+                self.reloadGlobalTableActionsTemplate();
             });
         },
 
@@ -87,8 +127,44 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         viewPolicies: function (e) {
             router.routeTo(router.configuration.routes.managePolicies,
                 {args: [e.target.getAttribute('data-app-name')], trigger: true});
+        },
+
+        deleteApplications: function (e) {
+            e.preventDefault();
+
+            var self = this, i, promises = [];
+
+            if ($(e.target).hasClass('inactive')) {
+                return;
+            }
+
+            for (i = 0; i < this.selectedApps.length; i++) {
+                promises.push(policyDelegate.deleteApplication(this.selectedApps[i]));
+            }
+
+            $.when.apply($, promises).then(function deleteSuccessClb() {
+                self.handleAppsDelete('deleteApplicationsSuccess');
+            }, function deleteFailClb() {
+                self.handleAppsDelete('deleteApplicationsFail');
+            });
+        },
+
+        handleAppsDelete: function (message) {
+            sessionStorage.removeItem(this.storageSelectedAppsKey);
+            this.selectedApps = [];
+
+            this.reloadGlobalTableActionsTemplate();
+
+            this.grid.trigger('reloadGrid');
+            eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, message);
+        },
+
+        reloadGlobalTableActionsTemplate: function () {
+            this.gridButtonSet.html(uiUtils.fillTemplateWithData("templates/policy/ApplicationTableGlobalActionsTemplate.html",
+                {appNumber: this.selectedApps.length}));
         }
     });
 
     return new ManageApplicationsView();
-});
+})
+;
