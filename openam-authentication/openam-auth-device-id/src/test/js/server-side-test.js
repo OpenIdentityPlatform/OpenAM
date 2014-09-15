@@ -129,6 +129,21 @@ describe("ComparisonResult test suite", function() {
         //Then
         expect(result).toEqual(1);
     });
+
+    it("should sort comparison results with descending penalty points", function() {
+        // Given
+        var comparisonResults = [
+            new ComparisonResult(3), new ComparisonResult(1), new ComparisonResult(2), new ComparisonResult(4)
+        ];
+        // When
+        comparisonResults.sort(ComparisonResult.compare);
+        //Then
+        expect(comparisonResults[0].penaltyPoints).toEqual(1);
+        expect(comparisonResults[1].penaltyPoints).toEqual(2);
+        expect(comparisonResults[2].penaltyPoints).toEqual(3);
+        expect(comparisonResults[3].penaltyPoints).toEqual(4);
+    });
+
 });
 
 describe("ScalarComparator test suite", function() {

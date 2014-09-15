@@ -700,7 +700,9 @@ function compareDevicePrintProfiles(attributeConfig, devicePrint, devicePrintPro
         return null;
     }
 
-    results.sort(ComparisonResult.compare);
+    results.sort(function(a, b) {
+        return ComparisonResult.compare(a.key, b.key);
+    });
     selectedComparisonResult = results[0].key;
     if (logger.messageEnabled()) {
         logger.message("Selected comparison result: successful=" + selectedComparisonResult.isSuccessful()
@@ -712,7 +714,8 @@ function compareDevicePrintProfiles(attributeConfig, devicePrint, devicePrintPro
     if (selectedComparisonResult.penaltyPoints <= maxPenaltyPoints) {
         selectedProfile = results[0].value;
         if (logger.messageEnabled()) {
-            logger.message("Selected profile: " + JSON.stringify(selectedProfile));
+            logger.message("Selected profile: " + JSON.stringify(selectedProfile) +
+                " with " + selectedComparisonResult.penaltyPoints + " penalty points");
         }
     }
 
