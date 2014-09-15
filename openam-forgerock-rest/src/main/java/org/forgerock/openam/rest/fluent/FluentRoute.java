@@ -23,6 +23,7 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.json.resource.VersionHandler;
 import org.forgerock.openam.rest.authz.LoggingAuthzModule;
 import org.forgerock.openam.rest.resource.CrestRouter;
 
@@ -39,6 +40,7 @@ public class FluentRoute implements FluentVersion {
     private final CrestRouter router;
     private final String uriTemplate;
     private final List<CrestAuthorizationModule> modules;
+    private VersionHandler versionHandler;
 
     FluentRoute(CrestRouter router, String uriTemplate) {
         this.router = router;
@@ -92,7 +94,10 @@ public class FluentRoute implements FluentVersion {
      * @param provider The provider of the resource.
      */
     void addVersion(String version, CollectionResourceProvider provider) {
-        router.addRoute(uriTemplate).addVersion(version, provider);
+        if (versionHandler == null) {
+            versionHandler = router.addRoute(uriTemplate);
+        }
+        versionHandler.addVersion(version, provider);
     }
 
     /**
@@ -103,7 +108,10 @@ public class FluentRoute implements FluentVersion {
      * @param provider The provider of the resource.
      */
     void addVersion(String version, SingletonResourceProvider provider) {
-        router.addRoute(uriTemplate).addVersion(version, provider);
+        if (versionHandler == null) {
+            versionHandler = router.addRoute(uriTemplate);
+        }
+        versionHandler.addVersion(version, provider);
     }
 
     /**
@@ -114,7 +122,10 @@ public class FluentRoute implements FluentVersion {
      * @param handler The provider of the resource.
      */
     void addVersion(RoutingMode mode, String version, RequestHandler handler) {
-        router.addRoute(mode, uriTemplate).addVersion(version, handler);
+        if (versionHandler == null) {
+            versionHandler = router.addRoute(mode, uriTemplate);
+        }
+        versionHandler.addVersion(version, handler);
     }
 
     private <T> T get(Class<T> resourceClass) {

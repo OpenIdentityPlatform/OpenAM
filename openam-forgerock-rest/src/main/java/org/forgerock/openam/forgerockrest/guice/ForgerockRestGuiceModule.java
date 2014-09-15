@@ -48,7 +48,8 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.forgerockrest.IdentityResource;
+import org.forgerock.openam.forgerockrest.IdentityResourceV1;
+import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.EntitlementEvaluatorFactory;
@@ -140,16 +141,16 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Named("UsersResource")
     @Inject
     @Singleton
-    public IdentityResource getUsersResource(MailServerLoader mailServerLoader) {
-        return new IdentityResource(IdentityResource.USER_TYPE, mailServerLoader);
+    public IdentityResourceV1 getUsersResourceV1(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV1(IdentityResourceV1.USER_TYPE, mailServerLoader);
     }
 
     @Provides
     @Named("GroupsResource")
     @Inject
     @Singleton
-    public IdentityResource getGroupsResource(MailServerLoader mailServerLoader) {
-        return new IdentityResource(IdentityResource.GROUP_TYPE, mailServerLoader);
+    public IdentityResourceV1 getGroupsResourceV1(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV1(IdentityResourceV1.GROUP_TYPE, mailServerLoader);
     }
 
     @Provides
@@ -179,8 +180,32 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Named("AgentsResource")
     @Inject
     @Singleton
-    public IdentityResource getAgentsResource(MailServerLoader mailServerLoader) {
-        return new IdentityResource(IdentityResource.AGENT_TYPE, mailServerLoader);
+    public IdentityResourceV1 getAgentsResourceV1(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV1(IdentityResourceV1.AGENT_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Named("UsersResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getUsersResource(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV2(IdentityResourceV2.USER_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Named("GroupsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getGroupsResource(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV2(IdentityResourceV2.GROUP_TYPE, mailServerLoader);
+    }
+
+    @Provides
+    @Named("AgentsResource")
+    @Inject
+    @Singleton
+    public IdentityResourceV2 getAgentsResource(MailServerLoader mailServerLoader) {
+        return new IdentityResourceV2(IdentityResourceV2.AGENT_TYPE, mailServerLoader);
     }
 
     @Provides

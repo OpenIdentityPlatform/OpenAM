@@ -66,7 +66,7 @@ public final class FluentTo {
             route.addVersion(version, provider);
         }
 
-        return new FluentRoute(route);
+        return route;
     }
 
     /**
@@ -84,7 +84,7 @@ public final class FluentTo {
             route.addVersion(version, provider);
         }
 
-        return new FluentRoute(route);
+        return route;
     }
 
     private <T> T get(Class<T> resourceClass, String named) {

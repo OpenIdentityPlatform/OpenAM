@@ -20,9 +20,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.VersionSelector;
-import org.forgerock.openam.forgerockrest.IdentityResource;
+import org.forgerock.openam.forgerockrest.IdentityResourceV1;
+import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.RealmResource;
-import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationService;
+import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV1;
+import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
@@ -109,16 +111,19 @@ public class RestEndpoints {
                 .forVersion("1.0").to(DashboardResource.class);
 
         dynamicRealmRouter.route("/serverinfo")
-                .forVersion("1.0").to(ServerInfoResource.class);
+                .forVersion("1.1").to(ServerInfoResource.class);
 
         dynamicRealmRouter.route("/users")
-                .forVersion("1.0").to(IdentityResource.class, "UsersResource");
+                .forVersion("1.1").to(IdentityResourceV1.class, "UsersResource")
+                .forVersion("2.0").to(IdentityResourceV2.class, "UsersResource");
 
         dynamicRealmRouter.route("/groups")
-                .forVersion("1.0").to(IdentityResource.class, "GroupsResource");
+                .forVersion("1.1").to(IdentityResourceV1.class, "GroupsResource")
+                .forVersion("2.0").to(IdentityResourceV2.class, "GroupsResource");
 
         dynamicRealmRouter.route("/agents")
-                .forVersion("1.0").to(IdentityResource.class, "AgentsResource");
+                .forVersion("1.1").to(IdentityResourceV1.class, "AgentsResource")
+                .forVersion("2.0").to(IdentityResourceV2.class, "AgentsResource");
 
         dynamicRealmRouter.route("/users/{user}/devices/trusted")
                 .forVersion("1.0").to(TrustedDevicesResource.class);
@@ -134,7 +139,7 @@ public class RestEndpoints {
 
         dynamicRealmRouter.route("/sessions")
                 .through(SessionResourceAuthzModule.class, SessionResourceAuthzModule.NAME)
-                .forVersion("1.0").to(SessionResource.class);
+                .forVersion("1.1").to(SessionResource.class);
 
         dynamicRealmRouter.route("/applications")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
@@ -180,7 +185,8 @@ public class RestEndpoints {
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
 
         router.addRoute("/authenticate")
-                .addVersion("1.0", wrap(AuthenticationService.class));
+                .addVersion("1.0", wrap(AuthenticationServiceV1.class))
+                .addVersion("2.0", wrap(AuthenticationServiceV2.class));
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 

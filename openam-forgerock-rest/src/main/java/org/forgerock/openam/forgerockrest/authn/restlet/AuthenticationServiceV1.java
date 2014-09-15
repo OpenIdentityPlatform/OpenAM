@@ -31,13 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.util.Reject;
 import org.json.JSONException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -57,7 +55,7 @@ import org.restlet.util.Series;
  *
  * @since 12.0.0
  */
-public class AuthenticationService extends ServerResource {
+public class AuthenticationServiceV1 extends ServerResource {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -79,7 +77,7 @@ public class AuthenticationService extends ServerResource {
      * @param restAuthenticationHandler An instance of the RestAuthenticationHandler.
      */
     @Inject
-    public AuthenticationService(RestAuthenticationHandler restAuthenticationHandler) {
+    public AuthenticationServiceV1(RestAuthenticationHandler restAuthenticationHandler) {
         this.restAuthenticationHandler = restAuthenticationHandler;
     }
 
@@ -110,7 +108,8 @@ public class AuthenticationService extends ServerResource {
             if (DEBUG.errorEnabled()) {
                 DEBUG.error("AuthenticationService :: Unable to handle media type request : " + entity.getMediaType());
             }
-            throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+            return handleErrorResponse(
+                    new Status(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type"), null);
         }
 
         final HttpServletRequest request = getHttpServletRequest();
@@ -139,24 +138,16 @@ public class AuthenticationService extends ServerResource {
 
         } catch (RestAuthResponseException e) {
             DEBUG.message("AuthenticationService.authenticate() :: Exception from CallbackHandler", e);
-            return handleCallbackException(e);
+            return handleErrorResponse(new Status(e.getStatusCode()), e);
         } catch (RestAuthException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
-            org.forgerock.json.resource.ResourceException cause =
-                    org.forgerock.json.resource.ResourceException.getException(401, e.getMessage());
-
-            if (e.getFailureUrl() != null) {
-                cause.setDetail(json(object(field("failureUrl", e.getFailureUrl()))));
-            }
-
-            throw new ResourceException(401, cause);
-
+            return handleErrorResponse(Status.CLIENT_ERROR_UNAUTHORIZED, e);
         } catch (JSONException e) {
             DEBUG.error("Internal Error", e);
-            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
+            return handleErrorResponse(Status.SERVER_ERROR_INTERNAL, e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
-            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
+            return handleErrorResponse(Status.SERVER_ERROR_INTERNAL, e);
         }
     }
 
@@ -283,7 +274,7 @@ public class AuthenticationService extends ServerResource {
      * @param value The header value.
      */
     @SuppressWarnings("unchecked")
-    private void addResponseHeader(final String key, final String value) {
+    protected void addResponseHeader(final String key, final String value) {
         Series<Header> headers = (Series<Header>) getResponse().getAttributes().get(RESTLET_HEADERS_KEY);
         if (headers == null) {
             headers = new Series(Header.class);
@@ -293,26 +284,44 @@ public class AuthenticationService extends ServerResource {
     }
 
     /**
-     * Processes the given RestAuthResponseException into a Restlet response representation and
-     * adds any response headers from the exception.
+     * Processes the given Exception into a Restlet response representation or wrap it into
+     * a ResourceException, which will be thrown.
      *
-     * @param e The RestAuthCallbackHandlerException.
+     * @param status The status to set the response to.
+     * @param exception The Exception to be handled.
      * @return The Restlet Response Representation.
+     * @throws ResourceException If the given exception is wrapped in a ResourceException.
      */
-    private Representation handleCallbackException(final RestAuthResponseException e) {
-        for (final String key : e.getResponseHeaders().keySet()) {
-            addResponseHeader(key, e.getResponseHeaders().get(key));
+    protected Representation handleErrorResponse(Status status, Exception exception) throws ResourceException {
+        Reject.ifNull(status);
+        Representation representation = null;
+        final Map<String, Object> rep = new HashMap<String, Object>();
+
+        if (exception instanceof RestAuthResponseException) {
+            final RestAuthResponseException authResponseException = (RestAuthResponseException)exception;
+            for (final String key : authResponseException.getResponseHeaders().keySet()) {
+                addResponseHeader(key, authResponseException.getResponseHeaders().get(key));
+            }
+            representation = new JacksonRepresentation<Map>(authResponseException.getJsonResponse().asMap());
+
+        } else if (exception instanceof RestAuthException) {
+            final RestAuthException authException = (RestAuthException)exception;
+            if (authException.getFailureUrl() != null) {
+                rep.put("failureUrl", authException.getFailureUrl());
+            }
+            rep.put("errorMessage", exception.getMessage());
+
+        } else if (exception == null) {
+            rep.put("errorMessage", status.getDescription());
+        } else {
+            rep.put("errorMessage", exception.getMessage());
         }
 
-        final ObjectMapper mapper = JsonValueBuilder.getObjectMapper();
-        try {
-            return new JacksonRepresentation<Map>(mapper.readValue(e.getJsonResponse().toString(), Map.class));
-        } catch (IOException ioe) {
-            if (DEBUG.errorEnabled()) {
-                DEBUG.error("AuthenticationService :: Unable to transform callback exception to Jackson" +
-                        " representation into a Restlet Response.");
-            }
-            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, ioe);
+        if (representation == null) {
+            representation = new JsonRepresentation(rep);
         }
+        getResponse().setStatus(status);
+
+        return representation;
     }
 }

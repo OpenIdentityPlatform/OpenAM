@@ -25,6 +25,7 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
+import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
@@ -50,7 +51,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.mail.MessagingException;
 import javax.security.auth.callback.Callback;
@@ -59,9 +59,6 @@ import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -90,8 +87,6 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
@@ -103,23 +98,40 @@ import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
 
+import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
+
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class IdentityResource implements CollectionResourceProvider {
+public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     private static final String AM_ENCRYPTION_PWD = "am.encryption.pwd";
 
     private static final String SEND_NOTIF_TAG = "IdentityResource.sendNotification() :: ";
     private static Debug debug = Debug.getInstance("frRest");
-
     public static final String USER_TYPE = "user";
+
     public static final String GROUP_TYPE = "group";
     public static final String AGENT_TYPE = "agent";
-
-
     private final static RedirectUrlValidator<String> URL_VALIDATOR =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+
 
     // TODO: filters, sorting, paged results.
 
@@ -142,6 +154,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String CONFIRMATION_ID = "confirmationId";
     final static String CURRENT_PASSWORD = "currentpassword";
     final static String USER_PASSWORD = "userpassword";
+    public static final String OLD_PASSWORD = "olduserpassword";
 
     private final MailServerLoader mailServerLoader;
 
@@ -150,7 +163,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     /**
      * Creates a backend
      */
-    public IdentityResource(String userType, MailServerLoader mailServerLoader) {
+    public IdentityResourceV1(String userType, MailServerLoader mailServerLoader) {
         this(userType, null, null, mailServerLoader);
     }
 
@@ -172,7 +185,8 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     // Constructor used for testing...
-    IdentityResource(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm, MailServerLoader mailServerLoader) {
+    IdentityResourceV1(String userType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
+            MailServerLoader mailServerLoader) {
         this.userType = userType;
         this.mailmgr = mailmgr;
         this.mailscm = mailscm;
@@ -183,9 +197,11 @@ public final class IdentityResource implements CollectionResourceProvider {
      * Gets the user id from the session provided in the server context
      *
      * @param context Current Server Context
+     * @param request Request from client to retrieve id
      * @param handler Result handler
      */
-    private void idFromSession(final ServerContext context, final ResultHandler<JsonValue> handler) {
+    private void idFromSession(final ServerContext context, final ActionRequest request,
+                               final ResultHandler<JsonValue> handler) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         SSOToken ssotok;
@@ -208,10 +224,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             handler.handleResult(result);
 
         } catch (SSOException e) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token. ", e);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
             handler.handleError(new ForbiddenException("SSO Token cannot be retrieved.", e));
         } catch (IdRepoException ex) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo", ex);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
             handler.handleError(new ForbiddenException("Cannot retrieve id from session.", ex));
         }
     }
@@ -331,30 +347,24 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             if (debug.messageEnabled()) {
                 debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to, " + emailAddress +
-                " with subject, " + subject + ". In realm, " + realm + " for token ID, " + tokenID);
+                        " with subject, " + subject + ". In realm, " + realm + " for token ID, " + tokenID);
             }
 
             handler.handleResult(result);
         } catch (BadRequestException be) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress
-                        + be.getMessage());
-            }
+            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
+                    + be.getMessage());
             handler.handleError(be);
         } catch (NotFoundException nfe) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress, nfe);
-            }
+            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
+                    + nfe.getMessage());
             handler.handleError(nfe);
         } catch (NotSupportedException nse) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.createRegistrationEmail(): Operation not enabled.", nse);
-            }
+            debug.error("IdentityResource.createRegistrationEmail: Operation not enabled " + nse.getMessage());
             handler.handleError(nse);
         } catch (Exception e) {
-            if (debug.errorEnabled()) {
-                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress, e);
-            }
+            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
+                    + e.getMessage());
             handler.handleError(new NotFoundException("Email not sent"));
         }
     }
@@ -479,17 +489,18 @@ public final class IdentityResource implements CollectionResourceProvider {
 
     /**
      * Will validate confirmationId is correct
+     * @param context Current Server Context
      * @param request Request from client to confirm registration
      * @param handler Result handler
      */
-    private void confirmationIdCheck(final ActionRequest request,
+    private void confirmationIdCheck(final ServerContext context, final ActionRequest request,
                                      final ResultHandler<JsonValue> handler, final String realm){
         final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
         String tokenID;
         String confirmationId;
-        String email;
-        String username;
+        String email = null;
+        String username = null;
         //email or username value used to create confirmationId
         String hashComponent = null;
         String hashComponentAttr = null;
@@ -511,11 +522,11 @@ public final class IdentityResource implements CollectionResourceProvider {
             if (isNullOrEmpty(email) && !isNullOrEmpty(username)) {
                 hashComponent = username;
                 hashComponentAttr = USERNAME;
-            } 
+            }
             if (!isNullOrEmpty(email) && isNullOrEmpty(username)) {
                 hashComponent = email;
                 hashComponentAttr = EMAIL;
-            } 
+            }
             if (isNullOrEmpty(hashComponent)) {
                 if (debug.errorEnabled()) {
                     debug.error(METHOD + ": Bad Request - hashcomponent not found in request.");
@@ -554,7 +565,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     /**
      * Validates a provided token against a selection of criteria to ensure that it's valid for the given
      * realm. This function is the validation equiv. of
-     * {@link IdentityResource#generateToken(String, String, Long, String)}.
+     * {@link IdentityResourceV2#generateToken(String, String, Long, String)}.
      *
      * @param tokenID The token ID to retrieve from the store, against which to perform validation
      * @param realm The realm under which the current request is being made, must match the realm the token was
@@ -574,7 +585,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         //check expiry
         org.forgerock.openam.cts.api.tokens.Token ctsToken = CTSHolder.getCTS().read(tokenID);
 
-        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < TimeUtils.currentUnixTime()) {
+        if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < System.currentTimeMillis()) {
             throw new NotFoundException("Cannot find tokenID: " + tokenID);
         }
 
@@ -611,21 +622,21 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
-            idFromSession(context, handler);
+            idFromSession(context, request, handler);
         } else if (action.equalsIgnoreCase("register")){
             createRegistrationEmail(context,request, realm, restSecurity, handler);
         } else if (action.equalsIgnoreCase("confirm")) {
-            confirmationIdCheck(request, handler, realm);
+            confirmationIdCheck(context, request, handler, realm);
         } else if (action.equalsIgnoreCase("anonymousCreate")) {
             anonymousCreate(context, request, realm, handler, restSecurity);
         } else if (action.equalsIgnoreCase("forgotPassword")) {
             generateNewPasswordEmail(context, request, realm, restSecurity, handler);
         } else if (action.equalsIgnoreCase("forgotPasswordReset")) {
             anonymousUpdate(context, request, realm, handler);
-        } else if (action.equalsIgnoreCase("validateGoto")) {
-            validateGoto(context, request, handler);
         } else { // for now this is the only case coming in, so fail if otherwise
-            RestUtils.generateUnsupportedOperation(handler);
+            final ResourceException e =
+                    new NotSupportedException("Actions are not supported for resource instances");
+            handler.handleError(e);
         }
     }
 
@@ -755,8 +766,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 Long tokenLifeTime = restSecurity.getForgotPassTLT();
 
                 // Generate Token
-                org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username,
-                        tokenLifeTime, realm);
+                org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime, realm);
 
                 // Store token in datastore
                 CTSHolder.getCTS().create(ctsToken);
@@ -1013,63 +1023,10 @@ public final class IdentityResource implements CollectionResourceProvider {
      */
     @Override
     public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
-                               final ResultHandler<JsonValue> handler) {
-
-        String action = request.getAction();
-
-        if ("changePassword".equalsIgnoreCase(action)) {
-
-            RealmContext realmContext = context.asContext(RealmContext.class);
-            final String realm = realmContext.getRealm();
-
-            JsonValue value = request.getContent();
-
-            try {
-                String userPassword = value.get(USER_PASSWORD).asString();
-                if (userPassword == null || userPassword.isEmpty()) {
-                    throw new BadRequestException("'" + USER_PASSWORD + "' attribute not set in JSON content.");
-                }
-
-                String currentPassword = value.get(CURRENT_PASSWORD).asString();
-                if (!checkValidPassword(resourceId, currentPassword.toCharArray(), realm)) {
-                    throw new BadRequestException("Invalid Password");
-                }
-
-                IdentityServicesImpl idsvc = new IdentityServicesImpl();
-                Token admin = new Token();
-                admin.setId(getCookieFromServerContext(context));
-                IdentityDetails identityDetails = jsonValueToIdentityDetails(json(object(
-                        field(USER_PASSWORD, userPassword))), realm);
-                identityDetails.setName(resourceId);
-                idsvc.update(identityDetails, admin);
-                String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-                debug.message("IdentityResource.actionInstance :: ACTION of change password for " + resourceId +
-                        " in realm " + realm + " performed by " + principalName);
-                handler.handleResult(json(object()));
-                return;
-
-            } catch (BadRequestException e) {
-                debug.error("Cannot change password! " + resourceId + ":" + e);
-                handler.handleError(e);
-            } catch (GeneralFailure e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new BadRequestException(e.getMessage(), e));
-            } catch (ObjectNotFound e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new NotFoundException("Resource not found.", e));
-            } catch (NeedMoreCredentials e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new ForbiddenException("Token is not authorized", e));
-            } catch (AccessDenied e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new ForbiddenException(e.getMessage(), e));
-            } catch (TokenExpired e) {
-                debug.error("Cannot change password: " + e.getMessage());
-                handler.handleError(new PermanentException(401, "Unauthorized", null));
-            }
-        } else {
-            handler.handleError(new NotSupportedException(action + " not supported for resource instances"));
-        }
+            final ResultHandler<JsonValue> handler) {
+        final ResourceException e =
+                new NotSupportedException("Actions are not supported for resource instances");
+        handler.handleError(e);
     }
 
     /**
@@ -1153,7 +1110,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             // Create the resource
-            idsvc.create(identity, admin);
+            CreateResponse success = idsvc.create(identity, admin);
             // Read created resource
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
             if (debug.messageEnabled()) {
@@ -1489,11 +1446,11 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
             final ResultHandler<Resource> handler) {
 
-        RealmContext realmContext = context.asContext(RealmContext.class);
-        final String realm = realmContext.getRealm();
-
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
+
+        RealmContext realmContext = context.asContext(RealmContext.class);
+        final String realm = realmContext.getRealm();
 
         final JsonValue jVal = request.getContent();
         final String rev = request.getRevision();
@@ -1505,73 +1462,35 @@ public final class IdentityResource implements CollectionResourceProvider {
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
             // Continue modifying the identity if read success
 
-            for (String key : jVal.keys()) {
-                if ("userpassword".equalsIgnoreCase(key)) {
-                    handler.handleError(new BadRequestException("Cannot update user password via PUT. "
-                            + "Use POST with _action=forgotPassword."));
-                    return;
-                }
-            }
-
             newDtls = jsonValueToIdentityDetails(jVal, realm);
-
-            if (newDtls.getAttributes() == null || newDtls.getAttributes().length < 1) {
-                throw new BadRequestException("Illegal arguments: One or more required arguments is null or empty");
-            }
-
-            if(newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())){
+            if (newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())) {
                 throw new BadRequestException("id in path does not match id in request body");
             }
             newDtls.setName(resourceId);
-
-            // Handle attribute change when password is required
-            // Get restSecurity for this realm
-            RestSecurity restSecurity = getRestSecurity(realm);
-            // Make sure user is not admin and check to see if we are requiring a password to change any attributes
-            Set<String> protectedUserAttributes = restSecurity.getProtectedUserAttributes();
-            if (protectedUserAttributes != null && !isAdmin(context)) {
-                Boolean hasReauthenticated = false;
-                for (String protectedAttr : protectedUserAttributes) {
-                    JsonValue jValAttr = jVal.get(protectedAttr);
-                    if(!jValAttr.isNull()){
-                        // If attribute is not available set newAttr variable to empty string for use in comparison
-                        String newAttr = (jValAttr.isString()) ? jValAttr.asString() : "";
-                        // Get the value of current attribute
-                        String currentAttr = "";
-                        Attribute[] attrs = dtls.getAttributes();
-                        for (Attribute attribute : attrs){
-                            String attributeName = attribute.getName();
-                            if(protectedAttr.equalsIgnoreCase(attributeName)){
-                                currentAttr = attribute.getValues()[0];
-                            }
-                        }
-                        // Compare newAttr and currentAttr
-                        if (currentAttr.equals(newAttr)){
-                            // attribute has not changed
-                        } else {
-                            if(hasReauthenticated){
-                                //already reauthed continue with attr change
-                            } else {
-                                // check header to make sure that password is there then check to see if it's correct
-                                String strCurrentPass = getPasswordFromHeader(context, CURRENT_PASSWORD);
-                                if(strCurrentPass != null && !strCurrentPass.isEmpty() && checkValidPassword(resourceId, strCurrentPass.toCharArray(), realm)){
-                                    //set a boolean value so we know reauth has been done
-                                    hasReauthenticated = true;
-                                    //continue will allow attribute(s) change(s)
-                                } else{
-                                    throw new BadRequestException("Must provide a valid confirmation password to change protected attribute (" + protectedAttr + ") from '" + currentAttr + "' to '" + newAttr + "'");
-                                }
-                            }
-                        }
+            String userpass = null;
+            for (String attrName : jVal.keys()) {
+                if ("userpassword".equalsIgnoreCase(attrName)) {
+                    userpass = jVal.get(attrName).asString();
+                }
+            }
+            // Check that the attribute userpassword is in the json object
+            if(userpass != null && !userpass.isEmpty()) {
+                // If so password reset attempt
+                if(checkValidPassword(resourceId, userpass.toCharArray(),realm) || isAdmin(context)){
+                    // same password as before, update the attributes
+                } else {
+                    // check header to make sure that oldpassword is there check to see if it's correct
+                    String strPass = getPasswordFromHeader(context, OLD_PASSWORD);
+                    if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
+                        //continue will allow password change
+                    } else{
+                        throw new BadRequestException("Invalid Password");
                     }
                 }
             }
 
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
-            String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-            debug.message("IdentityResource.updateInstance :: UPDATE of " + resourceId + " in realm " + realm +
-                    " performed by " + principalName);
             // read updated identity back to client
             IdentityDetails checkIdent = idsvc.read(dtls.getName(), getIdentityServicesAttributes(realm), admin);
             // handle updated resource
@@ -1625,6 +1544,22 @@ public final class IdentityResource implements CollectionResourceProvider {
             return URLEncoder.encode(toEncode, "UTF-8").replace("+", "%20");
         } else {
             return toEncode;
+        }
+    }
+
+    /**
+     * Indicates that the requested Token has not been found.
+     */
+    private static class InvalidTokenException extends Throwable {
+        private final String tokenID;
+
+        public InvalidTokenException(String error, String tokenID) {
+            super(error);
+            this.tokenID = tokenID;
+        }
+
+        private String getTokenID() {
+            return tokenID;
         }
     }
 
