@@ -290,4 +290,22 @@ $ <userinput>ssoadm \
    </textobject>
   </mediaobject>
  </section>
+
+ <section xml:id="extend-ssoadm-classpath">
+  <title>Extending the ssoadm Classpath</title>
+  <para>
+   After customizing your OpenAM deployment to use policy evaluation plugins,
+   inform <command>ssoadm</command> users to add the jar file containing the
+   plugins to the classpath before running policy management subcommands.
+  </para>
+  <para>
+   To add a jar file to the <command>ssoadm</command> classpath, set the
+   <literal>CLASSPATH</literal> environment variable before running the
+   <command>ssoadm</command> command.
+   <screen>
+    $ <userinput>export CLASSPATH=<replaceable>/path/to/jarfile</replaceable>:$CLASSPATH</userinput>
+    $ <userinput>ssoadm ...</userinput>
+   </screen>
+  </para>
+ </section>
 </chapter>
