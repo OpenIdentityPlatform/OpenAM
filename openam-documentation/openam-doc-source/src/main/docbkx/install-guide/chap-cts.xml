@@ -1197,8 +1197,8 @@ $ <userinput>backup \
    <title>General Recommendations for CTS Configuration</title>
 
    <para>When configuring CTS, start with the OpenDJ server embedded with an
-    installation of OpenAM.
-    As it already has required CTS indexes included, that simplifies your tasks.</para>
+    installation of OpenAM
+    as it already has required CTS indexes included, simplifying your tasks.</para>
 
    <para>If you are deploying on a single site, and want CTS replication limited
     to that site, the default configuration store may be sufficient for your
