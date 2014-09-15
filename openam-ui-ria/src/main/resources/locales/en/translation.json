@@ -42,7 +42,8 @@
                 "userAlreadyExists" : "User already exists",
                 "errorDeletingNotification" : "Error deleting notification.",
                 "errorFetchingNotifications" : "Error Fetching notifications.",
-                "identityNoSpace" : "Identity names may not have a space <br> character at the beginning or end."
+                "identityNoSpace" : "Identity names may not have a space <br> character at the beginning or end.",
+                "selfRegistrationDisabled"  : "Self Registration is disabled."
                 
             },
             "AdminMessages" : {
