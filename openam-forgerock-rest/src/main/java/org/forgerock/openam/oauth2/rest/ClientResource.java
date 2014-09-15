@@ -33,13 +33,20 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
@@ -51,36 +58,31 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.oauth2.core.exceptions.BadRequestException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.OAuthTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
 
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
-public class ClientResource  implements CollectionResourceProvider {
+public class ClientResource implements CollectionResourceProvider {
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final OAuth2AuditLogger auditLogger;
     private final ClientResourceManager manager;
     private final CTSPersistentStore store;
+    private final Debug debug;
     private ServiceSchemaManager serviceSchemaManager = null;
     private ServiceSchema serviceSchema = null;
 
     @Inject
-    public ClientResource(ClientResourceManager manager, CTSPersistentStore store, OAuth2AuditLogger auditLogger) {
+    public ClientResource(ClientResourceManager manager, CTSPersistentStore store, OAuth2AuditLogger auditLogger,
+                          @Named("frRest") Debug debug) {
         this.store = store;
         this.manager = manager;
         this.auditLogger = auditLogger;
+        this.debug = debug;
         try {
             SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             this.serviceSchemaManager = new ServiceSchemaManager("AgentService", token);
@@ -95,12 +97,12 @@ public class ClientResource  implements CollectionResourceProvider {
     }
 
     public ClientResource(ClientResourceManager manager, CTSPersistentStore store, ServiceSchemaManager mgr,
-            OAuth2AuditLogger auditLogger) {
+            OAuth2AuditLogger auditLogger, Debug debug) {
         this.store = store;
         this.manager = manager;
         this.auditLogger = auditLogger;
+        this.debug = debug;
         try {
-            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
             this.serviceSchemaManager = mgr;
             this.serviceSchema = serviceSchemaManager.getOrganizationSchema().getSubSchema("OAuth2Client");
         } catch (Exception e){
@@ -113,29 +115,34 @@ public class ClientResource  implements CollectionResourceProvider {
     }
 
     public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
                                ResultHandler<JsonValue> handler){
-        final ResourceException e =
-                new NotSupportedException("Actions are not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler){
 
+        String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         Map< String, String> responseVal = new HashMap< String, String>();
         try {
             if (serviceSchema == null || serviceSchemaManager == null){
+                if (debug.errorEnabled()) {
+                    debug.error("ClientResource :: CREATE by " + principal + ": No serviceSchema available.");
+                }
                 throw new PermanentException(ResourceException.INTERNAL_ERROR, "", null);
             }
 
-            Map<String, ArrayList<String>> client = (Map<String, ArrayList<String>>) createRequest.getContent().getObject();
+            Map<String, ArrayList<String>> client =
+                    (Map<String, ArrayList<String>>) createRequest.getContent().getObject();
             String realm = null;
             if (client == null || client.isEmpty()){
+                if (debug.errorEnabled()) {
+                    debug.error("ClientResource :: CREATE by " + principal + ": No client definition.");
+                }
                 throw new PermanentException(ResourceException.BAD_REQUEST, "Missing client definition", null);
             }
 
@@ -144,10 +151,12 @@ public class ClientResource  implements CollectionResourceProvider {
             if (client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_ID)){
                 ArrayList<String> idList = client.remove(OAuth2Constants.OAuth2Client.CLIENT_ID);
                 if (idList != null && !idList.isEmpty()){
-                    id = (String) idList.iterator().next();
+                    id = idList.iterator().next();
                 }
             }
+
             if (id == null || id.isEmpty()){
+                debug.error("ClientResource :: CREATE by " + principal + ": No client ID.");
                 throw new PermanentException(ResourceException.BAD_REQUEST, "Missing client id", null);
             }
 
@@ -155,26 +164,30 @@ public class ClientResource  implements CollectionResourceProvider {
             if (client.containsKey(OAuth2Constants.OAuth2Client.REALM)){
                 ArrayList<String> realmList = client.remove(OAuth2Constants.OAuth2Client.REALM);
                 if (realmList != null && !realmList.isEmpty()){
-                    realm = (String) realmList.iterator().next();
+                    realm = realmList.iterator().next();
                 }
             }
 
             //check for required parameters
-            if (client.containsKey(OAuth2Constants.OAuth2Client.USERPASSWORD)){
-                if (client.get(OAuth2Constants.OAuth2Client.USERPASSWORD).iterator().next().isEmpty()){
-                    throw new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
+            if (!client.containsKey(OAuth2Constants.OAuth2Client.USERPASSWORD) ||
+                    client.get(OAuth2Constants.OAuth2Client.USERPASSWORD).iterator().next().isEmpty()){
+                if (debug.errorEnabled()) {
+                    debug.error("ClientResource :: CREATE by " + principal + ": " +
+                            "Resource ID: " + id + ": No user password.");
                 }
-            } else {
-                throw new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
+                throw new PermanentException(ResourceException.BAD_REQUEST, "Missing user password", null);
             }
-            if (client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)){
+
+            if (!client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)){
                 String type = client.get(OAuth2Constants.OAuth2Client.CLIENT_TYPE).iterator().next();
-                if (type.equals("Confidential") || type.equals("Public")){
-                    //do nothing
-                } else {
+                if (!(type.equals("Confidential") || type.equals("Public"))){
+                    debug.error("ClientResource :: CREATE by " + principal + ": " +
+                            "Resource ID: " + id + ": No client type.");
                     throw new PermanentException(ResourceException.BAD_REQUEST, "Missing client type", null);
                 }
             } else {
+                debug.error("ClientResource :: CREATE by" + principal + ": " +
+                        "Resource ID: " + id + ": No client type.");
                 throw new PermanentException(ResourceException.BAD_REQUEST, "Missing client type", null);
             }
 
@@ -200,15 +213,12 @@ public class ClientResource  implements CollectionResourceProvider {
             temp.add("Active");
             attrs.put("sunIdentityServerDeviceStatus", temp);
 
-            JsonValue response = null;
-            String uid;
-
             manager.createIdentity(realm, id, attrs);
             responseVal.put("success", "true");
 
-            response = new JsonValue(responseVal);
+            JsonValue response = new JsonValue(responseVal);
 
-            Resource resource = new Resource("results", "1", response);
+            Resource resource = new Resource("results", String.valueOf(System.currentTimeMillis()), response);
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"CREATED_CLIENT", responseVal.toString()};
                 auditLogger.logAccessMessage("CREATED_CLIENT", obs, null);
@@ -220,12 +230,21 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
+
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
+                        "IdRepo exception.", e);
+            }
             handler.handleError(new InternalServerErrorException("Unable to create client", e));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
+            }
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: CREATE by " + principal + ": Unable to create client due to " +
+                        "SSO exception.", e);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client", e));
         } catch (PermanentException e){
@@ -234,6 +253,10 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: CREATE by " + principal +
+                        ": Unable to create client due to exception.", e);
+            }
             handler.handleError(e);
         } catch (org.forgerock.json.resource.BadRequestException e) {
             responseVal.put("success", "false");
@@ -241,6 +264,7 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
+            debug.error("ClientResource :: CREATE : Unable to create client due to Bad Request.", e);
             handler.handleError(e);
         }
     }
@@ -248,6 +272,9 @@ public class ClientResource  implements CollectionResourceProvider {
     private boolean isSingle(String value) throws org.forgerock.json.resource.BadRequestException {
         AttributeSchema attributeSchema = serviceSchema.getAttributeSchema(value);
         if (attributeSchema == null) {
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource.isSingle() : Invalid OAuth2 Client attribute, " + value);
+            }
             throw new org.forgerock.json.resource.BadRequestException("Invalid OAuth2 Client attribute, " + value);
         }
         AttributeSchema.UIType uiType = attributeSchema.getUIType();
@@ -260,9 +287,11 @@ public class ClientResource  implements CollectionResourceProvider {
 
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler){
+
+        String principal = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         Map<String, String> responseVal = new HashMap<String, String>();
-        JsonValue response = null;
-        String uid;
+        JsonValue response;
         try {
             manager.deleteIdentity(resourceId);
 
@@ -276,6 +305,10 @@ public class ClientResource  implements CollectionResourceProvider {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                     auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
                 }
+                if (debug.errorEnabled()) {
+                    debug.error("ClientResource :: DELETE by " + principal + ": Unable to delete client with ID, "
+                            + resourceId);
+                }
                 throw new InternalServerErrorException("Unable to delete client", e);
             }
 
@@ -286,6 +319,9 @@ public class ClientResource  implements CollectionResourceProvider {
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"DELETED_CLIENT", response.toString()};
                 auditLogger.logAccessMessage("DELETED_CLIENT", obs, null);
+                if (debug.messageEnabled()) {
+                    debug.error("ClientResource :: DELETE by " + principal + ": delete client with ID, " + resourceId);
+                }
             }
             handler.handleResult(resource);
         } catch(IdRepoException e){
@@ -294,12 +330,20 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: DELETE by " + principal +
+                        ": Unable to delete client with ID, " + resourceId, e);
+            }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (auditLogger.isAuditLogEnabled()) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+            }
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: DELETE by " + principal +
+                        ": Unable to delete client with ID, " + resourceId, e);
             }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         } catch (InternalServerErrorException e){
@@ -308,34 +352,30 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 auditLogger.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
+            if (debug.errorEnabled()) {
+                debug.error("ClientResource :: DELETE by " + principal +
+                        ": Unable to delete client with ID, " + resourceId, e);
+            }
             handler.handleError(new InternalServerErrorException("Unable to delete client", e));
         }
     }
 
     public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                               ResultHandler<Resource> handler){
-        final ResourceException e =
-                new NotSupportedException("Patch is not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler){
-        final ResourceException e =
-                new NotSupportedException("Query is not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler){
-        final ResourceException e =
-                new NotSupportedException("Read is not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> handler){
-        final ResourceException e =
-                new NotSupportedException("Update is not supported for resource instances");
-        handler.handleError(e);
+        RestUtils.generateUnsupportedOperation(handler);
     }
 }

@@ -27,7 +27,6 @@ package org.forgerock.openam.forgerockrest.server;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.configuration.MapValueParser;
@@ -37,10 +36,15 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-
+import java.security.AccessController;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.NotFoundException;
@@ -57,44 +61,34 @@ import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.ServiceConfigUtils;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.forgerockrest.entitlements.RealmAwareResource;
 import org.forgerock.openam.services.RestSecurity;
-import org.forgerock.openam.utils.StringUtils;
-
-import java.security.AccessController;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 /**
  * Represents Server Information that can be queried via a REST interface.
  *
  * This resources acts as a read only resource for the moment.
- *
- * @author alin.brici@forgerock.com
  */
-public class ServerInfoResource implements CollectionResourceProvider {
+public class ServerInfoResource extends RealmAwareResource {
 
-    private static Debug debug = Debug.getInstance("frRest");
+    private final Debug debug;
 
-    private static final String SERVICE_NAME = "socialAuthNService";
-    private static final String ENABLED_IMPLEMENTATIONS_ATTRIBUTE = "socialAuthNEnabled";
-    private static final String DISPLAY_NAME_ATTRIBUTE = "socialAuthNDisplayName";
-    private static final String CHAINS_ATTRIBUTE = "socialAuthNAuthChain";
-    private static final String ICONS_ATTRIBUTE = "socialAuthNIcon";
+    private final static String COOKIE_DOMAINS = "cookieDomains";
+    private final static String ALL_SERVER_INFO = "*";
 
-    private static final String AUTH_CHAIN_ATTRIBUTE = "Configurations";
+    @Inject
+    public ServerInfoResource(@Named("frRest") Debug debug) {
+        this.debug = debug;
+    }
 
     private final MapValueParser nameValueParser = new MapValueParser();
 
     /**
-     * Retrieves the cookie domains set on the server
-     * @param context Current Server Context
-     * @param request Request from client to retrieve id
+     * Retrieves the cookie domains set on the server.
+     *
      * @param handler Result handler which handles error or success
      */
-    private void getCookieDomains(ServerContext context, String resourceId,  ReadRequest request,
-            ResultHandler<Resource> handler) {
+    private void getCookieDomains(ResultHandler<Resource> handler) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Resource resource;
@@ -103,23 +97,27 @@ public class ServerInfoResource implements CollectionResourceProvider {
             cookieDomains = AuthClientUtils.getCookieDomains();
             rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
-            resource = new Resource(resourceId, Integer.toString(rev), result);
+            resource = new Resource(COOKIE_DOMAINS, Integer.toString(rev), result);
+            if (debug.messageEnabled()) {
+                debug.message("ServerInfoResource.getCookieDomains ::" +
+                        " Added resource to response: " + COOKIE_DOMAINS);
+            }
             handler.handleResult(resource);
         } catch (Exception e) {
-            debug.error("ServerInfoResource.getCookieDomains: Cannot retrieve cookie domains." + e);
+            debug.error("ServerInfoResource.getCookieDomains : Cannot retrieve cookie domains.", e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
 
     /**
-     * Retrieves all server info set on the server
-     * @param context Current Server Context
-     * @param request Request from client to retrieve id
-     * @param handler Result handler which handles error or success
+     * Retrieves all server info set on the server.
+     *
+     * @param context Current Server Context.
+     * @param realm realm in whose security context we use.
+     * @param handler Result handler which handles error or success.
      * @param realm The realm
      */
-    private void getAllServerInfo(ServerContext context, String resourceId,  ReadRequest request,
-            ResultHandler<Resource> handler, final String realm) {
+    private void getAllServerInfo(ServerContext context, ResultHandler<Resource> handler, String realm) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Set<String> protectedUserAttributes;
@@ -141,13 +139,18 @@ public class ServerInfoResource implements CollectionResourceProvider {
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
             result.put("lang", locale.getLocale().getLanguage());
             result.put("successfulUserRegistrationDestination", restSecurity.getSuccessfulUserRegistrationDestination());
+            result.put("socialImplementations", getSocialAuthnImplementations(realm));
 
-            addSocialAuthnImplementations(realm, result);
+            if (debug.messageEnabled()) {
+                debug.message("ServerInfoResource.getAllServerInfo ::" +
+                        " Added resource to response: " + ALL_SERVER_INFO);
+            }
 
-            resource = new Resource(resourceId, Integer.toString(result.asMap().hashCode()), result);
+            resource = new Resource(ALL_SERVER_INFO, Integer.toString(result.asMap().hashCode()), result);
+
             handler.handleResult(resource);
         } catch (Exception e) {
-            debug.error("ServerInfoResource.getAllServerInfo:: Cannot retrieve all server info. " + e);
+            debug.error("ServerInfoResource.getAllServerInfo : Cannot retrieve all server info domains.", e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
@@ -158,59 +161,50 @@ public class ServerInfoResource implements CollectionResourceProvider {
      * names, auth chains and icons.
      *
      * @param realm The realm/organization name
-     * @param result The Json we're writing into
      */
-    private void addSocialAuthnImplementations(String realm, JsonValue result) {
+    private List<SocialAuthenticationImplementation> getSocialAuthnImplementations(String realm) {
+
+        List<SocialAuthenticationImplementation> implementations =
+                new ArrayList<SocialAuthenticationImplementation>();
 
         try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(SERVICE_NAME, token);
+            SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(SocialAuthenticationImplementation.SERVICE_NAME, token);
             ServiceConfig serviceConfig = mgr.getOrganizationConfig(realm, null);
 
             Set<String> enabledImplementationSet = ServiceConfigUtils.getSetAttribute(serviceConfig,
-                                                                                ENABLED_IMPLEMENTATIONS_ATTRIBUTE);
-            ArrayList<SocialAuthenticationImplementation> implementations =
-                                    new ArrayList<SocialAuthenticationImplementation>();
+                    SocialAuthenticationImplementation.ENABLED_IMPLEMENTATIONS_ATTRIBUTE);
 
-            // For each of the enabled implementations...
             if (enabledImplementationSet != null) {
                 for (String name : enabledImplementationSet) {
 
                     SocialAuthenticationImplementation implementation = new SocialAuthenticationImplementation();
                     implementation.setDisplayName(getEntryForImplementation(serviceConfig, name,
-                                                                                        DISPLAY_NAME_ATTRIBUTE));
-                    implementation.setAuthnChain(getEntryForImplementation(serviceConfig, name, CHAINS_ATTRIBUTE));
-                    implementation.setIconPath(getEntryForImplementation(serviceConfig, name, ICONS_ATTRIBUTE));
+                            SocialAuthenticationImplementation.DISPLAY_NAME_ATTRIBUTE));
+                    implementation.setAuthnChain(getEntryForImplementation(serviceConfig, name,
+                            SocialAuthenticationImplementation.CHAINS_ATTRIBUTE));
+                    implementation.setIconPath(getEntryForImplementation(serviceConfig, name,
+                            SocialAuthenticationImplementation.ICONS_ATTRIBUTE));
 
-                    if (isValid(implementation)) {
+                    if (implementation.isValid()) {
                         implementations.add(implementation);
                     }
                 }
-                if (!implementations.isEmpty()) {
-                    result.put("socialImplementations", implementations);
-                }
+
             }
         } catch (SSOException sso) {
             debug.error("Caught SSO Exception while trying to get the ServiceConfigManager", sso);
         } catch (SMSException sms) {
             debug.error("Caught SMS Exception while trying to get the ServiceConfigManager", sms);
         } catch (Exception e) {
-            debug.error("Caught exception while trying to get the attribute " + ENABLED_IMPLEMENTATIONS_ATTRIBUTE, e);
+            if (debug.errorEnabled()) {
+                debug.error("Caught exception while trying to get the attribute " +
+                        SocialAuthenticationImplementation.ENABLED_IMPLEMENTATIONS_ATTRIBUTE, e);
+            }
         }
-    }
 
-    /**
-     * Check if the values in the specified implementation are valid.  Currently this just involves checking the
-     * values are non null.
-     *
-     * @param implementation the social authentication implementation
-     * @return true if the implementation has all its required values
-     */
-    private boolean isValid(SocialAuthenticationImplementation implementation) {
+        return implementations;
 
-        return StringUtils.isNotBlank(implementation.getAuthnChain())
-                && StringUtils.isNotBlank(implementation.getDisplayName())
-                && StringUtils.isNotBlank(implementation.getIconPath());
     }
 
     /**
@@ -273,17 +267,23 @@ public class ServerInfoResource implements CollectionResourceProvider {
     /**
      * {@inheritDoc}
      */
-    public void readInstance(ServerContext context, String s, ReadRequest request, ResultHandler<Resource> handler) {
+    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
+                             ResultHandler<Resource> handler) {
 
-        RealmContext realmContext = context.asContext(RealmContext.class);
-        String realm = realmContext.getRealm();
+        final String realm = getRealm(context);
 
-        if (s.equalsIgnoreCase("cookieDomains")) {
-            getCookieDomains(context, s, request, handler);
-        } else if (s.equalsIgnoreCase("*")) {
-            getAllServerInfo(context, s, request, handler, realm);
+        debug.message("ServerInfoResource :: READ : in realm: " + realm);
+
+        if (COOKIE_DOMAINS.equalsIgnoreCase(resourceId)) {
+            getCookieDomains(handler);
+        } else if (ALL_SERVER_INFO.equalsIgnoreCase(resourceId)) {
+            getAllServerInfo(context, handler, realm);
         } else { // for now this is the only case coming in, so fail if otherwise
-            final ResourceException e = new NotSupportedException("ResourceId not supported: " + s);
+            final ResourceException e = new NotSupportedException("ResourceId not supported: " + resourceId);
+            if (debug.errorEnabled()) {
+                debug.error("ServerInfoResource :: READ : in realm: " + realm +
+                        ": Cannot receive information on requested resource: " + resourceId, e);
+            }
             handler.handleError(e);
         }
     }
@@ -296,37 +296,4 @@ public class ServerInfoResource implements CollectionResourceProvider {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
-    /**
-     * A class to encapsulate a social authentication implementation.  This is just here so JSON will give us some
-     * pretty output.
-     */
-    static class SocialAuthenticationImplementation {
-        private String iconPath; // the path to the icon
-        private String authnChain;
-        private String displayName;
-
-        public String getIconPath() {
-            return iconPath;
-        }
-
-        public void setIconPath(String iconPath) {
-            this.iconPath = iconPath;
-        }
-
-        public String getAuthnChain() {
-            return authnChain;
-        }
-
-        public void setAuthnChain(String authnChain) {
-            this.authnChain = authnChain;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        public void setDisplayName(String displayName) {
-            this.displayName = displayName;
-        }
-    }
 }

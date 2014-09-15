@@ -13,7 +13,7 @@
 *
 * Copyright 2014 ForgeRock AS.
 */
-package org.forgerock.openam.rest;
+package org.forgerock.openam.rest.resource;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,7 +40,7 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.VersionHandler;
 import org.forgerock.json.resource.VersionRouter;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.router.VersionedRouter;
 
 /**
@@ -307,7 +307,11 @@ public class CrestRouter<T extends CrestRouter> implements RequestHandler, Versi
     }
 
     /**
-     * Verifies that our context already contains an SSOTokenContext, or adds it.
+     * <p>Creates the {@link SSOTokenContext}, if one doesn't already exist. </p>
+     *
+     * @param context The context.
+     * @return The augmented context.
+     * @throws BadRequestException If the current full realm is not a valid realm.
      */
     protected ServerContext transformContext(ServerContext context) throws BadRequestException {
         if (!context.containsContext(SSOTokenContext.class)) {

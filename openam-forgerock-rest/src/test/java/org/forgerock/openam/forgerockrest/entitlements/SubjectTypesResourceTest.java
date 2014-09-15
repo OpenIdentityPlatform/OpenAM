@@ -107,6 +107,8 @@ public class SubjectTypesResourceTest {
         QueryResultHandler mockHandler = mock(QueryResultHandler.class);
         JsonSchema mockSchema = mock(JsonSchema.class);
 
+        given(mockRequest.getPageSize()).willReturn(2);
+        given(mockHandler.handleResource(any(Resource.class))).willReturn(true);
         given(mockMapper.generateJsonSchema((Class<?>) any(Class.class))).willReturn(mockSchema);
 
         //when

@@ -38,7 +38,7 @@ public class RestTokenDispatcher {
             myRouter.route("/token/").forVersion("1.0").to(TokenResource.class);
 
             myRouter.route("/client/")
-                    .through(AdminOnlyAuthzModule.class)
+                    .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                     .forVersion("1.0").to(ClientResource.class);
 
             VersionBehaviourConfigListener.bindToServiceConfigManager(myRouter);

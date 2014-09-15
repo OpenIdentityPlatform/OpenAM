@@ -15,9 +15,10 @@
 */
 package org.forgerock.openam.rest.fluent;
 
-import javax.inject.Named;
+import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -30,22 +31,23 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.LoggingUtils;
-import org.forgerock.openam.rest.CrestRouter;
-import org.forgerock.openam.rest.fluent.FluentRouter;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.openam.forgerockrest.utils.ServerContextUtils;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 /**
- * Fluent Router which will log any requests that pass through it.
+ * Fluent Router which will audit any requests that pass through it.
  */
 public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> {
 
     private final Debug debug;
+    private final RestLog restLog;
 
     @Inject
-    public LoggingFluentRouter(@Named("frRest") Debug debug) {
+    public LoggingFluentRouter(@Named("frRest") Debug debug, RestLog restLog) {
         this.debug = debug;
+        this.restLog = restLog;
     }
 
     /**
@@ -58,7 +60,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleAction(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
-        log(request.getResourceName(), "ACTION", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getActionString(request);
+
+        logAccess(resource, action, context);
         super.handleAction(context, request, handler);
     }
 
@@ -72,7 +77,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleCreate(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
-        log(request.getResourceName(), "CREATE", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getCreateString(request);
+
+        logAccess(resource, action, context);
         super.handleCreate(context, request, handler);
     }
 
@@ -86,7 +94,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
-        log(request.getResourceName(), "DELETE", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getDeleteString(request);
+
+        logAccess(resource, action, context);
         super.handleDelete(context, request, handler);
     }
 
@@ -100,7 +111,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handlePatch(ServerContext context, PatchRequest request, ResultHandler<Resource> handler) {
-        log(request.getResourceName(), "PATCH", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getPatchString(request);
+
+        logAccess(resource, action, context);
         super.handlePatch(context, request, handler);
     }
 
@@ -114,8 +128,12 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleQuery(ServerContext context, QueryRequest request, QueryResultHandler handler) {
-        log(request.getResourceName(), "QUERY", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getQueryString(request);
+
+        logAccess(resource, action, context);
         super.handleQuery(context, request, handler);
+
     }
 
     /**
@@ -128,7 +146,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleRead(ServerContext context, ReadRequest request, ResultHandler<Resource> handler) {
-        log(request.getResourceName(), "READ", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getReadString(request);
+
+        logAccess(resource, action, context);
         super.handleRead(context, request, handler);
     }
 
@@ -142,29 +163,34 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
      */
     @Override
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
-        log(request.getResourceName(), "UPDATE", context);
+        final String resource = ServerContextUtils.getResourceId(request, context);
+        final String action = ServerContextUtils.getUpdateString(request);
+
+        logAccess(resource, action, context);
         super.handleUpdate(context, request, handler);
     }
 
     /**
      * Pushes off to our logging subsystem.
      */
-    private void log(String resource, String operation, ServerContext context) {
-        String realm;
-        try {
-            RealmContext realmContext = context.asContext(RealmContext.class);
-            realm = realmContext.getRealm().equals("") ? "/" : realmContext.getRealm();
-        } catch (IllegalArgumentException iae) {
-            //thrown if no realm context found
-            realm = null;
-        }
+    private void logAccess(String resource, String operation, ServerContext context) {
 
-        //ensures if there's an SSOToken we can access the user's name
         if (!context.containsContext(SSOTokenContext.class)) {
             context = new SSOTokenContext(context);
         }
 
-        LoggingUtils.logOperationAttemptAsPrincipal(resource, operation, context, realm, debug);
+        SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
+
+        try {
+            restLog.auditAccessMessage(resource, operation, ssoTokenContext.getCallerSSOToken());
+        } catch (SSOException e) {
+            if (debug.errorEnabled()) {
+                debug.error("LoggingFluentRouter :: " +
+                        "Error retrieving SSO Token from provided context, forced to log user as 'null'.");
+            }
+        }
+
+        restLog.debugOperationAttemptAsPrincipal(resource, operation, context, null, debug);
     }
 
 }

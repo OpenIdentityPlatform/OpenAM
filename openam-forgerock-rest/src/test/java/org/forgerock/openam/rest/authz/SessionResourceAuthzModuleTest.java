@@ -16,6 +16,7 @@
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
@@ -35,7 +36,7 @@ public class SessionResourceAuthzModuleTest {
     Config<SessionService> mockConfig = mock(Config.class);
     SessionService mockService = mock(SessionService.class);
 
-    public SessionResourceAuthzModule testModule = new SessionResourceAuthzModule(mockConfig);
+    public SessionResourceAuthzModule testModule = new SessionResourceAuthzModule(mockConfig, mock(Debug.class));
 
     @BeforeTest
     public void beforeTest() {

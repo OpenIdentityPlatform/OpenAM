@@ -15,10 +15,9 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.google.inject.name.Named;
+import javax.inject.Named;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.shared.debug.Debug;
-import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +40,9 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 
 /**
  * Allows for CREST-handling of stored {@link EntitlementCombiner}s.
@@ -56,6 +57,8 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 public class DecisionCombinersResource implements CollectionResourceProvider {
 
     private final static String JSON_OBJ_TITLE = "title";
+
+    private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final Debug debug;
     private final EntitlementRegistry entitlementRegistry;
@@ -123,6 +126,8 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
         final Set<String> combinerTypeNames = new TreeSet<String>();
         List<JsonValue> combinerTypes = new ArrayList<JsonValue>();
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         combinerTypeNames.addAll(entitlementRegistry.getCombinersShortNames());
 
         for (String combinerTypeName : combinerTypeNames) {
@@ -130,7 +135,10 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
                     entitlementRegistry.getCombinerType(combinerTypeName);
 
             if (conditionClass == null) {
-                debug.error("Listed combiner short name not found: " + combinerTypeName);
+                if (debug.warningEnabled()) {
+                    debug.warning("DecisionCombinersResource :: QUERY by " + principalName +
+                            ": Listed combiner short name not found: " + combinerTypeName);
+                }
                 continue;
             }
 
@@ -141,34 +149,30 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
             }
         }
 
-        int totalSize = combinerTypes.size();
-        int pageSize = request.getPageSize();
-        int offset = request.getPagedResultsOffset();
+        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        if (pageSize > 0) {
-            combinerTypes = combinerTypes.subList(offset, offset + pageSize);
+        int remaining = 0;
+        if (combinerTypes.size() > 0) {
+            remaining = combinerTypes.size();
+            for (JsonValue comberTypeToReturn : combinerTypes) {
+
+                final JsonValue resourceId = comberTypeToReturn.get(JSON_POINTER_TO_TITLE);
+                final String id = resourceId != null ? resourceId.toString() : null;
+
+                boolean keepGoing = handler.handleResource(new Resource(id,
+                        String.valueOf(System.currentTimeMillis()), comberTypeToReturn));
+                remaining--;
+                if (debug.messageEnabled()) {
+                    debug.message("SubjectTypesResource :: QUERY by " + principalName +
+                            ": Added resource to response: " + id);
+                }
+                if (!keepGoing) {
+                    break;
+                }
+            }
         }
 
-        final JsonPointer jp = new JsonPointer(JSON_OBJ_TITLE);
-
-        for (JsonValue combinerTypeToReturn : combinerTypes) {
-
-            final JsonValue resourceId = combinerTypeToReturn.get(jp);
-            final String id = resourceId != null ? resourceId.toString() : null;
-
-            final Resource resource = new Resource(id, "0", combinerTypeToReturn);
-
-            handler.handleResource(resource);
-        }
-
-        //paginate
-        if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ?
-                    String.valueOf(totalSize) : String.valueOf(offset + pageSize);
-            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
-        } else {
-            handler.handleResult(new QueryResult(null, -1));
-        }
+        handler.handleResult(new QueryResult(null, remaining));
 
     }
 
@@ -181,15 +185,20 @@ public class DecisionCombinersResource implements CollectionResourceProvider {
 
         final Class<? extends EntitlementCombiner> combinerClass = entitlementRegistry.getCombinerType(resourceId);
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         if (combinerClass == null) {
-            debug.error("Requested combiner short name not found: " + resourceId);
+            if (debug.errorEnabled()) {
+                debug.error("DecisionCombinersResource :: READ by " + principalName +
+                        ": Requested combiner short name not found: " + resourceId);
+            }
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
 
         final JsonValue json = jsonify(resourceId);
 
-        final Resource resource = new Resource(resourceId, "0", json);
+        final Resource resource = new Resource(resourceId, String.valueOf(System.currentTimeMillis()), json);
         handler.handleResult(resource);
     }
 

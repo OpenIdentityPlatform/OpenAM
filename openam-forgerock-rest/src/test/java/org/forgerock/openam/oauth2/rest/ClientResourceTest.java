@@ -26,7 +26,10 @@ package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.openam.cts.CTSPersistentStore;
+import com.sun.identity.shared.debug.Debug;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -34,15 +37,17 @@ import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.oauth2.OAuth2AuditLogger;
-import org.testng.annotations.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ClientResourceTest {
 
@@ -85,7 +90,7 @@ public class ClientResourceTest {
         Resource expectedResource = new Resource("results", "1", response);
 
         ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class),
-                mock(OAuth2AuditLogger.class)));
+                mock(OAuth2AuditLogger.class), mock(Debug.class)));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -116,7 +121,7 @@ public class ClientResourceTest {
         Resource expectedResource = new Resource("results", "1", response);
 
         ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class),
-                mock(OAuth2AuditLogger.class)));
+                mock(OAuth2AuditLogger.class), mock(Debug.class)));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);

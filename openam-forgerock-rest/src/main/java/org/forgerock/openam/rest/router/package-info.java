@@ -15,9 +15,9 @@
  */
 
 /**
- * This package contains classes for the routing of rest requests for OpenAM.
+ * This package contains classes for the routing of REST requests for OpenAM.
  * <br/>
- * Each rest request is parsed for the presence of a realm in the URI before being routed to the requested
+ * Each REST request is parsed for the presence of a realm in the URI before being routed to the requested
  * endpoint.
  */
 package org.forgerock.openam.rest.router;

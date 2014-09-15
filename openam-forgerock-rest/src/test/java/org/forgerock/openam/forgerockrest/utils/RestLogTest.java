@@ -15,6 +15,8 @@
 */
 package org.forgerock.openam.forgerockrest.utils;
 
+import com.sun.identity.log.Logger;
+import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
 import java.util.Collections;
@@ -32,14 +34,21 @@ import static org.testng.Assert.assertNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class LoggingUtilsTest {
+public class RestLogTest {
 
     ServerContext mockContext = mock(ServerContext.class);
     Debug mockDebug;
+    RestLog restLog;
+
+
+    LogMessageProvider msgProvider = mock(LogMessageProvider.class);
+    Logger accessLogger = mock(Logger.class);
+    Logger authzLogger = mock(Logger.class);
 
     @BeforeMethod
-    public void setup() {
+    public void setup() { //you need this
         mockDebug = mock(Debug.class);
+        restLog = new RestLog(msgProvider, accessLogger, authzLogger);
     }
 
     @Test (expectedExceptions = NullPointerException.class)
@@ -47,7 +56,7 @@ public class LoggingUtilsTest {
         //given
 
         //when
-        LoggingUtils.logOperationAttemptAsPrincipal(null, "", mockContext, null, mockDebug);
+        restLog.debugOperationAttemptAsPrincipal(null, "", mockContext, null, mockDebug);
 
         //then
     }
@@ -57,7 +66,7 @@ public class LoggingUtilsTest {
         //given
 
         //when
-        LoggingUtils.logOperationAttemptAsPrincipal("", null, mockContext, null, mockDebug);
+        restLog.debugOperationAttemptAsPrincipal("", null, mockContext, null, mockDebug);
 
         //then
     }
@@ -67,7 +76,7 @@ public class LoggingUtilsTest {
         //given
 
         //when
-        LoggingUtils.logOperationAttemptAsPrincipal(null, "", mockContext, null, mockDebug);
+        restLog.debugOperationAttemptAsPrincipal(null, "", mockContext, null, mockDebug);
 
         //then
     }
@@ -77,7 +86,7 @@ public class LoggingUtilsTest {
         //given
 
         //when
-        LoggingUtils.logOperationAttemptAsPrincipal("", "", mockContext, null, null);
+        restLog.debugOperationAttemptAsPrincipal("", "", mockContext, null, null);
 
         //then
     }
@@ -88,7 +97,7 @@ public class LoggingUtilsTest {
         SSOTokenContext tokenContext = generateTestSSOTokenContext(null);
 
         //when
-        String principal = LoggingUtils.logOperationAttemptAsPrincipal("", "", tokenContext, null, mockDebug);
+        String principal = restLog.debugOperationAttemptAsPrincipal("", "", tokenContext, null, mockDebug);
 
         //then
         assertNull(principal);
@@ -102,7 +111,7 @@ public class LoggingUtilsTest {
         SSOTokenContext tokenContext = generateTestSSOTokenContext("test");
 
         //when
-        String principal = LoggingUtils.logOperationAttemptAsPrincipal("", "", tokenContext, null, mockDebug);
+        String principal = restLog.debugOperationAttemptAsPrincipal("", "", tokenContext, null, mockDebug);
 
         //then
         assertEquals("test", principal);

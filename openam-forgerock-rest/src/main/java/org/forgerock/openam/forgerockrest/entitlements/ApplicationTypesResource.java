@@ -15,13 +15,11 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.google.inject.name.Named;
+import javax.inject.Named;
 import com.sun.identity.entitlement.ApplicationType;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
-import static java.lang.Math.max;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +41,9 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeWrapper;
 
@@ -54,6 +54,8 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeW
  * endpoint only supports the READ and QUERY operations.
  */
 public class ApplicationTypesResource extends SubjectAwareResource {
+
+    final JsonPointer JSON_POINTER_TO_NAME = new JsonPointer(ApplicationType.FIELD_NAME);
 
     private final ApplicationTypeManagerWrapper typeManager;
     private final Debug debug;
@@ -83,7 +85,8 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
+                               ResultHandler<JsonValue> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -99,7 +102,8 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request, ResultHandler<Resource> handler) {
+    public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
+                               ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -107,7 +111,8 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void patchInstance(ServerContext context, String resourceId, PatchRequest request, ResultHandler<Resource> handler) {
+    public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
+                              ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -115,7 +120,8 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * Unsupported by this endpoint.
      */
     @Override
-    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request, ResultHandler<Resource> handler) {
+    public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
+                               ResultHandler<Resource> handler) {
         RestUtils.generateUnsupportedOperation(handler);
     }
 
@@ -132,11 +138,15 @@ public class ApplicationTypesResource extends SubjectAwareResource {
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
         //auth
-        final Subject mySubject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
         if (mySubject == null) {
+            debug.error("ApplicationsTypesResource :: QUERY : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
+
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         //select
         final Set<String> appTypeNames =  typeManager.getApplicationTypeNames(mySubject);
@@ -147,39 +157,40 @@ public class ApplicationTypesResource extends SubjectAwareResource {
             final ApplicationTypeWrapper wrap = new ApplicationTypeWrapper(type);
             if (type != null) {
                 appTypes.add(wrap);
+            } else {
+                if (debug.warningEnabled()) {
+                    debug.warning("ApplicationTypesResource :: QUERY by " + principalName +
+                            ": ApplicationType was not found: " + appTypeName);
+                }
             }
-        }
-
-        int totalSize = appTypes.size();
-        int pageSize = request.getPageSize();
-        int offset = request.getPagedResultsOffset();
-
-        if (pageSize > 0) {
-            Collections.sort(appTypes);
-            appTypes = appTypes.subList(offset, offset + pageSize);
         }
 
         final List<JsonValue> jsonifiedAppTypes = jsonify(appTypes);
 
-        final JsonPointer jp = new JsonPointer(ApplicationType.FIELD_NAME);
+        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        for (JsonValue appTypeToReturn : jsonifiedAppTypes) {
+        int remaining = 0;
+        if (appTypes.size() > 0) {
+            remaining = appTypes.size();
+            for (JsonValue appTypesToReturn : jsonifiedAppTypes) {
 
-            final JsonValue resourceId = appTypeToReturn.get(jp);
-            final String id = resourceId != null ? resourceId.toString() : null;
+                final JsonValue resourceId = appTypesToReturn.get(JSON_POINTER_TO_NAME);
+                final String id = resourceId != null ? resourceId.toString() : null;
 
-            final Resource resource = new Resource(id, "0", appTypeToReturn);
-
-            handler.handleResource(resource);
+                boolean keepGoing = handler.handleResource(new Resource(id,
+                        String.valueOf(System.currentTimeMillis()), appTypesToReturn));
+                remaining--;
+                if (debug.messageEnabled()) {
+                    debug.message("ApplicationTypesResource :: QUERY by " + principalName +
+                            ": Added resource to response: " + id);
+                }
+                if (!keepGoing) {
+                    break;
+                }
+            }
         }
 
-        //paginate
-        if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ? String.valueOf(totalSize) : String.valueOf(offset + pageSize);
-            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
-        } else {
-            handler.handleResult(new QueryResult(null, -1));
-        }
+        handler.handleResult(new QueryResult(null, remaining));
 
     }
 
@@ -197,7 +208,10 @@ public class ApplicationTypesResource extends SubjectAwareResource {
             try {
                 applicationsList.add(entry.toJsonValue());
             } catch (IOException e) {
-                debug.error("Error converting entry to Json value.");
+                if (debug.warningEnabled()) {
+                    debug.warning("ApplicationTypesResource :: JSONIFY - Error applying " +
+                            "jsonification to the ApplicationType class representation.", e);
+                }
             }
         }
 
@@ -216,30 +230,41 @@ public class ApplicationTypesResource extends SubjectAwareResource {
      * @param handler {@inheritDoc}
      */
     @Override
-    public void readInstance(ServerContext context, String resourceId, ReadRequest request, ResultHandler<Resource> handler) {
+    public void readInstance(ServerContext context, String resourceId, ReadRequest request,
+                             ResultHandler<Resource> handler) {
 
         //auth
-        final Subject mySubject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
         if (mySubject == null) {
+            debug.error("ApplicationsTypesResource :: READ : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
+
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         final ApplicationType applType = typeManager.getApplicationType(mySubject, resourceId);
         final ApplicationTypeWrapper wrap = new ApplicationTypeWrapper(applType);
 
         if (applType == null) {
-            debug.error("Read failed on invalid ApplicationType.");
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationTypesResource :: READ by " + principalName +
+                        ": Requested application type short name not found: " + resourceId);
+            }
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
 
         try {
-            final Resource resource = new Resource(resourceId, "0",
-                    JsonValue.json(wrap.toJsonValue()));
+            final Resource resource = new Resource(resourceId,
+                    String.valueOf(System.currentTimeMillis()), JsonValue.json(wrap.toJsonValue()));
             handler.handleResult(resource);
         } catch (IOException e) {
-            debug.message("ApplicationType could not jsonify class associated with defined Type.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationTypesResource :: READ by " + principalName +
+                        ": Could not jsonify class associated with defined Type: " + resourceId, e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
     }

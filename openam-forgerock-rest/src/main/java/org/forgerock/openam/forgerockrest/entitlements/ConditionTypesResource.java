@@ -15,11 +15,10 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.google.inject.name.Named;
+import javax.inject.Named;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
-import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +46,10 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.util.Reject;
 
 /**
@@ -62,6 +63,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_CONFIG = "config";
     private final static String JSON_OBJ_LOGICAL = "logical";
+
+    private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final static ObjectMapper mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
     private final Debug debug;
@@ -147,6 +150,8 @@ public class ConditionTypesResource implements CollectionResourceProvider {
         final Set<String> conditionTypeNames = new TreeSet<String>();
         List<JsonValue> conditionTypes = new ArrayList<JsonValue>();
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         conditionTypeNames.addAll(entitlementRegistry.getConditionsShortNames());
 
         for (String conditionTypeName : conditionTypeNames) {
@@ -154,7 +159,10 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                     entitlementRegistry.getConditionType(conditionTypeName);
 
             if (conditionClass == null) {
-                debug.error("Listed condition short name not found: " + conditionTypeName);
+                if (debug.warningEnabled()) {
+                    debug.warning("ConditionTypesResource :: QUERY by " + principalName +
+                            ": Requested condition short name not found: " + conditionTypeName);
+                }
                 continue;
             }
 
@@ -166,34 +174,30 @@ public class ConditionTypesResource implements CollectionResourceProvider {
             }
         }
 
-        int totalSize = conditionTypes.size();
-        int pageSize = request.getPageSize();
-        int offset = request.getPagedResultsOffset();
+        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        if (pageSize > 0) {
-            conditionTypes = conditionTypes.subList(offset, offset + pageSize);
+        int remaining = 0;
+        if (conditionTypes.size() > 0) {
+            remaining = conditionTypes.size();
+            for (JsonValue conditionTypesToReturn : conditionTypes) {
+
+                final JsonValue resourceId = conditionTypesToReturn.get(JSON_POINTER_TO_TITLE);
+                final String id = resourceId != null ? resourceId.toString() : null;
+
+                boolean keepGoing = handler.handleResource(new Resource(id,
+                        String.valueOf(System.currentTimeMillis()), conditionTypesToReturn));
+                remaining--;
+                if (debug.messageEnabled()) {
+                    debug.message("ConditionTypesResource :: QUERY by " + principalName +
+                            ": Added resource to response: " + id);
+                }
+                if (!keepGoing) {
+                    break;
+                }
+            }
         }
 
-        final JsonPointer jp = new JsonPointer(JSON_OBJ_TITLE);
-
-        for (JsonValue conditionTypeToReturn : conditionTypes) {
-
-            final JsonValue resourceId = conditionTypeToReturn.get(jp);
-            final String id = resourceId != null ? resourceId.toString() : null;
-
-            final Resource resource = new Resource(id, "0", conditionTypeToReturn);
-
-            handler.handleResource(resource);
-        }
-
-        //paginate
-        if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ?
-                    String.valueOf(totalSize) : String.valueOf(offset + pageSize);
-            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
-        } else {
-            handler.handleResult(new QueryResult(null, -1));
-        }
+        handler.handleResult(new QueryResult(null, remaining));
 
     }
 
@@ -208,8 +212,13 @@ public class ConditionTypesResource implements CollectionResourceProvider {
 
         final Class<? extends EntitlementCondition> conditionClass = entitlementRegistry.getConditionType(resourceId);
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         if (conditionClass == null) {
-            debug.error("Requested condition short name not found: " + resourceId);
+            if (debug.errorEnabled()) {
+                debug.error("ConditionTypesResource :: READ by " + principalName +
+                        ": Requested condition short name not found: " + resourceId);
+            }
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
@@ -217,7 +226,7 @@ public class ConditionTypesResource implements CollectionResourceProvider {
         final JsonValue json = jsonify(conditionClass, resourceId,
                 LogicalCondition.class.isAssignableFrom(conditionClass));
 
-        final Resource resource = new Resource(resourceId, "0", json);
+        final Resource resource = new Resource(resourceId, String.valueOf(System.currentTimeMillis()), json);
         handler.handleResult(resource);
     }
 
@@ -250,7 +259,10 @@ public class ConditionTypesResource implements CollectionResourceProvider {
                     JsonValue.field(JSON_OBJ_CONFIG, schema)));
 
         } catch (JsonMappingException e) {
-            debug.error("Error applying jsonification to the Condition class representation.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ConditionTypesResource :: JSONIFY - Error applying " +
+                        "jsonification to the Condition class representation.", e);
+            }
             return null;
         }
     }

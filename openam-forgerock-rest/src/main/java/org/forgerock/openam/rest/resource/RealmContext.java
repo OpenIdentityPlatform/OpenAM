@@ -56,7 +56,7 @@ public class RealmContext extends ServerContext {
      *
      * @param subrealm The sub-realm to add to the realm context.
      */
-    void addSubRealm(String subrealm) {
+    public void addSubRealm(String subrealm) {
         if (subrealm == null || subrealm.isEmpty()) {
             return;
         }

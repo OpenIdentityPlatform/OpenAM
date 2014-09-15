@@ -15,33 +15,38 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import javax.security.auth.Subject;
-import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.rest.resource.RealmContext;
 
 /**
- * Resource capable of determining a subject from a ServerContext.
+ * Resource capable of determining a realm from a ServerContext.
  *
  * @since 12.0.0
  */
-public abstract class SubjectAwareResource implements CollectionResourceProvider {
+public abstract class RealmAwareResource extends SubjectAwareResource {
 
     /**
-     * Retrieves the {@link javax.security.auth.Subject} from the {@link org.forgerock.json.resource.ServerContext}.
-     * If there's no Subject or no SSOTokenContext in the provided context this method will return null.
+     * Retrieves the Realm from a provided {@link org.forgerock.json.resource.ServerContext}.
      *
-     * @param context Context of the request made to this resource.
-     * @return an instance of the Subject in the context, or null.
+     * Returns null if there's no RealmContext in the provided ServerContext.
+     *
+     * @param context The request context.
+     * @return a String containing the name of the realm associated with this request,
+     *  or null if there is no RealmContext in the ServerContext.
      */
-    protected Subject getContextSubject(ServerContext context) {
+    protected String getRealm(ServerContext context) {
 
-        if (!context.containsContext(SSOTokenContext.class)) {
+        if (!context.containsContext(RealmContext.class)) {
             return null;
         }
 
-        final SSOTokenContext sc = context.asContext(SSOTokenContext.class);
-        return sc.getCallerSubject();
+        final RealmContext rc = context.asContext(RealmContext.class);
+
+        if (rc.getRealm().equals("")) {
+            return "/";
+        }
+
+        return rc.getRealm();
     }
 
 }

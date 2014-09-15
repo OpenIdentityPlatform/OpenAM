@@ -14,9 +14,7 @@
  * Copyright 2014 ForgeRock Inc.
  */
 
-
 /**
- * This package contains classes for the handling of REST request to CREST Resource endpoints with the concept of realms
- * in OpenAM built in.
+ * This package contains the authorization filters for end points.
  */
-package org.forgerock.openam.rest.resource;
+package org.forgerock.openam.rest.authz;

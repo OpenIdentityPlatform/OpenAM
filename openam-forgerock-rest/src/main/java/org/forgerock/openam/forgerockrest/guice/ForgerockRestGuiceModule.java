@@ -21,11 +21,25 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.PolicyPrivilegeManager;
+import com.sun.identity.log.LogConstants;
+import com.sun.identity.log.Logger;
+import com.sun.identity.log.messageid.LogMessageProvider;
+import com.sun.identity.log.messageid.MessageProviderFactory;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -45,29 +59,20 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
+import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.util.SignatureUtil;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -148,6 +153,29 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     }
 
     @Provides
+    @Singleton
+    public RestLog getRestLog() {
+        LogMessageProvider msgProvider = null;
+        Logger accessLogger = null;
+        Logger authzLogger = null;
+
+        try {
+            String status = SystemProperties.get(Constants.AM_LOGSTATUS);
+
+            if ("ACTIVE".equalsIgnoreCase(status)) {
+                accessLogger = (Logger) Logger.getLogger(LogConstants.REST_ACCESS);
+                authzLogger = (Logger) Logger.getLogger(LogConstants.REST_AUTHZ);
+                msgProvider = MessageProviderFactory.getProvider(RestLog.LOG_NAME);
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return new RestLog(msgProvider, accessLogger, authzLogger);
+    }
+
+    @Provides
     @Named("AgentsResource")
     @Inject
     @Singleton
@@ -159,8 +187,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public CoreTokenResource getCoreTokenResource(JSONSerialisation jsonSerialisation,
-            CTSPersistentStoreProxy ctsPersistentStore) {
-        return new CoreTokenResource(jsonSerialisation, ctsPersistentStore);
+            CTSPersistentStoreProxy ctsPersistentStore, @Named("frRest") Debug debug) {
+        return new CoreTokenResource(jsonSerialisation, ctsPersistentStore, debug);
     }
 
     @Provides

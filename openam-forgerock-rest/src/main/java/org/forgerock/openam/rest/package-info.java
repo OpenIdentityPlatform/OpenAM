@@ -15,7 +15,7 @@
  */
 
 /**
- * This package contains classes for all the REST framework classes responsible for routing requests to the request
+ * This package contains classes for all the REST framework classes responsible for determining the location of request
  * REST endpoints.
  */
 package org.forgerock.openam.rest;

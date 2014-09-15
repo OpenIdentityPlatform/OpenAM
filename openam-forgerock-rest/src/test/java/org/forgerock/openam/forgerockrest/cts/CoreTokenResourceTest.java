@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.forgerockrest.cts;
 
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
@@ -29,20 +30,22 @@ import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.testng.annotations.Test;
-
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
+import org.mockito.Matchers;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenResourceTest {
+
+    Debug mockDebug = mock(Debug.class);
+
     @Test
     public void shouldUseDeserialisedTokenToCreate() throws CoreTokenException {
         // Given
@@ -52,7 +55,7 @@ public class CoreTokenResourceTest {
         JSONSerialisation serialisation = mock(JSONSerialisation.class);
         given(serialisation.deserialise(anyString(), Matchers.<Class<Object>>any())).willReturn(token);
 
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store);
+        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
 
         CreateRequest request = mock(CreateRequest.class);
         given(request.getContent()).willReturn(new JsonValue(""));
@@ -69,7 +72,7 @@ public class CoreTokenResourceTest {
         String one = "one";
 
         CTSPersistentStore store = mock(CTSPersistentStore.class);
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store);
+        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
 
         // When
         resource.deleteInstance(null, one, mock(DeleteRequest.class), mock(ResultHandler.class));
@@ -86,7 +89,7 @@ public class CoreTokenResourceTest {
 
         CTSPersistentStore store = mock(CTSPersistentStore.class);
         given(store.read(anyString())).willReturn(token);
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store);
+        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
 
         // When
         resource.readInstance(null, one, mock(ReadRequest.class), mock(ResultHandler.class));
@@ -106,7 +109,7 @@ public class CoreTokenResourceTest {
         JSONSerialisation serialisation = mock(JSONSerialisation.class);
         given(serialisation.serialise(any(Token.class))).willReturn(serialisedToken);
 
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store);
+        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
 
         ResultHandler handler = mock(ResultHandler.class);
 
@@ -126,7 +129,7 @@ public class CoreTokenResourceTest {
         CTSPersistentStore store = mock(CTSPersistentStore.class);
         given(store.read(anyString())).willReturn(null);
 
-        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store);
+        CoreTokenResource resource = new CoreTokenResource(mock(JSONSerialisation.class), store, mockDebug);
 
         ResultHandler<Resource> handler = mock(ResultHandler.class);
 
@@ -148,7 +151,7 @@ public class CoreTokenResourceTest {
         CTSPersistentStore store = mock(CTSPersistentStore.class);
         ResultHandler<Resource> handler = mock(ResultHandler.class);
         UpdateRequest updateRequest = mock(UpdateRequest.class);
-        CoreTokenResource resource = new CoreTokenResource(serialisation, store);
+        CoreTokenResource resource = new CoreTokenResource(serialisation, store, mockDebug);
         JsonValue value = mock(JsonValue.class);
 
         //Ensure the Token is included in the UpdateRequest

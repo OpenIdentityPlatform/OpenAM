@@ -18,7 +18,7 @@ package org.forgerock.openam.rest.router;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.forgerock.openam.rest.CrestRouter;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.RestEndpoints;
 import org.forgerock.openam.rest.service.ServiceRouter;
 import static org.mockito.BDDMockito.given;

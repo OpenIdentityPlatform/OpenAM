@@ -18,6 +18,11 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import javax.security.auth.Subject;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
@@ -34,20 +39,13 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
-import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.util.Reject;
-
-import javax.security.auth.Subject;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Endpoint for the ApplicationsResource.
@@ -59,7 +57,7 @@ import java.util.Set;
  * leg for us.
  *
  */
-public class ApplicationsResource extends SubjectAwareResource {
+public class ApplicationsResource extends RealmAwareResource {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final ApplicationManagerWrapper appManager;
@@ -121,39 +119,45 @@ public class ApplicationsResource extends SubjectAwareResource {
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
 
         //auth
-        final Subject subject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
-        if (subject == null) {
+        if (mySubject == null) {
+            debug.error("ApplicationsResource :: CREATE : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         //select
         final String realm = getRealm(context);
-
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
         final JsonValue creationRequest = request.getContent();
 
         final ApplicationWrapper wrapp;
         try {
-            wrapp = createApplicationWrapper(creationRequest, subject, realm);
+            wrapp = createApplicationWrapper(creationRequest, mySubject, realm);
         } catch (IOException e) {
-            debug.error("Application failed to create the resource specified.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                ": Application failed to create the resource specified. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         } catch (EntitlementException e) {
-            debug.error("Application Type not correctly specified in request.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Application Type not correctly specified in the request. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
-        String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
         try {
-            appManager.saveApplication(subject, realm, wrapp.getApplication());
-
-            debug.message("ApplicationsResource.createInstance :: CREATE of application " +
-                wrapp.getApplication().getName() + " in realm " + realm + " performed by " + principalName);
+            appManager.saveApplication(mySubject, realm, wrapp.getApplication());
         } catch (EntitlementException e) {
-           debug.error("Application failed to store the created resource. Attempted store of application " +
-                " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Application failed to store the created resource. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
@@ -161,10 +165,16 @@ public class ApplicationsResource extends SubjectAwareResource {
         try {
             final Resource resource = new Resource(wrapp.getName(),
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
+            if (debug.messageEnabled()) {
+                debug.message("ApplicationsResource :: CREATE by " + principalName +
+                        ": for Application: " + wrapp.getName());
+            }
             handler.handleResult(resource);
         } catch (IOException e) {
-            debug.error("Application failed to return the resource created. Attempted return of application " +
-                    wrapp.getApplication().getName() + " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Application failed to return the resource created. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
@@ -200,7 +210,10 @@ public class ApplicationsResource extends SubjectAwareResource {
 
         if (appTypeValue == null || appTypeValue.asString().isEmpty()
                 || !wrapp.setApplicationType(mySubject, appTypeValue.asString())) {
-            debug.error("Specified Application Type was not available.");
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource.createApplicationWrapper() : " +
+                        "Specified Application Type was not available.");
+            }
             throw new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
         }
 
@@ -237,25 +250,28 @@ public class ApplicationsResource extends SubjectAwareResource {
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                               ResultHandler<Resource> handler) {
 
-        final Subject subject = getContextSubject(context, handler);
+        //auth
+        final Subject mySubject = getContextSubject(context);
 
-        if (subject == null) {
+        if (mySubject == null) {
+            debug.error("ApplicationsResource :: DELETE : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         final String realm = getRealm(context);
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
-        String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
         try {
-            appManager.deleteApplication(subject, realm, resourceId);
-            debug.message("ApplicationsResource.deleteInstance :: DELETE of application " +
-                    resourceId + " in realm " + realm + " performed by " + principalName);
+            appManager.deleteApplication(mySubject, realm, resourceId);
 
             final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
             handler.handleResult(resource);
         } catch (EntitlementException e) {
-            debug.error("Application failed to delete the resource specified. Attempted delete of "  +
-                    resourceId + " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: DELETE by " + principalName +
+                        ": Application failed to delete the resource specified. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
@@ -286,50 +302,61 @@ public class ApplicationsResource extends SubjectAwareResource {
     public void queryCollection(ServerContext context, QueryRequest request, QueryResultHandler handler) {
 
         //auth
-        final Subject subject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
-        if (subject == null) {
+        if (mySubject == null) {
+            debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         //select
         final String realm = getRealm(context);
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
+
         List<ApplicationWrapper> apps = new LinkedList<ApplicationWrapper>();
 
         try {
-            final Set<String> appNames = appManager.getApplicationNames(subject, realm);
+            final Set<String> appNames = appManager.getApplicationNames(mySubject, realm);
 
             for (String appName : appNames) {
-                final Application application = appManager.getApplication(subject, realm, appName);
+                final Application application = appManager.getApplication(mySubject, realm, appName);
                 apps.add(createApplicationWrapper(application, appTypeManagerWrapper));
             }
         } catch (EntitlementException e) {
-            debug.error("Application failed to retrieve the resource specified", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: QUERY by " + principalName +
+                        ": Application failed to retrieve the resource specified. ", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
-        debug.message("ApplicationsResource.queryCollection :: QUERY of applications " +
-                " in realm " + realm + " performed by " + principalName);
-
         int remaining = 0;
         try {
-            if (apps != null) {
+            if (apps.size() > 0) {
                 remaining = apps.size();
                 for (ApplicationWrapper app : apps) {
                     boolean keepGoing = handler.handleResource(
                             new Resource(app.getName(), Long.toString(app.getLastModifiedDate()), app.toJsonValue()));
                     remaining--;
+                    if (debug.messageEnabled()) {
+                        debug.message("ApplicationsResource :: QUERY by " + principalName +
+                                ": Added resource to response: " + app.getName());
+                    }
                     if (!keepGoing) {
                         break;
                     }
                 }
             }
         } catch (IOException e) {
-            debug.error("Unable to convert resource to JSON.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: QUERY by " + principalName +
+                        ": Unable to convert resource to JSON.", e);
+
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
@@ -349,32 +376,35 @@ public class ApplicationsResource extends SubjectAwareResource {
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler) {
 
-        final Subject subject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
-        if (subject == null) {
+        if (mySubject == null) {
+            debug.error("ApplicationsResource :: READ : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         final String realm = getRealm(context);
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
-        String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
         try {
-            final Application app = appManager.getApplication(subject, realm, resourceId);
-            if (app != null) {
-                debug.message("ApplicationsResource.readInstance :: READ of application " +
-                    resourceId + " in realm " + realm + " performed by " + principalName);
-            }
+            final Application app = appManager.getApplication(mySubject, realm, resourceId);
             final ApplicationWrapper wrapp = new ApplicationWrapper(app, appTypeManagerWrapper);
 
-            final Resource resource = new Resource(resourceId, Long.toString(app.getLastModifiedDate()), wrapp.toJsonValue());
+            final Resource resource = new Resource(resourceId, Long.toString(app.getLastModifiedDate()),
+                    wrapp.toJsonValue());
             handler.handleResult(resource);
         } catch (EntitlementException e) {
-            debug.error("Application failed to retrieve the resource specified. Attempted return of resource for " +
-                    "read of application " + resourceId + " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: READ by " + principalName +
+                        ": Application failed to retrieve the resource specified.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         } catch (IOException e) {
-            debug.error("Error converting resource to JSON format. Attempted return of resource for " +
-                    "read of application " + resourceId + " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: READ by " + principalName +
+                    ": Error converting resource to JSON format.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
@@ -395,53 +425,65 @@ public class ApplicationsResource extends SubjectAwareResource {
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> handler) {
 
-        final Subject subject = getContextSubject(context, handler);
+        final Subject mySubject = getContextSubject(context);
 
-        if (subject == null) {
+        if (mySubject == null) {
+            debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
-        String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(subject);
-
         final String realm = getRealm(context);
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         final ApplicationWrapper wrapp;
         try {
-            wrapp = createApplicationWrapper(request.getContent(), subject, realm);
+            wrapp = createApplicationWrapper(request.getContent(), mySubject, realm);
         } catch (IOException e) {
-            debug.error("Application Type not correctly specified in request.", e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Application Type not correctly specified in request.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         } catch (EntitlementException e) {
-            debug.error("Application failed to create the resource specified. Attempted create of " + resourceId +
-                    " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Application failed to create the resource specified.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
         final Application oldApplication;
         try {
-            oldApplication = appManager.getApplication(subject, realm, resourceId);
+            oldApplication = appManager.getApplication(mySubject, realm, resourceId);
         } catch (EntitlementException e) {
-            debug.error("Error retrieving Application to update. Attempted update of " + resourceId + " in realm " +
-                    realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Error retrieving Application to update.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
 
         if (oldApplication == null) {
+
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Error retrieving Application to update.");
+            }
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
 
         try {
-            appManager.updateApplication(oldApplication, wrapp.getApplication(), subject, realm);
-            debug.message("ApplicationsResource.updateInstance :: UPDATE of application " +
-                    oldApplication.getName() + " to new application " + wrapp.getApplication().getName() +
-                    " in realm " + realm + " performed by " + principalName);
+            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, realm);
         } catch (EntitlementException e) {
-            debug.error("Unable to perform update operation. Attempted update of "  +
-                    resourceId + " to new application in realm " + realm + " performed by " + principalName);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Error  performing update operation.");
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         }
@@ -451,29 +493,13 @@ public class ApplicationsResource extends SubjectAwareResource {
                     Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
             handler.handleResult(resource);
         } catch (IOException e) {
-            debug.error("Application failed to return the resource updated. Attempted return of resource for " +
-                    "update of " + oldApplication.getName() + " to new application " +
-                    wrapp.getApplication().getName() + " in realm " + realm + " performed by " + principalName, e);
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Application failed to return the resource updated.", e);
+            }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
         }
 
-    }
-
-    /**
-     * Retrieves the Realm from a provided {@link ServerContext}.
-     *
-     * @param context The request context
-     * @return a String containing the name of the realm associated with this request.
-     */
-    private String getRealm(ServerContext context) {
-
-        final RealmContext rc = context.asContext(RealmContext.class);
-
-        if (rc.getRealm().equals("")) {
-            return "/";
-        }
-
-        return rc.getRealm();
     }
 
 }

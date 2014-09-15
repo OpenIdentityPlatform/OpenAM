@@ -17,10 +17,23 @@
 package org.forgerock.openam.forgerockrest.authn.restlet;
 
 import com.sun.identity.shared.debug.Debug;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
@@ -37,20 +50,6 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.json.fluent.JsonValue.*;
 
 /**
  * Base Restlet class for server-side resources. It acts as a wrapper to a given call,
@@ -70,6 +69,7 @@ public class AuthenticationService extends ServerResource {
     private static final String EXPIRES_HEADER_NAME = "Expires";
     private static final String ALWAYS_EXPIRE_HEADER = "0";
     private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
+    private static final String REALM = "realm";
 
     private final RestAuthenticationHandler restAuthenticationHandler;
 
@@ -107,6 +107,9 @@ public class AuthenticationService extends ServerResource {
     public Representation authenticate(JsonRepresentation entity) throws ResourceException {
 
         if (entity != null && !isSupportedMediaType(entity)) {
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("AuthenticationService :: Unable to handle media type request : " + entity.getMediaType());
+            }
             throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
         }
 
@@ -135,11 +138,10 @@ public class AuthenticationService extends ServerResource {
             return createResponse(jsonResponse);
 
         } catch (RestAuthResponseException e) {
-            DEBUG.message("Exception from CallbackHandler", e);
+            DEBUG.message("AuthenticationService.authenticate() :: Exception from CallbackHandler", e);
             return handleCallbackException(e);
         } catch (RestAuthException e) {
-            DEBUG.error("Rest Authentication Exception", e);
-            //todo: org.forgerock.json.resource.ResourceException.UNAUTHORIZED for 401 when we're commons 3.0
+            DEBUG.error("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
             org.forgerock.json.resource.ResourceException cause =
                     org.forgerock.json.resource.ResourceException.getException(401, e.getMessage());
 
@@ -149,8 +151,11 @@ public class AuthenticationService extends ServerResource {
 
             throw new ResourceException(401, cause);
 
-        } catch (Exception e) {
+        } catch (JSONException e) {
             DEBUG.error("Internal Error", e);
+            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
+        } catch (IOException e) {
+            DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
         }
     }
@@ -177,7 +182,7 @@ public class AuthenticationService extends ServerResource {
         final HttpServletRequest request = ServletUtils.getRequest(getRequest());
 
         // The request contains the realm query param then use that over any realm parsed from the URI
-        final String queryParamRealm = request.getParameter("realm");
+        final String queryParamRealm = request.getParameter(REALM);
         if (queryParamRealm != null && !queryParamRealm.isEmpty()) {
             return request;
         }
@@ -196,7 +201,7 @@ public class AuthenticationService extends ServerResource {
         return new HttpServletRequestWrapper(request) {
             @Override
             public String getParameter(String name) {
-                if ("realm".equals(name)) {
+                if (REALM.equals(name)) {
                     return (String) request.getAttribute(name);
                 }
                 return super.getParameter(name);
@@ -206,7 +211,7 @@ public class AuthenticationService extends ServerResource {
             public Map getParameterMap() {
                 Map params = super.getParameterMap();
                 Map p = new HashMap(params);
-                p.put("realm", request.getAttribute("realm"));
+                p.put(REALM, request.getAttribute(REALM));
                 return p;
             }
 
@@ -217,13 +222,13 @@ public class AuthenticationService extends ServerResource {
                 while (paramNames.hasMoreElements()) {
                     names.add(paramNames.nextElement());
                 }
-                names.add("realm");
+                names.add(REALM);
                 return Collections.enumeration(names);
             }
 
             @Override
             public String[] getParameterValues(String name) {
-                if ("realm".equals(name)) {
+                if (REALM.equals(name)) {
                     return new String[]{(String) request.getAttribute(name)};
                 }
                 return super.getParameterValues(name);
@@ -303,6 +308,10 @@ public class AuthenticationService extends ServerResource {
         try {
             return new JacksonRepresentation<Map>(mapper.readValue(e.getJsonResponse().toString(), Map.class));
         } catch (IOException ioe) {
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("AuthenticationService :: Unable to transform callback exception to Jackson" +
+                        " representation into a Restlet Response.");
+            }
             throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, ioe);
         }
     }

@@ -146,18 +146,20 @@ public final class PolicyResource implements CollectionResourceProvider {
      */
     @Override
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
+        String providedName = null;
         try {
-            final String providedName = request.getNewResourceId();
+            providedName = request.getNewResourceId();
             Privilege policy = policyParser.parsePolicy(providedName, request.getContent());
 
             if (isNotBlank(providedName) && !providedName.equals(policy.getName())) {
-                // Resource name and json body name do not match.
+                DEBUG.error("PolicyResource :: CREATE : Resource name and JSON body name do not match.");
                 throw new EntitlementException(EntitlementException.POLICY_NAME_MISMATCH);
             }
 
             policyStoreProvider.getPolicyStore(context).create(policy);
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
+            DEBUG.error("PolicyResource :: CREATE : Error performing create for policy, " + providedName, ex);
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
     }
@@ -171,9 +173,13 @@ public final class PolicyResource implements CollectionResourceProvider {
         try {
             PolicyStore store = policyStoreProvider.getPolicyStore(context);
             store.delete(resourceId);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("PolicyResource :: DELETE : Deleted policy with ID, " + resourceId);
+            }
             // Return an empty resource to indicate success?
             handler.handleResult(new Resource(resourceId, "0", json(object())));
         } catch (EntitlementException ex) {
+            DEBUG.error("PolicyResource :: DELETE : Error performing delete for policy, " + resourceId, ex);
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
     }
@@ -210,8 +216,10 @@ public final class PolicyResource implements CollectionResourceProvider {
 
             handler.handleResult(new QueryResult(null, remaining));
         } catch (EntitlementException ex) {
+            DEBUG.error("PolicyResource :: QUERY : Error querying policy collection.", ex);
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         } catch (IllegalArgumentException ex) {
+            DEBUG.error("PolicyResource :: QUERY : Error querying policy collection due to bad request.", ex);
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST, ex.getMessage()));
         }
     }
@@ -226,6 +234,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             Privilege policy = policyStoreProvider.getPolicyStore(context).read(resourceId);
             handler.handleResult(policyResource(policy));
         } catch (EntitlementException ex) {
+            DEBUG.error("PolicyResource :: READ : Error reading policy, " + resourceId + ".", ex);
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
     }
@@ -241,6 +250,7 @@ public final class PolicyResource implements CollectionResourceProvider {
             Resource result = policyResource(policyStoreProvider.getPolicyStore(context).update(resourceId, policy));
             handler.handleResult(result);
         } catch (EntitlementException ex) {
+            DEBUG.error("PolicyResource :: UPDATE : Error updating policy, " + resourceId + ".", ex);
             handler.handleError(resourceErrorHandler.handleError(request, ex));
         }
     }

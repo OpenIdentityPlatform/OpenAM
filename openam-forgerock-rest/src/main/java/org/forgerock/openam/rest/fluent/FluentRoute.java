@@ -23,7 +23,8 @@ import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.SingletonResourceProvider;
-import org.forgerock.openam.rest.CrestRouter;
+import org.forgerock.openam.rest.authz.LoggingAuthzModule;
+import org.forgerock.openam.rest.resource.CrestRouter;
 
 /**
  * Class representing a Route which can be added to a FluentRouter. The FluentRouter itself is
@@ -55,10 +56,11 @@ public class FluentRoute implements FluentVersion {
      * if it is to reach its destination.
      *
      * @param module authorization filter for the request.
+     * @param moduleReference the name of the authorization filter, referenced in logs.
      * @return this FluentRoute (fluent API).
      */
-    public FluentRoute through(Class<? extends CrestAuthorizationModule> module) {
-        this.modules.add(get(module));
+    public FluentRoute through(Class<? extends CrestAuthorizationModule> module, String moduleReference) {
+        this.modules.add(new LoggingAuthzModule(get(module), moduleReference));
         return this;
     }
 

@@ -39,6 +39,7 @@ import org.forgerock.openam.rest.dashboard.TrustedDevicesResource;
 import org.forgerock.openam.rest.fluent.FluentRealmRouter;
 import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionBehaviourConfigListener;
 import org.forgerock.openam.rest.service.ServiceRouter;
@@ -124,34 +125,44 @@ public class RestEndpoints {
 
         //protected
         dynamicRealmRouter.route("/policies")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(PolicyResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(PolicyResource.class);
 
         dynamicRealmRouter.route("/realms")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(RealmResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(RealmResource.class);
 
         dynamicRealmRouter.route("/sessions")
-                .through(SessionResourceAuthzModule.class).forVersion("1.0").to(SessionResource.class);
+                .through(SessionResourceAuthzModule.class, SessionResourceAuthzModule.NAME)
+                .forVersion("1.0").to(SessionResource.class);
 
         dynamicRealmRouter.route("/applications")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ApplicationsResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ApplicationsResource.class);
 
         rootRealmRouter.route("/applicationtypes")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ApplicationTypesResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ApplicationTypesResource.class);
 
         rootRealmRouter.route("/decisioncombiners")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(DecisionCombinersResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(DecisionCombinersResource.class);
 
         rootRealmRouter.route("/conditiontypes")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(ConditionTypesResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(ConditionTypesResource.class);
 
         rootRealmRouter.route("/subjecttypes")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(SubjectTypesResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(SubjectTypesResource.class);
 
         rootRealmRouter.route("/tokens")
-                .through(AdminOnlyAuthzModule.class).forVersion("1.0").to(CoreTokenResource.class);
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(CoreTokenResource.class);
 
         rootRealmRouter.route("/sessions")
-                .through(SessionResourceAuthzModule.class).forVersion("1.0").to(SessionResource.class);
+                .through(SessionResourceAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(SessionResource.class);
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);

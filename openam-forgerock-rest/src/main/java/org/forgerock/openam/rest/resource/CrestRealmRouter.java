@@ -21,7 +21,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.RouterContext;
 import static org.forgerock.json.resource.RoutingMode.STARTS_WITH;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.openam.rest.CrestRouter;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.rest.router.VersionedRouter;
 
@@ -29,7 +29,7 @@ import org.forgerock.openam.rest.router.VersionedRouter;
  * A CREST request handler which will route to resource endpoints, dynamically handling realm URI parameters.
  *
  * This implementation ensures that the context passed along with the request to the endpoint contains
- * a {@link RealmContext}.
+ * a {@link org.forgerock.openam.rest.resource.RealmContext}.
  *
  * @since 12.0.0
  */
@@ -49,7 +49,7 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
     }
 
     /**
-     * <p>Creates a or adds to the {@link RealmContext}.</p>
+     * <p>Creates a or adds to the {@link org.forgerock.openam.rest.resource.RealmContext}.</p>
      *
      * <p>If multiple realm URI parameters are present then this method will be called repeatedly and for each call
      * the last realm URI parameter will be appended to the realm on the {@code RealmContext}.</p>
@@ -60,13 +60,12 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
      */
     @Override
     protected ServerContext transformContext(ServerContext context) throws BadRequestException {
-
         String realm = null;
+
         if (context.containsContext(RouterContext.class)) {
             realm = context.asContext(RouterContext.class).getUriTemplateVariables().get("realm");
         }
 
-        //this also covers the case of this being a default router, we need to be explicit about the realm
         if (realm == null) {
             realm = "/";
         }
@@ -86,4 +85,5 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
 
         return realmContext;
     }
+
 }

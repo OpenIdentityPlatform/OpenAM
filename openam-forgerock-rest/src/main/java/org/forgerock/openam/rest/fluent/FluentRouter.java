@@ -16,7 +16,7 @@
 package org.forgerock.openam.rest.fluent;
 
 import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.rest.CrestRouter;
+import org.forgerock.openam.rest.resource.CrestRouter;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
 import org.forgerock.openam.rest.resource.CrestRealmRouter;
 import org.forgerock.util.Reject;

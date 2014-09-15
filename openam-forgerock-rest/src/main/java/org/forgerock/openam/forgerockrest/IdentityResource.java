@@ -25,7 +25,6 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.idsvcs.CreateResponse;
 import com.sun.identity.idsvcs.DeleteResponse;
 import com.sun.identity.idsvcs.DuplicateObject;
 import com.sun.identity.idsvcs.GeneralFailure;
@@ -42,9 +41,27 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import org.apache.commons.lang.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -73,9 +90,11 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
-import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServer;
@@ -83,26 +102,6 @@ import org.forgerock.openam.services.email.MailServerImpl;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.TimeUtils;
 import org.forgerock.util.Reject;
-
-import javax.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.forgerock.json.fluent.JsonValue.*;
-import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
-import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -184,11 +183,9 @@ public final class IdentityResource implements CollectionResourceProvider {
      * Gets the user id from the session provided in the server context
      *
      * @param context Current Server Context
-     * @param request Request from client to retrieve id
      * @param handler Result handler
      */
-    private void idFromSession(final ServerContext context, final ActionRequest request,
-                               final ResultHandler<JsonValue> handler) {
+    private void idFromSession(final ServerContext context, final ResultHandler<JsonValue> handler) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         SSOToken ssotok;
@@ -205,13 +202,16 @@ public final class IdentityResource implements CollectionResourceProvider {
             result.put("dn", amIdentity.getUniversalId());
             result.put("successURL", ssotok.getProperty(ISAuthConstants.SUCCESS_URL,false));
             result.put("fullLoginURL", ssotok.getProperty(ISAuthConstants.FULL_LOGIN_URL,false));
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.idFromSession() :: Retrieved ID for user, " + amIdentity.getName());
+            }
             handler.handleResult(result);
 
         } catch (SSOException e) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token. ", e);
             handler.handleError(new ForbiddenException("SSO Token cannot be retrieved.", e));
         } catch (IdRepoException ex) {
-            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+            debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo", ex);
             handler.handleError(new ForbiddenException("Cannot retrieve id from session.", ex));
         }
     }
@@ -328,21 +328,33 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             // Send Registration
             sendNotification(emailAddress, subject, message, realm, confirmationLink);
+
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to, " + emailAddress +
+                " with subject, " + subject + ". In realm, " + realm + " for token ID, " + tokenID);
+            }
+
             handler.handleResult(result);
         } catch (BadRequestException be) {
-            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
-                    + be.getMessage());
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress
+                        + be.getMessage());
+            }
             handler.handleError(be);
         } catch (NotFoundException nfe) {
-            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
-                    + nfe.getMessage());
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress, nfe);
+            }
             handler.handleError(nfe);
         } catch (NotSupportedException nse) {
-            debug.error("IdentityResource.createRegistrationEmail: Operation not enabled " + nse.getMessage());
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.createRegistrationEmail(): Operation not enabled.", nse);
+            }
             handler.handleError(nse);
         } catch (Exception e) {
-            debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
-                    + e.getMessage());
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.createRegistrationEmail(): Cannot send email to : " + emailAddress, e);
+            }
             handler.handleError(new NotFoundException("Email not sent"));
         }
     }
@@ -365,16 +377,22 @@ public final class IdentityResource implements CollectionResourceProvider {
             mailattrs = mailscm.getAttributes();
 
         } catch (SMSException smse) {
-            debug.error(SEND_NOTIF_TAG + "Cannot create service " + MailServerImpl.SERVICE_NAME + smse);
+            if (debug.errorEnabled()) {
+                debug.error(SEND_NOTIF_TAG + "Cannot create service " + MailServerImpl.SERVICE_NAME + smse);
+            }
             throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, smse);
 
         } catch (SSOException ssoe) {
-            debug.error(SEND_NOTIF_TAG + "Invalid SSOToken " + ssoe);
+            if (debug.errorEnabled()) {
+                debug.error(SEND_NOTIF_TAG + "Invalid SSOToken " + ssoe);
+            }
             throw new InternalServerErrorException("Cannot create the service: " + MailServerImpl.SERVICE_NAME, ssoe);
         }
 
         if (mailattrs == null || mailattrs.isEmpty()) {
-            debug.error(SEND_NOTIF_TAG + "no attrs set" + mailattrs);
+            if (debug.errorEnabled()) {
+                debug.error(SEND_NOTIF_TAG + "no attrs set" + mailattrs);
+            }
             throw new NotFoundException("No service Config Manager found for realm " + realm);
         }
 
@@ -396,7 +414,9 @@ public final class IdentityResource implements CollectionResourceProvider {
                 subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
             }
         } catch (Exception e) {
-            debug.warning(SEND_NOTIF_TAG + "no subject found" + e.getMessage());
+            if (debug.warningEnabled()) {
+                debug.warning(SEND_NOTIF_TAG + "no subject found ", e);
+            }
             subject = "";
         }
         try {
@@ -407,7 +427,9 @@ public final class IdentityResource implements CollectionResourceProvider {
             }
             message = message + System.getProperty("line.separator") + confirmationLink;
         } catch (Exception e) {
-            debug.warning(SEND_NOTIF_TAG + "no message found" + e.getMessage());
+            if (debug.warningEnabled()) {
+                debug.warning(SEND_NOTIF_TAG + "no message found", e);
+            }
             message = confirmationLink;
         }
 
@@ -416,7 +438,9 @@ public final class IdentityResource implements CollectionResourceProvider {
             mailServer.sendEmail(to, subject, message);
         } catch (MessagingException e) {
             String error = "Failed to send mail";
-            debug.warning(SEND_NOTIF_TAG + error, e);
+            if (debug.errorEnabled()) {
+                debug.error(SEND_NOTIF_TAG + error, e);
+            }
             throw new InternalServerErrorException(error, e);
         }
     }
@@ -446,25 +470,26 @@ public final class IdentityResource implements CollectionResourceProvider {
             result.put("successURL", gotoURL);
             handler.handleResult(result);
         } catch (SSOException ssoe){
-            debug.message("IdentityResource.validateGoto(): Invalid SSOToken: " + ssoe.getMessage());
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.validateGoto() :: Invalid SSOToken.", ssoe);
+            }
             handler.handleError(ResourceException.getException(ResourceException.FORBIDDEN, ssoe.getMessage(), ssoe));
         }
     }
 
     /**
      * Will validate confirmationId is correct
-     * @param context Current Server Context
      * @param request Request from client to confirm registration
      * @param handler Result handler
      */
-    private void confirmationIdCheck(final ServerContext context, final ActionRequest request,
+    private void confirmationIdCheck(final ActionRequest request,
                                      final ResultHandler<JsonValue> handler, final String realm){
         final String METHOD = "IdentityResource.confirmationIdCheck";
         final JsonValue jVal = request.getContent();
         String tokenID;
         String confirmationId;
-        String email = null;
-        String username = null;
+        String email;
+        String username;
         //email or username value used to create confirmationId
         String hashComponent = null;
         String hashComponentAttr = null;
@@ -477,6 +502,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             username = jVal.get(USERNAME).asString();
 
             if (isNullOrEmpty(confirmationId)) {
+
+                if (debug.errorEnabled()) {
+                    debug.error(METHOD + ": Bad Request - confirmationId not found in request.");
+                }
                 throw new BadRequestException("confirmationId not provided");
             }
             if (isNullOrEmpty(email) && !isNullOrEmpty(username)) {
@@ -488,9 +517,15 @@ public final class IdentityResource implements CollectionResourceProvider {
                 hashComponentAttr = EMAIL;
             } 
             if (isNullOrEmpty(hashComponent)) {
+                if (debug.errorEnabled()) {
+                    debug.error(METHOD + ": Bad Request - hashcomponent not found in request.");
+                }
                 throw new BadRequestException("Required information not provided");
             }
             if (isNullOrEmpty(tokenID)) {
+                if (debug.errorEnabled()) {
+                    debug.error(METHOD + ": Bad Request - tokenID not found in request.");
+                }
                 throw new BadRequestException("tokenId not provided");
             }
 
@@ -500,6 +535,11 @@ public final class IdentityResource implements CollectionResourceProvider {
             result.put(hashComponentAttr,hashComponent);
             result.put(TOKEN_ID, tokenID);
             result.put(CONFIRMATION_ID, confirmationId);
+
+            if (debug.messageEnabled()) {
+                debug.message(METHOD + ": Confirmed for token, " + tokenID + ", with confirmation " + confirmationId);
+            }
+
             handler.handleResult(result);
 
         } catch (BadRequestException be){
@@ -551,6 +591,11 @@ public final class IdentityResource implements CollectionResourceProvider {
             throw new BadRequestException("Invalid realm", null);
         }
 
+        if (debug.messageEnabled()) {
+            debug.message("Validated token with ID, " + tokenID + ", in realm, " + realm + " against "
+                    + confirmationId);
+        }
+
     }
 
     /**
@@ -566,11 +611,11 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         final String action = request.getAction();
         if (action.equalsIgnoreCase("idFromSession")) {
-            idFromSession(context, request, handler);
+            idFromSession(context, handler);
         } else if (action.equalsIgnoreCase("register")){
             createRegistrationEmail(context,request, realm, restSecurity, handler);
         } else if (action.equalsIgnoreCase("confirm")) {
-            confirmationIdCheck(context, request, handler, realm);
+            confirmationIdCheck(request, handler, realm);
         } else if (action.equalsIgnoreCase("anonymousCreate")) {
             anonymousCreate(context, request, realm, handler, restSecurity);
         } else if (action.equalsIgnoreCase("forgotPassword")) {
@@ -580,9 +625,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } else if (action.equalsIgnoreCase("validateGoto")) {
             validateGoto(context, request, handler);
         } else { // for now this is the only case coming in, so fail if otherwise
-            final ResourceException e =
-                    new NotSupportedException("Actions are not supported for resource instances");
-            handler.handleError(e);
+            RestUtils.generateUnsupportedOperation(handler);
         }
     }
 
@@ -596,12 +639,20 @@ public final class IdentityResource implements CollectionResourceProvider {
     private boolean isUserActive(String uid) throws NotFoundException {
         try {
             AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.isUserActive() : UID: " + uid + " isActive,  " +
+                        userIdentity.isActive());
+            }
             return userIdentity.isActive();
         } catch (IdRepoException idr) {
-            debug.error("IdentityResource.isUserActive(): Invalid UID: " + uid + " Exception " + idr);
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid UID: " + uid + " Exception " + idr);
+            }
             throw new NotFoundException("Invalid UID, could not retrived " + uid);
         } catch (SSOException ssoe){
-            debug.error("IdentityResource.isUserActive(): Invalid SSOToken" + " Exception " + ssoe);
+            if (debug.errorEnabled()) {
+                debug.error("IdentityResource.isUserActive() : Invalid SSOToken" + " Exception " + ssoe);
+            }
             throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage());
         }
     }
@@ -704,7 +755,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                 Long tokenLifeTime = restSecurity.getForgotPassTLT();
 
                 // Generate Token
-                org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime, realm);
+                org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username,
+                        tokenLifeTime, realm);
 
                 // Store token in datastore
                 CTSHolder.getCTS().create(ctsToken);
@@ -1101,9 +1153,13 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             // Create the resource
-            CreateResponse success = idsvc.create(identity, admin);
+            idsvc.create(identity, admin);
             // Read created resource
             dtls = idsvc.read(resourceId, getIdentityServicesAttributes(realm), admin);
+            if (debug.messageEnabled()) {
+                debug.message("IdentityResource.createInstance() :: Created " + resourceId + " in realm " + realm +
+                        " by Admin with ID: " + admin.getId());
+            }
         } catch (final ObjectNotFound notFound) {
             debug.error("IdentityResource.createInstance() :: Cannot READ " +
                     resourceId + ": Resource cannot be found." + notFound);
@@ -1569,22 +1625,6 @@ public final class IdentityResource implements CollectionResourceProvider {
             return URLEncoder.encode(toEncode, "UTF-8").replace("+", "%20");
         } else {
             return toEncode;
-        }
-    }
-
-    /**
-     * Indicates that the requested Token has not been found.
-     */
-    private static class InvalidTokenException extends Throwable {
-        private final String tokenID;
-
-        public InvalidTokenException(String error, String tokenID) {
-            super(error);
-            this.tokenID = tokenID;
-        }
-
-        private String getTokenID() {
-            return tokenID;
         }
     }
 

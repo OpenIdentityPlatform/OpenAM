@@ -43,7 +43,6 @@ public interface RestEndpointManager {
      */
     String AUTHENTICATE = "/authenticate";
 
-
     /**
      * Returns the type of endpoint of the given endpoint.
      *

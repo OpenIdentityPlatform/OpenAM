@@ -19,6 +19,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ExecutionException;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ResourceException;
@@ -37,7 +38,7 @@ public class AdminOnlyAuthzModuleTest {
     Config<SessionService> mockConfig = mock(Config.class);
     SessionService mockService = mock(SessionService.class);
 
-    public AdminOnlyAuthzModule testModule = new AdminOnlyAuthzModule(mockConfig);
+    public AdminOnlyAuthzModule testModule = new AdminOnlyAuthzModule(mockConfig, mock(Debug.class));
 
     @BeforeTest
     public void beforeTest() {

@@ -496,6 +496,8 @@ public class LogConstants {
     public static final String LOGGED_BY_SID = "LoggedBySid";
 
     public static final String DEFAULT_AGENT_FILE = "amAuthLog";
+    public static final String REST_ACCESS = "amRest.access";
+    public static final String REST_AUTHZ = "amRest.authz";
     public static final String POLICY_ACCESS = "amPolicy.access";
     public static final String CONSOLE_ACCESS = "amConsole.access";
     public static final String AUTHENTICATION_ACCESS =
@@ -509,6 +511,8 @@ public class LogConstants {
     public static final String ADMIN_ERROR = "amAdmin.error";
     public static final String [] LOGFILENAMES = {
         DEFAULT_AGENT_FILE,
+        REST_ACCESS,
+        REST_AUTHZ,
         POLICY_ACCESS,
         CONSOLE_ACCESS,
         AUTHENTICATION_ACCESS,

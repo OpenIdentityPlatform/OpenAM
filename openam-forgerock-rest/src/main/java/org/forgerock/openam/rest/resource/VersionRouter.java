@@ -13,7 +13,7 @@
 *
 * Copyright 2014 ForgeRock AS.
 */
-package org.forgerock.openam.rest.router;
+package org.forgerock.openam.rest.resource;
 
 import java.util.Collections;
 import java.util.Set;
@@ -38,6 +38,7 @@ import org.forgerock.json.resource.SingletonResourceProvider;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.VersionHandler;
 import org.forgerock.openam.rest.DefaultVersionBehaviour;
+import org.forgerock.openam.rest.router.VersionedRouter;
 
 /**
  * Non-instantiable CREST-versioned router, used as a base for routers which require versioned functionality while
@@ -288,8 +289,7 @@ public class VersionRouter<T extends VersionedRouter<T>>
     }
 
     public VersionRouter<T> setHeaderWarningEnabled(boolean warningEnabled) {
-     //   router.setWarningEnabled(warningEnabled); todo: uncomment this once CREST supports
-
+        router.setWarningEnabled(warningEnabled);
         return this;
     }
 

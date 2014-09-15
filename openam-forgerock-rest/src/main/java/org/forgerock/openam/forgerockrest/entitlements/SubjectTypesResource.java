@@ -15,11 +15,10 @@
 */
 package org.forgerock.openam.forgerockrest.entitlements;
 
-import com.google.inject.name.Named;
+import javax.inject.Named;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.LogicalSubject;
 import com.sun.identity.shared.debug.Debug;
-import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +46,10 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.entitlements.model.json.JsonEntitlementConditionModule;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.util.Reject;
 
 /**
@@ -64,6 +65,8 @@ public class SubjectTypesResource implements CollectionResourceProvider {
     private final static String JSON_OBJ_TITLE = "title";
     private final static String JSON_OBJ_LOGICAL = "logical";
     private final static String JSON_OBJ_CONFIG = "config";
+
+    private final JsonPointer JSON_POINTER_TO_TITLE = new JsonPointer(JSON_OBJ_TITLE);
 
     private final static ObjectMapper mapper = new ObjectMapper().withModule(new JsonEntitlementConditionModule());
     private final Debug debug;
@@ -149,6 +152,8 @@ public class SubjectTypesResource implements CollectionResourceProvider {
         final Set<String> subjectTypeNames = new TreeSet<String>();
         List<JsonValue> subjectTypes = new ArrayList<JsonValue>();
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         subjectTypeNames.addAll(entitlementRegistry.getSubjectsShortNames());
 
         for (String subjectTypeName : subjectTypeNames) {
@@ -156,7 +161,10 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                     entitlementRegistry.getSubjectType(subjectTypeName);
 
             if (subjectClass == null) {
-                debug.error("Listed subject short name not found: " + subjectTypeName);
+                if (debug.warningEnabled()) {
+                    debug.warning("SubjectTypesResource :: QUERY by " + principalName +
+                            ": Listed subject short name not found: " + subjectTypeName);
+                }
                 continue;
             }
 
@@ -168,34 +176,30 @@ public class SubjectTypesResource implements CollectionResourceProvider {
             }
         }
 
-        int totalSize = subjectTypes.size();
-        int pageSize = request.getPageSize();
-        int offset = request.getPagedResultsOffset();
+        handler = QueryResultHandlerBuilder.withPagingAndSorting(handler, request);
 
-        if (pageSize > 0) {
-            subjectTypes = subjectTypes.subList(offset, offset + pageSize);
+        int remaining = 0;
+        if (subjectTypes.size() > 0) {
+            remaining = subjectTypes.size();
+            for (JsonValue subjectTypeToReturn : subjectTypes) {
+
+                final JsonValue resourceId = subjectTypeToReturn.get(JSON_POINTER_TO_TITLE);
+                final String id = resourceId != null ? resourceId.toString() : null;
+
+                boolean keepGoing = handler.handleResource(new Resource(id,
+                        String.valueOf(System.currentTimeMillis()), subjectTypeToReturn));
+                remaining--;
+                if (debug.messageEnabled()) {
+                    debug.message("SubjectTypesResource :: QUERY by " + principalName +
+                            ": Added resource to response: " + id);
+                }
+                if (!keepGoing) {
+                    break;
+                }
+            }
         }
 
-        final JsonPointer jp = new JsonPointer(JSON_OBJ_TITLE);
-
-        for (JsonValue subjectTypeToReturn : subjectTypes) {
-
-            final JsonValue resourceId = subjectTypeToReturn.get(jp);
-            final String id = resourceId != null ? resourceId.toString() : null;
-
-            final Resource resource = new Resource(id, "0", subjectTypeToReturn);
-
-            handler.handleResource(resource);
-        }
-
-        //paginate
-        if (pageSize > 0) {
-            final String lastIndex = offset + pageSize > totalSize ?
-                    String.valueOf(totalSize) : String.valueOf(offset + pageSize);
-            handler.handleResult(new QueryResult(lastIndex, max(0, totalSize - (offset + pageSize))));
-        } else {
-            handler.handleResult(new QueryResult(null, -1));
-        }
+        handler.handleResult(new QueryResult(null, remaining));
 
     }
 
@@ -210,8 +214,13 @@ public class SubjectTypesResource implements CollectionResourceProvider {
 
         final Class<? extends EntitlementSubject> subjectClass = entitlementRegistry.getSubjectType(resourceId);
 
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
+
         if (subjectClass == null) {
-            debug.error("Requested subject short name not found: " + resourceId);
+            if (debug.errorEnabled()) {
+                debug.error("SubjectTypesResource :: READ by " + principalName +
+                        "Requested subject short name not found: " + resourceId);
+            }
             handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
             return;
         }
@@ -219,7 +228,7 @@ public class SubjectTypesResource implements CollectionResourceProvider {
         final JsonValue json = jsonify(subjectClass, resourceId,
                 LogicalSubject.class.isAssignableFrom(subjectClass));
 
-        final Resource resource = new Resource(resourceId, "0", json);
+        final Resource resource = new Resource(resourceId, String.valueOf(System.currentTimeMillis()), json);
         handler.handleResult(resource);
     }
 
@@ -235,7 +244,6 @@ public class SubjectTypesResource implements CollectionResourceProvider {
     private JsonValue jsonify(Class<? extends EntitlementSubject> subjectClass, String resourceId,
                                 boolean logical) {
         try {
-
             final JsonSchema schema = mapper.generateJsonSchema(subjectClass);
 
             //this will remove the 'subjectName' attribute from those subjects which incorporate it unnecessarily
@@ -252,8 +260,12 @@ public class SubjectTypesResource implements CollectionResourceProvider {
                     JsonValue.field(JSON_OBJ_CONFIG, schema)));
 
         } catch (JsonMappingException e) {
-            debug.error("Error applying jsonification to the Subject class representation.", e);
+            if (debug.errorEnabled()) {
+                debug.error("SubjectTypesResource :: JSONIFY - Error applying " +
+                        "jsonification to the Subject class representation.", e);
+            }
             return null;
         }
     }
+
 }

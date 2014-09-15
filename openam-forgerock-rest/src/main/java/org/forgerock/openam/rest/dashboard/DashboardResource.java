@@ -18,35 +18,43 @@ package org.forgerock.openam.rest.dashboard;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.shared.debug.Debug;
+import java.util.HashMap;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.Dashboard;
-import org.forgerock.openam.dashboard.ServerContextHelper;
-
-import java.util.HashMap;
+import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
+import org.forgerock.openam.rest.resource.SSOTokenContext;
 
 /**
- * A simple {@code Map} based collection resource provider.
+ * JSON REST interface to return specific information from the Dashboard service.
+ *
+ * This endpoint only supports the READ operation - and then only for specific
+ * values (referred to as the resourceId).
  */
 public final class DashboardResource implements CollectionResourceProvider {
+
+    private final Debug debug;
+
+    @Inject
+    public DashboardResource(@Named("frRest") Debug debug) {
+        this.debug = debug;
+    }
 
     /**
      * {@inheritDoc}
@@ -54,7 +62,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void actionCollection(final ServerContext context, final ActionRequest request,
             final ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -63,7 +71,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
             final ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -72,7 +80,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
             final ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -81,7 +89,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
             final ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Actions are not supported for resource instances"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -90,7 +98,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void patchInstance(final ServerContext context, final String resourceId, final PatchRequest request,
             final ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Patch operations are not supported"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -99,8 +107,7 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(final ServerContext context, final QueryRequest request,
             final QueryResultHandler handler) {
-        handler.handleError(new NotSupportedException("Query operations are not supported"));
-
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -109,23 +116,39 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
             final ResultHandler<Resource> handler) {
+
         try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            SSOToken token = mgr.createSSOToken(ServerContextHelper.getCookieFromServerContext(context));
+            SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
+            SSOToken token = tokenContext.getCallerSSOToken();
+
+            final String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
             JsonValue val = new JsonValue(new HashMap<String, Object>());
+
             if (resourceId.equals("defined")) {
+                if (debug.messageEnabled()) {
+                    debug.message("DashboardResource :: READ by " + principalName +
+                            ": Locating definitions from DashboardService.");
+                }
                 val = Dashboard.getDefinitions(token);
-            }
-            if (resourceId.equals("available")) {
+            } else if (resourceId.equals("available")) {
+                if (debug.messageEnabled()) {
+                    debug.message("DashboardResource :: READ by " + principalName +
+                        ": Locating allowed apps from DashboardService.");
+                }
                 val = Dashboard.getAllowedDashboard(token);
-            }
-            if (resourceId.equals("assigned")) {
+            } else if (resourceId.equals("assigned")) {
+                if (debug.messageEnabled()) {
+                    debug.message("DashboardResource :: READ by " + principalName +
+                            ": Locating assigned apps from DashboardService.");
+                }
                 val = Dashboard.getAssignedDashboard(token);
             }
-            Resource resource = new Resource("0", String.valueOf(System.currentTimeMillis() ), val);
+
+            Resource resource = new Resource("0", String.valueOf(System.currentTimeMillis()), val);
             handler.handleResult(resource);
         } catch (SSOException ex) {
+            debug.error("DashboardResource :: READ : SSOToken was not found.");
             handler.handleError(new PermanentException(401, "Unauthorized", null));
         }
 
@@ -137,34 +160,6 @@ public final class DashboardResource implements CollectionResourceProvider {
     @Override
     public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
             final ResultHandler<Resource> handler) {
-        final ResourceException e = new NotSupportedException("Update operations are not supported");
-        handler.handleError(e);
-    }
-
-    /*
-     * Add the ID and revision to the JSON content so that they are included
-     * with subsequent responses. We shouldn't really update the passed in
-     * content in case it is shared by other components, but we'll do it here
-     * anyway for simplicity.
-     */
-    private void addIdAndRevision(final Resource resource) throws ResourceException {
-        final JsonValue content = resource.getContent();
-        try {
-            content.asMap().put("_id", resource.getId());
-            content.asMap().put("_rev", resource.getRevision());
-        } catch (final JsonValueException e) {
-            throw new BadRequestException(
-                    "The request could not be processed because the provided "
-                            + "content is not a JSON object");
-        }
-    }
-
-    private String getNextRevision(final String rev) throws ResourceException {
-        try {
-            return String.valueOf(Integer.parseInt(rev) + 1);
-        } catch (final NumberFormatException e) {
-            throw new InternalServerErrorException("Malformed revision number '" + rev
-                    + "' encountered while updating a resource");
-        }
+        RestUtils.generateUnsupportedOperation(handler);
     }
 }

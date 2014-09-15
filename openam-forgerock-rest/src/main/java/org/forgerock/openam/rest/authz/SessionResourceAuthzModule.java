@@ -16,7 +16,9 @@
 package org.forgerock.openam.rest.authz;
 
 import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -28,50 +30,58 @@ import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
+/**
+ * Authorization module specifically designed for the Sessions Resource endpoint. This allows anonymous access
+ * to the Sessions Endpoint for the ACTIONS of 'logout' and 'validate'. All other endpoint requests are
+ * pushed up to the {@link AdminOnlyAuthzModule}.
+ */
 public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
 
+    public final static String NAME = "SessionResourceFilter";
+
     @Inject
-    public SessionResourceAuthzModule(Config<SessionService> sessionService) {
-        super(sessionService);
+    public SessionResourceAuthzModule(Config<SessionService> sessionService, @Named("frRest") Debug debug) {
+        super(sessionService, debug);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeRead(ServerContext context, ReadRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeUpdate(ServerContext context, UpdateRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeDelete(ServerContext context, DeleteRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizePatch(ServerContext context, PatchRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeQuery(ServerContext context, QueryRequest request) {
-        return authorize(request, context);
+        return authorize(context);
     }
 
     /**
@@ -82,12 +92,19 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
 
         if ((request instanceof ActionRequest)) {
             ActionRequest actionRequest = (ActionRequest) request;
-            if ("logout".equals(actionRequest.getAction()) ||
-                    "validate".equals(actionRequest.getAction())) {
+            if (SessionResource.LOGOUT.equals(actionRequest.getAction()) ||
+                    SessionResource.VALIDATE.equals(actionRequest.getAction())) {
+                if (debug.messageEnabled()) {
+                    debug.message("SessionResourceAuthzModule :: " + actionRequest.getAction() +
+                            " action request authorized by module.");
+                }
                 return Promises.newSuccessfulPromise(AuthorizationResult.success());
             }
         }
 
+        if (debug.messageEnabled()) {
+            debug.message("SessionResourceAuthzModule :: Request forwarded to AdminOnlyAuthzModule.");
+        }
         return super.authorize(context);
     }
 }

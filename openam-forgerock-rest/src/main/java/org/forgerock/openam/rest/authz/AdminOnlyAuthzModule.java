@@ -19,7 +19,9 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.authz.filter.crest.api.CrestAuthorizationModule;
 import org.forgerock.json.resource.ActionRequest;
@@ -35,8 +37,6 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Filter which ensures that only users with an SSO Token which has Administrator-level access are allowed access
@@ -44,13 +44,15 @@ import org.slf4j.LoggerFactory;
  */
 public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
 
-    private final Logger logger = LoggerFactory.getLogger(AdminOnlyAuthzModule.class);
+    public static final String NAME = "AdminOnlyFilter";
 
     private final Config<SessionService> sessionService;
+    protected final Debug debug;
 
     @Inject
-    public AdminOnlyAuthzModule(Config<SessionService> sessionService) {
+    public AdminOnlyAuthzModule(Config<SessionService> sessionService, @Named("frRest") Debug debug) {
         this.sessionService = sessionService;
+        this.debug = debug;
     }
 
     @Override
@@ -88,6 +90,9 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
         return authorize(context);
     }
 
+    /**
+     * Lets through any request which is coming from a verifiable administrator.
+     */
     Promise<AuthorizationResult, ResourceException> authorize(ServerContext context) {
 
         SSOTokenContext tokenContext = context.asContext(SSOTokenContext.class);
@@ -97,15 +102,22 @@ public class AdminOnlyAuthzModule implements CrestAuthorizationModule {
             SSOToken token = tokenContext.getCallerSSOToken();
             userId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
         } catch (SSOException e) {
-            logger.error("Unable to retrieve userId information from the SSOToken context.");
+            if (debug.errorEnabled()) {
+                debug.error("AdminOnlyAuthZModule :: Unable to authorize as Admin user using SSO Token.", e);
+            }
             return Promises.newFailedPromise(ResourceException
-                    .getException(ResourceException.INTERNAL_ERROR, e.getMessage(), e));
+                    .getException(ResourceException.FORBIDDEN, e.getMessage(), e));
         }
 
         if (sessionService.get().isSuperUser(userId)) {
+            if (debug.messageEnabled()) {
+                debug.message("AdminOnlyAuthZModule :: User, " + userId + " accepted as Administrator.");
+            }
             return Promises.newSuccessfulPromise(AuthorizationResult.success());
         } else {
-            logger.warn("User " + userId + " attempted access but was restricted by AdminOnlyAuthzModule.");
+            if (debug.warningEnabled()) {
+                debug.warning("AdminOnlyAuthZModule :: Restricted access to " + userId);
+            }
             return Promises.newSuccessfulPromise(AuthorizationResult.failure("User is not an administrator."));
         }
 

@@ -80,6 +80,10 @@ public class SessionResource implements CollectionResourceProvider {
 
     private static final Debug DEBUG = Debug.getInstance(SessionConstants.SESSION_DEBUG);
 
+    public static final String VALIDATE = "validate";
+    public static final String LOGOUT = "logout";
+    private static final String VALID = "valid";
+
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
 
@@ -111,6 +115,7 @@ public class SessionResource implements CollectionResourceProvider {
         try {
             return WebtopNaming.getAllServerIDs();
         } catch (Exception e) {
+            DEBUG.error("SessionResource.getAllServerIds() :: WebtopNaming throw irrecoverable error.");
             throw new IllegalStateException("Cannot recover from this error", e);
         }
     }
@@ -132,11 +137,11 @@ public class SessionResource implements CollectionResourceProvider {
         try {
             final SSOToken ssoToken = context.asContext(SSOTokenContext.class).getCallerSSOToken(ssoTokenManager);
 
-            if ("logout".equalsIgnoreCase(action)) {
+            if (LOGOUT.equalsIgnoreCase(action)) {
 
                 if (ssoToken == null) {
                     final BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
-                    DEBUG.error("iPlanetDirectoryCookie not set on request", e);
+                    DEBUG.error("SessionResource.actionCollection :: iPlanetDirectoryCookie not set on request", e);
                     handler.handleError(e);
                     return;
                 }
@@ -145,17 +150,17 @@ public class SessionResource implements CollectionResourceProvider {
                     final JsonValue jsonValue = logout(ssoToken.getTokenID().toString());
                     handler.handleResult(jsonValue);
                 } catch (InternalServerErrorException e) {
-                    DEBUG.error("Exception handling logout", e);
+                    DEBUG.error("SessionResource.actionCollection :: Exception handling logout", e);
                     handler.handleError(e);
                 }
                 return;
             }
 
-            if ("validate".equalsIgnoreCase(action)) {
+            if (VALIDATE.equalsIgnoreCase(action)) {
 
                 if (ssoToken == null) {
                     final BadRequestException e = new BadRequestException("SSO Token Id Cookie not set on request");
-                    DEBUG.error("SSO Token Id Cookie not set on request", e);
+                    DEBUG.error("SessionResource.actionCollection :: SSO Token Id Cookie not set on request", e);
                     handler.handleError(e);
                     return;
                 }
@@ -166,10 +171,13 @@ public class SessionResource implements CollectionResourceProvider {
 
             final NotSupportedException e =
                     new NotSupportedException("Action, " + action + ", Not implemented for this Resource");
-            DEBUG.error("Action, " + action + ", Not implemented for this Resource", e);
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("SessionResource.actionCollection :: Requested action, " + action +
+                        ", is not implemented for this resource.", e);
+            }
             handler.handleError(e);
         } catch (SSOException e) {
-            DEBUG.error(e.getMessage());
+            DEBUG.error("SessionResource.actionCollection :: SSO Token unreadable from provided context.", e);
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage()));
         }
     }
@@ -190,24 +198,32 @@ public class SessionResource implements CollectionResourceProvider {
 
         final String action = request.getAction();
 
-        if ("logout".equalsIgnoreCase(action)) {
+        if (LOGOUT.equalsIgnoreCase(action)) {
             try {
                 JsonValue jsonValue = logout(resourceId);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
-                DEBUG.error("Exception handling logout", e);
+                if (DEBUG.errorEnabled()) {
+                    DEBUG.error("SessionResource.actionInstance :: Error performing logout for token, " + resourceId +
+                            ".", e);
+                }
                 handler.handleError(e);
             }
             return;
         }
 
-        if ("validate".equalsIgnoreCase(action)) {
+        if (VALIDATE.equalsIgnoreCase(action)) {
             handler.handleResult(validateSession(resourceId));
             return;
         }
 
-        NotSupportedException e = new NotSupportedException("Action, " + action + ", Not implemented for this Resource");
-        DEBUG.error("Action, " + action + ", Not implemented for this Resource", e);
+        NotSupportedException e =
+                new NotSupportedException("Action, " + action + ", Not implemented for this Resource");
+
+        if (DEBUG.errorEnabled()) {
+            DEBUG.error("SessionResource.actionInstance :: Requested action, " + action +
+                    ", is not implemented for this resource.", e);
+        }
         handler.handleError(e);
     }
 
@@ -230,8 +246,10 @@ public class SessionResource implements CollectionResourceProvider {
             final SSOToken ssoToken = ssoTokenManager.createSSOToken(tokenId);
             return validateSession(ssoToken);
         } catch (SSOException e) {
-            DEBUG.error("Session validation for token, " + tokenId + ", failed.", e);
-            return json(object(field("valid", false)));
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("SessionResource.validateSession() :: Unable to validate token, " + tokenId + ".", e);
+            }
+            return json(object(field(VALID, false)));
         }
     }
 
@@ -251,20 +269,32 @@ public class SessionResource implements CollectionResourceProvider {
     private JsonValue validateSession(final SSOToken ssoToken) {
         try {
             if (!ssoTokenManager.isValidToken(ssoToken)) {
-                DEBUG.message("Session validation for token, " + ssoToken.getTokenID() + ", returning false.");
-                return json(object(field("valid", false)));
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("SessionResource.validateSession() :: Session validation for token, " +
+                            ssoToken.getTokenID() + ", returned false.");
+                }
+                return json(object(field(VALID, false)));
             }
 
-            DEBUG.message("Session validation for token, " + ssoToken.getTokenID() + ", returning true.");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("SessionResource.validateSession() :: Session validation for token, " +
+                        ssoToken.getTokenID() + ", returned true.");
+            }
             final AMIdentity identity = getIdentity(ssoToken);
-            return json(object(field("valid", true), field("uid", identity.getName()),
+            return json(object(field(VALID, true), field("uid", identity.getName()),
                     field("realm", convertDNToRealm(identity.getRealm()))));
         } catch (SSOException e) {
-            DEBUG.error("Session validation for token, " + ssoToken.getTokenID() + ", failed.", e);
-            return json(object(field("valid", false)));
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("SessionResource.validateSession() :: Session validation for token, " +
+                        ssoToken.getTokenID() + ", failed to return.", e);
+            }
+            return json(object(field(VALID, false)));
         } catch (IdRepoException e) {
-            DEBUG.error("Session validation for token, " + ssoToken.getTokenID() + ", failed.", e);
-            return json(object(field("valid", false)));
+            if (DEBUG.errorEnabled()) {
+                DEBUG.error("SessionResource.validateSession() :: Session validation for token, " +
+                        ssoToken.getTokenID() + ", failed to return.", e);
+            }
+            return json(object(field(VALID, false)));
         }
     }
 
@@ -301,7 +331,9 @@ public class SessionResource implements CollectionResourceProvider {
         SSOToken ssoToken;
         try {
             if (tokenId == null) {
-                DEBUG.error("Invalid Token Id");
+                if (DEBUG.errorEnabled()) {
+                    DEBUG.error("SessionResource.logout() :: Invalid Token Id.");
+                }
                 throw new InternalServerErrorException("Invalid Token Id");
             }
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -309,7 +341,9 @@ public class SessionResource implements CollectionResourceProvider {
         } catch (SSOException ex) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("result", "Token has expired");
-            DEBUG.error("Token has expired");
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("SessionResource.logout() :: Token ID, " + tokenId + ", already expired.");
+            }
             return new JsonValue(map);
         }
 
@@ -317,14 +351,19 @@ public class SessionResource implements CollectionResourceProvider {
             try {
                 AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
             } catch (SSOException e) {
-                DEBUG.error("Error logging out", e);
+                if (DEBUG.errorEnabled()) {
+                    DEBUG.error("SessionResource.logout() :: Token ID, " + tokenId +
+                            ", unable to log out associated token.");
+                }
                 throw new InternalServerErrorException("Error logging out", e);
             }
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("result", "Successfully logged out");
-        DEBUG.message("Successfully logged out");
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("SessionResource.logout() :: Successfully logged out token, " + tokenId);
+        }
         return new JsonValue(map);
     }
 
@@ -344,14 +383,18 @@ public class SessionResource implements CollectionResourceProvider {
 
         if (KEYWORD_LIST.equals(id)) {
             Collection<String> servers = generateListServers();
-            handler.handleResource(new Resource(KEYWORD_LIST, "0", new JsonValue(servers)));
+            DEBUG.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
+            handler.handleResource(new Resource(KEYWORD_LIST, String.valueOf(System.currentTimeMillis()),
+                    new JsonValue(servers)));
         } else {
             Collection<SessionInfo> sessions;
 
             if (KEYWORD_ALL.equals(id)) {
                 sessions = generateAllSessions();
+                DEBUG.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
             } else {
                 sessions = generateNamedServerSession(id);
+                DEBUG.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
             }
 
             for (SessionInfo session : sessions) {
@@ -363,7 +406,8 @@ public class SessionResource implements CollectionResourceProvider {
                 map.put(HEADER_USER_ID, username);
                 map.put(HEADER_TIME_REMAINING, timeleft);
 
-                handler.handleResource(new Resource("Sessions", "0", new JsonValue(map)));
+                handler.handleResource(new Resource("Sessions", String.valueOf(System.currentTimeMillis()),
+                        new JsonValue(map)));
             }
         }
 
@@ -376,7 +420,7 @@ public class SessionResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     public void readInstance(ServerContext context, String id, ReadRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(new NotSupportedException("Not implemented for this Resource"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -386,6 +430,10 @@ public class SessionResource implements CollectionResourceProvider {
     private Collection<SessionInfo> generateNamedServerSession(String serverId) {
         List<String> serverList = Arrays.asList(new String[]{serverId});
         Collection<SessionInfo> sessions = queryManager.getAllSessions(serverList);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("SessionResource.generateNmaedServerSession :: retrieved session list for server, " +
+                    serverId);
+        }
         return sessions;
     }
 
@@ -395,6 +443,9 @@ public class SessionResource implements CollectionResourceProvider {
      */
     private Collection<SessionInfo> generateAllSessions() {
         Collection<SessionInfo> sessions = queryManager.getAllSessions(getAllServerIds());
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("SessionResource.generateNmaedServerSession :: retrieved session list for all servers.");
+        }
         return sessions;
     }
 
