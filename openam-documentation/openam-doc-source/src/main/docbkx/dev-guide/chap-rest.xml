@@ -800,43 +800,88 @@ $ <userinput>curl \
     authentication module in use.</para>
 
     <listitem>
-     <para>ChoiceCallback</para>
+     <para>
+      <literal>ChoiceCallback</literal>:
+      Used to display a list of choices and retrieve the selected choice
+     </para>
     </listitem>
 
     <listitem>
-     <para>ConfirmationCallback</para>
+     <para>
+      <literal>ConfirmationCallback</literal>:
+      Used to ask for a confirmation such as Yes, No, or Cancel and retrieve the selection
+     </para>
     </listitem>
 
     <listitem>
-     <para>HttpCallback</para>
+     <para>
+      <literal>HiddenValueCallback</literal>:
+      Used to return form values that are not visually rendered to the end user
+     </para>
     </listitem>
 
     <listitem>
-     <para>LanguageCallback</para>
+     <para>
+      <literal>HttpCallback</literal>:
+      Used for HTTP handshake negotiations
+     </para>
     </listitem>
 
     <listitem>
-     <para>NameCallback</para>
+     <para>
+      <literal>LanguageCallback</literal>:
+      Used to retrieve the locale for localizing text presented to the end user
+     </para>
     </listitem>
 
     <listitem>
-     <para>PasswordCallback</para>
+     <para>
+      <literal>NameCallback</literal>:
+      Used to retrieve a name string
+     </para>
     </listitem>
 
     <listitem>
-     <para>RedirectCallback</para>
+     <para>
+      <literal>PasswordCallback</literal>:
+      Used to retrieve a password value
+     </para>
     </listitem>
 
     <listitem>
-     <para>TextInputCallback</para>
+     <para>
+      <literal>RedirectCallback</literal>:
+      Used to redirect the client user-agent
+     </para>
     </listitem>
 
     <listitem>
-     <para>TextOutputCallback</para>
+     <para>
+      <literal>ScriptTextOutputCallback</literal>:
+      Used to insert a script into the page presented to the end user.
+      The script can, for example, collect data about the user's environment.
+     </para>
     </listitem>
 
     <listitem>
-     <para>X509CertificateCallback</para>
+     <para>
+      <literal>TextInputCallback</literal>:
+      Used to retrieve text input from the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>TextOutputCallback</literal>:
+      Used to display a message to the end user
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <literal>X509CertificateCallback</literal>:
+      Used to retrieve the content of an x.509 certificate
+     </para>
     </listitem>
    </itemizedlist>
 
