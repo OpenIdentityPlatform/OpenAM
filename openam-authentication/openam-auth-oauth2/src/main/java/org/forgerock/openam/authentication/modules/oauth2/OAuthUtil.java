@@ -76,11 +76,6 @@ public class OAuthUtil  {
         return value == null || "".equals(value);
     }
     
-    public static Set addToSet(Set<String> set, String attribute) {
-	set.add(attribute);
-	return set;
-    }
-    
     public static void sendEmail(String from, String emailAddress, String activCode,
               Map<String, String> SMTPConfig, ResourceBundle bundle, String linkURL)
     throws NoEmailSentException {

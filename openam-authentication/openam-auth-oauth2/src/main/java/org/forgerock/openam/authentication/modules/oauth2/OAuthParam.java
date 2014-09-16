@@ -44,6 +44,7 @@ public class OAuthParam {
     static final String KEY_SCOPE = "iplanet-am-auth-oauth-scope";
     static final String KEY_SSO_PROXY_URL = "iplanet-am-auth-oauth-sso-proxy-url";
     static final String KEY_AUTH_LEVEL = "iplanet-am-auth-oauth-auth-level";
+    static final String KEY_ACCOUNT_PROVIDER = "org-forgerock-auth-oauth-account-provider";
     static final String KEY_ACCOUNT_MAPPER = "org-forgerock-auth-oauth-account-mapper";
     static final String KEY_ACCOUNT_MAPPER_CONFIG =
             "org-forgerock-auth-oauth-account-mapper-configuration";
@@ -110,5 +111,10 @@ public class OAuthParam {
     public final static String PARAM_LOGGEDOUT = "loggedout";
     public final static String PARAM_LOGOUT_URL = "logoutURL"; 
     public final static String LOGOUT_FORM = "logoutForm";
+
+    //OpenID Connect
+    public final static String ID_TOKEN = "id_token";
+    public final static String OIDC_SCOPE = "openid";
+    public final static String SCOPE_SEPARATOR = " ";
 }
 

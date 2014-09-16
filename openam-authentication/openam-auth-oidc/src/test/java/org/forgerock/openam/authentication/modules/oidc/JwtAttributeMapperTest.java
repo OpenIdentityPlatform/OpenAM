@@ -30,7 +30,7 @@ Not testing the lookupPrincipal method, as the AMIdentityRespository is final, a
 byte-code engineering to test the simple consumption of the AMIdentityRepository in the DefaultPrincipalMapper not
 worth the downsides of PowerMock.
  */
-public class DefaultPrincipalMapperTest {
+public class JwtAttributeMapperTest {
     private static final String EMAIL = "email";
     private static final String AM_EMAIL = "mail";
     private static final String EMAIL_VALUE = "bobo@bobo.com";
@@ -42,7 +42,7 @@ public class DefaultPrincipalMapperTest {
     private Map<String, Object> jwtMappings;
     private Map<String, String> attributeMappings;
     private JwtClaimsSet claimsSet;
-    private DefaultPrincipalMapper defaultPrincipalMapper;
+    private JwtAttributeMapper defaultPrincipalMapper;
 
     @BeforeTest
     public void initialize() {
@@ -56,13 +56,13 @@ public class DefaultPrincipalMapperTest {
         attributeMappings.put(AM_EMAIL, EMAIL);
 
         claimsSet = new JwtClaimsSet(jwtMappings);
-        defaultPrincipalMapper = new DefaultPrincipalMapper();
+        defaultPrincipalMapper = new JwtAttributeMapper();
     }
 
     @Test
     public void testBasicJwtMapping() {
         final Map<String, Set<String>> attrs =
-                defaultPrincipalMapper.getAttributesForPrincipalLookup(attributeMappings, claimsSet);
+                defaultPrincipalMapper.getAttributes(attributeMappings, claimsSet);
         assertTrue(SUBJECT_VALUE.equals(attrs.get(UID).iterator().next()));
         assertTrue(EMAIL_VALUE.equals(attrs.get(AM_EMAIL).iterator().next()));
     }

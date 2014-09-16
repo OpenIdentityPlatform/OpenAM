@@ -21,16 +21,9 @@ import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.jaspi.modules.openid.exceptions.FailedToLoadJWKException;
-import org.forgerock.jaspi.modules.openid.exceptions.OpenIdConnectVerificationException;
-import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
-import org.forgerock.json.jose.common.JwtReconstruction;
-import org.forgerock.json.jose.exceptions.InvalidJwtException;
-import org.forgerock.json.jose.exceptions.JwtReconstructionException;
-import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.util.Reject;
+import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
+import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -62,26 +55,19 @@ import java.util.Set;
 public class OpenIdConnect extends AMLoginModule {
     private static Debug logger = Debug.getInstance("amAuth");
 
-    private OpenIdResolverCache openIdResolverCache;
-    private JwtReconstruction jwtReconstruction;
     private OpenIdConnectConfig config;
     private String principalName;
+    private JwtHandler jwtHandler;
 
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
         config = new OpenIdConnectConfig(options);
-        openIdResolverCache = InjectorHolder.getInstance(OpenIdResolverCache.class);
-        Reject.ifNull(openIdResolverCache, "OpenIdResolverCache could not be obtained from the InjectorHolder!");
-        jwtReconstruction = new JwtReconstruction();
+        this.jwtHandler = new JwtHandler(config);
     }
 
     @Override
     public int process(Callback[] callbacks, int state) throws LoginException {
-        /*
-        See if a resolver is present corresponding to jwt issuer, and if not, add.
-        Then dispatch validation to resolver.
-         */
         final HttpServletRequest request = getHttpServletRequest();
         final String jwtValue = request.getHeader(config.getHeaderName());
         if (jwtValue == null || jwtValue.isEmpty()) {
@@ -89,73 +75,47 @@ public class OpenIdConnect extends AMLoginModule {
             throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_MISSING_HEADER, null);
         }
 
-        final SignedJwt signedJwt;
-        try {
-            signedJwt = jwtReconstruction.reconstructJwt(jwtValue, SignedJwt.class);
-        } catch (InvalidJwtException ije) {
-            logger.error("Could not reconstruct jwt from header value: " + ije);
-            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWT_PARSE_ERROR, null);
-        } catch (JwtReconstructionException jre) {
-            logger.error("Could not reconstruct jwt from header value: " + jre);
-            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWT_PARSE_ERROR, null);
-        }
+        JwtClaimsSet jwtClaims = jwtHandler.validateJwt(jwtValue);
 
-        final JwtClaimsSet jwtClaimSet = signedJwt.getClaimsSet();
-        final String jwtClaimSetIssuer = jwtClaimSet.getIssuer();
-        if (!config.getConfiguredIssuer().equals(jwtClaimSetIssuer)) {
-            logger.error("The issuer configured for the module, " + config.getConfiguredIssuer() + ", and the issuer found in the token, " +
-                jwtClaimSetIssuer +", do not match. This means that the token authentication was directed at the wrong module, " +
-                    "or the targeted module is mis-configured.");
-            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_TOKEN_ISSUER_MISMATCH, null);
+        if (!JwtHandler.isIntendedForAudience(config.getAudienceName(), jwtClaims)) {
+            logger.error("ID token is not for this audience.");
+            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_ID_TOKEN_BAD_AUDIENCE, null);
         }
-        OpenIdResolver resolver = openIdResolverCache.getResolverForIssuer(config.getCryptoContextValue());
-
-        if (resolver == null) {
-            if (logger.messageEnabled()) {
-                if (CRYPTO_CONTEXT_TYPE_CLIENT_SECRET.equals(config.getCryptoContextType())) {
-                    logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using client secret");
-                } else {
-                    logger.message("Creating OpenIdResolver for issuer " + jwtClaimSetIssuer + " using config url "
-                            + config.getCryptoContextValue());
-                }
-            }
-            try {
-                resolver = openIdResolverCache.createResolver(
-                        jwtClaimSetIssuer, config.getCryptoContextType(), config.getCryptoContextValue(), config.getCryptoContextUrlValue());
-            } catch (IllegalStateException e) {
-                logger.error("Could not create OpenIdResolver for issuer " + jwtClaimSetIssuer +
-                        " using crypto context value " + config.getCryptoContextValue() + " :" + e);
-                throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_ISSUER_MISMATCH, null);
-            } catch (FailedToLoadJWKException e) {
-                logger.error("Could not create OpenIdResolver for issuer " + jwtClaimSetIssuer +
-                        " using crypto context value " + config.getCryptoContextValue() + " :" + e, e);
-                throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_JWK_NOT_LOADED, null);
+        if (JwtHandler.jwtHasAuthorizedPartyClaim(jwtClaims)) {
+            if (!JwtHandler.isFromValidAuthorizedParty(config.getAcceptedAuthorizedParties(), jwtClaims)) {
+                logger.error("ID token was received from invalid authorized party.");
+                throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_INVALID_AUTHORIZED_PARTY, null);
             }
         }
-        try {
-            resolver.validateIdentity(signedJwt);
-            principalName = mapPrincipal(jwtClaimSet);
-            return ISAuthConstants.LOGIN_SUCCEED;
-        } catch (OpenIdConnectVerificationException oice) {
-            logger.warning("Verification of ID Token failed: " + oice);
-            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_VERIFICATION_FAILED, null);
-        }
+        principalName = mapPrincipal(jwtClaims);
+        return ISAuthConstants.LOGIN_SUCCEED;
     }
 
     private String mapPrincipal(JwtClaimsSet jwtClaimsSet) throws AuthLoginException {
-        PrincipalMapper principalMapper = instantiatePrincipalMapper();
+        AttributeMapper<JwtClaimsSet> principalMapper = instantiatePrincipalMapper();
+        AccountProvider accountProvider = instantiateAccountProvider();
         Map<String, Set<String>> lookupAttrs =
-                principalMapper.getAttributesForPrincipalLookup(config.getLocalToJwkAttributeMappings(), jwtClaimsSet);
+                principalMapper.getAttributes(config.getLocalToJwkAttributeMappings(), jwtClaimsSet);
         if (lookupAttrs.isEmpty()) {
             throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_NO_ATTRIBUTES_MAPPED, null);
         }
-        return principalMapper.lookupPrincipal(getAMIdentityRepository(getRequestOrg()), lookupAttrs);
+        return accountProvider.searchUser(getAMIdentityRepository(getRequestOrg()), lookupAttrs).getName();
     }
 
-    private PrincipalMapper instantiatePrincipalMapper() throws AuthLoginException {
+    private AccountProvider instantiateAccountProvider() throws AuthLoginException {
         try {
-            return Class.forName(config.getPrincipalMapperClass()).asSubclass(PrincipalMapper.class).
-                            newInstance();
+            return Class.forName(config.getAccountProviderClass()).asSubclass(AccountProvider.class).
+                    newInstance();
+        } catch (Exception e) {
+            logger.error("Exception caught instantiating principal mapper class: " + e, e);
+            throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_PRINCIPAL_MAPPER_INSTANTIATION_ERROR, null);
+        }
+    }
+
+    private AttributeMapper<JwtClaimsSet> instantiatePrincipalMapper() throws AuthLoginException {
+        try {
+            return Class.forName(config.getPrincipalMapperClass()).asSubclass(AttributeMapper.class).
+                    newInstance();
         } catch (Exception e) {
             logger.error("Exception caught instantiating principal mapper class: " + e, e);
             throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_PRINCIPAL_MAPPER_INSTANTIATION_ERROR, null);

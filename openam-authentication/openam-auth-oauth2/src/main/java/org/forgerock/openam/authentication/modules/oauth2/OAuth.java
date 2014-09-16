@@ -36,8 +36,16 @@ import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import org.apache.commons.lang.StringUtils;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.authentication.modules.common.mapping.AccountProvider;
+import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
+import org.forgerock.openam.authentication.modules.oidc.JwtHandler;
+import org.forgerock.openam.authentication.modules.oidc.JwtHandlerConfig;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -58,7 +66,6 @@ import java.net.URL;
 import java.security.Principal;
 import java.security.SecureRandom;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -69,16 +76,20 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuth extends AMLoginModule {
 
+    public static final String PROFILE_SERVICE_RESPONSE = "ATTRIBUTES";
+    public static final String OPENID_TOKEN = "OPENID_TOKEN";
+    private static Debug debug = Debug.getInstance("amLoginModule");
     private String authenticatedUser = null;
     private Map sharedState;
     private OAuthConf config;
+    private JwtHandlerConfig jwtHandlerConfig;
     String serverName = "";
     private ResourceBundle bundle = null;
     private static final SecureRandom random = new SecureRandom();    
     String data = "";
     String userPassword = "";
     String proxyURL = "";
-    
+
     public OAuth() {
         OAuthUtil.debugMessage("OAuth()");
     }
@@ -86,6 +97,7 @@ public class OAuth extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map config) {
         this.sharedState = sharedState;
         this.config = new OAuthConf(config);
+        this.jwtHandlerConfig = new JwtHandlerConfig(config);
         bundle = amCache.getResBundle(BUNDLE_NAME, getLoginLocale());
         setAuthLevel(this.config.getAuthnLevel());    
     }
@@ -195,14 +207,27 @@ public class OAuth extends AMLoginModule {
                             config.getTokenServiceUrl(code, proxyURL), null);
                     OAuthUtil.debugMessage("OAuth.process(): token=" + tokenSvcResponse);
 
-                    String token = extractToken(tokenSvcResponse);
+                    JwtClaimsSet jwtClaims = null;
+                    String idToken = null;
+                    if (config.isOpenIDConnect()) {
+                        idToken = extractToken(ID_TOKEN, tokenSvcResponse);
+                        JwtHandler jwtHandler = new JwtHandler(jwtHandlerConfig);
+                        jwtClaims = jwtHandler.validateJwt(idToken);
+                        if (!JwtHandler.isIntendedForAudience(config.getClientId(), jwtClaims)) {
+                            OAuthUtil.debugError("OAuth.process(): ID token is not for this client as audience.");
+                            throw new AuthLoginException(BUNDLE_NAME, "audience", null);
+                        }
+                    }
+
+                    String token = extractToken(PARAM_ACCESS_TOKEN, tokenSvcResponse);
 
                     setUserSessionProperty(SESSION_OAUTH_TOKEN, token);
 
-                    String profileSvcResponse = getContent(config.getProfileServiceUrl(), "Bearer " + token);
-
-                    OAuthUtil.debugMessage("OAuth.process(): Profile Svc "
-                            + "response: " + profileSvcResponse);
+                    String profileSvcResponse = null;
+                    if (StringUtils.isNotEmpty(config.getProfileServiceUrl())) {
+                        profileSvcResponse = getContent(config.getProfileServiceUrl(), "Bearer " + token);
+                        OAuthUtil.debugMessage("OAuth.process(): Profile Svc response: " + profileSvcResponse);
+                    }
 
                     String realm = getRequestOrg();
 
@@ -210,17 +235,14 @@ public class OAuth extends AMLoginModule {
                         realm = "/";
                     }
 
-                    AccountMapper accountMapper = instantiateAccountMapper();
-                    Map<String, Set<String>> userNames = 
-                            new HashMap<String, Set<String>>();
-
-                    userNames = accountMapper.getAccount(
-                            config.getAccountMapperConfig(),
-                            profileSvcResponse);
+                    AccountProvider accountProvider = instantiateAccountProvider();
+                    AttributeMapper accountAttributeMapper = instantiateAccountMapper();
+                    Map<String, Set<String>> userNames = getAttributes(profileSvcResponse,
+                            config.getAccountMapperConfig(), accountAttributeMapper, jwtClaims);
                     
                     String user = null;
                     if (!userNames.isEmpty()) {
-                      user = getUser(realm, accountMapper, userNames);
+                      user = getUser(realm, accountProvider, userNames);
                     }
 
                     if (user == null && !config.getCreateAccountFlag()) {
@@ -229,7 +251,7 @@ public class OAuth extends AMLoginModule {
                         if (authenticatedUser != null) {
                             if (config.getSaveAttributesToSessionFlag()) {
                                 Map <String, Set<String>> attributes = 
-                                        getAttributesMap(profileSvcResponse);
+                                        getAttributesMap(profileSvcResponse, null);
                                 saveAttributes(attributes);
                             }
                             OAuthUtil.debugMessage("OAuth.process(): LOGIN_SUCCEED "
@@ -243,11 +265,12 @@ public class OAuth extends AMLoginModule {
 
                     if (user == null && config.getCreateAccountFlag()) {
                         if (config.getPromptPasswordFlag()) {
-                            setUserSessionProperty("ATTRIBUTES", profileSvcResponse);
+                            setUserSessionProperty(PROFILE_SERVICE_RESPONSE, profileSvcResponse);
+                            setUserSessionProperty(OPENID_TOKEN, idToken);
                             return SET_PASSWORD_STATE;
                         } else {
-                            authenticatedUser = provisionAccountNow(
-                                    realm, profileSvcResponse, getRandomData());
+                            authenticatedUser = provisionAccountNow(accountProvider, realm, profileSvcResponse,
+                                    getRandomData(), jwtClaims);
                             if (authenticatedUser != null) {
                                 OAuthUtil.debugMessage("User created: " + authenticatedUser);
                                 return ISAuthConstants.LOGIN_SUCCEED;
@@ -263,7 +286,7 @@ public class OAuth extends AMLoginModule {
                                 + "with user " + authenticatedUser);
                         if (config.getSaveAttributesToSessionFlag()) {
                             Map<String, Set<String>> attributes = getAttributesMap(
-                                    profileSvcResponse);
+                                    profileSvcResponse, null);
                             saveAttributes(attributes);
                         }
                         return ISAuthConstants.LOGIN_SUCCEED;
@@ -333,14 +356,21 @@ public class OAuth extends AMLoginModule {
                     return CREATE_USER_STATE;
                 }
 
-                String profileSvcResponse = getUserSessionProperty("ATTRIBUTES");
+                String profileSvcResponse = getUserSessionProperty(PROFILE_SERVICE_RESPONSE);
+                String idToken = getUserSessionProperty(ID_TOKEN);
                 String realm = getRequestOrg();
                 if (realm == null) {
                     realm = "/";
                 }
 
                 OAuthUtil.debugMessage("Got Attributes: " + profileSvcResponse);
-                authenticatedUser = provisionAccountNow(realm,profileSvcResponse, userPassword);
+                AccountProvider accountProvider = instantiateAccountProvider();
+                JwtClaimsSet jwtClaims = null;
+                if (idToken != null) {
+                    jwtClaims = new JwtHandler(jwtHandlerConfig).getJwtClaims(idToken);
+                }
+                authenticatedUser = provisionAccountNow(accountProvider, realm, profileSvcResponse, userPassword,
+                        jwtClaims);
                 if (authenticatedUser != null) {
                     OAuthUtil.debugMessage("User created: " + authenticatedUser);
                     return ISAuthConstants.LOGIN_SUCCEED;
@@ -359,13 +389,13 @@ public class OAuth extends AMLoginModule {
     }
 
     // Search for the user in the realm, using the instantiated account mapper
-    private String getUser(String realm, AccountMapper accountMapper, 
+    private String getUser(String realm, AccountProvider accountProvider,
             Map<String, Set<String>> userNames)
             throws AuthLoginException, JSONException, SSOException, IdRepoException {
 
         String user = null;
         if ((userNames != null) && !userNames.isEmpty()) {
-            AMIdentity userIdentity = accountMapper.searchUser(
+            AMIdentity userIdentity = accountProvider.searchUser(
                     getAMIdentityRepository(realm), userNames);
             if (userIdentity != null) {
                 user = userIdentity.getName();
@@ -383,42 +413,70 @@ public class OAuth extends AMLoginModule {
      }
 
     // Create an instance of the pluggable account mapper
-    private AccountMapper instantiateAccountMapper () 
-    throws AuthLoginException {
-                
-        try {
-            AccountMapper accountMapper =
-                    Class.forName(config.getAccountMapper()).asSubclass(AccountMapper.class).
-                    newInstance();
-            return accountMapper;
-        } catch (Exception ex) {
-            throw new AuthLoginException("Problem when trying to instantiate "
-                    + "the account mapper", ex);
-        }
-    }
-    
-    // Obtain the attributes configured for the module, by using the pluggable
-    // Attribute mapper
-    private Map<String, Set<String>> getAttributesMap (String svcProfileResponse) {
-        
-        Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
+    private AttributeMapper<?> instantiateAccountMapper ()
+            throws AuthLoginException {
 
         try {
-            AttributeMapper attributeMapper =
-                    Class.forName(config.getAttributeMapper()).
-                    asSubclass(AttributeMapper.class).newInstance();
-            attributes = attributeMapper.getAttributes(
-                    config.getAttributeMapperConfig(), svcProfileResponse);
+            AttributeMapper<?> attributeMapper =
+                    Class.forName(config.getAccountMapper()).asSubclass(AttributeMapper.class).newInstance();
+            return attributeMapper;
+        } catch (ClassCastException ex) {
+            debug.error("Account Mapper is not an implementation of AttributeMapper.", ex);
+            throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
         } catch (Exception ex) {
-            OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the "
-                    + "Attribute Mapper", ex);
+            throw new AuthLoginException("Problem when trying to instantiate the account mapper", ex);
         }
-        OAuthUtil.debugMessage("OAuth.getUser: creating new user; attributes = "
-                    + attributes);
+    }
+
+    // Create an instance of the pluggable account mapper
+    private AccountProvider instantiateAccountProvider()
+            throws AuthLoginException {
+        try {
+            AccountProvider accountProvider =
+                    Class.forName(config.getAccountProvider()).asSubclass(AccountProvider.class).newInstance();
+            return accountProvider;
+        } catch (ClassCastException ex) {
+            debug.error("Account Provider is not actually an implementation of AccountProvider.", ex);
+            throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
+        } catch (Exception ex) {
+            throw new AuthLoginException("Problem when trying to instantiate the account provider", ex);
+        }
+    }
+
+    // Obtain the attributes configured for the module, by using the pluggable
+    // Attribute mapper
+    private Map<String, Set<String>> getAttributesMap(String svcProfileResponse, JwtClaimsSet jwtClaims) {
+        
+        Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
+        Map<String, String> attributeMapperConfig = config.getAttributeMapperConfig();
+
+        for (String attributeMapperClassname : config.getAttributeMappers()) {
+            try {
+                Class<?> attrMapperClass = Class.forName(attributeMapperClassname);
+                AttributeMapper attributeMapper = attrMapperClass.asSubclass(AttributeMapper.class).newInstance();
+                attributeMapper.init(OAuthParam.BUNDLE_NAME);
+                attributes.putAll(getAttributes(svcProfileResponse, attributeMapperConfig, attributeMapper, jwtClaims));
+            } catch (ClassCastException ex) {
+                debug.error("Attribute Mapper is not actually an implementation of AttributeMapper.", ex);
+            } catch (Exception ex) {
+                OAuthUtil.debugError("OAuth.getUser: Problem when trying to get the Attribute Mapper", ex);
+            }
+        }
+        OAuthUtil.debugMessage("OAuth.getUser: creating new user; attributes = " + attributes);
         return attributes;
     }
-    
-    
+
+    private Map getAttributes(String svcProfileResponse, Map<String, String> attributeMapperConfig,
+            AttributeMapper attributeMapper, JwtClaimsSet jwtClaims) throws AuthLoginException {
+        try {
+            attributeMapper.getClass().getDeclaredMethod("getAttributes", Map.class, String.class);
+            return attributeMapper.getAttributes(attributeMapperConfig, svcProfileResponse);
+        } catch (NoSuchMethodException e) {
+            return attributeMapper.getAttributes(attributeMapperConfig, jwtClaims);
+        }
+    }
+
+
     // Save the attributes configured for the attribute mapper as session attributes
     public void saveAttributes(Map<String, Set<String>> attributes) throws AuthLoginException {
 
@@ -487,21 +545,18 @@ public class OAuth extends AMLoginModule {
 
     // Create the account in the realm, by using the pluggable account mapper and
     // the attributes configured in the attribute mapper
-    public String provisionAccountNow(String realm, String profileSvcResponse, 
-            String userPassword)
+    public String provisionAccountNow(AccountProvider accountProvider, String realm, String profileSvcResponse,
+            String userPassword, JwtClaimsSet jwtClaims)
             throws AuthLoginException {
 
-            AccountMapper accountMapper = instantiateAccountMapper();
-            Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse);
+            Map<String, Set<String>> attributes = getAttributesMap(profileSvcResponse, jwtClaims);
             if (config.getSaveAttributesToSessionFlag()) {
                 saveAttributes(attributes);
             }
-            attributes.put("userPassword",
-                    OAuthUtil.addToSet(new HashSet<String>(), userPassword));
-            attributes.put("inetuserstatus", 
-                    OAuthUtil.addToSet(new HashSet<String>(), "Active"));
+            attributes.put("userPassword", CollectionUtils.asSet(userPassword));
+            attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
             AMIdentity userIdentity =
-                    accountMapper.provisionUser(getAMIdentityRepository(realm),
+                    accountProvider.provisionUser(getAMIdentityRepository(realm),
                     attributes);
             if (userIdentity != null) {
                 return userIdentity.getName().trim();
@@ -621,19 +676,19 @@ public class OAuth extends AMLoginModule {
 
     // Extract the Token from the OAuth 2.0 response
     // Todo: Maybe this should be pluggable
-    public String extractToken(String response) {
+    public String extractToken(String tokenName, String response) {
 
         String token = "";
         try {
             JSONObject jsonToken = new JSONObject(response);
             if (jsonToken != null
-                    && !jsonToken.isNull(PARAM_ACCESS_TOKEN)) {
-                token = jsonToken.getString(PARAM_ACCESS_TOKEN);
-                OAuthUtil.debugMessage(PARAM_ACCESS_TOKEN + ": " + token);
+                    && !jsonToken.isNull(tokenName)) {
+                token = jsonToken.getString(tokenName);
+                OAuthUtil.debugMessage(tokenName + ": " + token);
             }
         } catch (JSONException je) {
             OAuthUtil.debugMessage("OAuth.extractToken: Not in JSON format" + je);
-            token = OAuthUtil.getParamValue(response, PARAM_ACCESS_TOKEN);
+            token = OAuthUtil.getParamValue(response, tokenName);
         }
 
         return token;

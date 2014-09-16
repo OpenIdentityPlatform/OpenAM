@@ -38,7 +38,6 @@ import java.util.TreeSet;
 public class ConfiguredSocialAuthServices extends ConfiguredAuthServices {
 
     private static final String OAUTH2_TYPE = "OAuth";
-    private static final String OIDC_TYPE = "OpenIdConnect";
     private Debug debug = Debug.getInstance("amConsole");
 
     @Override
@@ -66,9 +65,9 @@ public class ConfiguredSocialAuthServices extends ConfiguredAuthServices {
                 ServiceConfig authConfig = parentConfig.getSubConfig(config);
                 Set<String> chainConfig = (Set<String>) authConfig.getAttributes().get(AMAuthConfigUtils.ATTR_NAME);
                 AppConfigurationEntry[] chain = AMAuthConfigUtils.parseValues(chainConfig.iterator().next());
-                for (int i = 0; i < chain.length - 1; i++) {
-                    if (i <= chain.length - 2 && getType(authMgr, chain[i]).equals(OAUTH2_TYPE) &&
-                        getType(authMgr, chain[i + 1]).equals(OIDC_TYPE)) {
+                for (int i = 0; i < chain.length; i++) {
+                    if (getType(authMgr, chain[i]).equals(OAUTH2_TYPE)) {
+                        // There's an OAuth2 module in the chain, so this could be a social authn chain
                         configs.add(config);
                     }
                 }

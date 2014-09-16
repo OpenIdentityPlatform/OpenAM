@@ -85,10 +85,16 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                 <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
+                                 type="single" syntax="string" i18nKey="a108a">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
                                  type="single" syntax="string" i18nKey="a109">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration" 
@@ -101,9 +107,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                 type="single" syntax="string" i18nKey="a111">
+                                 type="list" syntax="string" i18nKey="a111">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
@@ -239,6 +245,21 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                 type="single" syntax="string" i18nKey="oidc.issuer_name">
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                 type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                    <ChoiceValues>
+                        <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                        <ChoiceValue>jwk_url</ChoiceValue>
+                        <ChoiceValue>client_secret</ChoiceValue>
+                    </ChoiceValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                 type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                </AttributeSchema>
+
                 <SubSchema name="serverconfig" inheritance="multiple">
                 <AttributeSchema name="iplanet-am-auth-oauth-client-id"
                                  type="single" syntax="string" i18nKey="a101">
@@ -282,13 +303,19 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                                 <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
+                    <AttributeSchema name="org-forgerock-auth-oauth-account-provider"
+                                     type="single" syntax="string" i18nKey="a108a">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
                                  type="single" syntax="string" i18nKey="a109">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
-		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration" 
+		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper-configuration"
 		    type="list"
                     syntax="string"
                     i18nKey="a110">
@@ -298,9 +325,9 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                     </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper"
-                                 type="single" syntax="string" i18nKey="a111">
+                                 type="list" syntax="string" i18nKey="a111">
                         <DefaultValues>
-                                <Value>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</Value>
+                                <Value>org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-attribute-mapper-configuration"
@@ -434,6 +461,20 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-issuer-name"
+                                     type="single" syntax="string" i18nKey="oidc.issuer_name">
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-type"
+                                     type="single_choice" syntax="string" i18nKey="oidc.crypto_context_type">
+                        <ChoiceValues>
+                            <ChoiceValue>.well-known/openid-configuration_url</ChoiceValue>
+                            <ChoiceValue>jwk_url</ChoiceValue>
+                            <ChoiceValue>client_secret</ChoiceValue>
+                        </ChoiceValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-crypto-context-value"
+                                     type="single" syntax="string" i18nKey="oidc.crypto_context_value">
+                    </AttributeSchema>
                 </SubSchema>
             </Organization>
         </Schema>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2014 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -24,59 +24,63 @@
  *
  */
 
-package org.forgerock.openam.authentication.modules.oauth2;
+package org.forgerock.openam.authentication.modules.common.mapping;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
-
-import java.util.Map;
-import java.util.Set;
-
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
-import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+/**
+ * An {@code AttributeMapper} that takes its values from a JSON string.
+ */
+public class JsonAttributeMapper implements AttributeMapper<String> {
 
+    private static Debug debug = Debug.getInstance("amAuth");
+    private String bundleName;
 
-public class DefaultAttributeMapper implements AttributeMapper {
-
-    public DefaultAttributeMapper() {
+    /**
+     * {@inheritDoc}
+     */
+    public void init(String bundleName) {
+        this.bundleName = bundleName;
     }
 
-    //@Override
-    public Map<String, Set<String>> getAttributes(Set<String> attributeMapConfiguration, 
-                   String svcProfileResponse) 
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Set<String>> getAttributes(Map<String, String> attributeMapConfiguration, String jsonText)
             throws AuthLoginException {
 
-        OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " +
-                attributeMapConfiguration);
+        if (debug.messageEnabled()) {
+            debug.message("defaultAttributeMapper.getAttributes: " + attributeMapConfiguration);
+        }
         JSONObject json;
         try {
-            json = new JSONObject((String) svcProfileResponse);
+            json = new JSONObject(jsonText);
         } catch (JSONException ex) {
-            OAuthUtil.debugError("OAuth.process(): JSONException: " + ex.getMessage());
-                    throw new AuthLoginException(BUNDLE_NAME,
-                            ex.getMessage(), null);
+            debug.error("OAuth.process(): JSONException: " + ex.getMessage());
+            throw new AuthLoginException(bundleName, ex.getMessage(), null);
         }
         Map<String, Set<String>> attr = new HashMap<String, Set<String>>();
         String responseName = "";
-        String localName = "";
-        for(String entry : attributeMapConfiguration) {
+        String localName;
+        for(Map.Entry<String, String> entry : attributeMapConfiguration.entrySet()) {
             try {
-                if (entry.indexOf("=") == -1) {
-                    OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " + "Invalid entry." + entry);
-                    continue;
-                }
-                StringTokenizer st = new StringTokenizer(entry, "=");
-                responseName = st.nextToken();
-                localName = st.nextToken();
-                OAuthUtil.debugMessage("defaultAttributeMapper.getAttributes: " +
-                        responseName + ":" + localName);
+                responseName = entry.getKey();
+                localName = entry.getValue();
 
-                String data = "";
+                if (debug.messageEnabled()) {
+                    debug.message("defaultAttributeMapper.getAttributes: " + responseName + ":" + localName);
+                }
+
+                String data;
                 if (responseName != null && responseName.indexOf(".") != -1) {
                     StringTokenizer parts = new StringTokenizer(responseName, ".");
                     data = json.getJSONObject(parts.nextToken()).getString(parts.nextToken());
@@ -84,14 +88,13 @@ public class DefaultAttributeMapper implements AttributeMapper {
                     data = json.getString(responseName);
                 }
 
-                attr.put(localName, OAuthUtil.addToSet(new HashSet<String>(), data));
+                attr.put(localName, CollectionUtils.asSet(data));
             } catch (JSONException ex) {
-                OAuthUtil.debugError("defaultAttributeMapper.getAttributes: Could not "
-                        + "get the attribute" + responseName, ex);
+                debug.error("defaultAttributeMapper.getAttributes: Could not get the attribute" + responseName, ex);
             }
         }
         
-	return attr;
+	    return attr;
 
     }
 }

@@ -76,6 +76,14 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-oidc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>

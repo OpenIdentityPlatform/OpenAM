@@ -523,7 +523,6 @@
                 <artifactId>openam-auth-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-deviceprint-module</artifactId>

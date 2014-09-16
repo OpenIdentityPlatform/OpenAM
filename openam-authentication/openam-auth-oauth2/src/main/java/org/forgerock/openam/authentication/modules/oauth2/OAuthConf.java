@@ -32,7 +32,10 @@ package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import org.forgerock.openam.authentication.modules.common.mapping.MappingUtils;
+
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +53,9 @@ import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 public class OAuthConf {
 
     static final String CLIENT = "genericHTML";
-   // private static Debug debug = Debug.getInstance("amAuth");
+    private boolean openIDConnect;
+    private String accountProvider;
+    // private static Debug debug = Debug.getInstance("amAuth");
     private String clientId = null;
     private String clientSecret = null;
     private String scope = null;
@@ -60,13 +65,13 @@ public class OAuthConf {
     private String profileServiceParam = null;
     private String ssoProxyUrl = null;
     private String accountMapper = null;
-    private String attributeMapper = null;
+    private Set<String> attributeMappers = null;
     private String createAccountFlag = null;
     private String promptPasswordFlag = null;
     private String useAnonymousUserFlag = null;
     private String anonymousUser = null;
-    private Set<String> accountMapperConfig = null;
-    private Set<String> attributeMapperConfig = null;
+    private Map<String, String> accountMapperConfig = null;
+    private Map<String, String> attributeMapperConfig = null;
     private String saveAttributesToSessionFlag = null;
     private String mailAttribute = null;
     private String logoutServiceUrl = null;
@@ -87,16 +92,18 @@ public class OAuthConf {
         clientId = CollectionHelper.getMapAttr(config, KEY_CLIENT_ID);
         clientSecret = CollectionHelper.getMapAttr(config, KEY_CLIENT_SECRET);
         scope = CollectionHelper.getMapAttr(config, KEY_SCOPE);
+        openIDConnect = Arrays.asList(scope.split(SCOPE_SEPARATOR)).contains(OIDC_SCOPE);
         authServiceUrl = CollectionHelper.getMapAttr(config, KEY_AUTH_SERVICE);
         tokenServiceUrl = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE);
         profileServiceUrl = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE);
         profileServiceParam = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE_PARAM, "access_token");
         // ssoLoginUrl = CollectionHelper.getMapAttr(config, KEY_SSO_LOGIN_URL);
         ssoProxyUrl = CollectionHelper.getMapAttr(config, KEY_SSO_PROXY_URL);
+        accountProvider = CollectionHelper.getMapAttr(config, KEY_ACCOUNT_PROVIDER);
         accountMapper = CollectionHelper.getMapAttr(config, KEY_ACCOUNT_MAPPER);
-        accountMapperConfig = (Set) config.get(KEY_ACCOUNT_MAPPER_CONFIG);
-        attributeMapper = CollectionHelper.getMapAttr(config, KEY_ATTRIBUTE_MAPPER);
-        attributeMapperConfig = (Set) config.get(KEY_ATTRIBUTE_MAPPER_CONFIG);
+        accountMapperConfig = MappingUtils.parseMappings((Set<String>) config.get(KEY_ACCOUNT_MAPPER_CONFIG));
+        attributeMappers = (Set<String>) config.get(KEY_ATTRIBUTE_MAPPER);
+        attributeMapperConfig = MappingUtils.parseMappings((Set<String>) config.get(KEY_ATTRIBUTE_MAPPER_CONFIG));
         saveAttributesToSessionFlag = CollectionHelper.getMapAttr(config,
                 KEY_SAVE_ATTRIBUTES_TO_SESSION);
         mailAttribute = CollectionHelper.getMapAttr(config, KEY_MAIL_ATTRIBUTE);
@@ -163,23 +170,28 @@ public class OAuthConf {
 
         return emailFrom;
     }
-    
+
     public String getAccountMapper() {
 
         return accountMapper;
     }
 
-    public String getAttributeMapper() {
+    public String getAccountProvider() {
 
-        return attributeMapper;
+        return accountProvider;
     }
 
-    public Set<String> getAccountMapperConfig() {
+    public Set<String> getAttributeMappers() {
+
+        return attributeMappers;
+    }
+
+    public Map<String, String> getAccountMapperConfig() {
 
         return accountMapperConfig;
     }
 
-    public Set<String> getAttributeMapperConfig() {
+    public Map<String, String> getAttributeMapperConfig() {
 
         return attributeMapperConfig;
     }
@@ -217,6 +229,10 @@ public class OAuthConf {
     public String getProxyURL() {
 
         return ssoProxyUrl;
+    }
+
+    public String getScope() {
+        return scope;
     }
 
     public String getAuthServiceUrl(String originalUrl) throws AuthLoginException {
@@ -302,14 +318,14 @@ public class OAuthConf {
         }
         if (authServiceUrl==null || authServiceUrl.isEmpty() || 
                 tokenServiceUrl == null || tokenServiceUrl.isEmpty() ||
-                profileServiceUrl == null || profileServiceUrl.isEmpty()) {
+                (!openIDConnect && (profileServiceUrl == null || profileServiceUrl.isEmpty()))) {
             OAuthUtil.debugError("One or more of the OAuth2 Provider endpoints "
                     + "is empty");
             throw new AuthLoginException("One or more of the OAuth2 Provider "
                     + "endpoints is empty");
         }
         if (accountMapper == null || accountMapper.isEmpty() ||
-                attributeMapper == null || attributeMapper.isEmpty()) {
+                attributeMappers == null || attributeMappers.isEmpty()) {
             OAuthUtil.debugError("One or more of the Mappers is empty");
             throw new AuthLoginException("One or more of the Mappers is empty");
         }
@@ -330,5 +346,13 @@ public class OAuthConf {
                     + "Create Account if does not exist can not be"
                     + " selected at the same time");
         }
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public boolean isOpenIDConnect() {
+        return openIDConnect;
     }
 }

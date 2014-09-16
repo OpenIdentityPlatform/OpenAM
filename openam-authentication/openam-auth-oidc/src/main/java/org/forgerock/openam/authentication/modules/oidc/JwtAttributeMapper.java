@@ -27,6 +27,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,9 +39,10 @@ import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConf
 import static org.forgerock.openam.authentication.modules.oidc.OpenIdConnectConfig.RESOURCE_BUNDLE_NAME;
 
 /**
- * @see org.forgerock.openam.authentication.modules.oidc.PrincipalMapper
+ * An {@code AttributeMapper} that gets its values from a JWT.
+ * @see org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper
  */
-public class DefaultPrincipalMapper implements PrincipalMapper {
+public class JwtAttributeMapper implements AttributeMapper<JwtClaimsSet> {
     private static Debug logger = Debug.getInstance("amAuth");
     /*
     This value should always be set to one, as we are returning the first result in the Set encapsulated in the
@@ -48,7 +50,17 @@ public class DefaultPrincipalMapper implements PrincipalMapper {
      */
     private static final int SINGLE_SEARCH_RESULT = 1;
 
-    public Map<String, Set<String>> getAttributesForPrincipalLookup(Map<String, String> localToJwtAttributeMapping,
+    /**
+     * {@inheritDoc}
+     */
+    public void init(String bundleName) {
+        // not needed
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, Set<String>> getAttributes(Map<String, String> localToJwtAttributeMapping,
                                                                     JwtClaimsSet jwtClaimsSet) {
         Map<String, Set<String>> lookupAttributes = new HashMap<String, Set<String>>();
         /*
@@ -57,7 +69,7 @@ public class DefaultPrincipalMapper implements PrincipalMapper {
         As far as excluding duplicates is concerned:
         1. the JwtClaimsSet excludes duplicate entries with the same key
         2. The localToJwtAttributeMapping is ultimately derived from user-input state, but the OpenIdConnectConfig ctor
-        excludes duplicate mapping entries (preserving the first). See OpenIdConnectConfig.parseLocalToJwkMappings. So
+        excludes duplicate mapping entries (preserving the first). See MappingUtils.parseMappings. So
         when populating he lookupAttributes below, I don't need to exclude duplicate entries, as neither the JwtClaimsSet,
         nor the localToJwtAttributeMapping contains duplicate entries.
         Just to be sure, I will log an error if I encounter this situation, in case any of the above invariants are violated.
@@ -70,7 +82,7 @@ public class DefaultPrincipalMapper implements PrincipalMapper {
                     value.add(jwtClaimsSet.getClaim(entry.getValue()).toString());
                     lookupAttributes.put(entry.getKey(), value);
                 } else {
-                    logger.error("In DefaultPrincipalMapper.getAttributesForPrincipalLookup, the " +
+                    logger.error("In JwtAttributeMapper.getAttributes, the " +
                             "localToJwtAttributeMappings appears to have duplicate entries: " + localToJwtAttributeMapping +
                             "; Or possibly the JwtClaimsSet has duplicate entries: " + jwtClaimsSet +
                             ". Will preserve the following existing mappings: " + lookupAttributes);
@@ -80,39 +92,4 @@ public class DefaultPrincipalMapper implements PrincipalMapper {
         return lookupAttributes;
     }
 
-    @Override
-    public String lookupPrincipal(AMIdentityRepository idrepo, Map<String, Set<String>> searchAttributes) throws AuthLoginException {
-        if (searchAttributes == null || searchAttributes.isEmpty()) {
-            logger.error("Search attributes empty in lookupPrincipal!");
-            return null;
-        }
-        try {
-            final IdSearchResults searchResults = idrepo.searchIdentities(IdType.USER, "*", getSearchControl(searchAttributes));
-            if ((searchResults != null) && (IdSearchResults.SUCCESS == searchResults.getErrorCode())) {
-                Set<AMIdentity> resultSet = searchResults.getSearchResults();
-                if (resultSet.size() == SINGLE_SEARCH_RESULT) {
-                    return resultSet.iterator().next().getName();
-                } else {
-                    logger.warning("In lookupPrincipal, result set did not return a single result: " + resultSet.size());
-                }
-            } else {
-                logger.warning("In lookupPrincipal, IdSearchResults returned non-success status: " + searchResults.getErrorCode());
-            }
-        } catch (IdRepoException ex) {
-            logger.error("DefaultPrincipalMapper.lookupPrincipal: Problem while  "
-                    + "searching  for the user: " + ex, ex);
-        } catch (SSOException ex) {
-            logger.error("DefaultPrincipalMapper.lookupPrincipal: Problem while  "
-                    + "searching  for the user: " + ex, ex);
-        }
-        logger.error("No principal could be mapped in the DefaultPrincipalMapper.");
-        throw new AuthLoginException(RESOURCE_BUNDLE_NAME, BUNDLE_KEY_PRINCIPAL_MAPPING_FAILURE, null);
-    }
-
-    private IdSearchControl getSearchControl(Map<String, Set<String>> searchAttributes) {
-        IdSearchControl control = new IdSearchControl();
-        control.setMaxResults(SINGLE_SEARCH_RESULT);
-        control.setSearchModifiers(IdSearchOpModifier.OR, searchAttributes);
-        return control;
-    }
 }

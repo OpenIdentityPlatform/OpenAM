@@ -66,11 +66,18 @@
                         <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
+                                 type="single" syntax="string" i18nKey="account_provider_class"
+                                 validator="RequiredValueValidator">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
                                  type="single" syntax="string" i18nKey="princial_mapper_class"
                                  validator="RequiredValueValidator">
                     <DefaultValues>
-                        <Value>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</Value>
+                        <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -82,6 +89,27 @@
                     <DefaultValues>
                         <Value>uid=sub</Value>
                         <Value>mail=email</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-audience-name"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="listed_audience_name">
+                    <DefaultValues>
+                        <Value>example</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="openam-auth-openidconnect-accepted-authorized-parties"
+                                 type="list"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="listed_authorized_parties">
+                    <DefaultValues>
+                        <Value>AuthorizedPartyExample</Value>
+                        <Value>http://www.example.com/authorized/party</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -126,11 +154,18 @@
                             <Value>https://accounts.google.com/.well-known/openid-configuration</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
+                                     type="single" syntax="string" i18nKey="account_provider_class"
+                                     validator="RequiredValueValidator">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
                                      type="single" syntax="string" i18nKey="princial_mapper_class"
                                      validator="RequiredValueValidator">
                         <DefaultValues>
-                            <Value>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</Value>
+                            <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -142,6 +177,27 @@
                         <DefaultValues>
                             <Value>uid=sub</Value>
                             <Value>mail=email</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-audience-name"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="listed_audience_name">
+                        <DefaultValues>
+                            <Value>example</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="openam-auth-openidconnect-accepted-authorized-parties"
+                                     type="list"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="listed_authorized_parties">
+                        <DefaultValues>
+                            <Value>AuthorizedPartyExample</Value>
+                            <Value>http://www.example.com/authorized/party</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
