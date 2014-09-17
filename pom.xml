@@ -129,7 +129,7 @@
         <powermock.version>1.5</powermock.version>
         <jackson.version>2.1.2</jackson.version>
         <guice.version>3.0</guice.version>
-        <forgerock.guice.version>1.0.1</forgerock.guice.version>
+        <forgerock.guice.version>1.0.2</forgerock.guice.version>
         <slf4j.version>1.7.5</slf4j.version>
         <santuario.xmlsec.version>1.5.6</santuario.xmlsec.version>
         <cxf.version>2.7.8</cxf.version>
@@ -1881,6 +1881,21 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+    </dependencies>
 
     <!-- Build -->
     <build>
