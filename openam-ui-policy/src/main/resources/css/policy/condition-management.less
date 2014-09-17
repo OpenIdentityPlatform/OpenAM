@@ -12,10 +12,15 @@
 	/*stop dragged items from cropping when they go out of content bounds*/
 	overflow: visible;
 }
-
-#subjectContainer, #environmentContainer{
-	min-height:300px;
+body{
+	/* This will prevent to sudden shift of content which can sometimes occur 
+	 * when navigating between them long views which require a scroll bar and 
+	 * short ones which do not.
+	 */
+	overflow-y: scroll;
 }
+
+
 
 /* POLICY */
 body.dragging,
@@ -31,8 +36,7 @@ body.editing{
 		background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
 	}
 
-	#condition-management ol.condition-management-group li.subject.editing,
-	#condition-management ol.condition-management-group li.environment.editing{
+	#condition-management ol.condition-management-group li.rule.editing{
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -90,11 +94,10 @@ body.editing{
 		padding:10px 8px;
 		margin:5px;
 		border: 1px solid #ccc;
-		min-height: 120px;
-
+		
 		ol#pickUpItem {
 
-			li.operator, li.subject, li.environment{
+			li.operator, li.rule{
 		 		margin: 10px 0 0;
 				cursor: move;
 				box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
@@ -205,7 +208,7 @@ body.editing{
 
 			}
 
-			&.subject, &.environment{
+			&.rule{
 				cursor: default;
 				&:focus{
 					cursor: move;
@@ -348,8 +351,7 @@ body.editing{
 section.active-step{
 
 	#condition-management #pickup-area ol#pickUpItem li.operator:not(.dragged),
-	#condition-management #pickup-area ol#pickUpItem li.subject:not(.dragged),
-	#condition-management #pickup-area ol#pickUpItem li.environment:not(.dragged) {
+	#condition-management #pickup-area ol#pickUpItem li.rule:not(.dragged) {
 		display: block;
 	}
 }

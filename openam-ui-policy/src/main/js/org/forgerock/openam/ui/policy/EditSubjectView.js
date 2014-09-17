@@ -61,6 +61,7 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
             if (itemData) {
                 // Temporay fix, the name attribute is being added by the server after the policy is created.
+                delete itemData.name;
                 this.$el.data('itemData',itemData);
                 this.$el.find('select#selection').val(itemData.type).trigger('change');
             }

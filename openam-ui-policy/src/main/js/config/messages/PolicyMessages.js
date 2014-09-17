@@ -53,6 +53,14 @@ define("config/messages/PolicyMessages", [], function () {
         "policyUpdated": {
             msg: "config.messages.PolicyMessages.policyUpdated",
             type: "info"
+        },
+        "ruleErrorFullLogical": {
+            msg: "config.messages.PolicyMessages.ruleErrorFullLogical",
+            type: "error"
+        },
+        "ruleHelperTryAndOr": {
+            msg: "config.messages.PolicyMessages.ruleHelperTryAndOr",
+            type: "info"
         }
     };
 });

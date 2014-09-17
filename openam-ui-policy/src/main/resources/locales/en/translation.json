@@ -42,9 +42,12 @@
                 "deleteApplicationsFail": "Failed to delete some applications",
                 "policyCreated": "Policy created successfully",
                 "policyUpdated": "Policy updated successfully",
+                "ruleErrorFullLogical": "The parent logical container can only accept one child.",
+                "ruleHelperTryAndOr" : "If more than one child is required, try changing<br>it's type, or adding a child of type AND or OR.",
                 "edit": "Edit ",
                 "createApp": "Create Application",
                 "createPol": "Create Policy"
+
             }
         },
         "AppConfiguration" : {

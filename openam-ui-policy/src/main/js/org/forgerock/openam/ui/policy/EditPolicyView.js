@@ -70,7 +70,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise).done(function (policy, app, allSubjects, allEnvironments) {
                 var actions = [],
                     subjects = [],
-                    environments = [];
+                    conditions = [];
 
                 if (policyName) {
 
@@ -95,19 +95,21 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
                 _.each(allEnvironments[0].result, function (value) {
                    if ( _.contains(app[0].conditions, value.title) ){
-                       environments.push(value);
+                       conditions.push(value);
                    }
                 });
 
                 data.options = {};
 
                 data.options.availableSubjects = subjects;
-                data.options.availableEnvironments = environments;
+                data.options.availableEnvironments = conditions;
                 data.options.availableActions = actions;
                 data.options.resourcePatterns = app[0].resources;
 
                 data.entity.applicationName = appName;
+        
                 self.parentRender(function () {
+
                     manageSubjects.render(data);
                     manageEnvironments.render(data);
                     actionsView.render(data);

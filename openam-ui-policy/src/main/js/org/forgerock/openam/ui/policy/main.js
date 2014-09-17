@@ -36,6 +36,8 @@ define([
     "./ManagePoliciesView",
     "./EditPolicyView",
 
+    "./ManageRulesView",
+
     "./ManageSubjectsView",
     "./EditSubjectView",
 

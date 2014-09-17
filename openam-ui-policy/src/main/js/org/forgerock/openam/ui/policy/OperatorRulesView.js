@@ -48,14 +48,15 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
         select: null,
         dropbox: null,
 
-        render: function (args, callback, element, itemID) {
+        render: function (args, callback, element, itemID, firstChild) {
 
             this.data = $.extend(true, {}, args);
             this.data.itemID = itemID;
+            this.data.firstChild = firstChild;
             this.setElement(element);
             this.$el.append(uiUtils.fillTemplateWithData("templates/policy/OperatorRulesTemplate.html", this.data));
 
-            this.setElement('#operator_'+itemID );
+            this.setElement('#operator' + itemID);
             this.select = this.$el.find("select");
             this.delegateEvents();
 

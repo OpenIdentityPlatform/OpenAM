@@ -91,7 +91,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
         createListItem: function(allEnvironments, item){
 
             item.focus(); //  Required to trigger changeInput.
-            this.data.environments = allEnvironments;
+            this.data.conditions = allEnvironments;
             var html = '';
             if (item.data().itemData) {
                 _.map(item.data().itemData, function(value, key) {
@@ -261,7 +261,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                     return returnVal;
                 };
 
-            schema =  _.findWhere(this.data.environments, {title: selectedType}) || {};
+            schema =  _.findWhere(this.data.conditions, {title: selectedType}) || {};
 
             if (this.$el.data().itemData && this.$el.data().itemData.type === selectedType) {
                 itemData = this.$el.data().itemData;
