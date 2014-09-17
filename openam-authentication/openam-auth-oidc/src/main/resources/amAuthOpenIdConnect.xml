@@ -155,14 +155,14 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-account-provider-class"
-                                     type="single" syntax="string" i18nKey="account_provider_class"
+                                     type="single" syntax="string" i18nKey="principal_provider_class"
                                      validator="RequiredValueValidator">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-openidconnect-principal-mapper-class"
-                                     type="single" syntax="string" i18nKey="princial_mapper_class"
+                                     type="single" syntax="string" i18nKey="principal_mapper_class"
                                      validator="RequiredValueValidator">
                         <DefaultValues>
                             <Value>org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper</Value>
