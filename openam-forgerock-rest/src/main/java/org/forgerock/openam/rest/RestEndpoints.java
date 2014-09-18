@@ -165,10 +165,6 @@ public class RestEndpoints {
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(CoreTokenResource.class);
 
-        rootRealmRouter.route("/sessions")
-                .through(SessionResourceAuthzModule.class, AdminOnlyAuthzModule.NAME)
-                .forVersion("1.0").to(SessionResource.class);
-
         VersionBehaviourConfigListener.bindToServiceConfigManager(rootRealmRouter);
         VersionBehaviourConfigListener.bindToServiceConfigManager(dynamicRealmRouter);
 

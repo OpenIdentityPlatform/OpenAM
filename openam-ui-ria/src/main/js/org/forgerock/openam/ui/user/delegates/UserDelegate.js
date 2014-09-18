@@ -47,7 +47,7 @@ define("UserDelegate", [
             url: resourceName,
             type: "GET",
             // needed to prevent reads from getting cached
-            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Cache-Control": "no-cache", "Accept-API-Version": "protocol=1.0,resource=2.0"},
             success: function(user) {
                 var user_cleaned = {},i=0;
                 for (i in user) {
@@ -79,7 +79,7 @@ define("UserDelegate", [
             url: "/users?_action=idFromSession",
             data: "{}",
             type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             success: function (data) {
                 configuration.globalData.auth.successURL = data.successURL;
                 configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
@@ -92,7 +92,7 @@ define("UserDelegate", [
 
     obj.updateUser = function(oldUserData, objectParam, successCallback, errorCallback) {
 
-        var headers = {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+        var headers = {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             picked = _.pick(objectParam, ["givenName","sn","mail","postalAddress","telephoneNumber"]);
 
         if(objectParam._rev) {
@@ -119,7 +119,7 @@ define("UserDelegate", [
     obj.changePassword = function(oldUserData, postData, successCallback, errorCallback, errorsHandlers) {
         return this.serviceCall({url: this.getUserResourceName(oldUserData) + "?_action=changePassword",
             data: JSON.stringify(postData),
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             type: "POST",
             success: successCallback,
             error: errorCallback,
@@ -132,7 +132,7 @@ define("UserDelegate", [
 
         return obj.serviceCall({
             url: realm + "/users?_action=" + action,
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             data: JSON.stringify(postData),
             type: "POST",
             success: function (data) {

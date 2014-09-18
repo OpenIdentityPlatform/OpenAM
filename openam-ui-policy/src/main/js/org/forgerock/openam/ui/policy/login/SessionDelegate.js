@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/policy/login/SessionDelegate", [
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
         return obj.serviceCall({
             url: "?_action=idFromSession",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
             data: "{}",
             type: "POST",
             success: function (data) {
