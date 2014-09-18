@@ -111,7 +111,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy("resourceName", content);
 
         // Then
-        Assertions.assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getName()).isEqualTo(name);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(name, content);
 
         // Then
-        Assertions.assertThat(result.getName()).isEqualTo(name);
+        assertThat(result.getName()).isEqualTo(name);
     }
 
     @Test
@@ -136,7 +136,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.isActive()).isTrue();
+        assertThat(result.isActive()).isTrue();
     }
 
     @Test
@@ -148,7 +148,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCreationDate()).isEqualTo(0); // 0 = not set
+        assertThat(result.getCreationDate()).isEqualTo(0); // 0 = not set
     }
 
     @Test
@@ -160,7 +160,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCreatedBy()).isNull();
+        assertThat(result.getCreatedBy()).isNull();
     }
 
     @Test
@@ -172,7 +172,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getLastModifiedDate()).isEqualTo(0);
+        assertThat(result.getLastModifiedDate()).isEqualTo(0);
     }
 
     @Test
@@ -184,7 +184,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getLastModifiedBy()).isNull();
+        assertThat(result.getLastModifiedBy()).isNull();
     }
 
     @Test
@@ -197,7 +197,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getDescription()).isEqualTo(description);
+        assertThat(result.getDescription()).isEqualTo(description);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getResourceNames()).containsOnly(included.toArray());
+        assertThat(result.getEntitlement().getResourceNames()).containsOnly(included.toArray());
     }
 
     @Test
@@ -223,7 +223,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getResourceNames()).isNullOrEmpty();
+        assertThat(result.getEntitlement().getResourceNames()).isNullOrEmpty();
     }
 
     @Test
@@ -236,7 +236,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getApplicationName()).isEqualTo(applicationName);
+        assertThat(result.getEntitlement().getApplicationName()).isEqualTo(applicationName);
     }
 
     @Test
@@ -251,7 +251,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getActionValues()).isEqualTo(actionValues);
+        assertThat(result.getEntitlement().getActionValues()).isEqualTo(actionValues);
     }
 
     @Test
@@ -264,7 +264,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getAdvices()).isNullOrEmpty();
+        assertThat(result.getEntitlement().getAdvices()).isNullOrEmpty();
     }
 
     @Test
@@ -277,7 +277,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getAttributes()).isNullOrEmpty();
+        assertThat(result.getEntitlement().getAttributes()).isNullOrEmpty();
     }
 
     @Test
@@ -290,7 +290,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getEntitlement().getTTL()).isNotSameAs(ttl);
+        assertThat(result.getEntitlement().getTTL()).isNotSameAs(ttl);
     }
 
     @Test
@@ -307,9 +307,9 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCondition()).isInstanceOf(IPCondition.class);
-        Assertions.assertThat(((IPCondition) result.getCondition()).getStartIp()).isEqualTo(startIp);
-        Assertions.assertThat(((IPCondition) result.getCondition()).getEndIp()).isEqualTo(endIp);
+        assertThat(result.getCondition()).isInstanceOf(IPCondition.class);
+        assertThat(((IPCondition) result.getCondition()).getStartIp()).isEqualTo(startIp);
+        assertThat(((IPCondition) result.getCondition()).getEndIp()).isEqualTo(endIp);
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -346,13 +346,13 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCondition()).isInstanceOf(AndCondition.class);
+        assertThat(result.getCondition()).isInstanceOf(AndCondition.class);
         AndCondition and = (AndCondition) result.getCondition();
-        Assertions.assertThat(and.getEConditions()).hasSize(1);
-        Assertions.assertThat(and.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
+        assertThat(and.getEConditions()).hasSize(1);
+        assertThat(and.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
         IPCondition ip = (IPCondition) and.getEConditions().iterator().next();
-        Assertions.assertThat(ip.getStartIp()).isEqualTo(startIp);
-        Assertions.assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(ip.getStartIp()).isEqualTo(startIp);
+        assertThat(ip.getEndIp()).isEqualTo(endIp);
     }
 
     @Test
@@ -372,13 +372,13 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCondition()).isInstanceOf(OrCondition.class);
+        assertThat(result.getCondition()).isInstanceOf(OrCondition.class);
         OrCondition or = (OrCondition) result.getCondition();
-        Assertions.assertThat(or.getEConditions()).hasSize(1);
-        Assertions.assertThat(or.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
+        assertThat(or.getEConditions()).hasSize(1);
+        assertThat(or.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
         IPCondition ip = (IPCondition) or.getEConditions().iterator().next();
-        Assertions.assertThat(ip.getStartIp()).isEqualTo(startIp);
-        Assertions.assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(ip.getStartIp()).isEqualTo(startIp);
+        assertThat(ip.getEndIp()).isEqualTo(endIp);
     }
 
     @Test
@@ -397,12 +397,12 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCondition()).isInstanceOf(NotCondition.class);
+        assertThat(result.getCondition()).isInstanceOf(NotCondition.class);
         NotCondition not = (NotCondition) result.getCondition();
-        Assertions.assertThat(not.getECondition()).isInstanceOf(IPCondition.class);
+        assertThat(not.getECondition()).isInstanceOf(IPCondition.class);
         IPCondition ip = (IPCondition) not.getECondition();
-        Assertions.assertThat(ip.getStartIp()).isEqualTo(startIp);
-        Assertions.assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(ip.getStartIp()).isEqualTo(startIp);
+        assertThat(ip.getEndIp()).isEqualTo(endIp);
     }
 
     @Test
@@ -418,10 +418,10 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getCondition()).isInstanceOf(PolicyCondition.class);
+        assertThat(result.getCondition()).isInstanceOf(PolicyCondition.class);
         PolicyCondition condition = (PolicyCondition) result.getCondition();
-        Assertions.assertThat(condition.getClassName()).isEqualTo(OAuth2ScopeCondition.class.getName());
-        Assertions.assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("OAuth2Scope", new HashSet<String>(scope)));
+        assertThat(condition.getClassName()).isEqualTo(OAuth2ScopeCondition.class.getName());
+        assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("OAuth2Scope", new HashSet<String>(scope)));
     }
 
     @Test
@@ -433,7 +433,7 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getSubject()).isInstanceOf(AnyUserSubject.class);
+        assertThat(result.getSubject()).isInstanceOf(AnyUserSubject.class);
     }
 
     @Test
@@ -448,10 +448,10 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getSubject()).isInstanceOf(AndSubject.class);
+        assertThat(result.getSubject()).isInstanceOf(AndSubject.class);
         AndSubject and = (AndSubject) result.getSubject();
-        Assertions.assertThat(and.getESubjects()).hasSize(1);
-        Assertions.assertThat(and.getESubjects().iterator().next()).isInstanceOf(AnyUserSubject.class);
+        assertThat(and.getESubjects()).hasSize(1);
+        assertThat(and.getESubjects().iterator().next()).isInstanceOf(AnyUserSubject.class);
     }
 
     @Test
@@ -467,11 +467,11 @@ public class JsonPolicyParserTest {
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        Assertions.assertThat(result.getResourceAttributes()).hasSize(1);
+        assertThat(result.getResourceAttributes()).hasSize(1);
         ResourceAttribute attr = result.getResourceAttributes().iterator().next();
-        Assertions.assertThat(attr).isInstanceOf(StaticAttributes.class);
-        Assertions.assertThat(attr.getPropertyName()).isEqualTo("test");
-        Assertions.assertThat(attr.getPropertyValues()).containsOnly(values.toArray());
+        assertThat(attr).isInstanceOf(StaticAttributes.class);
+        assertThat(attr.getPropertyName()).isEqualTo("test");
+        assertThat(attr.getPropertyValues()).containsOnly(values.toArray());
     }
 
     @Test
@@ -485,7 +485,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("name").asString()).isEqualTo(name);
+        assertThat(result.get("name").asString()).isEqualTo(name);
     }
 
     @Test
@@ -499,7 +499,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("active").asBoolean()).isEqualTo(active);
+        assertThat(result.get("active").asBoolean()).isEqualTo(active);
     }
 
     @Test
@@ -513,7 +513,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("creationDate").asString()).isEqualTo(DateUtils.toUTCDateFormat(createdDate));
+        assertThat(result.get("creationDate").asString()).isEqualTo(DateUtils.toUTCDateFormat(createdDate));
     }
 
     @Test
@@ -527,7 +527,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("createdBy").asString()).isEqualTo(createdBy);
+        assertThat(result.get("createdBy").asString()).isEqualTo(createdBy);
     }
 
     @Test
@@ -541,7 +541,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("lastModified").asString()).isEqualTo(DateUtils.toUTCDateFormat(lastModified));
+        assertThat(result.get("lastModified").asString()).isEqualTo(DateUtils.toUTCDateFormat(lastModified));
     }
 
     @Test
@@ -555,7 +555,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("lastModifiedBy").asString()).isEqualTo(lastModifiedBy);
+        assertThat(result.get("lastModifiedBy").asString()).isEqualTo(lastModifiedBy);
     }
 
     @Test
@@ -569,7 +569,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("description").asString()).isEqualTo(description);
+        assertThat(result.get("description").asString()).isEqualTo(description);
     }
 
     @Test
@@ -585,7 +585,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("resources").asList()).containsOnly(included.toArray());
+        assertThat(result.get("resources").asList()).containsOnly(included.toArray());
     }
 
     @Test
@@ -600,7 +600,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("applicationName").asString()).isEqualTo(applicationName);
+        assertThat(result.get("applicationName").asString()).isEqualTo(applicationName);
     }
 
     @Test
@@ -617,7 +617,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("actionValues").asMap(Boolean.class)).isEqualTo(actionValues);
+        assertThat(result.get("actionValues").asMap(Boolean.class)).isEqualTo(actionValues);
     }
 
     @Test
@@ -632,7 +632,7 @@ public class JsonPolicyParserTest {
 
         // Then
         // "Advice" should not appear on the policy entitlement
-        Assertions.assertThat(result.get("advice").asMapOfList(String.class)).isNullOrEmpty();
+        assertThat(result.get("advice").asMapOfList(String.class)).isNullOrEmpty();
     }
 
     @Test
@@ -647,7 +647,7 @@ public class JsonPolicyParserTest {
 
         // Then
         // Attributes should not appear on the policy entitlement
-        Assertions.assertThat(result.get("attributes").asMapOfList(String.class)).isNullOrEmpty();
+        assertThat(result.get("attributes").asMapOfList(String.class)).isNullOrEmpty();
     }
 
     @Test
@@ -662,7 +662,7 @@ public class JsonPolicyParserTest {
 
         // Then
         // TTL should not appear on the policy entitlement
-        Assertions.assertThat(result.get("ttl").asLong()).isNull();
+        assertThat(result.get("ttl").asLong()).isNull();
     }
 
     @Test
@@ -686,13 +686,13 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get(new JsonPointer("condition/type")).asString()).isEqualTo("AND");
-        Assertions.assertThat(result.get(new JsonPointer("condition/conditions/0/type")).asString()).isEqualTo("NOT");
-        Assertions.assertThat(result.get(new JsonPointer("condition/conditions/0/condition/type")).asString()).isEqualTo("Policy");
-        Assertions.assertThat(result.get(new JsonPointer("condition/conditions/0/condition/className")).asString())
+        assertThat(result.get(new JsonPointer("condition/type")).asString()).isEqualTo("AND");
+        assertThat(result.get(new JsonPointer("condition/conditions/0/type")).asString()).isEqualTo("NOT");
+        assertThat(result.get(new JsonPointer("condition/conditions/0/condition/type")).asString()).isEqualTo("Policy");
+        assertThat(result.get(new JsonPointer("condition/conditions/0/condition/className")).asString())
                 .isEqualTo(OAuth2ScopeCondition.class.getName());
-        Assertions.assertThat(result.get(new JsonPointer("condition/conditions/0/condition/properties")).asMapOfList(String.class))
-                .includes(MapAssert.entry("OAuth2Scope", Arrays.asList("openid profile")));
+        assertThat(result.get(new JsonPointer("condition/conditions/0/condition/properties")).asMapOfList(String.class))
+                .includes(entry("OAuth2Scope", Arrays.asList("openid profile")));
     }
 
     @Test
@@ -705,7 +705,7 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get(new JsonPointer("subject/type")).asString()).isEqualTo("AnyUser");
+        assertThat(result.get(new JsonPointer("subject/type")).asString()).isEqualTo("AnyUser");
     }
 
     @Test
@@ -726,13 +726,13 @@ public class JsonPolicyParserTest {
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        Assertions.assertThat(result.get("resourceAttributes").asList()).hasSize(2);
-        Assertions.assertThat(result.get(new JsonPointer("resourceAttributes/0/type")).asString()).isEqualTo("User");
-        Assertions.assertThat(result.get(new JsonPointer("resourceAttributes/0/propertyName")).asString()).isEqualTo(userAttrName);
-        Assertions.assertThat(result.get(new JsonPointer("resourceAttributes/1/type")).asString()).isEqualTo("Static");
-        Assertions.assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyName")).asString())
+        assertThat(result.get("resourceAttributes").asList()).hasSize(2);
+        assertThat(result.get(new JsonPointer("resourceAttributes/0/type")).asString()).isEqualTo("User");
+        assertThat(result.get(new JsonPointer("resourceAttributes/0/propertyName")).asString()).isEqualTo(userAttrName);
+        assertThat(result.get(new JsonPointer("resourceAttributes/1/type")).asString()).isEqualTo("Static");
+        assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyName")).asString())
                 .isEqualTo(staticAttrName);
-        Assertions.assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyValues")).asList(String.class))
+        assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyValues")).asList(String.class))
                 .containsOnly(staticAttrValue.toArray());
     }
 }

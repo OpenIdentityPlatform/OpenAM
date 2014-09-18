@@ -26,7 +26,7 @@ public class MailServerLoaderTest {
     public void shouldLoadTestClass() {
         MailServerLoader loader = new MailServerLoader();
         MailServer result = loader.load(TestMailServer.class.getName(), "badger");
-        Assertions.assertThat(result).isInstanceOf(TestMailServer.class);
+        assertThat(result).isInstanceOf(TestMailServer.class);
     }
 
     private static class TestMailServer extends MailServerImpl {

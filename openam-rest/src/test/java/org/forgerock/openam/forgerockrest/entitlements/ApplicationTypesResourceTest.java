@@ -80,7 +80,7 @@ public class ApplicationTypesResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler, times(1)).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
 
     }
 
@@ -103,7 +103,7 @@ public class ApplicationTypesResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler, times(1)).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
     }
 
     @Test

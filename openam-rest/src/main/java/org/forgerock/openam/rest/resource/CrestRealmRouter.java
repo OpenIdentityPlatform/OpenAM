@@ -44,7 +44,7 @@ public class CrestRealmRouter extends CrestRouter<CrestRealmRouter> implements V
     @Inject
     public CrestRealmRouter(RestRealmValidator realmValidator) {
         this.realmValidator = realmValidator;
-        getRouter().addRoute(RoutingMode.STARTS_WITH, "/{realm}", this);
+        getRouter().addRoute(STARTS_WITH, "/{realm}", this);
     }
 
     /**

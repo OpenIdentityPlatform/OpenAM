@@ -228,7 +228,7 @@ public class RestAuthenticationHandler {
             throws AuthLoginException, SignatureException, RestAuthException {
 
         switch (loginProcess.getLoginStage()) {
-        case LoginStage.REQUIREMENTS_WAITING: {
+        case REQUIREMENTS_WAITING: {
 
             Callback[] callbacks = loginProcess.getCallbacks();
 
@@ -254,7 +254,7 @@ public class RestAuthenticationHandler {
                         loginProcess, loginConfiguration);
             }
         }
-        case LoginStage.COMPLETE: {
+        case COMPLETE: {
             loginProcess.cleanup();
 
             if (loginProcess.isSuccessful()) {

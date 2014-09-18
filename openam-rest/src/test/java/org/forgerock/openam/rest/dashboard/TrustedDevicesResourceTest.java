@@ -67,7 +67,7 @@ public class TrustedDevicesResourceTest {
 
         //Given
         QueryRequest request = Requests.newQueryRequest("");
-        Connection connection = Resources.newInternalConnection(Resources.newCollection(resource));
+        Connection connection = newInternalConnection(newCollection(resource));
         QueryResultHandler handler = mock(QueryResultHandler.class);
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("name", "NAME_1"), field("lastSelectedDate", new Date().getTime()))));
@@ -87,7 +87,7 @@ public class TrustedDevicesResourceTest {
 
         //Given
         DeleteRequest request = Requests.newDeleteRequest("UUID_1");
-        Connection connection = Resources.newInternalConnection(Resources.newCollection(resource));
+        Connection connection = newInternalConnection(newCollection(resource));
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));
@@ -100,7 +100,7 @@ public class TrustedDevicesResourceTest {
         //Then
         ArgumentCaptor<List> devicesCaptor = ArgumentCaptor.forClass(List.class);
         verify(dao).saveDeviceProfiles(Matchers.<Context>anyObject(), devicesCaptor.capture());
-        Assertions.assertThat(devicesCaptor.getValue()).hasSize(1);
+        assertThat(devicesCaptor.getValue()).hasSize(1);
     }
 
     @Test (expectedExceptions = NotFoundException.class)
@@ -108,7 +108,7 @@ public class TrustedDevicesResourceTest {
 
         //Given
         DeleteRequest request = Requests.newDeleteRequest("UUID_3");
-        Connection connection = Resources.newInternalConnection(Resources.newCollection(resource));
+        Connection connection = newInternalConnection(newCollection(resource));
         List<JsonValue> devices = new ArrayList<JsonValue>();
         devices.add(json(object(field("uuid", "UUID_1"), field("name", "NAME_1"))));
         devices.add(json(object(field("uuid", "UUID_2"), field("name", "NAME_2"))));

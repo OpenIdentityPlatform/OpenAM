@@ -223,7 +223,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
@@ -259,7 +259,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
@@ -297,7 +297,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
@@ -335,7 +335,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
@@ -373,7 +373,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }
@@ -411,7 +411,7 @@ public class LoginAuthenticatorTest {
         LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
         //Then
-        Assertions.assertThat(loginProcess.isSuccessful()).isTrue();
+        assertThat(loginProcess.isSuccessful()).isTrue();
         verify(authContextLocalWrapper, never()).login();
         assertNotNull(loginProcess);
     }

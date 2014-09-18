@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.cli.realm.RealmUtils;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -54,6 +53,7 @@ import org.forgerock.json.resource.UpdateRequest;
 import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.resource.RealmContext;
+import org.forgerock.openam.utils.RealmUtils;
 
 /**
  * A simple {@code Map} based collection resource provider.

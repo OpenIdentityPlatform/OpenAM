@@ -48,7 +48,7 @@ public class EntitlementsResourceErrorHandlerTest {
         ResourceException result = errorHandler.handleError(null, error);
 
         // Then
-        Assertions.assertThat(result).isInstanceOf(NotFoundException.class)
+        assertThat(result).isInstanceOf(NotFoundException.class)
             .hasMessage(ERROR_MESSAGE);
     }
 
@@ -63,7 +63,7 @@ public class EntitlementsResourceErrorHandlerTest {
         ResourceException result = errorHandler.handleError(null, error);
 
         // Then
-        Assertions.assertThat(result).isInstanceOf(InternalServerErrorException.class)
+        assertThat(result).isInstanceOf(InternalServerErrorException.class)
                 .hasMessage(ERROR_MESSAGE);
 
     }
@@ -86,7 +86,7 @@ public class EntitlementsResourceErrorHandlerTest {
         ResourceException result = errorHandler.handleError(request, error);
 
         // Then
-        Assertions.assertThat(result).isInstanceOf(BadRequestException.class)
+        assertThat(result).isInstanceOf(BadRequestException.class)
                           .hasMessage(ERROR_MESSAGE);
     }
 

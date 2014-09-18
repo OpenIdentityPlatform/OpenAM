@@ -72,8 +72,8 @@ public class PagingQueryResultHandlerTest {
         boolean secondHandle = testHandler.handleResource(new Resource("b", null, null));
 
         // Then
-        Assertions.assertThat(firstHandle).isTrue();
-        Assertions.assertThat(secondHandle).isFalse();
+        assertThat(firstHandle).isTrue();
+        assertThat(secondHandle).isFalse();
     }
 
     @Test

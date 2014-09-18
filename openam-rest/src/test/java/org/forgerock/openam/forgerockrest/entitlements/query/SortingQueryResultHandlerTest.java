@@ -40,7 +40,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class SortingQueryResultHandlerTest {
     private static final List<SortKey> SORT_BY_NAME = Arrays.asList(SortKey.ascendingOrder("name"));
@@ -89,7 +88,7 @@ public class SortingQueryResultHandlerTest {
         // Then
         ArgumentCaptor<Resource> resourceArgumentCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(mockHandler, times(resources.size())).handleResource(resourceArgumentCaptor.capture());
-        Assertions.assertThat(resourceArgumentCaptor.getAllValues()).isEqualTo(namedResources("a", "b", "c"));
+        assertThat(resourceArgumentCaptor.getAllValues()).isEqualTo(namedResources("a", "b", "c"));
     }
 
     @Test
@@ -108,7 +107,7 @@ public class SortingQueryResultHandlerTest {
         // Then
         ArgumentCaptor<Resource> resourceArgumentCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(mockHandler, times(resources.size())).handleResource(resourceArgumentCaptor.capture());
-        Assertions.assertThat(resourceArgumentCaptor.getAllValues()).isEqualTo(namedResources("c", "b", "a"));
+        assertThat(resourceArgumentCaptor.getAllValues()).isEqualTo(namedResources("c", "b", "a"));
     }
 
     @Test
@@ -127,7 +126,7 @@ public class SortingQueryResultHandlerTest {
         // Then
         ArgumentCaptor<Resource> resourceArgumentCaptor = ArgumentCaptor.forClass(Resource.class);
         verify(mockHandler, times(resources.size())).handleResource(resourceArgumentCaptor.capture());
-        Assertions.assertThat(resourceArgumentCaptor.getAllValues())
+        assertThat(resourceArgumentCaptor.getAllValues())
                 // Sort by name first and then equal names should be sorted by descending age
                 .isEqualTo(nameAgeResources(field("a", 1), field("b", 2), field("b", 1), field("c", 1)));
 
@@ -166,8 +165,8 @@ public class SortingQueryResultHandlerTest {
         // Then
         ArgumentCaptor<QueryResult> resultCaptor = ArgumentCaptor.forClass(QueryResult.class);
         verify(mockHandler).handleResult(resultCaptor.capture());
-        Assertions.assertThat(resultCaptor.getValue().getPagedResultsCookie()).isEqualTo(cookie);
-        Assertions.assertThat(resultCaptor.getValue().getRemainingPagedResults()).isEqualTo(resources.size() - 1);
+        assertThat(resultCaptor.getValue().getPagedResultsCookie()).isEqualTo(cookie);
+        assertThat(resultCaptor.getValue().getRemainingPagedResults()).isEqualTo(resources.size() - 1);
     }
 
     private List<Resource> namedResources(String...names) {

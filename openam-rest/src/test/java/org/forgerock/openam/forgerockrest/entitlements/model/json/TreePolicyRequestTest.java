@@ -69,8 +69,8 @@ public class TreePolicyRequestTest {
         TreePolicyRequest request = TreePolicyRequest.getTreePolicyRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getResource()).isEqualTo("/resource/a");
+        assertThat(request).isNotNull();
+        assertThat(request.getResource()).isEqualTo("/resource/a");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest, times(2)).getContent();

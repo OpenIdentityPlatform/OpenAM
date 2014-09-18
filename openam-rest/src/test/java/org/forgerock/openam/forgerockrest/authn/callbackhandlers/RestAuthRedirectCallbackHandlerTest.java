@@ -88,15 +88,15 @@ public class RestAuthRedirectCallbackHandlerTest {
         JsonValue json = restAuthRedirectCallbackHandler.convertToJson(redirectCallback, 1);
 
         //Then
-        Assertions.assertThat(json.asMap()).hasSize(2);
-        Assertions.assertThat(json.get("type").asString()).isEqualTo("RedirectCallback");
-        Assertions.assertThat(json.get("output").asList()).hasSize(3);
-        Assertions.assertThat(json.get("output").get(0).get("name").asString()).isEqualTo("redirectUrl");
-        Assertions.assertThat(json.get("output").get(0).get("value").asString()).isEqualTo("REDIRECT_URL");
-        Assertions.assertThat(json.get("output").get(1).get("name").asString()).isEqualTo("redirectMethod");
-        Assertions.assertThat(json.get("output").get(1).get("value").asString()).isEqualTo("REDIRECT_METHOD");
-        Assertions.assertThat(json.get("output").get(2).get("name").asString()).isEqualTo("redirectData");
-        Assertions.assertThat(json.get("output").get(2).get("value").asMap()).hasSize(0);
+        assertThat(json.asMap()).hasSize(2);
+        assertThat(json.get("type").asString()).isEqualTo("RedirectCallback");
+        assertThat(json.get("output").asList()).hasSize(3);
+        assertThat(json.get("output").get(0).get("name").asString()).isEqualTo("redirectUrl");
+        assertThat(json.get("output").get(0).get("value").asString()).isEqualTo("REDIRECT_URL");
+        assertThat(json.get("output").get(1).get("name").asString()).isEqualTo("redirectMethod");
+        assertThat(json.get("output").get(1).get("value").asString()).isEqualTo("REDIRECT_METHOD");
+        assertThat(json.get("output").get(2).get("name").asString()).isEqualTo("redirectData");
+        assertThat(json.get("output").get(2).get("value").asMap()).hasSize(0);
     }
 
     @Test
@@ -110,6 +110,6 @@ public class RestAuthRedirectCallbackHandlerTest {
         RedirectCallback redirectCb = restAuthRedirectCallbackHandler.convertFromJson(redirectCallback, jsonValue);
 
         //Then
-        Assertions.assertThat(redirectCb).isEqualTo(redirectCallback);
+        assertThat(redirectCb).isEqualTo(redirectCallback);
     }
 }

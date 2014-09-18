@@ -74,9 +74,99 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- Java EE -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+        </dependency>
+
+        <!-- OpenAM Shared -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
+        </dependency>
+        <!-- OpenAM core -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-dashboard</artifactId>
+        </dependency>
+
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-web-token</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>authz-framework</artifactId>
+        </dependency>
+
+        <!-- OAuth2 Dependencies -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-easymock</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>httpunit</groupId>
+            <artifactId>httpunit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-servlet-tester</artifactId>
         </dependency>
 
         <dependency>
@@ -92,11 +182,6 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
         </dependency>
 
         <dependency>

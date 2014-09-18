@@ -33,7 +33,7 @@ public class RealmContextTest {
         context.addSubRealm(null);
 
         //Then
-        Assertions.assertThat(context.getRealm()).isEqualTo("/");
+        assertThat(context.getRealm()).isEqualTo("/");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class RealmContextTest {
         context.addSubRealm("");
 
         //Then
-        Assertions.assertThat(context.getRealm()).isEqualTo("/");
+        assertThat(context.getRealm()).isEqualTo("/");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class RealmContextTest {
         context.addSubRealm("realm1");
 
         //Then
-        Assertions.assertThat(context.getRealm()).isEqualTo("/realm1");
+        assertThat(context.getRealm()).isEqualTo("/realm1");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class RealmContextTest {
         context.addSubRealm("realm2");
 
         //Then
-        Assertions.assertThat(context.getRealm()).isEqualTo("/realm1/realm2");
+        assertThat(context.getRealm()).isEqualTo("/realm1/realm2");
     }
 
     @Test
@@ -86,6 +86,6 @@ public class RealmContextTest {
         context.addSubRealm("/realm1/realm2/");
 
         //Then
-        Assertions.assertThat(context.getRealm()).isEqualTo("/realm1/realm2");
+        assertThat(context.getRealm()).isEqualTo("/realm1/realm2");
     }
 }

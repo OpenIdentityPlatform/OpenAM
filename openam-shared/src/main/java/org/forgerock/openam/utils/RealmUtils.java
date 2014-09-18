@@ -26,7 +26,7 @@
  *
  */
 
-package com.sun.identity.cli.realm;
+package org.forgerock.openam.utils;
 
 
 /**

@@ -112,7 +112,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).createInstance(contextCaptor.capture(), Matchers.<CreateRequest>anyObject(),
                 Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -129,7 +129,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).readInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<ReadRequest>anyObject(), Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -146,7 +146,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).updateInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<UpdateRequest>anyObject(), Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -163,7 +163,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).deleteInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<DeleteRequest>anyObject(), Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -180,7 +180,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).patchInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<PatchRequest>anyObject(), Matchers.<ResultHandler<Resource>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -197,7 +197,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).actionInstance(contextCaptor.capture(), eq(resourceName),
                 Matchers.<ActionRequest>anyObject(), Matchers.<ResultHandler<JsonValue>>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     @Test (dataProvider = "data")
@@ -215,7 +215,7 @@ public class RestletCrestRealmRouterTest {
         verify(expectedProvider).queryCollection(contextCaptor.capture(), Matchers.<QueryRequest>anyObject(),
                 Matchers.<QueryResultHandler>anyObject());
         RealmContext realmContext = contextCaptor.getValue().asContext(RealmContext.class);
-        Assertions.assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
+        assertThat(realmContext.getRealm()).isEqualTo(expectedRealm);
     }
 
     private static CollectionResourceProvider collection(final CollectionResourceProvider provider) {

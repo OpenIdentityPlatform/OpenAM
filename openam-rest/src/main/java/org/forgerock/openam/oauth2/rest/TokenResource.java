@@ -35,23 +35,8 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
-import java.net.HttpURLConnection;
-import java.security.AccessController;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
@@ -72,13 +57,6 @@ import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.oauth2.core.OAuth2Constants;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.REFRESH_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.TOKEN_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.USERNAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
-import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -91,6 +69,26 @@ import org.forgerock.openam.oauth2.OAuthTokenStore;
 import org.forgerock.openam.oauth2.OpenAMOAuth2ProviderSettingsFactory;
 import org.forgerock.openidconnect.Client;
 import org.forgerock.openidconnect.ClientDAO;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.net.HttpURLConnection;
+import java.security.AccessController;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.CoreTokenParams.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.GRANT_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.REALM;
+import static org.forgerock.oauth2.core.OAuth2Constants.Token.OAUTH_ACCESS_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS;
 
 public class TokenResource implements CollectionResourceProvider {
 
@@ -175,7 +173,7 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 throw new NotFoundException("Token Not Found", null);
             }
-            String username = getAttributeValue(token, CoreTokenParams.USERNAME);
+            String username = getAttributeValue(token, USERNAME);
             if (username == null || username.isEmpty()) {
                 if (debug.errorEnabled()) {
                     debug.error("TokenResource :: DELETE : No username associated with " +
@@ -184,15 +182,15 @@ public class TokenResource implements CollectionResourceProvider {
                 throw new PermanentException(HttpURLConnection.HTTP_NOT_FOUND, "Not Found", null);
             }
 
-            String grantType = getAttributeValue(token, Params.GRANT_TYPE);
+            String grantType = getAttributeValue(token, GRANT_TYPE);
 
-            if (grantType != null && grantType.equalsIgnoreCase(TokenEndpoint.CLIENT_CREDENTIALS)) {
+            if (grantType != null && grantType.equalsIgnoreCase(CLIENT_CREDENTIALS)) {
                 if (deleteRefreshToken) {
                     deleteAccessTokensRefreshToken(token);
                 }
                 tokenStore.delete(tokenId);
             } else {
-                String realm = getAttributeValue(token, Params.REALM);
+                String realm = getAttributeValue(token, REALM);
                 AMIdentity uid2 = identityManager.getResourceOwnerIdentity(username, realm);
                 if (uid.equals(uid2) || uid.equals(adminUserId)) {
                     if (deleteRefreshToken) {
@@ -235,8 +233,8 @@ public class TokenResource implements CollectionResourceProvider {
      * @throws CoreTokenException If there was a problem deleting the refresh token.
      */
     private void deleteAccessTokensRefreshToken(JsonValue token) throws CoreTokenException {
-        if (Token.OAUTH_ACCESS_TOKEN.equals(getAttributeValue(token, CoreTokenParams.TOKEN_NAME))) {
-            String refreshTokenId = getAttributeValue(token, CoreTokenParams.REFRESH_TOKEN);
+        if (OAUTH_ACCESS_TOKEN.equals(getAttributeValue(token, TOKEN_NAME))) {
+            String refreshTokenId = getAttributeValue(token, REFRESH_TOKEN);
             if (refreshTokenId != null) {
                 tokenStore.delete(refreshTokenId);
             }
@@ -300,9 +298,9 @@ public class TokenResource implements CollectionResourceProvider {
             try {
                 uid = getUid(context);
                 if (!uid.equals(adminUserId)) {
-                    query.put(CoreTokenParams.USERNAME, uid.getName());
+                    query.put(USERNAME, uid.getName());
                 } else {
-                    query.put(CoreTokenParams.USERNAME, "*");
+                    query.put(USERNAME, "*");
                 }
             } catch (Exception e) {
                 if (debug.errorEnabled()) {
@@ -497,16 +495,16 @@ public class TokenResource implements CollectionResourceProvider {
                 throw new NotFoundException("Token Not Found");
             }
 
-            String grantType = getAttributeValue(response, Params.GRANT_TYPE);
+            String grantType = getAttributeValue(response, GRANT_TYPE);
 
             if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS)) {
                 resource =
                         new Resource(OAuth2Constants.Params.ID, String.valueOf(System.currentTimeMillis()), response);
                 handler.handleResult(resource);
             } else {
-                String realm = getAttributeValue(response, Params.REALM);
+                String realm = getAttributeValue(response, REALM);
 
-                String username = getAttributeValue(response, CoreTokenParams.USERNAME);
+                String username = getAttributeValue(response, USERNAME);
                 if (username == null || username.isEmpty()) {
                     if (debug.errorEnabled()) {
                         debug.error("TokenResource :: READ : No token found with ID, " + resourceId);

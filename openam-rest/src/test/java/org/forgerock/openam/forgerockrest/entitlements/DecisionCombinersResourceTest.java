@@ -82,7 +82,7 @@ public class DecisionCombinersResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockHandler, times(1)).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
     }
 
     @Test
@@ -133,8 +133,8 @@ public class DecisionCombinersResourceTest {
         verify(mockHandler, times(1)).handleResult(captor.capture());
 
         Map result = captor.getValue().getContent().asMap();
-        Assertions.assertThat(result.containsKey("title")).isTrue();
-        Assertions.assertThat(result.get("title")).isEqualTo(TEST_COMBINER);
+        assertThat(result.containsKey("title")).isTrue();
+        assertThat(result.get("title")).isEqualTo(TEST_COMBINER);
     }
 
     /**

@@ -95,12 +95,12 @@ public class PolicyRequestTest {
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getRestSubject()).isEqualTo(restSubject);
-        Assertions.assertThat(request.getPolicySubject()).isEqualTo(policySubject);
-        Assertions.assertThat(request.getRealm()).isEqualTo("/abc");
-        Assertions.assertThat(request.getApplication()).isEqualTo("some-application");
-        Assertions.assertThat(request.getEnvironment()).is(new EnvMapCondition(env));
+        assertThat(request).isNotNull();
+        assertThat(request.getRestSubject()).isEqualTo(restSubject);
+        assertThat(request.getPolicySubject()).isEqualTo(policySubject);
+        assertThat(request.getRealm()).isEqualTo("/abc");
+        assertThat(request.getApplication()).isEqualTo("some-application");
+        assertThat(request.getEnvironment()).is(new EnvMapCondition(env));
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();
@@ -147,9 +147,9 @@ public class PolicyRequestTest {
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getRestSubject()).isEqualTo(restSubject);
-        Assertions.assertThat(request.getPolicySubject()).isEqualTo(restSubject);
+        assertThat(request).isNotNull();
+        assertThat(request.getRestSubject()).isEqualTo(restSubject);
+        assertThat(request.getPolicySubject()).isEqualTo(restSubject);
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();
@@ -169,8 +169,8 @@ public class PolicyRequestTest {
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getApplication()).isEqualTo("iPlanetAMWebAgentService");
+        assertThat(request).isNotNull();
+        assertThat(request.getApplication()).isEqualTo("iPlanetAMWebAgentService");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();
@@ -190,8 +190,8 @@ public class PolicyRequestTest {
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getRealm()).isEqualTo("/");
+        assertThat(request).isNotNull();
+        assertThat(request.getRealm()).isEqualTo("/");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();
@@ -211,9 +211,9 @@ public class PolicyRequestTest {
         PolicyRequest request = MockRequest.getRequest(context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getEnvironment()).isNotNull();
-        Assertions.assertThat(request.getEnvironment()).isEmpty();
+        assertThat(request).isNotNull();
+        assertThat(request.getEnvironment()).isNotNull();
+        assertThat(request.getEnvironment()).isEmpty();
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest).getContent();

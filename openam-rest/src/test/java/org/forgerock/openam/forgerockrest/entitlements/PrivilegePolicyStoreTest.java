@@ -40,7 +40,6 @@ import java.util.Map;
 
 import static java.util.Collections.singleton;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.forgerock.json.resource.QueryFilter.*;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anySetOf;
@@ -90,7 +89,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).getPrivilege(id);
-        Assertions.assertThat(response).isSameAs(policy);
+        assertThat(response).isSameAs(policy);
     }
 
     @Test
@@ -103,7 +102,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).addPrivilege(policy);
-        Assertions.assertThat(response).isSameAs(policy);
+        assertThat(response).isSameAs(policy);
     }
 
     @Test
@@ -117,7 +116,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         verify(mockManager).modifyPrivilege(name, policy);
-        Assertions.assertThat(response).isSameAs(policy);
+        assertThat(response).isSameAs(policy);
     }
 
 
@@ -157,7 +156,7 @@ public class PrivilegePolicyStoreTest {
         List<Privilege> result = testStore.query(request);
 
         // Then
-        Assertions.assertThat(result).isEqualTo(policies);
+        assertThat(result).isEqualTo(policies);
     }
 
     @Test(expectedExceptions = EntitlementException.class,

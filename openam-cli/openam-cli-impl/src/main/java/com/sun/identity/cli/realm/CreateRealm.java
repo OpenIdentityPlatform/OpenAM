@@ -39,6 +39,8 @@ import com.sun.identity.cli.RequestContext;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
+import org.forgerock.openam.utils.RealmUtils;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

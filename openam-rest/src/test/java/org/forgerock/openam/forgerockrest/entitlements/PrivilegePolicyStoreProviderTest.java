@@ -64,7 +64,7 @@ public class PrivilegePolicyStoreProviderTest {
 
         // Then
         verify(mockFactory).getPrivilegeManager(realm, subject);
-        Assertions.assertThat(store).isNotNull().isInstanceOf(PrivilegePolicyStore.class);
+        assertThat(store).isNotNull().isInstanceOf(PrivilegePolicyStore.class);
     }
 
 }

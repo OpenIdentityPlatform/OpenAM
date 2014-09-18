@@ -90,7 +90,7 @@ public class SubjectTypesResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockHandler, times(1)).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.NOT_FOUND);
     }
 
     @Test
@@ -143,14 +143,14 @@ public class SubjectTypesResourceTest {
         verify(mockHandler, times(1)).handleResult(captor.capture());
 
         Map result = captor.getValue().getContent().asMap();
-        Assertions.assertThat(result.containsKey("title")).isTrue();
-        Assertions.assertThat(result.containsKey("config")).isTrue();
-        Assertions.assertThat(result.containsKey("logical")).isTrue();
-        Assertions.assertThat(result.get("title")).isEqualTo(TEST_CONDITION_WITH_NAME);
-        Assertions.assertThat(result.get("logical")).isEqualTo(false);
-        Assertions.assertThat(result.get("config")).isInstanceOf(JsonSchema.class);
+        assertThat(result.containsKey("title")).isTrue();
+        assertThat(result.containsKey("config")).isTrue();
+        assertThat(result.containsKey("logical")).isTrue();
+        assertThat(result.get("title")).isEqualTo(TEST_CONDITION_WITH_NAME);
+        assertThat(result.get("logical")).isEqualTo(false);
+        assertThat(result.get("config")).isInstanceOf(JsonSchema.class);
         JsonSchema resultSchema = (JsonSchema) result.get("config");
-        Assertions.assertThat(resultSchema.toString().equals("{\"type\":\"object\",\"properties\":{}}")).isTrue();
+        assertThat(resultSchema.toString().equals("{\"type\":\"object\",\"properties\":{}}")).isTrue();
     }
 
     @Test
@@ -177,8 +177,8 @@ public class SubjectTypesResourceTest {
         verify(mockHandler, times(1)).handleResult(captor.capture());
 
         Map result = captor.getValue().getContent().asMap();
-        Assertions.assertThat(result.containsKey("logical")).isTrue();
-        Assertions.assertThat(result.get("logical")).isEqualTo(true);
+        assertThat(result.containsKey("logical")).isTrue();
+        assertThat(result.get("logical")).isEqualTo(true);
     }
 
     /**

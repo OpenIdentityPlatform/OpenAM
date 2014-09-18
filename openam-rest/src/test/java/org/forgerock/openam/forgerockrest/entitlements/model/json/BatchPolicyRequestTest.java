@@ -67,8 +67,8 @@ public class BatchPolicyRequestTest {
         ServerContext context = buildContextStructure("/abc");
         BatchPolicyRequest request = BatchPolicyRequest.getBatchPolicyRequest(context, actionRequest);
 
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getResources()).containsOnly("/resource/a", "/resource/b");
+        assertThat(request).isNotNull();
+        assertThat(request.getResources()).containsOnly("/resource/a", "/resource/b");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest, times(2)).getContent();

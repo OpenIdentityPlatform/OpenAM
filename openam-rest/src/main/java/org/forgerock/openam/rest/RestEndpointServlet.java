@@ -105,11 +105,11 @@ public class RestEndpointServlet extends HttpServlet {
         }
 
         switch (endpointType) {
-        case EndpointType.RESOURCE: {
+        case RESOURCE: {
             crestServlet.service(request, response);
             break;
         }
-        case EndpointType.SERVICE: {
+        case SERVICE: {
             restServiceServlet.service(new HttpServletRequestWrapper(request), response);
             break;
         }

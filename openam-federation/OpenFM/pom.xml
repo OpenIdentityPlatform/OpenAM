@@ -146,6 +146,11 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
 

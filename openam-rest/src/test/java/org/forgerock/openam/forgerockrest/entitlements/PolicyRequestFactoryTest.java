@@ -76,11 +76,11 @@ public class PolicyRequestFactoryTest {
         PolicyRequest request = factory.buildRequest(PolicyAction.EVALUATE, context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getRealm()).isEqualTo("/abc");
-        Assertions.assertThat(request).isInstanceOfAny(BatchPolicyRequest.class);
+        assertThat(request).isNotNull();
+        assertThat(request.getRealm()).isEqualTo("/abc");
+        assertThat(request).isInstanceOfAny(BatchPolicyRequest.class);
         BatchPolicyRequest batchRequest = (BatchPolicyRequest)request;
-        Assertions.assertThat(batchRequest.getResources()).containsOnly("/resource/a", "/resource/b");
+        assertThat(batchRequest.getResources()).containsOnly("/resource/a", "/resource/b");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest, times(2)).getContent();
@@ -101,11 +101,11 @@ public class PolicyRequestFactoryTest {
         PolicyRequest request = factory.buildRequest(PolicyAction.TREE_EVALUATE, context, actionRequest);
 
         // Then...
-        Assertions.assertThat(request).isNotNull();
-        Assertions.assertThat(request.getRealm()).isEqualTo("/abc");
-        Assertions.assertThat(request).isInstanceOfAny(TreePolicyRequest.class);
+        assertThat(request).isNotNull();
+        assertThat(request.getRealm()).isEqualTo("/abc");
+        assertThat(request).isInstanceOfAny(TreePolicyRequest.class);
         TreePolicyRequest treeRequest = (TreePolicyRequest)request;
-        Assertions.assertThat(treeRequest.getResource()).isEqualTo("/resource/a");
+        assertThat(treeRequest.getResource()).isEqualTo("/resource/a");
 
         verify(subjectContext).getCallerSubject();
         verify(actionRequest, times(2)).getContent();

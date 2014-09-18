@@ -172,9 +172,9 @@ public class SessionResourceTest {
         //Then
         final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(handler).handleResult(responseCaptor.capture());
-        Assertions.assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
-        Assertions.assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
-        Assertions.assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
+        assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
+        assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
     }
 
     @Test
@@ -196,7 +196,7 @@ public class SessionResourceTest {
         //Then
         final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(handler).handleResult(responseCaptor.capture());
-        Assertions.assertThat(responseCaptor.getValue().get("valid").asBoolean()).isFalse();
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isFalse();
     }
 
     @Test
@@ -222,8 +222,8 @@ public class SessionResourceTest {
         //Then
         final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
         verify(handler).handleResult(responseCaptor.capture());
-        Assertions.assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
-        Assertions.assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
-        Assertions.assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
+        assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
+        assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
+        assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
     }
 }

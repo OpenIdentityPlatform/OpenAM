@@ -113,7 +113,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler, times(1)).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     @Test
@@ -172,7 +172,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.BAD_REQUEST);
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class ApplicationsResourceTest {
         //then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     @Test
@@ -253,7 +253,7 @@ public class ApplicationsResourceTest {
         // Then
         ArgumentCaptor<ResourceException> captor = ArgumentCaptor.forClass(ResourceException.class);
         verify(mockResultHandler).handleError(captor.capture());
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(captor.getValue().getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     @Test
@@ -630,13 +630,13 @@ public class ApplicationsResourceTest {
 
         List<String> selectedApps = CollectionUtils
                 .transformList(resourceCapture.getAllValues(), new ResourceToIdMapper());
-        Assertions.assertThat(selectedApps).containsOnly("app2", "app3", "app4");
+        assertThat(selectedApps).containsOnly("app2", "app3", "app4");
 
         ArgumentCaptor<QueryResult> resultCapture = ArgumentCaptor.forClass(QueryResult.class);
         verify(handler).handleResult(resultCapture.capture());
 
         QueryResult result = resultCapture.getValue();
-        Assertions.assertThat(result.getRemainingPagedResults()).isEqualTo(1);
+        assertThat(result.getRemainingPagedResults()).isEqualTo(1);
     }
 
     @Test
@@ -668,7 +668,7 @@ public class ApplicationsResourceTest {
         verify(handler).handleError(exceptionCapture.capture());
 
         ResourceException resourceException = exceptionCapture.getValue();
-        Assertions.assertThat(resourceException.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(resourceException.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
 
@@ -736,7 +736,7 @@ public class ApplicationsResourceTest {
         verify(handler).handleError(exceptionCapture.capture());
 
         ResourceException resourceException = exceptionCapture.getValue();
-        Assertions.assertThat(resourceException.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+        assertThat(resourceException.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
     }
 
     /**
