@@ -66,7 +66,6 @@ public class JwtHandler {
         final SignedJwt signedJwt = getSignedJwt(jwtValue);
         JwtClaimsSet jwtClaimSet = signedJwt.getClaimsSet();
         final String jwtClaimSetIssuer = jwtClaimSet.getIssuer();
-        // TODO I think I can remove this issuer check as it's also done in resolver.validateIdentity(signedJwt) later?
         if (!config.getConfiguredIssuer().equals(jwtClaimSetIssuer)) {
             logger.error("The issuer configured for the module, " + config.getConfiguredIssuer() + ", and the " +
                     "issuer found in the token, " + jwtClaimSetIssuer + ", do not match. This means that the token " +
