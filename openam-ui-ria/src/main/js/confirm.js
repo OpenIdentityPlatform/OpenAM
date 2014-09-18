@@ -33,15 +33,16 @@ require.config({
     paths: { 
 
         i18next: "libs/i18next-1.7.3-min",
-        backbone: "libs/backbone-0.9.2-min",
-        underscore: "libs/underscore-1.4.4-min",
-        js2form: "libs/js2form-1.0",
-        form2js: "libs/form2js-1.0",
-        spin: "libs/spin-1.2.5-min",
-        xdate: "libs/xdate-0.7-min",
+        backbone: "libs/backbone-1.1.0-min",
+        underscore: "libs/lodash-2.4.1-min",
+        js2form: "libs/js2form-2.0",
+        form2js: "libs/form2js-2.0",
+        spin: "libs/spin-2.0.1-min",
+        jquery: "libs/jquery-1.11.1-min",
+        xdate: "libs/xdate-0.8-min",
         doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
-        handlebars: "libs/handlebars-1.0.rc.1",
-        moment: "libs/moment-1.7.2-min",
+        handlebars: "libs/handlebars-1.3.0-min",
+        moment: "libs/moment-2.8.1-min",
         ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager",
         UserDelegate: "org/forgerock/openam/ui/user/delegates/UserDelegate"
     },
@@ -67,6 +68,7 @@ require.config({
             exports: "xdate"
         },
         doTimeout: {
+            deps: ["jquery"],
             exports: "doTimeout"
         },
         handlebars: {

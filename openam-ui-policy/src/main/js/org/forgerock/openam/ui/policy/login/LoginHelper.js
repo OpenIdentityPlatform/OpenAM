@@ -32,14 +32,19 @@ define("org/forgerock/openam/ui/policy/login/LoginHelper", [
     "org/forgerock/commons/ui/common/main/ServiceInvoker",
     "org/forgerock/commons/ui/common/main/Configuration"
 ], function (sessionDelegate, eventManager, constants, AbstractConfigurationAware, serviceInvoker, conf) {
-    var obj = new AbstractConfigurationAware();
+    var obj = new AbstractConfigurationAware(),
+        reauthenticate = function () {
+            window.location.href = constants.host + "/"+ constants.context + "?goto=" + encodeURIComponent(window.location.href);
+        };
 
     obj.login = function (params, successCallback, errorCallback) {
 
     };
 
-    obj.logout = function () {
-
+    obj.logout = function (successCallback) {
+        conf.loggedUser = null;
+        // Do not invoke the successCallback, because we don't want the default forgerock-ui behavior
+        sessionDelegate.logout().always(reauthenticate);
     };
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
@@ -48,9 +53,9 @@ define("org/forgerock/openam/ui/policy/login/LoginHelper", [
             if (successCallback) {
                 successCallback(user);
             }
-        }, function () {
-            window.location.href = constants.host + "/"+ constants.context + "?goto=" + window.location.href;
-        }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
+        }, 
+        reauthenticate, 
+        {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
     };
 
     return obj;

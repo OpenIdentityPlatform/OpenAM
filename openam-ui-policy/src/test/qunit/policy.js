@@ -25,6 +25,11 @@
 /*global require, define, QUnit, $ */
 
 define([
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/policy/login/LoginHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/policy/PolicyDelegate",
     "org/forgerock/openam/ui/policy/EditApplicationView",
@@ -40,7 +45,8 @@ define([
     "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
     "org/forgerock/openam/ui/policy/ManageSubjectsView",
     "org/forgerock/openam/ui/policy/OperatorRulesView"
-], function (uiUtils, policyDelegate, editAppView, editPolView, resListView, addNewResView, manageAppsView,
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, 
+             editPolView, resListView, addNewResView, manageAppsView,
              managePolView, actionsView, reviewInfoView) {
     return {
         executeAll: function (server) {
@@ -56,8 +62,6 @@ define([
 
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
-
-                    QUnit.start();
 
                     QUnit.ok(editAppView.accordion.getActive() === 2, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
@@ -146,7 +150,9 @@ define([
 
                             QUnit.ok(_.isEqual(resources, app.resources), "Correct resources are displayed in the review step");
                         }
+                        QUnit.start();
                     }));
+
 
                 });
             });
@@ -160,8 +166,6 @@ define([
 
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
-
-                    QUnit.start();
 
                     QUnit.ok(editAppView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
@@ -177,6 +181,8 @@ define([
                     resListView.render([], function () {
                         var resources = resListView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
+
+                        QUnit.start();
                     });
                 });
             });
@@ -187,7 +193,6 @@ define([
                 $("#qunit-fixture").append(manageAppsView.element);
 
                 manageAppsView.render([], function () {
-                    QUnit.start();
                     var table = $('#manageApps', manageAppsView.$el),
                         postedData = table.jqGrid('getGridParam', 'postData'),
                         rowData = table.jqGrid('getRowData'),
@@ -230,6 +235,7 @@ define([
 
                     // Show/hide columns
                     QUnit.ok($('.navtable', manageAppsView.$el).length === 1, 'Columns Button is available');
+                    QUnit.start();
                 });
             });
 
@@ -246,8 +252,6 @@ define([
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
                     actionsView.element = actionsViewEl[0];
-
-                    QUnit.start();
 
                     QUnit.ok(editPolView.accordion.getActive() === 5, "Last step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
@@ -325,14 +329,19 @@ define([
                         QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
 
                         // Toggle all actions
-                        var toggleAll = actionsView.$el.find('.toggle-all-actions').attr('checked', 'checked').trigger('click'),
+                        var toggleAll = actionsView.$el.find('.toggle-all-actions').prop('checked', true),
                             allChecked = true;
+
+                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all-actions')[0]});
+
                         _.each(actionsView.data.entity.actions, function (action) {
                             allChecked = allChecked && action.selected;
                         });
                         QUnit.ok(allChecked, "All actions are marked as selected in a JS object after Toggle All checkbox is selected");
 
-                        toggleAll.removeAttr('checked').trigger('click');
+                        toggleAll.prop('checked', false);
+                        actionsView.toggleAllActions({target: actionsView.$el.find('.toggle-all-actions')[0]});
+
                         allChecked = true;
                         _.each(actionsView.data.entity.actions, function (action) {
                             allChecked = allChecked && !action.selected;
@@ -422,6 +431,8 @@ define([
                         }
                         */
 
+
+                        QUnit.start();
                     }));
 
                 });
@@ -438,8 +449,6 @@ define([
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
                     actionsView.element = actionsViewEl[0];
-
-                    QUnit.start();
 
                     QUnit.ok(editPolView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
@@ -467,6 +476,7 @@ define([
                             });
                         });
                         QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
+                        QUnit.start();
                     });
                 });
             });
@@ -477,8 +487,6 @@ define([
                 $("#qunit-fixture").append(managePolView.element);
 
                 managePolView.render(['sunIdentityServerLibertyPPService'], function () {
-                    QUnit.start();
-
                     var table = $('#managePolicies', managePolView.$el),
                         rowData = table.jqGrid('getRowData'),
                         postedData = table.jqGrid('getGridParam', 'postData'),
@@ -523,8 +531,39 @@ define([
 
                     // Show/hide columns
                     QUnit.ok($('.navtable', managePolView.$el).length === 1, 'Columns Button is available');
+                    QUnit.start();
                 });
             });
+
+
+            QUnit.asyncTest("Unauthorized GET Request", function () {
+                conf.loggedUser = {"roles": ["ui-admin"]};
+                eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {
+                    route: router.configuration.routes.manageApps,
+                    callback: function () {
+                        sinon.stub(loginHelper, "logout", function () {
+                            QUnit.ok(true, "Logout helper method called");
+                            QUnit.start();
+                        });
+
+                        eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type:"GET"} });
+                    }
+                });
+            });
+
+            QUnit.asyncTest("Unauthorized non-GET Request", function () {
+                var loginDialog = require("LoginDialog"),
+                    loginDialogSpy = sinon.spy(loginDialog, 'render');
+
+                QUnit.ok(!loginDialogSpy.called, "Login Dialog render function has not yet been called");
+                conf.loggedUser = {"roles": ["ui-admin"]};
+                eventManager.sendEvent(constants.EVENT_UNAUTHORIZED, {error: {type:"POST"} });
+                QUnit.ok(conf.loggedUser !== null, "User info should be retained after UNAUTHORIZED POST error");
+                QUnit.ok(loginDialogSpy.called, "Login Dialog render function was called");
+                QUnit.start();
+            });
+
+
         }
     }
 });

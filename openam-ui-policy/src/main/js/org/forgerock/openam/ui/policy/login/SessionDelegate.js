@@ -28,10 +28,28 @@ define("org/forgerock/openam/ui/policy/login/SessionDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/EventManager"
-], function(constants, AbstractDelegate, configuration, eventManager) {
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/CookieHelper"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/users");
+
+    obj.logout = function () {
+        return obj.serviceCall({
+            type: "POST",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            data: "{}",
+            url: "",
+            serviceUrl: constants.host + "/"+ constants.context + "/json/sessions?_action=logout",
+            errorsHandlers: {"Bad Request": {status: 400}, "Unauthorized": {status: 401}}
+        })
+        .always(function () {
+            console.log("Successfully logged out");
+            _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
+                cookieHelper.deleteCookie(configuration.globalData.auth.cookieName, "/", cookieDomain);
+            });
+        });
+    };
 
     /**
      * Checks if logged in and returns users id

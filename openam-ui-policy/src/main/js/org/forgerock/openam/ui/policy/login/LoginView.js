@@ -24,27 +24,10 @@
 
 /*global define*/
 
-define([
-    "./login/LoginView",
-    "./login/LoginDialog",
-    "./login/LoginHelper",
-    "./login/SessionDelegate",
-
-    "./PolicyDelegate",
-
-    "./ManageApplicationsView",
-    "./EditApplicationView",
-
-    "./ManagePoliciesView",
-    "./EditPolicyView",
-
-    "./ManageRulesView",
-
-    "./ManageSubjectsView",
-    "./EditSubjectView",
-
-    "./ManageEnvironmentsView",
-    "./EditEnvironmentView",
-
-    "./OperatorRulesView"
-]);
+define("org/forgerock/openam/ui/policy/login/LoginView", [], function() {
+    return {
+        render: function () {
+            return;
+        }
+    };
+});

@@ -26,7 +26,7 @@
 
 require.config({
     paths: {
-        sinon: "../test/libs/sinon-1.9.1",
+        sinon: "../test/libs/sinon-1.10.3",
         text: "../test/text"
     },
     shim: {
