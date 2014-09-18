@@ -1504,9 +1504,9 @@ $ <userinput>jar -cf ../openam.war *</userinput>
 
 
 <section xml:id="prepare-jboss-7">
-  <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6</title>
+  <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6 / WildFly 8</title>
 
-    <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6. </para>
+    <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6 / WildFly 8.</para>
 
     <para>The following instructions provide guidance for both standalone and domain deployments.
     OpenAM must be able to store its configuration between restarts. The procedures listed here are
@@ -1516,13 +1516,18 @@ $ <userinput>jar -cf ../openam.war *</userinput>
     AS, see the following article on <link xlink:href="https://access.redhat.com/site/articles/112673"
     xlink:show="new"><citetitle>JBoss Enterprise Application Platform Component Details</citetitle></link>.</para>
 
-    <para>Once JBoss has been configured, you can then prepare OpenAM for deployment, by making a few changes
+    <para>
+     This section also covers workarounds for using OpenAM on WildFly 8.
+    </para>
+
+    <para>Once JBoss or WildFly has been configured, you can then prepare OpenAM for deployment, by making a few changes
     to the contents of the OpenAM <filename>.war</filename> archive.</para>
 
         <itemizedlist>
             <listitem><para><xref linkend="prep-jboss-710-711" /></para></listitem>
             <listitem><para><xref linkend="prep-jboss-600-601" /></para></listitem>
             <listitem><para><xref linkend="prep-jboss-61x" /></para></listitem>
+            <listitem><para><xref linkend="prep-wildfly-81" /></para></listitem>
             <listitem><para><xref linkend="prep-jboss-for-openam" /></para></listitem>
             <listitem><para><xref linkend="prep-openam-for-jboss" /></para></listitem>
         </itemizedlist>
@@ -1715,6 +1720,106 @@ $ <userinput>jar cvf ../openam.war *</userinput>
             </step>
 
         </procedure>
+
+ <procedure xml:id="prep-wildfly-81">
+  <title>To Prepare WildFly 8</title>
+
+  <para>
+   To prepare for deployment on WildFly 8,
+   you must both edit the content of the OpenAM war file
+   and also edit <literal>JAVA_OPTS</literal> in the WildFly configuration.
+  </para>
+
+  <step>
+   <para>
+    Unpack the OpenAM war file.
+   </para>
+
+   <screen>
+$ <userinput>mkdir openam &amp;&amp; cd openam</userinput>
+$ <userinput>jar xf ~/Downloads/${coreWarFile}</userinput>
+   </screen>
+  </step>
+
+  <step>
+   <para>
+    Make the requisite changes to the OpenAM war file content.
+   </para>
+
+   <substeps>
+    <step>
+     <para>
+      Edit <filename>WEB-INF/classes/bootstrap.properties</filename>
+      to set the configuration directory.
+     </para>
+
+     <para>
+      The following example sets the configuration directory
+      to <filename>/home/openam/openamWildFly</filename>.
+      Make sure to set the configuration directory
+      appropriately for your deployment.
+     </para>
+
+     <programlisting language="ini">
+configuration.dir=/home/openam/openamWildFly
+     </programlisting>
+    </step>
+
+    <step>
+     <para>
+      Add the following deployment structure file as
+      <filename>WEB-INF/jboss-deployment-structure.xml</filename>.
+     </para>
+
+     <programlisting language="xml">
+<xinclude:include href="../resources/jboss-deployment-structure.xml" parse="text">
+ <xinclude:fallback>
+  Failed to include jboss-deployment-structure.xml
+ </xinclude:fallback>
+</xinclude:include>
+     </programlisting>
+    </step>
+
+    <step>
+     <para>
+      Add the following file as <filename>META-INF/jboss-all.xml</filename>
+      to resolve Contexts and Dependency Injection (CDI) issues.
+     </para>
+
+     <programlisting language="xml">
+<xinclude:include href="../resources/jboss-all.xml" parse="text">
+ <xinclude:fallback>
+  Failed to include jboss-all.xml
+ </xinclude:fallback>
+</xinclude:include>
+     </programlisting>
+    </step>
+   </substeps>
+  </step>
+
+  <step>
+   <para>
+    Pack the edited OpenAM war file for deployment.
+   </para>
+
+   <screen>
+$ <userinput>jar cf ../openam.war *</userinput>
+   </screen>
+  </step>
+
+  <step>
+   <para>
+    Stop WildFly.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Finish preparing WildFly for OpenAM
+    by following the steps in <xref linkend="prep-jboss-for-openam" />.
+   </para>
+  </step>
+ </procedure>
 
         <procedure xml:id="prep-jboss-for-openam">
             <title>To Prepare JBoss for OpenAM</title>
