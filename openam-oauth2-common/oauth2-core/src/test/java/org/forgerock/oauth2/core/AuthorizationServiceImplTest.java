@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -120,7 +121,9 @@ public class AuthorizationServiceImplTest {
         boolean consentGiven = false;
         boolean saveConsent = false;
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
 
+        given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
 
         //When
@@ -185,7 +188,10 @@ public class AuthorizationServiceImplTest {
         boolean consentGiven = false;
         boolean saveConsent = false;
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
 
+        given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
+        given(clientRegistration.getAllowedScopes()).willReturn(Collections.singleton("openid"));
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
 
         //When
@@ -206,7 +212,9 @@ public class AuthorizationServiceImplTest {
         boolean consentGiven = false;
         boolean saveConsent = false;
         ResourceOwner resourceOwner = mock(ResourceOwner.class);
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
 
+        given(clientRegistrationStore.get(anyString(), eq(request))).willReturn(clientRegistration);
         given(resourceOwnerSessionValidator.validate(request)).willReturn(resourceOwner);
 
         //When

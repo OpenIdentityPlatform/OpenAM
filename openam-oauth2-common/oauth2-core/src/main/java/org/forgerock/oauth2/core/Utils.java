@@ -24,6 +24,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+
 /**
  * Utility class containing common utility functions.
  *
@@ -126,20 +132,64 @@ public final class Utils {
 
     /**
      * When using the OpenId Connect authorization Implicit Flow the response_type value is
-     * "id_token token" or "id_token".
+     * "id_token token" or "id_token". When using the Hybrid Flow, this value is "code id_token",
+     * "code token", or "code id_token" token.
+     *
      * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#ImplicitAuthRequest">
      *     3.2.2.1. Authentication Request</a>
+     * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#HybridAuthRequest">
+     *     3.3.2.1. Authentication Request</a>
      *
-     * @param request The OAuth2Request for the client requesting authorization.
-     * @return True if the request is part of an OpenId Connect authorization Implicit Flow.
+     * @return True if the request is part of an OpenId Connect authorization Implicit Flow or Hybrid Flow.
      */
-    public static boolean isOpenIdConnectImplicitFlow(OAuth2Request request) {
-        final Set<String> requestedResponseTypes = splitResponseType(
-                request.<String>getParameter(OAuth2Constants.Params.RESPONSE_TYPE));
-        if (requestedResponseTypes.contains(OAuth2Constants.AuthorizationEndpoint.ID_TOKEN)) {
-            return true;
-        }
-        return false;
+    public static boolean isOpenIdConnectFragmentErrorType(Set<String> requestedResponseTypes) {
+        return requestedResponseTypes.contains(ID_TOKEN) || requestedResponseTypes.contains(TOKEN);
+    }
+
+    /**
+     * When using the OAuth2 Implicit Grant the response_type value is "token".
+     *
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.2.2.1">4.2.2.1. Error Response</a>
+     *
+     * @return True if the request is part of an OAuth2 Implicit Grant.
+     */
+    public static boolean isOAuth2FragmentErrorType(Set<String> requestedResponseTypes) {
+        return requestedResponseTypes.contains(TOKEN);
+    }
+
+    /**
+     * Check if the OAuth2 Client is configured to be an OpenId Connect Client.
+     *
+     * @param clientRegistration The registered client.
+     * @return True if the client is configured as an OpenId Connect client.
+     */
+    public static boolean isOpenIdConnectClient(ClientRegistration clientRegistration) {
+        return clientRegistration.getAllowedScopes().contains(OPENID);
+    }
+
+    /**
+     * Determines if the UrlLocation is fragment or query based on the response types read from the request
+     * and the type of client.
+     *
+     * @param request The OAuth2 request.
+     * @param clientRegistration The ClientRegistration.
+     * @return UrlLocation.FRAGMENT or UrlLocation.QUERY
+     */
+    public static UrlLocation getRequiredUrlLocation(OAuth2Request request, ClientRegistration clientRegistration) {
+        final Set<String> responseTypes = splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
+        return getRequiredUrlLocation(responseTypes, clientRegistration);
+    }
+
+    /**
+     * Determines if the UrlLocation is fragment or query based on the given response types and the type of client.
+     *
+     * @param responseTypes The requested response types.
+     * @param clientRegistration The registered client.
+     * @return UrlLocation.FRAGMENT or UrlLocation.QUERY
+     */
+    public static UrlLocation getRequiredUrlLocation(Set<String> responseTypes, ClientRegistration clientRegistration) {
+        return (isOpenIdConnectClient(clientRegistration) && isOpenIdConnectFragmentErrorType(responseTypes))
+                || isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY;
     }
 
 }

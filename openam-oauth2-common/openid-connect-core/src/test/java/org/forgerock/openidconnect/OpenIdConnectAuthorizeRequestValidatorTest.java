@@ -123,7 +123,7 @@ public class OpenIdConnectAuthorizeRequestValidatorTest {
 
         given(request.getParameter("client_id")).willReturn("CLIENT_ID");
         given(request.getParameter("scope")).willReturn("openid");
-        given(request.getParameter("response_type")).willReturn("id_token");
+        given(request.getParameter("response_type")).willReturn("token");
 
         //When
         try {

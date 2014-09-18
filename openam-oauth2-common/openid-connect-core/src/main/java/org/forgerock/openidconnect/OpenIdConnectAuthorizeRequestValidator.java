@@ -19,7 +19,6 @@ package org.forgerock.openidconnect;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
-import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.Utils;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
@@ -29,6 +28,10 @@ import org.forgerock.oauth2.core.exceptions.InvalidScopeException;
 import org.forgerock.util.Reject;
 
 import javax.inject.Inject;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
+
 import java.util.Set;
 
 /**
@@ -69,20 +72,18 @@ public class OpenIdConnectAuthorizeRequestValidator implements AuthorizeRequestV
     private void validateOpenIdScope(OAuth2Request request) throws InvalidClientException, InvalidRequestException,
             InvalidScopeException {
         final ClientRegistration clientRegistration = clientRegistrationStore.get(
-                request.<String>getParameter(OAuth2Constants.Params.CLIENT_ID), request);
-        final Set<String> clientScope = clientRegistration.getAllowedScopes();
-        final Set<String> requestScope = Utils.splitScope(request.<String>getParameter(OAuth2Constants.Params.SCOPE));
+                request.<String>getParameter(CLIENT_ID), request);
+        final boolean openIdConnectRequested = Utils.splitScope(request.<String>getParameter(SCOPE)).contains(OPENID);
+        final Set<String> responseTypes = Utils.splitResponseType(request.<String>getParameter(RESPONSE_TYPE));
 
-        if (clientScope.contains(OAuth2Constants.Params.OPENID) && !requestScope.contains(OAuth2Constants.Params.OPENID)) {
+        if (Utils.isOpenIdConnectClient(clientRegistration) && !openIdConnectRequested) {
             throw new InvalidRequestException("Missing expected scope=openid from request",
-                    Utils.isOpenIdConnectImplicitFlow(request) ?
-                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
+                    Utils.isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
         }
 
-        if (!clientScope.contains(OAuth2Constants.Params.OPENID) && requestScope.contains(OAuth2Constants.Params.OPENID)) {
+        if (!Utils.isOpenIdConnectClient(clientRegistration) && openIdConnectRequested) {
             throw new InvalidScopeException("Missing expected scope=openid from OpenID Connect client",
-                    Utils.isOpenIdConnectImplicitFlow(request) ?
-                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
+                    Utils.isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY);
         }
     }
 }

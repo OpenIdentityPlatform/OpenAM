@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core.exceptions;
 
+import org.forgerock.oauth2.core.OAuth2Constants;
+
 /**
  * Thrown when the requested response type is not supported by either the client or the OAuth2 provider.
  *
@@ -29,6 +31,16 @@ public class UnsupportedResponseTypeException extends OAuth2Exception {
      * @param message The reason for the exception.
      */
     public UnsupportedResponseTypeException(final String message) {
-        super(400, "unsupported_response_type", message);
+        this(message, OAuth2Constants.UrlLocation.QUERY);
+    }
+
+    /**
+     * Constructs a new UnsupportedResponseTypeException instance with the specified message.
+     *
+     * @param message The reason for the exception.
+     * @param parameterLocation Indicates the location of the parameters in the URL.
+     */
+    public UnsupportedResponseTypeException(final String message, final OAuth2Constants.UrlLocation parameterLocation) {
+        super(400, "unsupported_response_type", message, parameterLocation);
     }
 }

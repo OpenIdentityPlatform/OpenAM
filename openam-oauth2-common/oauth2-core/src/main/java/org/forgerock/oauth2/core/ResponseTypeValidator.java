@@ -19,10 +19,15 @@ package org.forgerock.oauth2.core;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Set;
+
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
 
 /**
  * Validates that the requested response types are valid and are allowed by the OAuth2 Provider and client registration.
@@ -31,6 +36,8 @@ import java.util.Set;
  */
 @Singleton
 public class ResponseTypeValidator {
+
+    private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
 
     /**
      * Validates that the requested response types are valid and supported by both the OAuth2 client and provider.
@@ -50,19 +57,51 @@ public class ResponseTypeValidator {
             throw new UnsupportedResponseTypeException("Response type is not supported.");
         }
 
+        final UrlLocation urlLocation = Utils.getRequiredUrlLocation(requestedResponseTypes, clientRegistration);
         final Map<String, ResponseTypeHandler> allowedResponseTypes = providerSettings.getAllowedResponseTypes();
 
         if (allowedResponseTypes == null || allowedResponseTypes.isEmpty()) {
-            throw new InvalidRequestException("Invalid Response Type.");
+            throw new InvalidRequestException("Invalid Response Type.", urlLocation);
         }
 
         if (!allowedResponseTypes.keySet().containsAll(requestedResponseTypes)) {
-            throw new UnsupportedResponseTypeException("Response type is not supported.");
+            throw new UnsupportedResponseTypeException("Response type is not supported.", urlLocation);
         }
 
         final Set<String> clientAllowedResponseTypes = clientRegistration.getAllowedResponseTypes();
         if (!clientAllowedResponseTypes.containsAll(requestedResponseTypes)) {
-            throw new UnsupportedResponseTypeException("Client does not support this response type.");
+            throw new UnsupportedResponseTypeException("Client does not support this response type.", urlLocation);
+        }
+
+        validateForOAuth2(clientRegistration, requestedResponseTypes);
+        validateForOpenIdConnect(clientRegistration, requestedResponseTypes);
+
+    }
+
+    private void validateForOAuth2(ClientRegistration clientRegistration, Set<String> requestedResponseTypes)
+            throws UnsupportedResponseTypeException {
+
+        if (!Utils.isOpenIdConnectClient(clientRegistration)
+                && requestedResponseTypes.contains(TOKEN)
+                && requestedResponseTypes.contains(CODE)) {
+
+            logger.debug("Response type is not supported. OAuth2 client does not support scope=\"token code\".");
+            throw new UnsupportedResponseTypeException("Response type is not supported.",
+                    Utils.getRequiredUrlLocation(requestedResponseTypes, clientRegistration));
+        }
+    }
+
+    private void validateForOpenIdConnect(ClientRegistration clientRegistration, Set<String> requestedResponseTypes)
+            throws UnsupportedResponseTypeException {
+
+        if (Utils.isOpenIdConnectClient(clientRegistration)
+                && requestedResponseTypes.contains(TOKEN)
+                && !requestedResponseTypes.contains(CODE)
+                && !requestedResponseTypes.contains(ID_TOKEN)) {
+
+            logger.debug("Response type is not supported. OpenId Connect client does not support scope=\"token\".");
+            throw new UnsupportedResponseTypeException("Response type is not supported.",
+                    Utils.getRequiredUrlLocation(requestedResponseTypes, clientRegistration));
         }
     }
 }

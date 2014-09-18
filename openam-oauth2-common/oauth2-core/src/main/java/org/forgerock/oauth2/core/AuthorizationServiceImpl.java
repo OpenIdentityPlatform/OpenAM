@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.Custom.*;
+
 /**
  * Handles authorization requests from OAuth2 clients to the OAuth2 provider to grant authorization for a specific
  * client by a specific resource owner.
@@ -96,9 +99,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         final ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
 
         final ClientRegistration clientRegistration =
-                clientRegistrationStore.get(request.<String>getParameter("client_id"), request);
+                clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
 
-        final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
+        final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
 
         //plugin point
         final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope);
@@ -110,7 +113,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         final boolean haveConsent = consentVerifier.verify(consentSaved, request);
 
         if (!haveConsent) {
-            final String locale = request.getParameter("locale");
+            final String locale = request.getParameter(LOCALE);
             final String clientName = clientRegistration.getDisplayName(locale);
             final String clientDescription = clientRegistration.getDisplayDescription(locale);
             final Set<String> scopeDescriptions = getScopeDescriptions(validatedScope,
@@ -155,17 +158,16 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }
 
         final ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+        final ClientRegistration clientRegistration =
+                clientRegistrationStore.get(request.<String>getParameter(CLIENT_ID), request);
 
         if (!consentGiven) {
             logger.debug("Resource Owner did not authorize the request");
             throw new AccessDeniedException("Resource Owner did not authorize the request",
-                    Utils.isOpenIdConnectImplicitFlow(request) ?
-                            OAuth2Constants.UrlLocation.FRAGMENT : OAuth2Constants.UrlLocation.QUERY);
+                    Utils.getRequiredUrlLocation(request, clientRegistration));
         }
 
-        final Set<String> scope = Utils.splitScope(request.<String>getParameter("scope"));
-        final ClientRegistration clientRegistration =
-                clientRegistrationStore.get(request.<String>getParameter("client_id"), request);
+        final Set<String> scope = Utils.splitScope(request.<String>getParameter(SCOPE));
         final Set<String> validatedScope = providerSettings.validateAuthorizationScope(clientRegistration, scope);
 
         if (saveConsent) {
