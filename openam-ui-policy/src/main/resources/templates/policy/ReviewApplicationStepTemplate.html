@@ -2,11 +2,9 @@
 <div class="col2">
 
     <div class="review-row clearfix" tabindex="0" >
-        <h2>Name</h2> 
+        <h2>Name</h2>
         <p id="reviewName">{{entity.name}}</p>
 
-        <h2>Application Type</h2>
-        <p id="reviewType">{{entity.applicationType}}</p>
         {{#if entity.description}}<p id="reviewDesc">{{entity.description}}</p>{{/if}}
 
         <h2>Realms</h2>
@@ -28,50 +26,6 @@
             {{/each}}
         </ul>
         {{/if}}
-    </div>
-
-    <div class="review-row clearfix" tabindex="0" >
-        <h2>Actions</h2>
-        {{#if entity.actions}}
-        <ul id="reviewActions">
-            {{#each entity.actions}}
-            {{#if selected}}
-            <li>{{action}}: {{#if value}} Allowed {{else}} Denied {{/if}}</li>
-            {{/if}}
-            {{/each}}
-        </ul>
-        {{/if}}
-    </div>
-
-</div>
-
-<div class="col2">
-
-    <div class="review-row clearfix" tabindex="0" >
-        <h2>Subjects</h2>
-        {{#if entity.subjects}}
-        <ul id="reviewSubjects">
-            {{#each entity.subjects}}
-            <li>{{this}}</li>
-            {{/each}}
-        </ul>
-        {{/if}}
-    </div>
-
-    <div class="review-row clearfix" tabindex="0" >
-        <h2>Environments</h2>
-        {{#if entity.conditions}}
-        <ul id="reviewEnvConditions">
-            {{#each entity.conditions}}
-            <li>{{this}}</li>
-            {{/each}}
-        </ul>
-        {{/if}}
-    </div>
-
-      <div class="review-row clearfix" tabindex="0" >
-        <h2>Override Rules</h2>
-        <p id="reviewEntComb">{{entity.entitlementCombiner}}: Allow</p>
     </div>
 
 </div>

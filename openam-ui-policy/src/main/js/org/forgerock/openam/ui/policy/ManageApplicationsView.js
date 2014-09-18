@@ -69,7 +69,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 var options = {
                         url: '/openam/json/applications?_queryFilter=true',
-                        colNames: ['', 'Name', 'Description', 'Realm', 'Resources', 'Author', 'Created', 'Last Modified'],
+                        colNames: ['', 'Name', 'Description', 'Realm', 'Application Base', 'Author', 'Created', 'Last Modified'],
                         colModel: [
                             {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
                             {name: 'name', width: 230, frozen: true},

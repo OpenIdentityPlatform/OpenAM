@@ -52,16 +52,14 @@ define([
 
                 editAppView.render(['iPlanetAMWebAgentService'], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
-                        actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>');
 
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
-                    actionsView.element = actionsViewEl[0];
 
                     QUnit.start();
 
-                    QUnit.ok(editAppView.accordion.getActive() === 6, "Last step of accordion is selected");
+                    QUnit.ok(editAppView.accordion.getActive() === 2, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
                     var app = editAppView.data.entity,
@@ -70,7 +68,6 @@ define([
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === app.name, "Name is set");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === (app.description ? app.description : ''), "Description is set");
-                    QUnit.ok(editAppView.$el.find('#appType').val() === app.applicationType, "Application type is selected");
                     QUnit.ok(editAppView.$el.find('#appRealm').val() === app.realm, "Realm is set");
 
                     // Step 2
@@ -118,76 +115,8 @@ define([
                         $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data));
                     });
 
+
                     // Step 3
-                    actionsView.render([], function () {
-                        // Correct actions are displayed for the selected application type
-                        var availableActions = actionsView.data.typeActions[actionsView.data.entity.applicationType],
-                            actionsCells = actionsView.$el.find('.action-name');
-                        QUnit.ok(availableActions.length === actionsCells.length, "Correct number of actions is displayed");
-
-                        var actionsPresent = true;
-                        _.each(actionsCells, function (val, key, list) {
-                            actionsPresent = actionsPresent && _.find(availableActions, function (action) {
-                                return action.action === val.innerHTML;
-                            });
-                        });
-                        QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
-
-                        // Toggle all actions
-                        var toggleAll = actionsView.$el.find('.toggle-all-actions').attr('checked', 'checked').trigger('click'),
-                            allChecked = true;
-                        _.each(actionsView.data.entity.actions, function (action) {
-                            allChecked = allChecked && action.selected;
-                        });
-                        QUnit.ok(allChecked, "All actions are marked as selected in a JS object after Toggle All checkbox is selected");
-
-                        toggleAll.removeAttr('checked').trigger('click');
-                        allChecked = true;
-                        _.each(actionsView.data.entity.actions, function (action) {
-                            allChecked = allChecked && !action.selected;
-                        });
-                        QUnit.ok(!allChecked, "All actions are marked as deselected in a JS object after Toggle All checkbox is deselected");
-
-                        // Action permissions
-                        var permissions = actionsView.$el.find('input[type=radio][data-action-name]:checked'),
-                            correctPermissions = true;
-                        _.each(permissions, function (val, key, list) {
-                            correctPermissions = correctPermissions &&
-                                _.find(actionsView.data.entity.actions, function (action) {
-                                    return action.action === val.getAttribute('data-action-name') &&
-                                        action.value === (val.value === 'Allow');
-                                });
-                        });
-                        QUnit.ok(correctPermissions, "All permissions are selected correctly");
-
-                        // Selecting individual actions
-                        var toggleSingleAction = actionsView.$el.find('.toggle-action');
-                        _.each(toggleSingleAction, function (val, key, list) {
-                            $(val).attr('checked', 'checked').trigger('click');
-                        });
-                        allChecked = true;
-                        _.each(actionsView.data.entity.actions, function (action) {
-                            allChecked = allChecked && action.selected;
-                        });
-                        QUnit.ok(allChecked, "All actions are marked as selected in a JS object after selecting corresponding checkboxes");
-
-                        // Reload review step
-                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data));
-                    });
-
-                    // Step 4
-                    var subjCond = editAppView.$el.find('[name=subjCond]:checked');
-                    QUnit.ok(app.subjects.length === subjCond.length, "The number of checked subject conditions is equal to the length of application subject conditions");
-
-                    // Step 5
-                    var envCond = editAppView.$el.find('[name=envCond]:checked');
-                    QUnit.ok(app.conditions.length === envCond.length, "The number of checked environment conditions is equal to the length of application environment conditions");
-
-                    // Step 6
-                    QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
-
-                    // Step 7
                     $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                         QUnit.ok(editAppView.$el.find('#reviewName').html() === app.name, "Correct name is displayed in the review step");
 
@@ -197,8 +126,6 @@ define([
                         } else {
                             QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (app.description ? app.description : ''), "Correct description is displayed in the review step");
                         }
-
-                        QUnit.ok(editAppView.$el.find('#reviewType').html() === app.applicationType, "Correct application type is displayed in the review step");
 
                         // Realms
                         if (app.realm.length) {
@@ -219,44 +146,6 @@ define([
 
                             QUnit.ok(_.isEqual(resources, app.resources), "Correct resources are displayed in the review step");
                         }
-
-                        // Actions
-                        if (app.actions.length) {
-                            var actions = [],
-                                appSelectedActions = _.where(app.actions, {selected: true}),
-                                actionPair;
-
-                            _.each(editAppView.$el.find('ul#reviewActions').find('li'), function (value) {
-                                actionPair = value.innerHTML.split(':');
-                                actions.push({action: actionPair[0].trim(), value: actionPair[1].trim() === 'Allowed', selected: true});
-                            });
-
-                            QUnit.ok(_.isEqual(actions, appSelectedActions), "Correct actions are displayed in the review step");
-                        }
-
-                        // Subject Conditions
-                        if (app.subjects.length) {
-                            var subjects = [];
-                            _.each(editAppView.$el.find('ul#reviewSubjects').find('li'), function (value, key) {
-                                subjects[key] = value.innerHTML;
-                            });
-
-                            QUnit.ok(_.isEqual(subjects, app.subjects), "Correct subject conditions are displayed in the review step");
-                        }
-
-                        // Environment Conditions
-                        if (app.conditions.length) {
-                            var envConditions = [];
-                            _.each(editAppView.$el.find('ul#reviewEnvConditions').find('li'), function (value, key) {
-                                envConditions[key] = value.innerHTML;
-                            });
-
-                            QUnit.ok(_.isEqual(envConditions, app.conditions), "Correct environment conditions are displayed in the review step");
-                        }
-
-                        // Entitlement Combiner
-                        QUnit.ok(editAppView.$el.find('#reviewEntComb').html().split(':')[0] === app.entitlementCombiner, "Correct name is displayed in the review step");
-
                     }));
 
                 });
@@ -267,12 +156,10 @@ define([
 
                 editAppView.render([], function () {
                     var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
-                        actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
+                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>');
 
                     resListView.element = resListViewEl[0];
                     addNewResView.element = addNewResViewEl[0];
-                    actionsView.element = actionsViewEl[0];
 
                     QUnit.start();
 
@@ -284,7 +171,6 @@ define([
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === '', "Name is empty");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === '', "Description is empty");
-                    QUnit.ok(editAppView.$el.find('#appType').val() === app.applicationType, "Application type is selected");
                     QUnit.ok(editAppView.$el.find('#appRealm').val() === '', "Realm is empty");
 
                     // Step 2
@@ -292,36 +178,6 @@ define([
                         var resources = resListView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
                     });
-
-                    // Step 3
-                    actionsView.render([], function () {
-                        // Correct actions are displayed for the selected application type
-                        var availableActions = actionsView.data.typeActions[actionsView.data.entity.applicationType],
-                            actionsCells = actionsView.$el.find('.action-name');
-                        QUnit.ok(availableActions.length === actionsCells.length, "Correct number of actions is displayed");
-
-                        var actionsPresent = true;
-                        _.each(actionsCells, function (val, key, list) {
-                            actionsPresent = actionsPresent && _.find(availableActions, function (action) {
-                                return action.action === val.innerHTML;
-                            });
-                        });
-                        QUnit.ok(actionsPresent, "Actions are displayed correctly (available for selected application type)");
-                    });
-
-                    // Step 4
-                    var subjCond = editAppView.$el.find('[name=subjCond]:checked');
-                    QUnit.ok(subjCond.length === 0, "0 subject conditions is selected");
-
-                    // Step 5
-                    var envCond = editAppView.$el.find('[name=envCond]:checked');
-                    QUnit.ok(envCond.length === 0, "0 environment conditions is selected");
-
-                    // Step 6
-
-                    var options = editAppView.data.options;
-                    QUnit.ok(editAppView.$el.find('#conflictRule').is(':checked'), "Decision conflict rule radio is checked");
-                    QUnit.ok(app.entitlementCombiner === 'DenyOverride', "Decision conflict rule is set");
                 });
             });
 

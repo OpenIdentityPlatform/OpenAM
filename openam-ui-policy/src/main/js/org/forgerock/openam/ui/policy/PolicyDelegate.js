@@ -35,9 +35,9 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/openam/json");
 
-    obj.getApplicationTypes = function (successCallback, errorCallback) {
+    obj.getApplicationType = function (applicationType, successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/applicationtypes?_queryFilter=true",
+            url: "/applicationtypes/" + applicationType,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             success: function (data) {
                 if (successCallback) {
