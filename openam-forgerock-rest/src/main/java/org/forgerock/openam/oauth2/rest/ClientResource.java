@@ -178,7 +178,7 @@ public class ClientResource implements CollectionResourceProvider {
                 throw new PermanentException(ResourceException.BAD_REQUEST, "Missing user password", null);
             }
 
-            if (!client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)){
+            if (client.containsKey(OAuth2Constants.OAuth2Client.CLIENT_TYPE)) {
                 String type = client.get(OAuth2Constants.OAuth2Client.CLIENT_TYPE).iterator().next();
                 if (!(type.equals("Confidential") || type.equals("Public"))){
                     debug.error("ClientResource :: CREATE by " + principal + ": " +
