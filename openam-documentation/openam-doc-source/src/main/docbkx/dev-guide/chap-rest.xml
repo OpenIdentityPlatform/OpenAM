@@ -2357,8 +2357,8 @@ $ <userinput>curl \
 {
    "subject": {
        "type": "Attribute",
-       "name": "ou",
-       "value": "Product Testing"
+       "id": "mail",
+       "value": "test@example.com"
    }
 }
          </programlisting>
