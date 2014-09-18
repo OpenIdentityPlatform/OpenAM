@@ -181,7 +181,7 @@ public class RestEndpoints {
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
 
         router.addRoute("/authenticate")
-                .addVersion("1.0", wrap(AuthenticationServiceV1.class))
+                .addVersion("1.1", wrap(AuthenticationServiceV1.class))
                 .addVersion("2.0", wrap(AuthenticationServiceV2.class));
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);

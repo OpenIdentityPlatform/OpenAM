@@ -185,6 +185,7 @@ public class RestAuthenticationHandlerTest {
         given(pagePropertiesCallback.getTemplateName()).willReturn("TEMPLATE_NAME");
         given(pagePropertiesCallback.getModuleName()).willReturn("MODULE_NAME");
         given(pagePropertiesCallback.getPageState()).willReturn("PAGE_STATE");
+        given(pagePropertiesCallback.getHeader()).willReturn("HEADER");
 
         AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
 
@@ -208,10 +209,11 @@ public class RestAuthenticationHandlerTest {
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.size(), 4);
+        assertEquals(response.size(), 5);
         assertEquals(response.get("authId").asString(), "AUTH_ID");
         assertEquals(response.get("template").asString(), "TEMPLATE_NAME");
         assertEquals(response.get("stage").asString(), "MODULE_NAMEPAGE_STATE");
+        assertEquals(response.get("header").asString(), "HEADER");
         assertEquals(response.get("callbacks").get("KEY").asString(), "VALUE");
     }
 
