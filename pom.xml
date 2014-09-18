@@ -285,9 +285,6 @@
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
 
-        <!-- OpenAM ForgeRock REST - CORE Module -->
-        <module>openam-forgerock-rest</module>
-
         <module>openam-plugins</module>
 
         <module>openam-console</module>
@@ -629,11 +626,6 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-rest</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-forgerock-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

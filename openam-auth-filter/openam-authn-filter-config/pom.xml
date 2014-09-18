@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-forgerock-rest</artifactId>
+            <artifactId>openam-rest</artifactId>
         </dependency>
     </dependencies>
 </project>
