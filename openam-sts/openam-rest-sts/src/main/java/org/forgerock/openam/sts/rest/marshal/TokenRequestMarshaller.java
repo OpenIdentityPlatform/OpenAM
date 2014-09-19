@@ -64,15 +64,6 @@ public interface TokenRequestMarshaller {
     SAML2SubjectConfirmation getSubjectConfirmation(JsonValue token) throws TokenMarshalException;
 
     /**
-     * Returns the ServiceProvider's Assertion Consumer Service URL specified in the SAML2TokenState. Note that this
-     * method should only be called if a Bearer assertion is specified by the SAML2TokenState.
-     * @param token The JsonValue corresponding to the SAML2TokenState
-     * @return The SP ACS URL
-     * @throws TokenMarshalException if the value could not be obtained
-     */
-    String getServiceProviderAssertionConsumerServiceUrl(JsonValue token) throws TokenMarshalException;
-
-    /**
      * Returns the X509Certificated proof token for HolderOfKey assertions specified in the SAML2TokenState. Note that
      * this method should only be called if a HolderOfKey assertion is specified by the SAML2TokenState.
      * @param token The JsonValue corresponding to the SAML2TokenState

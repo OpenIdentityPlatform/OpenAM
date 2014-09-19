@@ -25,11 +25,9 @@ import java.util.*;
 /**
  * Class which encapsulates all of the user-provided config information necessary to create an instance of the
  * STS.
- * It is an ummutable object with getter methods to obtain all of the necessary information needed by the various
+ * It is an immutable object with getter methods to obtain all of the necessary information needed by the various
  * guice modules and providers to inject the object graph corresponding to a fully-configured STS instance.
  *
- *
- * @author Dirk Hogan
  */
 public class SoapSTSInstanceConfig extends STSInstanceConfig {
     public abstract static class SOAPSTSInstanceConfigBuilderBase <T extends SOAPSTSInstanceConfigBuilderBase<T>> extends STSInstanceConfig.STSInstanceConfigBuilderBase<T>  {
@@ -50,6 +48,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         private Set<TokenType> renewTokenTypes;
 
         private DeploymentConfig deploymentConfig;
+        private SoapSTSKeystoreConfig keystoreConfig;
 
         private SOAPSTSInstanceConfigBuilderBase() {
             issueTokenTypes = new HashSet<TokenType>();
@@ -82,6 +81,12 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
             issueTokenTypes.add(type);
             return self();
         }
+
+        public T soapSTSKeystoreConfig(SoapSTSKeystoreConfig keystoreConfig) {
+            this.keystoreConfig = keystoreConfig;
+            return self();
+        }
+
         public SoapSTSInstanceConfig build() {
             return new SoapSTSInstanceConfig(this);
         }
@@ -103,6 +108,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
     private final Set<TokenType> renewTokenTypes;
 
     private final DeploymentConfig deploymentConfig;
+    private final SoapSTSKeystoreConfig keystoreConfig;
 
     private SoapSTSInstanceConfig(SOAPSTSInstanceConfigBuilderBase<?> builder) {
         super(builder);
@@ -111,6 +117,7 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
         this.validateTokenTransformTypes = Collections.unmodifiableMap(builder.validateTokenTransformTypes);
         this.renewTokenTypes = Collections.unmodifiableSet(builder.renewTokenTypes);
         this.deploymentConfig = builder.deploymentConfig;
+        this.keystoreConfig = builder.keystoreConfig;
         Reject.ifNull(keystoreConfig, "KeystoreConfig cannot be null");
         Reject.ifNull(issuerName, "Issuer name cannot be null");
         Reject.ifNull(deploymentConfig, "DeploymentConfig cannot be null");
@@ -139,6 +146,10 @@ public class SoapSTSInstanceConfig extends STSInstanceConfig {
 
     public Set<TokenType> getRenewTokenTypes() {
         return renewTokenTypes;
+    }
+
+    public SoapSTSKeystoreConfig getKeystoreConfig() {
+        return keystoreConfig;
     }
 
     @Override

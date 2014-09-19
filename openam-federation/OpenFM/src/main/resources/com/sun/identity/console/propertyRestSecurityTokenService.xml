@@ -95,65 +95,28 @@
             <fieldhelp name="helpDeploymentTLSOffloadEngineHosts" defaultValue="rest.sts.deployment.TLSOffloadEngineHosts.help" />
         </property>
     </section>
-
-    <section name="Keystore" defaultValue="rest.sts.keystore.section.title">
-        <property>
-            <label name="lblKeystoreFilename"
-                   defaultValue="rest.sts.keystore.filename"
-                   labelFor="keystore-filename"/>
-            <cc name="keystore-filename"
-                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-            </cc>
-            <fieldhelp name="helpKeystoreFilename" defaultValue="rest.sts.keystore.filename.help" />
-        </property>
-
-        <property>
-            <label name="lblKeystorePassword"
-                   defaultValue="rest.sts.keystore.password"
-                   labelFor="keystore-password"/>
-            <cc name="keystore-password"
-                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
-            </cc>
-        </property>
-
-        <property>
-            <label name="lblKeystoreEncryptionKeyAlias"
-                   defaultValue="rest.sts.keystore.EncryptionKeyAlias"
-                   labelFor="keystore-encryption-key-alias"/>
-            <cc name="keystore-encryption-key-alias"
-                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-            </cc>
-        </property>
-
-        <property>
-            <label name="lblKeystoreEncryptionKeyPassword"
-                   defaultValue="rest.sts.keystore.EncryptionKeyPassword"
-                   labelFor="keystore-encryption-key-password"/>
-            <cc name="keystore-encryption-key-password"
-                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
-            </cc>
-        </property>
-
-        <property>
-            <label name="lblKeystoreSignatureKeyAlias"
-                   defaultValue="rest.sts.keystore.SignatureKeyAlias"
-                   labelFor="keystore-signature-key-alias"/>
-            <cc name="keystore-signature-key-alias"
-                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-            </cc>
-        </property>
-
-        <property>
-            <label name="lblKeystoreSignatureKeyPassword"
-                   defaultValue="rest.sts.keystore.SignatureKeyPassword"
-                   labelFor="keystore-signature-key-password"/>
-            <cc name="keystore-signature-key-password"
-                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
-            </cc>
-        </property>
-    </section>
-
     <section name="SAML2" defaultValue="rest.sts.saml2.section.title">
+        <property>
+            <label name="lblSAML2ServiceProviderEntityId"
+                   defaultValue="rest.sts.saml2.ServiceProviderEntityId"
+                   labelFor="saml2-sp-entity-id"/>
+            <cc name="saml2-sp-entity-id"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2ServiceProviderEntityId"
+                       defaultValue="rest.sts.saml2.ServiceProviderEntityId.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2ServiceProviderAssertionConsumerServiceUrl"
+                   defaultValue="rest.sts.saml2.ServiceProviderAssertionConsumerServiceUrl"
+                   labelFor="saml2-sp-acs-url"/>
+            <cc name="saml2-sp-acs-url"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2ServiceProviderAssertionConsumerServiceUrl"
+                       defaultValue="rest.sts.saml2.ServiceProviderAssertionConsumerServiceUrl.help" />
+        </property>
         <property>
             <label name="lblSAML2NameIdFormat"
                    defaultValue="rest.sts.saml2.NameIdFormat"
@@ -252,30 +215,6 @@
         </property>
 
         <property>
-            <label name="lblSAML2CanonicalizationAlgorithm"
-                   defaultValue="rest.sts.saml2.CanonicalizationAlgorithm"
-                   labelFor="saml2-canonicalization-algorithm"/>
-            <cc name="saml2-canonicalization-algorithm"
-                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="rest.sts.saml2.CanonicalizationExcNoComments" value="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-                <option label="rest.sts.saml2.CanonicalizationExcWithComments" value="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"/>
-            </cc>
-        </property>
-
-        <property>
-            <label name="lblSAML2SignatureAlgorithm"
-                   defaultValue="rest.sts.saml2.SignatureAlgorithm"
-                   labelFor="saml2-signature-algorithm"/>
-            <cc name="saml2-signature-algorithm"
-                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="rest.sts.saml2.SignatureKeyDetermined" value=""/>
-                <option label="rest.sts.saml2.SignatureDsaSha1" value="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
-                <option label="rest.sts.saml2.SignatureRsaSha1" value="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-            </cc>
-            <fieldhelp name="helpSAML2SignatureAlgorithm" defaultValue="rest.sts.saml2.SignatureAlgorithm.help" />
-        </property>
-
-        <property>
             <label name="lblSAML2SignAssertion"
                    defaultValue="rest.sts.saml2.SignAssertion"
                    labelFor="saml2-sign-assertion"/>
@@ -285,16 +224,95 @@
         </property>
 
         <property>
-            <label name="lblSAML2Audiences"
-                   defaultValue="rest.sts.saml2.Audiences"
-                   labelFor="saml2-audiences"/>
-            <cc name="saml2-audiences"
-                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
-                <attribute name="name" value="list" />
-                <attribute name="listboxLabel" value="label.current.value" />
-                <attribute name="textboxLabel" value="label.new.value" />
+            <label name="lblSAML2EncryptAssertion"
+                   defaultValue="rest.sts.saml2.EncryptAssertion"
+                   labelFor="saml2-encrypt-assertion"/>
+            <cc name="saml2-encrypt-assertion"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
             </cc>
-            <fieldhelp name="helpSAML2Audiences" defaultValue="rest.sts.saml2.Audiences.help" />
+            <fieldhelp name="helpSAML2EncryptAssertion" defaultValue="rest.sts.saml2.EncryptAssertion.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptAttributes"
+                   defaultValue="rest.sts.saml2.EncryptAttributes"
+                   labelFor="saml2-encrypt-attributes"/>
+            <cc name="saml2-encrypt-attributes"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpSAML2EncryptAttributes" defaultValue="rest.sts.saml2.EncryptAttributes.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptNameID"
+                   defaultValue="rest.sts.saml2.EncryptNameID"
+                   labelFor="saml2-encrypt-nameid"/>
+            <cc name="saml2-encrypt-nameid"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+            </cc>
+            <fieldhelp name="helpSAML2EncryptNameID" defaultValue="rest.sts.saml2.EncryptNameID.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2EncryptionAlgorithm"
+                   defaultValue="rest.sts.saml2.EncryptionAlgorithm"
+                   labelFor="saml2-encryption-algorithm"/>
+            <cc name="saml2-encryption-algorithm"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+                <option label="http://www.w3.org/2001/04/xmlenc#aes128-cbc" value="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+                <option label="http://www.w3.org/2001/04/xmlenc#aes192-cbc" value="http://www.w3.org/2001/04/xmlenc#aes192-cbc"/>
+                <option label="http://www.w3.org/2001/04/xmlenc#aes256-cbc" value="http://www.w3.org/2001/04/xmlenc#aes256-cbc"/>
+                <attribute name="multiple" value="false" />
+            </cc>
+            <fieldhelp name="helpSAML2EncryptionAlgorithm" defaultValue="rest.sts.saml2.EncryptionAlgorithm.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreFilename"
+                   defaultValue="rest.sts.saml2.keystore.filename"
+                   labelFor="saml2-keystore-filename"/>
+            <cc name="saml2-keystore-filename"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreFilename" defaultValue="rest.sts.saml2.keystore.filename.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystorePassword"
+                   defaultValue="rest.sts.saml2.keystore.password"
+                   labelFor="saml2-keystore-password"/>
+            <cc name="saml2-keystore-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreEncryptionKeyAlias"
+                   defaultValue="rest.sts.saml2.keystore.EncryptionKeyAlias"
+                   labelFor="saml2-encryption-key-alias"/>
+            <cc name="saml2-encryption-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreEncryptionKeyAlias" defaultValue="rest.sts.saml2.keystore.EncryptionKeyAlias.help" />
+        </property>
+
+        <property>
+            <label name="lblSAML2KeystoreSignatureKeyAlias"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyAlias"
+                   labelFor="saml2-signature-key-alias"/>
+            <cc name="saml2-signature-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            </cc>
+            <fieldhelp name="helpSAML2KeystoreSignatureKeyAlias" defaultValue="rest.sts.saml2.keystore.SignatureKeyAlias.help" />
+        </property>
+
+        <property>
+            <label name="lblKeystoreSignatureKeyPassword"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyPassword"
+                   labelFor="saml2-signature-key-password"/>
+            <cc name="saml2-signature-key-password"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
         </property>
 
         <property>

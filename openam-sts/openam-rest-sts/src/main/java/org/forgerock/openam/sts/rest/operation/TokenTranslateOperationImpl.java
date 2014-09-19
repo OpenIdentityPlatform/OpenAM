@@ -179,10 +179,6 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
         Additionally, the AMSAMLTokenProvider needs to specify the AuthnContext passed to the TokenGenerationService. This
         value will be a function of the validated token type, so this value is placed in the additionalProperties as well.
 
-        If we are dealing with Bearer SubjectConfirmation, the ServiceProvider AssertionConsumerService URL must
-        be provided to the TokenGenerationService so that it may be set as the Recipient attribute of the SubjectConfirmationData,
-        as specified by section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf
-
         Finally, if we are dealing with HolderOfKey SubjectConfirmation, the ProofTokenState must be included in the request
         to the TokenGenerationService.
          */
@@ -191,10 +187,6 @@ public class TokenTranslateOperationImpl implements TokenTranslateOperation {
             final SAML2SubjectConfirmation subjectConfirmation = tokenRequestMarshaller.getSubjectConfirmation(desiredToken);
             additionalProperties.put(AMSTSConstants.SAML2_SUBJECT_CONFIRMATION_KEY, subjectConfirmation);
             additionalProperties.put(AMSTSConstants.VALIDATED_TOKEN_TYPE_KEY, inputTokenType);
-            if (SAML2SubjectConfirmation.BEARER.equals(subjectConfirmation)) {
-                final String spAcsUrl = tokenRequestMarshaller.getServiceProviderAssertionConsumerServiceUrl(desiredToken);
-                additionalProperties.put(AMSTSConstants.SP_ACS_URL_KEY, spAcsUrl);
-            }
             /*
             The established CXF-STS way to include the x509Certificate specified in the ProofTokenState would be to
             include it in a ReceivedKey specified in the KeyRequirements specified in the TokenProviderParameters.

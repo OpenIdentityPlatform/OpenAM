@@ -270,7 +270,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 return RestSTSInstanceConfig.fromJson(requestContent.get(AMSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE));
             } catch (Exception e) {
                 logger.error("Exception caught marshalling json into RestSTSInstanceConfig instance for SDK invocation " +
-                        "context: " + e);
+                        "context: " + e, e);
                 throw new BadRequestException(e);
             }
         } else if (AMSTSConstants.REST_STS_PUBLISH_INVOCATION_CONTEXT_VIEW_BEAN.equals(invocationContext)) {
@@ -279,7 +279,7 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                         AMSTSConstants.REST_STS_PUBLISH_INSTANCE_STATE));
             } catch (Exception e) {
                 logger.error("Exception caught marshalling attribute map into RestSTSInstanceConfig instance for " +
-                        "ViewBean invocation context: " + e);
+                        "ViewBean invocation context: " + e, e);
                 throw new BadRequestException(e);
             }
         } else {

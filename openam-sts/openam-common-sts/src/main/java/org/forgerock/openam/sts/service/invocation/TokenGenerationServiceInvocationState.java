@@ -49,13 +49,6 @@ public class TokenGenerationServiceInvocationState {
         private ProofTokenState proofTokenState;
         private String realm = "/"; //default value
 
-        /*
-        According to section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf:
-        Bearer assertions must contain a SubjectConfirmationData element that contains a Recipient attribute which
-        contains the service providers assertion consumer service url.
-         */
-        private String spAcsUrl;
-
         public TokenGenerationServiceInvocationStateBuilder ssoTokenString(String ssoTokenString) {
             this.ssoTokenString = ssoTokenString;
             return this;
@@ -78,11 +71,6 @@ public class TokenGenerationServiceInvocationState {
 
         public TokenGenerationServiceInvocationStateBuilder saml2SubjectConfirmation(SAML2SubjectConfirmation saml2SubjectConfirmation) {
             this.saml2SubjectConfirmation = saml2SubjectConfirmation;
-            return this;
-        }
-
-        public TokenGenerationServiceInvocationStateBuilder serviceProviderAssertionConsumerServiceUrl(String spAcsUrl) {
-            this.spAcsUrl = spAcsUrl;
             return this;
         }
 
@@ -119,7 +107,6 @@ public class TokenGenerationServiceInvocationState {
     private static final String TOKEN_TYPE = "tokenType";
     private static final String STS_INSTANCE_ID = "stsInstanceId";
     private static final String SAML2_SUBJECT_CONFIRMATION = "saml2SubjectConfirmation";
-    private static final String SP_ACS_URL = "spAcsUrl";
     private static final String STS_TYPE = "stsType";
     private static final String PROOF_TOKEN_STATE = "proofTokenState";
     private static final String REALM = "realm";
@@ -129,7 +116,6 @@ public class TokenGenerationServiceInvocationState {
     private final TokenType tokenType;
     private final String stsInstanceId;
     private final SAML2SubjectConfirmation saml2SubjectConfirmation;
-    private final String spAcsUrl;
     private final AMSTSConstants.STSType stsType;
     private final ProofTokenState proofTokenState;
     private final String realm;
@@ -140,7 +126,6 @@ public class TokenGenerationServiceInvocationState {
         this.tokenType = builder.tokenType;
         this.stsInstanceId = builder.stsInstanceId;
         this.saml2SubjectConfirmation = builder.saml2SubjectConfirmation;
-        this.spAcsUrl = builder.spAcsUrl; // no reject if null, as is optional, but only for non-bearer tokens
         this.stsType = builder.stsType;
         this.realm = builder.realm;
         this.proofTokenState = builder.proofTokenState;//no reject if null, as it is optional
@@ -151,11 +136,6 @@ public class TokenGenerationServiceInvocationState {
         Reject.ifNull(saml2SubjectConfirmation, "SAML2 subject confirmation method must be set");
         Reject.ifNull(stsType, "sts type must be set");
         Reject.ifNull(realm, "realm must be set");
-        if (SAML2SubjectConfirmation.BEARER.equals(saml2SubjectConfirmation) && ((spAcsUrl == null) || spAcsUrl.isEmpty())) {
-            throw new IllegalStateException("According to section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf:\n" +
-                    "Bearer assertions must contain a SubjectConfirmationData element that contains a Recipient attribute which\n" +
-                    "contains the service providers assertion consumer service url.");
-        }
         if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(saml2SubjectConfirmation) && (proofTokenState == null)) {
             throw new IllegalStateException("Specified a SAML2 HolderOfKey assertion without specifying the " +
                     "ProofTokenState necessary to prove assertion ownership.");
@@ -186,9 +166,6 @@ public class TokenGenerationServiceInvocationState {
         return saml2SubjectConfirmation;
     }
 
-    public String getSpAcsUrl() {
-        return spAcsUrl;
-    }
 
     public AMSTSConstants.STSType getStsType() {
         return stsType;
@@ -209,7 +186,6 @@ public class TokenGenerationServiceInvocationState {
         sb.append('\t').append("TokenType: ").append(tokenType.name()).append('\n');
         sb.append('\t').append("STS instance id: ").append(stsInstanceId).append('\n');
         sb.append('\t').append("saml2 subject confirmation ").append(saml2SubjectConfirmation).append('\n');
-        sb.append('\t').append("Service Provider ACS URL ").append(spAcsUrl).append('\n');
         sb.append('\t').append("sts type ").append(stsType).append('\n');
         sb.append('\t').append("ProofTokenState ").append(proofTokenState).append('\n');
         sb.append('\t').append("AuthNContextClassRef ").append(authnContextClassRef).append('\n');
@@ -228,7 +204,6 @@ public class TokenGenerationServiceInvocationState {
                     realm.equals(otherConfig.getRealm()) &&
                     saml2SubjectConfirmation.equals(otherConfig.getSaml2SubjectConfirmation()) &&
                     authnContextClassRef.equals(otherConfig.getAuthnContextClassRef()) &&
-                    (spAcsUrl != null ? spAcsUrl.equals(otherConfig.getSpAcsUrl()) : otherConfig.getSpAcsUrl() == null) &&
                     (proofTokenState != null ? proofTokenState.equals(otherConfig.getProofTokenState()) : otherConfig.getProofTokenState() == null);
         }
         return false;
@@ -246,7 +221,6 @@ public class TokenGenerationServiceInvocationState {
                 field(TOKEN_TYPE, tokenType.name()),
                 field(STS_INSTANCE_ID, stsInstanceId),
                 field(SAML2_SUBJECT_CONFIRMATION, saml2SubjectConfirmation.name()),
-                field(SP_ACS_URL, spAcsUrl),
                 field(REALM, realm),
                 field(STS_TYPE, stsType.name())));
         if (proofTokenState != null) {
@@ -263,7 +237,6 @@ public class TokenGenerationServiceInvocationState {
                 .stsInstanceId(json.get(STS_INSTANCE_ID).asString())
                 .realm(json.get(REALM).asString())
                 .saml2SubjectConfirmation(SAML2SubjectConfirmation.valueOf(SAML2SubjectConfirmation.class, json.get(SAML2_SUBJECT_CONFIRMATION).asString()))
-                .serviceProviderAssertionConsumerServiceUrl(json.get(SP_ACS_URL).asString())
                 .stsType(AMSTSConstants.STSType.valueOf(AMSTSConstants.STSType.class, json.get(STS_TYPE).asString()));
         JsonValue proofToken = json.get(PROOF_TOKEN_STATE);
         if (!proofToken.isNull()) {

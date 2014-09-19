@@ -18,7 +18,6 @@ package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.testng.annotations.Test;
 
 import javax.xml.namespace.QName;
@@ -73,8 +72,8 @@ public class SoapSTSInstanceConfigTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
+        SoapSTSKeystoreConfig keystoreConfig =
+                SoapSTSKeystoreConfig.builder()
                         .fileName("stsstore.jks")
                         .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .encryptionKeyAlias("mystskey")
@@ -85,7 +84,7 @@ public class SoapSTSInstanceConfigTest {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
+                .soapSTSKeystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();
     }
@@ -99,8 +98,8 @@ public class SoapSTSInstanceConfigTest {
                         .amDeploymentUrl("whatever")
                         .build();
 
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
+        SoapSTSKeystoreConfig keystoreConfig =
+                SoapSTSKeystoreConfig.builder()
                         .fileName("stsstore.jks")
                         .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .encryptionKeyAlias("mystskey")
@@ -111,7 +110,7 @@ public class SoapSTSInstanceConfigTest {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
+                .soapSTSKeystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .build();
     }

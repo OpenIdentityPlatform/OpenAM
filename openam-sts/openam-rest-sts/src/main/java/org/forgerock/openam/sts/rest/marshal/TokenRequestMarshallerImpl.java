@@ -151,24 +151,6 @@ public class TokenRequestMarshallerImpl implements TokenRequestMarshaller {
         }
     }
 
-    public String getServiceProviderAssertionConsumerServiceUrl(JsonValue token) throws TokenMarshalException {
-        try {
-            SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
-            return tokenState.getServiceProviderAssertionConsumerServiceUrl();
-        } catch (TokenMarshalException e) {
-            /*
-            Try to get the value directly
-             */
-            JsonValue acsUrl = token.get(SAML2TokenState.SP_ACS_URL);
-            if (acsUrl.isNull()) {
-                throw new TokenMarshalException(ResourceException.BAD_REQUEST,
-                        "No SP Assertion Consumer Service url specified in the JsonValue corresponding to SAML2TokenState. " +
-                                "The JsonValue: " + token.toString());
-            }
-            return acsUrl.asString();
-        }
-    }
-
     public ProofTokenState getProofTokenState(JsonValue token) throws TokenMarshalException {
         final SAML2TokenState tokenState = SAML2TokenState.fromJson(token);
         final ProofTokenState proofTokenState = tokenState.getProofTokenState();

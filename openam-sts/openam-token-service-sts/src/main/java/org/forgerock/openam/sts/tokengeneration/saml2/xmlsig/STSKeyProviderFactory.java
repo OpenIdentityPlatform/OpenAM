@@ -17,11 +17,11 @@
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.forgerock.openam.sts.config.user.SAML2Config;
 
 /**
  * Defines concern related to obtaining an instance of the STSKeyProvider class.
  */
 public interface STSKeyProviderFactory {
-    STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException;
+    STSKeyProvider createSTSKeyProvider(SAML2Config config) throws TokenCreationException;
 }

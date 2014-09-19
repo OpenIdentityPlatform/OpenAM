@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.shared.Constants;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
 import org.apache.cxf.sts.cache.DefaultInMemoryTokenStore;
@@ -168,49 +167,9 @@ public class RestSTSInstanceModule extends AbstractModule {
     STSPropertiesMBean getSTSProperties(Logger logger) {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
-        /*
-        The STSCallbackHandler is used to obtain the password for the signature and encryption keys for a given key alias.
-        However, because the REST-STS is not issuing SAML2 assertions via the CXF-STS framework, a signature key is not
-        required. In addition, because encryption key support is usually required in the context of enforcing wsdl-resident
-        SecurityPolicy, bindings, which are obviously not present in the REST-STS, the encryption context is not required
-        either.
-        Furthermore, because OpenAM is issuing SAML2 assertions, and performing all of the token validation, the
-        Crypto context does not need to be initialized at all. Retaining this code for the moment in case this support is required for
-        some pending token transformation.
-        stsProperties.setCallbackHandler(new STSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
-
-        Crypto crypto = null;
-        try {
-            crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        } catch (WSSecurityException e) {
-            String message = "Exception caught initializing the CryptoFactory: " + e;
-            logger.error(message, e);
-            throw new IllegalStateException(message);
-        }
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureUsername(stsInstanceConfig.getKeystoreConfig().getSignatureKeyAlias());
-        */
         return stsProperties;
     }
-/*
-    private Properties getEncryptionProperties() {
-        Properties properties = new Properties();
-        properties.put(
-                "org.apache.ws.security.crypto.provider", "org.apache.ws.security.components.crypto.Merlin"
-        );
-        String keystorePassword  = null;
-        try {
-            keystorePassword = new String(stsInstanceConfig.getKeystoreConfig().getKeystorePassword(), AMSTSConstants.UTF_8_CHARSET_ID);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Unsupported string encoding for keystore password: " + e);
-        }
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.password", keystorePassword);
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.file", stsInstanceConfig.getKeystoreConfig().getKeystoreFileName());
-        properties.put("org.apache.ws.security.crypto.merlin.keystore.type", "jks");
-        return properties;
-    }
-*/
+
     /*
     Provides the WSSUsernameTokenValidator provider to the TokenTransformFactoryImpl
      */

@@ -79,30 +79,6 @@ provided for required attributes upon service registration.
                 <AttributeSchema name="deployment-tls-offload-engine-hosts"
                                  type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
                 </AttributeSchema>
-                <AttributeSchema name="keystore-filename"
-                                 type="single" syntax="string" i18nKey="keystore_filename"
-                                 validator="RequiredValueValidator">
-                </AttributeSchema>
-                <AttributeSchema name="keystore-password"
-                                 type="single" syntax="password" i18nKey="keystore_password"
-                                 validator="RequiredValueValidator">
-                </AttributeSchema>
-                <AttributeSchema name="keystore-encryption-key-alias"
-                                 type="single" syntax="string" i18nKey="keystore_encryption_key_alias"
-                                 validator="RequiredValueValidator">
-                </AttributeSchema>
-                <AttributeSchema name="keystore-encryption-key-password"
-                                 type="single" syntax="password" i18nKey="keystore_encryption_key_password">
-                </AttributeSchema>
-
-                <AttributeSchema name="keystore-signature-key-alias"
-                                 type="single" syntax="string" i18nKey="keystore_signature_key_alias"
-                                 validator="RequiredValueValidator">
-                </AttributeSchema>
-                <AttributeSchema name="keystore-signature-key-password"
-                                 type="single" syntax="password" i18nKey="keystore_signature_key_password">
-                </AttributeSchema>
-
                 <AttributeSchema name="saml2-name-id-format"
                                  type="single" syntax="string" i18nKey="saml2_name_id_format"
                                  validator="RequiredValueValidator">
@@ -131,23 +107,54 @@ provided for required attributes upon service registration.
                 <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
                                  type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
                 </AttributeSchema>
-                <AttributeSchema name="saml2-canonicalization-algorithm"
-                                 type="single" syntax="string" i18nKey="saml2_canonicalization_algorithm"
-                                 validator="RequiredValueValidator">
-                    <DefaultValues>
-                        <Value>http://www.w3.org/2001/10/xml-exc-c14n#</Value>
-                    </DefaultValues>
-                </AttributeSchema>
-                <AttributeSchema name="saml2-signature-algorithm"
-                                 type="single" syntax="string" i18nKey="saml2_signature_algorithm">
-                </AttributeSchema>
                 <AttributeSchema name="saml2-sign-assertion"
                                  type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
                 </AttributeSchema>
-                <AttributeSchema name="saml2-audiences"
-                                 type="list"
-                                 syntax="string"
-                                 i18nKey="saml2_audiences">
+                <AttributeSchema name="saml2-sp-entity-id"
+                                 type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-sp-acs-url"
+                                 type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-attributes"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-assertion"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encrypt-nameid"
+                                 type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-algorithm"
+                                 type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
+                        <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_256">http://www.w3.org/2001/04/xmlenc#aes256-cbc</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2001/04/xmlenc#aes128-cbc</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-algorithm-strength"
+                                 type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-keystore-filename"
+                                 type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-keystore-password"
+                                 type="single" syntax="password" i18nKey="saml2_keystore_password">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-encryption-key-alias"
+                                 type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-signature-key-alias"
+                                 type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                 validator="RequiredValueValidator">
+                </AttributeSchema>
+                <AttributeSchema name="saml2-signature-key-password"
+                                 type="single" syntax="password" i18nKey="saml2_signature_key_password">
                 </AttributeSchema>
                 <AttributeSchema name="saml2-attribute-map"
                                  type="list"
@@ -200,29 +207,6 @@ provided for required attributes upon service registration.
                     <AttributeSchema name="deployment-tls-offload-engine-hosts"
                                      type="list" syntax="string" i18nKey="deployment_tls_offload_engine_hosts">
                     </AttributeSchema>
-                    <AttributeSchema name="keystore-filename"
-                                     type="single" syntax="string" i18nKey="keystore_filename"
-                                     validator="RequiredValueValidator">
-                    </AttributeSchema>
-                    <AttributeSchema name="keystore-password"
-                                     type="single" syntax="password" i18nKey="keystore_password"
-                                     validator="RequiredValueValidator">
-                    </AttributeSchema>
-                    <AttributeSchema name="keystore-encryption-key-alias"
-                                     type="single" syntax="string" i18nKey="keystore_encryption_key_alias"
-                                     validator="RequiredValueValidator">
-                    </AttributeSchema>
-                    <AttributeSchema name="keystore-encryption-key-password"
-                                     type="single" syntax="password" i18nKey="keystore_encryption_key_password">
-                    </AttributeSchema>
-                    <AttributeSchema name="keystore-signature-key-alias"
-                                     type="single" syntax="string" i18nKey="keystore_signature_key_alias"
-                                     validator="RequiredValueValidator">
-                    </AttributeSchema>
-                    <AttributeSchema name="keystore-signature-key-password"
-                                     type="single" syntax="password" i18nKey="keystore_signature_key_password">
-                    </AttributeSchema>
-
                     <AttributeSchema name="saml2-name-id-format"
                                      type="single" syntax="string" i18nKey="saml2_name_id_format"
                                      validator="RequiredValueValidator">
@@ -251,23 +235,54 @@ provided for required attributes upon service registration.
                     <AttributeSchema name="saml2-custom-authn-context-mapper-class-name"
                                      type="single" syntax="string" i18nKey="saml2_custom_authn_context_mapper_class_name">
                     </AttributeSchema>
-                    <AttributeSchema name="saml2-canonicalization-algorithm"
-                                     type="single" syntax="string" i18nKey="saml2_canonicalization_algorithm"
-                                     validator="RequiredValueValidator">
-                        <DefaultValues>
-                            <Value>http://www.w3.org/2001/10/xml-exc-c14n#</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="saml2-signature-algorithm"
-                                     type="single" syntax="string" i18nKey="saml2_signature_algorithm">
-                    </AttributeSchema>
                     <AttributeSchema name="saml2-sign-assertion"
                                      type="single" syntax="boolean" i18nKey="saml2_sign_assertion">
                     </AttributeSchema>
-                    <AttributeSchema name="saml2-audiences"
-                                     type="list"
-                                     syntax="string"
-                                     i18nKey="saml2_audiences">
+                    <AttributeSchema name="saml2-sp-entity-id"
+                                     type="single" syntax="string" i18nKey="saml2_sp_entity_id"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-sp-acs-url"
+                                     type="single" syntax="string" i18nKey="saml2_sp_acs_url">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-attributes"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_attributes">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-assertion"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_assertion">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encrypt-nameid"
+                                     type="single" syntax="boolean" i18nKey="saml2_encrypt_nameid">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-algorithm"
+                                     type="single_choice" syntax="string" i18nKey="saml2_encryption_algorithm">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_128">http://www.w3.org/2001/04/xmlenc#aes128-cbc</ChoiceValue>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_192">http://www.w3.org/2001/04/xmlenc#aes192-cbc</ChoiceValue>
+                            <ChoiceValue i18nKey="saml2_encryption_algorithm_aes_256">http://www.w3.org/2001/04/xmlenc#aes256-cbc</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>http://www.w3.org/2001/04/xmlenc#aes128-cbc</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-algorithm-strength"
+                                     type="single" syntax="number" i18nKey="saml2_encryption_algorithm_strength">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-keystore-filename"
+                                     type="single" syntax="string" i18nKey="saml2_keystore_filename">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-keystore-password"
+                                     type="single" syntax="password" i18nKey="saml2_keystore_password">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-encryption-key-alias"
+                                     type="single" syntax="string" i18nKey="saml2_encryption_key_alias">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-signature-key-alias"
+                                     type="single" syntax="string" i18nKey="saml2_signature_key_alias"
+                                     validator="RequiredValueValidator">
+                    </AttributeSchema>
+                    <AttributeSchema name="saml2-signature-key-password"
+                                     type="single" syntax="password" i18nKey="saml2_signature_key_password">
                     </AttributeSchema>
                     <AttributeSchema name="saml2-attribute-map"
                                      type="list"

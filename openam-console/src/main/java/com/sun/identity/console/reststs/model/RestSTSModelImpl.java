@@ -22,6 +22,7 @@ import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
 import com.sun.identity.console.base.model.AMSystemConfig;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -146,25 +147,38 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.issuername.message"));
         }
 
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.KEYSTORE_FILE_NAME))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.filename.message"));
-        }
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.KEYSTORE_PASSWORD))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.password.message"));
-        }
-        if ("true".equalsIgnoreCase(configurationState.get(SharedSTSConstants.SAML2_SIGN_ASSERTION).iterator().next())) {
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SIGNATURE_KEY_ALIAS))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.signature.keyalias.message"));
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
+
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.filename.message"));
             }
-            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SIGNATURE_KEY_PASSWORD))) {
-                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.signature.keypassword.message"));
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_KEYSTORE_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.password.message"));
             }
         }
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ENCRYPTION_KEY_ALIAS))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.encryption.keyalias.message"));
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_SIGN_ASSERTION, false)) {
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keyalias.message"));
+            }
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.signature.keypassword.message"));
+            }
         }
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.ENCRYPTION_KEY_PASSWORD))) {
-            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.keystore.encryption.keypassword.message"));
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false)) {
+
+            if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS))) {
+                return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.saml2.keystore.encryption.keyalias.message"));
+            }
+        }
+        if (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ASSERTION, false)
+                && (CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES, false)
+                    || CollectionHelper.getBooleanMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPT_NAME_ID, false))) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.saml2.encryptioncombinations.message"));
         }
 
         if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS))) {
@@ -175,10 +189,28 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
     }
 
     /*
-    Add the url corresponding to the am deployment, and the realm, as this information does not have to be solicited from the user.
+    Add the realm, as this information does not have to be solicited from the user. Also add the encryption strength
+    parameter, as this value is hard-coded based upon the encryption algorithm type, and necessary only if the
+    FMEncProvider is over-ridden. See comment in SAML2Config.SAML2ConfigBuilder#encryptionAlgorithmStrength for details.
      */
     private void addProgrammaticConfigurationState(Map<String, Set<String>> configurationState, String realm) {
         configurationState.put(SharedSTSConstants.DEPLOYMENT_REALM, CollectionUtils.asSet(realm));
+        final String encryptionAlgorithmStrength =
+                getEncryptionStrengthFromEncryptionAlgorithm(CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM));
+        configurationState.put(SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM_STRENGTH,
+                CollectionUtils.asSet(encryptionAlgorithmStrength));
+    }
+
+    private String getEncryptionStrengthFromEncryptionAlgorithm(String encryptionAlgorithm) {
+        if ("http://www.w3.org/2001/04/xmlenc#aes128-cbc".equals(encryptionAlgorithm)) {
+            return "128";
+        } else if ("http://www.w3.org/2001/04/xmlenc#aes192-cbc".equals(encryptionAlgorithm)) {
+            return "192";
+        } else if ("http://www.w3.org/2001/04/xmlenc#aes256-cbc".equals(encryptionAlgorithm)) {
+            return "256";
+        }
+        //safety case, should not be triggered because possible values specified in properties file
+        return "128";
     }
 
     private JsonValue createInstanceInvocationState(Map<String, Set<String>> configurationState) {

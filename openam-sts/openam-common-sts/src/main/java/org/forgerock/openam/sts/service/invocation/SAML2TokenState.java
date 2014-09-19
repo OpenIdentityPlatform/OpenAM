@@ -34,7 +34,6 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class SAML2TokenState {
     public static class SAML2TokenStateBuilder {
         private SAML2SubjectConfirmation subjectConfirmation;
-        private String spAcsUrl;
         private ProofTokenState proofTokenState;
 
         public SAML2TokenStateBuilder saml2SubjectConfirmation(SAML2SubjectConfirmation subjectConfirmation) {
@@ -44,11 +43,6 @@ public class SAML2TokenState {
 
         public SAML2TokenStateBuilder proofTokenState(ProofTokenState proofTokenState) {
             this.proofTokenState = proofTokenState;
-            return this;
-        }
-
-        public SAML2TokenStateBuilder serviceProviderAssertionConsumerServiceUrl(String spAcsUrl) {
-            this.spAcsUrl = spAcsUrl;
             return this;
         }
 
@@ -62,31 +56,19 @@ public class SAML2TokenState {
      */
     public static final String SUBJECT_CONFIRMATION = "subject_confirmation";
     public static final String PROOF_TOKEN_STATE = "proof_token_state";
-    public static final String SP_ACS_URL = "service_provider_assertion_consumer_service_url";
 
     private final SAML2SubjectConfirmation subjectConfirmation;
     private final ProofTokenState proofTokenState;
-    private final String spAcsUrl;
 
     private SAML2TokenState(SAML2TokenStateBuilder builder) throws TokenMarshalException {
         this.subjectConfirmation = builder.subjectConfirmation;
         this.proofTokenState = builder.proofTokenState;
-        this.spAcsUrl = builder.spAcsUrl;
         if (subjectConfirmation == null) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "SubjectConfirmation type must be set.");
         }
         if (SAML2SubjectConfirmation.HOLDER_OF_KEY.equals(subjectConfirmation) && (proofTokenState == null)) {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "If " +
                     SAML2SubjectConfirmation.HOLDER_OF_KEY + " is specified, proofTokenState must also be set.");
-        }
-        /*
-        See section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf: for a Bearer assertion,
-        the Recipient attribute of the SubjectConfirmationData must contain the Service Provider Assertion Consumer Service
-        Url.
-         */
-        if (SAML2SubjectConfirmation.BEARER.equals(subjectConfirmation) && (spAcsUrl == null)) {
-            throw new TokenMarshalException(ResourceException.BAD_REQUEST, "If " +
-                    SAML2SubjectConfirmation.BEARER + " is specified, the serviceProviderAssertionConsumerServiceUrl must also be set.");
         }
     }
 
@@ -102,10 +84,6 @@ public class SAML2TokenState {
         return proofTokenState;
     }
 
-    public String getServiceProviderAssertionConsumerServiceUrl() {
-        return spAcsUrl;
-    }
-
     public static SAML2TokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
         String subjectConfirmationString = jsonValue.get(SUBJECT_CONFIRMATION).asString();
         if (subjectConfirmationString == null) {
@@ -119,8 +97,7 @@ public class SAML2TokenState {
             throw new TokenMarshalException(ResourceException.BAD_REQUEST, "Invalid subject confirmation type specified.");
         }
         SAML2TokenStateBuilder builder = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(saml2SubjectConfirmation)
-                .serviceProviderAssertionConsumerServiceUrl(jsonValue.get(SP_ACS_URL).asString());
+                .saml2SubjectConfirmation(saml2SubjectConfirmation);
         JsonValue jsonProofToken = jsonValue.get(PROOF_TOKEN_STATE);
         if (!jsonProofToken.isNull()) {
             builder.proofTokenState(ProofTokenState.fromJson(jsonProofToken));
@@ -133,13 +110,11 @@ public class SAML2TokenState {
             return json(object(
                     field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.SAML2.name()),
                     field(SUBJECT_CONFIRMATION, subjectConfirmation.name()),
-                    field(SP_ACS_URL, spAcsUrl),
                     field(PROOF_TOKEN_STATE, proofTokenState.toJson())));
 
         } else {
             return json(object(
                     field(AMSTSConstants.TOKEN_TYPE_KEY, TokenType.SAML2.name()),
-                    field(SP_ACS_URL, spAcsUrl),
                     field(SUBJECT_CONFIRMATION, subjectConfirmation.name())));
         }
     }
@@ -159,8 +134,6 @@ public class SAML2TokenState {
         if (other instanceof SAML2TokenState) {
             SAML2TokenState otherTokenState = (SAML2TokenState)other;
             return subjectConfirmation.equals(otherTokenState.getSubjectConfirmation()) &&
-                    spAcsUrl != null ? spAcsUrl.equals(otherTokenState.getServiceProviderAssertionConsumerServiceUrl()) :
-                    (otherTokenState.getServiceProviderAssertionConsumerServiceUrl() == null) &&
                     proofTokenState != null ? proofTokenState.equals(otherTokenState.getProofTokenState()) :
                     (otherTokenState.getProofTokenState() == null);
         }

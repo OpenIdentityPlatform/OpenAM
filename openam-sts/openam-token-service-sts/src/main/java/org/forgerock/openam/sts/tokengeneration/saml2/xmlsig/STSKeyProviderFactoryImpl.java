@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
 
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.slf4j.Logger;
 
 import javax.inject.Inject;
@@ -31,7 +31,14 @@ public class STSKeyProviderFactoryImpl implements STSKeyProviderFactory {
     STSKeyProviderFactoryImpl(Logger logger) {
         this.logger = logger;
     }
-    public STSKeyProvider createSTSKeyProvider(KeystoreConfig config) throws TokenCreationException {
-        return new STSKeyProviderImpl(config, logger);
+    public STSKeyProvider createSTSKeyProvider(SAML2Config config) throws TokenCreationException {
+        /*
+        Return a real STSKeyProvider only if the configuration indicates that encryption or signing will be required.
+         */
+        if (config.signAssertion() || config.encryptAttributes() || config.encryptNameID() || config.encryptAssertion()) {
+            return new STSKeyProviderImpl(config, logger);
+        } else {
+            return new FauxSTSKeyProvider();
+        }
     }
 }

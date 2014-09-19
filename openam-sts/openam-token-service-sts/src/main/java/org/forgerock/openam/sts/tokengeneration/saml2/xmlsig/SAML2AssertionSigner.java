@@ -25,7 +25,23 @@ import java.security.cert.X509Certificate;
 
 /**
  * Encapsulates concerns related to signing SAML2 Assertions.
- *  */
+ * @deprecated In the standard consumption of the OpenAM SAML2 generation libraries (e.g. IDPSSOUtil), the AssertionImpl
+ * class is consumed directly to sign the assertion. Assertion signing is ultimately delegated to the FMSigProvider class.
+ * I initially chose not to go this path, but rather implement my own SAML2AssertionSigner interface and implementation,
+ * because the signature algorithm and canonicalization algorithm are set globally in the FMSigProvider. However, it
+ * seems that the signature algorithm is ultimately a function of the type of the private key (DSA or RSA), and the
+ * customization of the canonicalization algorithm does not seem to be a particularly desirable feature.
+ *
+ * Furthermore, if an entire assertion is to be encrypted, this encryption must take place AFTER the assertion is signed.
+ * Thus an assertion must be re-constituted from signing interface that generates an Element. This is certainly possible
+ * using the AssertionImpl ctor, but this also requires that my token generation functionality deal with the AssertionImpl
+ * class, rather than the Assertion interface. I would rather be constrained by a globally-defined canonicalization
+ * algorithm, than have to code directly to the AssertionImpl interface. However, this interface, and the corresponding
+ * implementation, will be kept around in case customer input indicates that canonicalization algorithm specification is
+ * desirable. It is hard to imagine that any customer plugs in their own, custom Assertion implementation, but I'd rather
+ * code to an interface, and thus will consume the assertion signing functionality encapsulated in the Assertion interface.
+ *
+ */
 public interface SAML2AssertionSigner {
     /**
      * @param saml2Document The to-be-signed document

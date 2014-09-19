@@ -170,14 +170,8 @@ public class AMSAMLTokenProvider implements TokenProvider {
                                 Map<String, Object> additionalProperties) throws TokenCreationException {
         switch (subjectConfirmation) {
             case BEARER:
-                Object spAcsUrlObject = additionalProperties.get(AMSTSConstants.SP_ACS_URL_KEY);
-                if (!(spAcsUrlObject instanceof String)) {
-                    throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                            "No string entry in additionalProperties map in TokenProvideProperties for "
-                                    + AMSTSConstants.SP_ACS_URL_KEY);
-                }
                 return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, realm, (String)spAcsUrlObject, authnContextClassRef);
+                        stsInstanceId, realm, authnContextClassRef);
             case SENDER_VOUCHES:
                 return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMToken(),
                         stsInstanceId, realm, authnContextClassRef);

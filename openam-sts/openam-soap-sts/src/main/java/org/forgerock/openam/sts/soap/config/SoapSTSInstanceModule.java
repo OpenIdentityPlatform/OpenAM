@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Provider;
 
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.apache.cxf.sts.STSPropertiesMBean;
 import org.apache.cxf.sts.StaticSTSProperties;
@@ -42,11 +41,11 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.message.token.UsernameToken;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.STSCallbackHandler;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
 import org.forgerock.openam.sts.XmlMarshaller;
 import org.forgerock.openam.sts.soap.STSEndpoint;
+import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisherImpl;
 import org.forgerock.openam.sts.soap.token.config.*;
@@ -156,7 +155,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     STSPropertiesMBean getSTSProperties(Logger logger) {
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         stsProperties.setIssuer(stsInstanceConfig.getIssuerName());
-        stsProperties.setCallbackHandler(new STSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
+        stsProperties.setCallbackHandler(new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto;
         try {
             crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -181,7 +180,7 @@ public class SoapSTSInstanceModule extends AbstractModule {
     @Inject
     Map<String, Object> getProperties(Provider<UsernameTokenValidator> usernameTokenValidatorProvider, Logger logger) throws WSSecurityException {
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(SecurityConstants.CALLBACK_HANDLER, new STSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
+        properties.put(SecurityConstants.CALLBACK_HANDLER, new SoapSTSCallbackHandler(stsInstanceConfig.getKeystoreConfig(), logger));
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         properties.put(SecurityConstants.ENCRYPT_CRYPTO, crypto);
         properties.put(SecurityConstants.SIGNATURE_CRYPTO, crypto);

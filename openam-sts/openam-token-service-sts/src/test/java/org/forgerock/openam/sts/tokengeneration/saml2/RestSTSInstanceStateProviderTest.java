@@ -27,7 +27,6 @@ import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
 import org.forgerock.openam.sts.rest.ServiceListenerRegistration;
@@ -43,12 +42,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -112,35 +107,17 @@ public class RestSTSInstanceStateProviderTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        KeystoreConfig keystoreConfig = null;
-        try {
-            keystoreConfig = KeystoreConfig.builder()
-                    .fileName("/Users/bobo/openam/openam/keystore.jks")
-                    .password("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .encryptionKeyAlias("dill")
-                    .signatureKeyAlias("dill")
-                    .encryptionKeyPassword("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .signatureKeyPassword("bobo".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .build();
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
         Map<String, String> attributes = new HashMap<String, String>();
         attributes.put("email", "mail");
-        Set<String> audiences = new HashSet<String>();
-        audiences.add("http://host.com:8080/openam/sp");
         SAML2Config saml2Config =
                 SAML2Config.builder()
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                        .audiences(audiences)
+                        .spEntityId("http://host.com/sp/entity/id")
                         .build();
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("http://macbook.dirk.internal.forgerock.com:8080/openam")
                 .addSupportedTokenTranslation(
@@ -160,7 +137,5 @@ public class RestSTSInstanceStateProviderTest {
                         TokenType.SAML2,
                         AMSTSConstants.INVALIDATE_INTERIM_OPENAM_SESSION)
                 .build();
-
     }
-
 }

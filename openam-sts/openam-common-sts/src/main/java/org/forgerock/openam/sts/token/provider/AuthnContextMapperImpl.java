@@ -42,6 +42,8 @@ public class AuthnContextMapperImpl implements AuthnContextMapper {
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
             case OPENIDCONNECT:
                 return SAML2Constants.AUTH_CONTEXT_CLASS_REF_PASSWORD_PROTECTED_TRANSPORT;
+            case X509:
+                return SAML2Constants.AUTH_CONTEXT_CLASS_REF_X509;
             default:
                 logger.error("Unexpected TokenType passed to AuthnContextMapperImpl: " + inputTokenType + "; returning " +
                         SAML2Constants.AUTH_CONTEXT_CLASS_REF_UNSPECIFIED);

@@ -233,17 +233,13 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         if (configurationState == null) {
             return;
         }
-        String password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.KEYSTORE_PASSWORD);
+        String password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_KEYSTORE_PASSWORD);
         if (AMPropertySheetModel.passwordRandom.equals(password)) {
-            configurationState.remove(SharedSTSConstants.KEYSTORE_PASSWORD);
+            configurationState.remove(SharedSTSConstants.SAML2_KEYSTORE_PASSWORD);
         }
-        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SIGNATURE_KEY_PASSWORD);
+        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD);
         if (AMPropertySheetModel.passwordRandom.equals(password)) {
-            configurationState.remove(SharedSTSConstants.SIGNATURE_KEY_PASSWORD);
-        }
-        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.ENCRYPTION_KEY_PASSWORD);
-        if (AMPropertySheetModel.passwordRandom.equals(password)) {
-            configurationState.remove(SharedSTSConstants.ENCRYPTION_KEY_PASSWORD);
+            configurationState.remove(SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD);
         }
     }
 

@@ -37,13 +37,9 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertEquals;
@@ -105,12 +101,10 @@ public class DefaultSubjectProviderTest {
         Map<String, String> attributeMap = new HashMap<String, String>();
         attributeMap.put("email", "mail");
         SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder();
-        Set<String> audiences = new HashSet<String>();
-        audiences.add("http://macbook.dirk.internal.forgerock.com:8080/openam/sp");
         return builder
                 .attributeMap(attributeMap)
                 .nameIdFormat(NAME_ID_FORMAT)
-                .audiences(audiences)
+                .spEntityId("http://host.com/sp/entity/id")
                 .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)
                 .build();
     }

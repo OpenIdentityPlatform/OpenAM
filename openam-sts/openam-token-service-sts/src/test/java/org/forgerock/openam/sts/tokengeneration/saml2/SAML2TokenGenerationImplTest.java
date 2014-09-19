@@ -27,7 +27,6 @@ import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XMLUtilities;
 import org.forgerock.openam.sts.XMLUtilitiesImpl;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.rest.config.user.RestDeploymentConfig;
@@ -55,13 +54,9 @@ import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -75,7 +70,6 @@ public class SAML2TokenGenerationImplTest {
     private static final String AUTHN_CONTEXT = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
     private static final String SSO_TOKEN_STRING = "irrelevant";
     private static final String STS_INSTANCE_ID = "also_irrelevant";
-    private static final String SP_ACS_URL = "cho_mama";
     private static final boolean SIGN_ASSERTION = true;
     private static final String HOLDER_OF_KEY = "urn:oasis:names:tc:SAML:2.0:cm:holder-of-key";
     private static final String BEARER = "urn:oasis:names:tc:SAML:2.0:cm:bearer";
@@ -187,7 +181,6 @@ public class SAML2TokenGenerationImplTest {
                 .tokenType(TokenType.SAML2)
                 .stsInstanceId(STS_INSTANCE_ID)
                 .saml2SubjectConfirmation(subjectConfirmation)
-                .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                 .proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build())
                 .build();
 
@@ -210,36 +203,23 @@ public class SAML2TokenGenerationImplTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        KeystoreConfig keystoreConfig = null;
-        try {
-            keystoreConfig = KeystoreConfig.builder()
-                    .fileName("/keystore.jks")
-                    .password("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .encryptionKeyAlias("test")
-                    .signatureKeyAlias("test")
-                    .encryptionKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                    .build();
-
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
         Map<String, String> attributes = new HashMap<String, String>();
         attributes.put("email", "mail");
-        Set<String> audiences = new HashSet<String>();
-        audiences.add("spEntityId");
         SAML2Config saml2Config =
                 SAML2Config.builder()
                         .attributeMap(attributes)
                         .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                        .audiences(audiences)
+                        .spEntityId("http://host.com/sp/entity/id")
                         .signAssertion(signAssertion)
+                        .keystoreFile("/keystore.jks")
+                        .keystorePassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                        .encryptionKeyAlias("test")
+                        .signatureKeyAlias("test")
+                        .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                         .build();
 
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .issuerName("idpEntityId")
                 .addSupportedTokenTranslation(

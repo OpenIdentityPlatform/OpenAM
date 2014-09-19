@@ -21,12 +21,12 @@ import com.google.inject.Injector;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
+import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.soap.config.SoapSTSInstanceModule;
 import org.forgerock.openam.sts.soap.config.user.DeploymentConfig;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 
 import javax.jws.WebService;
@@ -99,9 +99,9 @@ public class STSPublishImpl implements STSPublish {
                                         .authTargetMapping(mapping)
                                         .build();
 
-        KeystoreConfig keystoreConfig;
+        SoapSTSKeystoreConfig keystoreConfig;
         try {
-            keystoreConfig = KeystoreConfig.builder()
+            keystoreConfig = SoapSTSKeystoreConfig.builder()
                     .fileName("stsstore.jks")
                     .password("frstssrvkspw".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                     .encryptionKeyAlias("frstssrval")
@@ -115,7 +115,7 @@ public class STSPublishImpl implements STSPublish {
 
         return SoapSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
+                .soapSTSKeystoreConfig(keystoreConfig)
                 .issuerName("OpenAM")
                 .addIssueTokenType(TokenType.SAML2)
                 .addRenewTokenType(TokenType.SAML2)

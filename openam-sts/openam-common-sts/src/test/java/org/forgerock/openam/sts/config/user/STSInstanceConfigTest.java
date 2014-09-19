@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.sts.config.user;
 
-import org.forgerock.openam.sts.AMSTSConstants;
 import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
@@ -27,7 +26,6 @@ import static org.testng.Assert.assertFalse;
 
 public class STSInstanceConfigTest {
     private static final String ISSUER = "cornholio";
-    private static final String KEYSTORE = "keystore_stuff";
 
     @Test
     public void testSettings() throws UnsupportedEncodingException {
@@ -82,44 +80,24 @@ public class STSInstanceConfigTest {
     }
 
     private STSInstanceConfig buildConfig() throws UnsupportedEncodingException {
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
-                        .fileName(KEYSTORE)
-                        .password(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias(KEYSTORE)
-                        .signatureKeyAlias(KEYSTORE)
-                        .encryptionKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
-
         return STSInstanceConfig.builder()
                 .issuerName(ISSUER)
-                .keystoreConfig(keystoreConfig)
                 .build();
     }
 
     private STSInstanceConfig buildConfigWithSaml2Config() throws UnsupportedEncodingException {
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
-                        .fileName(KEYSTORE)
-                        .password(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias(KEYSTORE)
-                        .signatureKeyAlias(KEYSTORE)
-                        .encryptionKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword(KEYSTORE.getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
-
         SAML2Config saml2Config =
                 SAML2Config.builder()
                 .nameIdFormat("transient")
                 .tokenLifetimeInSeconds(500000)
+                .keystoreFile("/usr/local/dillrod/keystore")
+                .keystorePassword("super_secret".getBytes())
+                .spEntityId("http://host.com/saml/entity/id")
                 .build();
 
         return STSInstanceConfig.builder()
                 .issuerName(ISSUER)
-                .keystoreConfig(keystoreConfig)
                 .saml2Config(saml2Config)
                 .build();
     }
-
 }

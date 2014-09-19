@@ -44,12 +44,10 @@ public class DefaultAuthenticationStatementsProviderTest {
         Map<String, String> attributeMap = new HashMap<String, String>();
         attributeMap.put("email", "mail");
 
-        Set<String> audiences = new HashSet<String>();
-        audiences.add("http://macbook.dirk.internal.forgerock.com:8080/openam/sp");
         return SAML2Config.builder()
                 .attributeMap(attributeMap)
                 .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                .audiences(audiences)
+                .spEntityId("http://host.com/sp/entity/id")
                 .build();
     }
 }

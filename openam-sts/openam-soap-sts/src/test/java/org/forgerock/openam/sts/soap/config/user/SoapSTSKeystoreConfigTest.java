@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.config.user;
+package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.testng.annotations.Test;
@@ -24,10 +24,10 @@ import java.io.UnsupportedEncodingException;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
-public class KeystoreConfigTest {
+public class SoapSTSKeystoreConfigTest {
     @Test
     public void testEquals() throws UnsupportedEncodingException {
-        KeystoreConfig kc1 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc1 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -36,7 +36,7 @@ public class KeystoreConfigTest {
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
 
-        KeystoreConfig kc2 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc2 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -51,7 +51,7 @@ public class KeystoreConfigTest {
 
     @Test
     public void testNotEquals() throws UnsupportedEncodingException {
-        KeystoreConfig kc1 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc1 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -59,7 +59,7 @@ public class KeystoreConfigTest {
                 .signatureKeyAlias("e")
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
-        KeystoreConfig kc2 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc2 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("aa")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -70,7 +70,7 @@ public class KeystoreConfigTest {
         assertNotEquals(kc1, kc2);
         assertNotEquals(kc1.hashCode(), kc2.hashCode());
 
-        KeystoreConfig kc3 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc3 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -79,7 +79,7 @@ public class KeystoreConfigTest {
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
 
-        KeystoreConfig kc4 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc4 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -94,7 +94,7 @@ public class KeystoreConfigTest {
 
     @Test (expectedExceptions = NullPointerException.class)
     public void testNullRejected() throws UnsupportedEncodingException {
-        KeystoreConfig.builder()
+        SoapSTSKeystoreConfig.builder()
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
                 .password("d".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
@@ -105,7 +105,7 @@ public class KeystoreConfigTest {
 
     @Test
     public void testSetting() throws UnsupportedEncodingException {
-        KeystoreConfig kc1 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc1 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -120,7 +120,7 @@ public class KeystoreConfigTest {
 
     @Test
     public void testJsonRountTrip() throws UnsupportedEncodingException {
-        KeystoreConfig kc1 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc1 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -128,12 +128,12 @@ public class KeystoreConfigTest {
                 .signatureKeyAlias("e")
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
-        assertEquals(kc1, KeystoreConfig.fromJson(kc1.toJson()));
+        assertEquals(kc1, SoapSTSKeystoreConfig.fromJson(kc1.toJson()));
     }
 
     @Test
     public void testAttributeMappingRoundTrip() throws UnsupportedEncodingException {
-        KeystoreConfig kc1 = KeystoreConfig.builder()
+        SoapSTSKeystoreConfig kc1 = SoapSTSKeystoreConfig.builder()
                 .encryptionKeyAlias("a")
                 .encryptionKeyPassword("b".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .fileName("c")
@@ -142,7 +142,7 @@ public class KeystoreConfigTest {
                 .signatureKeyPassword("f".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .build();
 
-        assertEquals(kc1, KeystoreConfig.marshalFromAttributeMap(kc1.marshalToAttributeMap()));
+        assertEquals(kc1, SoapSTSKeystoreConfig.marshalFromAttributeMap(kc1.marshalToAttributeMap()));
 
     }
 }

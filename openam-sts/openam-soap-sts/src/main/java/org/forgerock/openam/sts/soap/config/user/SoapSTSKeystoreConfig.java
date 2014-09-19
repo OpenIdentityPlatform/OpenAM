@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.config.user;
+package org.forgerock.openam.sts.soap.config.user;
 
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -36,11 +36,13 @@ import static org.forgerock.openam.shared.sts.SharedSTSConstants.*;
  * STS instance. UI state soliciting user input in the context of creating STS instances will emit instances of classes
  * in this package upon UI-harvest.
  *
- * This class defines the keystore state necessary to sign and encrypt tokens.
+ * This class defines the keystore state necessary for a soap-sts instance to sign and encrypt messages to/from the
+ * sts, as specified by the ws-security-policy bindings. Note that this keystore state does not pertain to the keystore
+ * state related to generating SAML2 assertions, which is defined in SAML2Config.
  *
  */
-public class KeystoreConfig {
-    public static class KeystoreConfigBuilder {
+public class SoapSTSKeystoreConfig {
+    public static class SoapSTSKeystoreConfigBuilder {
         private String keystoreFileName;
         private byte[] keystorePassword;
         private String signatureKeyAlias;
@@ -48,40 +50,47 @@ public class KeystoreConfig {
         private byte[] signatureKeyPassword;
         private byte[] encryptionKeyPassword;
 
-        public KeystoreConfigBuilder fileName(String keystoreFileName) {
+        public SoapSTSKeystoreConfigBuilder fileName(String keystoreFileName) {
             this.keystoreFileName = keystoreFileName;
             return this;
         }
 
-        public KeystoreConfigBuilder password(byte[] keystorePassword) {
+        public SoapSTSKeystoreConfigBuilder password(byte[] keystorePassword) {
             this.keystorePassword = keystorePassword;
             return this;
         }
 
-        public KeystoreConfigBuilder signatureKeyAlias(String signatureKeyAlias) {
+        public SoapSTSKeystoreConfigBuilder signatureKeyAlias(String signatureKeyAlias) {
             this.signatureKeyAlias = signatureKeyAlias;
             return this;
         }
 
-        public KeystoreConfigBuilder encryptionKeyAlias(String encryptionKeyAlias) {
+        public SoapSTSKeystoreConfigBuilder encryptionKeyAlias(String encryptionKeyAlias) {
             this.encryptionKeyAlias = encryptionKeyAlias;
             return this;
         }
 
-        public KeystoreConfigBuilder signatureKeyPassword(byte[] signatureKeyPassword) {
+        public SoapSTSKeystoreConfigBuilder signatureKeyPassword(byte[] signatureKeyPassword) {
             this.signatureKeyPassword = signatureKeyPassword;
             return this;
         }
 
-        public KeystoreConfigBuilder encryptionKeyPassword(byte[] encryptionKeyPassword) {
+        public SoapSTSKeystoreConfigBuilder encryptionKeyPassword(byte[] encryptionKeyPassword) {
             this.encryptionKeyPassword = encryptionKeyPassword;
             return this;
         }
 
-        public KeystoreConfig build() {
-            return new KeystoreConfig(this);
+        public SoapSTSKeystoreConfig build() {
+            return new SoapSTSKeystoreConfig(this);
         }
     }
+
+    public static final String KEYSTORE_FILE_NAME = "keystore-filename";
+    public static final String KEYSTORE_PASSWORD = "keystore-password";
+    public static final String SIGNATURE_KEY_ALIAS = "keystore-signature-key-alias";
+    public static final String ENCRYPTION_KEY_ALIAS = "keystore-encryption-key-alias";
+    public static final String SIGNATURE_KEY_PASSWORD = "keystore-signature-key-password";
+    public static final String ENCRYPTION_KEY_PASSWORD = "keystore-encryption-key-password";
 
     private final String keystoreFileName;
     private final byte[] keystorePassword;
@@ -94,7 +103,7 @@ public class KeystoreConfig {
     private final byte[] signatureKeyPassword;
     private final byte[] encryptionKeyPassword;
 
-    private KeystoreConfig(KeystoreConfigBuilder builder) {
+    private SoapSTSKeystoreConfig(SoapSTSKeystoreConfigBuilder builder) {
         this.keystoreFileName = builder.keystoreFileName;
         this.keystorePassword = builder.keystorePassword;
         this.signatureKeyAlias = builder.signatureKeyAlias;
@@ -109,8 +118,8 @@ public class KeystoreConfig {
         Reject.ifNull(encryptionKeyPassword, "Encryption key password cannot be null");
     }
 
-    public static KeystoreConfigBuilder builder() {
-        return new KeystoreConfigBuilder();
+    public static SoapSTSKeystoreConfigBuilder builder() {
+        return new SoapSTSKeystoreConfigBuilder();
     }
 
     public String getKeystoreFileName() {
@@ -147,8 +156,8 @@ public class KeystoreConfig {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof KeystoreConfig) {
-            KeystoreConfig otherConfig = (KeystoreConfig)other;
+        if (other instanceof SoapSTSKeystoreConfig) {
+            SoapSTSKeystoreConfig otherConfig = (SoapSTSKeystoreConfig)other;
             return keystoreFileName.equals(otherConfig.getKeystoreFileName()) &&
                     Arrays.equals(keystorePassword, otherConfig.getKeystorePassword()) &&
                     signatureKeyAlias.equals(otherConfig.getSignatureKeyAlias()) &&
@@ -177,9 +186,9 @@ public class KeystoreConfig {
         }
     }
 
-    public static KeystoreConfig fromJson(JsonValue json) throws IllegalStateException {
+    public static SoapSTSKeystoreConfig fromJson(JsonValue json) throws IllegalStateException {
         try {
-            return KeystoreConfig.builder()
+            return SoapSTSKeystoreConfig.builder()
                     .fileName(json.get(KEYSTORE_FILE_NAME).asString())
                     .password(json.get(KEYSTORE_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                     .signatureKeyAlias(json.get(SIGNATURE_KEY_ALIAS).asString())
@@ -196,7 +205,7 @@ public class KeystoreConfig {
         return MapMarshallUtils.toSmsMap(toJson().asMap());
     }
 
-    public static KeystoreConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
+    public static SoapSTSKeystoreConfig marshalFromAttributeMap(Map<String, Set<String>> attributeMap) {
         return fromJson(new JsonValue(MapMarshallUtils.toJsonValueMap(attributeMap)));
     }
 }

@@ -14,25 +14,30 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts;
+package org.forgerock.openam.sts.soap;
 
 import org.apache.ws.security.WSPasswordCallback;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import java.io.IOException;
 
+import org.forgerock.openam.sts.soap.config.user.SoapSTSKeystoreConfig;
 import org.slf4j.Logger;
 
-public class STSCallbackHandler implements CallbackHandler {
-    private final KeystoreConfig keystoreConfig;
+/**
+ * An instance of this class is set in the StaticSTSProperties passed to the cxf-runtime. It is used to provide passwords
+ * for the various signature and encryption keys needed to enforce the ws-security-policy bindings protecting a soap-sts
+ * instance.
+ */
+public class SoapSTSCallbackHandler implements CallbackHandler {
+    private final SoapSTSKeystoreConfig keystoreConfig;
 
     private final Logger logger;
 
-    public STSCallbackHandler(KeystoreConfig keystoreConfig, Logger logger) {
+    public SoapSTSCallbackHandler(SoapSTSKeystoreConfig keystoreConfig, Logger logger) {
         this.keystoreConfig = keystoreConfig;
         this.logger = logger;
     }

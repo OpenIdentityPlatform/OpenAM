@@ -34,6 +34,6 @@ public class RestSTSInstanceStateFactoryImpl implements RestSTSInstanceStateFact
     }
 
     public RestSTSInstanceState createRestSTSInstanceState(RestSTSInstanceConfig config) throws TokenCreationException {
-        return new RestSTSInstanceState(config, keyProviderFactory.createSTSKeyProvider(config.getKeystoreConfig()));
+        return new RestSTSInstanceState(config, keyProviderFactory.createSTSKeyProvider(config.getSaml2Config()));
     }
 }

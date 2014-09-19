@@ -39,6 +39,8 @@ import java.security.cert.X509Certificate;
  *
  * Code modeled after the FMSigProvider, and the enveloped signature creation found here:
  * https://svn.apache.org/repos/asf/santuario/xml-security-java/trunk/samples/org/apache/xml/security/samples/signature/CreateSignature.java
+ *
+ * @deprecated
  */
 public class SAML2AssertionSignerImpl implements SAML2AssertionSigner {
     /*
@@ -61,7 +63,7 @@ public class SAML2AssertionSignerImpl implements SAML2AssertionSigner {
 
         Element documentRoot = saml2Document.getDocumentElement();
         documentRoot.setIdAttribute(SAML2Constants.ID, true);
-        XMLSignature xmlSignature = null;
+        XMLSignature xmlSignature;
         try {
             xmlSignature = new XMLSignature(
                         saml2Document, EMPTY_BASE_URI, signatureAlgorithm, canonicalizationAlgorithm);

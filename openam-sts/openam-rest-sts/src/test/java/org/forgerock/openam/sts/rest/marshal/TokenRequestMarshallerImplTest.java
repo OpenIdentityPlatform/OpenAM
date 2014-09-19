@@ -64,7 +64,6 @@ import static org.testng.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 public class TokenRequestMarshallerImplTest {
-    private final String SP_ACS_URL = "http://sp.acs.com/consume";
     private TokenRequestMarshaller tokenMarshaller;
     static class MyModule extends AbstractModule {
 
@@ -132,7 +131,6 @@ public class TokenRequestMarshallerImplTest {
     public void testMarshalSubjectConfirmation() throws TokenMarshalException {
         SAML2TokenState tokenState = SAML2TokenState.builder()
                 .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                 .build();
         assertEquals(SAML2SubjectConfirmation.BEARER, tokenMarshaller.getSubjectConfirmation(tokenState.toJson()));
     }
@@ -141,21 +139,6 @@ public class TokenRequestMarshallerImplTest {
     public void testMarshalDegradedSubjectConfirmation() throws TokenMarshalException {
         JsonValue json = json(object(field(SAML2TokenState.SUBJECT_CONFIRMATION, SAML2SubjectConfirmation.BEARER.name())));
         assertEquals(SAML2SubjectConfirmation.BEARER, tokenMarshaller.getSubjectConfirmation(json));
-    }
-
-    @Test
-    public void testMarshalSPACSUrl() throws TokenMarshalException {
-        SAML2TokenState tokenState = SAML2TokenState.builder()
-                .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
-                .build();
-        assertEquals(SP_ACS_URL, tokenMarshaller.getServiceProviderAssertionConsumerServiceUrl(tokenState.toJson()));
-    }
-
-    @Test
-    public void testMarshalDegradedSPACSURL() throws TokenMarshalException {
-        JsonValue json = json(object(field(SAML2TokenState.SP_ACS_URL, SP_ACS_URL)));
-        assertEquals(SP_ACS_URL, tokenMarshaller.getServiceProviderAssertionConsumerServiceUrl(json));
     }
 
     @Test

@@ -17,19 +17,17 @@
 package org.forgerock.openam.sts.config.user;
 
 import org.apache.ws.security.saml.ext.builder.SAML2Constants;
-import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.shared.sts.SharedSTSConstants;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
-import org.forgerock.util.Reject;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -45,6 +43,12 @@ import static org.forgerock.json.fluent.JsonValue.object;
  * as this allows custom attributes to be set in the AttributeStatement.
  *
  * TODO: do I want a name-qualifier in addition to a nameIdFormat?
+ *
+ * Currently, each published rest-sts instance will encapsulate state to allow it to issue saml2 assertions for a single
+ * SP. Thus the spEntityId, and spAcsUrl (the url of the SP's assertion consumer service) are specified in this class.
+ * The signatureAlias corresponds to the IDP's signing
+ * key, and the encryptionKeyAlias could correspond to the SP's public key corresponding to the key used to encrypt the
+ * symmetric key used to encrypt assertion elements.
  */
 public class SAML2Config {
     private static final String EQUALS = "=";
@@ -56,12 +60,6 @@ public class SAML2Config {
         private String nameIdFormat = SAML2Constants.NAMEID_FORMAT_UNSPECIFIED;
         private Map<String, String> attributeMap;
         private long tokenLifetimeInSeconds = 60 * 10; //default token lifetime is 10 minutes
-        /**
-         * This list contains the EntityIds (URLs) of the SPs. It will be used to populate the Audiences of the AudienceRestriction
-         * element of the Conditions element, as required for bearer tokens.
-         * http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf
-         */
-        private Set<String> audiences;
         private String customConditionsProviderClassName;
         private String customSubjectProviderClassName;
         private String customAuthenticationStatementsProviderClassName;
@@ -69,9 +67,27 @@ public class SAML2Config {
         private String customAuthzDecisionStatementsProviderClassName;
         private String customAttributeMapperClassName;
         private String customAuthNContextMapperClassName;
-        private String canonicalizationAlgorithm = Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS;
-        private String signatureAlgorithm;
-        private boolean signAssertion = true;
+        private String spEntityId;
+        private String spAcsUrl;
+        private boolean signAssertion;
+        private boolean encryptNameID;
+        private boolean encryptAttributes;
+        private boolean encryptAssertion;
+        private String encryptionAlgorithm;
+        private int encryptionAlgorithmStrength;
+        private String keystoreFileName;
+        private byte[] keystorePassword;
+        /*
+        Corresponds to the key used to sign the assertion.
+         */
+        private String signatureKeyAlias;
+        private byte[] signatureKeyPassword;
+        /*
+        Corresponds to the SP's x509 cert -  the corresponding public key is used to encrypt the symmetric key used to
+        encrypt assertion elements
+         */
+        private String encryptionKeyAlias;
+
 
         public SAML2ConfigBuilder nameIdFormat(String nameIdFormat) {
             //TODO - test to see if it matches one of the allowed values?
@@ -86,11 +102,6 @@ public class SAML2Config {
 
         public SAML2ConfigBuilder tokenLifetimeInSeconds(long lifetimeInSeconds) {
             this.tokenLifetimeInSeconds = lifetimeInSeconds;
-            return this;
-        }
-
-        public SAML2ConfigBuilder audiences(Set<String> audiences) {
-            this.audiences = new LinkedHashSet<String>(audiences);
             return this;
         }
 
@@ -129,22 +140,28 @@ public class SAML2Config {
             return this;
         }
 
-        public SAML2ConfigBuilder canonicalizationAlgorithm(String canonicalizationAlgorithm) {
-            this.canonicalizationAlgorithm = canonicalizationAlgorithm;
+        public SAML2ConfigBuilder spEntityId(String spEntityId) {
+            this.spEntityId = spEntityId;
             return this;
         }
 
-        /*
-        See comments in SAML2AssertionSigner class about the ultimate validation of the correctness of this specification.
-        One issue with maintaining a static map of valid values is that the xmlsec package allows for the dynamic registration
-        of handlers for new signature specification types. It could make sense to new up an instance of the
-        org.apache.xml.security.algorithms.SignatureAlgorithm class with the specified algorithm, but this is a bit hacky,
-        and requires a Document parameter as well. The allowed set of algorithms is probably best handled in documentation.
-        If no algorithm is set, either http://www.w3.org/2000/09/xmldsig#dsa-sha1 or http://www.w3.org/2000/09/xmldsig#rsa-sha1
-        is used, depending upon the type of the private key.
-         */
-        public SAML2ConfigBuilder signatureAlgorithm(String signatureAlgorithm) {
-            this.signatureAlgorithm = signatureAlgorithm;
+        public SAML2ConfigBuilder spAcsUrl(String spAcsUrl) {
+            this.spAcsUrl = spAcsUrl;
+            return this;
+        }
+
+        public SAML2ConfigBuilder signatureKeyAlias(String signatureKeyAlias) {
+            this.signatureKeyAlias = signatureKeyAlias;
+            return this;
+        }
+
+        public SAML2ConfigBuilder signatureKeyPassword(byte[] signatureKeyPassword) {
+            this.signatureKeyPassword = signatureKeyPassword;
+            return this;
+        }
+
+        public SAML2ConfigBuilder encryptionKeyAlias(String encryptionKeyAlias) {
+            this.encryptionKeyAlias = encryptionKeyAlias;
             return this;
         }
 
@@ -153,6 +170,70 @@ public class SAML2Config {
             return this;
         }
 
+        public SAML2ConfigBuilder encryptNameID(boolean encryptNameID) {
+            this.encryptNameID = encryptNameID;
+            return this;
+        }
+
+        public SAML2ConfigBuilder encryptAttributes(boolean encryptAttributes) {
+            this.encryptAttributes = encryptAttributes;
+            return this;
+        }
+
+        public SAML2ConfigBuilder encryptAssertion(boolean encryptAssertion) {
+            this.encryptAssertion = encryptAssertion;
+            return this;
+        }
+
+        /*
+        Note that the encryption of SAML2 assertions, is, by default, delegated to the FMEncProvider class, which supports
+        only http://www.w3.org/2001/04/xmlenc#aes128-cbc, http://www.w3.org/2001/04/xmlenc#aes192-cbc,
+        http://www.w3.org/2001/04/xmlenc#aes256-cbc, or http://www.w3.org/2001/04/xmlenc#tripledes-cbc. However, because
+        this EncProvider implementation can be over-ridden by setting the com.sun.identity.saml2.xmlenc.EncryptionProvider
+        property, I can't reject the specification of an encryption algorithm not supported by the FMEncProvider, as
+        I don't know whether this property has been over-ridden.
+
+        Note also that I will remove http://www.w3.org/2001/04/xmlenc#tripledes-cbc from the set of choices exposed
+        in the UI. There seems to be a bug in the FMEncProvider - when the tripledes-cbc is chosen, note on line 294 that
+        this string http://www.w3.org/2001/04/xmlenc#tripledes-cbc is passed to XMLCipher.getInstance resulting in the
+        error below:
+        org.apache.xml.security.encryption.XMLEncryptionException: Wrong algorithm: DESede or TripleDES required
+        The correct thing is done in FMEncProvider#generateSecretKey, where the http://www.w3.org/2001/04/xmlenc#tripledes-cbc
+        is translated to 'TripleDES' before being passed to the XMLCipher - and this actually works.
+         */
+        public SAML2ConfigBuilder encryptionAlgorithm(String encryptionAlgorithm) {
+            this.encryptionAlgorithm = encryptionAlgorithm;
+            return this;
+        }
+
+        /*
+        Note that the encryption of SAML2 assertions, is, by default, delegated to the FMEncProvider class, which supports
+        only encryption algorithm strength values of 128, 192, and 256 for the encryption types XMLCipher.AES_128,
+        XMLCipher.AES_192, and XMLCipher.AES_256, respectively. It does not look like the XMLCipher.TRIPLEDES supports a
+        key encryption strength (see FMEncProvider for details). Given that the encryption strength is directly related
+        to the cipher, it seems a bit silly to set these values. However, because
+        this EncProvider implementation can be over-ridden by setting the com.sun.identity.saml2.xmlenc.EncryptionProvider
+        property, and because the EncProvider specifies an encryption strength parameter, it would seem that I would have
+        to support the setting of this seemingly superfluous parameter, just to support the plug-in interface. For now,
+        I will not expose this value in the UI, as it adds unnecessary complexity, and the encryption algorithms are
+        pre-defined as well. I will simply set this value in the UI context based upon the encryption algorithm. If
+        a customer wants to specify a custom value because they have implemented their own EncryptionProvider, then they
+        can publish a rest-sts instance programmatically.
+         */
+        public SAML2ConfigBuilder encryptionAlgorithmStrength(int encryptionAlgorithmStrength) {
+            this.encryptionAlgorithmStrength = encryptionAlgorithmStrength;
+            return this;
+        }
+
+        public SAML2ConfigBuilder keystoreFile(String keystoreFileName) {
+            this.keystoreFileName = keystoreFileName;
+            return this;
+        }
+
+        public SAML2ConfigBuilder keystorePassword(byte[] keystorePassword) {
+            this.keystorePassword = keystorePassword;
+            return this;
+        }
 
         public SAML2Config build() {
             return new SAML2Config(this);
@@ -167,7 +248,6 @@ public class SAML2Config {
     private static final String NAME_ID_FORMAT = "saml2-name-id-format";
     private static final String ATTRIBUTE_MAP = "saml2-attribute-map";
     private static final String TOKEN_LIFETIME = SharedSTSConstants.SAML2_TOKEN_LIFETIME;
-    private static final String AUDIENCES = "saml2-audiences";
     private static final String CUSTOM_CONDITIONS_PROVIDER_CLASS = "saml2-custom-conditions-provider-class-name";
     private static final String CUSTOM_SUBJECT_PROVIDER_CLASS = "saml2-custom-subject-provider-class-name";
     private static final String CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS = "saml2-custom-attribute-statements-provider-class-name";
@@ -175,14 +255,23 @@ public class SAML2Config {
     private static final String CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS = "saml2-custom-authz-decision-statements-provider-class-name";
     private static final String CUSTOM_ATTRIBUTE_MAPPER_CLASS = "saml2-custom-attribute-mapper-class-name";
     private static final String CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS = "saml2-custom-authn-context-mapper-class-name";
-    private static final String SIGNATURE_ALGORITHM = "saml2-signature-algorithm";
-    private static final String CANONICALIZATION_ALGORITHM = "saml2-canonicalization-algorithm";
     private static final String SIGN_ASSERTION = SharedSTSConstants.SAML2_SIGN_ASSERTION;
+    private static final String ENCRYPT_ATTRIBUTES = SharedSTSConstants.SAML2_ENCRYPT_ATTRIBUTES;
+    private static final String ENCRYPT_NAME_ID = SharedSTSConstants.SAML2_ENCRYPT_NAME_ID;
+    private static final String ENCRYPT_ASSERTION = SharedSTSConstants.SAML2_ENCRYPT_ASSERTION;
+    private static final String ENCRYPTION_ALGORITHM = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM;
+    private static final String ENCRYPTION_ALGORITHM_STRENGTH = SharedSTSConstants.SAML2_ENCRYPTION_ALGORITHM_STRENGTH;
+    private static final String KEYSTORE_FILE_NAME = SharedSTSConstants.SAML2_KEYSTORE_FILE_NAME;
+    private static final String KEYSTORE_PASSWORD = SharedSTSConstants.SAML2_KEYSTORE_PASSWORD;
+    private static final String SP_ENTITY_ID = SharedSTSConstants.SAML2_SP_ENTITY_ID;
+    private static final String SP_ACS_URL = SharedSTSConstants.SAML2_SP_ACS_URL;
+    private static final String ENCRYPTION_KEY_ALIAS = SharedSTSConstants.SAML2_ENCRYPTION_KEY_ALIAS;
+    private static final String SIGNATURE_KEY_ALIAS = SharedSTSConstants.SAML2_SIGNATURE_KEY_ALIAS;
+    private static final String SIGNATURE_KEY_PASSWORD = SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD;
 
     private final String nameIdFormat;
     private final Map<String, String> attributeMap;
     private final long tokenLifetimeInSeconds;
-    private final Set<String> audiences;
     private final String customConditionsProviderClassName;
     private final String customSubjectProviderClassName;
     private final String customAuthenticationStatementsProviderClassName;
@@ -190,9 +279,19 @@ public class SAML2Config {
     private final String customAuthzDecisionStatementsProviderClassName;
     private final String customAttributeMapperClassName;
     private final String customAuthNContextMapperClassName;
-    private final String signatureAlgorithm;
-    private final String canonicalizationAlgorithm;
+    private final String spEntityId;
+    private final String spAcsUrl;
     private final boolean signAssertion;
+    private final boolean encryptNameID;
+    private final boolean encryptAttributes;
+    private final boolean encryptAssertion;
+    private final String encryptionAlgorithm;
+    private final int encryptionAlgorithmStrength;
+    private final String keystoreFileName;
+    private final byte[] keystorePassword;
+    private final String signatureKeyAlias;
+    private final byte[] signatureKeyPassword;
+    private final String encryptionKeyAlias;
 
     private SAML2Config(SAML2ConfigBuilder builder) {
         this.nameIdFormat = builder.nameIdFormat; //not required so don't reject if null
@@ -200,11 +299,6 @@ public class SAML2Config {
             this.attributeMap = Collections.unmodifiableMap(builder.attributeMap);
         } else {
             attributeMap = Collections.emptyMap();
-        }
-        if (builder.audiences != null) {
-            this.audiences = Collections.unmodifiableSet(builder.audiences);
-        } else {
-            audiences = Collections.emptySet();
         }
         tokenLifetimeInSeconds = builder.tokenLifetimeInSeconds; //will be set to default if not explicitly set
         customConditionsProviderClassName = builder.customConditionsProviderClassName;
@@ -214,15 +308,52 @@ public class SAML2Config {
         customAttributeStatementsProviderClassName = builder.customAttributeStatementsProviderClassName;
         customAttributeMapperClassName = builder.customAttributeMapperClassName;
         customAuthNContextMapperClassName = builder.customAuthNContextMapperClassName;
-        signatureAlgorithm = builder.signatureAlgorithm;
-        canonicalizationAlgorithm = builder.canonicalizationAlgorithm;
         this.signAssertion = builder.signAssertion;
+        this.encryptNameID = builder.encryptNameID;
+        this.encryptAttributes = builder.encryptAttributes;
+        this.encryptAssertion = builder.encryptAssertion;
+        this.encryptionAlgorithm = builder.encryptionAlgorithm;
+        this.encryptionAlgorithmStrength = builder.encryptionAlgorithmStrength;
+        this.keystoreFileName = builder.keystoreFileName;
+        this.keystorePassword = builder.keystorePassword;
+        this.spEntityId = builder.spEntityId;
+        this.spAcsUrl = builder.spAcsUrl;
+        this.signatureKeyAlias = builder.signatureKeyAlias;
+        this.signatureKeyPassword = builder.signatureKeyPassword;
+        this.encryptionKeyAlias = builder.encryptionKeyAlias;
 
-        Reject.ifNull(canonicalizationAlgorithm, "CanonicalizationAlgorithm must be set.");
-        if (!Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS.equals(canonicalizationAlgorithm) && !Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS.equals(canonicalizationAlgorithm)) {
-            throw new IllegalArgumentException("Canonicalization algorithm must be set to either " +
-                    Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS + " or " + Canonicalizer.ALGO_ID_C14N_EXCL_WITH_COMMENTS + ". See" +
-                    "section 5.4.3 or 5.4.4 of http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf for details.");
+        if (spEntityId ==  null) {
+            throw new IllegalArgumentException("The entity id of the consumer (SP) for issued assertions must be specified.");
+        }
+        if (encryptAssertion || encryptNameID || encryptAttributes) {
+            if (encryptionAlgorithm == null) {
+                throw new IllegalArgumentException("If elements of the assertion are to be encrypted, an encryption " +
+                        "algorithm must be specified.");
+            }
+            if (encryptionAlgorithmStrength == 0 && !XMLCipher.TRIPLEDES.equals(encryptionAlgorithm)) {
+                throw new IllegalArgumentException("If elements of the assertion are to be encrypted, an encryption " +
+                        "algorithm strength must be specified.");
+            }
+            if (encryptionKeyAlias ==  null) {
+                throw new IllegalArgumentException("If elements of the assertion are to be encrypted, an encryption key" +
+                        "alias  must be specified.");
+            }
+        }
+        if (encryptAssertion || encryptNameID || encryptAttributes || signAssertion) {
+            if (keystorePassword == null || keystoreFileName == null) {
+                throw new IllegalArgumentException("If the assertions are to be signed or encrypted, then the keystore " +
+                        "file and password must be specified.");
+            }
+        }
+        if (signAssertion) {
+            if ((signatureKeyPassword == null) || (signatureKeyAlias == null)) {
+                throw new IllegalArgumentException("If the assertion is to be signed, then the signature key alias and" +
+                        " signature key password must be specified.");
+            }
+        }
+
+        if (encryptAssertion && (encryptNameID || encryptAttributes)) {
+            throw new IllegalArgumentException("Either the entire assertion can be encrypted, or the Attributes and/or NameID.");
         }
     }
 
@@ -236,10 +367,6 @@ public class SAML2Config {
 
     public long getTokenLifetimeInSeconds() {
         return tokenLifetimeInSeconds;
-    }
-
-    public Set<String> getAudiences() {
-        return audiences;
     }
 
     public Map<String, String> getAttributeMap() {
@@ -274,16 +401,56 @@ public class SAML2Config {
         return customAuthzDecisionStatementsProviderClassName;
     }
 
-    public String getCanonicalizationAlgorithm() {
-        return canonicalizationAlgorithm;
-    }
-
-    public String getSignatureAlgorithm() {
-        return signatureAlgorithm;
-    }
-
     public boolean signAssertion() {
         return signAssertion;
+    }
+
+    public boolean encryptNameID() {
+        return encryptNameID;
+    }
+
+    public boolean encryptAttributes() {
+        return encryptAttributes;
+    }
+
+    public boolean encryptAssertion() {
+        return encryptAssertion;
+    }
+
+    public String getEncryptionAlgorithm() {
+        return encryptionAlgorithm;
+    }
+
+    public int getEncryptionAlgorithmStrength() {
+        return encryptionAlgorithmStrength;
+    }
+
+    public String getKeystoreFileName() {
+        return keystoreFileName;
+    }
+
+    public byte[] getKeystorePassword() {
+        return keystorePassword;
+    }
+
+    public String getSpEntityId() {
+        return spEntityId;
+    }
+
+    public String getSpAcsUrl() {
+        return spAcsUrl;
+    }
+
+    public String getEncryptionKeyAlias() {
+        return encryptionKeyAlias;
+    }
+
+    public String getSignatureKeyAlias() {
+        return signatureKeyAlias;
+    }
+
+    public byte[] getSignatureKeyPassword() {
+        return signatureKeyPassword;
     }
 
     @Override
@@ -292,7 +459,6 @@ public class SAML2Config {
         sb.append("SAML2Config instance:").append('\n');
         sb.append('\t').append("nameIDFormat: ").append(nameIdFormat).append('\n');
         sb.append('\t').append("attributeMap: ").append(attributeMap).append('\n');
-        sb.append('\t').append("audiences: ").append(audiences).append('\n');
         sb.append('\t').append("tokenLifetimeInSeconds: ").append(tokenLifetimeInSeconds).append('\n');
         sb.append('\t').append("customConditionsProviderClassName: ").append(customConditionsProviderClassName).append('\n');
         sb.append('\t').append("customSubjectProviderClassName: ").append(customSubjectProviderClassName).append('\n');
@@ -301,9 +467,18 @@ public class SAML2Config {
         sb.append('\t').append("customAuthNContextMapperClassName: ").append(customAuthNContextMapperClassName).append('\n');
         sb.append('\t').append("customAuthenticationStatementsProviderClassName: ").append(customAuthenticationStatementsProviderClassName).append('\n');
         sb.append('\t').append("customAuthzDecisionStatementsProviderClassName: ").append(customAuthzDecisionStatementsProviderClassName).append('\n');
-        sb.append('\t').append("signatureAlgorithm: ").append(signatureAlgorithm).append('\n');
-        sb.append('\t').append("canonicalizationAlgorithm: ").append(canonicalizationAlgorithm).append('\n');
         sb.append('\t').append("Sign assertion ").append(signAssertion).append('\n');
+        sb.append('\t').append("Encrypt NameID ").append(encryptNameID).append('\n');
+        sb.append('\t').append("Encrypt Attributes ").append(encryptAttributes).append('\n');
+        sb.append('\t').append("Encrypt Assertion ").append(encryptAssertion).append('\n');
+        sb.append('\t').append("Encryption Algorithm ").append(encryptionAlgorithm).append('\n');
+        sb.append('\t').append("Encryption Algorithm Strength ").append(encryptionAlgorithmStrength).append('\n');
+        sb.append('\t').append("Keystore File ").append(keystoreFileName).append('\n');
+        sb.append('\t').append("Keystore Password ").append("xxx").append('\n');
+        sb.append('\t').append("SP Entity Id ").append(spEntityId).append('\n');
+        sb.append('\t').append("SP ACS URL ").append(spAcsUrl).append('\n');
+        sb.append('\t').append("Encryption key alias ").append(encryptionKeyAlias).append('\n');
+        sb.append('\t').append("Signature key alias").append(signatureKeyAlias).append('\n');
         return sb.toString();
     }
 
@@ -314,8 +489,15 @@ public class SAML2Config {
             return nameIdFormat.equals(otherConfig.getNameIdFormat()) &&
                     tokenLifetimeInSeconds == otherConfig.tokenLifetimeInSeconds &&
                     attributeMap.equals(otherConfig.attributeMap) &&
-                    audiences.equals(otherConfig.audiences) &&
                     signAssertion == otherConfig.signAssertion() &&
+                    encryptAssertion == otherConfig.encryptAssertion() &&
+                    encryptAttributes == otherConfig.encryptAttributes() &&
+                    encryptNameID == otherConfig.encryptNameID() &&
+                    encryptionAlgorithmStrength == otherConfig.encryptionAlgorithmStrength &&
+                    spEntityId.equals(otherConfig.spEntityId) &&
+                    (encryptionAlgorithm != null
+                            ? encryptionAlgorithm.equals(otherConfig.getEncryptionAlgorithm())
+                            : otherConfig.getEncryptionAlgorithm() == null) &&
                     (customConditionsProviderClassName != null
                             ? customConditionsProviderClassName.equals(otherConfig.getCustomConditionsProviderClassName())
                             : otherConfig.getCustomConditionsProviderClassName() == null) &&
@@ -337,19 +519,31 @@ public class SAML2Config {
                     (customAuthenticationStatementsProviderClassName != null
                         ? customAuthenticationStatementsProviderClassName.equals(otherConfig.getCustomAuthenticationStatementsProviderClassName())
                         : otherConfig.getCustomAuthenticationStatementsProviderClassName() == null) &&
-                    (signatureAlgorithm != null
-                        ? signatureAlgorithm.equals(otherConfig.getSignatureAlgorithm())
-                        : otherConfig.getSignatureAlgorithm() == null) &&
-                    (canonicalizationAlgorithm != null
-                            ? canonicalizationAlgorithm.equals(otherConfig.getCanonicalizationAlgorithm())
-                            : otherConfig.getCanonicalizationAlgorithm() == null);
+                    (keystoreFileName != null
+                            ? keystoreFileName.equals(otherConfig.getKeystoreFileName())
+                            : otherConfig.getKeystoreFileName() == null) &&
+                    (keystorePassword != null
+                            ? Arrays.equals(keystorePassword, otherConfig.getKeystorePassword())
+                            : otherConfig.getKeystorePassword() == null) &&
+                    (spAcsUrl != null
+                            ? spAcsUrl.equals(otherConfig.getSpAcsUrl())
+                            : otherConfig.getSpAcsUrl() == null) &&
+                    (signatureKeyAlias != null
+                            ? signatureKeyAlias.equals(otherConfig.getSignatureKeyAlias())
+                            : otherConfig.getSignatureKeyAlias() == null) &&
+                    (encryptionKeyAlias != null
+                            ? encryptionKeyAlias.equals(otherConfig.getEncryptionKeyAlias())
+                            : otherConfig.getEncryptionKeyAlias() == null) &&
+                    (signatureKeyPassword != null
+                            ? Arrays.equals(signatureKeyPassword, otherConfig.getSignatureKeyPassword())
+                            : otherConfig.getSignatureKeyPassword() == null);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return (nameIdFormat + attributeMap + audiences + canonicalizationAlgorithm + Long.toString(tokenLifetimeInSeconds)).hashCode();
+        return (nameIdFormat + attributeMap + spEntityId + Long.toString(tokenLifetimeInSeconds)).hashCode();
     }
 
     /*
@@ -358,42 +552,72 @@ public class SAML2Config {
     as strings as well.
      */
     public JsonValue toJson() {
-        return json(object(
-                field(NAME_ID_FORMAT, nameIdFormat),
-                field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
-                field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
-                field(CUSTOM_SUBJECT_PROVIDER_CLASS, customSubjectProviderClassName),
-                field(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS, customAttributeStatementsProviderClassName),
-                field(CUSTOM_ATTRIBUTE_MAPPER_CLASS, customAttributeMapperClassName),
-                field(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS, customAuthNContextMapperClassName),
-                field(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, customAuthenticationStatementsProviderClassName),
-                field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
-                field(SIGNATURE_ALGORITHM, signatureAlgorithm),
-                field(SIGN_ASSERTION, String.valueOf(signAssertion)),
-                field(CANONICALIZATION_ALGORITHM, canonicalizationAlgorithm),
-                field(AUDIENCES, audiences),
-                field(ATTRIBUTE_MAP, attributeMap)));
+        try {
+            return json(object(
+                    field(NAME_ID_FORMAT, nameIdFormat),
+                    field(TOKEN_LIFETIME, String.valueOf(tokenLifetimeInSeconds)),
+                    field(CUSTOM_CONDITIONS_PROVIDER_CLASS, customConditionsProviderClassName),
+                    field(CUSTOM_SUBJECT_PROVIDER_CLASS, customSubjectProviderClassName),
+                    field(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS, customAttributeStatementsProviderClassName),
+                    field(CUSTOM_ATTRIBUTE_MAPPER_CLASS, customAttributeMapperClassName),
+                    field(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS, customAuthNContextMapperClassName),
+                    field(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS, customAuthenticationStatementsProviderClassName),
+                    field(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS, customAuthzDecisionStatementsProviderClassName),
+                    field(SIGN_ASSERTION, String.valueOf(signAssertion)),
+                    field(ENCRYPT_ASSERTION, String.valueOf(encryptAssertion)),
+                    field(ENCRYPT_ATTRIBUTES, String.valueOf(encryptAttributes)),
+                    field(ENCRYPT_NAME_ID, String.valueOf(encryptNameID)),
+                    field(ENCRYPTION_ALGORITHM, encryptionAlgorithm),
+                    field(ENCRYPTION_ALGORITHM_STRENGTH, String.valueOf(encryptionAlgorithmStrength)),
+                    field(ATTRIBUTE_MAP, attributeMap),
+                    field(KEYSTORE_FILE_NAME, keystoreFileName),
+                    field(KEYSTORE_PASSWORD,
+                            keystorePassword != null ? new String(keystorePassword, AMSTSConstants.UTF_8_CHARSET_ID) : null),
+                    field(SP_ACS_URL, spAcsUrl),
+                    field(SP_ENTITY_ID, spEntityId),
+                    field(SIGNATURE_KEY_ALIAS, signatureKeyAlias),
+                    field(SIGNATURE_KEY_PASSWORD,
+                            signatureKeyPassword != null ? new String(signatureKeyPassword, AMSTSConstants.UTF_8_CHARSET_ID) : null),
+                    field(ENCRYPTION_KEY_ALIAS, encryptionKeyAlias)));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unsupported encoding when marshalling from String to to byte[]: " + e, e);
+        }
     }
 
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
-        return SAML2Config.builder()
-                .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
-                //because we have to go to the SMS Map representation, where all values are Set<String>, I need to
-                // pull the value from Json as a string, and then parse out a Long.
-                .tokenLifetimeInSeconds(Long.valueOf(json.get(TOKEN_LIFETIME).asString()))
-                .customConditionsProviderClassName(json.get(CUSTOM_CONDITIONS_PROVIDER_CLASS).asString())
-                .customSubjectProviderClassName(json.get(CUSTOM_SUBJECT_PROVIDER_CLASS).asString())
-                .customAttributeStatementsProviderClassName(json.get(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS).asString())
-                .customAttributeMapperClassName(json.get(CUSTOM_ATTRIBUTE_MAPPER_CLASS).asString())
-                .customAuthNContextMapperClassName(json.get(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS).asString())
-                .customAuthenticationStatementsProviderClassName(json.get(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS).asString())
-                .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
-                .signatureAlgorithm(json.get(SIGNATURE_ALGORITHM).asString())
-                .signAssertion(Boolean.valueOf(json.get(SIGN_ASSERTION).asString()))
-                .canonicalizationAlgorithm(json.get(CANONICALIZATION_ALGORITHM).asString())
-                .audiences(json.get(AUDIENCES).asSet(String.class))
-                .attributeMap(json.get(ATTRIBUTE_MAP).asMap(String.class))
-                .build();
+        try {
+            return SAML2Config.builder()
+                    .nameIdFormat(json.get(NAME_ID_FORMAT).asString())
+                    //because we have to go to the SMS Map representation, where all values are Set<String>, I need to
+                    // pull the value from Json as a string, and then parse out a Long.
+                    .tokenLifetimeInSeconds(Long.valueOf(json.get(TOKEN_LIFETIME).asString()))
+                    .customConditionsProviderClassName(json.get(CUSTOM_CONDITIONS_PROVIDER_CLASS).asString())
+                    .customSubjectProviderClassName(json.get(CUSTOM_SUBJECT_PROVIDER_CLASS).asString())
+                    .customAttributeStatementsProviderClassName(json.get(CUSTOM_ATTRIBUTE_STATEMENTS_PROVIDER_CLASS).asString())
+                    .customAttributeMapperClassName(json.get(CUSTOM_ATTRIBUTE_MAPPER_CLASS).asString())
+                    .customAuthNContextMapperClassName(json.get(CUSTOM_AUTHN_CONTEXT_MAPPER_CLASS).asString())
+                    .customAuthenticationStatementsProviderClassName(json.get(CUSTOM_AUTHENTICATION_STATEMENTS_PROVIDER_CLASS).asString())
+                    .customAuthzDecisionStatementsProviderClassName(json.get(CUSTOM_AUTHZ_DECISION_STATEMENTS_PROVIDER_CLASS).asString())
+                    .signAssertion(Boolean.valueOf(json.get(SIGN_ASSERTION).asString()))
+                    .encryptAssertion(Boolean.valueOf(json.get(ENCRYPT_ASSERTION).asString()))
+                    .encryptNameID(Boolean.valueOf(json.get(ENCRYPT_NAME_ID).asString()))
+                    .encryptAttributes(Boolean.valueOf(json.get(ENCRYPT_ATTRIBUTES).asString()))
+                    .encryptionAlgorithm(json.get(ENCRYPTION_ALGORITHM).asString())
+                    .encryptionAlgorithmStrength(Integer.valueOf(json.get(ENCRYPTION_ALGORITHM_STRENGTH).asString()))
+                    .attributeMap(json.get(ATTRIBUTE_MAP).asMap(String.class))
+                    .keystoreFile(json.get(KEYSTORE_FILE_NAME).asString())
+                    .keystorePassword(json.get(KEYSTORE_PASSWORD).isString()
+                            ? json.get(KEYSTORE_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID) : null)
+                    .signatureKeyPassword(json.get(SIGNATURE_KEY_PASSWORD).isString()
+                            ? json.get(SIGNATURE_KEY_PASSWORD).asString().getBytes(AMSTSConstants.UTF_8_CHARSET_ID) : null)
+                    .signatureKeyAlias(json.get(SIGNATURE_KEY_ALIAS).asString())
+                    .spAcsUrl(json.get(SP_ACS_URL).asString())
+                    .spEntityId(json.get(SP_ENTITY_ID).asString())
+                    .encryptionKeyAlias(json.get(ENCRYPTION_KEY_ALIAS).asString())
+                    .build();
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unsupported encoding when marshalling from String to to byte[]: " + e, e);
+        }
     }
 
     /*
@@ -416,15 +640,6 @@ public class SAML2Config {
             throw new IllegalStateException("Type corresponding to " + ATTRIBUTE_MAP + " key unexpected. Type: "
                     + (attributesObject != null ? attributesObject.getClass().getName() :" null"));
         }
-
-        Object audiencesObject = preMap.get(AUDIENCES);
-        if (audiencesObject instanceof Set) {
-            finalMap.put(AUDIENCES, (Set)audiencesObject);
-        } else {
-            throw new IllegalStateException("Type corresponding to " + AUDIENCES + " key unexpected. Type: "
-                    + (audiencesObject != null ? audiencesObject.getClass().getName() :" null"));
-        }
-
         return finalMap;
     }
 
@@ -452,8 +667,6 @@ public class SAML2Config {
             jsonAttributeMap.put(st.nextToken(), st.nextToken());
         }
         jsonAttributes.put(ATTRIBUTE_MAP, new JsonValue(jsonAttributeMap));
-
-        jsonAttributes.put(AUDIENCES, new JsonValue(smsAttributeMap.get(AUDIENCES)));
 
         return fromJson(new JsonValue(jsonAttributes));
     }

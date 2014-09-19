@@ -28,7 +28,6 @@ import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.statements.ConditionsProvider
@@ -50,20 +49,22 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                     "Exception caught setting token lifetime state in SAML2TokenGenerationImpl: " + e, e);
 
         }
-        Set<String> audiences = saml2Config.getAudiences();
+        String audience = saml2Config.getSpEntityId();
         /*
          Section 4.1.4.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf specifies that
          Audiences specifying the entity ids of SPs, must be contained in the AudienceRestriction for bearer tokens.
          */
-        if (audiences.isEmpty() && SAML2SubjectConfirmation.BEARER.equals(saml2SubjectConfirmation)) {
+        if (((audience == null) || audience.isEmpty()) && SAML2SubjectConfirmation.BEARER.equals(saml2SubjectConfirmation)) {
             throw new TokenCreationException(ResourceException.BAD_REQUEST, "The audiences field in the SAML2Config is empty, " +
                     "but the BEARER SubjectConfirmation is required. BEARER tokens must include Conditions with " +
                     "AudienceRestrictions specifying the SP entity ids.");
         }
-        if (!audiences.isEmpty()) {
+        if ((audience != null) && !audience.isEmpty()) {
             try {
                 AudienceRestriction audienceRestriction = AssertionFactory.getInstance().createAudienceRestriction();
-                audienceRestriction.setAudience(new ArrayList<String>(audiences));
+                List<String> audienceList = new ArrayList<String>(1);
+                audienceList.add(audience);
+                audienceRestriction.setAudience(audienceList);
                 List<AudienceRestriction> audienceRestrictionList = new ArrayList<AudienceRestriction>(1);
                 audienceRestrictionList.add(audienceRestriction);
                 conditions.setAudienceRestrictions(audienceRestrictionList);

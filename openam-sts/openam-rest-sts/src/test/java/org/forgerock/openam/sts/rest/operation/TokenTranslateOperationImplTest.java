@@ -164,7 +164,6 @@ public class TokenTranslateOperationImplTest {
         if (TokenType.SAML2.equals(desiredTokenType)) {
             outputTokenState = SAML2TokenState.builder()
                     .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                    .serviceProviderAssertionConsumerServiceUrl("http://sp.acs")
                     .build()
                     .toJson();
         } else if (TokenType.OPENAM.equals(desiredTokenType)) {

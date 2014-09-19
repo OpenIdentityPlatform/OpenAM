@@ -17,7 +17,7 @@
 package org.forgerock.openam.sts.service.invocation;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 import org.forgerock.openam.sts.TokenType;
@@ -33,76 +33,68 @@ public class TokenGenerationServiceInvocationStateTest {
     private static final String X_509 = "X.509";
     private static final boolean WITH_SPECIOUS_INSTANCE_ID = true;
     private static final boolean WITH_PROOF_TOKEN_STATE = true;
-    private static final boolean WITH_SP_ACS_URL = true;
     private static final String SSO_TOKEN_STRING = "abbssccsdfd";
     private static final String STS_INSTANCE_ID = "sts_instance_id";
-    private static final String SP_ACS_URL = "http://host.com:8080/openam/Consumer/metaAlias/s";
     private static final String AUTHN_CONTEXT_CLASS_REF = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
     private static final TokenType TOKEN_TYPE = TokenType.SAML2;
 
     @Test
     public void testEquals() throws Exception {
         TokenGenerationServiceInvocationState config1 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                !WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.SENDER_VOUCHES);
+                !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.SENDER_VOUCHES);
         TokenGenerationServiceInvocationState config2 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                !WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.SENDER_VOUCHES);
+                !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.SENDER_VOUCHES);
         assertEquals(config1, config2);
 
         config1 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         config2 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         assertEquals(config1, config2);
 
         config1 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                !WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         config2 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                !WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         assertEquals(config1, config2);
 
         config1 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         config2 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         assertEquals(config1, config2);
 
         config1 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY);
         config2 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY);
         assertEquals(config1, config2);
 
         config1 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY);
         config2 = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
-        assertFalse(config1.equals(config2));
-
-        config1 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
-        config2 = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
-        assertFalse(config1.equals(config2));
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+        assertNotEquals(config1, config2);
     }
 
     @Test
     public void testJsonRoundTrip1() throws Exception {
         TokenGenerationServiceInvocationState state = buildInvocationState(WITH_SPECIOUS_INSTANCE_ID,
-                WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER);
         assertTrue(state.equals(TokenGenerationServiceInvocationState.fromJson(state.toJson())));
     }
 
     @Test
     public void testJsonRoundTrip2() throws Exception {
         TokenGenerationServiceInvocationState state = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, !WITH_PROOF_TOKEN_STATE,
-                WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
+                SAML2SubjectConfirmation.BEARER);
         assertTrue(state.equals(TokenGenerationServiceInvocationState.fromJson(state.toJson())));
     }
 
     @Test
     public void testFieldPersistenceAfterRoundTrip() throws Exception {
         TokenGenerationServiceInvocationState state = buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE,
-                WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+                SAML2SubjectConfirmation.HOLDER_OF_KEY);
         assertEquals(state, TokenGenerationServiceInvocationState.fromJson(state.toJson()));
 
         assertEquals(SAML2SubjectConfirmation.HOLDER_OF_KEY,
@@ -110,19 +102,13 @@ public class TokenGenerationServiceInvocationStateTest {
         assertEquals(SSO_TOKEN_STRING, state.getSsoTokenString());
         assertEquals(TOKEN_TYPE, state.getTokenType());
         assertEquals(STS_INSTANCE_ID, state.getStsInstanceId());
-        assertEquals(SP_ACS_URL, state.getSpAcsUrl());
         assertEquals(AUTHN_CONTEXT_CLASS_REF, state.getAuthnContextClassRef());
         assertTrue(state.getProofTokenState() != null);
     }
 
     @Test (expectedExceptions=IllegalStateException.class)
-    public void testBearerNoSPACSURLStateValidation() throws Exception{
-        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER);
-    }
-
-    @Test (expectedExceptions=IllegalStateException.class)
     public void testHoKNoProofTokenStateValidation() throws Exception {
-        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, !WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY);
+        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY);
     }
 
     @Test
@@ -130,15 +116,14 @@ public class TokenGenerationServiceInvocationStateTest {
         /*
         build a few different types of instances, and call toString to insure no NPE ensues.
          */
-        buildInvocationState(WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER).toString();
-        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, WITH_SP_ACS_URL, SAML2SubjectConfirmation.BEARER).toString();
-        buildInvocationState(WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.HOLDER_OF_KEY).toString();
-        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, !WITH_PROOF_TOKEN_STATE, !WITH_SP_ACS_URL, SAML2SubjectConfirmation.SENDER_VOUCHES).toString();
+        buildInvocationState(WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER).toString();
+        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.BEARER).toString();
+        buildInvocationState(WITH_SPECIOUS_INSTANCE_ID, WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.HOLDER_OF_KEY).toString();
+        buildInvocationState(!WITH_SPECIOUS_INSTANCE_ID, !WITH_PROOF_TOKEN_STATE, SAML2SubjectConfirmation.SENDER_VOUCHES).toString();
 
     }
     private TokenGenerationServiceInvocationState buildInvocationState(boolean withSpeciousInstanceId,
                                                                        boolean withProofTokenState,
-                                                                       boolean withSPACSUrl,
                                                                        SAML2SubjectConfirmation subjectConfirmation) throws Exception {
         TokenGenerationServiceInvocationState.TokenGenerationServiceInvocationStateBuilder builder =
                 TokenGenerationServiceInvocationState.builder();
@@ -153,9 +138,6 @@ public class TokenGenerationServiceInvocationStateTest {
             builder.stsInstanceId("specious instance id");
         }
 
-        if (withSPACSUrl) {
-            builder.serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL);
-        }
         if (withProofTokenState) {
             builder.proofTokenState(ProofTokenState.builder().x509Certificate(getCertificate()).build());
         }

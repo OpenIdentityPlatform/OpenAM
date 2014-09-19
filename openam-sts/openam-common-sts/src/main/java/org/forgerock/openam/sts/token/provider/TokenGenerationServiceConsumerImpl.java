@@ -61,7 +61,6 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
     public String getSAML2BearerAssertion(String ssoTokenString,
                                           String stsInstanceId,
                                           String realm,
-                                          String serviceProviderAssertionConsumerServiceUrl,
                                           String authnContextClassRef) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
                 buildCommonSaml2InvocationState(
@@ -70,7 +69,6 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         stsInstanceId,
                         realm,
                         ssoTokenString);
-        invocationStateBuilder.serviceProviderAssertionConsumerServiceUrl(serviceProviderAssertionConsumerServiceUrl);
         return makeInvocation(invocationStateBuilder.build().toJson().toString());
     }
 

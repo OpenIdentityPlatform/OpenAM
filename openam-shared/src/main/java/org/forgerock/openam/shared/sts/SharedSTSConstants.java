@@ -60,6 +60,85 @@ public class SharedSTSConstants {
     public static final String SAML2_SIGN_ASSERTION = "saml2-sign-assertion";
 
     /*
+    This field referenced in SAML2Config.ENCRYPT_NAME_ID. It is the name of the key of the json field referencing
+    whether the issued assertion should have its NameID encrypted, which also matches the name of the AttributeSchema
+    element defined in restSTS.xml
+     */
+    public static final String SAML2_ENCRYPT_NAME_ID = "saml2-encrypt-nameid";
+
+    /*
+    This field referenced in SAML2Config.ENCRYPT_ATTRIBUTES. It is the name of the key of the json field referencing
+    whether the issued assertion should have its Attributes encrypted, which also matches the name of the AttributeSchema
+    element defined in restSTS.xml
+     */
+    public static final String SAML2_ENCRYPT_ATTRIBUTES = "saml2-encrypt-attributes";
+
+    /*
+    This field referenced in SAML2Config.ENCRYPT_ASSERTION. It is the name of the key of the json field referencing
+    whether the issued assertion should be encrypted, which also matches the name of the AttributeSchema
+    element defined in restSTS.xml
+     */
+    public static final String SAML2_ENCRYPT_ASSERTION = "saml2-encrypt-assertion";
+
+    /*
+    This field referenced in SAML2Config.ENCRYPTION_ALGORITHM. It is the name of the key of the json field referencing
+    the type of encryption algorithm, which also matches the name of the AttributeSchema
+    element defined in restSTS.xml.
+     */
+    public static final String SAML2_ENCRYPTION_ALGORITHM = "saml2-encryption-algorithm";
+
+    /*
+   This field referenced in SAML2Config.ENCRYPTION_ALGORITHM_STRENGTH. It is the name of the key of the json field referencing
+   the strength of the encryption algorithm, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_ENCRYPTION_ALGORITHM_STRENGTH = "saml2-encryption-algorithm-strength";
+
+    /*
+   This field referenced in SAML2Config.KEYSTORE_FILE_NAME. It is the name of the key of the json field referencing
+   the keystore location for keys used to sign and encrypt SAML assertions, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_KEYSTORE_FILE_NAME = "saml2-keystore-filename";
+
+    /*
+   This field referenced in SAML2Config.KEYSTORE_PASSWORD. It is the name of the key of the json field referencing
+   the keystore password, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_KEYSTORE_PASSWORD = "saml2-keystore-password";
+
+    /*
+   This field referenced in SAML2Config.SIGNATURE_KEY_ALIAS. It is the name of the key of the json field referencing
+   the signature key alias, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_SIGNATURE_KEY_ALIAS = "saml2-signature-key-alias";
+    /*
+   This field referenced in SAML2Config.SIGNATURE_KEY_PASSWORD. It is the name of the key of the json field referencing
+   the signature key password, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_SIGNATURE_KEY_PASSWORD = "saml2-signature-key-password";
+    /*
+   This field referenced in SAML2Config.SP_ENTITY_ID. It is the name of the key of the json field referencing
+   the entity id of the SP for whom generated assertions are intended, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_SP_ENTITY_ID = "saml2-sp-entity-id";
+    /*
+   This field referenced in SAML2Config.SP_ACS_URL. It is the name of the key of the json field referencing
+   the url of the SP's assertion consumer service, which is required when issuing bearer assertions. Also matches the
+   name of the AttributeSchema element defined in restSTS.xml
+    */
+    public static final String SAML2_SP_ACS_URL = "saml2-sp-acs-url";
+    /*
+   This field referenced in SAML2Config.ENCRYPTION_KEY_ALIAS. It is the name of the key of the json field referencing
+   the public key of the SP intented to consume issued assertions, which also matches the name of the AttributeSchema
+   element defined in restSTS.xml
+    */
+    public static final String SAML2_ENCRYPTION_KEY_ALIAS = "saml2-encryption-key-alias";
+    /*
     This field referenced in RestDeploymentConfig.URI_ELEMENT. It is the name of the key of the json field referencing
     the realm-relative url element where a published rest instance is to be exposed, which also matches the name of the
     AttributeSchema element defined in restSTS.xml
@@ -98,18 +177,6 @@ public class SharedSTSConstants {
     the set of token transformations, which also matches the name of the AttributeSchema element defined in restSTS.xml
      */
     public static final String SUPPORTED_TOKEN_TRANSFORMS = "supported-token-transforms";
-
-    /*
-    The next 6 fields are referenced by the KeystoreConfig class. They define the names of the key of the json fields referencing
-    keystore configuration state, which also matches the name of the related AttributeSchema elements defined in restSTS.xml
-     */
-    public static final String KEYSTORE_FILE_NAME = "keystore-filename";
-    public static final String KEYSTORE_PASSWORD = "keystore-password";
-    public static final String SIGNATURE_KEY_ALIAS = "keystore-signature-key-alias";
-    public static final String ENCRYPTION_KEY_ALIAS = "keystore-encryption-key-alias";
-    public static final String SIGNATURE_KEY_PASSWORD = "keystore-signature-key-password";
-    public static final String ENCRYPTION_KEY_PASSWORD = "keystore-encryption-key-password";
-
 
     public static final String FORWARD_SLASH = "/";
 

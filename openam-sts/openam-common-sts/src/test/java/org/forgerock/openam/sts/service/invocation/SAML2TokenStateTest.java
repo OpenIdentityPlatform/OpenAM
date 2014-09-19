@@ -28,12 +28,10 @@ import java.security.cert.X509Certificate;
 import static org.testng.Assert.assertEquals;
 
 public class SAML2TokenStateTest {
-    private static final String SP_ACS_URL = "sp_acs_url";
     @Test
     public void testJsonRoundTripNoProofTokenState() throws Exception {
         SAML2TokenState tokenState = SAML2TokenState.builder()
                 .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                 .build();
         assertEquals(tokenState, SAML2TokenState.fromJson(tokenState.toJson()));
     }
@@ -43,7 +41,6 @@ public class SAML2TokenStateTest {
         ProofTokenState proofTokenState = ProofTokenState.builder().x509Certificate(getCertificate()).build();
         SAML2TokenState tokenState = SAML2TokenState.builder()
                 .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                 .proofTokenState(proofTokenState)
                 .build();
         assertEquals(tokenState, SAML2TokenState.fromJson(tokenState.toJson()));

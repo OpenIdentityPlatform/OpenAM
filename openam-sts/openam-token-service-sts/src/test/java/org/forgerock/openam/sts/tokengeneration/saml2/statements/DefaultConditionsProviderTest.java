@@ -18,31 +18,28 @@ package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 
 import com.sun.identity.saml2.assertion.AudienceRestriction;
 import com.sun.identity.saml2.assertion.Conditions;
+import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 
 public class DefaultConditionsProviderTest {
-    private static final boolean WITH_AUDIENCES = true;
     private static final String AM_SP_AUDIENCE = "http://macbook.dirk.internal.forgerock.com:8080/openam/sp";
     private static final int TOKEN_LIFETIME_SECONDS = 600;
     @Test
-    public void testBearerWithAudiences() throws TokenCreationException {
+    public void testBearerWithAudiences() throws TokenCreationException, UnsupportedEncodingException {
         Date issueInstant = new Date();
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
-                conditionsProvider.get(createSAML2Config(WITH_AUDIENCES), issueInstant,
+                conditionsProvider.get(createSAML2Config(), issueInstant,
                         SAML2SubjectConfirmation.BEARER);
         assertTrue(issueInstant.equals(conditions.getNotBefore()));
         assertTrue((issueInstant.getTime() + (TOKEN_LIFETIME_SECONDS * 1000)) == conditions.getNotOnOrAfter().getTime());
@@ -50,46 +47,30 @@ public class DefaultConditionsProviderTest {
         assertTrue(audienceRestriction.getAudience().contains(AM_SP_AUDIENCE));
     }
 
-    @Test (expectedExceptions = TokenCreationException.class)
-    public void testBearerNoAudiences() throws TokenCreationException {
-        Date issueInstant = new Date();
-        ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
-        conditionsProvider.get(createSAML2Config(!WITH_AUDIENCES), issueInstant,
-                SAML2SubjectConfirmation.BEARER);
-    }
-
     @Test
-    public void testNoBearerNoAudiences() throws TokenCreationException {
+    public void testNoBearer() throws TokenCreationException, UnsupportedEncodingException {
         Date issueInstant = new Date();
         ConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         Conditions conditions =
-                conditionsProvider.get(createSAML2Config(!WITH_AUDIENCES), issueInstant,
+                conditionsProvider.get(createSAML2Config(), issueInstant,
                         SAML2SubjectConfirmation.HOLDER_OF_KEY);
         assertTrue(issueInstant.equals(conditions.getNotBefore()));
         assertTrue((issueInstant.getTime() + (TOKEN_LIFETIME_SECONDS * 1000)) == conditions.getNotOnOrAfter().getTime());
     }
 
-    private SAML2Config createSAML2Config(boolean addAudiences) {
+    private SAML2Config createSAML2Config() throws UnsupportedEncodingException {
         Map<String, String> attributeMap = new HashMap<String, String>();
         attributeMap.put("email", "mail");
-        SAML2Config.SAML2ConfigBuilder builder = SAML2Config.builder();
-        if (addAudiences) {
-            Set<String> audiences = new HashSet<String>();
-            audiences.add(AM_SP_AUDIENCE);
-            return builder
-                    .attributeMap(attributeMap)
-                    .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                    .audiences(audiences)
-                    .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)
-                    .build();
-        } else {
-            return builder
-                    .attributeMap(attributeMap)
-                    .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                    .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)
-                    .build();
-        }
+        return SAML2Config.builder()
+                .attributeMap(attributeMap)
+                .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
+                .spEntityId(AM_SP_AUDIENCE)
+                .tokenLifetimeInSeconds(TOKEN_LIFETIME_SECONDS)
+                .keystoreFile("/keystore.jks")
+                .keystorePassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .encryptionKeyAlias("test")
+                .signatureKeyAlias("test")
+                .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .build();
     }
-
-
 }

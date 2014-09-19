@@ -21,7 +21,6 @@ import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshallUtils;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
@@ -204,7 +203,6 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         }
         STSInstanceConfig baseConfig = STSInstanceConfig.fromJson(json);
         RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
-                .keystoreConfig(baseConfig.getKeystoreConfig())
                 .issuerName(baseConfig.getIssuerName())
                 .saml2Config(baseConfig.getSaml2Config())
                 .deploymentConfig(RestDeploymentConfig.fromJson(json.get(DEPLOYMENT_CONFIG)));
@@ -253,9 +251,6 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
             interimMap.putAll(saml2Config.marshalToAttributeMap());
         }
 
-        interimMap.remove(KEYSTORE_CONFIG);
-        interimMap.putAll(keystoreConfig.marshalToAttributeMap());
-
         return interimMap;
     }
 
@@ -295,9 +290,6 @@ public class RestSTSInstanceConfig extends STSInstanceConfig {
         for (String translation : stringTokenTranslations) {
             jsonTranslationsList.add(TokenTransformConfig.fromSMSString(translation).toJson());
         }
-
-        jsonAttributes.remove(KEYSTORE_CONFIG);
-        jsonAttributes.put(KEYSTORE_CONFIG, KeystoreConfig.marshalFromAttributeMap(attributeMap).toJson());
 
         return fromJson(new JsonValue(jsonAttributes));
     }

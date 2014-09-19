@@ -64,7 +64,7 @@ public class TokenGenerationModule extends AbstractModule {
         bind(StatementProvider.class).to(StatementProviderImpl.class);
         bind(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){}).to(RestSTSInstanceStateProvider.class)
                 .in(Scopes.SINGLETON);
-        bind(SAML2AssertionSigner.class).to(SAML2AssertionSignerImpl.class);
+//        bind(SAML2AssertionSigner.class).to(SAML2AssertionSignerImpl.class);
         /*
         Once the TokenGenerationService gets called by the SOAP STS, I will need to bind a
         STSInstanceConfigPersister<SoapSTSInstanceConfig> class.

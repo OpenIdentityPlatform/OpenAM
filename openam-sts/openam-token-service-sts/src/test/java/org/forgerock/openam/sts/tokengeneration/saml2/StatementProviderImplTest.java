@@ -43,6 +43,7 @@ public class StatementProviderImplTest {
     public void testCustomProvider() throws TokenCreationException {
         SAML2Config config = SAML2Config.builder()
                             .customConditionsProviderClassName("org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditionsProvider")
+                            .spEntityId("http://host.com/sp/entity/id")
                             .build();
         StatementProvider statementProvider = Guice.createInjector(new MyModule()).getInstance(StatementProvider.class);
         assertTrue(statementProvider.getConditionsProvider(config) instanceof DefaultConditionsProvider);
@@ -52,6 +53,7 @@ public class StatementProviderImplTest {
     public void testSpeciousProvider() throws TokenCreationException {
         SAML2Config config = SAML2Config.builder()
                 .customConditionsProviderClassName("faux_class_name")
+                .spEntityId("http://host.com/sp/entity/id")
                 .build();
         StatementProvider statementProvider = Guice.createInjector(new MyModule()).getInstance(StatementProvider.class);
         statementProvider.getConditionsProvider(config);

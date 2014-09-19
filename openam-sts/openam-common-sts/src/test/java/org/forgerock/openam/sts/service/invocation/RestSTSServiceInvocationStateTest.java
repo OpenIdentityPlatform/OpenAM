@@ -27,14 +27,12 @@ public class RestSTSServiceInvocationStateTest {
     private static final String PASSWORD = "dodo";
     private static final String SESSION_ID = "AQIC5wM2LY4SfczNfYrVEX9Z0D3wB3T5TMCX8CFKzQOEi-s";
     private static final String TOKEN_VALUE = "eyJhb.eyJpc3MiOiJhY2N.SqcfMU-BsrS69tGLIFRq";
-    private static final String SP_ACS_URL = "sp_acs_url";
 
     @Test
     public void testRountTripWithUntAndSaml() throws TokenMarshalException {
         SAML2TokenState saml2TokenState =
                 SAML2TokenState.builder()
                         .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                        .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                         .build();
         UsernameTokenState usernameTokenState =
                 UsernameTokenState.builder().username(USERNAME.getBytes()).password(PASSWORD.getBytes()).build();
@@ -53,7 +51,6 @@ public class RestSTSServiceInvocationStateTest {
         SAML2TokenState saml2TokenState =
                 SAML2TokenState.builder()
                         .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                        .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                         .build();
         OpenAMTokenState openAMTokenState = OpenAMTokenState.builder().sessionId(SESSION_ID).build();
         RestSTSServiceInvocationState invocationState =
@@ -71,7 +68,6 @@ public class RestSTSServiceInvocationStateTest {
         SAML2TokenState saml2TokenState =
                 SAML2TokenState.builder()
                         .saml2SubjectConfirmation(SAML2SubjectConfirmation.BEARER)
-                        .serviceProviderAssertionConsumerServiceUrl(SP_ACS_URL)
                         .build();
         OpenIdConnectTokenState idConnectTokenState = OpenIdConnectTokenState.builder().tokenValue(TOKEN_VALUE).build();
         RestSTSServiceInvocationState invocationState =

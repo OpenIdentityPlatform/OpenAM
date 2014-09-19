@@ -20,7 +20,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.signature.XMLSignature;
 import org.forgerock.openam.sts.AMSTSConstants;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
+import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.slf4j.Logger;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
@@ -30,6 +30,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.testng.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -60,17 +62,22 @@ public class SAML2AssertionSignerImplTest {
     }
 
     private STSKeyProvider getKeyProvider() throws Exception {
-        return new STSKeyProviderImpl(createKeystoreConfig(), mock(Logger.class));
+        return new STSKeyProviderImpl(createSAML2Config(), mock(Logger.class));
     }
 
-    private KeystoreConfig createKeystoreConfig() throws UnsupportedEncodingException {
-        return KeystoreConfig.builder()
-                .fileName("keystore.jks")
-                .password("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+    private SAML2Config createSAML2Config() throws UnsupportedEncodingException {
+        Map<String, String> attributeMap = new HashMap<String, String>();
+        attributeMap.put("email", "mail");
+        return SAML2Config.builder()
+                .attributeMap(attributeMap)
+                .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
+                .spEntityId("http://host.com/sp/entity/id")
+                .keystoreFile("/keystore.jks")
+                .keystorePassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .encryptionKeyAlias("test")
                 .signatureKeyAlias("test")
-                .encryptionKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
                 .signatureKeyPassword("changeit".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
+                .tokenLifetimeInSeconds(999)
                 .build();
     }
 

@@ -257,13 +257,6 @@ public class AMSTSConstants {
     public static final String VALIDATED_TOKEN_TYPE_KEY = "validated_token_type_key";
 
     /*
-    This value is used to key the String instance in additionalProperties Map<String, Object> encapsulated
-    in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to the TokenGenerationService when issuing
-    BEARER assertions.
-     */
-    public static final String SP_ACS_URL_KEY = "sp_acs_url_key";
-
-    /*
     This value is used to key the ProofTokenState instance in additionalProperties Map<String, Object> encapsulated
     in the TokenProviderParameters so that the AMSAMLTokenProvider can pass it to the TokenGenerationService when issuing
     HolderOfKey assertions.

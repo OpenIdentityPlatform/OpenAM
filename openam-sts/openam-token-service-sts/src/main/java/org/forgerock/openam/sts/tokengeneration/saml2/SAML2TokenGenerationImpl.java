@@ -19,53 +19,47 @@ package org.forgerock.openam.sts.tokengeneration.saml2;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
+import com.sun.identity.saml2.assertion.Attribute;
+import com.sun.identity.saml2.assertion.AttributeStatement;
+import com.sun.identity.saml2.assertion.EncryptedAssertion;
+import com.sun.identity.saml2.assertion.EncryptedAttribute;
+import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.assertion.NameID;
+import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
-import org.apache.xml.security.signature.XMLSignature;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.TokenCreationException;
-import org.forgerock.openam.sts.XMLUtilities;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
 import org.forgerock.openam.sts.config.user.STSInstanceConfig;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProvider;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 import java.io.UnsupportedEncodingException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @see org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration
  */
 public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
-    private static final String DSA_PRIVATE_KEY_ALGORITHM = "DSA";
-    private static final String RSA_PRIVATE_KEY_ALGORITHM = "RSA";
     private static final boolean ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX = true;
     private static final boolean ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX = true;
-
-    private static final String DSA_DEFAULT_SIGNATURE_ALGORITHM = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-    private static final String RSA_DEFAULT_SIGNATURE_ALGORITHM = XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1;
-
-    private final SAML2AssertionSigner saml2AssertionSigner;
     private final StatementProvider statementProvider;
-    private final XMLUtilities xmlUtilities;
     private final SSOTokenIdentity ssoTokenIdentity;
 
     @Inject
-    SAML2TokenGenerationImpl(SAML2AssertionSigner saml2AssertionSigner, StatementProvider statementProvider,
-                             XMLUtilities xmlUtilities, SSOTokenIdentity ssoTokenIdentity) {
-        this.saml2AssertionSigner = saml2AssertionSigner;
+    SAML2TokenGenerationImpl(StatementProvider statementProvider, SSOTokenIdentity ssoTokenIdentity) {
         this.statementProvider = statementProvider;
-        this.xmlUtilities = xmlUtilities;
         this.ssoTokenIdentity = ssoTokenIdentity;
         /*
         Initialize the santuario library context. Multiple calls to this method are idempotent.
@@ -98,15 +92,33 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         final Date issueInstant = new Date();
         setIssueInstant(assertion, issueInstant);
         setConditions(assertion, saml2Config, issueInstant, invocationState.getSaml2SubjectConfirmation());
-        setSubject(assertion, subjectId, invocationState.getSpAcsUrl(), saml2Config,
+        setSubject(assertion, subjectId, saml2Config.getSpAcsUrl(), saml2Config,
                 invocationState.getSaml2SubjectConfirmation(), issueInstant, invocationState.getProofTokenState());
         setAuthenticationStatements(assertion, saml2Config, invocationState.getAuthnContextClassRef());
         setAttributeStatements(assertion, subjectToken, saml2Config);
         setAuthzDecisionStatements(assertion, subjectToken, saml2Config);
-
-        if (saml2Config.signAssertion()) {
-            return signAssertion(assertion, stsInstanceState);
+        /*
+        entering this branch handles both encryption and signing, as the encryption of the entire assertion must be
+        proceeded by signing.
+         */
+        if (saml2Config.encryptAssertion()) {
+            EncryptedAssertion encryptedAssertion = handleSingingAndEncryptionOfEntireAssertion(assertion, saml2Config, stsInstanceState);
+            try {
+                return encryptedAssertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
+            } catch (SAML2Exception e) {
+                throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                        "Exception caught calling Assertion.toXMLString: " + e, e);
+            }
         } else {
+            if (saml2Config.encryptAttributes()) {
+                encryptAttributeStatement(assertion, saml2Config, stsInstanceState);
+            }
+            if (saml2Config.encryptNameID()) {
+                encryptNameID(assertion, saml2Config, stsInstanceState);
+            }
+            if (saml2Config.signAssertion()) {
+                signAssertion(assertion, stsInstanceState);
+            }
             try {
                 return assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX);
             } catch (SAML2Exception e) {
@@ -115,6 +127,8 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
             }
         }
     }
+
+
 
     private void setVersionAndId(Assertion assertion) throws TokenCreationException {
         try {
@@ -180,7 +194,8 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
     private void setAttributeStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
         assertion.getAttributeStatements().addAll(
                 statementProvider.getAttributeStatementsProvider(saml2Config).get(
-                        token, saml2Config, statementProvider.getAttributeMapper(saml2Config)));
+                        token, saml2Config, statementProvider.getAttributeMapper(saml2Config))
+        );
     }
 
     private void setAuthzDecisionStatements(Assertion assertion, SSOToken token, SAML2Config saml2Config) throws TokenCreationException {
@@ -188,24 +203,116 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
                 statementProvider.getAuthzDecisionStatementsProvider(saml2Config).get(token, saml2Config));
     }
 
-    private String signAssertion(Assertion assertion, STSInstanceState instanceState) throws TokenCreationException {
-        Document assertionDocument;
+    /*
+    Called only if the entire assertion should be encrypted. Also handles signing, as this must be done before encryption.
+    Code modeled after IDPSSOUtil#signAndEncryptResponseComponents
+     */
+    private EncryptedAssertion handleSingingAndEncryptionOfEntireAssertion(Assertion assertion, SAML2Config saml2Config,
+                                                             STSInstanceState stsInstanceState) throws TokenCreationException {
+        /*
+        Section 6.2 of http://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf states
+        that when the entire assertion is encrypted, the signature must be performed prior to the encryption
+        */
+        if (saml2Config.signAssertion()) {
+            signAssertion(assertion, stsInstanceState);
+        }
         try {
-            assertionDocument = xmlUtilities.stringToDocumentConversion(
-                    assertion.toXMLString(ASSERTION_TO_STRING_INCLUDE_NAMESPACE_PREFIX, ASSERTION_TO_STRING_DECLARE_NAMESPACE_PREFIX));
+            return assertion.encrypt(
+                    stsInstanceState.getKeyProvider().getX509Certificate(saml2Config.getEncryptionKeyAlias()).getPublicKey(),
+                    saml2Config.getEncryptionAlgorithm(),
+                    saml2Config.getEncryptionAlgorithmStrength(),
+                    saml2Config.getSpEntityId());
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught obtaining String representation of Assertion in SAML2TokenGenerationImpl: " + e, e);
+                    "Exception thrown encrypting assertion in SAML2TokenGenerationImpl: " + e, e);
         }
-        if (assertionDocument == null) {
+
+    }
+
+    private void encryptNameID(Assertion assertion, SAML2Config saml2Config, STSInstanceState stsInstanceState) throws TokenCreationException {
+        /*
+        The null checks below model IDPSSOUtil#signAndEncryptResponseComponents. The Subject and NameID will
+        never be null when generated by the DefaultSubjectProvider, but when generated by a custom provider, this
+        invariant is not assured.
+         */
+        Subject subject = assertion.getSubject();
+        if (subject == null) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Could not obtain document representation of Assertion in SAML2TokenGenerationImpl: ");
+                    "In SAML2TokenGenerationImpl, saml2Config specifies encryption of NameID, but " +
+                            "encapsulating subject is null.");
         }
+        NameID nameID = subject.getNameID();
+        if (nameID == null) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "In SAML2TokenGenerationImpl, saml2Config specifies encryption of NameID, but " +
+                            "NameID in subject is null.");
+        }
+        try {
+            EncryptedID encryptedNameID = nameID.encrypt(
+                    stsInstanceState.getKeyProvider().getX509Certificate(saml2Config.getEncryptionKeyAlias()).getPublicKey(),
+                    saml2Config.getEncryptionAlgorithm(),
+                    saml2Config.getEncryptionAlgorithmStrength(),
+                    saml2Config.getSpEntityId());
+            if (encryptedNameID == null) {
+                throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                        "In SAML2TokenGenerationImpl, the EncryptedID returned from NameID#encrypt is null.");
+            }
+            subject.setEncryptedID(encryptedNameID);
+            subject.setNameID(null); // reset NameID
+            assertion.setSubject(subject);
+        } catch (SAML2Exception e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception thrown encrypting NameID in SAML2TokenGenerationImpl: " + e, e);
+        }
+    }
+
+    private void encryptAttributeStatement(Assertion assertion, SAML2Config saml2Config, STSInstanceState stsInstanceState)
+            throws TokenCreationException {
+        final PublicKey keyEncryptionKey = stsInstanceState.getKeyProvider().getX509Certificate(saml2Config.getEncryptionKeyAlias()).getPublicKey();
+        final String encryptionAlgorithm = saml2Config.getEncryptionAlgorithm();
+        final int algorithmStrength = saml2Config.getEncryptionAlgorithmStrength();
+        final String spEntityID = saml2Config.getSpEntityId();
+        try {
+            List<AttributeStatement> originalAttributeStatements = assertion.getAttributeStatements();
+            if ((originalAttributeStatements != null) && (originalAttributeStatements.size() > 0)) {
+                List<AttributeStatement> encryptedAttributeStatements = new ArrayList<AttributeStatement>(originalAttributeStatements.size());
+                for (AttributeStatement originalStatement : originalAttributeStatements) {
+                    List<Attribute> originalAttributes = originalStatement.getAttribute();
+                    if ((originalAttributes == null) || (originalAttributes.size() == 0)) {
+                        continue;
+                    }
+                    List<EncryptedAttribute> encryptedAttributes = new ArrayList<EncryptedAttribute>(originalAttributes.size());
+                    for (Attribute originalAttribute : originalAttributes) {
+                        EncryptedAttribute encryptedAttribute =
+                                originalAttribute.encrypt(
+                                        keyEncryptionKey,
+                                        encryptionAlgorithm,
+                                        algorithmStrength,
+                                        spEntityID);
+                        if (encryptedAttribute == null) {
+                            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, "In SAML2TokenGenerationImpl, " +
+                                    "attribute encryption invocation returned null.");
+                        }
+                        encryptedAttributes.add(encryptedAttribute);
+                    }
+                    originalStatement.setEncryptedAttribute(encryptedAttributes);
+                    originalStatement.setAttribute(Collections.EMPTY_LIST);
+                    encryptedAttributeStatements.add(originalStatement);
+                }
+                assertion.setAttributeStatements(encryptedAttributeStatements);
+            }
+        } catch (SAML2Exception e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR, "In SAML2TokenGenerationImpl, exception " +
+                    "caught encrypting assertion attributes: " + e, e);
+        }
+    }
+
+    private void signAssertion(Assertion assertion, STSInstanceState instanceState) throws TokenCreationException {
         final STSKeyProvider stsKeyProvider = instanceState.getKeyProvider();
-        final KeystoreConfig keystoreConfig = instanceState.getConfig().getKeystoreConfig();
+        final SAML2Config saml2Config = instanceState.getConfig().getSaml2Config();
         String signatureKeyPassword;
         try {
-            signatureKeyPassword = new String(keystoreConfig.getSignatureKeyPassword(), AMSTSConstants.UTF_8_CHARSET_ID);
+            signatureKeyPassword = new String(saml2Config.getSignatureKeyPassword(), AMSTSConstants.UTF_8_CHARSET_ID);
         } catch (UnsupportedEncodingException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Could not obtain string representation of signature key password in SAML2TokenGenerationImpl: ");
@@ -214,30 +321,12 @@ public class SAML2TokenGenerationImpl implements SAML2TokenGeneration {
         Note: the cert alias and private-key alias are the same. If there is a key entry in the keystore, it seems like
         they are represented by the same alias.
          */
-        PrivateKey privateKey = stsKeyProvider.getPrivateKey(keystoreConfig.getSignatureKeyAlias(), signatureKeyPassword);
-        String signatureAlgorithm = getSignatureAlgorithm(instanceState.getConfig().getSaml2Config(), privateKey);
-        Element signatureElement =
-                saml2AssertionSigner.signSAML2Assertion(
-                        assertionDocument,
-                        assertion.getID(),
-                        privateKey,
-                        stsKeyProvider.getX509Certificate(keystoreConfig.getSignatureKeyAlias()),
-                        signatureAlgorithm,
-                        instanceState.getConfig().getSaml2Config().getCanonicalizationAlgorithm());
-        return xmlUtilities.documentToStringConversion(signatureElement.getOwnerDocument().getDocumentElement());
-    }
-
-    private String getSignatureAlgorithm(SAML2Config sam2Config, PrivateKey privateKey) throws TokenCreationException {
-        if (sam2Config.getSignatureAlgorithm() != null) {
-            //TODO: do I want to check if the algorithm is supported?
-            return sam2Config.getSignatureAlgorithm();
+        PrivateKey privateKey = stsKeyProvider.getPrivateKey(saml2Config.getSignatureKeyAlias(), signatureKeyPassword);
+        try {
+            assertion.sign(privateKey, stsKeyProvider.getX509Certificate(saml2Config.getSignatureKeyAlias()));
+        } catch (SAML2Exception e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught signing assertion in SAML2TokenGenerationImpl: " + e, e);
         }
-        if (DSA_PRIVATE_KEY_ALGORITHM.equals(privateKey.getAlgorithm())) {
-            return DSA_DEFAULT_SIGNATURE_ALGORITHM;
-        } else if (RSA_PRIVATE_KEY_ALGORITHM.equals(privateKey.getAlgorithm())) {
-            return RSA_DEFAULT_SIGNATURE_ALGORITHM;
-        }
-        throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                "Unexpected PrivateKey algorithm encountered in SAML2TokenGenerationImpl: " + privateKey.getAlgorithm());
     }
 }

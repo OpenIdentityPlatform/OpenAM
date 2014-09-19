@@ -28,10 +28,8 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -76,12 +74,12 @@ public class DefaultAttributeStatementsProviderTest {
     }
 
     private SAML2Config createSAML2Config() {
-        Set<String> audiences = new HashSet<String>();
-        audiences.add("http://host.com:8080/openam/sp");
+        Map<String, String> attributeMap = new HashMap<String, String>();
+        attributeMap.put("email", "mail");
         return SAML2Config.builder()
-                        .attributeMap(attributeMap)
-                        .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
-                        .audiences(audiences)
-                        .build();
+                .attributeMap(attributeMap)
+                .nameIdFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
+                .spEntityId("http://host.com/sp/entity/id")
+                .build();
     }
 }

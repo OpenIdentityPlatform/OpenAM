@@ -22,9 +22,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenType;
-import org.forgerock.openam.sts.config.user.KeystoreConfig;
 import org.forgerock.openam.sts.config.user.SAML2Config;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -38,7 +36,6 @@ import java.util.Set;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.Assert.assertNotEquals;
-import static org.testng.AssertJUnit.assertTrue;
 
 public class RestSTSInstanceConfigTest {
     private static final boolean WITH_SAML2_CONFIG = true;
@@ -168,7 +165,7 @@ public class RestSTSInstanceConfigTest {
                 .build();
         Set<String> offloadHosts = new HashSet<String>(1);
         offloadHosts.add(TLS_OFFLOAD_HOST_IP);
-        RestDeploymentConfig deploymentConfig = null;
+        RestDeploymentConfig deploymentConfig;
         if (withTlsOffloadConfig) {
             deploymentConfig =
                     RestDeploymentConfig.builder()
@@ -185,21 +182,8 @@ public class RestSTSInstanceConfigTest {
                             .build();
         }
 
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
-                        .fileName("stsstore.jks")
-                        .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias("mystskey")
-                        .signatureKeyAlias("mystskey")
-                        .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
-
         SAML2Config saml2Config = null;
         if (withSaml2Config) {
-            Set<String> audiences = new HashSet<String>();
-            audiences.add("bobo_entity_id");
-            audiences.add("dodo_entity_id");
             Map<String,String> attributeMap = new HashMap<String, String>();
             attributeMap.put("mail", "email");
             attributeMap.put("uid", "id");
@@ -207,14 +191,22 @@ public class RestSTSInstanceConfigTest {
                     SAML2Config.builder()
                             .nameIdFormat("transient")
                             .tokenLifetimeInSeconds(500000)
-                            .audiences(audiences)
+                            .spEntityId("http://host.com/saml2/sp/entity/id")
+                            .encryptAssertion(true)
+                            .signAssertion(true)
+                            .encryptionAlgorithm("http://www.w3.org/2001/04/xmlenc#aes128-cbc")
+                            .encryptionKeyAlias("test")
+                            .signatureKeyAlias("test")
+                            .signatureKeyPassword("super.secret".getBytes())
+                            .encryptionAlgorithmStrength(128)
+                            .keystoreFile("da/directory/file")
+                            .keystorePassword("super.secret".getBytes())
                             .attributeMap(attributeMap)
                             .build();
         }
 
         RestSTSInstanceConfig.RestSTSInstanceConfigBuilderBase<?> builder = RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,
@@ -242,20 +234,8 @@ public class RestSTSInstanceConfigTest {
 
     private RestSTSInstanceConfig createIncompleteInstanceConfig() throws UnsupportedEncodingException {
         //leave out the DeploymentConfig to test null rejection
-        AuthTargetMapping mapping = AuthTargetMapping.builder().build();
-
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
-                        .fileName("stsstore.jks")
-                        .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias("mystskey")
-                        .signatureKeyAlias("mystskey")
-                        .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
 
         return RestSTSInstanceConfig.builder()
-                .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,
@@ -286,19 +266,8 @@ public class RestSTSInstanceConfigTest {
                         .authTargetMapping(mapping)
                         .build();
 
-        KeystoreConfig keystoreConfig =
-                KeystoreConfig.builder()
-                        .fileName("stsstore.jks")
-                        .password("stsspass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .encryptionKeyAlias("mystskey")
-                        .signatureKeyAlias("mystskey")
-                        .encryptionKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .signatureKeyPassword("stskpass".getBytes(AMSTSConstants.UTF_8_CHARSET_ID))
-                        .build();
-
         return RestSTSInstanceConfig.builder()
                 .deploymentConfig(deploymentConfig)
-                .keystoreConfig(keystoreConfig)
                 .issuerName("Cornholio")
                 .addSupportedTokenTranslation(
                         TokenType.USERNAME,
