@@ -242,7 +242,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
         return obj.serviceCall({
             type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=2.0"},
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
             data: "{}",
             url: "",
             serviceUrl: constants.host + "/"+ constants.context + "/json/sessions?_action=logout",
