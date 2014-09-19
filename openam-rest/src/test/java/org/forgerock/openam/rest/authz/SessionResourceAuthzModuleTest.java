@@ -52,7 +52,7 @@ public class SessionResourceAuthzModuleTest {
         given(mockRequest.getAction()).willReturn("logout");
 
         //when
-        Promise<AuthorizationResult, ResourceException> result = testModule.authorize(mockRequest, mockContext);
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, mockRequest);
 
         //then
         assertTrue(result.get().isAuthorized());
@@ -68,7 +68,7 @@ public class SessionResourceAuthzModuleTest {
         given(mockRequest.getAction()).willReturn("validate");
 
         //when
-        Promise<AuthorizationResult, ResourceException> result = testModule.authorize(mockRequest, mockContext);
+        Promise<AuthorizationResult, ResourceException> result = testModule.authorizeAction(mockContext, mockRequest);
 
         //then
         assertTrue(result.get().isAuthorized());
@@ -78,10 +78,12 @@ public class SessionResourceAuthzModuleTest {
     public void shouldDeferAllOthers() {
         //given
         ServerContext mockContext = mock(ServerContext.class);
-        Request mockRequest = mock(Request.class);
+        ActionRequest mockRequest = mock(ActionRequest.class);
+
+        given(mockRequest.getAction()).willReturn("something else");
 
         //when
-        testModule.authorize(mockRequest, mockContext);
+        testModule.authorizeAction(mockContext, mockRequest);
 
         //then
         // we should catch an IllegalArgumentException as we pass into super.authorize, as we have no SSOTokenContext

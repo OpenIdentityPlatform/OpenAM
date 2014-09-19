@@ -21,15 +21,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.forgerock.authz.filter.api.AuthorizationResult;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
@@ -49,57 +42,17 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
         super(sessionService, debug);
     }
 
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeCreate(ServerContext context, CreateRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeRead(ServerContext context, ReadRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeUpdate(ServerContext context, UpdateRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeDelete(ServerContext context, DeleteRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizePatch(ServerContext context, PatchRequest request) {
-        return authorize(context);
-    }
-
+    /**
+     * Lets through requests to ?_action=logout and ?_action=validate, otherwise defers to {@link AdminOnlyAuthzModule}.
+     */
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
-        return authorize(context);
-    }
-
-    @Override
-    public Promise<AuthorizationResult, ResourceException> authorizeQuery(ServerContext context, QueryRequest request) {
-        return authorize(context);
-    }
-
-    /**
-     * Lets through requests to ?_action=logout and ?_action=validate, otherwise defers to
-     * {@link AdminOnlyAuthzModule}.
-     */
-    Promise<AuthorizationResult, ResourceException> authorize(Request request, ServerContext context) {
-
-        if ((request instanceof ActionRequest)) {
-            ActionRequest actionRequest = (ActionRequest) request;
-            if (SessionResource.LOGOUT.equals(actionRequest.getAction()) ||
-                    SessionResource.VALIDATE.equals(actionRequest.getAction())) {
-                if (debug.messageEnabled()) {
-                    debug.message("SessionResourceAuthzModule :: " + actionRequest.getAction() +
-                            " action request authorized by module.");
-                }
-                return Promises.newSuccessfulPromise(AuthorizationResult.success());
+        if (SessionResource.LOGOUT.equals(request.getAction()) || SessionResource.VALIDATE.equals(request.getAction())) {
+            if (debug.messageEnabled()) {
+                debug.message("SessionResourceAuthzModule :: " + request.getAction() +
+                        " action request authorized by module.");
             }
+            return Promises.newSuccessfulPromise(AuthorizationResult.success());
         }
 
         if (debug.messageEnabled()) {
