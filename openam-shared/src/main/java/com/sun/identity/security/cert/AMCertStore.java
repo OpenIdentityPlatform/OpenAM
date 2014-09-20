@@ -24,13 +24,7 @@
  *
  * $Id: AMCertStore.java,v 1.5 2009/01/28 05:35:12 ww203982 Exp $
  *
- */
-
-/*
- * Created on Sep 11, 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 package com.sun.identity.security.cert;
 
@@ -41,16 +35,14 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
-import javax.security.auth.x500.X500Principal;
 
+import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.ldap.LDAPAttribute;
 import com.sun.identity.shared.ldap.LDAPAttributeSet;
 import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPEntry;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
-
-import com.iplanet.security.x509.X500Name;
 import com.sun.identity.security.SecurityDebug;
 
 /**
@@ -273,44 +265,23 @@ public class AMCertStore {
     }
 
     /**
-     * Return value of certificate Issuer DN 
+     * Return value of certificate Issuer DN.
      *
      * @param certificate
+     * @return The Issuer's DN as String.
      */
-    static public X500Name getIssuerDN(X509Certificate certificate) 
-                                                    throws IOException {
-        X500Name dn = null;
-
-        try {
-            X500Principal issuerPrincipal =
-                 certificate.getIssuerX500Principal();
-            dn = new X500Name(issuerPrincipal.getEncoded());
-        } catch (IOException e) {
-            debug.error("AMCertStore.getIssuerDN : " +
-                "Error in getting issuer DN : ", e);
-        }
-            
-        return dn;
+    public static String getIssuerDN(X509Certificate certificate) {
+        return CertUtils.getIssuerName(certificate);
     }
 
     /**
-     * Return value of certificate subject DN 
+     * Return value of certificate subject DN.
      *
      * @param certificate
+     * @return The Subject's DN as String.
      */
-    static public X500Name getSubjectDN(X509Certificate certificate) 
-                                                     throws IOException {
-        X500Name dn = null;
-
-        try {
-            X500Principal subjectPrincipal =
-                 certificate.getSubjectX500Principal();
-            dn = new X500Name(subjectPrincipal.getEncoded());
-        } catch (Exception e) {
-            debug.error("AMCertStore.getSubjectDN : " +
-                "Error in getting subject DN : " + e.toString());
-        }
-        return dn;
+    public static String getSubjectDN(X509Certificate certificate) throws IOException {
+        return CertUtils.getSubjectName(certificate);
     }    
     
     /**
@@ -375,28 +346,15 @@ public class AMCertStore {
     public static X509Certificate getIssuerCertificate (
         AMLDAPCertStoreParameters ldapParam, 
         X509Certificate cert, String attrName) {
-        String attrValue = null;
-        
-        try {
-            // Retrieve attribute value of amAuthCert_chkAttrCRL
-            X500Name dn = getIssuerDN(cert);
-	    if (dn != null) {
-                attrValue = dn.getAttributeValue(attrName);
-	    }
-        }
-        catch (Exception ex) {
-            if (debug.messageEnabled()) {
-                debug.message("getIssuerCertificate - cn substring: " + ex); 
-            }
+        String attrValue = CertUtils.getAttributeValue(cert.getIssuerX500Principal(), attrName);
+
+        if (attrValue == null) {
             return null;
         }
 
-        if (attrValue == null)
-            return null;
-        
         return getCertificate(ldapParam, attrName, attrValue);
     }
-            
+
     /**
      * Return X509 Certificate if the ldap entry has the same one
      *
@@ -407,28 +365,15 @@ public class AMCertStore {
     public static X509Certificate getRegisteredCertificate (
             AMLDAPCertStoreParameters ldapParam, 
             X509Certificate cert, String attrName) {
-        String attrValue = null;
+        String attrValue = CertUtils.getAttributeValue(cert.getSubjectX500Principal(), attrName);
         X509Certificate c = null;
         
-        try {
-            // Retrieve attribute value of amAuthCert_chkAttrCertInLDAP
-            X500Name dn = getSubjectDN(cert);
-            if (dn != null) {
-                attrValue = dn.getAttributeValue(attrName);
-            }
-        }
-        catch (Exception ex) {
-            if (debug.messageEnabled()) {
-                debug.message("Certificate - cn substring: " + ex); 
-            }
+        if (attrValue == null) {
             return null;
         }
 
-        if (attrValue == null)
-            return null;
-        
         if (debug.messageEnabled()) {
-            debug.message("Certificate - cn substring: " + attrValue); 
+            debug.message("Certificate - cn substring: " + attrValue);
         }
 
         c = getCertificate(ldapParam, attrName, attrValue);
@@ -438,7 +383,7 @@ public class AMCertStore {
             return null;
         }
     }
-    
+
     /**
      * Return X509 Certificate if the ldap entry has one  
      *
@@ -481,15 +426,6 @@ public class AMCertStore {
      * @param cert 
      */
     public static boolean isRootCA(X509Certificate cert) {
-        X500Name subjectDN = null;
-        X500Name issuerDN = null;
-        
-        try {
-            subjectDN = getIssuerDN(cert);
-            issuerDN = getSubjectDN(cert);
-        } catch (IOException e) {
-            ;
-        }
-        return issuerDN.equals(subjectDN);
+        return CertUtils.getIssuerName(cert).equals(CertUtils.getSubjectName(cert));
     }
 }

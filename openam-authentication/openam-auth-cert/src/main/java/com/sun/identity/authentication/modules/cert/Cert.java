@@ -24,10 +24,7 @@
  *
  * $Id: Cert.java,v 1.14 2009/03/13 20:54:42 beomsuk Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.modules.cert;
@@ -71,7 +68,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.iplanet.am.util.JSSInit;
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.security.x509.X500Name;
+import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -83,6 +80,8 @@ import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.security.cert.AMCertPath;
 import com.sun.identity.shared.encode.Base64;
 import java.util.Arrays;
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
 
 public class Cert extends AMLoginModule {
 
@@ -346,17 +345,14 @@ public class Cert extends AMLoginModule {
                 debug.error("Fatal error: LDAP Start Search " +
                                 "DN is not configured");
                 throw new AuthLoginException(amAuthCert, "wrongStartDN", null);
-            } 
-            
+            }
+
             if (amAuthCert_startSearchLoc != null) {
                 try {
-                    X500Name baseDN = new X500Name(amAuthCert_startSearchLoc);
-                }
-                catch (Exception e) {
-                    debug.error("Fatal error: LDAP Start Search " +
-                                    "DN misconfigured");
-                    throw new AuthLoginException(amAuthCert, "wrongStartDN",
-                        null);
+                    LdapName ldapName = new LdapName(amAuthCert_startSearchLoc);
+                } catch (InvalidNameException ine) {
+                    debug.error("Fatal error: LDAP Start Search DN misconfigured");
+                    throw new AuthLoginException(amAuthCert, "wrongStartDN", null);
                 }
             }
 
@@ -700,55 +696,36 @@ public class Cert extends AMLoginModule {
          * Get the Attribute value of the input certificate
          */
             X500Principal subjectPrincipal = cert.getSubjectX500Principal();
-            X500Name certDN = new X500Name(subjectPrincipal.getEncoded());
             if (debug.messageEnabled()) {
-                debug.message("getTokenFromCert: Subject DN : " + 
-                                certDN.getName());
+                debug.message("getTokenFromCert: Subject DN : " + CertUtils.getSubjectName(cert));
             }
 
-            if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject DN")) { 
-                userTokenId = certDN.getName();
-            }
-
-            if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject UID")) {
-                userTokenId = certDN.getAttributeValue("uid");
-            }
-
-            if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject CN")) { 
-                userTokenId = certDN.getCommonName(); 
-            }
-
-            if (amAuthCert_userProfileMapper.equalsIgnoreCase
-                                                  (amAuthCert_emailAddrTag)) {
-                userTokenId = certDN.getEmail();
+            if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject DN")) {
+                userTokenId = CertUtils.getSubjectName(cert);
+            } else if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject UID")) {
+                userTokenId = CertUtils.getAttributeValue(subjectPrincipal, CertUtils.UID);
+            } else if (amAuthCert_userProfileMapper.equalsIgnoreCase("subject CN")) {
+                userTokenId = CertUtils.getAttributeValue(subjectPrincipal, CertUtils.COMMON_NAME);
+            } else if (amAuthCert_userProfileMapper.equalsIgnoreCase(amAuthCert_emailAddrTag)) {
+                userTokenId = CertUtils.getAttributeValue(subjectPrincipal, CertUtils.EMAIL_ADDRESS);
                 if (userTokenId == null) {
-                    userTokenId = certDN.getAttributeValue("mail");
+                    userTokenId = CertUtils.getAttributeValue(subjectPrincipal, CertUtils.MAIL);
                 }
-            }
-
-            if (amAuthCert_userProfileMapper.
-                            equalsIgnoreCase("DER Certificate")) { 
+            } else if (amAuthCert_userProfileMapper.equalsIgnoreCase("DER Certificate")) {
                 userTokenId = String.valueOf(cert.getTBSCertificate());
-            }
-
-            //  "other" has been selected, so use attribute specified in the
-            //  iplanet-am-auth-cert-user-profile-mapper-other attribute,
-            //  which is in amAuthCert_altUserProfileMapper.
-            if (amAuthCert_userProfileMapper.equals("other")) {
-                userTokenId = certDN.getAttributeValue
-                                           (amAuthCert_altUserProfileMapper);
+            } else if (amAuthCert_userProfileMapper.equals("other")) {
+                //  "other" has been selected, so use attribute specified in the
+                //  iplanet-am-auth-cert-user-profile-mapper-other attribute,
+                //  which is in amAuthCert_altUserProfileMapper.
+                userTokenId =  CertUtils.getAttributeValue(subjectPrincipal, amAuthCert_altUserProfileMapper);
             }
 
             if (debug.messageEnabled()) {
-                debug.message("getTokenFromCert: " + 
-                                amAuthCert_userProfileMapper + userTokenId);
+                debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + userTokenId);
             }
-
-            return;
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("Certificate - " + 
-                    "Error in getTokenFromSubjectDN = " , e);
+                debug.message("Certificate - Error in getTokenFromSubjectDN = " , e);
             }
             throw new AuthLoginException(amAuthCert, "CertNoReg", null);
         }

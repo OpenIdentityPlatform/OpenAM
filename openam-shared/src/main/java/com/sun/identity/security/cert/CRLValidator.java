@@ -24,8 +24,8 @@
  *
  * $Id: CRLValidator.java,v 1.3 2008/06/25 05:52:58 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
-
 package com.sun.identity.security.cert;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.am.util.AMPasswordUtil;
-import com.iplanet.security.x509.X500Name;
+import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.security.SecurityDebug;
 
 /**
@@ -176,36 +176,19 @@ public class CRLValidator {
      */
     static public X509CRL getCRL(X509Certificate cert) {
         X509CRL crl = null;
-            /*
-         * Get the CN of the input certificate
-         */
-        String attrValue = null;
-        
-        try {
-            X500Name dn = AMCRLStore.getIssuerDN(cert);
-            // Retrieve attribute value of crlSearchAttr
-            if (dn != null) {
-                attrValue = dn.getAttributeValue(crlSearchAttr);
-            }
-        } catch (Exception ex) {
-            debug.error("attrValue to search crl : " + attrValue, ex); 
+        //Get the CN of the input certificate
+        String attrValue = CertUtils.getAttributeValue(cert.getIssuerX500Principal(), crlSearchAttr);
+
+        if (attrValue == null || ldapParams == null) {
             return null;
         }
 
-        if ((attrValue == null) || (ldapParams == null))
-            return null;
-        
         if (debug.messageEnabled()) {
-            debug.message("CRLValidator - " +
-                              "attrValue to search crl : " + attrValue); 
+            debug.message("CRLValidator - attrValue to search crl : " + attrValue);
         }
 
-        /*
-         * Lookup the certificate in the LDAP certificate
-         * directory and compare the values.
-         */ 
-        String searchFilter = 
-            AMCRLStore.setSearchFilter(crlSearchAttr, attrValue);
+        //Lookup the certificate in the LDAP certificate directory and compare the values.
+        String searchFilter = AMCRLStore.setSearchFilter(crlSearchAttr, attrValue);
         ldapParams.setSearchFilter(searchFilter);
         try {
             AMCRLStore store = new AMCRLStore(ldapParams);
@@ -213,10 +196,10 @@ public class CRLValidator {
         } catch (IOException e) {
             debug.error("X509Certificate: verifyCertificate." + e.toString());
         }
-                
-        return crl; 
+
+        return crl;
     }
-    
+
     static public boolean isCRLCheckEnabled() {
         return crlCheckEnabled;
     }

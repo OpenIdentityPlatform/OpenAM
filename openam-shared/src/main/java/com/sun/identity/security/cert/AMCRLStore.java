@@ -24,12 +24,8 @@
  *
  * $Id: AMCRLStore.java,v 1.7 2009/01/28 05:35:12 ww203982 Exp $
  *
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
-
-/**
- * Portions Copyrighted 2013 ForgeRock Inc
- */
-
 package com.sun.identity.security.cert;
 
 import java.io.ByteArrayInputStream;
@@ -48,7 +44,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.security.auth.x500.X500Principal;
 
+import com.iplanet.security.x509.CertUtils;
 import com.sun.identity.shared.ldap.LDAPAttribute;
 import com.sun.identity.shared.ldap.LDAPAttributeSet;
 import com.sun.identity.shared.ldap.LDAPConnection;
@@ -66,8 +64,6 @@ import sun.security.x509.CRLDistributionPointsExtension;
 import sun.security.x509.DistributionPoint;
 
 import com.iplanet.security.x509.IssuingDistributionPointExtension;
-import com.iplanet.security.x509.X500Name;
-//import com.iplanet.am.util.AMURLEncDec;
 import com.sun.identity.shared.encode.URLEncDec;
 
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -108,7 +104,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class AMCRLStore extends AMCertStore {
 
     // In memory CRL cache
-    private static Hashtable cachedcrls = new Hashtable();
+    private static Hashtable<String, X509CRL> cachedcrls = new Hashtable<String, X509CRL>();
 
     private String mCrlAttrName = null;
 
@@ -220,37 +216,31 @@ public class AMCRLStore extends AMCertStore {
     }
 
     /**
-     * Checks certificate and returns corresponding stored CRL 
-     * in cached CRL store
+     * Checks certificate and returns corresponding stored CRL in cached CRL store.
+     *
      * @param certificate
+     * @return Cached CRL information about the certificate.
      */
-    public X509CRL getCRLFromCache(X509Certificate certificate) 
-                                          throws IOException  {
-	X500Name issuerDN = getIssuerDN(certificate);
-	 
-	X509CRL crl = null;
-	
-	crl = (X509CRL) cachedcrls.get(issuerDN.toString());
-	
-	return crl;
+    public X509CRL getCRLFromCache(X509Certificate certificate) {
+	return cachedcrls.get(CertUtils.getIssuerName(certificate));
     }
 
     /**
-     * Checks certificate and update CRL in cached CRL store
+     * Checks certificate and update CRL in cached CRL store.
+     *
      * @param certificate
+     * @param crl
      */
-    public void updateCRLCache(X509Certificate certificate, X509CRL crl) 
-                                         throws IOException  {
-	X500Name issuerDN = getIssuerDN(certificate);
-		
+    public void updateCRLCache(X509Certificate certificate, X509CRL crl) {
+	String issuer = CertUtils.getIssuerName(certificate);
+
 	if (crl == null) {
-	    cachedcrls.remove(issuerDN.toString());
+	    cachedcrls.remove(issuer);
 	} else {
-	    cachedcrls.put(issuerDN.toString(), crl);
+	    cachedcrls.put(issuer, crl);
 	}
     }
 
-        
     private X509CRL getCRLFromEntry(LDAPEntry crlEntry) 
         throws Exception  {
 
@@ -727,27 +717,14 @@ public class AMCRLStore extends AMCertStore {
      * @param cert
      * @param attrNames, attributes names from the subjectDN of the issuer cert
      */
-    static public X509CRL getCRL(AMLDAPCertStoreParameters ldapParam, 
-                                 X509Certificate cert, String... attrNames) {
+    public static X509CRL getCRL(AMLDAPCertStoreParameters ldapParam, X509Certificate cert, String... attrNames) {
         X509CRL crl = null;
         
         try {
-        
             if (!ArrayUtils.isEmpty(attrNames)) {
+                X500Principal issuerPrincipal = cert.getIssuerX500Principal();
+                String searchFilter;
 
-                X500Name dn = null;
-
-                try {
-                    dn = AMCRLStore.getIssuerDN(cert);
-                } catch (Exception ex) {
-                    if (debug.messageEnabled()) {
-                        debug.message("AMCRLStore:getCRL " 
-                            + "Certificate - getIssuerDN: ",ex);
-                    }
-                    return crl;
-                }
-
-                String searchFilter = null;
 
                 if (attrNames.length < 2) {
                     /*
@@ -755,10 +732,8 @@ public class AMCRLStore extends AMCertStore {
                      */
                     String attrValue = null;
 
-                    if (null != dn) {
-                        // Retrieve attribute value of the attribute name
-                        attrValue = dn.getAttributeValue(attrNames[0]);
-                    }
+                    // Retrieve attribute value of the attribute name
+                    attrValue = CertUtils.getAttributeValue(issuerPrincipal, attrNames[0]);
 
                     if (null == attrValue) {
                         return crl;
@@ -767,9 +742,8 @@ public class AMCRLStore extends AMCertStore {
                     searchFilter = setSearchFilter(attrNames[0], attrValue);
 
 
-                } else {         
-
-                    String searchFilterValue = buildSearchFilterValue(attrNames, dn);
+                } else {
+                    String searchFilterValue = buildSearchFilterValue(attrNames, issuerPrincipal);
 
                     if (searchFilterValue.isEmpty()) {
                         return crl;
@@ -798,11 +772,11 @@ public class AMCRLStore extends AMCertStore {
         return crl; 
     }
     
-    private static String buildSearchFilterValue(String[] attrNames, X500Name dn) throws IOException {
+    private static String buildSearchFilterValue(String[] attrNames, X500Principal principal) {
         StringBuilder searchFilterBuilder = new StringBuilder();
         for (int i = 0; i < attrNames.length; i++) {
             String attrName = attrNames[i];
-            String attrValue = dn.getAttributeValue(attrName);
+            String attrValue = CertUtils.getAttributeValue(principal, attrName);
 
             if (null != attrValue) {
                 searchFilterBuilder.append(attrName);
