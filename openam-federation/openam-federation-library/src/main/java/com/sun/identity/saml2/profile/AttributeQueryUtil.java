@@ -24,9 +24,8 @@
  *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
- * Portions copyright 2010-2014 ForgeRock AS
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.util.ArrayList;
@@ -90,9 +89,10 @@ import com.sun.identity.saml2.xmlenc.EncManager;
  *
  * @supported.api
  */
-
 public class AttributeQueryUtil {
 
+    private static final String DEFAULT_ATTRIBUTE_NAME_FORMAT =
+            "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
     static KeyProvider keyProvider = KeyUtil.getKeyProviderInstance(); 
     static Hashtable attrAuthorityMapperCache = new Hashtable(); 
     static DataStoreProvider dsProvider = null;
@@ -840,37 +840,35 @@ public class AttributeQueryUtil {
         return AssertionFactory.getInstance().createEncryptedAssertion(el);
     }
 
-    private static List verifyDesiredAttributes(List supportedAttrs,
-        List desiredAttrs) throws SAML2Exception {
-
-        if ((supportedAttrs == null) || (supportedAttrs.isEmpty())) {
+    private static List<Attribute> verifyDesiredAttributes(List<AttributeElement> supportedAttrs,
+            List<Attribute> desiredAttrs) throws SAML2Exception {
+        if (supportedAttrs == null || supportedAttrs.isEmpty()) {
             return desiredAttrs;
         }
 
-        if ((desiredAttrs == null) || (desiredAttrs.isEmpty())) {
+        if (desiredAttrs == null || desiredAttrs.isEmpty()) {
             return convertAttributes(supportedAttrs);
         }
 
-        for(Iterator iterD = desiredAttrs.iterator(); iterD.hasNext(); ) {
-            Attribute attrD = (Attribute)iterD.next();
+        for (Attribute desiredAttr : desiredAttrs) {
             boolean isAttrValid = false;
-            Iterator iterS = supportedAttrs.iterator();
-            while(iterS.hasNext()) {
-                AttributeElement attrS = (AttributeElement)iterS.next();
-                if (isSameAttribute(attrD, attrS)) {
-                    if (isValueValid(attrD, attrS)) {
+            Iterator<AttributeElement> supportedAttrIterator = supportedAttrs.iterator();
+            while (supportedAttrIterator.hasNext()) {
+                AttributeElement supportedAttr = supportedAttrIterator.next();
+                if (isSameAttribute(desiredAttr, supportedAttr)) {
+                    if (isValueValid(desiredAttr, supportedAttr)) {
                         isAttrValid = true;
+                        //By removing the attribute from the supported list we make sure that an AttributeQuery can
+                        //not request the same Attribute more than once, see SAML core 3.3.2.3.
+                        supportedAttrIterator.remove();
                         break;
                     } else {
-                        throw new SAML2Exception(
-                            "Attribute value not suppoted");
+                        throw new SAML2Exception("Attribute value not supported");
                     }
                 }
             }
-            if (isAttrValid) {
-                iterS.remove();
-            } else {
-                throw new SAML2Exception("Attribute name not suppoted");
+            if (!isAttrValid) {
+                throw new SAML2Exception("Attribute name not supported");
             }
         }
         return desiredAttrs;
@@ -907,25 +905,21 @@ public class AttributeQueryUtil {
         return resultAttrs;
     }
 
-    private static List filterAttributes(List attributes, List desiredAttrs) {
+    private static List<Attribute> filterAttributes(List<Attribute> attributes, List<Attribute> desiredAttrs) {
 
-        if ((attributes == null) || (attributes.isEmpty())) {
+        if (attributes == null || attributes.isEmpty()) {
             SAML2Utils.debug.message("AttributeQueryUtil.filterAttributes: attributes are null");
             return attributes;
         }
-        if ((desiredAttrs == null) || (desiredAttrs.isEmpty())) {
+        if (desiredAttrs == null || desiredAttrs.isEmpty()) {
             SAML2Utils.debug.message("AttributeQueryUtil.filterAttributes: desired attributes are null");
             return attributes;
         }
 
-        List returnAttributes = new ArrayList();
-        if ((desiredAttrs != null) && (!desiredAttrs.isEmpty())) {
-            for(Iterator iterD = desiredAttrs.iterator(); iterD.hasNext();){
-
-                Attribute attrD = (Attribute)iterD.next();
-                for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-
-                    Attribute attr = (Attribute)iter.next();
+        List<Attribute> returnAttributes = new ArrayList<Attribute>();
+        if (!desiredAttrs.isEmpty()) {
+            for (Attribute attrD : desiredAttrs) {
+                for (Attribute attr : attributes) {
                     if (isSameAttribute(attr, attrD) ) {
                         attr = filterAttributeValues(attr, attrD);
                         if (attr != null) {
@@ -945,25 +939,13 @@ public class AttributeQueryUtil {
                     }
                 }
             }
-
         }
         return returnAttributes;
-
     }
 
-    private static boolean isSameAttribute(Attribute attr1, Attribute attr2) {
-        if (!attr1.getName().equals(attr2.getName())) {
-            return false;
-        }
-
-        String nameFormat1 = attr1.getNameFormat();
-
-        if (nameFormat1 == null) {
-            return (attr2.getNameFormat() == null);
-        } else {
-            return (nameFormat1.equals(attr2.getNameFormat()));
-        }
-
+    private static boolean isSameAttribute(Attribute attribute, Attribute desired) {
+        return desired.getName().equals(attribute.getName())
+                && isNameFormatMatching(desired.getNameFormat(), attribute.getNameFormat());
     }
 
     private static Attribute filterAttributeValues(Attribute attr,
@@ -1014,21 +996,30 @@ public class AttributeQueryUtil {
         }
     }
 
-    private static boolean isSameAttribute(Attribute attr1,
-        AttributeElement attr2) {
+    private static boolean isSameAttribute(Attribute desired, AttributeElement supported) {
+        return desired.getName().equals(supported.getName())
+                && isNameFormatMatching(desired.getNameFormat(), supported.getNameFormat());
+    }
 
-        if (!attr1.getName().equals(attr2.getName())) {
-            return false;
-        }
-
-        String nameFormat1 = attr1.getNameFormat();
-
-        if (nameFormat1 == null) {
-            return (attr2.getNameFormat() == null);
-        } else {
-            return (nameFormat1.equals(attr2.getNameFormat()));
-        }
-
+    /**
+     * Determines whether the desired Attribute NameFormat matches with the available attribute's NameFormat. When
+     * the NameFormat isn't specified in the request, the
+     * <code>urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified</code> default NameFormat needs to be used (see
+     * SAML core spec 2.7.3.1).
+     * The different attribute profiles (SAML profiles spec section 8) each determine how the attribute comparison
+     * should be performed, however there is no clear way to actually determine which attribute profile is being used
+     * when the Attribute Authority supports more than one profile. Because of this, the unspecified Attribute
+     * NameFormat has been implemented as a wildcard match, much similarly to how requesting the unspecified
+     * NameID-Format allows the IdP to choose an arbitrary NameID-Format when generating the assertion for an SP.
+     *
+     * @param desiredNameFormat The NameFormat of the Attribute defined in the AttributeQuery request.
+     * @param availableNameFormat The NameFormat of the Attribute defined in the server configuration.
+     * @return <code>true</code> if the desired NameFormat is unspecified, or if it is the same as the NameFormat
+     * defined in the server configuration.
+     */
+    private static boolean isNameFormatMatching(String desiredNameFormat, String availableNameFormat) {
+        return desiredNameFormat == null || DEFAULT_ATTRIBUTE_NAME_FORMAT.equals(desiredNameFormat)
+                || desiredNameFormat.equals(availableNameFormat);
     }
 
     private static boolean isValueValid(Attribute desiredAttr,
