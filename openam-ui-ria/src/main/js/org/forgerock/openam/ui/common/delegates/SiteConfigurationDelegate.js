@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/common/delegates/SiteConfigurationDelegate", [
             if (configuration.globalData.auth.realm[0] !== "/") {
                 configuration.globalData.auth.realm = "/" + configuration.globalData.auth.realm; 
             }
-        } else if (index !== -1 && params[index] !== undefined) {
+        } else if (index !== -1 && params[index] !== undefined && params[index] !== null ) {
             configuration.globalData.auth.realm = params[index];
         }
 

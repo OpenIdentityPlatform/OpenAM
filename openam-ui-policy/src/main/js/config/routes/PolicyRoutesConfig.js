@@ -34,6 +34,7 @@ define("config/routes/PolicyRoutesConfig", function () {
         "editApp": {
             view: "org/forgerock/openam/ui/policy/EditApplicationView",
             url: /^app\/([%A-Za-z0-9]*)(?:\/){0,1}$/,
+            defaults: [""],
             role: "ui-admin",
             pattern: "app/?"
         },
