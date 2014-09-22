@@ -52,7 +52,7 @@ public class PartialTokenTest {
         PartialToken clone = new PartialToken(first, field, id);
 
         // Then
-        assertThat(clone.getValue(field)).isEqualTo(id);
+        assertThat(clone.<String>getValue(field)).isEqualTo(id);
     }
 
     @Test (expectedExceptions = NullPointerException.class)
