@@ -6841,15 +6841,21 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data '{
-   "name":"newGroup",
-   "realm":"/",
+   "username":"newGroup",
    "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]
  }' \
  https://openam.example.com:8443/openam/json/groups?_action=create</userinput>
 <computeroutput>{
     "username": "newGroup",
+    "realm": "/",
     "uniqueMember": [
         "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "cn": [
+        "newGroup"
+    ],
+    "dn": [
+        "cn=newGroup,ou=groups,dc=openam,dc=forgerock,dc=org"
     ],
     "objectclass": [
         "groupofuniquenames",
@@ -6866,15 +6872,21 @@ $ <userinput>curl \
  --header "iPlanetDirectoryPro: AQIC5w...2NzEz*" \
  --header "Content-Type: application/json" \
  --data '{
-   "name":"anotherGroup",
-   "realm":"/",
+   "username":"anotherGroup",
    "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"]
  }' \
  https://openam.example.com:8443/openam/json/groups/anotherGroup</userinput>
 <computeroutput>{
     "username": "anotherGroup",
+    "realm": "/",
     "uniqueMember": [
         "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "cn": [
+        "anotherGroup"
+    ],
+    "dn": [
+        "cn=anotherGroup,ou=groups,dc=openam,dc=forgerock,dc=org"
     ],
     "objectclass": [
         "groupofuniquenames",
