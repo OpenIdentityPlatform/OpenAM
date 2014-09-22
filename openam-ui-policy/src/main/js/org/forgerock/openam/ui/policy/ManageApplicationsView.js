@@ -56,7 +56,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             var self = this,
                 actionsFormatter = function (cellvalue, options, rowObject) {
                     return uiUtils.fillTemplateWithData("templates/policy/ApplicationTableCellActionsTemplate.html",
-                        {appName: encodeURI(rowObject.name)});
+                        {appName: rowObject.name});
                 },
                 storedApps = JSON.parse(sessionStorage.getItem(self.storageSelectedAppsKey));
 

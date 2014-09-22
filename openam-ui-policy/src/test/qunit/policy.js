@@ -563,9 +563,13 @@ define([
                 QUnit.start();
             });
 
-            QUnit.test("Add/Edit Application routes with different input", function () {
+            QUnit.test("Add/Edit routes with different input", function () {
                 QUnit.equal(router.getLink(router.configuration.routes.editApp, [null]), "app/", "Add App - no arguments provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editApp, ["calendar"]), "app/calendar", "Edit App with one argument provided");
+                QUnit.equal(router.getLink(router.configuration.routes.editApp, ["test spaces"]), "app/test spaces", "Edit App with space in the name");
+
+                QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", null]), "app/calendar/policy/", "Add policy with one argument provided");
+                QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", "testPolicy"]), "app/calendar/policy/testPolicy", "Edit policy with two arguments provided");
             });
 
 

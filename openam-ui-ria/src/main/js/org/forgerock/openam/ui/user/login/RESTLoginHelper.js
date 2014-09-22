@@ -105,7 +105,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 conf.globalData.auth.realm = user.userid.realm;
                 
                 // keep track of the current realm as a future default value, following logout:
-                router.configuration.routes.login.defaults = [user.userid.realm];
+                router.configuration.routes.login.defaults[0] = user.userid.realm;
                 
                 userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, errorCallback);
             }, function() {
