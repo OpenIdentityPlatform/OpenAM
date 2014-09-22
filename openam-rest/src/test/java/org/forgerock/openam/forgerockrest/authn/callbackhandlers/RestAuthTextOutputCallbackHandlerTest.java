@@ -28,6 +28,9 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -106,11 +109,12 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJsonAndEscapeCharacters() throws RestAuthException {
+    public void shouldConvertToJsonAndEscapeCharacters() throws RestAuthException, JSONException {
 
         //Given
+        final String script = "for (var i = 0; i < 10; i++) { alert(\"alert\"); }";
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION,
-                "for (var i = 0; i < 10; i++) { alert(\"alert\"); }");
+                script);
 
         //When
         JsonValue jsonObject = testOutputRestAuthCallbackHandler.convertToJson(textOutputCallback, 1);
@@ -119,11 +123,15 @@ public class RestAuthTextOutputCallbackHandlerTest {
         assertEquals("TextOutputCallback", jsonObject.get("type").asString());
         assertNotNull(jsonObject.get("output"));
         assertEquals(2, jsonObject.get("output").size());
-        assertEquals("for (var i = 0; i < 10; i++) { alert(\\\"alert\\\"); }",
+        assertEquals(script,
                 jsonObject.get("output").get(0).get("value").asString());
         assertEquals(TextOutputCallback.INFORMATION,
                 Integer.parseInt(jsonObject.get("output").get(1).get("value").asString()));
         assertEquals(2, jsonObject.size());
+
+        // Round-trip via toString/parsing with JSONObject to verify correct escaping
+        JSONObject parsed = new JSONObject(jsonObject.toString());
+        assertEquals(script, parsed.getJSONArray("output").getJSONObject(0).getString("value"));
     }
 
     @Test
