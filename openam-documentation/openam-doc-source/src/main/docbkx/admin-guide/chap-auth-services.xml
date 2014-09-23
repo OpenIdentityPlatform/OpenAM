@@ -1877,9 +1877,35 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    <title>Hints for the Device ID (Match) Authentication Module</title>
 
    <para>The Device ID (Match) module provides device fingerprinting functionality
-    that collects the unique characteristics of a remote user's computing device for
-    risk-based authentication implementations. Typically, you configure and
-    gather the following device print items:
+    for risk-based authentication. The Device ID (Match) works together with other
+    modules, for example, the DataStore, HMAC One-Time Password (HOTP), and
+    Device ID (Save) modules in an authentication chain.
+   </para>
+   <para>
+    The Device ID (Match) module collects the unique characteristics of a remote user's computing device
+    and compares them to characteristics on a saved device profile.
+    The module computes any variances between the collected characteristics
+    to those stored on the saved device profile and assigns penalty points for
+    each difference.
+   </para>
+   <para>
+    For example, when a user who typically logs on to the Internet
+    on a FireFox browser, logs on using Chrome, the Device ID (Match) module notes the
+    difference and assigns penalty points to this change in behavior. If
+    the module detects additional differences in behavior, such as browser fonts,
+    geolocation, etc., then additional points are assessed and calculated. If the
+    total maximum number of penalty points exceeds a pre-configured threshold value,
+    the Device ID (Match) module fails and control is determined by how you
+    configured your authentication chain. For example, if you include the
+    HMAC One-Time Password (HOTP) module in your authentication chain
+    and if the Device ID (Match) module fails after the maximum number of penalty
+    points have been exceeded, then the authentication chain issues a HOTP request to the user,
+    requiring the user to identify himself using two-factor authentication.
+   </para>
+
+
+   <para>
+    Typically, you configure and gather the following device print items:
    </para>
 
    <itemizedlist>
@@ -1900,35 +1926,23 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </listitem>
    </itemizedlist>
 
-   <para>You can specify penalty points when characteristics
-    of the fingerprint have changed based on comparisons of the collected data to
-    a stored device profile. If the total penalty points
-    exceeds some configured threshold score, the user must verify her identity
-    using HOTP.
-    If more than one characteristic of the device fingerprint has
-    changed, the module assumes that the user is trying to connect from a different
-    system.</para>
-
    <para>The Device ID (Match) module comes out of the box with default
     client-side and server-side JavaScript code, supplying
     the logic necessary to fingerprint the user agent and computer.
     Scripting allows you to customize the code, providing more control over the
     device fingerprint elements that you would like to collect.
-   </para>
-   <para>OpenAM supports both the JavaScript and Groovy languages and requires that
-    both the client-side and server-side scripts be written in one or the other
-    language. The default language implemented for the Device ID (Match) module is
-    JavaScript.
+    OpenAM supports both the JavaScript (default) and Groovy languages.
+    The client-side code must be in JavaScript. The server-side script can be
+    written in JavaScript or Groovy.
    </para>
 
-   <caution><para>The Device ID (Match) module's default JavaScript
-    client-side and server-side scripts are fully functional.
-    If you change the client-side script, you must also
-    make a corresponding change to the server-side script.
-    For a safer option if you want to change the behavior of the module,
-    you can copy the scripts to a custom scripted module, and edit the code to
-    make your own customized version.
-   </para></caution>
+   <important>
+    <para>
+     By default, the maximum penalty points is set to 0, which you can adjust in
+     the server-side script.
+    </para>
+   </important>
+
    <para>
     To access the Device ID (Match) module page on the
     console, click Configuration &gt; Device Id (Match).
@@ -1949,9 +1963,26 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </mediaobject>
    </figure>
 
+   <caution><para>The Device ID (Match) module's default JavaScript
+    client-side and server-side scripts are fully functional.
+    If you change the client-side script, you must also
+    make a corresponding change to the server-side script.
+    For a safer option if you want to change the behavior of the module,
+    you can copy the scripts to a custom scripted module, and edit the code to
+    make your own customized version.
+   </para></caution>
+
    <para>The Device ID (Match) does not stand on its own within an authentication
-    chain and requires additional modules in the following order with the
-    specified criteria:</para>
+    chain and requires additional modules. For example, you can have any
+    module that identifies the user (for example, DataStore, Active Directory or others),
+    Device ID (Match), any module that provides two-factor authentication,
+    (for example, HOTP or SecurID), and Device ID (Save) within your authentication
+    chain.</para>
+
+   <para>
+    As an example, you can configure the following modules with the
+    specified criteria:
+   </para>
 
    <orderedlist>
     <listitem>
@@ -1974,7 +2005,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       If a match is successful, OpenAM determines that the client's device has the
       required attributes for a successful authentication.</para>
      <para>
-      If the device does not have a match, then the module falls through
+      If the device does not have a match, then the module fails and falls through
       to the HMAC One-Time Password (HOTP) module for further processing.
      </para>
     </listitem>
@@ -1983,6 +2014,11 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       If the user's device does not match a stored profile,
       OpenAM presents the user with a HMAC One-Time Password (HOTP) screen either
       by SMS or email, prompting the user to enter a password.
+     </para>
+     <para>
+      You can also use any other module that provides two-factor authentication,
+      such as SecurID. For information on the SecurID module, see
+      <xref linkend="securid-module-conf-hints"/>.
      </para>
      <para>
       After the HOTP has successfully validated the user, the Device ID (Save)
@@ -2010,6 +2046,13 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       For specific information about the Device ID (Save) module, see
       <xref linkend="device-id-save-hints"/>.
      </para>
+
+     <note>
+      <para>If a user has multiple device profiles, the profile that is the closest
+       match to the current client details is used for the comparison result.
+      </para>
+     </note>
+
     </listitem>
    </orderedlist>
 
@@ -2099,13 +2142,14 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
    <para>
     When the user logs on to the console, OpenAM determines if the user's device
     differs from that of the stored profile.
-    If there are differences, OpenAM sends an "Enter OTP" page, requiring the
-    user to enter a one-time password, which will be sent to the user via email or SMS.
+    If the differences exceed the maximum number of penalty points,
+    OpenAM sends an "Enter OTP" page, requiring the
+    user to enter a one-time password, which is sent to the user via email or SMS.
     The user also has the option to request a one-time password.
    </para>
 
    <para>Next, OpenAM presents the user with a "Add to Trusted Devices?" page,
-    asking if she wants to add the device to the list of trusted device profiles.
+    asking if the user wants to add the device to the list of trusted device profiles.
     If the user clicks "Yes", OpenAM prompts the user to enter a descriptive name
     for the trusted device.
    </para>
@@ -2142,6 +2186,13 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     profile requires update. The module also provides a configuration setting for
     the maximum number of stored profiles on the user record.
    </para>
+
+   <note>
+    <para>If a user has multiple device profiles, the profile that is the closest
+     match to the current client details is used for the comparison result.
+    </para>
+   </note>
+
    <para>
     Within its configured authentication chain, the Device ID (Save) module also
     takes the device print and creates a JSON object that consists of the ID,
@@ -2758,7 +2809,6 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </varlistentry>
    </variablelist>
   </section>
-
 
   <!--section xml:id="membership-module-conf-hints">
    <title>Hints For the Membership Authentication Module</title>
