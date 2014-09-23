@@ -59,11 +59,4 @@ public class CaseInsensitiveKey implements Serializable {
         return mKey;
     }
 
-    /*
-     * public static void main(String[] args) { CaseInsensitiveKey a = new
-     * CaseInsensitiveKey("one"); CaseInsensitiveKey b = new
-     * CaseInsensitiveKey("ONE"); System.out.println(a.hashCode());
-     * System.out.println(b.hashCode()); System.out.println(a.equals(b));
-     * System.out.println(b.equals(a)); }
-     */
 }

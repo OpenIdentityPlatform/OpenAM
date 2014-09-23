@@ -49,7 +49,7 @@ public class CreateHostedIDP
     extends Task {
     public CreateHostedIDP() {
     }
-    
+
     /**
      * Creates hosted identity provider.
      *
@@ -60,32 +60,32 @@ public class CreateHostedIDP
         throws WorkflowException {
         validateParameters(params);
         String metadataFile = getString(params, ParameterKeys.P_META_DATA);
-        boolean hasMetaData = (metadataFile != null) && 
+        boolean hasMetaData = (metadataFile != null) &&
             (metadataFile.trim().length() > 0);
         String metadata = null;
         String extendedData = null;
 
         if (hasMetaData) {
-            String extendedDataFile = getString(params, 
-                ParameterKeys.P_EXENDED_DATA);
+            String extendedDataFile = getString(params,
+                ParameterKeys.P_EXTENDED_DATA);
             metadata = getContent(metadataFile, locale);
             extendedData = getContent(extendedDataFile, locale);
         } else {
             String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
-            String metaAlias = generateMetaAliasForIDP(getString(params, 
+            String metaAlias = generateMetaAliasForIDP(getString(params,
                 ParameterKeys.P_REALM));
             Map map = new HashMap();
             map.put(MetaTemplateParameters.P_IDP, metaAlias);
-            map.put(MetaTemplateParameters.P_IDP_E_CERT, 
+            map.put(MetaTemplateParameters.P_IDP_E_CERT,
                 getString(params, ParameterKeys.P_IDP_E_CERT));
-            map.put(MetaTemplateParameters.P_IDP_S_CERT, 
+            map.put(MetaTemplateParameters.P_IDP_S_CERT,
                 getString(params, ParameterKeys.P_IDP_S_CERT));
 
             try {
                 metadata = CreateSAML2HostedProviderTemplate.
                     buildMetaDataTemplate(entityId, map, getRequestURL(params));
                 extendedData = CreateSAML2HostedProviderTemplate.
-                    createExtendedDataTemplate(entityId, map, 
+                    createExtendedDataTemplate(entityId, map,
                     getRequestURL(params));
             } catch (SAML2MetaException e) {
                 return e.getMessage();
@@ -109,9 +109,9 @@ public class CreateHostedIDP
             List attrMapping = getAttributeMapping(params);
             if (!attrMapping.isEmpty()) {
                 SAML2MetaManager manager = new SAML2MetaManager();
-                EntityConfigElement config = 
+                EntityConfigElement config =
                     manager.getEntityConfig(realm, entityId);
-                IDPSSOConfigElement ssoConfig = 
+                IDPSSOConfigElement ssoConfig =
                     manager.getIDPSSOConfig(realm, entityId);
 
                 Map attribConfig = SAML2MetaUtils.getAttributes(ssoConfig);
@@ -136,10 +136,10 @@ public class CreateHostedIDP
         String metadata = getString(params, ParameterKeys.P_META_DATA);
         boolean hasMetaData = (metadata != null) &&
             (metadata.trim().length() > 0);
-        String extendedData = getString(params, ParameterKeys.P_EXENDED_DATA);
+        String extendedData = getString(params, ParameterKeys.P_EXTENDED_DATA);
         boolean hasExtendedData = (extendedData != null) &&
             (extendedData.trim().length() > 0);
-        
+
         if ((hasMetaData && !hasExtendedData) ||
             (!hasMetaData && hasExtendedData)
             ) {
@@ -148,7 +148,7 @@ public class CreateHostedIDP
         }
         if ((params.size() == 3) &&
             params.containsKey(ParameterKeys.P_META_DATA) &&
-            params.containsKey(ParameterKeys.P_EXENDED_DATA) &&
+            params.containsKey(ParameterKeys.P_EXTENDED_DATA) &&
             !hasMetaData && !hasExtendedData
             ) {
             throw new WorkflowException("both-meta-extended-data-required",
@@ -159,13 +159,13 @@ public class CreateHostedIDP
         if ((cotname == null) || (cotname.trim().length() == 0)) {
             throw new WorkflowException("missing-cot", null);
         }
-            
+
         if (!hasMetaData && !hasExtendedData) {
             String realm = getString(params, ParameterKeys.P_REALM);
             if ((realm == null) || (realm.trim().length() == 0)) {
                 throw new WorkflowException("missing-realm", null);
             }
-            
+
             String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
             if ((entityId == null) || (entityId.trim().length() == 0)) {
                 throw new WorkflowException("missing-entity-id", null);

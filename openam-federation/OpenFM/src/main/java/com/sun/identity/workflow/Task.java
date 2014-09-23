@@ -147,8 +147,15 @@ public abstract class Task
             throw new WorkflowException(e.getMessage());
         }
     }
-    
-    private static String getWebContent(String url, Locale locale)
+
+    /**
+     * Reads the content in from a URL and returns as a String.
+     * @param url The URL to fetch content from.
+     * @param locale The locale used to construct error messages.
+     * @return A string of the contents fetched from the URL.
+     * @throws WorkflowException Thrown if the URL is malformed, or there is an error fetching content.
+     */
+    protected static String getWebContent(String url, Locale locale)
         throws WorkflowException {
         try {
             StringBuffer content = new StringBuffer();

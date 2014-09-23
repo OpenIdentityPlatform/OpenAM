@@ -43,6 +43,7 @@ import java.util.Set;
  * is preserved.
  */
 public class CaseInsensitiveHashMap extends HashMap {
+
     public CaseInsensitiveHashMap() {
         super();
     }
@@ -93,7 +94,7 @@ public class CaseInsensitiveHashMap extends HashMap {
 
     /**
      * Returns set view of mappings in this map
-     * 
+     *
      * @return a <code>Set</Code> of map entries
      */
     public Set entrySet() {

@@ -24,6 +24,8 @@ import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.idrepo.ldap.LDAPConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.testng.Assert.fail;
+
+import org.forgerock.openam.utils.MapHelper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

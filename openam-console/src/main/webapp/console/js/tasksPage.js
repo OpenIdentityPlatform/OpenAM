@@ -32,7 +32,7 @@ var hide  = true;
 var tleft;
 var ttop; 
 var ileft;
-var colnum = 17; // number of tasks
+var colnum = 18; // number of tasks
 
 function getElementPositionByName(elemID) {
     getElementPositionEx(document.getElementsByName(elemID)[0]);

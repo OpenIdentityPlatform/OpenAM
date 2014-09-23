@@ -18,6 +18,8 @@ package org.forgerock.openam.idrepo.ldap;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import static org.fest.assertions.Assertions.*;
+
+import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;

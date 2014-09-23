@@ -159,20 +159,4 @@ public class CaseInsensitiveProperties extends Properties {
         return retval;
     }
 
-    /*
-     * public static void main(String[] args) throws Exception {
-     * CaseInsensitiveProperties p = new CaseInsensitiveProperties();
-     * p.put("One", "une"); p.put("tWo", "deux");
-     * System.out.println(p.get("ONE"));
-     * System.out.println(p.getProperty("TWO")); p.setProperty("oNE", "uno");
-     * p.setProperty("tWo", "dos"); System.out.println(p.get("ONE"));
-     * System.out.println(p.getProperty("TWO")); java.io.ByteArrayOutputStream
-     * pOut = new java.io.ByteArrayOutputStream(); p.store(pOut, null);
-     * System.out.println(pOut.toString()); java.io.ByteArrayInputStream pIn =
-     * new java.io.ByteArrayInputStream(pOut.toByteArray());
-     * CaseInsensitiveProperties pp = new CaseInsensitiveProperties();
-     * pp.load(pIn); System.out.println(p.get("ONE"));
-     * System.out.println(p.getProperty("TWO")); }
-     */
-
 }

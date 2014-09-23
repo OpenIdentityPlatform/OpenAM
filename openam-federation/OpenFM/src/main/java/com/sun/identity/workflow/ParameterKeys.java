@@ -24,6 +24,7 @@
  *
  * $Id: ParameterKeys.java,v 1.7 2009/03/07 06:52:59 babysunil Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.workflow;
@@ -31,20 +32,28 @@ package com.sun.identity.workflow;
 /**
  * List of parameter keys.
  */
-public interface ParameterKeys {
-    String P_ENTITY_ID = "entityId";
-    String P_DOMAIN_ID = "domainId";
-    String P_META_DATA = "metadata";
-    String P_EXENDED_DATA = "extendeddata";
-    String P_REALM = "realm";
-    String P_IDP_E_CERT = "idpecert";
-    String P_IDP_S_CERT = "idpscert";
-    String P_SP_E_CERT = "idpecert";
-    String P_SP_S_CERT = "idpscert";
-    String P_COT = "cot";
-    String P_IDP = "idp";
-    String P_ATTR_MAPPING = "attributemappings";
-    String P_DEF_ATTR_MAPPING = "defaultattributemappings";
-    String P_ASSERT_CONSUMER = "assertionconsumer";
-    String P_SERVLET_CONTEXT = "_servlet_context_";
+public class ParameterKeys {
+    public static final String P_ENTITY_ID = "entityId";
+    public static final String P_DOMAIN_ID = "domainId";
+    public static final String P_META_DATA = "metadata";
+    public static final String P_EXTENDED_DATA = "extendeddata";
+    public static final String P_REALM = "realm";
+    public static final String P_IDP_E_CERT = "idpecert";
+    public static final String P_IDP_S_CERT = "idpscert";
+    public static final String P_SP_E_CERT = "idpecert";
+    public static final String P_SP_S_CERT = "idpscert";
+    public static final String P_COT = "cot";
+    public static final String P_IDP = "idp";
+    public static final String P_ATTR_MAPPING = "attributemappings";
+    public static final String P_DEF_ATTR_MAPPING = "defaultattributemappings";
+    public static final String P_ASSERT_CONSUMER = "assertionconsumer";
+    public static final String P_SERVLET_CONTEXT = "_servlet_context_";
+    public static final String P_CLIENT_ID = "clientId";
+    public static final String P_CLIENT_SECRET = "clientSecret";
+    public static final String P_CLIENT_SECRET_CONFIRM = "clientSecretConfirm";
+    public static final String P_REDIRECT_URL = "redirectUrl";
+    public static final String P_TYPE = "type";
+    public static final String P_PROVIDER_NAME = "providerName";
+    public static final String P_IMAGE_URL = "imageUrl";
+    public static final String P_OPENID_DISCOVERY_URL = "discoveryUrl";
 }

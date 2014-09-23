@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Set;
 import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
+
+import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.mockito.ArgumentCaptor;

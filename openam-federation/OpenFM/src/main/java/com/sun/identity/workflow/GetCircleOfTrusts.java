@@ -48,7 +48,7 @@ import javax.xml.bind.JAXBException;
 import org.forgerock.openam.utils.StringUtils;
 
 public class GetCircleOfTrusts
-    extends Task 
+    extends Task
 {
     public GetCircleOfTrusts() {
     }
@@ -64,7 +64,7 @@ public class GetCircleOfTrusts
         String realm = getString(params, ParameterKeys.P_REALM);
         if (realm == null) {
             String extendedMetaData = getString(params,
-                ParameterKeys.P_EXENDED_DATA);
+                ParameterKeys.P_EXTENDED_DATA);
             if (extendedMetaData != null) {
                 realm = getRealmFromExtData(getContent(
                     extendedMetaData, locale));

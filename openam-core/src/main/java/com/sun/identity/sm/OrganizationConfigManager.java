@@ -1335,7 +1335,7 @@ public class OrganizationConfigManager {
      *             if there is an error accessing the data store to read the
      *             service configuration
      */
-    public Set getAssignedServices() throws SMSException {
+    public Set<String> getAssignedServices() throws SMSException {
         return (getAssignedServices(true));
     }
 
@@ -1349,10 +1349,10 @@ public class OrganizationConfigManager {
      *             if there is an error accessing the data store to read the
      *             service configuration
      */
-    public Set getAssignedServices(boolean includeMandatory)
+    public Set<String> getAssignedServices(boolean includeMandatory)
             throws SMSException {
         validateConfigImpl();
-        Set assignedServices = Collections.EMPTY_SET;
+        Set<String> assignedServices = Collections.EMPTY_SET;
         if (coexistMode) {
             // Get assigned services from OrgConfigViaAMSDK
             assignedServices = amsdk.getAssignedServices();

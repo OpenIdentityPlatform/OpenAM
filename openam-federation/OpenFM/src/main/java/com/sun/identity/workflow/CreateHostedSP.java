@@ -48,7 +48,7 @@ public class CreateHostedSP
     extends Task {
     public CreateHostedSP() {
     }
-    
+
     /**
      * Creates hosted service provider.
      *
@@ -65,10 +65,10 @@ public class CreateHostedSP
             (metadataFile.trim().length() > 0);
         String metadata = null;
         String extendedData = null;
-            
+
         if (hasMetaData) {
             String extendedDataFile = getString(params,
-                ParameterKeys.P_EXENDED_DATA);
+                ParameterKeys.P_EXTENDED_DATA);
             metadata = getContent(metadataFile, locale);
             extendedData = getContent(extendedDataFile, locale);
         } else {
@@ -92,12 +92,12 @@ public class CreateHostedSP
                 return e.getMessage();
             }
         }
-            
+
         String[] results = ImportSAML2MetaData.importData(null, metadata,
             extendedData);
         String realm = results[0];
         String entityId = results[1];
-        
+
         String cot = getString(params, ParameterKeys.P_COT);
         if ((cot != null) && (cot.length() > 0)) {
             try {
@@ -106,7 +106,7 @@ public class CreateHostedSP
                 throw new WorkflowException(e.getMessage());
             }
         }
-       
+
         List attrMapping = null;
         if (defAttrMappings.equals("true")) {
             attrMapping = new ArrayList(1);
@@ -134,7 +134,7 @@ public class CreateHostedSP
 
         return "done|||realm=" + realm;
     }
-    
+
     private String enableSigning(String metadata) {
         int idx = metadata.indexOf("WantAssertionsSigned=\"false\"");
         if (idx != -1) {
@@ -144,16 +144,16 @@ public class CreateHostedSP
         }
         return metadata;
     }
-    
+
     private void validateParameters(Map params)
         throws WorkflowException {
         String metadata = getString(params, ParameterKeys.P_META_DATA);
         boolean hasMetaData = (metadata != null) &&
             (metadata.trim().length() > 0);
-        String extendedData = getString(params, ParameterKeys.P_EXENDED_DATA);
+        String extendedData = getString(params, ParameterKeys.P_EXTENDED_DATA);
         boolean hasExtendedData = (extendedData != null) &&
             (extendedData.trim().length() > 0);
-        
+
         if ((hasMetaData && !hasExtendedData) ||
             (!hasMetaData && hasExtendedData)
             ) {
@@ -162,7 +162,7 @@ public class CreateHostedSP
         }
         if ((params.size() == 3) &&
             params.containsKey(ParameterKeys.P_META_DATA) &&
-            params.containsKey(ParameterKeys.P_EXENDED_DATA) &&
+            params.containsKey(ParameterKeys.P_EXTENDED_DATA) &&
             !hasMetaData && !hasExtendedData
             ) {
             throw new WorkflowException("both-meta-extended-data-required",
@@ -173,13 +173,13 @@ public class CreateHostedSP
         if ((cotname == null) || (cotname.trim().length() == 0)) {
             throw new WorkflowException("missing-cot", null);
         }
-            
+
         if (!hasMetaData && !hasExtendedData) {
             String realm = getString(params, ParameterKeys.P_REALM);
             if ((realm == null) || (realm.trim().length() == 0)) {
                 throw new WorkflowException("missing-realm", null);
             }
-            
+
             String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
             if ((entityId == null) || (entityId.trim().length() == 0)) {
                 throw new WorkflowException("missing-entity-id", null);

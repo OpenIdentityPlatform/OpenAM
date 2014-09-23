@@ -104,14 +104,4 @@ public class CaseInsensitiveTreeSet extends TreeSet {
         }
     }
 
-    /*
-     * public static void main(String[] args) { CaseInsensitiveTreeSet s = new
-     * CaseInsensitiveTreeSet(); s.add("OnE"); s.add("TWo"); s.add("thrEE");
-     * System.out.println("s has one: "+s.contains("one"));
-     * System.out.println("s has two: "+s.contains("two"));
-     * System.out.println("s has three: "+s.contains("three")); Iterator iter =
-     * s.iterator(); while (iter.hasNext()) { System.out.println("s has item
-     * "+(String)iter.next()); } }
-     */
-
 }

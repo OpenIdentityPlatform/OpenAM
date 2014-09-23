@@ -19,6 +19,8 @@ import com.sun.identity.idm.IdRepo;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
 import static org.fest.assertions.Assertions.*;
+
+import org.forgerock.openam.utils.MapHelper;
 import org.forgerock.opendj.ldap.MemoryBackend;
 import org.forgerock.opendj.ldap.RequestContext;
 import org.forgerock.opendj.ldap.RequestHandler;
