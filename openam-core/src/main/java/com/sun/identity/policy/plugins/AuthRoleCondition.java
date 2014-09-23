@@ -48,7 +48,10 @@ import com.sun.identity.shared.debug.Debug;
  * This condition object provides the policy framework with the 
  * condition decision based on the user's authenticated role name.
  *
+ * @deprecated Not used internally and not exposed externally so being deprecated and not migrated to entitlements
+ * framework.
  */
+@Deprecated
 public class AuthRoleCondition implements Condition {
 
 
