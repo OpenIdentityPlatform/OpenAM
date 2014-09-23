@@ -4727,9 +4727,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named OAuth2Rest. Associated with the RestTokenDispatcher class.
                         class.  For more information, see the
-                        the chapter on <link xlink:href="dev-guide#chap-rest"
+                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
                                              xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Using RESTful Web Services</citetitle></link>.</para>
+                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
                 </listitem>
             </varlistentry>
 
@@ -4748,9 +4748,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <listitem>
                     <para>Used by a servlet named OAuth2RestletAdapter. Associated with the RestTokenDispatcher class.
                         For more information, see the chapter on
-                        the chapter on <link xlink:href="dev-guide#chap-rest"
+                        the chapter on <link xlink:href="dev-guide#chap-rest-oauth2-oidc"
                                              xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Using RESTful Web Services</citetitle></link>.</para>
+                            <citetitle>RESTful OAuth2 2.0 and OpenID Connect 1.0 Services</citetitle></link>.</para>
                 </listitem>
             </varlistentry>
 

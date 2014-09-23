@@ -77,9 +77,14 @@
  <!-- TODO: Build a full list of what to include in this chapter.
  <xinclude:include href='chap-best-practices.xml' />
  -->
-
  <xinclude:include href='chap-client-dev.xml' />
+
  <xinclude:include href='chap-rest.xml' />
+ <xinclude:include href='chap-rest-authz-policy.xml' />
+ <xinclude:include href='chap-rest-oauth2-oidc.xml' />
+ <xinclude:include href='chap-rest-user-services.xml' />
+ <xinclude:include href='chap-rest-identity-realm-mgmt.xml' />
+
  <xinclude:include href='chap-jdk.xml' />
  <xinclude:include href='chap-authentication.xml' />
  <xinclude:include href='chap-session.xml' />
