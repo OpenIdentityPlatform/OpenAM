@@ -14,6 +14,9 @@
  * Copyright 2013-2014 ForgeRock AS.
  */
 
+/*
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ */
 package org.forgerock.openam.forgerockrest.authn.core;
 
 import com.google.inject.Singleton;
@@ -135,7 +138,7 @@ public class LoginAuthenticator {
         if (indexType != null && indexType.equals(AuthIndexType.RESOURCE)) {
             Map<String, Set<String>> envMap = coreServicesWrapper.getEnvMap(request);
             authContext.login(indexType.getIndexType(), indexValue, false, envMap, null);
-        } else if (indexType.getIndexType() != null) {
+        } else if (indexType != null && indexType.getIndexType() != null) {
             authContext.login(indexType.getIndexType(), indexValue);
         } else {
             authContext.login();
@@ -209,7 +212,7 @@ public class LoginAuthenticator {
         switch (indexType) {
         case USER: {
             value = ssoToken.getProperty("UserToken");
-            if (!indexValue.equals(value)) {
+            if (indexValue == null || !indexValue.equals(value)) {
                 upgrade = true;
             }
             break;
