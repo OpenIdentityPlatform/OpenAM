@@ -41,6 +41,9 @@ import com.sun.identity.entitlement.StringAttributeCondition;
 import com.sun.identity.entitlement.TimeCondition;
 import com.sun.identity.entitlement.UserAttributes;
 import com.sun.identity.entitlement.UserSubject;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -75,6 +78,18 @@ public final class EntitlementRegistry {
         final ServiceLoader<EntitlementModule> loader = ServiceLoader.load(EntitlementModule.class);
     }
 
+    private final ConditionTypeRegistry conditionTypeRegistry;
+
+    /**
+     * Constructs a new instance of the EntitlementRegistry.
+     *
+     * @param conditionTypeRegistry An instance of the {@code ConditionTypeRegistry}.
+     */
+    @Inject
+    public EntitlementRegistry(ConditionTypeRegistry conditionTypeRegistry) {
+        this.conditionTypeRegistry = conditionTypeRegistry;
+    }
+
     /**
      * Loads all available {@link EntitlementModule} instances and registers them with a new entitlement registry.
      * Each invocation of this method will attempt to load any known entitlement modules as per
@@ -83,48 +98,55 @@ public final class EntitlementRegistry {
      *
      * @return an entitlement registry populated with all known entitlement modules.
      */
-    public static EntitlementRegistry load() {
-        final EntitlementRegistry registry = new EntitlementRegistry();
+    public EntitlementRegistry load() {
 
         // Register standard logical condition and subject types.
-        registry.registerConditionType("AND", AndCondition.class);
-        registry.registerConditionType("OR", OrCondition.class);
-        registry.registerConditionType("NOT", NotCondition.class);
+        registerConditionType("AND", AndCondition.class);
+        registerConditionType("OR", OrCondition.class);
+        registerConditionType("NOT", NotCondition.class);
 
-        registry.registerSubjectType("AND", AndSubject.class);
-        registry.registerSubjectType("OR", OrSubject.class);
-        registry.registerSubjectType("NOT", NotSubject.class);
+        registerSubjectType("AND", AndSubject.class);
+        registerSubjectType("OR", OrSubject.class);
+        registerSubjectType("NOT", NotSubject.class);
 
         // Standard OpenAM entitlement conditions (policy conditions will be loaded later)
-        registry.registerConditionType(IPCondition.class);
-        registry.registerConditionType(DNSNameCondition.class);
-        registry.registerConditionType(NumericAttributeCondition.class);
-        registry.registerConditionType(TimeCondition.class);
-        registry.registerConditionType(AttributeLookupCondition.class);
-        registry.registerConditionType(StringAttributeCondition.class);
+        registerConditionType(IPCondition.class);
+        registerConditionType(DNSNameCondition.class);
+        registerConditionType(NumericAttributeCondition.class);
+        registerConditionType(TimeCondition.class);
+        registerConditionType(AttributeLookupCondition.class);
+        registerConditionType(StringAttributeCondition.class);
 
-        // Standard OpenAM subjects
-        registry.registerSubjectType("NONE", NoSubject.class);
-        registry.registerSubjectType(AnyUserSubject.class);
-        //registry.registerSubjectType(AuthenticatedESubject.class); // Not implemented?
-        registry.registerSubjectType(GroupSubject.class);
-        registry.registerSubjectType(AttributeSubject.class);
-        registry.registerSubjectType(UserSubject.class);
-        registry.registerSubjectType(RoleSubject.class);
-        //registry.registerSubjectType(IdRepoRoleSubject.class);
-
-        // Standard OpenAM resource attribute types
-        registry.registerAttributeType("User", UserAttributes.class);
-        registry.registerAttributeType("Static", StaticAttributes.class);
-
-        // Standard OpenAM Decision Combiners
-        registry.registerDecisionCombiner(DenyOverride.class);
-
-        for (EntitlementModule provider : ServiceLoaderHolder.INSTANCE.loader) {
-            provider.registerCustomTypes(registry);
+        for (Class<? extends EntitlementCondition> condition : conditionTypeRegistry.getEnvironmentConditions()) {
+            registerConditionType(condition);
         }
 
-        return registry;
+        // Standard OpenAM subjects
+        registerSubjectType("NONE", NoSubject.class);
+        registerSubjectType(AnyUserSubject.class);
+        //registerSubjectType(AuthenticatedESubject.class); // Not implemented?
+        registerSubjectType(GroupSubject.class);
+        registerSubjectType(AttributeSubject.class);
+        registerSubjectType(UserSubject.class);
+        registerSubjectType(RoleSubject.class);
+        //registerSubjectType(IdRepoRoleSubject.class);
+
+        for (Class<? extends EntitlementSubject> condition : conditionTypeRegistry.getSubjectConditions()) {
+            registerSubjectType(condition);
+        }
+
+        // Standard OpenAM resource attribute types
+        registerAttributeType("User", UserAttributes.class);
+        registerAttributeType("Static", StaticAttributes.class);
+
+        // Standard OpenAM Decision Combiners
+        registerDecisionCombiner(DenyOverride.class);
+
+        for (EntitlementModule provider : ServiceLoaderHolder.INSTANCE.loader) {
+            provider.registerCustomTypes(this);
+        }
+
+        return this;
     }
 
     /**

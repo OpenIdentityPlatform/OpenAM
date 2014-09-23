@@ -15,3 +15,4 @@
 #
 org.forgerock.openam.core.guice.CoreGuiceModule
 org.forgerock.openam.core.guice.DataLayerGuiceModule
+org.forgerock.openam.entitlement.guice.EntitlementGuiceModule

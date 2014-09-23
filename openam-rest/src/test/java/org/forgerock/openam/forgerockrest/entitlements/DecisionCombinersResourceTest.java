@@ -31,7 +31,9 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.ArgumentCaptor;
@@ -47,13 +49,16 @@ public class DecisionCombinersResourceTest {
 
     DecisionCombinersResource testResource;
     ObjectMapper mockMapper = mock(ObjectMapper.class);
-    EntitlementRegistry mockRegistry = new EntitlementRegistry();
+    ConditionTypeRegistry conditionTypeRegistry = mock(ConditionTypeRegistry.class);
+    EntitlementRegistry mockRegistry = new EntitlementRegistry(conditionTypeRegistry);
     Debug mockDebug = mock(Debug.class);
 
     private final String TEST_COMBINER = "testCombiner";
 
     @BeforeMethod
     public void setUp() {
+
+        EntitlementRegistrySingleton.INSTANCE.setRegistry(mockRegistry);
 
         mockRegistry.registerDecisionCombiner(TEST_COMBINER, TestCombiner.class);
 

@@ -20,13 +20,9 @@ import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.LogicalCondition;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.schema.JsonSchema;
-import static org.fest.assertions.Assertions.assertThat;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -35,23 +31,30 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
+import java.util.Map;
+import java.util.Set;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 public class ConditionTypesResourceTest {
 
     ConditionTypesResource testResource;
     ObjectMapper mockMapper = mock(ObjectMapper.class);
-    EntitlementRegistry mockRegistry = new EntitlementRegistry();
+    ConditionTypeRegistry conditionTypeRegistry = mock(ConditionTypeRegistry.class);
+    EntitlementRegistry mockRegistry = new EntitlementRegistry(conditionTypeRegistry);
     Debug mockDebug = mock(Debug.class);
 
     private final String TEST_CONDITION_WITH_NAME = "testConditionWithName";
@@ -60,6 +63,8 @@ public class ConditionTypesResourceTest {
 
     @BeforeMethod
     public void setUp() {
+
+        EntitlementRegistrySingleton.INSTANCE.setRegistry(mockRegistry);
 
         mockRegistry.registerConditionType(TEST_CONDITION_WITH_NAME, TestConditionTypeWithName.class);
         mockRegistry.registerConditionType(TEST_LOGICAL_CONDITION, TestLogicalConditionTypeWithName.class);

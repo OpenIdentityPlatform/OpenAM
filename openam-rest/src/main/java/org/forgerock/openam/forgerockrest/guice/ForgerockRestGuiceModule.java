@@ -32,14 +32,6 @@ import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.RequestType;
@@ -47,6 +39,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
+import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
@@ -60,8 +53,6 @@ import org.forgerock.openam.forgerockrest.entitlements.PolicyParser;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.PrivilegePolicyStoreProvider;
 import org.forgerock.openam.forgerockrest.entitlements.ResourceErrorHandler;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
-import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
@@ -74,6 +65,18 @@ import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.forgerock.util.SignatureUtil;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.STRING;
+import static org.forgerock.openam.forgerockrest.entitlements.query.AttributeType.TIMESTAMP;
 
 /**
  * Guice Module for configuring bindings for the AuthenticationRestService classes.
@@ -92,8 +95,6 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 return SignatureUtil.getInstance();
             }
         });
-
-        bind(EntitlementRegistry.class).toInstance(EntitlementRegistry.load());
 
         bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
 

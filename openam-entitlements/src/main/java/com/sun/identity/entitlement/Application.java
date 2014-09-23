@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.util.Reject;
 
@@ -125,7 +127,7 @@ public class Application implements Cloneable {
      * can still use super().
      */
     public Application() {
-        this(EntitlementRegistry.load());
+        this(InjectorHolder.getInstance(EntitlementRegistry.class).load());
     }
 
     /**
