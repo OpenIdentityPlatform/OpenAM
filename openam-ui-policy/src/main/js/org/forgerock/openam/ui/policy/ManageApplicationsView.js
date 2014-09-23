@@ -69,16 +69,16 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 var options = {
                         url: '/openam/json/applications?_queryFilter=true',
-                        colNames: ['', 'Name', 'Description', 'Realm', 'Application Base', 'Author', 'Created', 'Last Modified'],
+                        colNames: ['', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                         colModel: [
                             {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
                             {name: 'name', width: 230, frozen: true},
-                            {name: 'description', sortable: false},
                             {name: 'realm', width: 150},
+                            {name: 'description', width:170, sortable: false},
                             {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'createdBy', width: 250},
-                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter}
+                            {name: 'createdBy', width: 250, hidden: true},
+                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
+                            {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true}
                         ],
                         onSelectRow: function (rowid, status, e) {
                             if (!$(e.target).is('[class*="icon"]')) {
@@ -100,7 +100,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     },
                     columnChooserOptions = {
                         width: 501,
-                        height: 300
+                        height: 180
                     };
 
                 self.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, columnChooserOptions, callback);

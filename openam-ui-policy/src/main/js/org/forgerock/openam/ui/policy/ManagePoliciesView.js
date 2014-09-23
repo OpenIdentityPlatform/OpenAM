@@ -56,14 +56,14 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         colModel: [
                             {name: 'name', width: 250, frozen: true, formatter: policyLinkFormatter},
                             {name: 'description', sortable: false, width: 150},
-                            {name: 'createdBy', width: 250},
-                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
-                            {name: 'lastModifiedBy', width: 250},
-                            {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                            {name: 'createdBy', width: 250, hidden: true},
+                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
+                            {name: 'lastModifiedBy', width: 250, hidden: true},
+                            {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
                             {name: 'actionValues', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
                             {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter}
+                            {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter, hidden: true},
+                            {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter, hidden: true}
                         ],
                         sortname: 'name',
                         width: 920,
@@ -72,7 +72,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     },
                     columnChooserOptions = {
                         width: 501,
-                        height: 220
+                        height: 230
                     },
                     grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, columnChooserOptions, callback);
 
