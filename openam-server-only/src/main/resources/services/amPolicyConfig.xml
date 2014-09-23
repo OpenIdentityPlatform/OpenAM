@@ -360,7 +360,6 @@
                         <ChoiceValue i18nKey="a141fc">LDAPFilterCondition</ChoiceValue>
                         <ChoiceValue i18nKey="a141amc">AMIdentityMembershipCondition</ChoiceValue>
                         <ChoiceValue i18nKey="a151">ResourceEnvIPCondition</ChoiceValue>
-                        <ChoiceValue i18nKey="oauth2Scope">OAuth2ScopeCondition</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>AuthLevelCondition</Value>
@@ -375,7 +374,6 @@
                         <Value>LDAPFilterCondition</Value>
                         <Value>AMIdentityMembershipCondition</Value>
                         <Value>ResourceEnvIPCondition</Value>
-                        <Value>OAuth2ScopeCondition</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="sun-am-policy-selected-responseproviders"

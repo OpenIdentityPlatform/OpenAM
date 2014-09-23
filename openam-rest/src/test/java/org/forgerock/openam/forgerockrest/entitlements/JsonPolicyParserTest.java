@@ -31,13 +31,13 @@ import com.sun.identity.entitlement.StaticAttributes;
 import com.sun.identity.entitlement.UserAttributes;
 import com.sun.identity.entitlement.opensso.OpenSSOPrivilege;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
+import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
-import org.forgerock.openam.policy.plugins.OAuth2ScopeCondition;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -415,11 +415,11 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldAllowLegacyPolicyConditions() throws Exception {
         // Given
-        List<String> scope = Arrays.asList("openid profile");
+        List<String> realm = Arrays.asList("REALM");
         JsonValue content = json(object(field("condition",
                 object(field("type", "Policy"),
-                       field("className", OAuth2ScopeCondition.class.getName()),
-                       field("properties", object(field("OAuth2Scope", scope)))))));
+                       field("className", AuthenticateToRealmCondition.class.getName()),
+                       field("properties", object(field("AuthenticateToRealm", realm)))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -427,8 +427,8 @@ public class JsonPolicyParserTest {
         // Then
         assertThat(result.getCondition()).isInstanceOf(PolicyCondition.class);
         PolicyCondition condition = (PolicyCondition) result.getCondition();
-        assertThat(condition.getClassName()).isEqualTo(OAuth2ScopeCondition.class.getName());
-        assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("OAuth2Scope", new HashSet<String>(scope)));
+        assertThat(condition.getClassName()).isEqualTo(AuthenticateToRealmCondition.class.getName());
+        assertThat(condition.getProperties()).isEqualTo(Collections.singletonMap("AuthenticateToRealm", new HashSet<String>(realm)));
     }
 
     @Test
@@ -680,8 +680,8 @@ public class JsonPolicyParserTest {
         Set<EntitlementCondition> subConditions = new LinkedHashSet<EntitlementCondition>();
 
         Map<String, Set<String>> props = new HashMap<String, Set<String>>();
-        props.put("OAuth2Scope", Collections.singleton("openid profile"));
-        PolicyCondition policyCondition = new PolicyCondition("test", OAuth2ScopeCondition.class.getName(), props);
+        props.put("AuthenticateToRealm", Collections.singleton("REALM"));
+        PolicyCondition policyCondition = new PolicyCondition("test", AuthenticateToRealmCondition.class.getName(), props);
 
         NotCondition not = new NotCondition(policyCondition);
         subConditions.add(not);
@@ -697,9 +697,9 @@ public class JsonPolicyParserTest {
         assertThat(result.get(new JsonPointer("condition/conditions/0/type")).asString()).isEqualTo("NOT");
         assertThat(result.get(new JsonPointer("condition/conditions/0/condition/type")).asString()).isEqualTo("Policy");
         assertThat(result.get(new JsonPointer("condition/conditions/0/condition/className")).asString())
-                .isEqualTo(OAuth2ScopeCondition.class.getName());
+                .isEqualTo(AuthenticateToRealmCondition.class.getName());
         assertThat(result.get(new JsonPointer("condition/conditions/0/condition/properties")).asMapOfList(String.class))
-                .includes(entry("OAuth2Scope", Arrays.asList("openid profile")));
+                .includes(entry("AuthenticateToRealm", Arrays.asList("REALM")));
     }
 
     @Test

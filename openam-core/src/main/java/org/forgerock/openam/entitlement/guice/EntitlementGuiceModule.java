@@ -21,6 +21,7 @@ import com.google.inject.Provides;
 import org.forgerock.guice.core.GuiceModule;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
 
 import javax.inject.Inject;
 
@@ -43,6 +44,8 @@ public class EntitlementGuiceModule extends AbstractModule {
     @Provides
     ConditionTypeRegistry getConditionTypeRegistry() {
         ConditionTypeRegistry conditionTypeRegistry = new ConditionTypeRegistry();
+
+        conditionTypeRegistry.addEnvironmentCondition(OAuth2ScopeCondition.class);
 
         return conditionTypeRegistry;
     }

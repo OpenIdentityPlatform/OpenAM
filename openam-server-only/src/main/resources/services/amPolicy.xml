@@ -270,12 +270,6 @@
                 i18nFileName="amPolicy"
                 i18nKey="sun-resourceenvip-condition-name"/>
         <PluginSchema
-                name="OAuth2ScopeCondition"
-                interfaceName="Condition"
-                className="org.forgerock.openam.policy.plugins.OAuth2ScopeCondition"
-                i18nFileName="amPolicy"
-                i18nKey="org-forgerock-oauth2scope-condition-name"/>
-        <PluginSchema
                 name="IDRepoResponseProvider"
                 interfaceName="ResponseProvider"
                 className="com.sun.identity.policy.plugins.IDRepoResponseProvider"
