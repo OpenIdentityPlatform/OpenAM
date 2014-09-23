@@ -301,6 +301,11 @@ $ <userinput>/path/to/tomcat/bin/shutdown.sh</userinput>
 
     <xinclude:include  href="../shared/para-licensing-agreement-procedure.xml" />
 
+    <note><para>When you unpack the J2EE policy agent for a Tomcat 7 installation,
+     be aware that <literal>agentadmin</literal> is located in the
+     "/j2ee_agents/tomcat_v6_agent/bin" subdirectory.
+    </para></note>
+
     <screen>
 $ <userinput>/path/to/j2ee_agents/tomcat_v6_agent/bin/agentadmin --install --acceptLicense</userinput>
 <computeroutput>...
@@ -407,7 +412,9 @@ Install log file location:
     <para>Since you did not install a global filter in the Tomcat 7
      <filename>web.xml</filename>, then you must add the filter
      manually for each protected application's <filename>WEB-INF/web.xml</filename>
-     deployment descriptor file, following the opening &lt;web-app&gt; tag.</para>
+     deployment descriptor file, following the opening &lt;web-app&gt; tag.
+     Make sure that the agent filter is first in the filter chain.
+    </para>
      <programlisting language="xml">&lt;filter&gt;
  &lt;filter-name&gt;Agent&lt;/filter-name&gt;
  &lt;display-name&gt;Agent&lt;/display-name&gt;
