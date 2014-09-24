@@ -26,6 +26,11 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2014 ForgeRock Inc
+    Portions Copyrighted 2014 Nomura Research Institute, Ltd
+-->
+
 <!DOCTYPE logmessages
         PUBLIC "OpenSSO Log Message DTD/EN"
         "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
@@ -1543,8 +1548,6 @@
                 description="Change user password failed">
         <datainfo>
             <item>error message</item>
-            <item>authentication type</item>
-            <item>user name</item>
         </datainfo>
         <triggers>
             <item>Change user password in authentication screen due to directory server password policy.
