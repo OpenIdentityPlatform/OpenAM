@@ -323,12 +323,10 @@ public class IPCondition implements Condition {
      * @return a copy of this object
      */
     public Object clone() {
-        IPCondition theClone = null;
-        if(ipv4){
-            iPv4ConditionInstance.clone();
-        }else if(ipv6){
-            iPv6ConditionInstance.clone();
+        if (ipv6) {
+            return iPv6ConditionInstance.clone();
+        } else {
+            return iPv4ConditionInstance.clone();
         }
-        return theClone;
     }
 }
