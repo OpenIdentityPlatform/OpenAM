@@ -654,5 +654,41 @@ Agreement (yes/no): [no]:</screen>
    </para>
   </listitem>
 
+  <listitem>
+   <para><emphasis role="bold">CREST Logging</emphasis>.
+    OpenAM now supports auditing logging and debug notifications for any request
+    going to a CREST endpoint.
+    OpenAM audits any request going to any CREST endpoint
+    and writes to two files:
+    <literal>amRest.access</literal> and <literal>amRest.authx</literal>.
+   </para>
+   <para>
+    The <literal>amRest.access</literal> records all accesses to a
+    CREST endpoint (except <literal>/authenticate</literal>),
+    regardless of whether the request successfully reached the endpoint through
+    policy authorization.
+   </para>
+   <para>
+    The <literal>amRest.authz</literal> records all CREST
+    authorization results regardless of success. If a request has an entry in the
+    <literal>amRest.access</literal> log, but no corresponding entry in
+    <literal>amRest.authz</literal>, then that
+    endpoint was not protected by an authorization filter and therefore the
+    request was granted access to the resource.
+   </para>
+   <para>
+    OpenAM now provides additional information in its debug notifications
+    depending on the message type (error, warning or message) including realm,
+    user, and result of the operation.
+   </para>
+   <para>
+    For more information on CREST logging, see <link
+    xlink:show="new"
+    xlink:href="dev-guide#rest-api-logging"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Logging</citetitle></link>.
+   </para>
+  </listitem>
+
  </itemizedlist>
 </chapter>

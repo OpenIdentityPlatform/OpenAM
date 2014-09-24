@@ -1236,36 +1236,119 @@ userdetails.attribute.value=6319</computeroutput>
   xlink:href="admin-guide#interface-stability"
   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>-->
 
-  <para>You can send OpenAM messages to log, specifying the message content
-  and the log file in which to write your message.</para>
-  
+  <para>
+   OpenAM supports access and audit logging for any request going to
+   a CREST endpoint and writes the data to two files:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">amRest.access</emphasis>. Records accesses to a
+     CREST endpoint, regardless of whether the request successfully reached the
+     endpoint through policy authorization.
+    </para>
+    <para>
+     An <literal>amRest.access</literal> example is as follows:
+    </para>
+    <screen>
+$ <userinput>cat openam/openam/log/amRest.access</userinput>
+
+<computeroutput>#Version: 1.0
+#Fields: time  Data  LoginID  ContextID  IPAddr  LogLevel  Domain  LoggedBy  MessageID  ModuleName
+NameID  HostName
+"2011-09-14 16:38:17"   /home/user/openam/openam/log/ "cn=dsameuser,ou=DSAME Users,o=openam"
+aa307b2dcb721d4201 "Not Available" INFO  o=openam   "cn=dsameuser,ou=DSAME Users,o=openam"
+LOG-1  amRest.access  "Not Available"  192.168.56.2
+"2011-09-14 16:38:17"  "Hello World"  id=bjensen,ou=user,o=openam 8a4025a2b3af291d01  "Not Available"
+INFO  o=openam id=amadmin,ou=user,o=openam "Not Available" amRest.access "Not Available"
+192.168.56.2</computeroutput>
+    </screen>
+   </listitem>
+   <listitem>
+    <para><emphasis role="bold">amRest.authz</emphasis>. Records all CREST
+     authorization results regardless of success. If a request has an entry in the
+     <literal>amRest.access</literal> log, but no corresponding entry in
+     <literal>amRest.authz</literal>, then that
+     endpoint was not protected by an authorization filter and therefore the
+     request was granted access to the resource.
+    </para>
+    <para>
+     The <literal>amRest.authz</literal> file has a key field, the
+     <literal>Data</literal> field, which specifies the authorization decision,
+     resource, and type of action performed on that resource.
+     The <literal>Data</literal> field has the following syntax:
+    </para>
+    <programlisting>
+("GRANT"||"DENY") > "RESOURCE | ACTION"
+
+where
+  "GRANT > " is prepended to the entry if the request was allowed
+  "DENY  > " is prepended to the entry if the request was not allowed
+  "RESOURCE" is "ResourceLocation | ResourceParameter"
+     where
+       "ResourceLocation" is the endpoint location (e.g., subrealm/applicationtypes)
+       "ResourceParameter" is the ID of the resource being touched
+        (e.g., myApplicationType) if applicable. Otherwise, this field is empty
+        if touching the resource itself, such as in a query.
+
+  "ACTION" is "ActionType | ActionParameter"
+     where
+       "ActionType" is "CREATE||READ||UPDATE||DELETE||PATCH||ACTION||QUERY"
+       "ActionParameter" is one of the following depending on the ActionType:
+          For CREATE: the new resource ID
+          For READ: empty
+          For UPDATE: the revision of the resource to update
+          For DELETE: the revision of the resource to delete
+          For PATCH: the revision of the resource to patch
+          For ACTION: the actual action performed (e.g., "forgotPassword")
+          For QUERY: the query ID if any
+    </programlisting>
+    <screen>
+$ <userinput>cat openam/openam/log/amRest.authz</userinput>
+
+<computeroutput>#Version: 1.0
+#Fields: time   Data  ContextID  LoginID  IPAddr  LogLevel  Domain  MessageID  LoggedBy  NameID
+ModuleName    HostName
+"2014-09-16 14:17:28"   /var/root/openam/openam/log/   7d3af9e799b6393301
+"cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org" "Not Available" INFO
+dc=openam,dc=forgerock,dc=org  LOG-1  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"
+"Not Available" amRest.authz    10.0.1.5
+"2014-09-16 15:56:12"  "GRANT > sessions|ACTION|logout|AdminOnlyFilter"  d3977a55a2ee18c201
+id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org "Not Available" INFO  dc=openam,dc=forgerock,dc=org
+OAuth2Provider-2  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"  "Not Available"
+amRest.authz    127.0.0.1
+"2014-09-16 15:56:40"   "GRANT > sessions|ACTION|logout|AdminOnlyFilter"  eedbc205bf51780001
+id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org  "Not Available" INFO dc=openam,dc=forgerock,dc=org
+OAuth2Provider-2  "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org"  "Not Available"
+amRest.authz    127.0.0.1</computeroutput>
+    </screen>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   OpenAM also provides additional information in its debug notifications for
+   accesses to any endpoint,
+   depending on the message type (error, warning or message) including realm,
+   user, and result of the operation.
+  </para>
+
+  <para>
+   You can also send OpenAM messages to log, specifying the message content
+   and the log file in which to write your message.
+   Logging takes a valid <literal>appid</literal> token for the subject
+   with access to log the message, and also a <literal>subjectid</literal> token
+   for the user whom the message concerns. If the tokens are valid and the
+   access rights correct, your message ends up in the log specified.
+  </para>
+
   <screen>
 $ <userinput>curl "https://openam.example.com:8443/openam/identity/log?\
 appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*\
 &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*\
-&amp;logname=rest.access\
+&amp;logname=amRest.access\
 &amp;message=Hello%20World"</userinput>
   </screen>
-  
-  <para>Logging takes a valid <literal>appid</literal> token for the subject
-  with access to log the message, and also a <literal>subjectid</literal> token
-  for the user whom the message concerns. If the tokens are valid and the
-  access rights correct, your message ends up in the log specified.</para>
-  
-  <screen>
-$ <userinput>cat openam/openam/log/rest.access</userinput>
-<computeroutput>#Version: 1.0
-#Fields: time   Data    LoginID ContextID   IPAddr  LogLevel    Domain 
- LoggedBy    MessageID   ModuleName  NameID  HostName    
-"2011-09-14 16:38:17"   /home/user/openam/openam/log/
-   "cn=dsameuser,ou=DSAME Users,o=openam"  aa307b2dcb721d4201
-   "Not Available" INFO    o=openam    "cn=dsameuser,ou=DSAME Users,o=openam"
-   LOG-1   rest.access "Not Available"192.168.56.2 
-"2011-09-14 16:38:17"   "Hello World"   id=bjensen,ou=user,o=openam
-   8a4025a2b3af291d01  "Not Available" INFO    o=openam
-   id=amadmin,ou=user,o=openam "Not Available" rest.access "Not Available"
-   192.168.56.2</computeroutput>
-  </screen>
+
  </section>
 
  <section xml:id="rest-api-status-codes">
