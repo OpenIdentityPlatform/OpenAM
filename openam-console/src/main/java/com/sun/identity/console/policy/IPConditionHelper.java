@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011-2013] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.console.policy;
 
@@ -85,18 +86,16 @@ public class IPConditionHelper {
             AMPropertySheetModel propertySheetModel,
             AMModel model
     ) {
-        String ipVer = null;
         if ((values != null) && !values.isEmpty()) {
             // Check which IP version we are working with
 
+            String ipVer = IPVersion.IPv4.toString();
+            setIPVersion(ATTR_IP_VERSION, ipVer, propertySheetModel);
             Map<String, Set<String>> holdMap = values;
             if(holdMap.keySet().contains(ATTR_IP_VERSION)){
                 // Get IP_Version
                 ipVer = (String)holdMap.get(ATTR_IP_VERSION).toArray()[0];
                 if(ipVer != null && !ipVer.isEmpty()){
-                    setIPVersion(ATTR_IP_VERSION, ipVer, propertySheetModel);
-                } else {
-                    ipVer = "IPv4";
                     setIPVersion(ATTR_IP_VERSION, ipVer, propertySheetModel);
                 }
             }
@@ -108,10 +107,10 @@ public class IPConditionHelper {
                 // add IPversion to propertySheetModel
                 if ((val != null) && !val.isEmpty()) {
                     if (propName.equals(ATTR_START_IP) || propName.equals(ATTR_END_IP)) {
-                        if(IPVersion.valueOf(ipVer) == IPVersion.IPv4){
-                            setIPAddress(propName, (String)val.iterator().next(), propertySheetModel);
-                        } else if(IPVersion.valueOf(ipVer) == IPVersion.IPv6){
+                        if(IPVersion.valueOf(ipVer) == IPVersion.IPv6){
                             setIPv6Address(propName, (String)val.iterator().next(), propertySheetModel);
+                        } else {
+                            setIPAddress(propName, (String)val.iterator().next(), propertySheetModel);
                         }
                     } else {
                         propertySheetModel.setValues(

@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011-13] [ForgeRock Inc]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.policy.plugins;
 
@@ -35,7 +36,6 @@ import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyException;
-import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.Syntax;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
@@ -45,15 +45,12 @@ import org.forgerock.openam.network.ipv4.IPv4Condition;
 import org.forgerock.openam.network.ipv6.IPv6Condition;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Collections;
-import java.util.StringTokenizer;
 
 /**
  * The class <code>IPCondition</code>  is a plugin implementation
@@ -71,7 +68,6 @@ public class IPCondition implements Condition {
     public static final String IPV6 = "IPv6";
     private IPv6Condition iPv6ConditionInstance = null;
     private IPv4Condition iPv4ConditionInstance = null;
-    boolean ipv4 = false;
     boolean ipv6 = false;
 
     private static List propertyNames = new ArrayList(4);
@@ -86,10 +82,10 @@ public class IPCondition implements Condition {
     /** No argument constructor
      */
     public IPCondition() {
-        if(iPv4ConditionInstance == null) {
+        if (iPv4ConditionInstance == null) {
             iPv4ConditionInstance = new IPv4Condition();
         }
-        if(iPv6ConditionInstance == null) {
+        if (iPv6ConditionInstance == null) {
             iPv6ConditionInstance = new IPv6Condition();
         }
     }
@@ -126,14 +122,11 @@ public class IPCondition implements Condition {
      * @return display name for the property name
      * @throws PolicyException
      */
-    public String getDisplayName(String property, Locale locale)
-            throws PolicyException {
-        if(ipv4){
-            return iPv4ConditionInstance.getDisplayName(property,locale);
-        }else if(ipv6){
-            return iPv6ConditionInstance.getDisplayName(property,locale);
+    public String getDisplayName(String property, Locale locale) throws PolicyException {
+        if (ipv6) {
+            return iPv6ConditionInstance.getDisplayName(property, locale);
         } else {
-            return "";
+            return iPv4ConditionInstance.getDisplayName(property, locale);
         }
     }
 
@@ -175,21 +168,21 @@ public class IPCondition implements Condition {
      */
     public void setProperties(Map properties) throws PolicyException {
         checkIpVersion(properties);
-        if(ipv4){
-            iPv4ConditionInstance.setProperties(properties);
-        }else if(ipv6){
+        if (ipv6) {
             iPv6ConditionInstance.setProperties(properties);
+        } else {
+            iPv4ConditionInstance.setProperties(properties);
         }
     }
 
-    private void checkIpVersion(Map properties) throws PolicyException{
+    private void checkIpVersion(Map properties) throws PolicyException {
         Set ipVersion = (Set) properties.get(IP_VERSION);
-        Iterator ipVerItr = ipVersion.iterator();
-        String ip = (String) ipVerItr.next();
-        if(ip.equalsIgnoreCase(IPV4)){
-            ipv4 = true;
-        } else if(ip.equalsIgnoreCase(IPV6)){
-            ipv6 = true;
+        if (ipVersion != null) {
+            Iterator ipVerItr = ipVersion.iterator();
+            String ip = (String) ipVerItr.next();
+            if (ip.equalsIgnoreCase(IPV6)) {
+                ipv6 = true;
+            }
         }
     }
 
@@ -200,12 +193,10 @@ public class IPCondition implements Condition {
      * @see #setProperties(Map)
      */
     public Map getProperties() {
-        if(ipv4){
-            return iPv4ConditionInstance.getProperties();
-        }else if(ipv6){
+        if (ipv6) {
             return iPv6ConditionInstance.getProperties();
         } else {
-            return null;
+            return iPv4ConditionInstance.getProperties();
         }
     }
 
@@ -248,18 +239,14 @@ public class IPCondition implements Condition {
      * @see #REQUEST_DNS_NAME
      * @see com.sun.identity.policy.
      */
-    public ConditionDecision getConditionDecision(SSOToken token, Map env)
-            throws PolicyException, SSOException {
+    public ConditionDecision getConditionDecision(SSOToken token, Map env) throws PolicyException, SSOException {
         // Determine Request IP address
         setIPVersion(env);
-        if(ipv4){
-            return iPv4ConditionInstance.getConditionDecision(token, env);
-        }else if(ipv6){
+        if (ipv6) {
             return iPv6ConditionInstance.getConditionDecision(token, env);
         } else {
-            return new ConditionDecision(false);
+            return iPv4ConditionInstance.getConditionDecision(token, env);
         }
-
     }
 
     /**
@@ -273,37 +260,40 @@ public class IPCondition implements Condition {
     public static String getRequestIp(Map env) {
         Object requestIpObject = env.get(REQUEST_IP);
         if (requestIpObject instanceof Set) {
-            Set requestIpSet = (Set)requestIpObject;
+            Set requestIpSet = (Set) requestIpObject;
             if ((requestIpSet != null) && (!requestIpSet.isEmpty())) {
                 if (requestIpSet.size() > 1) {
-                    DEBUG.warning("Set cardinality in environment map corresponding to " + REQUEST_IP +
-                    " key >1. Returning first value. The set: " + requestIpSet);
+                    DEBUG.warning("Set cardinality in environment map corresponding to " + REQUEST_IP
+                            + " key >1. Returning first value. The set: " + requestIpSet);
                 }
                 Object ip = requestIpSet.iterator().next();
                 if (ip != null) { // Set implementations can permit null values
                     if (ip instanceof String) {
-                        return (String)ip;
+                        return (String) ip;
                     } else {
-                        DEBUG.warning("ip value in environment map not String, but type " + ip.getClass().getCanonicalName() +
-                            ". The value: " + ip);
+                        DEBUG.warning("ip value in environment map not String, but type "
+                                + ip.getClass().getCanonicalName() + ". The value: " + ip);
                         return ip.toString();
                     }
                 } else {
-                    DEBUG.warning("In IPCondition, no value in Set corresponding to " + REQUEST_IP + " key contained environment map.");
+                    DEBUG.warning("In IPCondition, no value in Set corresponding to " + REQUEST_IP
+                            + " key contained environment map.");
                     return null;
                 }
             } else {
-                DEBUG.warning("In IPCondition, Set corresponding to " + REQUEST_IP + " key in environment map is null or empty.");
+                DEBUG.warning("In IPCondition, Set corresponding to " + REQUEST_IP
+                        + " key in environment map is null or empty.");
                 return null;
             }
         } else if (requestIpObject instanceof String) {
-            return (String)requestIpObject;
+            return (String) requestIpObject;
         } else if (requestIpObject == null) {
             DEBUG.warning("In IPCondition, no value corresponding to " + REQUEST_IP + " key in environment map.");
             return null;
         } else {
-            DEBUG.error("Unexpected type of value corresponding to  " + REQUEST_IP + " key in environment map. The type: " +
-                    requestIpObject.getClass().getCanonicalName() + " and the value: " + requestIpObject);
+            DEBUG.error("Unexpected type of value corresponding to  " + REQUEST_IP
+                    + " key in environment map. The type: " + requestIpObject.getClass().getCanonicalName()
+                    + " and the value: " + requestIpObject);
             return requestIpObject.toString();
         }
     }
@@ -312,19 +302,17 @@ public class IPCondition implements Condition {
      * Determine whether IPv4 or IPv6
      * @param env map containing environment description
      */
-    private void setIPVersion(Map env){
+    private void setIPVersion(Map env) {
         Map holdMap = env;
         String ipVer = null;
-        if(holdMap.keySet().contains(REQUEST_IP)){
+        if (holdMap.keySet().contains(REQUEST_IP)) {
             try {
                 // Get IP_Version
                 ipVer = getRequestIp(env);
-                if(ValidateIPaddress.isIPv6(ipVer)){
+                if (ValidateIPaddress.isIPv6(ipVer)) {
                     ipv6 = true;
-                } else {
-                    ipv4 = true; // treat as IPv4
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 DEBUG.error("IPCondition.setIPVersion() : Cannot set IPversion", e);
             }
         }
