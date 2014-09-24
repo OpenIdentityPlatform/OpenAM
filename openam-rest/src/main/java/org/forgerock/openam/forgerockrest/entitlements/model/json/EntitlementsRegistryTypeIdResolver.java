@@ -21,7 +21,6 @@ import org.codehaus.jackson.map.jsontype.TypeIdResolver;
 import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.type.JavaType;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
 
 /**
  * Abstract base class for type id resolvers based on the {@link org.forgerock.openam.entitlement.EntitlementRegistry}.
@@ -29,7 +28,7 @@ import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
  * @since 12.0.0
  */
 public abstract class EntitlementsRegistryTypeIdResolver<T> implements TypeIdResolver {
-    private final EntitlementRegistry registry = EntitlementRegistrySingleton.INSTANCE.getRegistry();
+    private final EntitlementRegistry registry = EntitlementRegistry.load();
 
     private volatile JavaType baseType;
 

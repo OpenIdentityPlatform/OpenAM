@@ -13,5 +13,4 @@
 #
 # Copyright 2014 ForgeRock AS.
 #
-org.forgerock.openam.core.guice.CoreGuiceModule
-org.forgerock.openam.core.guice.DataLayerGuiceModule
+org.forgerock.openam.entitlement.conditions.CoreConditionTypeRegistry

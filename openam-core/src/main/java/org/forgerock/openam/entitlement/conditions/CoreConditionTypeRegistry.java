@@ -14,45 +14,44 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.entitlement.guice;
+package org.forgerock.openam.entitlement.conditions;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import org.forgerock.guice.core.GuiceModule;
+import com.sun.identity.entitlement.EntitlementCondition;
+import com.sun.identity.entitlement.EntitlementSubject;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
 
-import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Guice module for entitlement bindings.
+ * Core implementation of the {@link ConditionTypeRegistry}.
  *
  * @since 12.0.0
  */
-@GuiceModule
-public class EntitlementGuiceModule extends AbstractModule {
+public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void configure() {
+    public Collection<Class<? extends EntitlementSubject>> getSubjectConditions() {
+        Set<Class<? extends EntitlementSubject>> conditions = new HashSet<Class<? extends EntitlementSubject>>();
 
+        return conditions;
     }
 
-    @Provides
-    ConditionTypeRegistry getConditionTypeRegistry() {
-        ConditionTypeRegistry conditionTypeRegistry = new ConditionTypeRegistry();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Class<? extends EntitlementCondition>> getEnvironmentConditions() {
 
-        conditionTypeRegistry.addEnvironmentCondition(OAuth2ScopeCondition.class);
+        Set<Class<? extends EntitlementCondition>> conditions = new HashSet<Class<? extends EntitlementCondition>>();
 
-        return conditionTypeRegistry;
-    }
+        conditions.add(OAuth2ScopeCondition.class);
 
-    @Provides
-    @Inject
-    public EntitlementRegistry getEntitlementRegistry(ConditionTypeRegistry conditionTypeRegistry) {
-        return new EntitlementRegistry(conditionTypeRegistry).load();
+        return conditions;
     }
 }

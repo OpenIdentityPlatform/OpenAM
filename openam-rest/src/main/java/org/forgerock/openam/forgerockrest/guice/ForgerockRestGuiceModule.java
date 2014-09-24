@@ -39,7 +39,6 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.cts.utils.JSONSerialisation;
-import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
@@ -95,6 +94,8 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 return SignatureUtil.getInstance();
             }
         });
+
+        bind(EntitlementRegistry.class).toInstance(EntitlementRegistry.load());
 
         bind(Debug.class).annotatedWith(Names.named("frRest")).toInstance(Debug.getInstance("frRest"));
 

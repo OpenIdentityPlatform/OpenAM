@@ -33,7 +33,6 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.mockito.ArgumentCaptor;
@@ -53,8 +52,7 @@ public class ConditionTypesResourceTest {
 
     ConditionTypesResource testResource;
     ObjectMapper mockMapper = mock(ObjectMapper.class);
-    ConditionTypeRegistry conditionTypeRegistry = mock(ConditionTypeRegistry.class);
-    EntitlementRegistry mockRegistry = new EntitlementRegistry(conditionTypeRegistry);
+    EntitlementRegistry mockRegistry = new EntitlementRegistry();
     Debug mockDebug = mock(Debug.class);
 
     private final String TEST_CONDITION_WITH_NAME = "testConditionWithName";
@@ -63,8 +61,6 @@ public class ConditionTypesResourceTest {
 
     @BeforeMethod
     public void setUp() {
-
-        EntitlementRegistrySingleton.INSTANCE.setRegistry(mockRegistry);
 
         mockRegistry.registerConditionType(TEST_CONDITION_WITH_NAME, TestConditionTypeWithName.class);
         mockRegistry.registerConditionType(TEST_LOGICAL_CONDITION, TestLogicalConditionTypeWithName.class);

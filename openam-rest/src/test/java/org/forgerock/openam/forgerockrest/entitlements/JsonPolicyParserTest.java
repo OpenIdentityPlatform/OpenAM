@@ -35,9 +35,6 @@ import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.entitlement.ConditionTypeRegistry;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.openam.entitlement.EntitlementRegistrySingleton;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -58,7 +55,6 @@ import java.util.Set;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.MapAssert.entry;
 import static org.forgerock.json.fluent.JsonValue.*;
-import static org.mockito.Mockito.mock;
 
 public class JsonPolicyParserTest {
     private static final String POLICY_NAME = "aPolicy";
@@ -67,11 +63,6 @@ public class JsonPolicyParserTest {
 
     @BeforeMethod
     public void setupTestObjects() {
-
-        ConditionTypeRegistry conditionTypeRegistry = mock(ConditionTypeRegistry.class);
-
-        EntitlementRegistrySingleton.INSTANCE.setRegistry(new EntitlementRegistry(conditionTypeRegistry));
-
         parser = new JsonPolicyParser();
     }
 

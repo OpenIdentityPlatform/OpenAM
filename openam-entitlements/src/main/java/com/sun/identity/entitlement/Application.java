@@ -31,15 +31,14 @@ package com.sun.identity.entitlement;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
+import org.forgerock.openam.entitlement.EntitlementRegistry;
+import org.forgerock.util.Reject;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.openam.entitlement.EntitlementRegistry;
-import org.forgerock.util.Reject;
 
 /**
  * Application class contains the information on how an application behaves
@@ -127,7 +126,7 @@ public class Application implements Cloneable {
      * can still use super().
      */
     public Application() {
-        this(InjectorHolder.getInstance(EntitlementRegistry.class).load());
+        this(EntitlementRegistry.load());
     }
 
     /**
