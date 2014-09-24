@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2011-2014 ForgeRock AS
+ * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.service;
 
@@ -568,7 +569,7 @@ public class AMLoginContext {
                         +  "using invalid realm name for internal user");
                 }
                 logFailedMessage = AuthUtils.getErrorVal(AMAuthErrorCode.AUTH_MODULE_DENIED, AuthUtils.ERROR_MESSAGE);
-                logFailedError = "AUTH_MODULE_DENIED";
+                logFailedError = "MODULEDENIED";
                 throw new AuthException(AMAuthErrorCode.AUTH_MODULE_DENIED, null);
             }
 
@@ -698,7 +699,7 @@ public class AMLoginContext {
                 logFailedMessage = AuthUtils.getErrorVal(
                         AMAuthErrorCode.AUTH_MODULE_DENIED,
                         AuthUtils.ERROR_MESSAGE);
-                logFailedError = "AUTH_MODULE_DENIED";
+                logFailedError = "MODULEDENIED";
                 loginState.setErrorCode(AMAuthErrorCode.AUTH_MODULE_DENIED);
             } else if (AMAuthErrorCode.AUTH_TIMEOUT.equals(le.getMessage())) {
                 debug.message("LOGINFAILED Error Timed Out....");
