@@ -32,6 +32,7 @@ define([
 
     "./PolicyDelegate",
 
+    "./GenericGridView",
     "./ManageApplicationsView",
     "./EditApplicationView",
 

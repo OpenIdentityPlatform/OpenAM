@@ -61,9 +61,9 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-    obj.updateApplication = function (appName, data, successCallback, errorCallback) {
+    obj.updateApplication = function (name, data, successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/applications/" + appName,
+            url: "/applications/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
@@ -93,7 +93,7 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.deleteApplication = function (name, successCallback, errorCallback) {
         return obj.serviceCall({
-            url: "/applications/" + encodeURI(name),
+            url: "/applications/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "DELETE",
             success: function (data) {
@@ -178,6 +178,20 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
             headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(data),
+            success: function (data) {
+                if (successCallback) {
+                    successCallback(data);
+                }
+            },
+            error: errorCallback
+        });
+    };
+
+    obj.deletePolicy = function (name, successCallback, errorCallback) {
+        return obj.serviceCall({
+            url: "/policies/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
+            type: "DELETE",
             success: function (data) {
                 if (successCallback) {
                     successCallback(data);

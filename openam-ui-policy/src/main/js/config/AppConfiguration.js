@@ -105,7 +105,8 @@ define("config/AppConfiguration", function () {
                         "templates/policy/ConditionAttrString.html",
                         "templates/policy/ConditionAttrBoolean.html",
                         "templates/policy/ApplicationTableCellActionsTemplate.html",
-                        "templates/policy/ApplicationTableGlobalActionsTemplate.html"
+                        "templates/policy/ApplicationTableGlobalActionsTemplate.html",
+                        "templates/policy/PoliciesTableGlobalActionsTemplate.html"
                     ]
                 }
             },

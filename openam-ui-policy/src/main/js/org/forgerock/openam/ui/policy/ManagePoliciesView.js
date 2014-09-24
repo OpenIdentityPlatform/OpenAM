@@ -27,34 +27,38 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, _, document, console, sessionStorage */
 
 define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
-    "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function (AbstractView, uiUtils) {
-    var ManagePoliciesView = AbstractView.extend({
-        baseTemplate: "templates/policy/BaseTemplate.html",
+    "org/forgerock/openam/ui/policy/GenericGridView",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/openam/ui/policy/PolicyDelegate"
+], function (GenericGridView, uiUtils, router, policyDelegate) {
+    var ManagePoliciesView = GenericGridView.extend({
         template: "templates/policy/ManagePoliciesTemplate.html",
 
+        events: {
+            'click #deleteItems': 'deletePolicies'
+        },
+
         render: function (args, callback) {
-            var appName = decodeURI(args[0]),
-                policyLinkFormatter = function (cellvalue, options, rowObject) {
-                    var url = '#app/' + appName + '/policy/' + cellvalue,
-                        encodedUrl = encodeURI(url);
-                    return '<a href="' + encodedUrl + '">' + cellvalue + '</a>';
-                };
+            var self = this;
+
+            _.extend(this.data, {appName: args[0]});
+
+            this.initBaseView('templates/policy/PoliciesTableGlobalActionsTemplate.html', 'PE-mng-pols-sel-' + this.data.appName);
 
             this.parentRender(function () {
-                this.$el.find('#newPolicy').attr("href", "#app/" + appName + "/policy/");
-                this.$el.find('#managePoliciesTitle').text("Manage " + appName + " Policies");
+                this.setGridButtonSet();
 
                 var options = {
-                        url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + appName + '"'),
-                        colNames: ['Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified', 'Actions',
-                            'Resources', 'Resource Attributes', 'Subject'],
+                        url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + this.data.appName + '"'),
+                        colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
+                            'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                         colModel: [
-                            {name: 'name', width: 250, frozen: true, formatter: policyLinkFormatter},
+                            {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
+                            {name: 'name', width: 250, frozen: true},
                             {name: 'description', sortable: false, width: 150},
                             {name: 'createdBy', width: 250, hidden: true},
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
@@ -65,23 +69,65 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                             {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter, hidden: true},
                             {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter, hidden: true}
                         ],
+                        gridComplete: function () {
+                            $(this).jqGrid('hideCol', 'cb');
+                        },
+                        beforeSelectRow: function (rowId, e) {
+                            var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
+                            if (!checkBoxCellSelected) {
+                                self.editPolicy(e);
+                            }
+                            return checkBoxCellSelected;
+                        },
+                        onSelectRow: function (rowid, status, e) {
+                            self.onRowSelect(rowid, status, e);
+                        },
+                        multiselect: true,
                         sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
                         pager: '#policiesPager'
                     },
-
                     additionalOptions = {
                         columnChooserOptions: {
                             width: 501,
                             height: 230
                         }
-                    },
-                    
-                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);
+                    };
 
-                grid.jqGrid('setFrozenColumns');
+                this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);
+
+                this.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
+                    self.selectRow(e, rowid, rowdata);
+                });
+
+                this.grid.jqGrid('setFrozenColumns');
+
+                this.reloadGlobalActionsTemplate();
             });
+        },
+
+        editPolicy: function (e) {
+            var policyName = this.grid.getRowData(this.getSelectedRowId(e)).name;
+
+            router.routeTo(router.configuration.routes.editPolicy,
+                {args: [this.data.appName, policyName], trigger: true});
+        },
+
+        deletePolicies: function (e) {
+            e.preventDefault();
+
+            if ($(e.target).hasClass('inactive')) {
+                return;
+            }
+
+            var self = this, i, promises = [];
+
+            for (i = 0; i < self.selectedItems.length; i++) {
+                promises.push(policyDelegate.deletePolicy(self.selectedItems[i]));
+            }
+
+            this.deleteItems(e, promises);
         }
     });
 

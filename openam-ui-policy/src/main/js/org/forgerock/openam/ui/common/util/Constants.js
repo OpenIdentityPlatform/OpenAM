@@ -31,7 +31,8 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
     commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
     commonConstants.CONSOLE_USERS = ['amadmin']; 
-    commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword"; 
-    
+    commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
+    commonConstants.OPENAM_STORAGE_KEY_PREFIX = "FR-OpenAM-";
+
     return commonConstants;
 });

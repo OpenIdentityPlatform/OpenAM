@@ -226,6 +226,7 @@
 }
 
 .ui-jqgrid {
+    cursor: pointer;
     margin: 15px 0 0 0;
 
     span.item-button-panel {
@@ -235,8 +236,8 @@
 
             &.tooltips {
                 &:hover span, &:focus span {
-                    margin-left: -36px;
-                    width: 60px;
+                    margin-left: -40px;
+                    width: 70px;
                 }
             }
         }
@@ -259,42 +260,40 @@
         }
     }
 
-    #manageApps {
-        cursor: pointer;
+    th[id*="_cb"] {
+        display: none;
     }
 
-    #manageApps_frozen {
-        cursor: pointer;
+    tr.jqgrow td[aria-describedby*="_iconChB"] {
+        text-align: center;
 
-        td[aria-describedby="manageApps_name"] {
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        td[aria-describedby="manageApps_actions"] {
-            cursor: default;
-            background-color: #ebebeb;
-            overflow: visible;
-            white-space: normal;
-            text-align: center;
-        }
-
-        .ui-state-hover, .ui-state-highlight {
-            td[aria-describedby="manageApps_actions"] {
-                background-color: inherit;
-            }
+        span {
+            font-size: 16px;
         }
     }
-}
 
-#gview_manageApps {
-    .frozen-bdiv {
-        overflow: visible !important;
+    tr.jqgrow td[aria-describedby*="_name"] {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    tr.jqgrow td[aria-describedby*="_actions"] {
+        background-color: #ebebeb;
+        overflow: visible;
+        white-space: normal;
+        text-align: center;
+    }
+
+    tr.jqgrow.ui-state-hover, tr.jqgrow.ui-state-highlight {
+        td[aria-describedby*="_actions"] {
+            background-color: inherit;
+        }
     }
 }
 
-.frozen-bdiv {
+[id*='gview_'] .frozen-bdiv {
+    overflow: visible !important;
     height: auto !important;
 }
 

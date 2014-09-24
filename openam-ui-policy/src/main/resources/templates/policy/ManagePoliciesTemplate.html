@@ -1,14 +1,12 @@
 <div class="content-bg">
-    <h1 id="managePoliciesTitle"></h1>
+    <h1>Manage {{appName}} policies</h1>
 
     <div class="clearfix">
         <p>To modify configured policies, click the policy name. You can also select the policy to remove it or export it.</p>
 
-        <a href="#apps/" class="button float-right" id="backToApps">Back</a>
-        <a href="#" id="newPolicy" class="button float-left">Add New Policy</a>
-        <a href="#" class="button float-left">Import Policies</a>
+        <span id="globalActions"></span>
     </div>
 
-    <table id="managePolicies"></table>
+    <table id="managePolicies" class="policy-editor-grid"></table>
     <div id="policiesPager"></div>
 </div>
