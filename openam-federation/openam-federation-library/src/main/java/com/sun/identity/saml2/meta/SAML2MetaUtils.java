@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock Inc
  */
 package com.sun.identity.saml2.meta;
 
@@ -280,12 +280,13 @@ public final class SAML2MetaUtils {
             return null;
         }
 
-        int index = uri.indexOf(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
-        if (index == -1 || index + 9 == uri.length()) {
+        final int index = uri.indexOf(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
+        final int marker = index + SAML2MetaManager.NAME_META_ALIAS_IN_URI.length();
+        if (index == -1 || marker == uri.length()) {
             return null;
         }
 
-        return uri.substring(index + 9);
+        return uri.substring(marker);
     }
 
     /**
