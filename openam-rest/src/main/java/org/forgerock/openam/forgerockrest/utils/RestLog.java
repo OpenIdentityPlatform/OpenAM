@@ -82,7 +82,7 @@ public final class RestLog {
      *
      * @param resource The accessed resource.
      * @param action The CREST action-type requested.
-     * @param token The SSO token of the accessing user.
+     * @param token The SSO token of the accessing user (null if XUI)
      */
     public void auditAccessMessage(String resource, String action, SSOToken token) {
         if (accessLogger != null && msgProvider != null) {

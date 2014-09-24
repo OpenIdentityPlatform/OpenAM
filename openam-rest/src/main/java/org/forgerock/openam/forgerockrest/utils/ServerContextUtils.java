@@ -17,6 +17,7 @@ package org.forgerock.openam.forgerockrest.utils;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.shared.debug.Debug;
 import java.util.Map;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
@@ -48,7 +49,7 @@ public class ServerContextUtils {
      * Retrieves a link to the user's SSO Token, if it exists in the context.
      * @param context from which to pull the SSO Token
      */
-    public static SSOToken getTokenFromContext(ServerContext context) {
+    public static SSOToken getTokenFromContext(ServerContext context, Debug debug) {
 
         SSOToken userToken = null;
 
@@ -61,7 +62,7 @@ public class ServerContextUtils {
         try {
             userToken = ssoTokenContext.getCallerSSOToken();
         } catch (SSOException e) {
-
+            debug.message("Unable to retrieve caller's SSOToken from context.", e);
         }
 
         return userToken;

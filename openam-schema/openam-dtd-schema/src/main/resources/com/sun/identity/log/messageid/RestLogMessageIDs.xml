@@ -23,6 +23,7 @@
         <datainfo>
             <item>resource</item>
             <item>operation</item>
+            <item>authzModule</item>
         </datainfo>
         <triggers>
             <item>Access was granted to the requested resource.</item>
@@ -35,6 +36,7 @@
         <datainfo>
             <item>resource</item>
             <item>operation</item>
+            <item>authzModule</item>
         </datainfo>
         <triggers>
             <item>Access was denied to the requested resource.</item>

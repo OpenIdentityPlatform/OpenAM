@@ -58,7 +58,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getCreateString(createRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeCreate(serverContext, createRequest), moduleName);
     }
 
@@ -68,7 +68,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getReadString(readRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeRead(serverContext, readRequest), moduleName);
     }
 
@@ -78,7 +78,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getUpdateString(updateRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeUpdate(serverContext, updateRequest), moduleName);
     }
 
@@ -88,7 +88,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getDeleteString(deleteRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeDelete(serverContext, deleteRequest), moduleName);
     }
 
@@ -98,7 +98,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getPatchString(patchRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizePatch(serverContext, patchRequest), moduleName);
     }
 
@@ -108,7 +108,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getActionString(actionRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeAction(serverContext, actionRequest), moduleName);
     }
 
@@ -118,7 +118,7 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
         final String resource = ServerContextUtils.getMatchedUri(serverContext);
         final String action = ServerContextUtils.getQueryString(queryRequest);
 
-        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext),
+        return log(resource, action, ServerContextUtils.getTokenFromContext(serverContext, debug),
                 module.authorizeQuery(serverContext, queryRequest), moduleName);
     }
 
@@ -132,9 +132,9 @@ public class LoggingAuthzModule implements CrestAuthorizationModule {
                 restLog.auditAccessGranted(resource, action, authZModule, token);
             }
         } catch (ExecutionException e) {
-            debug.error("ExecutionException attempting to retrieve authz result.", e);
+            debug.message(e.getMessage());
         } catch (InterruptedException e) {
-            debug.error("InterruptedExcetion attempting to retrieve authz result.", e);
+            debug.message(e.getMessage());
         }
 
         return result;

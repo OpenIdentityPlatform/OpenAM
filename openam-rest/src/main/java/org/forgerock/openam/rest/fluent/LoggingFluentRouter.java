@@ -184,9 +184,10 @@ public class LoggingFluentRouter<T extends CrestRouter> extends FluentRouter<T> 
         try {
             restLog.auditAccessMessage(resource, operation, ssoTokenContext.getCallerSSOToken());
         } catch (SSOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("LoggingFluentRouter :: " +
-                        "Error retrieving SSO Token from provided context, forced to log user as 'null'.");
+            if (debug.warningEnabled()) {
+                debug.warning("LoggingFluentRouter :: " +
+                        "Error retrieving SSO Token from provided context, forced to log user as 'null'.", e);
+                restLog.auditAccessMessage(resource, operation, null);
             }
         }
 
