@@ -305,4 +305,21 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     Set<String> getSupportedSubjectTypes() throws ServerException;
+
+    /**
+     * Indicates whether clients may register without providing an access token.
+     *
+     * @return true if allowed, otherwise false.
+     * @throws ServerException If any internal server error occurs.
+     */
+    boolean isOpenDynamicClientRegistrationAllowed() throws ServerException;
+
+    /**
+     * Whether to generate access tokens for clients that register without one. Only enabled if
+     * {@link #isOpenDynamicClientRegistrationAllowed()} is true.
+     *
+     * @return true if an access token should be generated for clients that register without one.
+     * @throws ServerException If any internal server error occurs.
+     */
+    boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException;
 }

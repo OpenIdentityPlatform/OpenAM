@@ -547,6 +547,14 @@ public class Client extends JsonValue {
     }
 
     /**
+     * Indicates whether this client has a registration access token or not.
+     */
+    public boolean hasAccessToken() {
+        final String token = getAccessToken();
+        return token != null && !token.isEmpty();
+    }
+
+    /**
      * Gets the client session uri of the OAuth2Client. If the client session uri is {@code null}, {@code null} is 
      * returned.
      *

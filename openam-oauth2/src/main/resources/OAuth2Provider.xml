@@ -201,6 +201,34 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerock-oauth2-provider-allow-open-dynamic-registration"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a115">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-generate-registration-access-tokens"
+                                 type="single"
+                                 syntax="boolean"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a116">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <SubSchema name="serverconfig" inheritance="multiple">
 
                     <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
@@ -374,6 +402,34 @@
                                      i18nKey="a114">
                         <DefaultValues>
                             <Value>test</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-allow-open-dynamic-registration"
+                                     type="single"
+                                     syntax="boolean"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a115">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-generate-registration-access-tokens"
+                                     type="single"
+                                     syntax="boolean"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a116">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

@@ -682,6 +682,32 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
         }
     }
 
+    @Override
+    public boolean isOpenDynamicClientRegistrationAllowed() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.OPEN_DYNAMIC_REGISTRATION_ALLOWED);
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException {
+        try {
+            return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.GENERATE_REGISTRATION_ACCESS_TOKENS);
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
     /**
      * ServiceListener implementation to clear cache when it changes.
      */

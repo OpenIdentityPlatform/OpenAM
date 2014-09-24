@@ -239,4 +239,14 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         return new HashSet<String>(configurationResource.getConfiguration().get("supportedSubjectTypes")
                 .asList(String.class));
     }
+
+    @Override
+    public boolean isOpenDynamicClientRegistrationAllowed() throws ServerException {
+        return false;
+    }
+
+    @Override
+    public boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException {
+        return false;
+    }
 }

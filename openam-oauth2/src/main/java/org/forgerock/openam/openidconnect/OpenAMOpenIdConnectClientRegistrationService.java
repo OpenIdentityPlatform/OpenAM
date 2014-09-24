@@ -16,11 +16,15 @@
 
 package org.forgerock.openam.openidconnect;
 
-import com.iplanet.am.util.SystemProperties;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.fluent.JsonValueException;
+import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AccessTokenVerifier;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.TokenStore;
 import org.forgerock.oauth2.core.exceptions.AccessDeniedException;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -30,8 +34,6 @@ import org.forgerock.openidconnect.ClientBuilder;
 import org.forgerock.openidconnect.ClientDAO;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationService;
 import org.forgerock.openidconnect.exceptions.InvalidClientMetadata;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.fluent.JsonValueException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,30 +41,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.APPLICATION_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_DESCRIPTION;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_ID;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SECRET;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_SESSION_URI;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CLIENT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.CONTACTS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DEFAULT_SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.DISPLAY_NAME;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.ID_TOKEN_SIGNED_RESPONSE_ALG;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.POST_LOGOUT_REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REDIRECT_URIS;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.REGISTRATION_ACCESS_TOKEN;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.RESPONSE_TYPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.SCOPES;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.SUBJECT_TYPE;
-import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.fromString;
+import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeNames.*;
 
 /**
  * Service for registering OpenId Connect clients in OpenAM.
@@ -71,13 +57,6 @@ import static org.forgerock.oauth2.core.OAuth2Constants.ShortClientAttributeName
  */
 @Singleton
 public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConnectClientRegistrationService {
-
-    /**
-     * System property to control whether open dynamic registration (without an access token) is allowed or not.
-     * Defaults to false (not allowed).
-     */
-    public static final String ALLOW_OPEN_DYNAMIC_REGISTRATION_PROPERTY =
-            "org.forgerock.openam.openidconnect.allow.open.dynamic.registration";
 
     private static final String ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT = "HS256";
     private static final String DEFAULT_APPLICATION_TYPE = "web";
@@ -91,6 +70,7 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     private final ClientDAO clientDAO;
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final AccessTokenVerifier tokenVerifier;
+    private final TokenStore tokenStore;
 
     /**
      * Constructs a new OpenAMOpenIdConnectClientRegistrationService.
@@ -101,10 +81,12 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
      */
     @Inject
     OpenAMOpenIdConnectClientRegistrationService(ClientDAO clientDAO,
-            OAuth2ProviderSettingsFactory providerSettingsFactory, AccessTokenVerifier tokenVerifier) {
+            OAuth2ProviderSettingsFactory providerSettingsFactory, AccessTokenVerifier tokenVerifier,
+            TokenStore tokenStore) {
         this.clientDAO = clientDAO;
         this.providerSettingsFactory = providerSettingsFactory;
         this.tokenVerifier = tokenVerifier;
+        this.tokenStore = tokenStore;
     }
 
     /**
@@ -113,19 +95,21 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
     public JsonValue createRegistration(String accessToken, String deploymentUrl, OAuth2Request request)
             throws InvalidClientMetadata, ServerException, UnsupportedResponseTypeException, AccessDeniedException {
 
-        if (!isOpenDynamicRegistrationAllowed()) {
+        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+
+        if (!providerSettings.isOpenDynamicClientRegistrationAllowed()) {
             if (!tokenVerifier.verify(request)) {
                 throw new AccessDeniedException("Access Token not valid");
             }
         }
 
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final JsonValue input = request.getBody();
 
         //check input to ensure it is valid
         Set<String> inputKeys = input.keys();
         for (String key : inputKeys) {
-            if (fromString(key) == null) {
+            OAuth2Constants.ShortClientAttributeNames keyName = fromString(key);
+            if (keyName == null) {
                 //input in unknown
                 logger.error("Unknown input given. Key: " + key);
                 throw new InvalidClientMetadata();
@@ -279,6 +263,12 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
 
         Client client = clientBuilder.createClient();
 
+        // If the client registered without an access token, generate one to allow access to the configuration endpoint
+        // See OPENAM-3604 and http://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration
+        if (providerSettings.isRegistrationAccessTokenGenerationEnabled() && !client.hasAccessToken()) {
+            client.setAccessToken(createRegistrationAccessToken(client, request));
+        }
+
         clientDAO.create(client, request);
 
         // Ensure client registrations are logged so that in an open dymamic registration environment, the admins can
@@ -297,6 +287,31 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
         response.put(EXPIRES_AT, 0);
 
         return new JsonValue(response);
+    }
+
+    /**
+     * Creates a fresh registration access token for the case where open dynamic registration is enabled and the client
+     * has registered without providing an access token. This allows the client to use the client registration endpoint
+     * to manage their registration.
+     *
+     * @param client the client to issue the access token for.
+     * @param request the OAuth2 request.
+     * @return the token id of the generated access token.
+     * @throws ServerException if an internal error occurs.
+     */
+    private String createRegistrationAccessToken(Client client, OAuth2Request request) throws ServerException {
+        final AccessToken rat = tokenStore.createAccessToken(
+                null,                           // Grant type
+                "Bearer",                       // Access Token Type
+                null,                           // Authorization Code
+                client.getClientID(),           // Resource Owner ID
+                client.getClientID(),           // Client ID
+                null,                           // Redirect URI
+                Collections.<String>emptySet(), // Scopes
+                null,                           // Refresh Token
+                null,                           // Nonce
+                request);                       // Request
+        return rat.getTokenId();
     }
 
     private boolean containsAllCaseInsensitive(final Set<String> collection, final List<String> values) {
@@ -323,21 +338,6 @@ public class OpenAMOpenIdConnectClientRegistrationService implements OpenIdConne
             }
         }
         return false;
-    }
-
-    /**
-     * Determines whether open dynamic client registration without an Access Token is allowed. As per the OpenID Connect
-     * Dynamic Client Registration 1.0 spec, section 3:
-     * <blockquote>
-     *     To support open Dynamic Registration, the Client Registration Endpoint SHOULD accept registration requests
-     *     without OAuth 2.0 Access Tokens.
-     * </blockquote>
-     * @see <a href="http://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration">
-     *     OpenID Connect Dynamic Client Registration 1.0, Section 3</a>
-     * @return true if registration is allowed without an access token.
-     */
-    private boolean isOpenDynamicRegistrationAllowed() {
-        return SystemProperties.getAsBoolean(ALLOW_OPEN_DYNAMIC_REGISTRATION_PROPERTY, false);
     }
 
     /**

@@ -740,6 +740,8 @@ public class OAuth2Constants {
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
         public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
         public static final String KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
+        public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED = "forgerock-oauth2-provider-allow-open-dynamic-registration";
+        public static final String GENERATE_REGISTRATION_ACCESS_TOKENS = "forgerock-oauth2-provider-generate-registration-access-tokens";
     }
 
     /**
