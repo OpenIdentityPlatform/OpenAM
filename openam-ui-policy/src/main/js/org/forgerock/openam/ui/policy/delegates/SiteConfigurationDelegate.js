@@ -22,30 +22,33 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+ /*global $, define, _ */
 
-define([
-    "./login/LoginView",
-    "./login/LoginDialog",
-    "./login/LoginHelper",
-    "./login/SessionDelegate",
+/**
+ * @author JKigwana
+ */
 
-    "./PolicyDelegate",
+define("org/forgerock/openam/ui/policy/delegates/SiteConfigurationDelegate", [
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/AbstractDelegate",
+    "org/forgerock/commons/ui/common/main/Configuration"
+], function (constants, AbstractDelegate, configuration) {
+    var obj = new AbstractDelegate('');
 
-    "./ManageApplicationsView",
-    "./EditApplicationView",
+    obj.getConfiguration = function (successCallback, errorCallback) {
+        console.info("Getting configuration");
+        obj.serviceCall({url: "configuration.json", success: function (data) {
+            if (successCallback) {
+                successCallback(data.configuration);
+            }
+        }, 
+        error: errorCallback, 
+        headers: {
+        }});
+    };
 
-    "./ManagePoliciesView",
-    "./EditPolicyView",
+    return obj;
+});
 
-    "./ManageRulesView",
 
-    "./ManageSubjectsView",
-    "./EditSubjectView",
 
-    "./ManageEnvironmentsView",
-    "./EditEnvironmentView",
-
-    "./OperatorRulesView",
-    "./delegates/SiteConfigurationDelegate"
-]);

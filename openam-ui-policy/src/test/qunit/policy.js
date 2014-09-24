@@ -201,6 +201,9 @@ define([
                         recordsPerPage = table.jqGrid('getGridParam', 'rowNum'),
                         rowList = table.jqGrid('getGridParam', 'rowList'),
                         remaining = table.jqGrid('getGridParam', 'userData').remaining;
+                       
+
+                    QUnit.ok(conf.globalData.policyEditorConfig, 'Configuration file loaded');
 
                     QUnit.ok(rowData.length > 0, "At least one application listed in the table");
                     QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
@@ -535,7 +538,7 @@ define([
                 });
             });
 
-
+            
             QUnit.asyncTest("Unauthorized GET Request", function () {
                 conf.loggedUser = {"roles": ["ui-admin"]};
                 eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {

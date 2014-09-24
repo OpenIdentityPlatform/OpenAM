@@ -70,11 +70,15 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         shrinkToFit: false,
                         pager: '#policiesPager'
                     },
-                    columnChooserOptions = {
-                        width: 501,
-                        height: 230
+
+                    additionalOptions = {
+                        columnChooserOptions: {
+                            width: 501,
+                            height: 230
+                        }
                     },
-                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, columnChooserOptions, callback);
+                    
+                    grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);
 
                 grid.jqGrid('setFrozenColumns');
             });

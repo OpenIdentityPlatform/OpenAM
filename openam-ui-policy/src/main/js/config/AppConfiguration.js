@@ -44,10 +44,8 @@ define("config/AppConfiguration", function () {
             {
                 moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
                 configuration: {
-                    remoteConfig: false,
-                    configuration: {
-                        lang: "en"
-                    }
+                    remoteConfig: true,
+                    delegate: "org/forgerock/openam/ui/policy/delegates/SiteConfigurationDelegate"
                 }
             },
 
