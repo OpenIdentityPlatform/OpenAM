@@ -24,6 +24,7 @@
  *
  * $Id: IPSigninRequest.java,v 1.8 2009/10/28 23:59:00 exu Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
+import org.owasp.esapi.ESAPI;
 
 /**
  * This class implements the sign-in request for the identity provider.
@@ -463,22 +465,17 @@ public class IPSigninRequest extends WSFederationAction {
     {
         String classMethod = "IDPSSOUtil.postToTarget: ";
         
-        String wresult = XMLUtils.escapeSpecialCharacters(rstr.toString());
+        String wresult = rstr.toString();
         
-        if (debug.messageEnabled()){
-            debug.message(classMethod + "wresult: " + wresult);
+        if (debug.messageEnabled()) {
+            debug.message(classMethod + "wresult before encoding: " + wresult);
         }
         
-        request.setAttribute(WSFederationConstants.POST_ACTION, 
-            targetURL);
-        request.setAttribute(WSFederationConstants.POST_WA, 
-            WSFederationConstants.WSIGNIN10);
-        request.setAttribute(WSFederationConstants.POST_WCTX, 
-            wctx);
-        request.setAttribute(WSFederationConstants.POST_WRESULT, 
-            wresult);
-        request.getRequestDispatcher("/wsfederation/jsp/post.jsp").
-            forward(request, response);
+        request.setAttribute(WSFederationConstants.POST_ACTION, ESAPI.encoder().encodeForHTML(targetURL));
+        request.setAttribute(WSFederationConstants.POST_WA, WSFederationConstants.WSIGNIN10);
+        request.setAttribute(WSFederationConstants.POST_WCTX, ESAPI.encoder().encodeForHTML(wctx));
+        request.setAttribute(WSFederationConstants.POST_WRESULT, ESAPI.encoder().encodeForHTML(wresult));
+        request.getRequestDispatcher("/wsfederation/jsp/post.jsp").forward(request, response);
     }
     
     private static IDPAccountMapper getIDPAccountMapper(Map<String, 
