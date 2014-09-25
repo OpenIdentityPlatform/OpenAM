@@ -794,12 +794,14 @@ $ <userinput>bin/ldapmodify \
 --port 1389 \
 --bindDN "cn=Directory Manager" \
 --bindPassword pwd \
+--defaultAdd \
 --fileName cts-indices.ldif</userinput>
 
 $ <userinput>bin/ldapmodify \
 --port 1389 \
 --bindDN "cn=Directory Manager" \
 --bindPassword pwd \
+--defaultAdd \
 --fileName cts-container.ldif</userinput>
          </screen>
 
@@ -817,7 +819,7 @@ $ <userinput>sudo bin/rebuild-index --baseDN dc=example,dc=com --rebuildAll</use
          <step><para>Verify the indexes. When completed, restart the server.</para>
 
              <screen>
-$ <userinput>sudo bin/verify-index —-baseDN dc=example,dc=com</userinput>
+$ <userinput>sudo bin/verify-index --baseDN dc=example,dc=com</userinput>
 $ <userinput>sudo bin/start-ds</userinput>
              </screen>
 

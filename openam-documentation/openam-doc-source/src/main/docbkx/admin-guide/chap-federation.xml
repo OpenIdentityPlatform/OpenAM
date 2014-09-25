@@ -2920,15 +2920,18 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
    <literal>sun-fm-saml2-nameid-infokey</literal> attributes of a user's
    entry.<footnote><para>These attribute types are configurable in the OpenAM
    console under Configuration &gt; Global &gt; SAMLv2 Service
-   Configuration.</para></footnote> You can retrieve the name identifier value
-   by checking the value of
-   <literal>sun-fm-saml2-nameid-infokey</literal>.</para>
+   Configuration.</para></footnote></para>
 
-   <para>For example, if the user's entry in the directory shows
-   <literal>sun-fm-saml2-nameid-infokey:
-   http://www.idp.example:8080/openam|http://www.sp.example:8080/openam|
-   XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>, then the name identifier is
-   <literal>XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>.</para>
+   <para>
+    You can retrieve the name identifier value on the IDP side
+    by checking the value of <literal>sun-fm-saml2-nameid-infokey</literal>.
+    For example, if the user's entry in the directory shows
+    <literal>sun-fm-saml2-nameid-infokey:
+    http://www.idp.example:8080/openam|http://www.sp.example:8080/openam|
+    XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>,
+    then the name identifier on the IDP side is
+    <literal>XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>.
+   </para>
 
    <para>You can use this identifier to initiate a change request from the
    service provider as in the following example.</para>
@@ -2951,11 +2954,28 @@ urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=<replaceable>attribute</re
  spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
  &amp;metaAlias=/idp
  &amp;requestType=NewID
- &amp;SPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
-
+ &amp;IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
 
    <para>If desired, you can substitute <literal>openam/IDPMniInit</literal>
    for <literal>openam/saml2/jsp/idpMNIRequestInit.jsp</literal></para>
+
+   <para>
+    You can retrieve the name identifier value on the SP side
+    by checking the value of <literal>sun-fm-saml2-nameid-info</literal>.
+    For example, if the user's entry in the directory shows
+    <literal>sun-fm-saml2-nameid-info:
+     http://www.sp.example:8080/openam|
+     http://www.idp.example:8080/openam|
+     ATo9TSA9Y2Ln7DDrAdO3HFfH5jKD|
+     http://www.idp.example:8080/openam|
+     urn:oasis:names:tc:SAML:2.0:nameid-format:persistent|
+     9B1OPy3m0ejv3fZYhlqxXmiGD24c|
+     http://www.sp.example:8080/openam|
+     SPRole|
+     false</literal>,
+    then the name identifier on the SP side is
+    <literal>9B1OPy3m0ejv3fZYhlqxXmiGD24c</literal>.
+   </para>
 
    <variablelist xml:id="idpmnirequestinit-parameters">
     <title><filename>idpMNIRequestInit.jsp</filename> Parameters</title>
