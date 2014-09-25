@@ -106,6 +106,9 @@ public class CORSService {
      * @return true if the caller is to continue processing the request
      */
     public boolean handleRequest(final HttpServletRequest req, final HttpServletResponse res) {
+        if (req.getHeader(CORSConstants.ORIGIN) == null) {
+            return true;
+        }
 
         if (!isValidCORSRequest(req)) {
             return false;
