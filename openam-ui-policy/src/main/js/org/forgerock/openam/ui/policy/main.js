@@ -47,6 +47,5 @@ define([
     "./ManageEnvironmentsView",
     "./EditEnvironmentView",
 
-    "./OperatorRulesView",
-    "./delegates/SiteConfigurationDelegate"
+    "./OperatorRulesView"
 ]);

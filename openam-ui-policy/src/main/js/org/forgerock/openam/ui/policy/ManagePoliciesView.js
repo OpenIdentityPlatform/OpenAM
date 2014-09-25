@@ -64,7 +64,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
                             {name: 'lastModifiedBy', width: 250, hidden: true},
                             {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
-                            {name: 'actionValues', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                            {name: 'actionValues', width: 205, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
                             {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                             {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter, hidden: true},
                             {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter, hidden: true}

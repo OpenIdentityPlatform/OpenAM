@@ -34,9 +34,8 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/openam/ui/policy/PolicyDelegate"
-], function (GenericGridView, uiUtils, router, constants, eventManager, configuration, policyDelegate) {
+], function (GenericGridView, uiUtils, router, constants, eventManager, policyDelegate) {
     var ManageApplicationsView = GenericGridView.extend({
         template: "templates/policy/ManageApplicationsTemplate.html",
 
@@ -66,7 +65,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                             {name: 'name', width: 230, frozen: true},
                             {name: 'realm', width: 150},
                             {name: 'description', width: 170, sortable: false},
-                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'resources', width: 240, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                             {name: 'createdBy', width: 250, hidden: true},
                             {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
                             {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true}
@@ -95,16 +94,6 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         columnChooserOptions: {
                             width: 501,
                             height: 180
-                        },
-                        preProcessing: function (data) {
-                            var defaultApplicatons = configuration.globalData.policyEditorConfig.defaultApplicatons,
-                                difference = _.difference(defaultApplicatons.defaultApplicatonList, defaultApplicatons.config.exceptThese);
-                            if (defaultApplicatons.config.hideByDefault) {
-                                data.result = _.removeByValues(data.result, 'name', difference);
-                            } else {
-                                data.result = _.findByValues(data.result, 'name', difference);
-                            }
-
                         }
                     };
 
