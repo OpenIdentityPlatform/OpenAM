@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -44,6 +44,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import com.sun.identity.policy.interfaces.Condition;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -173,23 +176,14 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
         Map<String, Set<String>> environment
     ) throws EntitlementException {
         try {
-            com.sun.identity.policy.interfaces.Condition cond =
-                (com.sun.identity.policy.interfaces.Condition)
-                Class.forName(className).newInstance();
-            cond.setProperties(properties);
             SSOToken token = (subject != null) ? getSSOToken(subject) : null;
+            Condition cond = getPolicyCondition();
             com.sun.identity.policy.ConditionDecision dec =
                 cond.getConditionDecision(token, environment);
             return new ConditionDecision(dec.isAllowed(), dec.getAdvices(), dec.getTimeToLive());
         } catch (SSOException ex) {
             throw new EntitlementException(510, ex);
         } catch (PolicyException ex) {
-            throw new EntitlementException(510, ex);
-        } catch (ClassNotFoundException ex) {
-            throw new EntitlementException(510, ex);
-        } catch (InstantiationException ex) {
-            throw new EntitlementException(510, ex);
-        } catch (IllegalAccessException ex) {
             throw new EntitlementException(510, ex);
         }
     }
@@ -227,4 +221,21 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
 	public String getDisplayType() {
 		return "policy";
 	}
+
+    /**
+     * Constructs a legacy policy {@link Condition} object based on the information contained in this adapter.
+     *
+     * @return the legacy policy condition.
+     * @throws EntitlementException if an error occurs constructing the condition.
+     */
+    @JsonIgnore
+    public Condition getPolicyCondition() throws EntitlementException {
+        try {
+            Condition cond = Class.forName(className).asSubclass(Condition.class).newInstance();
+            cond.setProperties(properties);
+            return cond;
+        } catch (Exception ex) {
+            throw new EntitlementException(510, ex);
+        }
+    }
 }

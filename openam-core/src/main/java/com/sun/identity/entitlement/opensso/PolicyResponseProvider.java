@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -31,6 +31,7 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.policy.PolicyException;
+import com.sun.identity.policy.interfaces.ResponseProvider;
 import com.sun.identity.shared.JSONUtils;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -139,12 +142,7 @@ public class PolicyResponseProvider implements ResourceAttribute {
      */
     public Map<String, Set<String>> evaluate(Subject adminSubject, String realm, Subject subject, String resourceName, Map<String, Set<String>> environment) throws EntitlementException {
         try {
-            com.sun.identity.policy.interfaces.ResponseProvider rp =
-                (com.sun.identity.policy.interfaces.ResponseProvider)
-                Class.forName(className).newInstance();
-            Map<String, Set<String>> properties = new HashMap<String, Set<String>>();
-            properties.put(propertyName, propertyValues);
-            rp.setProperties(properties);
+            ResponseProvider rp = getResponseProvider();
             SSOToken token = (subject != null) ? getSSOToken(subject) : null;
             Map<String, Set<String>> result = rp.getResponseDecision(token, environment);
             
@@ -153,11 +151,24 @@ public class PolicyResponseProvider implements ResourceAttribute {
             throw new EntitlementException(510, ex);
         } catch (PolicyException ex) {
             throw new EntitlementException(510, ex);
-        } catch (ClassNotFoundException ex) {
-            throw new EntitlementException(510, ex);
-        } catch (InstantiationException ex) {
-            throw new EntitlementException(510, ex);
-        } catch (IllegalAccessException ex) {
+        }
+    }
+
+    /**
+     * Constructs a legacy response provider based on the information in this adapter.
+     *
+     * @return the legacy response provider
+     * @throws EntitlementException if an error occurs constructing the response provider.
+     */
+    @JsonIgnore
+    public ResponseProvider getResponseProvider() throws EntitlementException {
+        try {
+            ResponseProvider rp = Class.forName(className).asSubclass(ResponseProvider.class).newInstance();
+            Map<String, Set<String>> properties = new HashMap<String, Set<String>>();
+            properties.put(propertyName, propertyValues);
+            rp.setProperties(properties);
+            return rp;
+        } catch (Exception ex) {
             throw new EntitlementException(510, ex);
         }
     }

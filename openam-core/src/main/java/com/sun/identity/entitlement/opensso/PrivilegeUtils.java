@@ -24,6 +24,10 @@
  *
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOToken;
@@ -614,13 +618,13 @@ public class PrivilegeUtils {
         EntitlementSubject es = privilege.getSubject();
         if ((es != null) && (es != Privilege.NOT_SUBJECT)) {
             Subject sbj = eSubjectToEPSubject(es);
-            policy.addSubject(randomName(), sbj, false);
+            policy.addSubject(getSubjectName(es), sbj, false);
         }
 
         EntitlementCondition ec = privilege.getCondition();
         if (ec != null) {
             Condition cond = eConditionToEPCondition(ec);
-            policy.addCondition(randomName(), cond);
+            policy.addCondition(getConditionName(ec), cond);
         }
 
         if (privilege.getResourceAttributes() != null) {
@@ -637,6 +641,42 @@ public class PrivilegeUtils {
         policy.setLastModifiedBy(privilege.getLastModifiedBy());
         policy.setLastModifiedDate(privilege.getLastModifiedDate());
         return policy;
+    }
+
+    /**
+     * Determine a name to use for this subject. If the subject is a legacy policy subject then use the name (if any)
+     * associated with that. Otherwise, generate a random name.
+     *
+     * @param subject the subject to generate a name for.
+     * @return a suitable name for the subject.
+     */
+    private static String getSubjectName(EntitlementSubject subject) {
+        String name = null;
+        if (subject instanceof PolicySubject) {
+            name = ((PolicySubject) subject).getName();
+        }
+        if (name == null) {
+            name = randomName();
+        }
+        return name;
+    }
+
+    /**
+     * Determins a name to use for this condition. If the condition is a legacy policy condition then use the name
+     * (if any) associated with that. Otherwise, generate a random name.
+     *
+     * @param condition the condition to generate a name for.
+     * @return a suitable name for the condition.
+     */
+    private static String getConditionName(EntitlementCondition condition) {
+        String name = null;
+        if (condition instanceof PolicyCondition) {
+            name = ((PolicyCondition) condition).getName();
+        }
+        if (name == null) {
+            name = randomName();
+        }
+        return name;
     }
 
     private static Set<Rule> entitlementToRule(
@@ -674,7 +714,11 @@ public class PrivilegeUtils {
     }
 
 
-    private static Subject eSubjectToEPSubject(EntitlementSubject es) {
+    private static Subject eSubjectToEPSubject(EntitlementSubject es) throws EntitlementException {
+        if (es instanceof PolicySubject) {
+            // It already is one captain!
+            return ((PolicySubject) es).getPolicySubject();
+        }
         PrivilegeSubject ps = new PrivilegeSubject();
         Set<String> values = new HashSet<String>();
         values.add(es.getClass().getName() + "=" + es.getState());
@@ -682,7 +726,11 @@ public class PrivilegeUtils {
         return ps;
     }
 
-    private static Condition eConditionToEPCondition(EntitlementCondition ec) throws PolicyException {
+    private static Condition eConditionToEPCondition(EntitlementCondition ec) throws PolicyException,
+            EntitlementException {
+        if (ec instanceof PolicyCondition) {
+            return ((PolicyCondition) ec).getPolicyCondition();
+        }
         PrivilegeCondition pc = new PrivilegeCondition();
         Map<String, Set<String>> map = new HashMap<String, Set<String>>();
         Set<String> set = new HashSet<String>(2);
@@ -771,7 +819,7 @@ public class PrivilegeUtils {
 
 
     private static Map<String, ResponseProvider> resourceAttributesToResponseProviders(
-            Set<ResourceAttribute> resourceAttributes) throws PolicyException {
+            Set<ResourceAttribute> resourceAttributes) throws PolicyException, EntitlementException {
 
         Map<String, ResponseProvider> results = new HashMap<String, ResponseProvider>();
 
@@ -800,6 +848,14 @@ public class PrivilegeUtils {
                 rp.setProperties(values);
 
                 results.put(n, rp);
+            }
+
+            // Copy any legacy response providers over directly
+            for (ResourceAttribute ra : resourceAttributes) {
+                if (ra instanceof PolicyResponseProvider) {
+                    PolicyResponseProvider prp = (PolicyResponseProvider) ra;
+                    results.put(prp.getPResponseProviderName(), prp.getResponseProvider());
+                }
             }
         }
 

@@ -25,6 +25,10 @@
  * $Id: PolicySubject.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -37,7 +41,13 @@ import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.SubjectDecision;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
+import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.security.AdminTokenAction;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,10 +55,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.security.auth.Subject;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This subject wraps all OpenSSO policy subject.
@@ -200,7 +206,7 @@ public class PolicySubject implements EntitlementSubject {
     public SubjectDecision evaluate(
         String realm,
         SubjectAttributesManager mgr,
-        Subject subject,
+        javax.security.auth.Subject subject,
         String resourceName,
         Map<String, Set<String>> environment
     ) throws EntitlementException {
@@ -209,11 +215,8 @@ public class PolicySubject implements EntitlementSubject {
 
         try {
             PolicyManager pm = new PolicyManager(adminToken, realm);
-            com.sun.identity.policy.interfaces.Subject sbj =
-                (com.sun.identity.policy.interfaces.Subject)
-                Class.forName(className).newInstance();
+            Subject sbj = getPolicySubject();
             sbj.initialize(pm.getPolicyConfig());
-            sbj.setValues(values);
             SSOToken token = getSSOToken(subject);
             boolean result = (token == null) ? true 
                     : sbj.isMember(token) ^ exclusive;
@@ -222,16 +225,10 @@ public class PolicySubject implements EntitlementSubject {
             throw new EntitlementException(508, ex);
         } catch (PolicyException ex) {
             throw new EntitlementException(508, ex);
-        } catch (ClassNotFoundException ex) {
-            throw new EntitlementException(508, ex);
-        } catch (InstantiationException ex) {
-            throw new EntitlementException(508, ex);
-        } catch (IllegalAccessException ex) {
-            throw new EntitlementException(508, ex);
         }
     }
 
-    private static SSOToken getSSOToken(Subject subject) {
+    private static SSOToken getSSOToken(javax.security.auth.Subject subject) {
         // subject could be null, a case in point: evaluation ignoring subjects
         if (subject == null) {
             return null;
@@ -253,5 +250,22 @@ public class PolicySubject implements EntitlementSubject {
      */
     public boolean isIdentity() {
         return true;
+    }
+
+    /**
+     * Constructs a legacy policy subject based on the information in this adapter.
+     *
+     * @return the legacy policy subject
+     * @throws EntitlementException if an error occurs constructing the subject.
+     */
+    @JsonIgnore
+    public Subject getPolicySubject() throws EntitlementException {
+        try {
+            Subject subject = Class.forName(className).asSubclass(Subject.class).newInstance();
+            subject.setValues(values);
+            return subject;
+        } catch (Exception ex) {
+            throw new EntitlementException(508, ex);
+        }
     }
 }

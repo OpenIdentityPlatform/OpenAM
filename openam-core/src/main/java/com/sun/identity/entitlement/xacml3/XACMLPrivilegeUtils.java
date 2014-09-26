@@ -38,15 +38,13 @@ import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
-
 import com.sun.identity.entitlement.UserSubject;
-
 import com.sun.identity.entitlement.opensso.XACMLOpenSSOPrivilege;
 import com.sun.identity.entitlement.xacml3.core.AllOf;
-import com.sun.identity.entitlement.xacml3.core.Apply;
 import com.sun.identity.entitlement.xacml3.core.AnyOf;
-import com.sun.identity.entitlement.xacml3.core.AttributeValue;
+import com.sun.identity.entitlement.xacml3.core.Apply;
 import com.sun.identity.entitlement.xacml3.core.AttributeDesignator;
+import com.sun.identity.entitlement.xacml3.core.AttributeValue;
 import com.sun.identity.entitlement.xacml3.core.Condition;
 import com.sun.identity.entitlement.xacml3.core.EffectType;
 import com.sun.identity.entitlement.xacml3.core.Match;
@@ -57,10 +55,18 @@ import com.sun.identity.entitlement.xacml3.core.Rule;
 import com.sun.identity.entitlement.xacml3.core.Target;
 import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
-
 import com.sun.identity.shared.JSONUtils;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.xml.sax.InputSource;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -71,16 +77,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.xml.sax.InputSource;
 
 /**
  * Class with utility methods to map from
@@ -482,7 +478,7 @@ public class XACMLPrivilegeUtils {
         String dataType = XACMLConstants.JSON_SUBJECT_DATATYPE + ":"
                 + es.getClass().getName();
         attributeValue.setDataType(dataType);
-        String esString = es.toString();
+        String esString = es.getState();
         attributeValue.getContent().add(esString);
 
         AttributeDesignator attributeDesignator = new AttributeDesignator();
@@ -717,7 +713,7 @@ public class XACMLPrivilegeUtils {
                     XACMLConstants.JSON_SUBJECT_AND_CONDITION_SATISFIED);
             List applyExpressions = apply.getExpression();
             if (es != null) {
-                String esString = es.toString();
+                String esString = es.getState();
                 // TODO: add custom xml attribute to idenity as privilge subject
                 AttributeValue esv = new AttributeValue();
                 Map<QName, String> otherAttrs = esv.getOtherAttributes();
@@ -731,7 +727,7 @@ public class XACMLPrivilegeUtils {
                 applyExpressions.add(esve);
             }
             if (ec != null) {
-                String ecString = ec.toString();
+                String ecString = ec.getState();
                 // TODO: add custom xml attribute to idenity as privilge condition
                 AttributeValue ecv = new AttributeValue();
                 Map<QName, String> otherAttrs = ecv.getOtherAttributes();
