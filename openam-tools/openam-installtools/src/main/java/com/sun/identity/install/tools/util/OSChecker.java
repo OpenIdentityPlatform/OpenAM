@@ -24,6 +24,7 @@
  *
  * $Id: OSChecker.java,v 1.2 2008/06/25 05:51:29 qcheng Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.install.tools.util;
@@ -38,31 +39,16 @@ public class OSChecker {
     /**
      * Sets the osName,osMajorVersion,osMinorVersion variables
      */
-    private static void getOS() {
+    private static void setOS() {
 
         osName = System.getProperty(OS_NAME);
-
-        try {
-            String this_version = System.getProperty(OS_VERSION);
-            int idx = this_version.indexOf(DOT);
-
-            if (idx != -1) {
-                osMajorVersion = Integer
-                        .valueOf(this_version.substring(0, idx)).intValue();
-                osMinorVersion = Integer.valueOf(
-                        this_version.substring(idx + 1)).intValue();
-            } else {
-                osMajorVersion = Integer.valueOf(this_version).intValue();
-            }
-        } catch (NumberFormatException ex) {
-            Debug.log("OSChecker.getOS() threw exception : ", ex);
-        }
+        parseVersion(System.getProperty(OS_VERSION));
     }
 
     /**
      * Sets the osArchitecture variable
      */
-    private static void getArch() {
+    private static void setArch() {
         osArchitecture = System.getProperty(OS_ARCH);
     }
 
@@ -78,21 +64,17 @@ public class OSChecker {
      */
     public static boolean match(String name) {
 
-        boolean result = (osName.equalsIgnoreCase(name) == true);
-
-        if (result) {
-            return result;
+        if (osName.equalsIgnoreCase(name)) {
+            return true;
         } else {
             // For windows
             String winPrefix = name.substring(0, 3);
-            if (osName.toLowerCase().indexOf(winPrefix.toLowerCase()) != -1) {
+            if (osName.toLowerCase().contains(winPrefix.toLowerCase())) {
                 return true;
             }
         }
 
         return false;
-
-        // return (osName.equalsIgnoreCase(name) == true);
     }
 
     /**
@@ -112,14 +94,9 @@ public class OSChecker {
      * @return true if version current operating system matches with a given
      *         version
      */
-    public static boolean match(String name, int majorVersion, 
-            int minorVersion) {
+    public static boolean match(String name, int majorVersion, int minorVersion) {
 
-        boolean result = (osName.equalsIgnoreCase(name) == true)
-                && (osMajorVersion == majorVersion)
-                && (osMinorVersion == minorVersion);
-
-        return result;
+        return osName.equalsIgnoreCase(name) && (osMajorVersion == majorVersion) && (osMinorVersion == minorVersion);
     }
 
     /**
@@ -152,14 +129,10 @@ public class OSChecker {
      * @return true if version current operating system is greater than a given
      *         version
      */
-    public static boolean atleast(String name, int majorVersion,
-            int minorVersion) {
+    public static boolean atleast(String name, int majorVersion, int minorVersion) {
 
-        boolean result = (osName.equalsIgnoreCase(name) == true)
-                && (osMajorVersion >= majorVersion)
-                && (osMinorVersion >= minorVersion);
+        return osName.equalsIgnoreCase(name) && (osMajorVersion >= majorVersion) && (osMinorVersion >= minorVersion);
 
-        return result;
     }
 
     /**
@@ -205,16 +178,55 @@ public class OSChecker {
      * @return
      * 
      */
-    static public boolean isUnix() {
-        return (isSolaris() || isHPUX() || isLinux() || isAIX());
+    public static boolean isUnix() {
+        return (isSolaris() || isHPUX() || isLinux() || isAIX() || isOSX());
     }
 
-    static public boolean isAIX() {
+    public static boolean isAIX() {
         return matchApprox(AIX);
     }
 
-    static public boolean isLinux() {
+    public static boolean isLinux() {
         return matchApprox(LINUX);
+    }
+
+    public static boolean isOSX() {
+        return matchApprox(OSX);
+    }
+
+    public static int getOsMajorVersion() {
+        return osMajorVersion;
+    }
+
+    public static int getOsMinorVersion() {
+        return osMinorVersion;
+    }
+
+    // Made public to enable testing
+    public static void parseVersion(String version) {
+
+        int idx = version.indexOf(DOT);
+
+        try {
+            if (idx != -1) {
+                osMajorVersion = Integer.valueOf(version.substring(0, idx));
+                // try to find the next dot in the version string
+                int nextidx = version.indexOf(DOT, idx + 1);
+                if (nextidx != -1) {
+                    osMinorVersion = Integer.valueOf(version.substring(idx + 1, nextidx));
+                } else {
+                    // Attempt to just read the remaining string as the minor version value
+                    osMinorVersion = Integer.valueOf(version.substring(idx + 1));
+                }
+            } else {
+                osMajorVersion = Integer.valueOf(version);
+                osMinorVersion = 0;
+            }
+        } catch (NumberFormatException ex) {
+            osMajorVersion = 0;
+            osMinorVersion = 0;
+            Debug.log("OSChecker.parseVersion: unable to parse OS version " + version, ex);
+        }
     }
 
     /**
@@ -224,7 +236,7 @@ public class OSChecker {
      * @return
      * 
      */
-    static public boolean isHPUX() {
+    public static boolean isHPUX() {
         return (matchApprox(HPUX));
     }
 
@@ -261,8 +273,10 @@ public class OSChecker {
 
     public static String HPUX = "HP-UX";
 
+    public static String OSX = "Mac OS X";
+
     static {
-        getOS();
-        getArch();
+        setOS();
+        setArch();
     }
 }
