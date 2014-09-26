@@ -24,9 +24,7 @@
                                                                                 
    $Id: membership.jsp,v 1.9 2010/02/02 05:32:13 bina Exp $
                                                                                 
---%>
-<%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2014 ForgeRock AS.
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -36,6 +34,7 @@
     <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
     <jato:useViewBean className="com.sun.identity.authentication.distUI.LoginViewBean">
         <%@ page contentType="text/html" %>
+        <%@ page import = "org.owasp.esapi.ESAPI" %>
         <head>
             <title><jato:text name="htmlTitle_Membership" /></title>
             <%
@@ -244,8 +243,8 @@
                                         }
                                         -->
                                     </script>
-                                    <input type="hidden" name="goto" value="<%= gotoURL %>"/>
-                                    <input type="hidden" name="gotoOnFail" value="<%= gotoOnFailURL %>"/>
+                                    <input type="hidden" name="goto" value="<%= ESAPI.encoder().encodeForHTMLAttribute(gotoURL) %>"/>
+                                    <input type="hidden" name="gotoOnFail" value="<%= ESAPI.encoder().encodeForHTMLAttribute(gotoOnFailURL) %>"/>
                                     <input type="hidden" name="SunQueryParamsString" value="<%= encodedQueryParams %>"/>
                                     <input type="hidden" name="encoded" value="<%= encoded %>"/>
                                 </auth:form>

@@ -24,9 +24,7 @@
                                                                                 
    $Id: new_org.jsp,v 1.6 2008/08/15 01:05:29 veiming Exp $
                                                                                 
---%>
-<%--
-   Portions Copyrighted 2012-2014 ForgeRock AS
+   Portions Copyrighted 2012-2014 ForgeRock AS.
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -36,6 +34,7 @@
     <%@taglib uri="/WEB-INF/auth.tld" prefix="auth"%>
     <jato:useViewBean className="com.sun.identity.authentication.UI.LoginViewBean">
         <%@ page contentType="text/html" %>
+        <%@ page import = "org.owasp.esapi.ESAPI" %>
         <head>
             <title><jato:text name="htmlTitle_NewOrg" /></title>
             <%
@@ -87,7 +86,7 @@
                                         </div>
                                     </jato:content>
                                     <input type="hidden" name="SunQueryParamsString" value="<%= encodedQueryParams %>" />
-                                    <input type="hidden" name="goto" value="<%= gotoURL %>" />
+                                    <input type="hidden" name="goto" value="<%= ESAPI.encoder().encodeForHTMLAttribute(gotoURL) %>" />
                                     <input type="hidden" name="encoded" value="<%= encoded %>" />
                                     <input type="hidden" name="new_org" value="true" />
                                 </fieldset>
