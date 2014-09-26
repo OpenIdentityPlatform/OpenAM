@@ -14,28 +14,30 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.console.UI.taglib;
+package org.forgerock.openam.console.ui.taglib;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.util.NonSyncStringBuffer;
 import com.sun.identity.shared.Constants;
-import com.sun.web.ui.taglib.html.CCPasswordTag;
+import com.sun.web.ui.taglib.html.CCFormTag;
 
-public class AutoCCPasswordTag extends CCPasswordTag {
+
+public class AutoCCFormTag extends CCFormTag {
 
     private boolean autoCompleteEnabled = true;
 
-    public AutoCCPasswordTag() {
+    public AutoCCFormTag() {
         super();
         autoCompleteEnabled = SystemProperties.getAsBoolean(Constants.AUTOCOMPLETE_ENABLED, true);
     }
 
     @Override
-    protected void appendCommonHtmlAttributes(NonSyncStringBuffer buffer) {
+    public void appendStyleAttributes(NonSyncStringBuffer buffer) {
 
-        super.appendCommonHtmlAttributes(buffer);
         if (!autoCompleteEnabled) {
             appendAttribute(buffer, "autocomplete", "off");
         }
+
+        super.appendStyleAttributes(buffer);
     }
 }

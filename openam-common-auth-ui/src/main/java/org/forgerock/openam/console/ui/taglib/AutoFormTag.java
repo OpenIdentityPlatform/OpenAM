@@ -14,7 +14,7 @@
  * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.console.UI.taglib;
+package org.forgerock.openam.console.ui.taglib;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.jato.taglib.html.FormTag;
