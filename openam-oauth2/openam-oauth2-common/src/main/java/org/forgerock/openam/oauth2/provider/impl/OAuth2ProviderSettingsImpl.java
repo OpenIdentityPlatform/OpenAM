@@ -35,8 +35,6 @@ import java.util.Collections;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.restlet.Request;
-import org.restlet.ext.servlet.ServletUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessController;
@@ -183,19 +181,15 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
      */
     private static final boolean PROPAGATE_EXCEPTIONS = false;
 
-    public OAuth2ProviderSettingsImpl(Request request) {
-        HttpServletRequest req = ServletUtils.getRequest(request);
-        initializeClass(req);
-    }
 
-    public OAuth2ProviderSettingsImpl(HttpServletRequest request) {
-        initializeClass(request);
-    }
+    public OAuth2ProviderSettingsImpl(HttpServletRequest request, String realm) { 
+    	  initializeClass(request, realm);
+	}
 
-    private void initializeClass(HttpServletRequest request){
+	private void initializeClass(HttpServletRequest request,String realm){
 
         deploymentUrl = OAuth2Utils.getDeploymentURL(request);
-        realm = OAuth2Utils.getRealm(request);
+        this.realm = realm;
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         ServiceConfigManager serviceConfigManager = null;
         try {

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
+ * Copyright (c) 2012-2014 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- */
-
-/**
- * Portions copyright 2012-2013 ForgeRock Inc
  */
 
 package org.forgerock.openam.oauth2.utils;
@@ -505,22 +501,35 @@ public class OAuth2Utils {
      * <p/>
      * Example: Custom code fetches it from the query, the body or more secure
      * from the User Session
-     * 
      * @param request
-     * @return
+     * @return the realm
      */
     public static String getRealm(Request request) {
-        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        return getRealm(httpRequest);
-    }
-
-    public static String getRealm(HttpServletRequest request) {
-        Object realm = request.getParameter(OAuth2Constants.Custom.REALM);
+        Object realm = request.getAttributes().get(OAuth2Constants.Custom.REALM);
         if (realm instanceof String) {
             return (String) realm;
         }
-        return "/";
+        String ret = getRequestParameter(request, OAuth2Constants.Custom.REALM, String.class);
+        if (ret == null){
+            return "/";
+        } else {
+            return ret;
+        }
     }
+
+    /**
+     * Get the realm from the <code>HttpServletRequest</code>.
+     * This will use the request parameter.
+     * @param request
+     * @return the realm - or top level realm if none is present.
+     */
+	public static String getRealm(HttpServletRequest request) {
+        String realm = request.getParameter(OAuth2Constants.Custom.REALM);
+        if (realm == null || realm.length() == 0) {
+            realm = "/";
+        }
+        return realm;
+	}
 
     public static String getModuleName(Request request) {
         Object module = request.getAttributes().get(OAuth2Constants.Custom.MODULE);
@@ -710,9 +719,9 @@ public class OAuth2Utils {
     }
 
     /**
-     * Gets the depoyment URI of the OAuth2 authorization server
-     * @param request the request to get the deployment uri of
-     * @return
+     * Gets the deployment URI of the OAuth2 authorization server.
+     * @param request the {@link Request} to get the deployment uri of
+     * @return deployment URI of the OAuth2 server
      */
     public static String getDeploymentURL(Request request){
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
@@ -720,9 +729,9 @@ public class OAuth2Utils {
     }
 
     /**
-     * Gets the depoyment URI of the OAuth2 authorization server
-     * @param request the request to get the deployment uri of
-     * @return
+     * Gets the deployment URI of the OAuth2 authorization server
+     * @param request the HttpServletRequest to get the deployment uri of
+     * @return deployment URI of the OAuth2 server
      */
     public static String getDeploymentURL(HttpServletRequest request){
         String uri = request.getRequestURI();
@@ -885,14 +894,32 @@ public class OAuth2Utils {
         return decodedPassword == null ? password : decodedPassword;
     }
 
-    public static KeyPair getServerKeyPair(org.restlet.Request request){
-        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        return getServerKeyPair(httpRequest);
+    /**
+     * Gets the KeyPair based on the current restlet Request
+     * @param request the restlet request
+     * @return the  KeyPair 
+     */
+    public static KeyPair getServerKeyPair(org.restlet.Request request) {
+        OAuth2ProviderSettings settings = getSettingsProvider(request);
+        return getServerKeyPairFromSettings(settings);
     }
 
+    /**
+     * Gets the KeyPair based on the current HttpServletRequest 
+     * @param request the HttpServletRequest
+     * @return KeyPair
+     */
     public static KeyPair getServerKeyPair(javax.servlet.http.HttpServletRequest request){
         OAuth2ProviderSettings settings = getSettingsProvider(request);
-        String alias = settings.getKeyStoreAlias();
+        return getServerKeyPairFromSettings(settings);
+    }
+    
+    /*
+     * Get the KeyPair from the OAuth2ProviderSettings provided.
+     */
+	private static KeyPair getServerKeyPairFromSettings(
+			OAuth2ProviderSettings settings) {
+		String alias = settings.getKeyStoreAlias();
 
         //get keystore password from file
         String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
@@ -946,30 +973,42 @@ public class OAuth2Utils {
         PrivateKey privateKey = keystoreManager.getPrivateKey(alias);
         PublicKey publicKey = keystoreManager.getPublicKey(alias);
         return new KeyPair(publicKey, privateKey);
-    }
+	}
 
     /*
      * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
      */
-    public static OAuth2ProviderSettings getSettingsProvider(org.restlet.Request request){
+    public static OAuth2ProviderSettings getSettingsProvider(org.restlet.Request request) {
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        return getSettingsProvider(httpRequest);
+        // need to get realm using org.restlet.Request as the corresponding  HttpServletRequest
+        // may have had its post parameters consumed. 
+        String realm =  getRealm(request);
+        return getSettingdProviderByRealm(httpRequest, realm);
     }
 
     /*
      * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
      */
-    public static OAuth2ProviderSettings getSettingsProvider(javax.servlet.http.HttpServletRequest request){
-        synchronized (settingsProviderMap) {
-            String realm = OAuth2Utils.getRealm(request);
+    public static OAuth2ProviderSettings getSettingsProvider(javax.servlet.http.HttpServletRequest request) {
+        String realm = getRealm(request);
+        return getSettingdProviderByRealm(request, realm);
+    }
+
+    
+    /*
+     * Gets the provider settings based on the realm.
+     */
+	private static OAuth2ProviderSettings getSettingdProviderByRealm(
+			javax.servlet.http.HttpServletRequest request, String realm) {
+		synchronized (settingsProviderMap) {
             OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
-            if (setting != null){
+            if (setting != null) {
                 return setting;
             } else {
-                setting = new OAuth2ProviderSettingsImpl(request);
+                setting = new OAuth2ProviderSettingsImpl(request, realm);
                 settingsProviderMap.put(realm, setting);
                 return setting;
             }
         }
-    }
+	}
 }
