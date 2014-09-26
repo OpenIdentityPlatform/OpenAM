@@ -272,7 +272,13 @@
         <para>
          This optional field holds the token ID of the subject,
          returned for example on successful authentication.
-         See <xref linkend="rest-api-auth" />.
+         See
+         <link
+          xlink:show="new"
+          xlink:href="dev-guide#rest-api-auth-json"
+          xlink:role="http://docbook.org/xlink/role/olink"
+          >REST APIs for Authentication &amp; Logout
+         </link>.
         </para>
 
         <para>
@@ -860,7 +866,13 @@ $ <userinput>curl \
         <para>
          This optional field holds the token ID of the subject,
          returned for example on successful authentication.
-         See <xref linkend="rest-api-auth" />.
+         See
+         <link
+          xlink:show="new"
+          xlink:href="dev-guide#rest-api-auth-json"
+          xlink:role="http://docbook.org/xlink/role/olink"
+          >REST APIs for Authentication &amp; Logout
+         </link>.
         </para>
 
         <para>
@@ -2388,7 +2400,7 @@ $ <userinput>curl \
         "daysOfWeek",
         "and"
     ],
-    "realm": "/realm",
+    "realm": "/",
     "applicationType": "crestPolicyService",
     "description": "An example application for Common REST",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
@@ -2402,7 +2414,7 @@ $ <userinput>curl \
         "com.sun.identity.admin.model.IdRepoGroupViewSubject",
         "com.sun.identity.admin.model.AttributeViewSubject"
     ],
-    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
     "searchIndex": null,
     "attributeNames": []
@@ -2452,7 +2464,7 @@ $ <userinput>curl \
    "com.sun.identity.admin.model.IdRepoGroupViewSubject",
    "com.sun.identity.admin.model.AttributeViewSubject"
   ],
-  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
   "searchIndex" : null,
   "attributeNames" : [ ]
@@ -2509,7 +2521,7 @@ $ <userinput>curl \
         "daysOfWeek",
         "and"
     ],
-    "realm": "/realm",
+    "realm": "/",
     "applicationType": "crestPolicyService",
     "description": "An example application for Common REST",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
@@ -2523,7 +2535,7 @@ $ <userinput>curl \
         "com.sun.identity.admin.model.IdRepoGroupViewSubject",
         "com.sun.identity.admin.model.AttributeViewSubject"
     ],
-    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
     "searchIndex": null,
     "attributeNames": []
@@ -2573,7 +2585,7 @@ $ <userinput>curl \
    "com.sun.identity.admin.model.IdRepoGroupViewSubject",
    "com.sun.identity.admin.model.AttributeViewSubject"
   ],
-  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
   "searchIndex" : null,
   "attributeNames" : [ ]
@@ -2621,7 +2633,7 @@ $ <userinput>curl \
     "daysOfWeek",
     "and"
   ],
-  "realm" : "/realm",
+  "realm" : "/",
   "creationDate" : 1398760362341,
   "lastModifiedDate" : 1398760362341,
   "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
@@ -2639,7 +2651,7 @@ $ <userinput>curl \
     "com.sun.identity.admin.model.IdRepoGroupViewSubject",
     "com.sun.identity.admin.model.AttributeViewSubject"
   ],
-  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
   "searchIndex" : null,
   "attributeNames" : [ ]
@@ -2702,7 +2714,7 @@ $ <userinput>curl \
         "daysOfWeek",
         "and"
     ],
-    "realm": "/realm",
+    "realm": "/",
     "applicationType": "crestPolicyService",
     "description": "An read-only example application for Common REST",
     "resourceComparator": "com.sun.identity.entitlement.URLResourceName",
@@ -2716,7 +2728,7 @@ $ <userinput>curl \
         "com.sun.identity.admin.model.IdRepoGroupViewSubject",
         "com.sun.identity.admin.model.AttributeViewSubject"
     ],
-    "entitlementCombiner": "com.sun.identity.entitlement.DenyOverride",
+    "entitlementCombiner": "DenyOverride",
     "saveIndex": null,
     "searchIndex": null,
     "attributeNames": []
@@ -2766,7 +2778,7 @@ $ <userinput>curl \
    "com.sun.identity.admin.model.IdRepoGroupViewSubject",
    "com.sun.identity.admin.model.AttributeViewSubject"
   ],
-  "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+  "entitlementCombiner" : "DenyOverride",
   "saveIndex" : null,
   "searchIndex" : null,
   "attributeNames" : [ ]
@@ -2839,7 +2851,7 @@ $ <userinput>curl \
       "daysOfWeek",
       "and"
     ],
-    "realm" : "/realm",
+    "realm" : "/",
     "creationDate" : 1398760362341,
     "lastModifiedDate" : 1398760362341,
     "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
@@ -2857,7 +2869,7 @@ $ <userinput>curl \
       "com.sun.identity.admin.model.IdRepoGroupViewSubject",
       "com.sun.identity.admin.model.AttributeViewSubject"
     ],
-    "entitlementCombiner" : "com.sun.identity.entitlement.DenyOverride",
+    "entitlementCombiner" : "DenyOverride",
     "saveIndex" : null,
     "searchIndex" : null,
     "attributeNames" : [ ]
@@ -3704,7 +3716,12 @@ uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html\
 
      <para>Authentication for these interfaces uses cookies, so if your
      application is not running in a browser, first authenticate as described in
-     <xref linkend="rest-api-auth" />.</para>
+      <link
+       xlink:show="new"
+       xlink:href="dev-guide#rest-api-auth-json"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       >REST APIs for Authentication &amp; Logout</link>.
+     </para>
 
      <para>To request a decision for a single resource, use an HTTP GET on
      <literal>/ws/1/entitlement/decision</literal> as in the following example:</para>
@@ -3848,7 +3865,12 @@ $ <userinput>curl \
 
      <para>Authentication for these interfaces uses cookies, so if your
      application is not running in a browser, first authenticate as described in
-     <xref linkend="rest-api-auth" />.</para>
+      <link
+       xlink:show="new"
+       xlink:href="dev-guide#rest-api-auth-json"
+       xlink:role="http://docbook.org/xlink/role/olink"
+       >REST APIs for Authentication &amp; Logout</link>.
+     </para>
 
      <section xml:id="rest-api-policy-management-create">
       <title>Creating Policies (Legacy API)</title>
