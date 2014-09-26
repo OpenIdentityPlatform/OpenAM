@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+            <artifactId>jaxb1-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun.msv.datatype.xsd</groupId>
