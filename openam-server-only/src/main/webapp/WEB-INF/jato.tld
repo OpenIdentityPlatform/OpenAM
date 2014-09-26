@@ -271,7 +271,7 @@ $Id: jato.tld,v 1.2 2006/02/01 00:13:42 veiming Exp $
 	<!-- ===================== Visual (HTML) Tags ====================== -->
 	<tag>
 		<name>form</name>
-		<tagclass>com.iplanet.jato.taglib.html.FormTag</tagclass>
+		<tagclass>org.forgerock.console.UI.taglib.AutoFormTag</tagclass>
 		<bodycontent>JSP</bodycontent>
 		<attribute>
 			<name>name</name>

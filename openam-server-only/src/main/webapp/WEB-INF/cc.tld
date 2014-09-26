@@ -14,7 +14,7 @@
   <!-- ===================== Visual (HTML) Tags ====================== -->
   <tag>
     <name>form</name>
-    <tagclass>com.sun.web.ui.taglib.html.CCFormTag</tagclass>
+    <tagclass>org.forgerock.console.UI.taglib.AutoCCFormTag</tagclass>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -427,7 +427,7 @@
   </tag>
   <tag>
     <name>password</name>
-    <tagclass>com.sun.web.ui.taglib.html.CCPasswordTag</tagclass>
+    <tagclass>org.forgerock.console.UI.taglib.AutoCCPasswordTag</tagclass>
     <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
