@@ -32,8 +32,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/openam/ui/user/delegates/SessionDelegate",
+    "org/forgerock/commons/ui/common/util/CookieHelper"
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants, sessionDelegate, cookieHelper) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
@@ -87,18 +89,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         });
     };
 
-    obj.logout = function(successCallback, errorCallback) {
-        var _this = this;
-        authNDelegate.logout().then(function(){
-            window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
-            successCallback();
-        }, function(){
-            if (errorCallback){
-                errorCallback();
-            }
-        });
-    };
-    
     obj.getLoggedUser = function(successCallback, errorCallback) {
         try{
             userDelegate.getProfile(function(user) {
@@ -170,6 +160,47 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
         });
         
         return (!$.isEmptyObject(filteredParams)) ? '&' + $.param(filteredParams) : '';
+    };
+
+    obj.logout = function(successCallback, errorCallback) {
+        var _this = this,
+            tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
+        sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
+            if (result.valid) {
+                sessionDelegate.logout().then(function () {
+                    if (conf.globalData.auth.fullLoginURL) {
+                        window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
+                    }
+                    successCallback();
+                });
+            } else {
+                if (errorCallback) {
+                    errorCallback();
+                }
+            }
+            obj.removeSessionCookie();
+        }, function () {
+            if (errorCallback) {
+                errorCallback();
+            }
+        });
+    };
+
+    obj.removeSession = function() {
+        var tokenCookie = cookieHelper.getCookie(conf.globalData.auth.cookieName);
+        sessionDelegate.isSessionValid(tokenCookie).then(function(result) {
+            if (result.valid) {
+                sessionDelegate.logout().then(function () {
+                    obj.removeSessionCookie();
+                });
+            }
+        });
+    };
+
+    obj.removeSessionCookie = function(){
+        _.each(conf.globalData.auth.cookieDomains,function(cookieDomain){
+            cookieHelper.deleteCookie(conf.globalData.auth.cookieName, "/", cookieDomain);
+        });
     };
     
     return obj;

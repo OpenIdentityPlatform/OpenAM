@@ -74,6 +74,7 @@ define("config/AppConfiguration", [
                     moduleClass: "org/forgerock/commons/ui/common/main/ProcessConfiguration",
                     configuration: {
                         processConfigurationFiles: [
+                            "config/process/AMConfig",
                             "config/process/UserConfig",
                             "config/process/CommonConfig"
                         ]

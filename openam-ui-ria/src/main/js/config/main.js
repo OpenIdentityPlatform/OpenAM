@@ -35,5 +35,6 @@ define("config/main", [
     "./messages/UserMessages",
     "./AppConfiguration",
     "./process/CommonConfig",
-    "./process/UserConfig"
+    "./process/UserConfig",
+    "./process/AMConfig"
 ]);

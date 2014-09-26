@@ -141,6 +141,10 @@
                 "emailMessage" : "Please goto the link below to continue the registration process:",
                 "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete the registration process.",
                 "registrationComplete" : "Registration complete"
+            },
+            "RestLogoutTemplate" : {
+                "loggedOut" : "You have been logged out.",
+                "returnToLogin" : "Return to Login page"
             }
         },
         "admin" : {

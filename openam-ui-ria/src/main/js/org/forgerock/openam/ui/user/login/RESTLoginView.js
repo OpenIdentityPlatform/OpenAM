@@ -133,7 +133,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
 
                     //clear out existing session if instructed
                     if (reqs.hasOwnProperty("tokenId") && urlParams.arg === 'newsession') {
-                        sessionManager.logout();
+                        restLoginHelper.removeSession();
                         conf.setProperty('loggedUser', null);
                     }
 
@@ -169,7 +169,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                             }
                         },function(){
                             //there is a tokenId but it is invalid so kill it
-                            sessionManager.logout();
+                            restLoginHelper.removeSession();
                             conf.setProperty('loggedUser', null);
                         });
 

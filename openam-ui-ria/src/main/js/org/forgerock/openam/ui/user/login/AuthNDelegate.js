@@ -237,26 +237,6 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         return ret;
     };
 
-    obj.logout = function () {
-        obj.resetProcess();
-
-        return obj.serviceCall({
-            type: "POST",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.1"},
-            data: "{}",
-            url: "",
-            serviceUrl: constants.host + "/"+ constants.context + "/json/sessions?_action=logout",
-            errorsHandlers: {"Bad Request": {status: 400}}
-        })
-        .done(function () {
-            console.log("Successfully logged out");
-            _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
-                cookieHelper.deleteCookie(configuration.globalData.auth.cookieName, "/", cookieDomain);
-            });
-        });
-
-    };
-
     obj.setGoToUrl = function (tokenId, urlGoTo){
         var args = {};
         args.goto = urlGoTo;

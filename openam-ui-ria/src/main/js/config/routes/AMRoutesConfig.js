@@ -73,6 +73,13 @@ define("config/routes/AMRoutesConfig", [
             role: "ui-user",
             url: "oauth2/tokens",
             forceUpdate: true
+        },
+        "logout" : {
+            view: "org/forgerock/openam/ui/user/logout/RESTLogoutView",
+            url: /logout([^\&]+)?(&.+)?/,
+            pattern: "logout??",
+            defaults: ["/",""],
+            argumentNames: ["realm","additionalParameters"]
         }
 
     };
