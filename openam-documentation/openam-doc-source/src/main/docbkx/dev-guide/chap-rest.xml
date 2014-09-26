@@ -29,8 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
  <title>RESTful Web Services</title>
  <indexterm><primary>REST API</primary></indexterm>
  <para>This chapter shows how to use the OpenAM RESTful interfaces for direct
@@ -1120,7 +1120,10 @@ $ <userinput>curl \
     <replaceable>value</replaceable> pairs.</para>
 
    <para>The newer API for retrieving user information is demonstrated in
-    <xref linkend="rest-api-read-identity" />. What follows describes the
+    <link xlink:show="new"
+          xlink:href="dev-guide#rest-api-read-identity"
+          xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Reading Identities</citetitle></link>. What follows describes the
     legacy API.</para>
 
    <screen>

@@ -31,6 +31,7 @@
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
  <title>RESTful OAuth 2.0 and OpenID Connect 1.0 Services</title>
 
  <indexterm><primary>REST API</primary></indexterm>
@@ -76,10 +77,13 @@
   the operations in the browser session.</para>
 
   <para>Clients not running in a browser can authenticate as described in
-  <xref linkend="rest-api-auth" />, whereby OpenAM returns a
-  <literal>token.id</literal> value. Clients pass the
-  <literal>token.id</literal> value in a header named after the
-  authentication cookie, by default <literal>iplanetDirectoryPro</literal>.</para>
+   <link xlink:href="dev-guide#rest-api-auth"
+         xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Authorization &amp; Policy Management</citetitle></link>, whereby
+   OpenAM returns a
+   <literal>token.id</literal> value. Clients pass the
+   <literal>token.id</literal> value in a header named after the
+   authentication cookie, by default <literal>iplanetDirectoryPro</literal>.</para>
 
   <section xml:id="rest-api-oauth2-client-endpoints">
    <title>OAuth 2.0 Client &amp; Resource Server Endpoints</title>
@@ -548,7 +552,6 @@ $ <userinput>curl \
      </textobject>
     </mediaobject>
    </figure>
-
 
   </section>
  </section>

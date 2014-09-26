@@ -29,8 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
  <title>RESTful Identity and Realm Management Services</title>
 
  <indexterm><primary>REST API</primary></indexterm>
@@ -70,7 +70,13 @@
     resources.</para>
 
     <para>Examples in this section do not repeat the authentication shown
-    in <xref linkend="rest-api-auth" />. For browser-based clients, you
+    in <link
+        xlink:show="new"
+        xlink:href="dev-guide#rest-api-auth"
+        xlink:role="http://docbook.org/xlink/role/olink"
+        >Authorization &amp; Policy Management</link>.
+
+    For browser-based clients, you
     can rely on OpenAM cookies rather than construct the header in your
     application. Managing agent profiles, groups, realms, and users with
     these APIs of course require authorization. The examples shown in this
@@ -1112,7 +1118,11 @@ $ <userinput>curl \
     A user must provide the current password, which is set in the request
     as the value of the <literal>olduserpassword</literal> header.
     For the case where the user has forgotten their password, see
-    <xref linkend="rest-api-password-reset" /> instead.
+    <link
+     xlink:show="new"
+     xlink:href="dev-guide#rest-api-password-reset"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Resetting Forgotten Passwords</link> instead.
    </para>
 
    <para>
@@ -1183,7 +1193,10 @@ $ <userinput>curl \
     <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
     xlink:show="new">HTTP status code</link>.
 
-    See also <xref linkend="rest-api-status-codes" /> for more information.
+    See also <link xlink:show="new"
+                   xlink:href="dev-guide#rest-api-status-codes"
+                   xlink:role="http://docbook.org/xlink/role/olink">REST Status Codes</link>
+    for more information.
    </para>
   </section>
 
@@ -1260,7 +1273,10 @@ admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*\
    xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
 
    <para>Reading is similar to attribute retrieval, as described in
-   <xref linkend="rest-api-tokens" />, but obtained using the token of
+    <link xlink:show="new"
+          xlink:href="dev-guide#rest-api-tokens"
+          xlink:role="http://docbook.org/xlink/role/olink">Token Validation</link>,
+   but obtained using the token of
    a user with permissions to perform the search, as shown in the following
    example.</para>
    

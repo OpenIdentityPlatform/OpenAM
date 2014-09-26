@@ -29,8 +29,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'
-         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+
   <title>RESTful User-Self Services</title>
 
   <indexterm><primary>REST API</primary></indexterm>
@@ -262,8 +262,9 @@ $ <userinput>curl \
   </para>
 
   <para>
-   If you know the current password, you can change it as described in
-   <xref linkend="rest-api-change-password" />.
+   <link xlink:show="new" xlink:href="dev-guide#rest-api-change-password"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Changing Passwords</citetitle></link>.
   </para>
 
   <para>The option is disabled by default. You can enable it in the OpenAM Console
