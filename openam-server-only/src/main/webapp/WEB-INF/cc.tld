@@ -14,7 +14,7 @@
   <!-- ===================== Visual (HTML) Tags ====================== -->
   <tag>
     <name>form</name>
-    <tagclass>org.forgerock.console.UI.taglib.AutoCCFormTag</tagclass>
+    <tagclass>org.forgerock.openam.console.ui.taglib.AutoCCFormTag</tagclass>
     <attribute>
       <name>name</name>
       <required>true</required>
@@ -427,7 +427,7 @@
   </tag>
   <tag>
     <name>password</name>
-    <tagclass>org.forgerock.console.UI.taglib.AutoCCPasswordTag</tagclass>
+    <tagclass>org.forgerock.openam.console.ui.taglib.AutoCCPasswordTag</tagclass>
     <bodycontent>empty</bodycontent>
     <attribute>
       <name>name</name>
