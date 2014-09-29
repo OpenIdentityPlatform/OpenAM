@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ListenerRestTest.java,v 1.4 2009/12/15 00:44:19 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.rest;
@@ -121,7 +123,7 @@ public class ListenerRestTest {
             privilege.setEntitlement(entitlement);
             EntitlementSubject sbj = new AuthenticatedESubject();
             privilege.setSubject(sbj);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
 
             listenerClient = Client.create().resource(
                 SystemProperties.getServerInstanceName() +
@@ -138,7 +140,7 @@ public class ListenerRestTest {
     public void cleanup() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance(REALM,
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
         IdRepoUtils.deleteIdentity(REALM, agent);
     }
 

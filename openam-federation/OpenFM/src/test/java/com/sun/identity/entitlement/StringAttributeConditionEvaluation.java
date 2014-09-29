@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: StringAttributeConditionEvaluation.java,v 1.2 2009/08/31 19:48:45 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -79,7 +81,7 @@ public class StringAttributeConditionEvaluation {
         tc.setValue(ATTR_VALUE);
         tc.setDisplayType("displayName");
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
         Thread.sleep(1000);
     }
 
@@ -90,7 +92,7 @@ public class StringAttributeConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test

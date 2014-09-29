@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: MetaDataTest.java,v 1.3 2009/10/14 03:18:42 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.policy;
@@ -126,7 +128,7 @@ public class MetaDataTest {
         Set<SearchFilter> filter =
             new HashSet<SearchFilter>();
         filter.add(new SearchFilter("creationdate", value, operator));
-        Set<String> privilegeNames = privilegMgr.searchPrivilegeNames(filter);
+        Set<String> privilegeNames = privilegMgr.searchNames(filter);
 
         if (!containCheckOnly) {
             if ((privilegeNames == null) || (privilegeNames.size() != 1)) {

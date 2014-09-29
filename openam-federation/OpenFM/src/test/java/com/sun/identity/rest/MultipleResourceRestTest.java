@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: MultipleResourceRestTest.java,v 1.1 2009/11/12 18:37:36 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.rest;
@@ -92,7 +94,7 @@ public class MultipleResourceRestTest {
             privilege.setEntitlement(entitlement);
             EntitlementSubject sbj = new AuthenticatedESubject();
             privilege.setSubject(sbj);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
         }
         {
             Privilege privilege = Privilege.getNewInstance();
@@ -104,7 +106,7 @@ public class MultipleResourceRestTest {
             privilege.setEntitlement(entitlement);
             EntitlementSubject sbj = new AuthenticatedESubject();
             privilege.setSubject(sbj);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
         }
 
         String tokenId = adminToken.getTokenID().toString();
@@ -135,8 +137,8 @@ public class MultipleResourceRestTest {
     public void cleanup() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance(REALM,
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME  + "1");
-        pm.removePrivilege(PRIVILEGE_NAME  + "2");
+        pm.remove(PRIVILEGE_NAME + "1");
+        pm.remove(PRIVILEGE_NAME + "2");
         IdRepoUtils.deleteIdentity(REALM, user);
     }
 

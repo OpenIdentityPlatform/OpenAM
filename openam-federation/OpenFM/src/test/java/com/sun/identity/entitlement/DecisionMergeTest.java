@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DecisionMergeTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -74,7 +76,7 @@ public class DecisionMergeTest {
         p1.setEntitlement(e1);
         p1.setSubject(sbj);
         PrivilegeManager mgr = PrivilegeManager.getInstance("/", adminSubject);
-        mgr.addPrivilege(p1);
+        mgr.add(p1);
 
         Map<String, Boolean> actionValues2 = new HashMap<String, Boolean>();
         actionValues2.put("GET", false);
@@ -85,14 +87,14 @@ public class DecisionMergeTest {
         p2.setName("DecisionMergeTestPolicy2");
         p2.setEntitlement(e2);
         p2.setSubject(sbj);
-        mgr.addPrivilege(p2);
+        mgr.add(p2);
     }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
         PrivilegeManager mgr = PrivilegeManager.getInstance("/", adminSubject);
-        mgr.removePrivilege("DecisionMergeTestPolicy1");
-        mgr.removePrivilege("DecisionMergeTestPolicy2");
+        mgr.remove("DecisionMergeTestPolicy1");
+        mgr.remove("DecisionMergeTestPolicy2");
     }
 
     

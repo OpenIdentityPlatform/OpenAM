@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TimeConditionEvaluation.java,v 1.3 2009/10/13 22:37:53 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -74,7 +76,7 @@ public class TimeConditionEvaluation {
         tc.setEndTime("16:00");
 
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 
     @AfterClass
@@ -84,7 +86,7 @@ public class TimeConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     private List<Entitlement> evaluate(String time) throws Exception {
@@ -183,10 +185,10 @@ public class TimeConditionEvaluation {
     public void indefiniteEndTimeTest() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        Privilege p = pm.getPrivilege(PRIVILEGE_NAME);
+        Privilege p = pm.findByName(PRIVILEGE_NAME);
         TimeCondition tc = (TimeCondition)p.getCondition();
         tc.setEndTime(null);
-        pm.modifyPrivilege(p);
+        pm.modify(p);
 
         List<Entitlement> entitlements = evaluate("128999400000");
         if ((entitlements == null) || entitlements.isEmpty()) {

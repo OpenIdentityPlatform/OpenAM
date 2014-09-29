@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DateRangeConditionEvaluation.java,v 1.2 2009/10/13 22:37:53 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -73,7 +75,7 @@ public class DateRangeConditionEvaluation {
         tc.setStartDate("2008:01:01");
         tc.setEndDate("2010:01:01");
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 
     @AfterClass
@@ -83,7 +85,7 @@ public class DateRangeConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test
@@ -116,10 +118,10 @@ public class DateRangeConditionEvaluation {
     public void negativeTest() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        Privilege p = pm.getPrivilege(PRIVILEGE_NAME);
+        Privilege p = pm.findByName(PRIVILEGE_NAME);
         TimeCondition tc = (TimeCondition)p.getCondition();
         tc.setEndDate("2008:01:02");
-        pm.modifyPrivilege(p);
+        pm.modify(p);
         boolean result = evaluate();
         if (result) {
             throw new Exception("DateRangeConditionEvaluation.negativeTest fails");
@@ -130,10 +132,10 @@ public class DateRangeConditionEvaluation {
     public void indefiniteEndDate() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        Privilege p = pm.getPrivilege(PRIVILEGE_NAME);
+        Privilege p = pm.findByName(PRIVILEGE_NAME);
         TimeCondition tc = (TimeCondition)p.getCondition();
         tc.setEndDate(null);
-        pm.modifyPrivilege(p);
+        pm.modify(p);
         boolean result = evaluate();
         if (!result) {
             throw new Exception("DateRangeConditionEvaluation.indefiniteEndDate fails");

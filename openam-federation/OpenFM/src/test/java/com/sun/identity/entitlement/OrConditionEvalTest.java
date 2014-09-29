@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OrConditionEvalTest.java,v 1.1 2009/09/05 00:24:03 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -78,7 +80,7 @@ public class OrConditionEvalTest {
 
             PrivilegeManager pm = PrivilegeManager.getInstance("/",
                     adminSubject);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
             Thread.sleep(1000);
         }
     }
@@ -88,7 +90,7 @@ public class OrConditionEvalTest {
         if (migrated) {
             PrivilegeManager pm = PrivilegeManager.getInstance("/",
                     adminSubject);
-            pm.removePrivilege(PRIVILEGE_NAME);
+            pm.remove(PRIVILEGE_NAME);
         }
     }
 

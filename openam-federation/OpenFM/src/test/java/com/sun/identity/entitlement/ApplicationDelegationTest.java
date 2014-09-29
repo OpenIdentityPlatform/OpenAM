@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ApplicationDelegationTest.java,v 1.2 2009/11/12 18:37:39 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -108,8 +110,8 @@ public class ApplicationDelegationTest {
         }
 
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME1);
-        pm.removePrivilege(PRIVILEGE_NAME2);
+        pm.remove(PRIVILEGE_NAME1);
+        pm.remove(PRIVILEGE_NAME2);
 
         ApplicationPrivilegeManager apm =
             ApplicationPrivilegeManager.getInstance("/", adminSubject);
@@ -132,14 +134,14 @@ public class ApplicationDelegationTest {
         privilege1.setName(PRIVILEGE_NAME1);
         privilege1.setEntitlement(entitlement);
         privilege1.setSubject(subject);
-        pm.addPrivilege(privilege1);
+        pm.add(privilege1);
 
         Privilege privilege2 = Privilege.getNewInstance();
         privilege2.setName(PRIVILEGE_NAME2);
         entitlement.setResourceName(DELEGATED_RESOURCE);
         privilege2.setEntitlement(entitlement);
         privilege2.setSubject(subject);
-        pm.addPrivilege(privilege2);
+        pm.add(privilege2);
     }
 
     private void createDelegationPrivilege()
@@ -229,7 +231,7 @@ public class ApplicationDelegationTest {
             Privilege.NAME_ATTRIBUTE, PRIVILEGE_NAME + "*"));
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             testUserSubject);
-        Set<String> names = pm.searchPrivilegeNames(filter);
+        Set<String> names = pm.searchNames(filter);
 
         // there are two privileges created in this test.
         // test user should be able to see only one.

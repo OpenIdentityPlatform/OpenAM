@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: MultiWildcardEvalTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -61,14 +63,14 @@ public class MultiWildcardEvalTest {
         p1.setSubject(sbj);
         PrivilegeManager mgr = PrivilegeManager.getInstance("/",
             adminSubject);
-        mgr.addPrivilege(p1);
+        mgr.add(p1);
     }
 
     @AfterClass
     public void cleanup() throws Exception {
         PrivilegeManager mgr = PrivilegeManager.getInstance("/",
             adminSubject);
-        mgr.removePrivilege("MultiWildcardEvalTest");
+        mgr.remove("MultiWildcardEvalTest");
     }
 
     @Test

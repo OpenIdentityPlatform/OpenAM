@@ -24,7 +24,7 @@
  *
  * $Id: SubRealmObserver.java,v 1.3 2010/01/20 17:01:36 veiming Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -144,7 +144,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
                 realm, adminSubject);
 
             for (String name : referralNames) {
-                ReferralPrivilege referral = rfm.getReferral(name);
+                ReferralPrivilege referral = rfm.findByName(name);
                 Set<String> realms = referral.getRealms();
 
                 for (Iterator<String> i = realms.iterator(); i.hasNext(); ) {
@@ -155,7 +155,7 @@ public class SubRealmObserver implements ServiceListener, SetupListener {
                 }
 
                 if (realms.isEmpty()) {
-                    rfm.delete(name);
+                    rfm.remove(name);
                 } else {
                     referral.setRealms(realms);
                     rfm.modify(referral);

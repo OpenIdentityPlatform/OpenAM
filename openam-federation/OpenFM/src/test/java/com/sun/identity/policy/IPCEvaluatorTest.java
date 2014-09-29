@@ -23,19 +23,19 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IPCEvaluatorTest.java,v 1.1 2009/08/21 05:27:00 dillidorai Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 package com.sun.identity.policy;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.authentication.internal.server.AuthSPrincipal;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.IPCondition;
 import com.sun.identity.entitlement.Privilege;
@@ -52,8 +52,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.unittest.UnittestLog;
 
 import java.security.AccessController;
-import java.security.Principal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -124,7 +122,7 @@ public class IPCEvaluatorTest {
                     "100.100.100.100", "200.200.200.200");
             privilege.setCondition(ec);
 
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
         } catch (Exception e) {
             UnittestLog.logError("IPCEvaluatorTest.setup():hit exception");
             UnittestLog.logError("Exception STACKTRACE, message:"
@@ -154,7 +152,7 @@ public class IPCEvaluatorTest {
         Subject adminSubject = SubjectUtils.createSubject(adminToken);
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
                 adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME1);
+        pm.remove(PRIVILEGE_NAME1);
 
         AMIdentityRepository amir = new AMIdentityRepository(
                 adminToken, "/");

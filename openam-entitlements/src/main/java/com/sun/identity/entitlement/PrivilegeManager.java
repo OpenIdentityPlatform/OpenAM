@@ -23,8 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeManager.java,v 1.8 2010/01/26 20:10:15 dillidorai Exp $
- */
-/**
+ *
  * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
@@ -43,15 +42,14 @@ import javax.security.auth.Subject;
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
  */
-public abstract class PrivilegeManager {
+public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     /**
      * Debug for Policy Administration Point classes
      */
     public static final Debug debug = Debug.getInstance("Entitlement");
 
     //REF: make configurable
-    private static final Pattern PRIVILEGE_NAME_PATTERN = Pattern.compile(
-        "[a-zA-Z0-9\\- _]*");
+    private static final Pattern PRIVILEGE_NAME_PATTERN = Pattern.compile("[a-zA-Z0-9\\- _]*");
     public static final Subject superAdminSubject = new Subject();
 
     private String realm;
@@ -59,15 +57,11 @@ public abstract class PrivilegeManager {
 
     /**
      * Returns instance of configured <code>PrivilegeManager</code>
-     * @param subject subject that would be used for the privilege management 
-     * operations
+     * @param subject subject that would be used for the privilege management operations
      * @return instance of configured <code>PrivilegeManager</code>
      */
-    static public PrivilegeManager getInstance(
-        String realm,
-        Subject subject) {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            subject, realm);
+    static public PrivilegeManager getInstance(String realm, Subject subject) {
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(subject, realm);
         if (!ec.migratedToEntitlementService()) {
             throw new UnsupportedOperationException(
                 "Updating of DITs is required before using the entitlement service");
@@ -75,8 +69,7 @@ public abstract class PrivilegeManager {
         PrivilegeManager pm = null;
         try {
             //RFE: read the class name from configuration
-            Class clazz = Class.forName(
-                "com.sun.identity.entitlement.opensso.PolicyPrivilegeManager");
+            Class clazz = Class.forName("com.sun.identity.entitlement.opensso.PolicyPrivilegeManager");
             pm = (PrivilegeManager)clazz.newInstance();
             pm.initialize(realm, subject);
         } catch (ClassNotFoundException e) {
@@ -109,26 +102,13 @@ public abstract class PrivilegeManager {
     /**
      * Returns a privilege.
      *
-     * @param privilegeName name for the privilege to be returned
+     * @param name name for the privilege to be returned
      * @param subject Subject to be used to obtain the privilege.
-     * @throws EntitlementException if privilege is not found.
+     * @throws EntitlementException if privilege is not found or if the provided subject is not permitted to access it.
      */
-    public abstract Privilege getPrivilege(
-        String privilegeName,
-        Subject subject)
-            throws EntitlementException;
+    public abstract Privilege findByName(String name, Subject subject) throws EntitlementException;
 
-    /**
-     * Returns a privilege.
-     *
-     * @param privilegeName name for the privilege to be returned
-     * @throws EntitlementException if privilege is not found.
-     */
-    public abstract Privilege getPrivilege(String privilegeName)
-            throws EntitlementException;
-
-    protected void validatePrivilege(Privilege privilege)
-        throws EntitlementException {
+    protected void validate(Privilege privilege) throws EntitlementException {
         String pName = privilege.getName();
         if ((pName == null) || (pName.trim().length() == 0)) {
             throw new EntitlementException(3);
@@ -142,14 +122,14 @@ public abstract class PrivilegeManager {
     }
 
     /**
-     * Adds a privilege.
+     * Add a privilege.
      *
-     * @param privilege privilege to be added
-     * @throws EntitlementException if the privilege could not be added
+     * @param privilege privilege to add.
+     * @throws EntitlementException if privilege cannot be added.
      */
-    public void addPrivilege(Privilege privilege)
-        throws EntitlementException {
-        validatePrivilege(privilege);
+    @Override
+    public void add(Privilege privilege) throws EntitlementException {
+        validate(privilege);
         Date date = new Date();
         privilege.validateResourceNames(adminSubject, realm);
         privilege.setCreationDate(date.getTime());
@@ -166,26 +146,6 @@ public abstract class PrivilegeManager {
     }
 
     /**
-     * Removes a privilege.
-     *
-     * @param privilegeName name of the privilege to be removed
-     * @throws EntitlementException if privilege cannot be removed.
-     */
-    public void removePrivilege(String privilegeName)
-        throws EntitlementException {
-        
-    }
-
-    /**
-     * Modifies a privilege.
-     *
-     * @param privilege the privilege to be modified
-     * @throws EntitlementException if privilege cannot be modified.
-     */
-    public abstract void modifyPrivilege(Privilege privilege)
-        throws EntitlementException;
-
-    /**
      * Modifies the specified policy.
      *
      * @param existingName
@@ -196,7 +156,7 @@ public abstract class PrivilegeManager {
      * @throws EntitlementException
      *         When an error occurs during modification
      */
-    public abstract void modifyPrivilege(String existingName, Privilege privilege) throws EntitlementException;
+    public abstract void modify(String existingName, Privilege privilege) throws EntitlementException;
 
     /**
      * Returns a set of privilege names for a given search criteria.
@@ -207,13 +167,11 @@ public abstract class PrivilegeManager {
      * @return a set of privilege names for a given search criteria.
      * @throws EntitlementException if search failed.
      */
-    public Set<String> searchPrivilegeNames(
-        Set<SearchFilter> filter,
-        int searchSizeLimit,
-        int searchTimeLimit
-    ) throws EntitlementException {
+    @Override
+    public Set<String> searchNames(Set<SearchFilter> filter, int searchSizeLimit, int searchTimeLimit)
+            throws EntitlementException {
 
-        List<Privilege> privileges = searchPrivileges(filter, searchSizeLimit, searchTimeLimit);
+        List<Privilege> privileges = search(filter, searchSizeLimit, searchTimeLimit);
         Set<String> result = new HashSet<String>(privileges.size());
 
         for (Privilege privilege : privileges) {
@@ -232,20 +190,20 @@ public abstract class PrivilegeManager {
      * @return the matching privileges.
      * @throws EntitlementException if the search fails for any reason.
      */
-    public List<Privilege> searchPrivileges(Set<SearchFilter> filter, int searchSizeLimit, int searchTimeLimit)
+    public List<Privilege> search(Set<SearchFilter> filter, int searchSizeLimit, int searchTimeLimit)
             throws EntitlementException {
         boolean hasSizeLimit = (searchSizeLimit > 0);
 
         PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, realm);
-        Set<String> privilegeNames = pis.searchPrivilegeNames(filter, true, searchSizeLimit, false, false); // TODO Search time limit
+        Set<String> privilegeNames = pis.searchPrivilegeNames(filter, true, searchSizeLimit, false, false);
+        // TODO Search time limit
 
         List<Privilege> results = new ArrayList<Privilege>(privilegeNames.size());
 
-        ApplicationPrivilegeManager applPrivilegeMgr =
-                ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+        ApplicationPrivilegeManager applPrivilegeMgr = ApplicationPrivilegeManager.getInstance(realm, adminSubject);
 
         for (String name : privilegeNames) {
-            Privilege privilege = getPrivilege(name, PrivilegeManager.superAdminSubject);
+            Privilege privilege = findByName(name, PrivilegeManager.superAdminSubject);
 
             if (applPrivilegeMgr.hasPrivilege(privilege, ApplicationPrivilege.Action.READ)) {
                 results.add(privilege);
@@ -266,8 +224,8 @@ public abstract class PrivilegeManager {
      * @return the matching privileges.
      * @throws EntitlementException if the search fails for any reason.
      */
-    public List<Privilege> searchPrivileges(Set<SearchFilter> filter) throws EntitlementException {
-        return searchPrivileges(filter, 0, 0);
+    public List<Privilege> search(Set<SearchFilter> filter) throws EntitlementException {
+        return search(filter, 0, 0);
     }
 
     /**
@@ -277,10 +235,9 @@ public abstract class PrivilegeManager {
      * @return a set of privilege names for a given search criteria.
      * @throws EntitlementException if search failed.
      */
-    public Set<String> searchPrivilegeNames(
-        Set<SearchFilter> filter
-    ) throws EntitlementException {
-        return searchPrivilegeNames(filter, 0, 0);
+    @Override
+    public Set<String> searchNames(Set<SearchFilter> filter) throws EntitlementException {
+        return searchNames(filter, 0, 0);
     }
 
     /**
@@ -300,8 +257,7 @@ public abstract class PrivilegeManager {
      * @throws EntitlementException if privilege is not found, or cannot
      * be obtained.
      */
-    public abstract String getPrivilegeXML(String name)
-        throws EntitlementException;
+    public abstract String getPrivilegeXML(String name) throws EntitlementException;
 
     /**
      * Returns the XML representation of this privilege.
@@ -311,17 +267,13 @@ public abstract class PrivilegeManager {
      * @throws EntitlementException if a specified privilege is not found, or cannot
      * be obtained.
      */
-    public abstract String getPrivilegesXML(Set<String> names)
-        throws EntitlementException;
+    public abstract String getPrivilegesXML(Set<String> names) throws EntitlementException;
 
     protected Subject getAdminSubject() {
         return adminSubject;
     }
 
-    protected void notifyPrivilegeChanged(
-        String realm,
-        Privilege previous,
-        Privilege current) {
+    protected void notifyPrivilegeChanged(String realm, Privilege previous, Privilege current) {
         Set<String> resourceNames = new HashSet<String>();
         if (previous != null) {
             Set<String> r = previous.getEntitlement().getResourceNames();

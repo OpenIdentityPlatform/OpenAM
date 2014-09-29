@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OrgAliasReferralTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -101,7 +103,7 @@ public class OrgAliasReferralTest {
         p1.setSubject(sbj);
         PrivilegeManager mgr = PrivilegeManager.getInstance(SUB_REALM1,
             adminSubject);
-        mgr.addPrivilege(p1);
+        mgr.add(p1);
     }
 
     @Test

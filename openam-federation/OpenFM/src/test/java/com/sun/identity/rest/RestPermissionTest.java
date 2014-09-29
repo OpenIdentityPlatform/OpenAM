@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RestPermissionTest.java,v 1.4 2009/12/11 09:24:43 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.rest;
@@ -112,7 +114,7 @@ public class RestPermissionTest {
         privilege.setEntitlement(entitlement);
         EntitlementSubject sbj = new AuthenticatedESubject();
         privilege.setSubject(sbj);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 
     private void login() throws Exception {
@@ -137,7 +139,7 @@ public class RestPermissionTest {
     public void cleanup() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
         IdRepoUtils.deleteIdentity(REALM, group);
         IdRepoUtils.deleteIdentity(REALM, user);
     }

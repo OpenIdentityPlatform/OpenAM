@@ -82,13 +82,13 @@ public class PrivilegePolicyStoreTest {
         // Given
         String id = "testPolicy";
         Privilege policy = new StubPrivilege();
-        given(mockManager.getPrivilege(id)).willReturn(policy);
+        given(mockManager.findByName(id)).willReturn(policy);
 
         // When
         Privilege response = testStore.read(id);
 
         // Then
-        verify(mockManager).getPrivilege(id);
+        verify(mockManager).findByName(id);
         assertThat(response).isSameAs(policy);
     }
 
@@ -101,7 +101,7 @@ public class PrivilegePolicyStoreTest {
         Privilege response = testStore.create(policy);
 
         // Then
-        verify(mockManager).addPrivilege(policy);
+        verify(mockManager).add(policy);
         assertThat(response).isSameAs(policy);
     }
 
@@ -115,7 +115,7 @@ public class PrivilegePolicyStoreTest {
         Privilege response = testStore.update(name, policy);
 
         // Then
-        verify(mockManager).modifyPrivilege(name, policy);
+        verify(mockManager).modify(name, policy);
         assertThat(response).isSameAs(policy);
     }
 
@@ -129,7 +129,7 @@ public class PrivilegePolicyStoreTest {
         testStore.delete(id);
 
         // Then
-        verify(mockManager).removePrivilege(id);
+        verify(mockManager).remove(id);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(Collections.<SearchFilter>emptySet());
+        verify(mockManager).search(Collections.<SearchFilter>emptySet());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class PrivilegePolicyStoreTest {
         QueryRequest request = mockQueryRequest(QueryFilter.alwaysTrue());
         List<Privilege> policies = Arrays.<Privilege>asList(
                 new StubPrivilege("one"), new StubPrivilege("two"), new StubPrivilege("three"));
-        given(mockManager.searchPrivileges(anySetOf(SearchFilter.class))).willReturn(policies);
+        given(mockManager.search(anySetOf(SearchFilter.class))).willReturn(policies);
 
         // When
         List<Privilege> result = testStore.query(request);
@@ -181,7 +181,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(singleton(new SearchFilter(STRING_ATTRIBUTE, value)));
+        verify(mockManager).search(singleton(new SearchFilter(STRING_ATTRIBUTE, value)));
     }
 
     @DataProvider(name = "SupportedQueryOperators")
@@ -208,7 +208,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(singleton(
+        verify(mockManager).search(singleton(
                 new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator)));
     }
 
@@ -254,7 +254,7 @@ public class PrivilegePolicyStoreTest {
 
         // Then
         // Date should be converted into a time-stamp long value
-        verify(mockManager).searchPrivileges(
+        verify(mockManager).search(
                 singleton(new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator)));
     }
 
@@ -282,7 +282,7 @@ public class PrivilegePolicyStoreTest {
         testStore.query(request);
 
         // Then
-        verify(mockManager).searchPrivileges(
+        verify(mockManager).search(
                 asSet(new SearchFilter(STRING_ATTRIBUTE, value1),
                         new SearchFilter(STRING_ATTRIBUTE, value2)));
     }

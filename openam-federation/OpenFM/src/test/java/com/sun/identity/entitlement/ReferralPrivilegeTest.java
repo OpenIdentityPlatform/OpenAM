@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferralPrivilegeTest.java,v 1.1 2009/12/07 19:46:50 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -118,7 +120,7 @@ public class ReferralPrivilegeTest {
         EntitlementSubject eSubject = new OpenSSOUserSubject(
             user.getUniversalId());
         p.setSubject(eSubject);
-        pm.addPrivilege(p);
+        pm.add(p);
     }
 
     @AfterClass
@@ -128,7 +130,7 @@ public class ReferralPrivilegeTest {
         }
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             adminSubject);
-        mgr.delete(REFERRAL_NAME);
+        mgr.remove(REFERRAL_NAME);
 
         IdRepoUtils.deleteIdentity("/", user);
         OrganizationConfigManager ocm = new OrganizationConfigManager(

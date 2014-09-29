@@ -24,6 +24,7 @@
  *
  * $Id: CreateXACML.java,v 1.3 2010/01/11 01:21:01 dillidorai Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 /*
@@ -135,7 +136,7 @@ public class CreateXACML extends AuthenticatedCommand {
                     if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
                         rpm.add(XACMLPrivilegeUtils.policyToReferral(policy));
                     } else {
-                        pm.addPrivilege(
+                        pm.add(
                                 XACMLPrivilegeUtils.policyToPrivilege(policy));
                     }
                 }

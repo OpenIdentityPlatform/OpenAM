@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DelegationPrivilegeIdRepoAccessTest.java,v 1.3 2009/12/18 21:56:56 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -120,7 +122,7 @@ public class DelegationPrivilegeIdRepoAccessTest {
 
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             SubjectUtils.createSuperAdminSubject());
-        mgr.delete(REFERRAL_NAME);
+        mgr.remove(REFERRAL_NAME);
 
         OrganizationConfigManager orgMgr = new OrganizationConfigManager(
             adminToken, "/");

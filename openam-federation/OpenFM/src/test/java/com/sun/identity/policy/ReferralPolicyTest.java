@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferralPolicyTest.java,v 1.2 2009/09/25 05:52:56 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.policy;
@@ -168,7 +170,7 @@ public class ReferralPolicyTest {
             adminSubject);
         SearchFilter f = new SearchFilter(
             Privilege.NAME_ATTRIBUTE, "*");
-        ReferralPrivilege ref = rfm.getReferral(REFERRAL_POLICY_NAME1);
+        ReferralPrivilege ref = rfm.findByName(REFERRAL_POLICY_NAME1);
         Map<String, Set<String>> map = ref.getMapApplNameToResources();
         if ((map == null) || map.isEmpty()) {
             throw new Exception("ReferralPolicyTest.getReferralInRootRealm: " +

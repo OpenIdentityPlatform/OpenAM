@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeResource.java,v 1.5 2009/12/15 00:44:19 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.rest;
@@ -70,8 +72,8 @@ public class PrivilegeResource extends ResourceBase {
         try {
             Subject caller = getCaller(request);
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
-            Set<String> privilegeNames = pm.searchPrivilegeNames(
-                getFilters(filters));
+            Set<String> privilegeNames = pm.searchNames(
+                    getFilters(filters));
             JSONObject jo = new JSONObject();
             jo.put(RESULT, privilegeNames);
             return createResponseJSONString(200, headers, jo);
@@ -99,7 +101,7 @@ public class PrivilegeResource extends ResourceBase {
             Subject caller = getCaller(request);
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
             Privilege privilege = Privilege.getNewInstance(jsonString);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
             return createResponseJSONString(201, headers, "Created");
         } catch (JSONException e) {
             PrivilegeManager.debug.error(
@@ -130,19 +132,19 @@ public class PrivilegeResource extends ResourceBase {
             Subject caller = getCaller(request);
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
             Privilege privilege = Privilege.getNewInstance(jsonString);
-            pm.modifyPrivilege(privilege);
+            pm.modify(privilege);
             return createResponseJSONString(200, headers, "OK");
         } catch (JSONException e) {
             PrivilegeManager.debug.error(
-                "PrivilegeResource.modifyPrivilege", e);
+                "PrivilegeResource.modify", e);
             throw getWebApplicationException(e, MimeType.JSON);
         } catch (RestException e) {
             PrivilegeManager.debug.error(
-                "PrivilegeResource.modifyPrivilege", e);
+                "PrivilegeResource.modify", e);
             throw getWebApplicationException(headers, e, MimeType.JSON);
         } catch (EntitlementException e) {
             PrivilegeManager.debug.error(
-                "PrivilegeResource.modifyPrivilege", e);
+                "PrivilegeResource.modify", e);
             throw getWebApplicationException(headers, e, MimeType.JSON);
         }
     }
@@ -159,7 +161,7 @@ public class PrivilegeResource extends ResourceBase {
         try {
             Subject caller = getCaller(request);
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
-            Privilege privilege = pm.getPrivilege(name);
+            Privilege privilege = pm.findByName(name);
             JSONObject jo = new JSONObject();
             jo.put(RESULT, privilege.toMinimalJSONObject());
             return createResponseJSONString(200, headers, jo);
@@ -187,7 +189,7 @@ public class PrivilegeResource extends ResourceBase {
         try {
             Subject caller = getCaller(request);
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
-            pm.removePrivilege(name);
+            pm.remove(name);
             return createResponseJSONString(200, headers, "OK");
         } catch (JSONException e) {
             PrivilegeManager.debug.error(

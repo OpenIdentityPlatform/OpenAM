@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: XACMLExportTest.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -38,7 +40,6 @@ import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.unittest.UnittestLog;
 
 import java.io.ByteArrayInputStream;
 import java.security.AccessController;
@@ -159,7 +160,7 @@ public class XACMLExportTest {
         privilege1.setCondition(ipc);
         //privilege.setResourceAttributes(ra);
 
-        pm.addPrivilege(privilege1);
+        pm.add(privilege1);
 
         //UnittestLog.logMessage("XACMLExportTest.setup(), added privilege:" +
                 //"Privilege1=" + privilege1.toString());
@@ -170,14 +171,14 @@ public class XACMLExportTest {
             throws SSOException, IdRepoException, EntitlementException,
             SMSException, InstantiationException, IllegalAccessException {
         //UnittestLog.logMessage("XACMLExportTest.deletePrivilege(), cleanup");
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test
     public void testListXACML() throws EntitlementException {
         //UnittestLog.logMessage("XACMLExportTest.testListXACML()");
         Set<Privilege> privileges = new HashSet<Privilege>();
-        Privilege privilege = pm.getPrivilege(PRIVILEGE_NAME, adminSubject);
+        Privilege privilege = pm.findByName(PRIVILEGE_NAME, adminSubject);
         privileges.add(privilege);
         PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet("/", privileges);
         policySetXML = XACMLPrivilegeUtils.toXML(policySet);
@@ -188,7 +189,7 @@ public class XACMLExportTest {
             throws SSOException, IdRepoException, EntitlementException,
             SMSException, InstantiationException, IllegalAccessException {
         //UnittestLog.logMessage("XACMLExportTest.testDeleteXACML()");
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test(dependsOnMethods={"testDeleteXACML"})
@@ -211,6 +212,6 @@ public class XACMLExportTest {
             throw new Exception("privielge is null");
         }
         assert privilege.equals(privilege1);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 }

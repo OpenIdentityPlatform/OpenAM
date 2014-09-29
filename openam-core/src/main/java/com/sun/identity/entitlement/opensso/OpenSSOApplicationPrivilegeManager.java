@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOApplicationPrivilegeManager.java,v 1.16 2010/01/11 20:15:46 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -127,7 +129,7 @@ public class OpenSSOApplicationPrivilegeManager extends
             dsameUserSubject);
 
         for (Privilege p : privileges) {
-            pm.addPrivilege(p);
+            pm.add(p);
         }
         
         cachePrivilege(privileges[0]);
@@ -165,8 +167,8 @@ public class OpenSSOApplicationPrivilegeManager extends
         if (isDsameUser() || delegatables.hasPrivilege(name)) {
             PrivilegeManager pm = PrivilegeManager.getInstance(
                 getHiddenRealmDN(), dsameUserSubject);
-            pm.removePrivilege(name);
-            pm.removePrivilege(GHOST_PRIVILEGE_NAME_PREFIX + name);
+            pm.remove(name);
+            pm.remove(GHOST_PRIVILEGE_NAME_PREFIX + name);
             readables.removePrivilege(name);
             modifiables.removePrivilege(name);
             delegatables.removePrivilege(name);
@@ -182,9 +184,9 @@ public class OpenSSOApplicationPrivilegeManager extends
             Privilege[] privileges = toPrivilege(appPrivilege);
             PrivilegeManager pm = PrivilegeManager.getInstance(
                 getHiddenRealmDN(), dsameUserSubject);
-            pm.modifyPrivilege(privileges[0]);
+            pm.modify(privileges[0]);
             cachePrivilege(privileges[0]);
-            pm.modifyPrivilege(privileges[1]);
+            pm.modify(privileges[1]);
             cachePrivilege(privileges[1]);
         } else {
             throw new EntitlementException(326);
@@ -849,8 +851,8 @@ public class OpenSSOApplicationPrivilegeManager extends
             String name = p.getName();
             PrivilegeManager pm = PrivilegeManager.getInstance(
                 getHiddenRealmDN(), dsameUserSubject);
-            pm.removePrivilege(name);
-            pm.removePrivilege(GHOST_PRIVILEGE_NAME_PREFIX + name);
+            pm.remove(name);
+            pm.remove(GHOST_PRIVILEGE_NAME_PREFIX + name);
         }
     }
 

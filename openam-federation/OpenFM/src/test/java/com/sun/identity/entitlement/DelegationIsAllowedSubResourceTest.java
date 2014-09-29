@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DelegationIsAllowedSubResourceTest.java,v 1.3 2009/12/22 18:00:24 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -107,7 +109,7 @@ public class DelegationIsAllowedSubResourceTest {
         }
 
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME1);
+        pm.remove(PRIVILEGE_NAME1);
 
         ApplicationPrivilegeManager apm =
             ApplicationPrivilegeManager.getInstance("/", adminSubject);
@@ -130,7 +132,7 @@ public class DelegationIsAllowedSubResourceTest {
         privilege1.setName(PRIVILEGE_NAME1);
         privilege1.setEntitlement(entitlement);
         privilege1.setSubject(subject);
-        pm.addPrivilege(privilege1);
+        pm.add(privilege1);
     }
 
     private void createDelegationPrivilege()

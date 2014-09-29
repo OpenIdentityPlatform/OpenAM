@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: MultipleResourceEval.java,v 1.1 2009/09/10 16:35:38 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -70,7 +72,7 @@ public class MultipleResourceEval {
             privilege.setName(PRIVILEGE_NAME + "1");
             privilege.setEntitlement(ent);
             privilege.setSubject(new AnyUserSubject());
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
         }
         {
             Map<String, Boolean> actions = new HashMap<String, Boolean>();
@@ -81,7 +83,7 @@ public class MultipleResourceEval {
             privilege.setName(PRIVILEGE_NAME + "2");
             privilege.setEntitlement(ent);
             privilege.setSubject(new AnyUserSubject());
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
         }
 
         Thread.sleep(1000);
@@ -94,8 +96,8 @@ public class MultipleResourceEval {
         }
         
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME + "1");
-        pm.removePrivilege(PRIVILEGE_NAME + "2");
+        pm.remove(PRIVILEGE_NAME + "1");
+        pm.remove(PRIVILEGE_NAME + "2");
     }
 
     @Test

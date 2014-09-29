@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenProvisioning.java,v 1.1 2009/08/19 05:41:02 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.policy;
@@ -111,7 +113,7 @@ public class OpenProvisioning {
         privilege.setEntitlement(entitlement);
         privilege.setSubject(sbj);
         privilege.setCondition(cond);
-        pMgr.addPrivilege(privilege);
+        pMgr.add(privilege);
     }
 
     @AfterClass
@@ -129,7 +131,7 @@ public class OpenProvisioning {
 
         PrivilegeManager pMgr = new PolicyPrivilegeManager();
         pMgr.initialize("/", SubjectUtils.createSubject(adminToken));
-        pMgr.removePrivilege(PRIVILEGE_NAME);
+        pMgr.remove(PRIVILEGE_NAME);
     }
 
     private AMIdentity createUser(AMIdentityRepository amir, String id)

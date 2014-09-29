@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: HttpStarEvaluationTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -63,13 +65,13 @@ public class HttpStarEvaluationTest {
             actions);
         privilege.setEntitlement(entitlement);
         privilege.setSubject(new AuthenticatedESubject());
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(POLICY_NAME);
+        pm.remove(POLICY_NAME);
     }
 
     @Test

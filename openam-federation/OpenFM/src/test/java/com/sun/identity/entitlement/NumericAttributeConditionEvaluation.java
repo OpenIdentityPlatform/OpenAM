@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: NumericAttributeConditionEvaluation.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -74,7 +76,7 @@ public class NumericAttributeConditionEvaluation {
         tc.setValue(10f);
         tc.setOperator(NumericAttributeCondition.Operator.GREATER_THAN);
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
         Thread.sleep(1000);
     }
 
@@ -85,7 +87,7 @@ public class NumericAttributeConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test

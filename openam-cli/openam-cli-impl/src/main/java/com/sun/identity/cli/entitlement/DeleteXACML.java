@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DeleteXACML.java,v 1.1 2009/11/25 18:54:08 dillidorai Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.cli.entitlement;
@@ -117,7 +119,7 @@ public class DeleteXACML extends AuthenticatedCommand {
                 params[1] = currentPolicyName;
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                     "ATTEMPT_DELETE_POLICY_IN_REALM", params);
-                pm.removePrivilege(currentPolicyName);
+                pm.remove(currentPolicyName);
                 writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                     "SUCCEED_DELETE_POLICY_IN_REALM", params);
             }

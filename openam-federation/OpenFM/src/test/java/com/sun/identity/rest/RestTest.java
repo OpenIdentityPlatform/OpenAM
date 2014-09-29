@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RestTest.java,v 1.3 2009/11/24 23:08:35 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.rest;
@@ -52,7 +54,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Cookie;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -103,7 +104,7 @@ public class RestTest {
             cond.setOperator(NumericAttributeCondition.Operator.EQUAL);
             cond.setValue(ATTR_VAL);
             privilege.setCondition(cond);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
             user = IdRepoUtils.createAgent(REALM, AGENT_NAME);
             SSOToken ssoToken = AuthUtils.authenticate(REALM, AGENT_NAME,
                 AGENT_NAME);
@@ -140,7 +141,7 @@ public class RestTest {
     public void cleanup() throws Exception {
         PrivilegeManager pm = PrivilegeManager.getInstance(REALM,
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
         IdRepoUtils.deleteIdentity(REALM, user);
     }
 

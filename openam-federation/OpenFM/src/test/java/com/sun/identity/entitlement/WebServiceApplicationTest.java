@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: WebServiceApplicationTest.java,v 1.1 2009/08/19 05:41:01 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -90,16 +92,16 @@ public class WebServiceApplicationTest {
             actions);
         privilege.setEntitlement(entitlement);
         privilege.setSubject(new AuthenticatedESubject());
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
 
-        Privilege p = pm.getPrivilege(POLICY_NAME);
+        Privilege p = pm.findByName(POLICY_NAME);
     }
 
     @AfterClass
     public void cleanup() throws EntitlementException {
         ApplicationManager.deleteApplication(adminSubject, "/", APPL_NAME);
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(POLICY_NAME);
+        pm.remove(POLICY_NAME);
     }
 
     @Test

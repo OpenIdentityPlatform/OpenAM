@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RealmRemovedTest.java,v 1.1 2010/01/11 20:15:45 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -89,7 +91,7 @@ public class RealmRemovedTest {
         }
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             adminSubject);
-        mgr.delete(REFERRAL_NAME2);
+        mgr.remove(REFERRAL_NAME2);
         OrganizationConfigManager ocm = new OrganizationConfigManager(
             adminToken, "/");
         String subRealm = SUB_REALM2.substring(1);
@@ -148,7 +150,7 @@ public class RealmRemovedTest {
             adminSubject);
         // referral privilege that only referral subrealm 1 should be removed.
         try {
-            ReferralPrivilege r = rpm.getReferral(REFERRAL_NAME1);
+            ReferralPrivilege r = rpm.findByName(REFERRAL_NAME1);
         } catch (EntitlementException e) {
             if (e.getErrorCode() != 263) {
                 throw e;
@@ -156,7 +158,7 @@ public class RealmRemovedTest {
         }
         // referral privilege that only referral subrealm 1 should NOT be
         // removed.
-        ReferralPrivilege r = rpm.getReferral(REFERRAL_NAME2);
+        ReferralPrivilege r = rpm.findByName(REFERRAL_NAME2);
         Set<String> realms = r.getRealms();
         if ((realms.size() != 1) || !realms.contains(SUB_REALM2)) {
             throw new Exception("RealmRemovedTest: referred realm is incorrect");

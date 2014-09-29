@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TestAttributeEvaluator.java,v 1.2 2009/11/12 18:37:40 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -95,7 +97,7 @@ public class TestAttributeEvaluator {
         privilege.setName(PRIVILEGE1_NAME);
         privilege.setEntitlement(ent);
         privilege.setSubject(es1);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
     }
 
     @AfterClass
@@ -105,7 +107,7 @@ public class TestAttributeEvaluator {
         }
         PrivilegeManager pm = new PolicyPrivilegeManager();
         pm.initialize("/", SubjectUtils.createSubject(adminToken));
-        pm.removePrivilege(PRIVILEGE1_NAME);
+        pm.remove(PRIVILEGE1_NAME);
 
         IdRepoUtils.deleteIdentity("/", user1);
 

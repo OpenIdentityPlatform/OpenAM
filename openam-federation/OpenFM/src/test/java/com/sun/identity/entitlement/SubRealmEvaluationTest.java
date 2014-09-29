@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubRealmEvaluationTest.java,v 1.2 2009/11/12 18:37:39 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -123,7 +125,7 @@ public class SubRealmEvaluationTest {
         privilege.setName(PRIVILEGE1_NAME);
         privilege.setEntitlement(ent);
         privilege.setSubject(eSubject);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
         Thread.sleep(1000);
     }
 
@@ -137,7 +139,7 @@ public class SubRealmEvaluationTest {
             AdminTokenAction.getInstance());
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             adminSubject);
-        mgr.delete(REFERRAL_NAME);
+        mgr.remove(REFERRAL_NAME);
 
         Set<AMIdentity> identities = new HashSet<AMIdentity>();
         identities.add(user1);

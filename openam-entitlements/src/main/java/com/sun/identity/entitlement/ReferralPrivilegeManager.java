@@ -25,7 +25,7 @@
  * $Id: ReferralPrivilegeManager.java,v 1.7 2010/01/20 17:01:35 veiming Exp $
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -43,7 +43,8 @@ import javax.security.auth.Subject;
 /**
  * Referral Privilege Manager manages referral privilege.
  */
-public final class ReferralPrivilegeManager {
+public final class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivilege> {
+
     private String realm;
     private Subject adminSubject;
 
@@ -59,14 +60,14 @@ public final class ReferralPrivilegeManager {
     }
 
     /**
-     * Adds referral privilege.
+     * Add a referral privilege.
      *
-     * @param referral Referral privilege.
-     * @throws EntitlementException if privilege cannot be added.
+     * @param referral referral privilege to add.
+     * @throws EntitlementException if referral privilege cannot be added.
      */
-    public void add(ReferralPrivilege referral)
-        throws EntitlementException {
-        validateReferral(referral);
+    @Override
+    public void add(ReferralPrivilege referral) throws EntitlementException {
+        validate(referral);
         Date date = new Date();
         referral.setCreationDate(date.getTime());
         referral.setLastModifiedDate(date.getTime());
@@ -87,11 +88,9 @@ public final class ReferralPrivilegeManager {
         notifyPrivilegeChanged(null, referral);
     }
 
-    private void validateReferral(ReferralPrivilege referral)
-        throws EntitlementException {
+    private void validate(ReferralPrivilege referral) throws EntitlementException {
         if (!realm.equals("/")) {
-            Map<String, Set<String>> map =
-                referral.getOriginalMapApplNameToResources();
+            Map<String, Set<String>> map = referral.getOriginalMapApplNameToResources();
             for (String appName : map.keySet()) {
                 Application appl = ApplicationManager.getApplication(
                     PrivilegeManager.superAdminSubject, realm, appName);
@@ -100,17 +99,15 @@ public final class ReferralPrivilegeManager {
                 Set<String> refResources = map.get(appName);
 
                 for (String r : resources) {
-                    validateReferral(referral, comp, r, refResources);
+                    validate(referral, comp, r, refResources);
                 }
             }
         }
     }
 
-    private void validateReferral(
-        ReferralPrivilege referral,
-        ResourceName comp,
-        String res,
-        Set<String> refResources) throws EntitlementException {
+    private void validate(ReferralPrivilege referral, ResourceName comp, String res, Set<String> refResources)
+            throws EntitlementException {
+
         if (!res.endsWith("*")) {
             res += "*";
         }
@@ -126,39 +123,38 @@ public final class ReferralPrivilegeManager {
         throw new EntitlementException(267, param);
     }
 
-    public void addApplicationToSubRealm(ReferralPrivilege referral)
-        throws EntitlementException {
+    public void addApplicationToSubRealm(ReferralPrivilege referral) throws EntitlementException {
         Map<String, Set<String>> map = referral.getMapApplNameToResources();
-        for (String appName : map.keySet()) {
-            Set<String> resources = map.get(appName);
-
+        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+            String appName = entry.getKey();
+            Set<String> resources = entry.getValue();
             for (String r : referral.getRealms()) {
-                ApplicationManager.referApplication(
-                    adminSubject, realm, r, appName, resources);
+                ApplicationManager.referApplication(adminSubject, realm, r, appName, resources);
             }
         }
     }
 
     /**
-     * Returns a referral privilege.
+     * Finds a referral privilege by its unique name.
      *
-     * @param name Name for the referral privilege to be returned
-     * @throws EntitlementException if referral privilege is not found.
+     * @param name name of the referral privilege to be returned
+     * @throws com.sun.identity.entitlement.EntitlementException if referral privilege is not found.
      */
-    public ReferralPrivilege getReferral(String name)
-        throws EntitlementException {
+    @Override
+    public ReferralPrivilege findByName(String name) throws EntitlementException {
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         return pdb.getReferral(adminSubject, realm, name);
     }
 
     /**
-     * Removes a referral privilege.
+     * Remove a referral privilege.
      *
-     * @param name name of referral privilege to be removed.
+     * @param name name of the referral privilege to be removed.
      * @throws EntitlementException if referral privilege cannot be removed.
      */
-    public void delete(String name) throws EntitlementException {
-        ReferralPrivilege referral = getReferral(name);
+    @Override
+    public void remove(String name) throws EntitlementException {
+        ReferralPrivilege referral = findByName(name);
 
         if (referral != null) {
             removeApplicationFromSubRealm(referral);
@@ -168,28 +164,26 @@ public final class ReferralPrivilegeManager {
         }
     }
 
-    private void removeApplicationFromSubRealm(ReferralPrivilege referral)
-        throws EntitlementException {
+    private void removeApplicationFromSubRealm(ReferralPrivilege referral) throws EntitlementException {
         Map<String, Set<String>> map = referral.getMapApplNameToResources();
-        for (String appName : map.keySet()) {
-            Set<String> resources = map.get(appName);
-
+        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+            String appName = entry.getKey();
+            Set<String> resources = entry.getValue();
             for (String r : referral.getRealms()) {
-                ApplicationManager.dereferApplication(
-                    adminSubject, r, appName, resources);
+                ApplicationManager.dereferApplication(adminSubject, r, appName, resources);
             }
         }
     }
 
     /**
-     * Modifies a referral privilege.
+     * Modify a referral privilege.
      *
      * @param referral the referral privilege to be modified
-     * @throws EntitlementException if privilege cannot be modified.
+     * @throws com.sun.identity.entitlement.EntitlementException if referral privilege cannot be modified.
      */
-    public void modify(ReferralPrivilege referral)
-        throws EntitlementException {
-        ReferralPrivilege orig = getReferral(referral.getName());
+    @Override
+    public void modify(ReferralPrivilege referral) throws EntitlementException {
+        ReferralPrivilege orig = findByName(referral.getName());
         if (orig != null) {
             referral.setCreatedBy(orig.getCreatedBy());
             referral.setCreationDate(orig.getCreationDate());
@@ -221,15 +215,13 @@ public final class ReferralPrivilegeManager {
      * @return a set of referral privilege names for a given search criteria.
      * @throws EntitlementException if search failed.
      */
-    public Set<String> searchReferralPrivilegeNames(
-        Set<SearchFilter> filter,
-        int searchSizeLimit,
-        int searchTimeLimit
-    ) throws EntitlementException {
-        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            adminSubject, realm);
-        return pis.searchReferralPrivilegeNames(filter, true, searchSizeLimit,
-            false, false);//TODO Search size and time limit
+    @Override
+    public Set<String> searchNames(Set<SearchFilter> filter, int searchSizeLimit, int searchTimeLimit)
+            throws EntitlementException {
+
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, realm);
+        return pis.searchReferralPrivilegeNames(filter, true, searchSizeLimit, false, false);
+        //TODO Search size and time limit
     }
 
     /**
@@ -239,21 +231,16 @@ public final class ReferralPrivilegeManager {
      * @return a set of privilege names for a given search criteria.
      * @throws EntitlementException if search failed.
      */
-    public Set<String> searchReferralPrivilegeNames(
-        Set<SearchFilter> filter
-    ) throws EntitlementException {
-        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(
-            adminSubject, realm);
+    @Override
+    public Set<String> searchNames(Set<SearchFilter> filter) throws EntitlementException {
+        PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, realm);
         return pis.searchReferralPrivilegeNames(filter, true, 0, false, false);
         //TODO Search size and time limit
     }
 
-    protected void notifyPrivilegeChanged(
-        ReferralPrivilege previous,
-        ReferralPrivilege current) {
+    protected void notifyPrivilegeChanged(ReferralPrivilege previous, ReferralPrivilege current) {
 
-        Map<String, Set<String>> mapApplNameToRes = new
-            HashMap<String, Set<String>>();
+        Map<String, Set<String>> mapApplNameToRes = new HashMap<String, Set<String>>();
 
         if (previous != null) {
             Map<String, Set<String>> m = previous.getMapApplNameToResources();
@@ -270,15 +257,11 @@ public final class ReferralPrivilegeManager {
         String name = current.getName();
         for (String app : mapApplNameToRes.keySet()) {
             Set<String> resourceNames = mapApplNameToRes.get(app);
-            PrivilegeChangeNotifier.getInstance().notify(adminSubject,
-                realm, app, name, resourceNames);
+            PrivilegeChangeNotifier.getInstance().notify(adminSubject, realm, app, name, resourceNames);
         }
     }
 
-    private void combineMap(
-        Map<String, Set<String>> m1,
-        Map<String, Set<String>> m2
-    ) {
+    private void combineMap(Map<String, Set<String>> m1, Map<String, Set<String>> m2) {
         Set<String> keys = new HashSet<String>();
         keys.addAll(m1.keySet());
         keys.addAll(m2.keySet());
@@ -300,20 +283,15 @@ public final class ReferralPrivilegeManager {
     /**
      * Returns the referred privileges for a given realm.
      */
-    public Map<String, Set<ReferralPrivilege>> getReferredPrivileges(
-        String targetRealm
-    ) throws EntitlementException {
-        if ((realm == null) || (realm.trim().length() == 0) ||
-            (realm.trim().equals("/"))) {
+    public Map<String, Set<ReferralPrivilege>> getReferredPrivileges(String targetRealm) throws EntitlementException {
+        if ((realm == null) || (realm.trim().isEmpty()) || (realm.trim().equals("/"))) {
             return Collections.EMPTY_MAP;
         }
 
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            PrivilegeManager.superAdminSubject, realm);
+        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(PrivilegeManager.superAdminSubject, realm);
         Set<String> names = ec.getParentAndPeerRealmNames();
         targetRealm = ec.getRealmName(targetRealm);
-        Map<String, Set<ReferralPrivilege>> results = new
-            HashMap<String, Set<ReferralPrivilege>>();
+        Map<String, Set<ReferralPrivilege>> results = new HashMap<String, Set<ReferralPrivilege>>();
         
         for (String name : names) {
             if (!name.startsWith("/")) {
@@ -325,18 +303,15 @@ public final class ReferralPrivilegeManager {
         return results;
     }
 
-    private Set<ReferralPrivilege> getReferredPrivileges(
-        String baseRealm,
-        String targetRealm
-    ) throws EntitlementException {
-        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(baseRealm,
-            PrivilegeManager.superAdminSubject);
-        Set<String> names = mgr.searchReferralPrivilegeNames(
-            Collections.EMPTY_SET);
+    private Set<ReferralPrivilege> getReferredPrivileges(String baseRealm, String targetRealm)
+            throws EntitlementException {
+
+        ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(baseRealm, PrivilegeManager.superAdminSubject);
+        Set<String> names = mgr.searchNames(Collections.EMPTY_SET);
         Set<ReferralPrivilege> results = new HashSet<ReferralPrivilege>();
 
         for (String name : names) {
-            ReferralPrivilege p = mgr.getReferral(name);
+            ReferralPrivilege p = mgr.findByName(name);
             for (String r : p.getRealms()) {
                 if (r.equalsIgnoreCase(targetRealm)) {
                     results.add(p);

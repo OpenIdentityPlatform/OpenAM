@@ -55,7 +55,7 @@ final class PrivilegePolicyStore implements PolicyStore {
 
     @Override
     public Privilege read(String policyName) throws EntitlementException {
-        final Privilege policy = privilegeManager.getPrivilege(policyName);
+        final Privilege policy = privilegeManager.findByName(policyName);
         if (policy == null) {
             throw new EntitlementException(EntitlementException.NO_SUCH_POLICY, new Object[] { policyName });
         }
@@ -64,19 +64,19 @@ final class PrivilegePolicyStore implements PolicyStore {
 
     @Override
     public Privilege create(Privilege policy) throws EntitlementException {
-        privilegeManager.addPrivilege(policy);
+        privilegeManager.add(policy);
         return policy;
     }
 
     @Override
     public Privilege update(String existingName, Privilege policy) throws EntitlementException {
-        privilegeManager.modifyPrivilege(existingName, policy);
+        privilegeManager.modify(existingName, policy);
         return policy;
     }
 
     @Override
     public void delete(String policyName) throws EntitlementException {
-        privilegeManager.removePrivilege(policyName);
+        privilegeManager.remove(policyName);
     }
 
     @Override
@@ -91,7 +91,7 @@ final class PrivilegePolicyStore implements PolicyStore {
             Set<SearchFilter> searchFilters = queryFilter.accept(new PrivilegeQueryBuilder(queryAttributes),
                                                                  new HashSet<SearchFilter>());
 
-            return privilegeManager.searchPrivileges(searchFilters);
+            return privilegeManager.search(searchFilters);
         } catch (UnsupportedOperationException ex) {
             throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER,
                     new Object[] { ex.getMessage() });

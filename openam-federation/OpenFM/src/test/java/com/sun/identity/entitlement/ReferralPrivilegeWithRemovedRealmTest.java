@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferralPrivilegeWithRemovedRealmTest.java,v 1.1 2010/01/08 23:59:31 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -79,7 +81,7 @@ public class ReferralPrivilegeWithRemovedRealmTest {
         }
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager("/",
             adminSubject);
-        mgr.delete(REFERRAL_NAME);
+        mgr.remove(REFERRAL_NAME);
     }
 
     private void createReferral()

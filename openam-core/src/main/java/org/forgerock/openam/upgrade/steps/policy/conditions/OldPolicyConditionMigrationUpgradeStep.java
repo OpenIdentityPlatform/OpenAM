@@ -92,7 +92,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
                 PrivilegeManager privilegeManager = getPrivilegeManager(realm);
                 List<Privilege> privileges;
                 try {
-                    privileges = privilegeManager.searchPrivileges(null);
+                    privileges = privilegeManager.search(null);
                 } catch (EntitlementException e) {
                     continue;
                 }
@@ -181,7 +181,7 @@ public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep 
             for (Privilege privilege : entry.getValue()) {
 
                 try {
-                    privilegeManager.modifyPrivilege(privilege.getName(), privilege);
+                    privilegeManager.modify(privilege.getName(), privilege);
                 } catch (EntitlementException e) {
                     DEBUG.error("Failed to modify privilege!", e);
                     throw new UpgradeException("Failed to modify privilege!", e);

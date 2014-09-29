@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DayConditionEvaluation.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -72,7 +74,7 @@ public class DayConditionEvaluation {
         tc.setStartDay("mon");
         tc.setEndDay("fri");
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
         Thread.sleep(1000);
     }
 
@@ -83,7 +85,7 @@ public class DayConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test

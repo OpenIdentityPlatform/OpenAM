@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: TimeZoneConditionEvaluation.java,v 1.1 2009/08/19 05:41:01 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -73,7 +75,7 @@ public class TimeZoneConditionEvaluation {
         TimeCondition tc = new TimeCondition();
         tc.setEnforcementTimeZone(TIME_ZONE);
         privilege.setCondition(tc);
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
         Thread.sleep(1000);
     }
 
@@ -84,7 +86,7 @@ public class TimeZoneConditionEvaluation {
         }
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test

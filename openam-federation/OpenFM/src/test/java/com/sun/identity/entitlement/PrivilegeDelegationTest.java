@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeDelegationTest.java,v 1.4 2009/11/12 18:37:39 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -72,9 +74,9 @@ public class PrivilegeDelegationTest {
         privilege.setName(PRIVILEGE_NAME);
         privilege.setEntitlement(ent);
         privilege.setSubject(new AnyUserSubject());
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
 
-        privilegeObject = pm.getPrivilege(PRIVILEGE_NAME);
+        privilegeObject = pm.findByName(PRIVILEGE_NAME);
         token = AuthUtils.authenticate(realm, USER_NAME, USER_NAME);
     }
 
@@ -84,7 +86,7 @@ public class PrivilegeDelegationTest {
 
         PrivilegeManager pm = PrivilegeManager.getInstance(realm,
             SubjectUtils.createSubject(adminToken));
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test
@@ -92,7 +94,7 @@ public class PrivilegeDelegationTest {
         PrivilegeManager mgr = PrivilegeManager.getInstance(realm,
             SubjectUtils.createSubject(token));
         try {
-            mgr.addPrivilege(privilegeObject);
+            mgr.add(privilegeObject);
             throw new Exception(
                 "PrivilegeDelegationTest.negativeTest: modify privilege should be deny");
         } catch (EntitlementException e) {
@@ -101,7 +103,7 @@ public class PrivilegeDelegationTest {
             }
         }
         try {
-            mgr.modifyPrivilege(privilegeObject);
+            mgr.modify(privilegeObject);
             throw new Exception(
                 "PrivilegeDelegationTest.negativeTest: modify privilege should be deny");
         } catch (EntitlementException e) {
@@ -110,7 +112,7 @@ public class PrivilegeDelegationTest {
             }
         }
         try {
-            mgr.modifyPrivilege(privilegeObject);
+            mgr.modify(privilegeObject);
             throw new Exception(
                 "PrivilegeDelegationTest.negativeTest: modify privilege should be deny");
         } catch (EntitlementException e) {
@@ -119,7 +121,7 @@ public class PrivilegeDelegationTest {
             }
         }
         try {
-            mgr.removePrivilege(PRIVILEGE_NAME);
+            mgr.remove(PRIVILEGE_NAME);
             throw new Exception(
                 "PrivilegeDelegationTest.negativeTest: remove privilege should be deny");
         } catch (EntitlementException e) {
@@ -136,9 +138,9 @@ public class PrivilegeDelegationTest {
             ApplicationPrivilege.PossibleAction.READ);
         PrivilegeManager mgr = PrivilegeManager.getInstance(realm,
             SubjectUtils.createSubject(token));
-        mgr.getPrivilege(PRIVILEGE_NAME);
+        mgr.findByName(PRIVILEGE_NAME);
         try {
-            mgr.modifyPrivilege(privilegeObject);
+            mgr.modify(privilegeObject);
             throw new Exception(
                 "PrivilegeDelegationTest.positiveGetTest: modify privilege should be deny");
         } catch (EntitlementException e) {
@@ -155,8 +157,8 @@ public class PrivilegeDelegationTest {
             ApplicationPrivilege.PossibleAction.READ_MODIFY);
         PrivilegeManager mgr = PrivilegeManager.getInstance(realm,
             SubjectUtils.createSubject(token));
-        mgr.getPrivilege(PRIVILEGE_NAME);
-        mgr.modifyPrivilege(privilegeObject);
+        mgr.findByName(PRIVILEGE_NAME);
+        mgr.modify(privilegeObject);
         apm.removePrivilege(DELEG_PRIVILEGE_NAME);
     }
 

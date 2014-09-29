@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SingleWildCardEvaluatorTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -75,7 +77,7 @@ public class SingleWildCardEvaluatorTest {
         privilege.setName(PRIVILEGE_NAME);
         privilege.setEntitlement(ent);
         privilege.setSubject(new AuthenticatedESubject());
-        pm.addPrivilege(privilege);
+        pm.add(privilege);
        
         Thread.sleep(1000);
     }
@@ -87,7 +89,7 @@ public class SingleWildCardEvaluatorTest {
         }
         
         PrivilegeManager pm = PrivilegeManager.getInstance("/", adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
     }
 
     @Test

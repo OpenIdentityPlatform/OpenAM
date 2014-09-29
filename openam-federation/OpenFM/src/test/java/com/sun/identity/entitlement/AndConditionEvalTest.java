@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AndConditionEvalTest.java,v 1.2 2010/01/12 21:29:58 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -78,7 +80,7 @@ public class AndConditionEvalTest {
 
             PrivilegeManager pm = PrivilegeManager.getInstance("/",
                     adminSubject);
-            pm.addPrivilege(privilege);
+            pm.add(privilege);
             Thread.sleep(1000);
         }
     }
@@ -88,7 +90,7 @@ public class AndConditionEvalTest {
         if (migrated) {
             PrivilegeManager pm = PrivilegeManager.getInstance("/",
                     adminSubject);
-            pm.removePrivilege(PRIVILEGE_NAME);
+            pm.remove(PRIVILEGE_NAME);
         }
     }
 

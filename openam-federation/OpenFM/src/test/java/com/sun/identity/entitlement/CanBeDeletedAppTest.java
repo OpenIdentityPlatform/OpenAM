@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CanBeDeletedAppTest.java,v 1.1 2010/01/08 22:20:46 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -127,7 +129,7 @@ public class CanBeDeletedAppTest {
             "http://www.CanBeDeletedAppTest.com/*", actionValues);
         p.setEntitlement(entitlement);
         p.setSubject(new AuthenticatedESubject());
-        pm.addPrivilege(p);
+        pm.add(p);
     }
 
     private void createApplicationPrivilege() throws Exception {
@@ -166,7 +168,7 @@ public class CanBeDeletedAppTest {
 
         PrivilegeManager pm = PrivilegeManager.getInstance("/",
             adminSubject);
-        pm.removePrivilege(PRIVILEGE_NAME);
+        pm.remove(PRIVILEGE_NAME);
 
         // at this point, we have referral privilege and application
         // privilege, so application cannot be deleted.
@@ -180,7 +182,7 @@ public class CanBeDeletedAppTest {
 
         ReferralPrivilegeManager mgr = new ReferralPrivilegeManager(
             "/", adminSubject);
-        mgr.delete(REFERRAL_NAME);
+        mgr.remove(REFERRAL_NAME);
 
         // at this point, we still have application privilege, so application
         // still cannot be deleted.

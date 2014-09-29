@@ -24,6 +24,7 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 /*
@@ -217,9 +218,9 @@ public class ListXACML extends AuthenticatedCommand {
                 "ATTEMPT_TO_GET_POLICY_NAMES_IN_REALM", parameters);
             
             Set<SearchFilter> filterSet = getFilters(filters);
-            Set<String> privilegeNames = pm.searchPrivilegeNames(filterSet);
+            Set<String> privilegeNames = pm.searchNames(filterSet);
             
-            Set<String> referralPrivilegeNames = rpm.searchReferralPrivilegeNames(
+            Set<String> referralPrivilegeNames = rpm.searchNames(
                     filterSet);
             if (referralPrivilegeNames != null & !referralPrivilegeNames.isEmpty()) {
                 if (privilegeNames == null) {
@@ -313,11 +314,11 @@ public class ListXACML extends AuthenticatedCommand {
 
             Set<SearchFilter> filterSet = getFilters(filters);
 
-            Set<String> privilegeNames = pm.searchPrivilegeNames(filterSet);
+            Set<String> privilegeNames = pm.searchNames(filterSet);
 
             ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, 
                     adminSubject); 
-            Set<String> referralNames = rpm.searchReferralPrivilegeNames(
+            Set<String> referralNames = rpm.searchNames(
                     filterSet);
 
             if (((privilegeNames != null) && !privilegeNames.isEmpty())
@@ -363,7 +364,7 @@ public class ListXACML extends AuthenticatedCommand {
                         params[1] = currentPrivilegeName;
                         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                             "ATTEMPT_GET_POLICY_IN_REALM", params);
-                        Privilege privilege = pm.getPrivilege(currentPrivilegeName, adminSubject);
+                        Privilege privilege = pm.findByName(currentPrivilegeName, adminSubject);
                         privileges.add(privilege);
                     }
                     policySet = XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges);
@@ -378,7 +379,7 @@ public class ListXACML extends AuthenticatedCommand {
                         params[1] = currentPrivilegeName;
                         writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                             "ATTEMPT_GET_POLICY_IN_REALM", params);
-                        ReferralPrivilege referralPrivilege = rpm.getReferral(currentPrivilegeName); 
+                        ReferralPrivilege referralPrivilege = rpm.findByName(currentPrivilegeName);
                         Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
                         XACMLPrivilegeUtils.addPolicyToPolicySet(policy, policySet);
                     }
