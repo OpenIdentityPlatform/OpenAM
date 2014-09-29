@@ -1007,7 +1007,7 @@ public class OpenSSOApplicationPrivilegeManager extends
             return appNameToResourceNames.containsKey(application.getName());
         }
 
-        private boolean hasPermission(Privilege privilege) 
+        private boolean hasPermission(Privilege privilege)
             throws EntitlementException {
             Entitlement ent = privilege.getEntitlement();
             String applName = ent.getApplicationName();

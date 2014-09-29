@@ -90,6 +90,11 @@ public class DataStore {
     public static final String REFERRAL_REALMS = "referralrealms";
     public static final String REFERRAL_APPLS = "referralappls";
 
+    private static final String NO_FILTER = "(objectClass=*)";
+    private static final int NO_LIMIT = 0;
+    private static final boolean NOT_SORTED = false;
+    private static final Set<String> NO_EXCLUSIONS = Collections.emptySet();
+
     private static final String SUBJECT_FILTER_TEMPLATE =
         "(" + SMSEntry.ATTR_XML_KEYVAL + "=" + SUBJECT_INDEX_KEY + "={0})";
     private static final String HOST_FILTER_TEMPLATE =
@@ -861,6 +866,46 @@ public class DataStore {
         return results;
     }
 
+    /**
+     * Retrieves an individual privilege from the data store. The privilege is returned by the method and
+     * also added to the passed in iterator.
+     *
+     * @param realm Realm in which the privilege exists.
+     * @param privilegeIdentifier The identifier of the privilege to retrieve.
+     * @return the privilege.
+     * @throws EntitlementException if there were issues retrieving the privilege from the data store.
+     */
+    public IPrivilege getPrivilege(String realm, String privilegeIdentifier)
+            throws EntitlementException {
+        final String privilegeDN = getPrivilegeDistinguishedName(privilegeIdentifier, realm, null);
+
+        final long start = DB_MONITOR_PRIVILEGE.start();
+
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final Privilege privilege;
+
+        try {
+            final Iterator i = SMSEntry.search(token, privilegeDN, NO_FILTER, NO_LIMIT, NO_LIMIT,
+                    NOT_SORTED, NOT_SORTED, NO_EXCLUSIONS);
+            if (i.hasNext()) {
+                SMSDataEntry e = (SMSDataEntry) i.next();
+                privilege = Privilege.getInstance(new JSONObject(e.getAttributeValue(SERIALIZABLE_INDEX_KEY)));
+            } else {
+                privilege = null;
+            }
+        } catch (SMSException e) {
+            Object[] arg = {privilegeDN};
+            throw new EntitlementException(52, arg, e);
+        } catch (JSONException e) {
+            Object[] arg = {privilegeDN};
+            throw new EntitlementException(52, arg, e);
+        }
+
+        DB_MONITOR_PRIVILEGE.end(start);
+
+        return privilege;
+    }
+
     private Set<IPrivilege> searchPrivileges(
         String realm,
         BufferedIterator iterator,
@@ -891,7 +936,7 @@ public class DataStore {
             if (SMSEntry.checkIfEntryExists(baseDN, token)) {
                 try {
                     Iterator i = SMSEntry.search(
-                        token, baseDN, filter, 0, 0, false, false, excludeDNs);
+                        token, baseDN, filter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, excludeDNs);
                     while (i.hasNext()) {
                         SMSDataEntry e = (SMSDataEntry) i.next();
                         Privilege privilege = Privilege.getInstance(
@@ -956,7 +1001,7 @@ public class DataStore {
             if (SMSEntry.checkIfEntryExists(baseDN, token)) {
                 try {
                     Iterator i = SMSEntry.search(
-                        token, baseDN, filter, 0, 0, false, false, excludeDNs);
+                        token, baseDN, filter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, excludeDNs);
                     while (i.hasNext()) {
                         SMSDataEntry e = (SMSDataEntry) i.next();
                         ReferralPrivilege referral = ReferralPrivilege.
@@ -1046,8 +1091,7 @@ public class DataStore {
         if (SMSEntry.checkIfEntryExists(baseDN, adminToken)) {
             try {
                 Iterator i = SMSEntry.search(
-                    adminToken, baseDN, filter, 0, 0, false, false,
-                    Collections.EMPTY_SET);
+                    adminToken, baseDN, filter, NO_LIMIT, NO_LIMIT, NOT_SORTED, NOT_SORTED, NO_EXCLUSIONS);
                 while (i.hasNext()) {
                     SMSDataEntry e = (SMSDataEntry) i.next();
                     ReferralPrivilege referral = ReferralPrivilege.getInstance(

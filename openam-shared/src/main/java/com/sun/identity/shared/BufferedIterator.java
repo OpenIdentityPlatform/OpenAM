@@ -25,61 +25,53 @@
  * $Id: BufferedIterator.java,v 1.1 2009/04/02 19:41:01 veiming Exp $
  */
 
+/**
+ * Portions Copyright 2014 ForgeRock AS
+ */
+
 package com.sun.identity.shared;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This iterator allows next method to be called before it has all its elements.
  */
-public class BufferedIterator implements Iterator {
-    private List queue = new LinkedList();
-    private boolean done = false;
-    private Object lock = new Object();
+public class BufferedIterator<T> implements Iterator<T> {
+    private final BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
+    private volatile boolean done = false;
 
-    public void add(Object entry) {
+    public void add(T entry) {
         queue.add(entry);
-        synchronized (lock) {
-            lock.notify();
-        }
     }
 
-    public void add(List entry) {
+    public void add(List<T> entry) {
         queue.addAll(entry);
-        synchronized (lock) {
-            lock.notify();
-        }
     }
 
     public void isDone() {
         done = true;
-        synchronized (lock) {
-            lock.notify();
-        }
     }
 
-    public Object next() {
-        return queue.remove(0);
+    public T next() {
+        while (hasNext()) {
+            try {
+                return queue.take();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     public boolean hasNext() {
-        synchronized (lock) {
-            if (queue.isEmpty() && !done) {
-                try {
-                    lock.wait();
-                } catch (InterruptedException ex) {
-                    done = true;
-                }
-            }
-        }
-
-        return !queue.isEmpty();
+        return !(done && queue.isEmpty());
     }
 
     public void remove() {
-        //not supported.
+        throw new UnsupportedOperationException();
     }
 }
-

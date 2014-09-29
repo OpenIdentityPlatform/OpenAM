@@ -38,6 +38,7 @@ import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.PolicyDataStore;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeChangeNotifier;
+import com.sun.identity.entitlement.PrivilegeIndexStore;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.policy.Policy;
@@ -46,11 +47,11 @@ import com.sun.identity.policy.PolicyEvent;
 import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.security.AdminTokenAction;
-
 import java.security.AccessController;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import javax.security.auth.Subject;
 
@@ -124,28 +125,25 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
     }
 
     @Override
-    public Privilege findByName(String name, Subject adminSubject) throws EntitlementException {
-        if (name == null) {
+    public Privilege findByName(String privilegeName, Subject adminSubject) throws EntitlementException {
+        if (privilegeName == null) {
             throw new EntitlementException(12);
         }
 
         Privilege privilege = null;
         try {
-            Object policy;
             if (!migratedToEntitlementSvc) {
-                policy = pm.getPolicy(name);
-            } else {
-                PolicyDataStore pdb = PolicyDataStore.getInstance();
-                policy = pdb.getPolicy(dsameUserSubject, getRealm(), name);
-            }
+                Policy policy = pm.getPolicy(privilegeName);
+                Set<IPrivilege> privileges = PrivilegeUtils.policyToPrivileges(policy);
+                Iterator<IPrivilege> it = privileges.iterator();
 
-            Set<IPrivilege> privileges = PrivilegeUtils.policyToPrivileges(policy);
-            if ((privileges != null) && !privileges.isEmpty()) {
-                for (IPrivilege p : privileges) {
-                    if (p instanceof Privilege) {
-                        privilege = (Privilege)p;
-                    }
+                if (it.hasNext()) {
+                    IPrivilege searchResult = it.next();
+                    privilege = (Privilege) searchResult;
                 }
+            } else {
+                PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, getRealm());
+                privilege = (Privilege) pis.getPrivilege(privilegeName);
             }
 
             if (adminSubject != PrivilegeManager.superAdminSubject) {

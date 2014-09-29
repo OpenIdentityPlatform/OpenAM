@@ -25,6 +25,10 @@
  * $Id: PrivilegeIndexStore.java,v 1.4 2010/01/08 22:20:47 veiming Exp $
  */
 
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.util.SearchFilter;
@@ -189,6 +193,15 @@ public abstract class PrivilegeIndexStore {
         Set<String> subjectIndexes,
         boolean bSubTree
     ) throws EntitlementException;
+
+    /**
+     * The single requested privilege, found
+     * within the context of this realm.
+     *
+     * @param privilegeName Name of the privilege to return.
+     * @return the matching privilege.
+     */
+    public abstract IPrivilege getPrivilege(String privilegeName);
 
     /**
      * Returns a set of privilege names that matched a set of search criteria.

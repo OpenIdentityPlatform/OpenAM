@@ -24,7 +24,7 @@
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
  *
- * Portions copyright 2011-2013 ForgeRock, Inc.
+ * Portions copyright 2011-2014 ForgeRock, AS
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -33,8 +33,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
-import com.sun.identity.entitlement.ApplicationPrivilege;
-import com.sun.identity.entitlement.ApplicationPrivilegeManager;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
@@ -57,7 +55,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.BufferedIterator;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
-
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -433,13 +430,45 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
             }
         }
 
-        if (indexCacheSize == 0 || doDSSearch()) {
-            threadPool.submit(new SearchTask(this, iterator, indexes, subjectIndexes, bSubTree, setDNs));
+        if (indexCacheSize == 0 || isDSSearchNecessary()) {
+            threadPool.submit(new SearchTask(iterator, indexes, subjectIndexes, bSubTree, setDNs));
         } else {
             iterator.isDone();
         }
 
         return iterator;
+    }
+
+    /**
+     * Retrieve an individual privilege from the data store.
+     *
+     * @param privilegeName Name of the privilege to return.
+     * @return The privilege, or empty if none was found.
+     */
+    public IPrivilege getPrivilege(String privilegeName) {
+
+        //if we have anything in the cache try to retrieve this one from it before going to DS
+        if (policyCacheSize > 0) {
+            String dn = DataStore.getPrivilegeDistinguishedName(privilegeName, getRealm(), null);
+            IPrivilege priv = policyCache.getPolicy(dn);
+            if (priv != null) {
+                return priv;
+            }
+        }
+
+        //only search if we don't know we have everything in the cache
+        if (isPolicyCacheBehind(getRealm())) {
+            try {
+                IPrivilege result = dataStore.getPrivilege(getRealm(), privilegeName);
+                cache(result, null, getRealm());
+                return result;
+            } catch (EntitlementException e) {
+                PrivilegeManager.debug.error(
+                        "OpenSSOIndexStore.GetTask.runPolicy", e);
+            }
+        }
+
+        return null;
     }
 
     private ReferralPrivilege getOrgAliasReferral(ResourceSearchIndexes indexes
@@ -524,26 +553,38 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         }
     }
 
-    private boolean doDSSearch() {
+    private boolean isPolicyCacheBehind(String realm) {
         if (!CacheTaboo.isEmpty()) {
             return true;
         }
-        String realm = getRealm();
 
-        // check if PolicyCache has all the entries for the realm
         int cacheEntries = policyCache.getCount(realm);
         int totalPolicies = DataStore.getNumberOfPolicies(realm);
         if ((totalPolicies > 0) &&(cacheEntries < totalPolicies)) {
             return true;
         }
 
-        cacheEntries = referralCache.getCount(realm);
+        return false;
+    }
+
+    private boolean isReferralCacheBehind(String realm) {
+        if (!CacheTaboo.isEmpty()) {
+            return true;
+        }
+
+        int cacheEntries = referralCache.getCount(realm);
         int totalReferrals = DataStore.getNumberOfReferrals(realm);
         if ((totalReferrals > 0) && (cacheEntries < totalReferrals)) {
             return true;
         }
 
         return false;
+    }
+
+    private boolean isDSSearchNecessary() {
+        String realm = getRealm();
+
+        return isPolicyCacheBehind(realm) || isReferralCacheBehind(realm);
     }
 
     private Set<String> searchReferrals(ResourceSearchIndexes indexes,
@@ -627,9 +668,6 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
                 strFilter.append(")");
             }
         }
-
-
-
 
         return strFilter.toString();
     }
@@ -888,7 +926,6 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     }
 
     public class SearchTask implements Runnable {
-        private OpenSSOIndexStore parent;
         private BufferedIterator iterator;
         private ResourceSearchIndexes indexes;
         private Set<String> subjectIndexes;
@@ -896,14 +933,12 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         private Set<String> excludeDNs;
 
         public SearchTask(
-            OpenSSOIndexStore parent,
             BufferedIterator iterator,
             ResourceSearchIndexes indexes,
             Set<String> subjectIndexes,
             boolean bSubTree,
             Set<String> excludeDNs
         ) {
-            this.parent = parent;
             this.iterator = iterator;
             this.indexes = indexes;
             this.subjectIndexes = subjectIndexes;
@@ -914,11 +949,11 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         public void run() {
             try {
                 Set<IPrivilege> results = dataStore.search(
-                    parent.getAdminSubject(), parent.getRealmDN(), iterator,
+                    getAdminSubject(), getRealmDN(), iterator,
                     indexes, subjectIndexes, bSubTree, excludeDNs);
                 if (indexCacheSize > 0) {
                     for (IPrivilege eval : results) {
-                        parent.cache(eval, subjectIndexes, parent.getRealmDN());
+                        cache(eval, subjectIndexes, getRealmDN());
                     }
                 }
             } catch (EntitlementException ex) {
