@@ -25,10 +25,10 @@
  * $Id: AMIdentityMembershipCondition.java,v 1.2 2008/06/25 05:43:50 qcheng Exp $
  *
  */
-
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
+
 package com.sun.identity.policy.plugins;
 
 import java.util.*;
@@ -59,7 +59,10 @@ import java.security.AccessController;
  * in the environment is a member of at least one <code>AMIdentity</code> 
  * object specified in the Condition.
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition}
+ * instead.
  */
+@Deprecated
 public class AMIdentityMembershipCondition implements Condition {
 
 

@@ -25,7 +25,9 @@
  * $Id: SessionCondition.java,v 1.4 2008/06/25 05:43:52 qcheng Exp $
  *
  */
-
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
 
 
 
@@ -64,7 +66,9 @@ import java.util.ResourceBundle;
  * to terminate the user session if the session time exceeds the
  * maximum allowed.
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.SessionCondition} instead.
  */
+@Deprecated
 public class SessionCondition implements Condition {
 
     /**

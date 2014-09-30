@@ -100,7 +100,7 @@ import com.sun.identity.shared.ldap.util.RDN;
  * @supported.api
  */
 
-public final class AMIdentity {
+public class AMIdentity {
 
     private String univIdWithoutDN;
 

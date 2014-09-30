@@ -25,10 +25,10 @@
  * $Id: SimpleTimeCondition.java,v 1.5 2010/01/05 22:00:26 dillidorai Exp $
  *
  */
-
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
+
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -49,7 +49,9 @@ import java.text.*;
  * of <code>Condition</code>. This lets you define the time range
  * of week days and/or date range during which a policy applies. 
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition} instead.
  */
+@Deprecated
 public class SimpleTimeCondition implements Condition {
 
     /** Key that is used to define current time that is passed in the

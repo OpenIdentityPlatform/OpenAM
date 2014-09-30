@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright 2013-2014 ForgeRock AS
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
+
 package org.forgerock.openam.network.ipv6;
 
 
@@ -38,7 +39,10 @@ import java.util.*;
 
 /**
  * @author alin.brici@forgerock.com
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPv6Condition} instead.
  */
+@Deprecated
 public class IPv6Condition implements Condition {
     /** Key that is used in <code>IPv6Condition</code> to define the  IP address
      * values for which a policy applies. The value corresponding to the key

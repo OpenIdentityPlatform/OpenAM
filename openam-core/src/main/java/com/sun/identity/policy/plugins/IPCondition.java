@@ -25,11 +25,11 @@
  * $Id: IPCondition.java,v 1.5 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
  */
-
 /*
  * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
+
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -57,7 +57,9 @@ import java.util.Collections;
  * of <code>Condition</code>. This lets you define the IP addresses,
  * IP address ranges and DNS name patterns for which the policy applies
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPCondition} instead.
  */
+@Deprecated
 public class IPCondition implements Condition {
 
     private static final Debug DEBUG

@@ -25,13 +25,13 @@
  * $Id: LDAPFilterCondition.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
  */
-
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.policy.plugins;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
@@ -75,8 +75,10 @@ import com.sun.identity.shared.ldap.LDAPReferralException;
  * user identified by sso token, in the directory specified 
  * in policy configuration service, satisfiies the ldap filter
  * specified in the condition
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.LDAPFilterCondition} instead.
  */
-
+@Deprecated
 public class LDAPFilterCondition implements Condition {
 
     static final String LDAP_SCOPE_BASE = "SCOPE_BASE";
@@ -658,9 +660,9 @@ public class LDAPFilterCondition implements Condition {
         }
 
         //validate LDAP_FILTER
-        Set ldapFilterSet = (Set) properties.get(LDAP_FILTER);
-        if ( ldapFilterSet != null ) {
-            validateLdapFilterSet(ldapFilterSet);
+        Collection ldapFilterCollection = (Collection) properties.get(LDAP_FILTER);
+        if ( ldapFilterCollection != null ) {
+            validateLdapFilterCollection(ldapFilterCollection);
         }
 
         return true;
@@ -673,7 +675,7 @@ public class LDAPFilterCondition implements Condition {
      * @see #LDAP_FILTER
      */
 
-    private boolean validateLdapFilterSet(Set ldapFilterSet) 
+    private boolean validateLdapFilterCollection(Collection ldapFilterSet)
             throws PolicyException {
         if ( ldapFilterSet.isEmpty() ) {
             String args[] = { LDAP_FILTER };

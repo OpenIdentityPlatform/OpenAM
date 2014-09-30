@@ -25,7 +25,9 @@
  * $Id: AuthLevelCondition.java,v 1.9 2009/05/26 08:06:23 kiran_gonipati Exp $
  *
  */
-
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
 
 
 package com.sun.identity.policy.plugins;
@@ -61,7 +63,9 @@ import java.util.Collections;
  * <code>env</code> map, <code>AuthLevel</code> is looked up from single sign on
  * token.
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AuthLevelCondition} instead.
  */
+@Deprecated
 public class AuthLevelCondition implements Condition {
 
     private static final Debug DEBUG 

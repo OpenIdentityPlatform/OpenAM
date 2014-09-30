@@ -25,9 +25,8 @@
  * $Id: AuthenticateToRealmCondition.java,v 1.6 2009/06/19 22:53:42 mrudul_uchil Exp $
  *
  */
-
 /*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 
 package com.sun.identity.policy.plugins;
@@ -58,7 +57,9 @@ import java.util.Collections;
  * implementation  of <code>Condition</code> that lets you specify 
  * the realm to which user should authenticate for the policy to apply
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AuthenticateToRealmCondition} instead.
  */
+@Deprecated
 public class AuthenticateToRealmCondition implements Condition {
 
     private static final Debug DEBUG 

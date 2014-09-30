@@ -98,7 +98,7 @@ public final class EntitlementRegistry {
         registry.registerSubjectType("NOT", NotSubject.class);
 
         // Standard OpenAM entitlement conditions (policy conditions will be loaded later)
-        registry.registerConditionType(IPCondition.class);
+//        registry.registerConditionType(IPCondition.class);
         registry.registerConditionType(DNSNameCondition.class);
         registry.registerConditionType(NumericAttributeCondition.class);
         registry.registerConditionType(TimeCondition.class);

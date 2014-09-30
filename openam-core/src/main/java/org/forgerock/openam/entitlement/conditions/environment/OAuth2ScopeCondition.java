@@ -33,17 +33,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static com.sun.identity.entitlement.EntitlementException.INVALID_OAUTH2_SCOPE;
+
 /**
- *
+ * An implementation of an {@link com.sun.identity.entitlement.EntitlementCondition} that will check whether the
+ * request OAuth2 scopes are sufficient to gain access.
  *
  * @since 12.0.0
  */
 public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
-
-    /**
-     * The property name used to configure the required scopes.
-     */
-    public static final String OAUTH2_SCOPE_PROPERTY = "OAuth2Scope";
 
     /**
      * The attribute that should be sent in the environment map for policy evaluation requests against this condition.
@@ -64,15 +62,20 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
     private final Debug debug;
 
     /**
-     * Set of scopes that are required for this condition to allow the request. Configured via the
-     * {@link #OAUTH2_SCOPE_PROPERTY} property.
+     * Set of scopes that are required for this condition to allow the request.
      */
     private volatile Set<String> requiredScopes = new HashSet<String>();
 
+    /**
+     * Constructs a new OAuth2ScopeCondition instance.
+     */
     public OAuth2ScopeCondition() {
         debug = PrivilegeManager.debug;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setState(String state) {
         try {
@@ -82,15 +85,22 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
             for (int i = 0; i < scopes.length(); i++) {
                 requiredScopes.add(scopes.getString(i));
             }
-        } catch (JSONException joe) {
+        } catch (JSONException e) {
+            debug.message("OAuth2ScopeCondition: Failed to set state", e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getState() {
         return toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName, Map<String, Set<String>> env)
             throws EntitlementException {
@@ -138,9 +148,10 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
         if (value != null) {
             for (String scope : value.split(SCOPE_DELIMITERS)) {
                 if (!VALID_SCOPE_PATTERN.matcher(scope.trim()).matches()) {
-                    //TODO
-//                    throw new EntitlementException(ResBundleUtils.rbName, "invalid_oauth2_scope", new Object[] { scope },
-//                            null);
+                    if (debug.errorEnabled()) {
+                        debug.error("OAuth2ScopeCondition.toScopeSet(): invalid OAuth2 scope, " + scope);
+                    }
+                    throw new EntitlementException(INVALID_OAUTH2_SCOPE, new Object[]{scope}, null);
                 }
                 scopes.add(scope.trim());
             }
@@ -159,6 +170,9 @@ public class OAuth2ScopeCondition extends EntitlementConditionAdaptor {
         return jo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         String s = null;

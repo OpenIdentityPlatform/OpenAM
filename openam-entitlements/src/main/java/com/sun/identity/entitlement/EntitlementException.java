@@ -83,6 +83,25 @@ public class EntitlementException extends Exception {
     public static final int MISSING_RESOURCE = 420;
     public static final int JSON_PARSE_ERROR = 425;
     public static final int AUTHENTICATION_ERROR = 434;
+    public static final int CLIENT_IP_EMPTY = 437;
+    public static final int RESOURCE_ENV_NOT_KNOWN = 438;
+
+    public static final int CONDITION_EVALUTATION_FAILED = 510;
+
+    public static final int INVALID_OAUTH2_SCOPE = 700;
+    public static final int AUTH_LEVEL_NOT_INTEGER = 710;
+    public static final int PROPERTY_VALUE_NOT_DEFINED = 711;
+    public static final int AUTH_LEVEL_NOT_INT_OR_SET = 712;
+    public static final int AUTH_SCHEME_NOT_FOUND = 713;
+    public static final int INVALID_ADMIN = 720;
+    public static final int AM_ID_SUBJECT_MEMBERSHIP_EVALUATION_ERROR = 721;
+    public static final int UNABLE_TO_PARSE_SSOTOKEN_AUTHINSTANT = 730;
+    public static final int AT_LEAST_ONE_OF_TIME_PROPS_SHOULD_BE_DEFINED = 740;
+    public static final int PAIR_PROPERTY_NOT_DEFINED = 741;
+    public static final int END_IP_BEFORE_START_IP = 750;
+
+    public static final int PROPERTY_IS_NOT_AN_INTEGER = 800;
+    public static final int PROPERTY_IS_NOT_A_SET = 801;
 
     private int errorCode;
     private String message;

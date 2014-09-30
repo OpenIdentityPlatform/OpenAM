@@ -25,6 +25,9 @@
  * $Id: SessionPropertyCondition.java,v 1.4 2008/06/25 05:43:52 qcheng Exp $
  *
  */
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
 
 package com.sun.identity.policy.plugins;
 import java.util.ArrayList;
@@ -54,8 +57,10 @@ import com.iplanet.sso.SSOToken;
  * implementation of <code>Condition</code> interface.
  * This condition checks whether session properties contain at least 
  * one value of the each property listed in the <code>Condition</code>
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition} instead.
  */
-
+@Deprecated
 public class SessionPropertyCondition implements Condition {
 
     private static final boolean IGNORE_VALUE_CASE_DEFAULT = true;

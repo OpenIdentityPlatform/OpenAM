@@ -25,11 +25,11 @@
  * $Id: ResourceEnvIPCondition.java,v 1.4 2009/07/21 18:33:17 mrudul_uchil Exp $
  *
  */
-
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
+
 package com.sun.identity.policy.plugins;
 
 import java.util.Set;
@@ -74,8 +74,10 @@ import org.forgerock.openam.utils.ValidateIPaddress;
  * condition decision and advices based on the client's environment or 
  * resource such as IP address, DNS host name, location, etc.
  * For the first drop, we are only supporting IP address.
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCondition instead}.
  */
-
+@Deprecated
 public class ResourceEnvIPCondition implements Condition {
 
     private static final Debug DEBUG 

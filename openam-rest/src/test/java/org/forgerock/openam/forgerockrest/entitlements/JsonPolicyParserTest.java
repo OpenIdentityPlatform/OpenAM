@@ -22,7 +22,6 @@ import com.sun.identity.entitlement.AnyUserSubject;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.IPCondition;
 import com.sun.identity.entitlement.NotCondition;
 import com.sun.identity.entitlement.OrCondition;
 import com.sun.identity.entitlement.Privilege;
@@ -35,6 +34,8 @@ import com.sun.identity.policy.plugins.AuthenticateToRealmCondition;
 import com.sun.identity.shared.DateUtils;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -294,20 +295,18 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldCorrectlyParseConditionTypes() throws Exception {
         // Given
-        String startIp = "127.0.0.1";
-        String endIp = "127.0.0.255";
+        String scope = "cn givenName";
         JsonValue content = json(object(field("condition",
-                object(field("type", "IP"),
-                       field("startIp", startIp),
-                       field("endIp", endIp)))));
+                object(field("type", "OAuth2Scope"),
+                       field("requiredScopes", array(scope))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        assertThat(result.getCondition()).isInstanceOf(IPCondition.class);
-        assertThat(((IPCondition) result.getCondition()).getStartIp()).isEqualTo(startIp);
-        assertThat(((IPCondition) result.getCondition()).getEndIp()).isEqualTo(endIp);
+        assertThat(result.getCondition()).isInstanceOf(OAuth2ScopeCondition.class);
+        assertThat(((OAuth2ScopeCondition) result.getCondition()).getRequiredScopes())
+                .isEqualTo(Collections.singleton(scope));
     }
 
     @Test(expectedExceptions = EntitlementException.class)
@@ -330,15 +329,13 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldParseNestedAndConditions() throws Exception {
         // Given
-        // An AND condition containing a single IP condition
-        String startIp = "127.0.0.1";
-        String endIp = "127.0.0.255";
+        // An AND condition containing a single OAuth2Scope condition
+        String scope = "cn givenName";
         JsonValue content = json(object(field("condition",
                 object(field("type", "AND"),
                        field("conditions",
-                               Collections.singletonList(object(field("type", "IP"),
-                                       field("startIp", startIp),
-                                       field("endIp", endIp))))))));
+                               Collections.singletonList(object(field("type", "OAuth2Scope"),
+                                       field("requiredScopes", array(scope)))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -347,24 +344,21 @@ public class JsonPolicyParserTest {
         assertThat(result.getCondition()).isInstanceOf(AndCondition.class);
         AndCondition and = (AndCondition) result.getCondition();
         assertThat(and.getEConditions()).hasSize(1);
-        assertThat(and.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
-        IPCondition ip = (IPCondition) and.getEConditions().iterator().next();
-        assertThat(ip.getStartIp()).isEqualTo(startIp);
-        assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(and.getEConditions().iterator().next()).isInstanceOf(OAuth2ScopeCondition.class);
+        OAuth2ScopeCondition oauth2Scope = (OAuth2ScopeCondition) and.getEConditions().iterator().next();
+        assertThat(oauth2Scope.getRequiredScopes()).isEqualTo(Collections.singleton(scope));
     }
 
     @Test
     public void shouldParseNestedOrConditions() throws Exception {
         // Given
-        // An OR condition containing a single IP condition
-        String startIp = "127.0.0.1";
-        String endIp = "127.0.0.255";
+        // An OR condition containing a single OAuth2Scope condition
+        String scope = "cn givenName";
         JsonValue content = json(object(field("condition",
                 object(field("type", "OR"),
                         field("conditions",
-                                Collections.singletonList(object(field("type", "IP"),
-                                        field("startIp", startIp),
-                                        field("endIp", endIp))))))));
+                                Collections.singletonList(object(field("type", "OAuth2Scope"),
+                                        field("requiredScopes", array(scope)))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -373,23 +367,20 @@ public class JsonPolicyParserTest {
         assertThat(result.getCondition()).isInstanceOf(OrCondition.class);
         OrCondition or = (OrCondition) result.getCondition();
         assertThat(or.getEConditions()).hasSize(1);
-        assertThat(or.getEConditions().iterator().next()).isInstanceOf(IPCondition.class);
-        IPCondition ip = (IPCondition) or.getEConditions().iterator().next();
-        assertThat(ip.getStartIp()).isEqualTo(startIp);
-        assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(or.getEConditions().iterator().next()).isInstanceOf(OAuth2ScopeCondition.class);
+        OAuth2ScopeCondition oauth2Scope = (OAuth2ScopeCondition) or.getEConditions().iterator().next();
+        assertThat(oauth2Scope.getRequiredScopes()).isEqualTo(Collections.singleton(scope));
     }
 
     @Test
     public void shouldParseNotConditions() throws Exception {
         // Given
-        // A NOT condition containing an IP condition
-        String startIp = "127.0.0.1";
-        String endIp = "127.0.0.255";
+        // A NOT condition containing an OAuth2Scope condition
+        String scope = "cn givenName";
         JsonValue content = json(object(field("condition",
                 object(field("type", "NOT"),
-                        field("condition", object(field("type", "IP"),
-                                field("startIp", startIp),
-                                field("endIp", endIp)))))));
+                        field("condition", object(field("type", "OAuth2Scope"),
+                                field("requiredScopes", array(scope))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -397,10 +388,9 @@ public class JsonPolicyParserTest {
         // Then
         assertThat(result.getCondition()).isInstanceOf(NotCondition.class);
         NotCondition not = (NotCondition) result.getCondition();
-        assertThat(not.getECondition()).isInstanceOf(IPCondition.class);
-        IPCondition ip = (IPCondition) not.getECondition();
-        assertThat(ip.getStartIp()).isEqualTo(startIp);
-        assertThat(ip.getEndIp()).isEqualTo(endIp);
+        assertThat(not.getECondition()).isInstanceOf(OAuth2ScopeCondition.class);
+        OAuth2ScopeCondition ip = (OAuth2ScopeCondition) not.getECondition();
+        assertThat(ip.getRequiredScopes()).isEqualTo(Collections.singleton(scope));
     }
 
     @Test

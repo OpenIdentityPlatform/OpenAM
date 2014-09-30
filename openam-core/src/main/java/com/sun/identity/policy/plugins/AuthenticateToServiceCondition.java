@@ -25,7 +25,9 @@
  * $Id: AuthenticateToServiceCondition.java,v 1.7 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
  */
-
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
 
 
 
@@ -56,7 +58,10 @@ import java.util.Collections;
  * implementation  of <code>Condition</code> that lets you specify 
  * the service to which user should authenticate for the policy to apply
  *
+ * @deprecated See {@link org.forgerock.openam.entitlement.conditions.environment.AuthenticateToServiceCondition}
+ * instead.
  */
+@Deprecated
 public class AuthenticateToServiceCondition implements Condition {
 
     private static final Debug DEBUG 

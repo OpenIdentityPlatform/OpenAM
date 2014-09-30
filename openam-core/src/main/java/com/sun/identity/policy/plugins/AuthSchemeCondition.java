@@ -25,7 +25,9 @@
  * $Id: AuthSchemeCondition.java,v 1.6 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
  */
-
+/*
+ * Portions Copyright 2014 ForgeRock AS
+ */
 
 
 
@@ -56,7 +58,9 @@ import java.util.Collections;
  * of <code>Condition</code> that lets you define authentication module
  * instances for which a <code>Policy</code> applies.
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition} instead.
  */
+@Deprecated
 public class AuthSchemeCondition implements Condition {
 
     private static final Debug DEBUG 

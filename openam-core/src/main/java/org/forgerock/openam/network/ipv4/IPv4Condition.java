@@ -25,10 +25,10 @@
  * $Id: .java,v 1.5 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
  */
-
 /*
- * Portions Copyrighted [2011-2013] [ForgeRock Inc]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
+
 package org.forgerock.openam.network.ipv4;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -59,7 +59,9 @@ import java.util.StringTokenizer;
  * of <code>Condition</code>. This lets you define the IP addresses,
  * IP address ranges and DNS name patterns for which the policy applies
  *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPv4Condition} instead.
  */
+@Deprecated
 public class IPv4Condition implements Condition {
 
     /** Key that is used in <code>IPv4Condition</code> to define the  IP address

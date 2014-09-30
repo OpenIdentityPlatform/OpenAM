@@ -68,7 +68,7 @@ public class OAuth2ScopeConditionTest {
     }
 
     @Test
-    public void conditionShouldEvaluateToTrueWhenNoRequiredScopesSetAndNoneSetInEnvironment()
+    public void conditionShouldEvaluateToFalseWhenNoRequiredScopesSetAndNoneSetInEnvironment()
             throws EntitlementException {
 
         //Given
@@ -81,11 +81,12 @@ public class OAuth2ScopeConditionTest {
         ConditionDecision decision = condition.evaluate(realm, subject, resourceName, env);
 
         //Then
-        assertThat(decision.isSatisfied()).isTrue();
+        assertThat(decision.isSatisfied()).isFalse();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
-    public void conditionShouldEvaluateToTrueWhenNoRequiredScopesSetAndEmptyScopeSetInEnvironment()
+    public void conditionShouldEvaluateToFalseWhenNoRequiredScopesSetAndEmptyScopeSetInEnvironment()
             throws EntitlementException {
 
         //Given
@@ -100,7 +101,8 @@ public class OAuth2ScopeConditionTest {
         ConditionDecision decision = condition.evaluate(realm, subject, resourceName, env);
 
         //Then
-        assertThat(decision.isSatisfied()).isTrue();
+        assertThat(decision.isSatisfied()).isFalse();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
@@ -121,6 +123,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
@@ -140,6 +143,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
@@ -160,6 +164,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
@@ -183,6 +188,7 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isFalse();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 
     @Test
@@ -206,5 +212,6 @@ public class OAuth2ScopeConditionTest {
 
         //Then
         assertThat(decision.isSatisfied()).isTrue();
+        assertThat(decision.getAdvices()).isEmpty();
     }
 }
