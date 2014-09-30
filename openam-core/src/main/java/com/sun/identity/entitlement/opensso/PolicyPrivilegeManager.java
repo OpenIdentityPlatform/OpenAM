@@ -144,6 +144,10 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
             } else {
                 PrivilegeIndexStore pis = PrivilegeIndexStore.getInstance(adminSubject, getRealm());
                 privilege = (Privilege) pis.getPrivilege(privilegeName);
+
+                if (privilege == null) {
+                    throw new EntitlementException(EntitlementException.NO_SUCH_POLICY, new Object[] { privilegeName });
+                }
             }
 
             if (adminSubject != PrivilegeManager.superAdminSubject) {
