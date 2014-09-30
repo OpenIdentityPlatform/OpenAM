@@ -19,6 +19,7 @@ import com.sun.identity.idm.IdType;
 import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.*;
+import org.forgerock.openam.utils.CollectionUtils;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 
 public class ADAMHelperTest {
@@ -31,7 +32,7 @@ public class ADAMHelperTest {
     @Test
     public void nullPasswordIsNotEncoded() {
         assertThat(helper.encodePassword(null)).isNull();
-        assertThat(helper.encodePassword(IdType.USER, null)).isNull();
+        assertThat(helper.encodePassword(IdType.USER, (byte[][]) null)).isNull();
     }
 
     @Test
@@ -57,7 +58,7 @@ public class ADAMHelperTest {
 
     @Test
     public void passwordSetIsCorrectlyEncoded() throws Exception {
-        assertThat(helper.encodePassword(IdType.USER, asSet())).isNull();
+        assertThat(helper.encodePassword(IdType.USER, CollectionUtils.<String>asSet())).isNull();
         assertThat(helper.encodePassword(IdType.USER, asSet(PASSWORD))).isNotNull()
                 .isEqualTo(QUOTED_PASSWORD.getBytes(ENCODING));
         assertThat(helper.encodePassword(IdType.USER, asSet(PASSWORD, QUOTED_PASSWORD))).isNotNull()

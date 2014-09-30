@@ -903,15 +903,6 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
             boolean isAdd, boolean isString, boolean changeOCs) throws IdRepoException {
         ModifyRequest modifyRequest = Requests.newModifyRequest(getDN(type, name));
         attributes = removeUndefinedAttributes(type, attributes);
-        //TODO should we really allow to use #setAttributes instead of #changePassword for changing passwords?
-        byte[] encodedPwd = helper.encodePassword(type, attributes);
-        if (encodedPwd != null) {
-            if (isAdd) {
-                modifyRequest.addModification(ModificationType.ADD, AD_UNICODE_PWD_ATTR, encodedPwd);
-            } else {
-                modifyRequest.addModification(ModificationType.REPLACE, AD_UNICODE_PWD_ATTR, encodedPwd);
-            }
-        }
 
         if (type.equals(IdType.USER)) {
             Object status = attributes.get(DEFAULT_USER_STATUS_ATTR);
@@ -937,8 +928,15 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
 
         for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) attributes.entrySet()) {
             Object values = entry.getValue();
-            Attribute attr = new LinkedAttribute(entry.getKey());
-            if (values instanceof byte[][]) {
+            String attrName = entry.getKey();
+            Attribute attr = new LinkedAttribute(attrName);
+            if (AD_UNICODE_PWD_ATTR.equalsIgnoreCase(attrName)) {
+                if (values instanceof byte[][]) {
+                    attr.add(ByteString.valueOf(helper.encodePassword(IdType.USER, (byte[][]) values)));
+                } else {
+                    attr.add(ByteString.valueOf(helper.encodePassword(IdType.USER, (Set) values)));
+                }
+            } else if (values instanceof byte[][]) {
                 for (byte[] bytes : (byte[][]) values) {
                     attr.add(ByteString.valueOf(bytes));
                 }
