@@ -24,32 +24,40 @@
  *
  * $Id: OrConditionTest.java,v 1.2 2009/09/05 00:24:03 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.sun.identity.unittest.UnittestLog;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.testng.annotations.Test;
 
 public class OrConditionTest {
 
     @Test
     public void testConstruction() throws Exception {
-        IPCondition ipc = new IPCondition("100.100.100.100", "200.200.200.200");
-        ipc.setPConditionName("ip1");
-        DNSNameCondition dnsc = new DNSNameCondition("*.sun.com");
-        dnsc.setPConditionName("dns1");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp("192.168.0.1");
+        ipc.setEndIp("192.168.0.2");
 
-        TimeCondition tc = new TimeCondition("08:00", "16:00",
-                "mon", "fri");
+        SimpleTimeCondition tc = new SimpleTimeCondition();
+        tc.setStartTime("08:00");
+        tc.setEndTime("16:00");
+        tc.setStartDay("mon");
+        tc.setEndDay("fri");
         tc.setStartDate("01/01/2001");
         tc.setEndDate("02/02/2002");
         tc.setEnforcementTimeZone("PST");
-        tc.setPConditionName("tc1");
 
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         conditions.add(ipc);
-        conditions.add(dnsc);
         conditions.add(tc);
         OrCondition oc = new OrCondition(conditions);
         OrCondition oc1 = new OrCondition();

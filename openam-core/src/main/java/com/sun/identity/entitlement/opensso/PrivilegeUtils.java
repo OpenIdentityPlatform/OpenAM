@@ -30,32 +30,25 @@
  */
 package com.sun.identity.entitlement.opensso;
 
-import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementCondition;
-import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.OrSubject;
-import com.sun.identity.entitlement.OrCondition;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
-import com.sun.identity.entitlement.AuthenticatedESubject;
-import com.sun.identity.entitlement.Privilege;
+import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.IPrivilege;
+import com.sun.identity.entitlement.OrCondition;
+import com.sun.identity.entitlement.OrSubject;
+import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
-import com.sun.identity.entitlement.RoleSubject;
 import com.sun.identity.entitlement.StaticAttributes;
 import com.sun.identity.entitlement.UserAttributes;
-import com.sun.identity.entitlement.UserSubject;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.policy.ActionSchema;
 import com.sun.identity.policy.InvalidNameException;
 import com.sun.identity.policy.NameNotFoundException;
@@ -71,8 +64,6 @@ import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.interfaces.Referral;
 import com.sun.identity.policy.interfaces.ResponseProvider;
 import com.sun.identity.policy.interfaces.Subject;
-import com.sun.identity.policy.plugins.AMIdentitySubject;
-import com.sun.identity.policy.plugins.AuthenticatedUsers;
 import com.sun.identity.policy.plugins.IDRepoResponseProvider;
 import com.sun.identity.policy.plugins.PrivilegeCondition;
 import com.sun.identity.policy.plugins.PrivilegeSubject;
@@ -80,11 +71,12 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.DNMapper;
+
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -254,53 +246,6 @@ public class PrivilegeUtils {
             entitlementSubjects.iterator().next() :
             new OrSubject(entitlementSubjects);
     }
-
-    private static Set<EntitlementSubject> toEntitlementSubject(
-        AMIdentitySubject sbj,
-        boolean exclusive) {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-
-        try {
-            Set<EntitlementSubject> result = new HashSet<EntitlementSubject>();
-            Set<String> values = sbj.getValues();
-
-            for (String uuid : values) {
-                AMIdentity amid = IdUtils.getIdentity(adminToken, uuid);
-                IdType type = amid.getType();
-                if (type.equals(IdType.GROUP)) {
-                    OpenSSOGroupSubject grp = new OpenSSOGroupSubject(uuid);
-                    grp.setExclusive(exclusive);
-                    result.add(grp);
-                } else if (type.equals(IdType.ROLE)) {
-                    RoleSubject role = new RoleSubject(uuid);
-                    role.setExclusive(exclusive);
-                    result.add(role);
-                } else if (type.equals(IdType.USER)) {
-                    UserSubject user = new UserSubject(uuid);
-                    user.setExclusive(exclusive);
-                    result.add(user);
-                } else {
-                    return Collections.EMPTY_SET;
-                }
-            }
-            return result;
-        } catch (IdRepoException ex) {
-            return Collections.EMPTY_SET;
-        }
-    }
-
-    private static Set<EntitlementSubject> toEntitlementSubject(
-        AuthenticatedUsers sbj,
-        boolean exclusive) {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-
-        Set<EntitlementSubject> result = new HashSet<EntitlementSubject>();
-        result.add(new AuthenticatedESubject());
-        return result;
-    }
-
 
     private static EntitlementCondition toEntitlementCondition(Policy policy)
         throws PolicyException {

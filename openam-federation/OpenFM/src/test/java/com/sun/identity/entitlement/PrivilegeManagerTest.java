@@ -26,6 +26,11 @@
  *
  * Portions Copyrighted 2014 ForgeRock AS
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOException;
@@ -46,6 +51,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.json.JSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -204,14 +212,15 @@ public class PrivilegeManagerTest {
         subjects.add(ua2);
         OrSubject os = new OrSubject(subjects);
 
-        IPCondition ipc = new IPCondition(startIp, endIp);
-        ipc.setPConditionName("ipc");
-        DNSNameCondition dnsc = new DNSNameCondition("*.sun.com");
-        dnsc.setPConditionName("dnsc");
-        TimeCondition tc = new TimeCondition("08:00", "16:00", "mon", "fri");
-        tc.setPConditionName("tc");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp(startIp);
+        ipc.setEndIp(endIp);
+        SimpleTimeCondition tc = new SimpleTimeCondition();
+        tc.setStartTime("08:00");
+        tc.setEndTime("16:00");
+        tc.setStartDay("mon");
+        tc.setEndDay("fri");
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
-        conditions.add(dnsc);
         conditions.add(tc);
 
         StaticAttributes sa1 = new StaticAttributes();

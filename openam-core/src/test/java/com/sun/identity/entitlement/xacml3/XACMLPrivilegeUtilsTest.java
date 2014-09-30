@@ -23,13 +23,13 @@ package com.sun.identity.entitlement.xacml3;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.IPCondition;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.xacml3.core.Match;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 

@@ -27,11 +27,16 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +47,8 @@ import javax.security.auth.Subject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.forgerock.openam.entitlement.conditions.environment.ConditionConstants.REQUEST_IP;
 
 public class OrConditionEvalTest {
     private static final String PRIVILEGE_NAME = "OrConditionEvalTest";
@@ -68,8 +75,10 @@ public class OrConditionEvalTest {
             OrCondition cond = new OrCondition();
             Set<EntitlementCondition> conditions = new 
                     HashSet<EntitlementCondition>();
-            conditions.add(new DNSNameCondition(DNS_MASK));
-            conditions.add(new IPCondition(START_IP, END_IP));
+            IPCondition ipc = new IPCondition();
+            ipc.setStartIp(START_IP);
+            ipc.setEndIp(END_IP);
+            conditions.add(ipc);
             cond.setEConditions(conditions);
 
             Privilege privilege = Privilege.getNewInstance();
@@ -160,22 +169,10 @@ public class OrConditionEvalTest {
         }
 
         String adv = ipAdvice.iterator().next();
-        if (!adv.equals(IPCondition.REQUEST_IP + "=" + START_IP + "-" + END_IP)
+        if (!adv.equals(REQUEST_IP + "=" + START_IP + "-" + END_IP)
         ) {
             throw new Exception(
                     "OrConditionEvalTest.negativeTest: incorrect decision for IPCondition");
-        }
-
-        Set<String> dsnAdvice = advices.get(DNSNameCondition.class.getName());
-        if ((dsnAdvice == null) || dsnAdvice.isEmpty()) {
-            throw new Exception(
-                    "OrConditionEvalTest.negativeTest: no advice for DNSNameCondition.");
-        }
-
-        String dnsAdv = dsnAdvice.iterator().next();
-        if (!dnsAdv.equals(DNSNameCondition.REQUEST_DNS_NAME + "=" + DNS_MASK)){
-            throw new Exception(
-                    "OrConditionEvalTest.negativeTest: incorrect decision for DNSNameCondition");
         }
     }
 
@@ -184,11 +181,11 @@ public class OrConditionEvalTest {
                 new HashMap<String, Set<String>>();
         Set<String> dnsMask = new HashSet<String>();
         dnsMask.add(dns);
-        environment.put(DNSNameCondition.REQUEST_DNS_NAME, dnsMask);
+        environment.put("requestDnsName", dnsMask);
 
         Set<String> ip = new HashSet<String>();
         ip.add(ipAddr);
-        environment.put(IPCondition.REQUEST_IP, ip);
+        environment.put(REQUEST_IP, ip);
 
         return environment;
     }

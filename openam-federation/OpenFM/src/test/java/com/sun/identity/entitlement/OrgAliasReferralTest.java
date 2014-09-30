@@ -27,6 +27,10 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOToken;
@@ -42,6 +46,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -95,7 +101,7 @@ public class OrgAliasReferralTest {
         Entitlement e1 = new Entitlement(
             "http://www.OrgAliasReferralTest.com:80/*.*",
             actionValues);
-        EntitlementSubject sbj = new AuthenticatedESubject();
+        EntitlementSubject sbj = new AuthenticatedUsers();
 
         Privilege p1 = Privilege.getNewInstance();
         p1.setName("OrgAliasReferralTest");

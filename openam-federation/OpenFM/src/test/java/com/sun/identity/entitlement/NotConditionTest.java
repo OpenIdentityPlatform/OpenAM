@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 
 
 public class NotConditionTest {
@@ -42,8 +43,9 @@ public class NotConditionTest {
     @Test
     public void testConstruction() throws Exception {
 
-        IPCondition ipc = new IPCondition("100.100.100.100", "200.200.200.200");
-        ipc.setPConditionName("ip1");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp("100.100.100.100");
+        ipc.setEndIp("200.200.200.200");
         NotCondition ac = new NotCondition(ipc);
         NotCondition ac1 = new NotCondition();
         ac1.setState(ac.getState());
@@ -63,8 +65,12 @@ public class NotConditionTest {
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
 
-        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
-        IPCondition ip2 = new IPCondition("192.168.0.5", "192.168.0.6");
+        IPCondition ip = new IPCondition();
+        ip.setStartIp("192.168.0.1");
+        ip.setEndIp("192.168.0.2");
+        IPCondition ip2 = new IPCondition();
+        ip2.setStartIp("192.168.0.5");
+        ip2.setEndIp("192.168.0.6");
 
         conditions.add(ip);
         conditions.add(ip2);
@@ -82,7 +88,9 @@ public class NotConditionTest {
     public void testSingleSubjectEnforced() {
         //given
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
-        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
+        IPCondition ip = new IPCondition();
+        ip.setStartIp("192.168.0.1");
+        ip.setEndIp("192.168.0.2");
         conditions.add(ip);
         NotCondition myNotCondition = new NotCondition();
 
@@ -97,7 +105,9 @@ public class NotConditionTest {
     @Test
     public void testSingleSubjectEnforcedRetrieval() {
         //given
-        IPCondition ip = new IPCondition("192.168.0.1", "192.168.0.2");
+        IPCondition ip = new IPCondition();
+        ip.setStartIp("192.168.0.1");
+        ip.setEndIp("192.168.0.2");
         NotCondition myNotCondition = new NotCondition(ip);
 
         //when

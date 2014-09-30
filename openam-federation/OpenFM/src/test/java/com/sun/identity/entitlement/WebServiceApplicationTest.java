@@ -27,6 +27,10 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOToken;
@@ -42,6 +46,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -91,7 +97,7 @@ public class WebServiceApplicationTest {
         Entitlement entitlement = new Entitlement(APPL_NAME, URL + "index.html",
             actions);
         privilege.setEntitlement(entitlement);
-        privilege.setSubject(new AuthenticatedESubject());
+        privilege.setSubject(new AuthenticatedUsers());
         pm.add(privilege);
 
         Privilege p = pm.findByName(POLICY_NAME);

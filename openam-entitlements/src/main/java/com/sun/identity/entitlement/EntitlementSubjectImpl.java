@@ -24,6 +24,11 @@
  *
  * $Id: EntitlementSubjectImpl.java,v 1.2 2009/10/29 19:05:18 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.security.Principal;
@@ -34,7 +39,10 @@ import org.json.JSONException;
 
 /**
  * EntitlementSubject to represent group identity for membership check.
+ *
+ * @deprecated As of ForgeRock OpenAM 12.
  */
+@Deprecated
 public abstract class EntitlementSubjectImpl implements SubjectImplementation {
     private String uuid;
     private String pSubjectName;

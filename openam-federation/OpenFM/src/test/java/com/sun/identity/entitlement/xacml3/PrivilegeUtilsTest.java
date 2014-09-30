@@ -24,13 +24,18 @@
  *
  * $Id: PrivilegeUtilsTest.java,v 1.1 2009/08/19 05:41:02 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement.xacml3;
 
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.IPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import com.sun.identity.entitlement.OrCondition;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
@@ -95,8 +100,9 @@ public class PrivilegeUtilsTest {
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         String startIp = "100.100.100.100";
         String endIp = "200.200.200.200";
-        IPCondition ipc = new IPCondition(startIp, endIp);
-        ipc.setPConditionName("ipc");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp(startIp);
+        ipc.setEndIp(endIp);
         conditions.add(ipc);
         OrCondition oc = new OrCondition(conditions);
         AndCondition ac = new AndCondition(conditions);

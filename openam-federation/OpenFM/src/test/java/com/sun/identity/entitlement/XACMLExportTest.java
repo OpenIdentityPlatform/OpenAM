@@ -26,6 +26,11 @@
  *
  * Portions Copyrighted 2014 ForgeRock AS
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOException;
@@ -35,6 +40,7 @@ import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.security.AdminTokenAction;
@@ -115,8 +121,9 @@ public class XACMLExportTest {
         Set<EntitlementCondition> conditions = new HashSet<EntitlementCondition>();
         String startIp = "100.100.100.100";
         String endIp = "200.200.200.200";
-        IPCondition ipc = new IPCondition(startIp, endIp);
-        ipc.setPConditionName("ipc");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp(startIp);
+        ipc.setEndIp(endIp);
         conditions.add(ipc);
         OrCondition oc = new OrCondition(conditions);
 

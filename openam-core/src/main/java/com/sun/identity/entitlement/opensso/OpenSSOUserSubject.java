@@ -24,6 +24,11 @@
  *
  * $Id: OpenSSOUserSubject.java,v 1.2 2009/08/21 21:52:01 hengming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 
@@ -45,8 +50,10 @@ import com.sun.identity.security.AdminTokenAction;
 
 /**
  * OpenSSOUserSubject to represent user identity for membership check
- * @author dorai
+ *
+ * @deprecated As of ForgeRock OpenAM 12.
  */
+@Deprecated
 public class OpenSSOUserSubject extends UserSubject {
     /**
      * Constructs an OpenSSOUserSubject

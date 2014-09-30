@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
 
 package com.sun.identity.policy;
 
@@ -144,15 +146,11 @@ public class ConditionTypeManager {
 
     /**
      * Returns the type of the <code>Condition</code> implementation.
-     * For example <code>TimeCondition</code>, <code>DayTimeCondition</code>,
-     * <code>IPCondition</code>.
      *
      * @param condition condition object for which this method will
      *         return its associated type
      *
-     * @return type of the condition, e.g. <code>AuthLevelConditon</code>,
-     *         <code>IPCondition</code>.  Returns <code>null</code> if not
-     *         present.
+     * @return type of the condition. Returns <code>null</code> if not present.
      */
     public String getConditionTypeName(Condition condition) {
         return (conditionTypeName(condition));
@@ -242,15 +240,11 @@ public class ConditionTypeManager {
 
     /**
      * Returns the type of the <code>Condition</code> implementation.
-     * For example <code>TimeCondition</code>, <code>DayTimeCondition</code>,
-     * <code>IPCondition</code>.
      *
      * @param condition condition object for which this method will
      *         return its associated type
      *
-     * @return type of the condition, e.g. <code>AuthLevelConditon</code>,
-     *         <code>IPCondition</code>.  Returns <code>null</code> if not
-     *         present.
+     * @return type of the condition.  Returns <code>null</code> if not present.
      */
     static String conditionTypeName(Condition condition) {
         if (condition == null) {

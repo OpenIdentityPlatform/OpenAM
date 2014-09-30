@@ -24,10 +24,18 @@
  *
  * $Id: AndConditionTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.testng.annotations.Test;
 
 /**
@@ -39,20 +47,20 @@ public class AndConditionTest {
     @Test
     public void testConstruction() throws Exception {
 
-        IPCondition ipc = new IPCondition("100.100.100.100", "200.200.200.200");
-        ipc.setPConditionName("ip1");
-        DNSNameCondition dnsc = new DNSNameCondition("*.sun.com");
-        dnsc.setPConditionName("ip2");
-        TimeCondition tc = new TimeCondition("08:00", "16:00",
-                "mon", "fri");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp("100.100.100.100");
+        ipc.setEndIp("200.200.200.200");
+        SimpleTimeCondition tc = new SimpleTimeCondition();
+        tc.setStartTime("08:00");
+        tc.setEndTime("16:00");
+        tc.setStartDay("mon");
+        tc.setEndDay("fri");
         tc.setStartDate("01/01/2001");
         tc.setEndDate("02/02/2002");
         tc.setEnforcementTimeZone("PST");
-        tc.setPConditionName("tc1");
         Set<EntitlementCondition> conditions
                 = new HashSet<EntitlementCondition>();
         conditions.add(ipc);
-        conditions.add(dnsc);
         conditions.add(tc);
         AndCondition ac = new AndCondition(conditions);
 

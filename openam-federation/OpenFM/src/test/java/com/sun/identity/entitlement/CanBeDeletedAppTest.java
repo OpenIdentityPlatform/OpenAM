@@ -27,6 +27,10 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOToken;
@@ -41,6 +45,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -128,7 +134,7 @@ public class CanBeDeletedAppTest {
         Entitlement entitlement = new Entitlement(APPL_NAME,
             "http://www.CanBeDeletedAppTest.com/*", actionValues);
         p.setEntitlement(entitlement);
-        p.setSubject(new AuthenticatedESubject());
+        p.setSubject(new AuthenticatedUsers());
         pm.add(p);
     }
 

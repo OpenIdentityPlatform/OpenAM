@@ -27,13 +27,16 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.rest;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.delegation.DelegationPrivilege;
-import com.sun.identity.entitlement.AuthenticatedESubject;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
@@ -58,6 +61,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Cookie;
+
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.json.JSONObject;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -112,7 +117,7 @@ public class RestPermissionTest {
         Entitlement entitlement = new Entitlement(RESOURCE_NAME + "/*",
             actions);
         privilege.setEntitlement(entitlement);
-        EntitlementSubject sbj = new AuthenticatedESubject();
+        EntitlementSubject sbj = new AuthenticatedUsers();
         privilege.setSubject(sbj);
         pm.add(privilege);
     }

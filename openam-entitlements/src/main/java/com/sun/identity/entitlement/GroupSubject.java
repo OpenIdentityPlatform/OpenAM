@@ -24,6 +24,11 @@
  *
  * $Id: GroupSubject.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.Collections;
@@ -35,7 +40,10 @@ import javax.security.auth.Subject;
 
 /**
  * This class represents group identity for membership check
+ *
+ * @deprecated As of ForgeRock OpenAM 12.
  */
+@Deprecated
 public class GroupSubject extends EntitlementSubjectImpl {
     public static final String GROUP_NAME = "group";
 

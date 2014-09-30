@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
 import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.VirtualSubject;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -38,9 +37,6 @@ public abstract class JsonEntitlementSubjectMixin {
 
     @JsonIgnore
     public abstract String getState();
-
-    @JsonIgnore
-    public abstract VirtualSubject.VirtualId getVirtualId();
 
     @JsonIgnore
     public abstract Map<String, Set<String>> getSearchIndexAttributes();

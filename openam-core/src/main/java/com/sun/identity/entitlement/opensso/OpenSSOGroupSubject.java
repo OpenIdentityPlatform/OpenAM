@@ -24,6 +24,11 @@
  *
  * $Id: OpenSSOGroupSubject.java,v 1.2 2009/08/21 21:52:01 hengming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOException;
@@ -50,7 +55,10 @@ import javax.security.auth.Subject;
 
 /**
  * This class represents group identity for membership check
+ *
+ * @deprecated As of ForgeRock OpenAM 12.
  */
+@Deprecated
 public class OpenSSOGroupSubject extends GroupSubject {
     /**
      * Constructor.

@@ -24,17 +24,21 @@
  *
  * $Id: PrivilegeUtilsTest.java,v 1.1 2009/08/19 05:41:03 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.policy;
 
 import com.sun.identity.entitlement.opensso.PrivilegeUtils;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.AndCondition;
-import com.sun.identity.entitlement.DNSNameCondition;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.IPCondition;
+import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import com.sun.identity.entitlement.IPrivilege;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.Privilege;
@@ -83,12 +87,12 @@ public class PrivilegeUtilsTest {
         subjects.add(us1);
         subjects.add(us2);
         OrSubject os = new OrSubject(subjects);
-        EntitlementCondition dnsc = new DNSNameCondition("*.sun.com");
-        EntitlementCondition ipc = new IPCondition("100.100.100.100",
-            "200.200.200.200");
+        IPCondition ipc = new IPCondition();
+        ipc.setStartIp("100.100.100.100");
+        ipc.setEndIp("200.200.200.200");
+
         Set<EntitlementCondition> setConditions = new
             HashSet<EntitlementCondition>();
-        setConditions.add(dnsc);
         setConditions.add(ipc);
         AndCondition andCondition = new AndCondition();
         andCondition.setEConditions(setConditions);

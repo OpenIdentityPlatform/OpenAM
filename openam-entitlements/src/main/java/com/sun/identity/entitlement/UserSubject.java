@@ -24,6 +24,11 @@
  *
  * $Id: UserSubject.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 
@@ -36,8 +41,10 @@ import javax.security.auth.Subject;
 
 /**
  * EntitlementSubject to represent user identity for membership check
- * @author dorai
+ *
+ * @deprecated As of ForgeRock OpenAM 12.
  */
+@Deprecated
 public class UserSubject extends EntitlementSubjectImpl {
     /**
      * Constructs an UserSubject

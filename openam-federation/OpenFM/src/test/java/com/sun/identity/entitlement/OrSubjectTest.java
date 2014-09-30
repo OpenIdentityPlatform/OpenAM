@@ -24,6 +24,11 @@
  *
  * $Id: OrSubjectTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
  */
+
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.HashSet;
@@ -49,16 +54,11 @@ public class OrSubjectTest {
         gs1.setPSubjectName("g1");
         GroupSubject gs3 = new GroupSubject("group31");
         gs1.setPSubjectName("g3");
-        RoleSubject rs1 = new RoleSubject("role1");
-        rs1.setPSubjectName("r1");
-        NotSubject ns1 = new NotSubject(rs1);
-        ns1.setPSubjectName("r1");
         Set<EntitlementSubject> subjects = new HashSet<EntitlementSubject>();
         subjects.add(us1);
         subjects.add(us2);
         subjects.add(gs1);
         subjects.add(gs2);
-        subjects.add(ns1);
         OrSubject os = new OrSubject(subjects);
         OrSubject os1 = new OrSubject();
         os1.setState(os.getState());

@@ -25,6 +25,10 @@
  * $Id: AnyUserSubject.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement;
 
 
@@ -35,10 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
-public class AnyUserSubject extends VirtualSubject {
-    public VirtualId getVirtualId() {
-        return VirtualId.ANY_USER;
-    }
+public class AnyUserSubject implements SubjectImplementation {
 
     public SubjectDecision evaluate(
         String realm,

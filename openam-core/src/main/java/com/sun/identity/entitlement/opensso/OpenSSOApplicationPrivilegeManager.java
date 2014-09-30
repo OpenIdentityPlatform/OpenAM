@@ -27,6 +27,10 @@
  * Portions Copyrighted 2014 ForgeRock AS
  */
 
+/**
+ * Portions copyright 2014 ForgeRock AS.
+ */
+
 package com.sun.identity.entitlement.opensso;
 
 import com.iplanet.sso.SSOToken;
@@ -54,13 +58,14 @@ import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.SubjectAttributesManager;
 import com.sun.identity.entitlement.SubjectDecision;
 import com.sun.identity.entitlement.SubjectImplementation;
-import com.sun.identity.entitlement.TimeCondition;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -333,8 +338,8 @@ public class OpenSSOApplicationPrivilegeManager extends
 
         ap.setSubject(subjects);
         EntitlementCondition cond = p.getCondition();
-        if (cond instanceof TimeCondition) {
-            ap.setCondition((TimeCondition)cond);
+        if (cond instanceof SimpleTimeCondition) {
+            ap.setCondition(cond);
         }
         return ap;
     }

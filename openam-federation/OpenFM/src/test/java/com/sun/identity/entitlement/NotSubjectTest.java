@@ -38,24 +38,6 @@ import org.testng.annotations.Test;
 
 public class NotSubjectTest {
 
-    @Test
-    public void testConstruction() throws Exception {
-        RoleSubject rs1 = new RoleSubject("role1");
-        rs1.setPSubjectName("r1");
-        NotSubject ns1 = new NotSubject(rs1);
-        ns1.setPSubjectName("r1");
-        NotSubject ns2 = new NotSubject();
-        ns2.setState(ns1.getState());
-
-        boolean result = ns1.equals(ns2);
-        if (!result) {
-            throw new Exception("NotSubjectTest.testConstruction():"
-                    + "NotSubject with setState="
-                    + "does not equal NotSubject with getState()");
-
-        }
-    }
-
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void testSingleSubject() {
         //given

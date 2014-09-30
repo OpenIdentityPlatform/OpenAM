@@ -21,13 +21,10 @@ import com.sun.identity.entitlement.AndSubject;
 import com.sun.identity.entitlement.AnyUserSubject;
 import com.sun.identity.entitlement.AttributeLookupCondition;
 import com.sun.identity.entitlement.AttributeSubject;
-import com.sun.identity.entitlement.DNSNameCondition;
 import com.sun.identity.entitlement.DenyOverride;
 import com.sun.identity.entitlement.EntitlementCombiner;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
-import com.sun.identity.entitlement.GroupSubject;
-import com.sun.identity.entitlement.IPCondition;
 import com.sun.identity.entitlement.NoSubject;
 import com.sun.identity.entitlement.NotCondition;
 import com.sun.identity.entitlement.NotSubject;
@@ -35,12 +32,9 @@ import com.sun.identity.entitlement.NumericAttributeCondition;
 import com.sun.identity.entitlement.OrCondition;
 import com.sun.identity.entitlement.OrSubject;
 import com.sun.identity.entitlement.ResourceAttribute;
-import com.sun.identity.entitlement.RoleSubject;
 import com.sun.identity.entitlement.StaticAttributes;
 import com.sun.identity.entitlement.StringAttributeCondition;
-import com.sun.identity.entitlement.TimeCondition;
 import com.sun.identity.entitlement.UserAttributes;
-import com.sun.identity.entitlement.UserSubject;
 
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -98,22 +92,14 @@ public final class EntitlementRegistry {
         registry.registerSubjectType("NOT", NotSubject.class);
 
         // Standard OpenAM entitlement conditions (policy conditions will be loaded later)
-//        registry.registerConditionType(IPCondition.class);
-        registry.registerConditionType(DNSNameCondition.class);
         registry.registerConditionType(NumericAttributeCondition.class);
-        registry.registerConditionType(TimeCondition.class);
         registry.registerConditionType(AttributeLookupCondition.class);
         registry.registerConditionType(StringAttributeCondition.class);
 
         // Standard OpenAM subjects
         registry.registerSubjectType("NONE", NoSubject.class);
         registry.registerSubjectType(AnyUserSubject.class);
-        //registry.registerSubjectType(AuthenticatedESubject.class); // Not implemented?
-        registry.registerSubjectType(GroupSubject.class);
         registry.registerSubjectType(AttributeSubject.class);
-        registry.registerSubjectType(UserSubject.class);
-        registry.registerSubjectType(RoleSubject.class);
-        //registry.registerSubjectType(IdRepoRoleSubject.class);
 
         // Standard OpenAM resource attribute types
         registry.registerAttributeType("User", UserAttributes.class);
