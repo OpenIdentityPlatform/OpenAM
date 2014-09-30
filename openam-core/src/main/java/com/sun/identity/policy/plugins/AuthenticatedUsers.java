@@ -45,7 +45,10 @@ import com.sun.identity.policy.Syntax;
 
 /**
  * This subject applies to all users with valid <code>SSOToken</code>.
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers} instead.
  */
+@Deprecated
 public class AuthenticatedUsers implements Subject {
 
     private static ValidValues validValues = 

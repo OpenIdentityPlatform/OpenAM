@@ -69,8 +69,10 @@ import java.security.AccessController;
  * AMIdentitySubject is a <code>Subject</code> implementation that checks for 
  * membership in a set of <code>AMIdentity</code> objects using the underlying
  * Identity repository service.
+ *
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject} instead.
  */
-
+@Deprecated
 public class AMIdentitySubject implements Subject {
 
     private Set subjectValues = new HashSet();

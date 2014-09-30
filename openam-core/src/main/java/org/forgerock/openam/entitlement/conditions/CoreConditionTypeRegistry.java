@@ -20,6 +20,8 @@ import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
+import org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,6 +40,9 @@ public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
     @Override
     public Collection<Class<? extends EntitlementSubject>> getSubjectConditions() {
         Set<Class<? extends EntitlementSubject>> conditions = new HashSet<Class<? extends EntitlementSubject>>();
+
+        conditions.add(AMIdentitySubject.class);
+        conditions.add(AuthenticatedUsers.class);
 
         return conditions;
     }

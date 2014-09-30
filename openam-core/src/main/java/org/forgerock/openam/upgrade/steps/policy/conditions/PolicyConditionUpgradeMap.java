@@ -20,9 +20,12 @@ import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.opensso.PolicyCondition;
 import com.sun.identity.entitlement.opensso.PolicySubject;
+import org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A map containing all the migration logic from an old policy condition to a new entitlement condition.
@@ -55,6 +58,38 @@ class PolicyConditionUpgradeMap {
                      }
                  });
         */
+
+        subjectConditionsUpgradeMap.put(com.sun.identity.policy.plugins.AMIdentitySubject.class.getName(),
+                new SubjectConditionMigrator() {
+                    @Override
+                    public EntitlementSubject migrate(PolicySubject subject, MigrationReport migrationReport) {
+
+                        AMIdentitySubject eSubject = new AMIdentitySubject();
+
+                        Set<String> subjects = subject.getValues();
+
+                        eSubject.setSubjectValues(subjects);
+
+                        migrationReport.migratedSubjectCondition(
+                                com.sun.identity.policy.plugins.AMIdentitySubject.class.getName(),
+                                AMIdentitySubject.class.getName());
+                        return eSubject;
+                    }
+                });
+
+        subjectConditionsUpgradeMap.put(com.sun.identity.policy.plugins.AuthenticatedUsers.class.getName(),
+                new SubjectConditionMigrator() {
+                    @Override
+                    public EntitlementSubject migrate(PolicySubject subject, MigrationReport migrationReport) {
+
+                        AuthenticatedUsers eSubject = new AuthenticatedUsers();
+
+                        migrationReport.migratedSubjectCondition(
+                                com.sun.identity.policy.plugins.AuthenticatedUsers.class.getName(),
+                                AuthenticatedUsers.class.getName());
+                        return eSubject;
+                    }
+        });
     }
 
     /**
