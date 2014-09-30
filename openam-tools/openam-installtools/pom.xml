@@ -46,9 +46,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <!-- Used by the OSChecker Test Case -->
-                        <os.name>Linux</os.name>
-                        <os.arch>x86</os.arch>
                         <com.sun.identity.product.logs.dir>${project.build.testOutputDirectory}</com.sun.identity.product.logs.dir>
                     </systemPropertyVariables>
                 </configuration>
