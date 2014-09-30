@@ -32,25 +32,34 @@ public class DirectoryHelper {
     protected static final Debug DEBUG = Debug.getInstance("DJLDAPv3Repo");
 
     /**
-     * Encodes the password to use the "correct" character encoding.
+     * Encodes the password to use the "correct" character encoding for AD.
      *
      * @param type The type of the identity, which should be always USER.
-     * @param attrValue The password value either in string or binary format. If binary, it is assumed that the value
-     * is already correctly encoded. May be null.
+     * @param binaryValues The password value in binary format which is assumed to be correctly encoded already. May
+     * be null.
      * @return The encoded password, or null if the input was null.
      */
-    public byte[] encodePassword(IdType type, Object attrValue) {
+    public byte[] encodePassword(IdType type, byte[][] binaryValues) {
         if (type.equals(IdType.USER)) {
-            if (attrValue instanceof Set) {
-                Set<String> password = (Set<String>) attrValue;
-                if (!password.isEmpty()) {
-                    return encodePassword(password.iterator().next());
-                }
-            } else if (attrValue instanceof byte[][]) {
-                byte[][] binaryAttr = (byte[][]) attrValue;
-                if (binaryAttr.length > 0) {
-                    return binaryAttr[0];
-                }
+            if (binaryValues != null && binaryValues.length > 0) {
+                return binaryValues[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Encodes the password to use the "correct" character encoding for AD.
+     *
+     * @param type The type of the identity, which should be always USER.
+     * @param passwordValues The password value in string format to be encoded. May be null.
+     * @return The encoded password, or null if the input was null.
+     */
+    public byte[] encodePassword(IdType type, Set<String> passwordValues) {
+        if (type.equals(IdType.USER)) {
+            if (passwordValues != null && !passwordValues.isEmpty()) {
+                return encodePassword(passwordValues.iterator().next());
             }
         }
 
