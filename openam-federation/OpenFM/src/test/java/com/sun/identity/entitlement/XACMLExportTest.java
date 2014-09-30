@@ -127,7 +127,6 @@ public class XACMLExportTest {
         conditions.add(ipc);
         OrCondition oc = new OrCondition(conditions);
 
-
         /*
         StaticAttributes sa1 = new StaticAttributes();
         Set<String> aValues = new HashSet<String>();

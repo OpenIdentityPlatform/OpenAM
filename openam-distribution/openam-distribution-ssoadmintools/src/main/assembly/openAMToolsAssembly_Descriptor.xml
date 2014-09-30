@@ -65,6 +65,8 @@
                 <include>external:jaxrpc-impl</include>
                 <include>com.sun.xml.rpc:jaxrpc-spi</include>
                 <include>org.json:json</include>
+                <include>org.codehaus.jackson:jackson-core-asl</include>
+                <include>org.codehaus.jackson:jackson-mapper-asl</include>
                 <include>external:jsr173_api</include>
                 <include>javax.mail:mail</include>
                 <include>relaxngDatatype:relaxngDatatype</include>
@@ -79,6 +81,7 @@
                 <include>org.slf4j:slf4j-nop</include>
                 <include>org.apache.santuario:xmlsec</include>
                 <include>commons-logging:commons-logging-api</include>
+
             </includes>
         </dependencySet>
         <dependencySet>

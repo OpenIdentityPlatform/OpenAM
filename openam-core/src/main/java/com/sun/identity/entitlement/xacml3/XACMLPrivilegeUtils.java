@@ -40,6 +40,7 @@ import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.UserSubject;
 import com.sun.identity.entitlement.opensso.XACMLOpenSSOPrivilege;
+import com.sun.identity.entitlement.xacml3.core.AdviceExpressions;
 import com.sun.identity.entitlement.xacml3.core.AllOf;
 import com.sun.identity.entitlement.xacml3.core.AnyOf;
 import com.sun.identity.entitlement.xacml3.core.Apply;
@@ -88,6 +89,10 @@ import java.util.TimeZone;
 public class XACMLPrivilegeUtils {
 
     private static final ObjectFactory objectFactory = new ObjectFactory();
+
+    // Used in ResourceAttribute serialisation.
+    private static ResourceAttributeUtil resourceAttributeUtil = new ResourceAttributeUtil();
+    private static XACMLSchemaFactory schemaFactory = new XACMLSchemaFactory();
 
     /**
      * Constructs XACMLPrivilegeUtils
@@ -161,13 +166,15 @@ public class XACMLPrivilegeUtils {
         try {
             policy = privilegeToPolicyInternal(privilege);
         } catch (JAXBException je) {
-            //TODO: log error, jaxbexception
+            PrivilegeManager.debug.error("Caught JAXBException while converting Privilege to Policy", je);
+        } catch (EntitlementException ee) {
+            PrivilegeManager.debug.error("Caught EntitlementException while converting Privilege to Policy", ee);
         }
         return policy;
     }
 
     private static Policy privilegeToPolicyInternal(Privilege privilege) throws
-            JAXBException  {
+            JAXBException, EntitlementException  {
 
         /*
          * See entitelement meeting minutes - 22apr09
@@ -375,8 +382,12 @@ public class XACMLPrivilegeUtils {
         Condition condition = eSubjectConditionToXCondition(
                 privilege.getSubject(), privilege.getCondition());
 
-        // FIXME: add it to Policy as AdviceExpressions?
+        // Include resource attributes (ResourceProvider) as AdviceExpressions
         Set<ResourceAttribute> ra = privilege.getResourceAttributes();
+        if (ra != null && !ra.isEmpty()) {
+            AdviceExpressions adviceExpressions = schemaFactory.resourceAttributesToAdviceExpressions(ra);
+            policy.setAdviceExpressions(adviceExpressions);
+        }
 
         if (!permitActions.isEmpty()) {
             Rule permitRule = new Rule();
@@ -549,24 +560,6 @@ public class XACMLPrivilegeUtils {
             AllOf allOf = new AllOf();
             List<Match> matchList = allOf.getMatch();
             matchList.add(actionNameToMatch(actionName, applicationName));
-            allOfList.add(allOf);
-        }
-        return anyOfList;
-    }
-
-    public static List<AnyOf> excludedResourceNamesToAnyOfList(
-            Set<String> excludedResources, String applicationName) {
-        if (excludedResources == null || excludedResources.isEmpty()) {
-            return null;
-        }
-        List<AnyOf> anyOfList = new ArrayList<AnyOf>();
-        AnyOf anyOf = new AnyOf();
-        anyOfList.add(anyOf);
-        List<AllOf> allOfList = anyOf.getAllOf();
-        for (String resourceName : excludedResources) {
-            AllOf allOf = new AllOf();
-            List<Match> matchList = allOf.getMatch();
-            matchList.add(resourceNameToNotMatch(resourceName, applicationName));
             allOfList.add(allOf);
         }
         return anyOfList;
@@ -754,7 +747,7 @@ public class XACMLPrivilegeUtils {
     }
 
     public static String getRuleCombiningAlgId(String applicationName) {
-        // TODO: return the correct alogrithm id based on application
+        // TODO: return the correct algorithm id based on application
         return XACMLConstants.XACML_RULE_DENY_OVERRIDES;
     }
 
@@ -801,14 +794,13 @@ public class XACMLPrivilegeUtils {
 
         List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
         Set<String> resourceNames = getResourceNamesFromMatches(policyMatches);
-        Set<String> excludedResourceNames = getExcludedResourceNamesFromMatches(policyMatches);
         Map<String, Boolean> actionValues = getActionValuesFromPolicy(policy);
 
         EntitlementSubject es = getEntitlementSubjectFromPolicy(policy);
         EntitlementCondition ec = getEntitlementConditionFromPolicy(policy);
 
         /*
-         * Constuct entitlement from Rule target
+         * Construct entitlement from Rule target
          * Get resource names, excluded resource names, action names from Rule Match element
          * One Match for Action
          * One Rule per value
@@ -818,8 +810,8 @@ public class XACMLPrivilegeUtils {
             entitlement.setName(entitlementName);
         }
 
-        // FIXME: add support ResourceAttributes
-        Set<ResourceAttribute> ras = null;
+        // Process AdviceExpressions from Export into ResourceAttributes
+        Set<ResourceAttribute> ras = schemaFactory.adviceExpressionsToResourceAttributes(policy.getAdviceExpressions());
 
         Privilege privilege = new XACMLOpenSSOPrivilege();
         privilege.setName(privilegeName);
@@ -917,6 +909,7 @@ public class XACMLPrivilegeUtils {
 
         return policySet;
     }
+
     private static PolicySet policiesToPolicySetInternal(String realm, Set<Policy> policies)
             throws JAXBException {
         PolicySet policySet = new PolicySet();
@@ -994,28 +987,6 @@ public class XACMLPrivilegeUtils {
         for (Match match : matches) {
             String matchId = match.getMatchId();
             if ((matchId != null) && matchId.indexOf(":resource-match:") != -1) {
-                AttributeValue attributeValue = match.getAttributeValue();
-                if (attributeValue != null) {
-                    List<Object> contentList = attributeValue.getContent();
-                    if ((contentList != null) && !contentList.isEmpty()) {
-                        // FIXME: log a warning if more than one element
-                        Object obj = contentList.get(0);
-                        resourceNames.add(obj.toString());
-                    }
-                }
-            }
-        }
-        return resourceNames;
-    }
-
-    static Set<String> getExcludedResourceNamesFromMatches(List<Match> matches) {
-        if (matches == null) {
-            return null;
-        }
-        Set<String> resourceNames = new HashSet<String>();
-        for (Match match : matches) {
-            String matchId = match.getMatchId();
-            if ((matchId != null) && matchId.indexOf(":resource-no-match:") != -1) {
                 AttributeValue attributeValue = match.getAttributeValue();
                 if (attributeValue != null) {
                     List<Object> contentList = attributeValue.getContent();
@@ -1544,6 +1515,4 @@ public class XACMLPrivilegeUtils {
 
         return anyOf;
     }
-
 }
-

@@ -76,6 +76,7 @@ public class EntitlementException extends Exception {
     public static final int SUBJECT_REQUIRED = 327;
     public static final int INVALID_SEARCH_FILTER = 328;
     public static final int UNKNOWN_POLICY_CLASS = 329;
+    public static final int UNKNOWN_RESOURCE_ATTRIBUTE_CLASS = 330;
     public static final int INVALID_PROPERTY_VALUE = 400;
     public static final int INVALID_VALUE = 401;
     public static final int START_DATE_AFTER_END_DATE = 402;

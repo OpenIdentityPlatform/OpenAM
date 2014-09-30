@@ -183,7 +183,7 @@ public class StaticAttributes implements ResourceAttribute {
      */
     @Override
     public boolean equals(Object obj) {
-        boolean equalled = true;
+
         if (obj == null) {
             return false;
         }
@@ -222,7 +222,7 @@ public class StaticAttributes implements ResourceAttribute {
                 return false;
             }
         }
-        return equalled;
+        return true;
     }
 
     /**
@@ -231,15 +231,15 @@ public class StaticAttributes implements ResourceAttribute {
      */
     @Override
     public int hashCode() {
-        int code = 0;
+        int code = 1;
         if (propertyName != null) {
-            code += propertyName.hashCode();
+            code = 31 * code + propertyName.hashCode();
         }
         if (propertyValues != null) {
-            code += propertyValues.hashCode();
+            code = 31 * code + propertyValues.hashCode();
         }
         if (pResponseProviderName != null) {
-             code += pResponseProviderName.hashCode();
+             code = 31 * code + pResponseProviderName.hashCode();
         }
         return code;
     }
