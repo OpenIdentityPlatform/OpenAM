@@ -22,7 +22,9 @@ import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.rest.resource.CrestHttpServlet;
 import org.forgerock.openam.rest.router.RestEndpointManager;
+import org.forgerock.openam.rest.service.JSONServiceEndpointApplication;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
+import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -42,7 +44,8 @@ public class RestEndpointServlet extends HttpServlet {
     public static final String CREST_CONNECTION_FACTORY_NAME = "CrestConnectionFactory";
 
     private final org.forgerock.json.resource.servlet.HttpServlet crestServlet;
-    private final RestletServiceServlet restServiceServlet;
+    private final RestletServiceServlet restletJSONServiceServlet;
+    private final RestletServiceServlet restletXACMLServiceServlet;
     private final RestEndpointManager endpointManager;
 
     /**
@@ -51,7 +54,10 @@ public class RestEndpointServlet extends HttpServlet {
     public RestEndpointServlet() {
         this.crestServlet = new CrestHttpServlet(this, InjectorHolder.getInstance(Key.get(ConnectionFactory.class,
                 Names.named(CREST_CONNECTION_FACTORY_NAME))));
-        this.restServiceServlet = new RestletServiceServlet(this);
+        this.restletJSONServiceServlet = new RestletServiceServlet(this, JSONServiceEndpointApplication.class,
+                "jsonRestletServiceServlet");
+        this.restletXACMLServiceServlet = new RestletServiceServlet(this, XACMLServiceEndpointApplication.class,
+                "xacmlRestletServiceServlet");
         this.endpointManager = InjectorHolder.getInstance(RestEndpointManager.class);
     }
 
@@ -59,13 +65,15 @@ public class RestEndpointServlet extends HttpServlet {
      * Constructor for test use.
      *
      * @param crestServlet An instance of a CrestHttpServlet.
-     * @param restServiceServlet An instance of a RestletServiceServlet.
+     * @param restletJSONServiceServlet An instance of a RestletServiceServlet.
+     * @param restletXACMLServiceServlet An instance of a RestletServiceServlet.
      * @param endpointManager An instance of the RestEndpointManager.
      */
-    RestEndpointServlet(final CrestHttpServlet crestServlet, final RestletServiceServlet restServiceServlet,
-            final RestEndpointManager endpointManager) {
+    RestEndpointServlet(final CrestHttpServlet crestServlet, final RestletServiceServlet restletJSONServiceServlet,
+            final RestletServiceServlet restletXACMLServiceServlet, final RestEndpointManager endpointManager) {
         this.crestServlet = crestServlet;
-        this.restServiceServlet = restServiceServlet;
+        this.restletJSONServiceServlet = restletJSONServiceServlet;
+        this.restletXACMLServiceServlet = restletXACMLServiceServlet;
         this.endpointManager = endpointManager;
     }
 
@@ -93,26 +101,29 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
+        if ("/json".equals(request.getServletPath())) {
+            final String restRequest = getResourceName(request);
 
-        final String restRequest = getResourceName(request);
+            final String endpoint = endpointManager.findEndpoint(restRequest);
 
-        final String endpoint = endpointManager.findEndpoint(restRequest);
+            final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
 
-        final RestEndpointManager.EndpointType endpointType = endpointManager.getEndpointType(endpoint);
+            if (endpointType == null) {
+                throw new ServletException("Endpoint Type could not be determined");
+            }
 
-        if (endpointType == null) {
-            throw new ServletException("Endpoint Type could not be determined");
-        }
-
-        switch (endpointType) {
-        case RESOURCE: {
-            crestServlet.service(request, response);
-            break;
-        }
-        case SERVICE: {
-            restServiceServlet.service(new HttpServletRequestWrapper(request), response);
-            break;
-        }
+            switch (endpointType) {
+                case RESOURCE: {
+                    crestServlet.service(request, response);
+                    break;
+                }
+                case SERVICE: {
+                    restletJSONServiceServlet.service(new HttpServletRequestWrapper(request), response);
+                    break;
+                }
+            }
+        } else if ("/xacml".equals(request.getServletPath())) {
+            restletXACMLServiceServlet.service(new HttpServletRequestWrapper(request), response);
         }
     }
 
@@ -140,6 +151,7 @@ public class RestEndpointServlet extends HttpServlet {
     @Override
     public void destroy() {
         crestServlet.destroy();
-        restServiceServlet.destroy();
+        restletXACMLServiceServlet.destroy();
+        restletJSONServiceServlet.destroy();
     }
 }

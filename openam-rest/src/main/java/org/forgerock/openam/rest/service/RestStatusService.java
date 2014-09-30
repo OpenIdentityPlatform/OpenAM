@@ -34,14 +34,13 @@ import java.util.Map;
  *
  * @since 12.0.0
  */
-public class RestStatusService extends StatusService {
+public abstract class RestStatusService extends StatusService {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Representation getRepresentation(Status status, Request request, Response response) {
-
         final JsonValue jsonResponse;
         Throwable throwable = status.getThrowable();
 
@@ -59,6 +58,9 @@ public class RestStatusService extends StatusService {
         } else {
             jsonResponse = ResourceException.getException(status.getCode()).toJsonValue();
         }
-        return new JacksonRepresentation<Map>(jsonResponse.asMap());
+        Map<String, Object> mapRepresentation = jsonResponse.asMap();
+        return representMap(mapRepresentation);
     }
+
+    protected abstract Representation representMap(Map<String, Object> map);
 }

@@ -31,6 +31,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
+import com.sun.identity.entitlement.xacml3.XACMLConstants;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -164,6 +165,12 @@ public class CoreGuiceModule extends AbstractModule {
 
         // CTS Reaper configuration
         bind(ReaperQuery.class).to(ReaperConnection.class);
+
+        /**
+         * Entitlements
+         */
+        bind(Debug.class).annotatedWith(Names.named(XACMLConstants.DEBUG))
+                .toInstance(Debug.getInstance(XACMLConstants.DEBUG));
 
         // Policy Monitoring
         bind(PolicyMonitor.class).to(PolicyMonitorImpl.class);

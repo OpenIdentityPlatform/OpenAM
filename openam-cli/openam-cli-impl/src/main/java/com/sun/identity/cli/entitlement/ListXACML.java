@@ -34,7 +34,6 @@ package com.sun.identity.cli.entitlement;
 
 
 import com.iplanet.sso.SSOToken;
-
 import com.sun.identity.cli.AuthenticatedCommand;
 import com.sun.identity.cli.CLIException;
 import com.sun.identity.cli.ExitCodes;
@@ -42,19 +41,18 @@ import com.sun.identity.cli.IArgument;
 import com.sun.identity.cli.IOutput;
 import com.sun.identity.cli.LogWriter;
 import com.sun.identity.cli.RequestContext;
-
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
-import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferralPrivilegeManager;
-import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
-import com.sun.identity.entitlement.xacml3.core.Policy;
-import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
+import com.sun.identity.entitlement.xacml3.XACMLImportExport;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
+import com.sun.identity.entitlement.xacml3.core.PolicySet;
 
+import javax.security.auth.Subject;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -66,12 +64,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-
-import javax.xml.bind.JAXBException;
-
-import javax.security.auth.Subject;
-
-import org.json.JSONException;
 
 /**
  * Gets policies in a realm.
@@ -87,6 +79,8 @@ public class ListXACML extends AuthenticatedCommand {
     private List filters;
     private String outfile;
     private IOutput outputWriter;
+    private final SearchFilterFactory searchFilterFactory = new SearchFilterFactory();
+    private final XACMLImportExport importExport = new XACMLImportExport();
 
     /**
      * Services a Commandline Request.
@@ -94,8 +88,7 @@ public class ListXACML extends AuthenticatedCommand {
      * @param rc Request Context.
      * @throws CLIException if the request cannot serviced.
      */
-    public void handleRequest(RequestContext rc) 
-            throws CLIException {
+    public void handleRequest(RequestContext rc) throws CLIException {
         super.handleRequest(rc);
         ldapLogin();
 
@@ -103,16 +96,16 @@ public class ListXACML extends AuthenticatedCommand {
         EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
             adminSubject, "/");
         if(!ec.migratedToEntitlementService()) {
-            String[] args = {realm, "ANY", 
+            String[] args = {realm, "ANY",
                     "list-xacml not supported in  legacy policy mode"};
             debugError("ListXACML.handleRequest(): "
                     + "list-xacml not supported in  legacy policy mode");
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM", 
+                "FAILED_GET_POLICY_IN_REALM",
                 args);
             throw new CLIException(
-                getResourceString( 
-                    "list-xacml-not-supported-in-legacy-policy-mode"), 
+                getResourceString(
+                    "list-xacml-not-supported-in-legacy-policy-mode"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED,
                 "list-xacml");
         }
@@ -133,6 +126,14 @@ public class ListXACML extends AuthenticatedCommand {
 
     }
 
+    /**
+     * Convert the String filter parameters into SearchFilter instances.
+     *
+     * @param filters Non null but possibly empty.
+     * @return Empty if no strings provided.
+     *
+     * @throws EntitlementException If there was an unexpected error parsing the filter strings.
+     */
     private Set<SearchFilter> getFilters(List<String> filters)
         throws EntitlementException {
         if ((filters == null) || filters.isEmpty()) {
@@ -140,71 +141,18 @@ public class ListXACML extends AuthenticatedCommand {
         }
 
         Set<SearchFilter> results = new HashSet<SearchFilter>();
-        for (String f : filters) {
-            SearchFilter sf = getEqualSearchFilter(f);
-            if (sf == null) {
-                sf = getNumericSearchFilter(f, true);
-                if (sf == null) {
-                    sf = getNumericSearchFilter(f, false);
-                }
-            }
-            if (sf != null) {
-                results.add(sf);
-            }
+        for (String filter : filters) {
+            results.add(searchFilterFactory.getFilter(filter));
         }
-
         return results;
     }
 
-    private SearchFilter getEqualSearchFilter(String f)
-        throws EntitlementException {
-        SearchFilter sf = null;
-        int idx = f.indexOf('=');
-
-        if (idx != -1) {
-            String attrName = f.substring(0, idx);
-            if ((attrName.equals(Privilege.LAST_MODIFIED_DATE_ATTRIBUTE)) ||
-                (attrName.equals(Privilege.CREATION_DATE_ATTRIBUTE))) {
-                try {
-                    sf = new SearchFilter(attrName,
-                        Long.parseLong(f.substring(idx + 1)),
-                        SearchFilter.Operator.EQUAL_OPERATOR);
-                } catch (NumberFormatException e) {
-                    String[] param = {f};
-                    throw new EntitlementException(328, param);
-                }
-            } else {
-                sf = new SearchFilter(attrName, f.substring(idx + 1));
-            }
-        }
-        return sf;
-    }
-
-    private SearchFilter getNumericSearchFilter(String f, boolean greaterThan)
-        throws EntitlementException {
-        SearchFilter sf = null;
-        int idx = (greaterThan) ? f.indexOf('>') : f.indexOf('<');
-
-        if (idx != -1) {
-            String attrName = f.substring(0, idx);
-            if ((attrName.equals(Privilege.LAST_MODIFIED_DATE_ATTRIBUTE)) ||
-                (attrName.equals(Privilege.CREATION_DATE_ATTRIBUTE))) {
-                try {
-                    sf = new SearchFilter(attrName,
-                        Long.parseLong(f.substring(idx + 1)),
-                        SearchFilter.Operator.EQUAL_OPERATOR);
-                } catch (NumberFormatException e) {
-                    String[] param = {f};
-                    throw new EntitlementException(328, param);
-                }
-            } else {
-                String[] param = {f};
-                throw new EntitlementException(328, param);
-            }
-        }
-        return sf;
-    }
-    
+    /**
+     * Indicates the names of the Privileges that match both the Realm and Search Filters
+     * provided.
+     *
+     * @throws CLIException If there was an unexpected error.
+     */
     private void getPolicyNames() throws CLIException {
         String currentPrivilegeName = null;
         try {
@@ -216,10 +164,10 @@ public class ListXACML extends AuthenticatedCommand {
 
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_TO_GET_POLICY_NAMES_IN_REALM", parameters);
-            
+
             Set<SearchFilter> filterSet = getFilters(filters);
             Set<String> privilegeNames = pm.searchNames(filterSet);
-            
+
             Set<String> referralPrivilegeNames = rpm.searchNames(
                     filterSet);
             if (referralPrivilegeNames != null & !referralPrivilegeNames.isEmpty()) {
@@ -228,11 +176,11 @@ public class ListXACML extends AuthenticatedCommand {
                 }
                 privilegeNames.addAll(referralPrivilegeNames);
             }
-            
+
             if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
                 FileOutputStream fout = null;
                 PrintWriter pwout = null;
-                
+
                 if (outfile != null) {
                     try {
                         fout = new FileOutputStream(outfile, true);
@@ -259,7 +207,7 @@ public class ListXACML extends AuthenticatedCommand {
                         throw new CLIException(e, ExitCodes.IO_EXCEPTION);
                     }
                 }
-            
+
                 String[] params = new String[2];
                 params[0] = realm;
 
@@ -273,7 +221,7 @@ public class ListXACML extends AuthenticatedCommand {
                 } else {
                     outputWriter.printlnMessage(buff.toString());
                 }
-               
+
                 if (pwout != null) {
                     try {
                         pwout.close();
@@ -294,7 +242,7 @@ public class ListXACML extends AuthenticatedCommand {
             outputWriter.printlnMessage(MessageFormat.format(
                 getResourceString("get-policy-names-in-realm-succeed"),
                 (Object[])arg));
-            
+
         } catch (EntitlementException e) {
             String[] args = {realm, currentPrivilegeName, e.getMessage()};
             debugError("ListXACML.handleRequest", e);
@@ -303,137 +251,88 @@ public class ListXACML extends AuthenticatedCommand {
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
-    
+
+    /**
+     * Uses the Realm and Search Filters to identify all Privileges in the Entitlement
+     * framework to export.
+     *
+     * @throws CLIException If there was an unexpected error.
+     */
     private void getPolicies() throws CLIException {
-        String currentPrivilegeName = null;
+        FileOutputStream fout = null;
+        PrintWriter pwout = null;
+
+        if (outfile != null) {
+            try {
+                fout = new FileOutputStream(outfile, true);
+                pwout = new PrintWriter(fout, true);
+            } catch (FileNotFoundException e) {
+                debugError("ListXACML.handleXACMLPolicyRequest", e);
+                try {
+                    if (fout != null) {
+                        fout.close();
+                    }
+                } catch (IOException ex) {
+                    //do nothing
+                }
+                throw new CLIException(e, ExitCodes.IO_EXCEPTION);
+            } catch (SecurityException e) {
+                debugError("ListXACML.handleXACMLPolicyRequest", e);
+                try {
+                    if (fout != null) {
+                        fout.close();
+                    }
+                } catch (IOException ex) {
+                    //do nothing
+                }
+                throw new CLIException(e, ExitCodes.IO_EXCEPTION);
+            }
+        }
+
+        PolicySet policySet = null;
         try {
-            PrivilegeManager pm = PrivilegeManager.getInstance(realm, adminSubject);
+            policySet = importExport.exportXACML(realm, adminSubject, filters);
+        } catch (EntitlementException e) {
+            String[] args = {realm, e.getMessage()};
+            debugError("ListXACML.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO,
+                    "FAILED_GET_POLICY_IN_REALM", args);
+            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        }
 
-            String[] parameters = new String[1];
-            parameters[0] = realm;
-
-            Set<SearchFilter> filterSet = getFilters(filters);
-
-            Set<String> privilegeNames = pm.searchNames(filterSet);
-
-            ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, 
-                    adminSubject); 
-            Set<String> referralNames = rpm.searchNames(
-                    filterSet);
-
-            if (((privilegeNames != null) && !privilegeNames.isEmpty())
-                    || ((referralNames != null) && !referralNames.isEmpty())) {
-                FileOutputStream fout = null;
-                PrintWriter pwout = null;
-                
-                if (outfile != null) {
-                    try {
-                        fout = new FileOutputStream(outfile, true);
-                        pwout = new PrintWriter(fout, true);
-                    } catch (FileNotFoundException e) {
-                        debugError("ListXACML.handleXACMLPolicyRequest", e);
-                        try {
-                            if (fout != null) {
-                                fout.close();
-                            }
-                        } catch (IOException ex) {
-                            //do nothing
-                        }
-                        throw new CLIException(e, ExitCodes.IO_EXCEPTION);
-                    } catch (SecurityException e) {
-                        debugError("ListXACML.handleXACMLPolicyRequest", e);
-                        try {
-                            if (fout != null) {
-                                fout.close();
-                            }
-                        } catch (IOException ex) {
-                            //do nothing
-                        }
-                        throw new CLIException(e, ExitCodes.IO_EXCEPTION);
-                    }
-                }
-            
-                String[] params = new String[2];
-                params[0] = realm;
-
-                PolicySet policySet = null;
-                if ((privilegeNames != null) && !privilegeNames.isEmpty()) {
-                    Set<Privilege> privileges = new HashSet<Privilege>();
-                    for (Iterator i = privilegeNames.iterator(); i.hasNext(); ) {
-                        currentPrivilegeName = (String)i.next();
-                        params[1] = currentPrivilegeName;
-                        writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                            "ATTEMPT_GET_POLICY_IN_REALM", params);
-                        Privilege privilege = pm.findByName(currentPrivilegeName, adminSubject);
-                        privileges.add(privilege);
-                    }
-                    policySet = XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges);
-                }
-
-                if ((referralNames != null) && !referralNames.isEmpty()) {
-                    if (policySet == null) {
-                        policySet = XACMLPrivilegeUtils.newPolicySet(realm); 
-                    }
-                    for (Iterator i = referralNames.iterator(); i.hasNext(); ) {
-                        currentPrivilegeName = (String)i.next();
-                        params[1] = currentPrivilegeName;
-                        writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                            "ATTEMPT_GET_POLICY_IN_REALM", params);
-                        ReferralPrivilege referralPrivilege = rpm.findByName(currentPrivilegeName);
-                        Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
-                        XACMLPrivilegeUtils.addPolicyToPolicySet(policy, policySet);
-                    }
-                }
-
+        if (policySet == null || policySet.getPolicySetOrPolicyOrPolicySetIdReference().isEmpty()) {
+            String[] arg = {realm};
+            outputWriter.printlnMessage(MessageFormat.format(
+                    getResourceString("get-policy-in-realm-no-policies"),
+                    (Object[])arg));
+        } else {
+            try {
                 if (pwout != null) {
                     pwout.write(XACMLPrivilegeUtils.toXML(policySet));
                 } else {
                     outputWriter.printlnMessage(XACMLPrivilegeUtils.toXML(policySet));
                 }
-
-                writeLog(LogWriter.LOG_ACCESS, Level.INFO,
-                    "SUCCEED_GET_POLICY_IN_REALM", params);
-
-                String[] arg = {realm};
-                outputWriter.printlnMessage(MessageFormat.format(
-                    getResourceString("get-policy-in-realm-succeed"), 
-                    (Object[])arg));
-
-                if (pwout != null) {
-                    try {
-                        pwout.close();
-                        fout.close();
-                    } catch (IOException e) {
-                        //do nothing
-                    }
-                }
-            } else {
-                String[] arg = {realm};
-                outputWriter.printlnMessage(MessageFormat.format(
-                    getResourceString("get-policy-in-realm-no-policies"),
-                    (Object[])arg));
+            } catch (EntitlementException e) {
+                throw new CLIException(e, ExitCodes.IO_EXCEPTION);
             }
-            
-        } catch (EntitlementException e) {
-            String[] args = {realm, currentPrivilegeName, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM", args);
-            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (JAXBException e) {
-            String[] args = {realm, currentPrivilegeName, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM", args);
-            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (JSONException e) {
-            String[] args = {realm, currentPrivilegeName, e.getMessage()};
-            debugError("ListXACML.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_GET_POLICY_IN_REALM", args);
-            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+
+            writeLog(LogWriter.LOG_ACCESS, Level.INFO,
+                    "SUCCEED_GET_POLICY_IN_REALM", new String[]{realm});
+
+            String[] arg = {realm};
+            outputWriter.printlnMessage(MessageFormat.format(
+                    getResourceString("get-policy-in-realm-succeed"),
+                    (Object[])arg));
+
+            if (pwout != null) {
+                try {
+                    pwout.close();
+                    fout.close();
+                } catch (IOException e) {
+                    //do nothing
+                }
+            }
         }
-    
     }
 
 }

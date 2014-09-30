@@ -49,7 +49,7 @@ public class RestEndpointManagerImpl implements RestEndpointManager {
     @Inject
     public RestEndpointManagerImpl(RestEndpoints restEndpoints) {
         this.resourceEndpoints = restEndpoints.getResourceRouter().getRoutes();
-        this.serviceEndpoints = restEndpoints.getServiceRouter().getRoutes();
+        this.serviceEndpoints = restEndpoints.getJSONServiceRouter().getRoutes();
         createEndpointTemplates(resourceEndpoints);
         createEndpointTemplates(serviceEndpoints);
     }

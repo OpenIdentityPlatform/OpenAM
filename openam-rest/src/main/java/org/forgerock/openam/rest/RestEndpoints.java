@@ -23,6 +23,7 @@ import org.forgerock.json.resource.VersionSelector;
 import org.forgerock.openam.forgerockrest.IdentityResourceV1;
 import org.forgerock.openam.forgerockrest.IdentityResourceV2;
 import org.forgerock.openam.forgerockrest.RealmResource;
+import org.forgerock.openam.forgerockrest.XacmlService;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV1;
 import org.forgerock.openam.forgerockrest.authn.restlet.AuthenticationServiceV2;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
@@ -62,7 +63,8 @@ public class RestEndpoints {
     private final RestRealmValidator realmValidator;
     private final VersionSelector versionSelector;
     private final CrestRouter resourceRouter;
-    private final ServiceRouter serviceRouter;
+    private final ServiceRouter jsonServiceRouter;
+    private final ServiceRouter xacmlServiceRouter;
 
     /**
      * Constructs a new RestEndpoints instance.
@@ -76,7 +78,8 @@ public class RestEndpoints {
         this.versionSelector = versionSelector;
 
         this.resourceRouter = createResourceRouter();
-        this.serviceRouter = createServiceRouter();
+        this.jsonServiceRouter = createJSONServiceRouter();
+        this.xacmlServiceRouter = createXACMLServiceRouter();
     }
 
     /**
@@ -88,11 +91,19 @@ public class RestEndpoints {
     }
 
     /**
-     * Gets the restlet service router.
+     * Gets the JSON restlet service router.
      * @return The router.
      */
-    public ServiceRouter getServiceRouter() {
-        return serviceRouter;
+    public ServiceRouter getJSONServiceRouter() {
+        return jsonServiceRouter;
+    }
+
+    /**
+     * Gets the XACML restlet service router.
+     * @return The router.
+     */
+    public ServiceRouter getXACMLServiceRouter() {
+        return xacmlServiceRouter;
     }
 
     /**
@@ -176,13 +187,30 @@ public class RestEndpoints {
      *
      * @return A {@code ServiceRouter}.
      */
-    private ServiceRouter createServiceRouter() {
+    private ServiceRouter createJSONServiceRouter() {
 
         ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
 
         router.addRoute("/authenticate")
                 .addVersion("1.1", wrap(AuthenticationServiceV1.class))
                 .addVersion("2.0", wrap(AuthenticationServiceV2.class));
+
+        VersionBehaviourConfigListener.bindToServiceConfigManager(router);
+
+        return router;
+    }
+
+    /**
+     * Constructs a new {@link ServiceRouter} with routes to each of the Restlet service endpoints.
+     *
+     * @return A {@code ServiceRouter}.
+     */
+    private ServiceRouter createXACMLServiceRouter() {
+
+        ServiceRouter router = new ServiceRouter(realmValidator, versionSelector);
+
+        router.addRoute("/policies")
+                .addVersion("1.0", wrap(XacmlService.class));
 
         VersionBehaviourConfigListener.bindToServiceConfigManager(router);
 
@@ -197,4 +225,5 @@ public class RestEndpoints {
             }
         };
     }
+
 }

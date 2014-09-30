@@ -60,6 +60,10 @@
             <param-name>module-configuration-factory-class</param-name>
             <param-value>org.forgerock.openam.jaspi.config.RestJaspiRuntimeConfigurationFactory</param-value>
         </init-param>
+        <init-param>
+            <param-name>resource-exception-handlers</param-name>
+            <param-value>org.forgerock.openam.forgerockrest.utils.XMLResourceExceptionHandler</param-value>
+        </init-param>
     </filter>
 
     <!-- filter declaration -->
@@ -93,6 +97,10 @@
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>
         <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthenticationFilter</filter-name>
+        <url-pattern>/xacml/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>
@@ -1096,6 +1104,10 @@
     <servlet-mapping>
         <servlet-name>ForgeRockRest</servlet-name>
         <url-pattern>/json/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgeRockRest</servlet-name>
+        <url-pattern>/xacml/*</url-pattern>
     </servlet-mapping>
 
     <!-- Setup favicon.ico extension type -->

@@ -39,6 +39,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.security.auth.Subject;
 
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
 /**
  * Class to manage entitlement privileges: to add, remove, modify privilege
  */
@@ -107,6 +109,18 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      * @throws EntitlementException if privilege is not found or if the provided subject is not permitted to access it.
      */
     public abstract Privilege findByName(String name, Subject subject) throws EntitlementException;
+
+    /**
+     * Checks if a privilege with the specified name can be found.
+     *
+     * @param name name of the privilege.
+     * @throws com.sun.identity.entitlement.EntitlementException if search failed.
+     */
+    @Override
+    public boolean canFindByName(String name) throws EntitlementException {
+        SearchFilter filter = new SearchFilter("name", name);
+        return searchNames(asSet(filter)).isEmpty();
+    }
 
     protected void validate(Privilege privilege) throws EntitlementException {
         String pName = privilege.getName();

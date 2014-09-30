@@ -40,17 +40,20 @@ public class RestEndpointServletTest {
     private RestEndpointServlet restEndpointServlet;
 
     private CrestHttpServlet crestServlet;
-    private RestletServiceServlet restServiceServlet;
+    private RestletServiceServlet restletJSONServiceServlet;
+    private RestletServiceServlet restletXACMLServiceServlet;
     private RestEndpointManager endpointManager;
 
     @BeforeMethod
     public void setUp() {
 
         crestServlet = mock(CrestHttpServlet.class);
-        restServiceServlet = mock(RestletServiceServlet.class);
+        restletJSONServiceServlet = mock(RestletServiceServlet.class);
+        restletXACMLServiceServlet = mock(RestletServiceServlet.class);
         endpointManager = mock(RestEndpointManager.class);
 
-        restEndpointServlet = new RestEndpointServlet(crestServlet, restServiceServlet, endpointManager);
+        restEndpointServlet = new RestEndpointServlet(crestServlet, restletJSONServiceServlet,
+                restletXACMLServiceServlet, endpointManager);
     }
 
     @Test
@@ -63,7 +66,8 @@ public class RestEndpointServletTest {
 
         //Then
         verify(crestServlet).init();
-        verifyZeroInteractions(restServiceServlet);
+        verifyZeroInteractions(restletJSONServiceServlet);
+        verifyZeroInteractions(restletXACMLServiceServlet);
     }
 
     @Test(expectedExceptions = ServletException.class)
@@ -73,6 +77,7 @@ public class RestEndpointServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
+        given(request.getServletPath()).willReturn("/json");
         given(request.getPathInfo()).willReturn(null);
 
         //When
@@ -83,12 +88,13 @@ public class RestEndpointServletTest {
     }
 
     @Test
-    public void shouldHandleRequestWithRestletServlet() throws ServletException, IOException {
+    public void shouldHandleRequestWithJSONRestletServlet() throws ServletException, IOException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
+        given(request.getServletPath()).willReturn("/json");
         given(request.getPathInfo()).willReturn("/users/demo/roles/");
         given(endpointManager.findEndpoint("/users/demo/roles")).willReturn("/users");
         given(endpointManager.getEndpointType("/users")).willReturn(RestEndpointManager.EndpointType.SERVICE);
@@ -98,7 +104,26 @@ public class RestEndpointServletTest {
 
         //Then
         verify(endpointManager).findEndpoint("/users/demo/roles");
-        verify(restServiceServlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
+        verify(restletJSONServiceServlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
+        verifyZeroInteractions(restletXACMLServiceServlet);
+        verifyZeroInteractions(crestServlet);
+    }
+
+    @Test
+    public void shouldHandleRequestWithXACMLRestletServlet() throws ServletException, IOException {
+
+        //Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        given(request.getServletPath()).willReturn("/xacml");
+
+        //When
+        restEndpointServlet.service(request, response);
+
+        //Then
+        verify(restletXACMLServiceServlet).service(Matchers.<HttpServletRequest>anyObject(), eq(response));
+        verifyZeroInteractions(restletJSONServiceServlet);
         verifyZeroInteractions(crestServlet);
     }
 
@@ -109,6 +134,7 @@ public class RestEndpointServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
+        given(request.getServletPath()).willReturn("/json");
         given(request.getPathInfo()).willReturn("/users/demo/roles/");
         given(endpointManager.findEndpoint("/users/demo/roles")).willReturn("/users");
         given(endpointManager.getEndpointType("/users")).willReturn(RestEndpointManager.EndpointType.RESOURCE);
@@ -119,7 +145,8 @@ public class RestEndpointServletTest {
         //Then
         verify(endpointManager).findEndpoint("/users/demo/roles");
         verify(crestServlet).service(request, response);
-        verifyZeroInteractions(restServiceServlet);
+        verifyZeroInteractions(restletJSONServiceServlet);
+        verifyZeroInteractions(restletXACMLServiceServlet);
     }
 
     @Test(expectedExceptions = ServletException.class)
@@ -129,6 +156,7 @@ public class RestEndpointServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
+        given(request.getServletPath()).willReturn("/json");
         given(request.getPathInfo()).willReturn("/users/demo/roles/");
         given(endpointManager.findEndpoint("/users/demo/roles")).willReturn(null);
 
@@ -149,6 +177,7 @@ public class RestEndpointServletTest {
 
         //Then
         verify(crestServlet).destroy();
-        verify(restServiceServlet).destroy();
+        verify(restletJSONServiceServlet).destroy();
+        verify(restletXACMLServiceServlet).destroy();
     }
 }

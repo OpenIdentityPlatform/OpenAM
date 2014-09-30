@@ -41,7 +41,7 @@ public class RestEndpointManagerImplTest {
         Set<String> serviceRoutes = new HashSet<String>();
 
         given(restEndpoints.getResourceRouter()).willReturn(resourceRouter);
-        given(restEndpoints.getServiceRouter()).willReturn(serviceRouter);
+        given(restEndpoints.getJSONServiceRouter()).willReturn(serviceRouter);
 
         given(resourceRouter.getRoutes()).willReturn(resourceRoutes);
         given(serviceRouter.getRoutes()).willReturn(serviceRoutes);

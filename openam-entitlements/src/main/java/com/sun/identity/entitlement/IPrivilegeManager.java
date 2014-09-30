@@ -25,6 +25,14 @@ import java.util.Set;
 public interface IPrivilegeManager<T extends IPrivilege> {
 
     /**
+     * Checks if a privilege with the specified name can be found.
+     *
+     * @param name name of the privilege.
+     * @throws com.sun.identity.entitlement.EntitlementException if search failed.
+     */
+    boolean canFindByName(String name) throws EntitlementException;
+
+    /**
      * Finds a privilege by its unique name.
      *
      * @param name name of the privilege to be returned

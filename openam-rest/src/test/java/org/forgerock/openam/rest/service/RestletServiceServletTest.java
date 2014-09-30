@@ -24,8 +24,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -40,7 +39,7 @@ public class RestletServiceServletTest {
 
         servlet = mock(HttpServlet.class);
 
-        restletServiceServlet = new RestletServiceServlet(servlet);
+        restletServiceServlet = new RestletServiceServlet(servlet, JSONServiceEndpointApplication.class, "json");
     }
 
     @Test
@@ -52,7 +51,7 @@ public class RestletServiceServletTest {
         String initParameter = restletServiceServlet.getInitParameter("org.restlet.application", "ANY");
 
         //Then
-        assertEquals(initParameter, ServiceEndpointApplication.class.getName());
+        assertEquals(initParameter, JSONServiceEndpointApplication.class.getName());
     }
 
     @Test
@@ -87,10 +86,10 @@ public class RestletServiceServletTest {
         //Given
 
         //When
-        restletServiceServlet.getServletName();
+        assertEquals(restletServiceServlet.getServletName(), "json");
 
         //Then
-        verify(servlet).getServletName();
+        verifyZeroInteractions(servlet);
     }
 
     @Test

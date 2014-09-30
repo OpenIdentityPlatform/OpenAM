@@ -88,6 +88,10 @@
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.xml</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
@@ -123,6 +127,10 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>authz-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-jaspi-runtime</artifactId>
         </dependency>
 
         <!-- OAuth2 Dependencies -->

@@ -68,6 +68,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,6 +86,9 @@ import java.util.TimeZone;
  * </code>com.sun.identity.entitlement.xacml3.core.Policy</code>
  */
 public class XACMLPrivilegeUtils {
+
+    private static final ObjectFactory objectFactory = new ObjectFactory();
+
     /**
      * Constructs XACMLPrivilegeUtils
      */
@@ -105,14 +109,11 @@ public class XACMLPrivilegeUtils {
         }
         StringWriter stringWriter = new StringWriter();
         try {
-            ObjectFactory objectFactory = new ObjectFactory();
             JAXBContext jaxbContext = JAXBContext.newInstance(
                     XACMLConstants.XACML3_CORE_PKG);
-            JAXBElement<Policy> policyElement
-                    = objectFactory.createPolicy(policy);
+            JAXBElement<Policy> policyElement = objectFactory.createPolicy(policy);
             Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(policyElement, stringWriter);
         } catch (JAXBException je) {
             //TOODO: handle, propogate exception
@@ -122,29 +123,37 @@ public class XACMLPrivilegeUtils {
         return stringWriter.toString();
     }
 
-    public static String toXML(PolicySet policySet) {
+    public static String toXML(PolicySet policySet) throws EntitlementException {
         if (policySet == null) {
             return "";
         }
         StringWriter stringWriter = new StringWriter();
         try {
-            ObjectFactory objectFactory = new ObjectFactory();
-            JAXBContext jaxbContext = JAXBContext.newInstance(
-                    XACMLConstants.XACML3_CORE_PKG);
-            JAXBElement<PolicySet> policySetElement
-                    = objectFactory.createPolicySet(policySet);
+            JAXBContext jaxbContext = JAXBContext.newInstance(XACMLConstants.XACML3_CORE_PKG);
+            JAXBElement<PolicySet> policySetElement = objectFactory.createPolicySet(policySet);
             Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(policySetElement, stringWriter);
         } catch (JAXBException je) {
-            //TOODO: handle, propogate exception
-            PrivilegeManager.debug.error(
-                "JAXBException while mapping privilege to policy:", je);
+            PrivilegeManager.debug.error("JAXBException while mapping privilege to policy:", je);
+            throw new EntitlementException(EntitlementException.UNABLE_TO_SERIALIZE_OBJECT, je);
         }
         return stringWriter.toString();
     }
 
+
+    public static void writeXMLToStream(PolicySet policySet, OutputStream outputStream) throws EntitlementException {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(XACMLConstants.XACML3_CORE_PKG);
+            JAXBElement<PolicySet> policySetElement = objectFactory.createPolicySet(policySet);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(policySetElement, outputStream);
+        } catch (JAXBException je) {
+            PrivilegeManager.debug.error("JAXBException while mapping privilege to policy:", je);
+            throw new EntitlementException(EntitlementException.UNABLE_TO_SERIALIZE_OBJECT, je);
+        }
+    }
 
 
     public static Policy privilegeToPolicy(Privilege privilege)  {
@@ -208,7 +217,6 @@ public class XACMLPrivilegeUtils {
         List<Object> vrList
             = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBContext jaxbContext = JAXBContext.newInstance(
                 XACMLConstants.XACML3_CORE_PKG);
 
@@ -704,7 +712,6 @@ public class XACMLPrivilegeUtils {
         Condition condition = null;
         if (es != null || ec != null) {
             condition = new Condition();
-            ObjectFactory objectFactory = new ObjectFactory();
             JAXBContext jaxbContext = JAXBContext.newInstance(
                     XACMLConstants.XACML3_CORE_PKG);
 
@@ -933,7 +940,6 @@ public class XACMLPrivilegeUtils {
         policySet.setVersion(version);
         policySet.setTarget(target);
 
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBContext jaxbContext = JAXBContext.newInstance(
                 XACMLConstants.XACML3_CORE_PKG);
 
@@ -955,7 +961,6 @@ public class XACMLPrivilegeUtils {
         if (policySet == null || policy == null) {
             return policySet;
         }
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBContext jaxbContext = JAXBContext.newInstance(
                 XACMLConstants.XACML3_CORE_PKG);
 
@@ -1354,7 +1359,6 @@ public class XACMLPrivilegeUtils {
         List<Object> vrList
             = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
-        ObjectFactory objectFactory = new ObjectFactory();
         JAXBContext jaxbContext = JAXBContext.newInstance(
                 XACMLConstants.XACML3_CORE_PKG);
 

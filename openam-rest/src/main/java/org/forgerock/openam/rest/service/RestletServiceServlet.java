@@ -40,14 +40,19 @@ public class RestletServiceServlet extends ServerServlet {
     private static final String RESTLET_APPLICATION_INIT_PARAM = "org.restlet.application";
 
     private final HttpServlet servlet;
+    private final Class<? extends ServiceEndpointApplication> application;
+    private final String name;
 
     /**
      * Constructs an instance of the RestletServiceServlet.
      *
      * @param servlet The underlying container created Java HttpServlet.
      */
-    public RestletServiceServlet(final HttpServlet servlet) {
+    public RestletServiceServlet(final HttpServlet servlet, Class<? extends ServiceEndpointApplication> application,
+            String name) {
         this.servlet = servlet;
+        this.application = application;
+        this.name = name;
     }
 
     /**
@@ -62,7 +67,7 @@ public class RestletServiceServlet extends ServerServlet {
     @Override
     public String getInitParameter(String name, String defaultValue) {
         if (RESTLET_APPLICATION_INIT_PARAM.equals(name)) {
-            return ServiceEndpointApplication.class.getName();
+            return application.getName();
         }
         final String value = servlet.getInitParameter(name);
         if (value == null) {
@@ -76,7 +81,7 @@ public class RestletServiceServlet extends ServerServlet {
      */
     @Override
     public String getServletName() {
-        return servlet.getServletName();
+        return name;
     }
 
     /**

@@ -21,34 +21,41 @@ import org.forgerock.openam.rest.RestEndpoints;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
+import org.restlet.service.StatusService;
 
 /**
  * Restlet Application for REST Service Endpoints.
  *
  * @since 12.0.0
  */
-public final class ServiceEndpointApplication extends Application {
+public abstract class ServiceEndpointApplication extends Application {
 
     private final RestEndpoints restEndpoints;
 
     /**
      * Constructs a new ServiceEndpointApplication.
      * <br/>
-     * Sets the default media type as "application/json" and sets the StatusService to {@link RestStatusService}.
+     * Sets the StatusService to {@link RestStatusService}.
      */
-    public ServiceEndpointApplication() {
+    protected ServiceEndpointApplication(StatusService statusService) {
         this.restEndpoints = InjectorHolder.getInstance(RestEndpoints.class);
-        getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
-        setStatusService(new RestStatusService());
+        setStatusService(statusService);
     }
 
     /**
-     * Crests an inbound Restlet root for all registered REST Service endpoints.
+     * Creates an inbound Restlet root for all registered REST Service endpoints.
      *
      * @return A Restlet for routing incoming REST Service endpoint requests.
      */
     @Override
     public Restlet createInboundRoot() {
-        return restEndpoints.getServiceRouter();
+        return getRouter(restEndpoints);
     }
+
+    /**
+     * Obtain the router for this application from the RestEndpoints.
+     * @param restEndpoints Registry of routers.
+     * @return The required router.
+     */
+    protected abstract ServiceRouter getRouter(RestEndpoints restEndpoints);
 }

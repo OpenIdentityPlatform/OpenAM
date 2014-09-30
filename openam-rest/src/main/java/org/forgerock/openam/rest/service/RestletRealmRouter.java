@@ -26,6 +26,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.routing.Router;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A Restlet router which will route to service endpoints, dynamically handling realm URI parameters.
@@ -33,6 +34,9 @@ import javax.servlet.http.HttpServletRequest;
  * @since 12.0.0
  */
 public class RestletRealmRouter extends Router {
+
+    // Keyword for Realm Attribute
+    static final String REALM = "realm";
 
     private final RestRealmValidator realmValidator;
     private final Restlet delegate;
@@ -79,16 +83,16 @@ public class RestletRealmRouter extends Router {
      */
     @Override
     protected void doHandle(Restlet next, Request request, Response response) {
-        String realm = (String) request.getAttributes().get("realm");
+        String realm = (String) request.getAttributes().get(REALM);
         String subrealm = (String) request.getAttributes().get("subrealm");
         if (realm == null || realm.isEmpty()) {
             realm = "/";
         } else if (subrealm != null && !subrealm.isEmpty()) {
             realm = realm.equals("/") ? realm + subrealm : realm + "/" + subrealm;
         }
-        request.getAttributes().put("realm", realm);
+        request.getAttributes().put(REALM, realm);
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        httpRequest.setAttribute("realm", realm);
+        httpRequest.setAttribute(REALM, realm);
         request.getAttributes().remove("subrealm");
 
         // Check that the path references an existing realm
@@ -97,6 +101,20 @@ public class RestletRealmRouter extends Router {
         }
 
         super.doHandle(next, request, response);
+    }
+
+    /**
+     * Returns the realm from the given request.
+     *
+     * @param request Non null request to examine.
+     * @return Null if no realm was found, otherwise the given Realm as a String.
+     */
+    public static String getRealmFromRequest(Request request) {
+        ConcurrentMap<String, Object> attributes = request.getAttributes();
+        if (attributes == null || attributes.get(REALM) == null) {
+            return null;
+        }
+        return attributes.get(REALM).toString();
     }
 
     /**

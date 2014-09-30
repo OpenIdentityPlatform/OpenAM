@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+
 /**
  * Referral Privilege Manager manages referral privilege.
  */
@@ -144,6 +146,18 @@ public final class ReferralPrivilegeManager implements IPrivilegeManager<Referra
     public ReferralPrivilege findByName(String name) throws EntitlementException {
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         return pdb.getReferral(adminSubject, realm, name);
+    }
+
+    /**
+     * Checks if a privilege with the specified name can be found.
+     *
+     * @param name name of the privilege.
+     * @throws com.sun.identity.entitlement.EntitlementException if search failed.
+     */
+    @Override
+    public boolean canFindByName(String name) throws EntitlementException {
+        SearchFilter filter = new SearchFilter("name", name);
+        return searchNames(asSet(filter)).isEmpty();
     }
 
     /**

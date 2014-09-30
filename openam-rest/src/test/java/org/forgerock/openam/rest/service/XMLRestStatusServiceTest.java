@@ -16,31 +16,31 @@
 
 package org.forgerock.openam.rest.service;
 
-import java.io.IOException;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.resource.ResourceException;
-import static org.mockito.Mockito.mock;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class RestStatusServiceTest {
+import java.io.IOException;
+
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
+
+public class XMLRestStatusServiceTest {
 
     private RestStatusService restStatusService;
 
     @BeforeMethod
     public void setUp() {
-        restStatusService = new RestStatusService();
+        restStatusService = new XMLRestStatusService();
     }
 
     @Test
-    public void shouldGetJsonResourceException() throws IOException {
+    public void shouldGetXmlResourceException() throws IOException {
 
         //Given
         Status status = Status.CLIENT_ERROR_BAD_REQUEST;
@@ -51,11 +51,11 @@ public class RestStatusServiceTest {
         Representation representation = restStatusService.getRepresentation(status, request, response);
 
         //Then
-        assertTrue(representation.getText().contains("\"code\":400"));
+        assertTrue(representation.getText().contains("<code>400</code>"));
     }
 
     @Test
-    public void shouldReturnThrowableJsonValueIfResourceException() throws IOException {
+    public void shouldReturnThrowableXmlValueIfResourceException() throws IOException {
 
         //Given
         Request request = mock(Request.class);
@@ -68,7 +68,7 @@ public class RestStatusServiceTest {
         Representation representation = restStatusService.getRepresentation(status, request, response);
 
         //Then
-        assertTrue(representation.getText().contains("\"bing\":\"bong\""));
+        assertTrue(representation.getText().contains("<bing>bong</bing>"));
 
     }
 }

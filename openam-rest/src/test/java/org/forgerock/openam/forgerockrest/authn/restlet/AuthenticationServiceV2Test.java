@@ -21,6 +21,7 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.rest.service.JSONRestStatusService;
 import org.forgerock.openam.rest.service.RestStatusService;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
@@ -71,7 +72,7 @@ public class AuthenticationServiceV2Test {
 
         // then
         JsonRepresentation jsonRep = new JsonRepresentation(
-                new RestStatusService().getRepresentation(exception.getStatus(), null, null));
+                new JSONRestStatusService().getRepresentation(exception.getStatus(), null, null));
         Assert.assertEquals(jsonRep.getJsonObject().has("code"), true);
         Assert.assertEquals(jsonRep.getJsonObject().get("code"), 415);
         Assert.assertEquals(jsonRep.getJsonObject().has("reason"), true);
@@ -124,7 +125,7 @@ public class AuthenticationServiceV2Test {
 
         // then
         JsonRepresentation jsonRep = new JsonRepresentation(
-                new RestStatusService().getRepresentation(exception.getStatus(), null, null));
+                new JSONRestStatusService().getRepresentation(exception.getStatus(), null, null));
         Assert.assertEquals(jsonRep.getJsonObject().has("code"), true);
         Assert.assertEquals(jsonRep.getJsonObject().get("code"), 401);
         Assert.assertEquals(jsonRep.getJsonObject().has("reason"), true);
