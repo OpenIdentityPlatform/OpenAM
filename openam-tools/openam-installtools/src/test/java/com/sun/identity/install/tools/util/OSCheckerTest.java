@@ -28,7 +28,7 @@ public class OSCheckerTest {
 
     private static final String OS_NAME = System.getProperty("os.name");
     private static final List<String> ARCHITECTURES = Arrays.asList(
-            "i386", "i686", "x86", "x86_64", "PowerPC", "ppc", "ppc64", "sparc");
+            "i386", "i686", "x86", "x86_64", "amd64", "PowerPC", "ppc", "ppc64", "sparc");
 
     @Test
     public void testIsUnixOrWindows() {
