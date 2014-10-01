@@ -498,7 +498,13 @@ public class AMSetupServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
         HttpServletResponse response)
         throws IOException, ServletException, ConfiguratorException {
-        
+
+        // Only continue if we are not already configured
+        if (isConfigured()) {
+            response.getWriter().write("Already Configured!") ;
+            return;
+        }
+
         HttpServletRequestWrapper req = 
             new HttpServletRequestWrapper(request);
         HttpServletResponseWrapper res = 
@@ -609,6 +615,11 @@ public class AMSetupServlet extends HttpServlet {
 
     public static boolean processRequest(IHttpServletRequest request, IHttpServletResponse response) {
 
+        // Only continue if we are not already configured
+        if (isConfigured()) {
+            return true;
+        }
+
         setLocale(request);
         final InstallLog installLog = InstallLog.getInstance();
         installLog.open((String) request.getParameterMap().get(SetupConstants.CONFIG_VAR_BASE_DIR));
@@ -616,14 +627,14 @@ public class AMSetupServlet extends HttpServlet {
          * This logic needs refactoring later. setServiceConfigValues()
          * attempts to check if directory is up and makes a call
          * back to this class. The implementation'd
-         * be cleaner if classes&methods are named better and separated than 
+         * be cleaner if classes&methods are named better and separated than
          * intertwined together.
          */
         ServicesDefaultValues.setServiceConfigValues(request);
 
         // set debug directory
         Map map = ServicesDefaultValues.getDefaultValues();
-        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR); 
+        String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
         String uri = (String)map.get(SetupConstants.CONFIG_VAR_SERVER_URI);
         SystemProperties.initializeProperties(
             Constants.SERVICES_DEBUG_DIRECTORY, basedir + uri + "/debug");
@@ -633,7 +644,7 @@ public class AMSetupServlet extends HttpServlet {
             SetupConstants.CONFIG_VAR_SITE_CONFIGURATION);
 
         Map userRepo = (Map)map.remove("UserStore");
-        
+
         try {
             isConfiguredFlag = configure(request, map, userRepo);
             if (isConfiguredFlag) {
