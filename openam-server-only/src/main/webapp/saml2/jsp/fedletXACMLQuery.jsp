@@ -23,7 +23,8 @@
 --%>
 
 <%--
-     Portions Copyrighted 2013 ForgeRock AS
+     Portions Copyrighted 2013-2014 ForgeRock AS
+     Portions Copyrighted 2014 Nomura Research Institute, Ltd
 --%>
 
 <%--
@@ -78,23 +79,6 @@ function checkEmptyResource() {
 <td nowrap="nowrap">&nbsp;</td>
 </tr></tbody></table>
 
-
-<%
-    try {		
-        CircleOfTrustManager cotManager = new CircleOfTrustManager();
-        Set members = cotManager.getAllCirclesOfTrust("/");
-            
-        if ((members == null) || members.isEmpty()) {
-            out.print("Misconfiguration - No circle of trust for root realm.");
-        } else {
-            out.print(members.toArray()[0]);
-        }
-    
-    } catch (Exception e) {
-        out.print(e.toString()); 
-    }
-%>		
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
 <tbody><tr>
 <td class="MstTdTtl" width="99%">
@@ -106,7 +90,30 @@ function checkEmptyResource() {
     <table border="0" width="700">
 	
     <tr>
-      <td colspan="2"> </td>
+      <td colspan="2">
+      <%
+          try {
+              CircleOfTrustManager cotManager = new CircleOfTrustManager();
+              Set members = cotManager.getAllCirclesOfTrust("/");
+              if ((members == null) || members.isEmpty()) {
+                  out.print("Misconfiguration - No circle of trust for root realm.");
+              } else {
+                  out.print("Circle of trust names for root realm: ");
+                  boolean isFirst = true;
+                  for (Object member : members) {
+                      if (isFirst) {
+                          isFirst = false;
+                      } else {
+                          out.print(", ");
+                      }
+                      out.print(member);
+                  }
+              }
+          } catch (Exception e) {
+              out.print(e.toString());
+          }
+      %>
+      </td>
     </tr>
     <tr>
       <td colspan="2"> </td>
