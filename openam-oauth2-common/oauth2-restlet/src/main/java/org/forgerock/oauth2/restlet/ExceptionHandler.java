@@ -129,8 +129,8 @@ public class ExceptionHandler {
      * @param response The Restlet response.
      */
     public void handle(Throwable throwable, Response response) {
-        if (LOGGER.isErrorEnabled()) {
-            LOGGER.error("Unhandled exception: " + throwable, throwable);
+        if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("Unhandled exception: " + throwable, throwable);
         }
 
         final OAuth2RestletException exception = toOAuth2RestletException(throwable);
