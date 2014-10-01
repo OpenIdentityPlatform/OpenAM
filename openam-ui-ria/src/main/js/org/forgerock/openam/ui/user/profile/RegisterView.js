@@ -49,7 +49,8 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
         },
         errorsHandlers: { 
             "Bad Request":  { status: "400" },
-            "Not found":    { status: "404" }
+            "Not found":    { status: "404" },
+            "Conflict":     { status: "409" }
         },
         render: function(args, callback) {
             this.data.urlParams = uiUtils.convertCurrentUrlToJSON().params;
@@ -121,6 +122,8 @@ define("org/forgerock/openam/ui/user/profile/RegisterView", [
                 } else if (responseCode === 400) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "selfRegistrationDisabled");
                     _this.$el.find("input[type=submit]").prop('disabled', true);
+                } else if (responseCode === 409) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
                 } else if (responseMessage.indexOf("Identity names may not have a space character" )> -1) {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "identityNoSpace");
                 }
