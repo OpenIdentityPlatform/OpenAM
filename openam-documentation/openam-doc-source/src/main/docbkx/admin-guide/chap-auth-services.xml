@@ -3508,7 +3508,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       </thead>
       <tbody>
        <row>
-        <entry>Authentication Endpoint URL</entry>
+        <entry>Authorization Endpoint URL</entry>
         <entry>
          <para><literal>/oauth2/authorize</literal> under the deployment
           URL.<footnote xml:id="oauth2-realms-footnote">
