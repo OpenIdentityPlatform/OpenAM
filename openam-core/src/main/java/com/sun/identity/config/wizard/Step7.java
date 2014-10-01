@@ -24,15 +24,13 @@
  *
  * $Id: Step7.java,v 1.15 2009/10/27 05:31:45 hengming Exp $
  *
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
- */
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.SetupConstants;
 import org.apache.click.Context;
 
@@ -40,7 +38,7 @@ import org.apache.click.Context;
  * This is the summary page for the values entered during the configuration
  * process. No actual work is done here except setting the page elements.
  */
-public class Step7 extends AjaxPage {
+public class Step7 extends ProtectedPage {
 
     private static final String DISABLED = "Disabled";
     private static final String ENABLED = "Enabled";

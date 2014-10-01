@@ -24,17 +24,15 @@
  *
  * $Id: Step4.java,v 1.20 2009/10/27 05:31:45 hengming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
+
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.sun.identity.config.SessionAttributeNames;
+import com.sun.identity.config.util.ProtectedPage;
 import org.apache.click.control.ActionLink;
-import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.SetupConstants;
 import org.apache.click.Context;
 import com.sun.identity.shared.ldap.LDAPConnection;
@@ -53,7 +51,7 @@ import javax.naming.directory.InitialDirContext;
 /**
  * Step 4 is the input of the remote user data store properties.
  */
-public class Step4 extends AjaxPage {
+public class Step4 extends ProtectedPage {
     public static final String LDAP_STORE_SESSION_KEY = "wizardCustomUserStore";
     public ActionLink validateUMHostLink = 
         new ActionLink("validateUMHost", this, "validateUMHost");
