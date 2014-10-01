@@ -24,17 +24,13 @@
  *
  * $Id: Step5.java,v 1.9 2009/01/05 23:17:10 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.AjaxPage;
-import com.sun.identity.setup.SetupConstants;
+import com.sun.identity.config.util.ProtectedPage;
 import org.apache.click.control.ActionLink;
 
 import java.net.URL;
@@ -48,7 +44,7 @@ import java.net.MalformedURLException;
  * as this information will be replicated by the underlying store.
  *
  */
-public class Step5 extends AjaxPage {
+public class Step5 extends ProtectedPage {
 
     public ActionLink clearLink = new ActionLink(
             "clear", this, "clear");

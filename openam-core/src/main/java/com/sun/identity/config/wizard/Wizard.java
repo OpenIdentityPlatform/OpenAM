@@ -24,16 +24,13 @@
  *
  * $Id: Wizard.java,v 1.27 2009/01/17 02:05:35 kevinserwin Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.ConfiguratorException;
 import com.sun.identity.setup.HttpServletRequestWrapper;
@@ -46,7 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.sun.identity.shared.Constants;
 import org.apache.click.control.ActionLink;
 
-public class Wizard extends AjaxPage implements Constants {
+public class Wizard extends ProtectedPage implements Constants {
 
     public int startingTab = 1;
 

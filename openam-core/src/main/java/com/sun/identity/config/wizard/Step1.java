@@ -24,16 +24,13 @@
  *
  * $Id: Step1.java,v 1.9 2009/01/05 23:17:10 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import org.apache.click.control.ActionLink;
 
 /**
@@ -41,7 +38,7 @@ import org.apache.click.control.ActionLink;
  * The user will be required to add the default admin password and
  * the agent passwords.
  */
-public class Step1 extends AjaxPage {
+public class Step1 extends ProtectedPage {
     
     // these two links required for client side validation calls.
     public ActionLink validateLink = 

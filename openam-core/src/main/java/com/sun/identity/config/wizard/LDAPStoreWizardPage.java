@@ -24,22 +24,19 @@
  *
  * $Id: LDAPStoreWizardPage.java,v 1.7 2008/06/25 05:42:42 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.pojos.LDAPStore;
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import org.apache.click.control.ActionLink;
 
 /*
- * LDAPStoreWizardPage is the base for steps 2,3, and 4.
+ * LDAPStoreWizardPage is the base for Step 3.
  */
-public class LDAPStoreWizardPage extends AjaxPage {
+public class LDAPStoreWizardPage extends ProtectedPage {
 
     public LDAPStore store = null;
 

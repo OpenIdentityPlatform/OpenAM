@@ -24,16 +24,13 @@
  *
  * $Id: Step2.java,v 1.15 2010/01/04 19:08:36 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
@@ -44,7 +41,7 @@ import java.net.URL;
 import org.apache.click.control.ActionLink;
 import org.publicsuffix.PSS;
 
-public class Step2 extends AjaxPage {
+public class Step2 extends ProtectedPage {
     public ActionLink validateConfigDirLink = 
         new ActionLink("validateConfigDir", this, "validateConfigDir");
     public ActionLink validateCookieDomainLink = 

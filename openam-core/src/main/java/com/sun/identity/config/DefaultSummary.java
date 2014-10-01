@@ -24,15 +24,12 @@
  *
  * $Id: DefaultSummary.java,v 1.13 2009/01/05 23:17:09 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010-2014] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.config;
 
-import com.sun.identity.config.util.AjaxPage;
+import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.HttpServletRequestWrapper;
 import com.sun.identity.setup.HttpServletResponseWrapper;
@@ -42,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.sun.identity.shared.Constants;
 import org.apache.click.control.ActionLink;
 
-public class DefaultSummary extends AjaxPage {
+public class DefaultSummary extends ProtectedPage {
     
     public ActionLink createConfig = 
         new ActionLink("createDefaultConfig", this, "createDefaultConfig");
