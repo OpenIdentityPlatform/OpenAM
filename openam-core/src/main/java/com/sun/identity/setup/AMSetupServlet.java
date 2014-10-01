@@ -522,7 +522,13 @@ public class AMSetupServlet extends HttpServlet {
     public void doPost(HttpServletRequest request,
         HttpServletResponse response)
         throws IOException, ServletException, ConfiguratorException {
-        
+
+        // Only continue if we are not already configured
+        if (isConfigured()) {
+            response.getWriter().write("Already Configured!") ;
+            return;
+        }
+
         HttpServletRequestWrapper req = 
             new HttpServletRequestWrapper(request);
         HttpServletResponseWrapper res = 
@@ -632,6 +638,11 @@ public class AMSetupServlet extends HttpServlet {
     }
 
     public static boolean processRequest(final IHttpServletRequest request, final IHttpServletResponse response) {
+
+        // Only continue if we are not already configured
+        if (isConfigured()) {
+            return true;
+        }
 
         setLocale(request);
         final InstallLog installLog = InstallLog.getInstance();
