@@ -32,30 +32,33 @@
  */
 package com.sun.identity.console.policy;
 
-import com.iplanet.jato.RequestManager;
+import com.iplanet.jato.CompleteRequestException;
 import com.iplanet.jato.RequestContext;
+import com.iplanet.jato.RequestManager;
 import com.iplanet.jato.model.ModelControlException;
+import com.iplanet.jato.util.HtmlUtil;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.event.RequestInvocationEvent;
-import com.iplanet.jato.util.HtmlUtil;
 import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.components.view.html.SerializedField;
-import com.sun.identity.console.realm.HasEntitiesTabs;
-import com.sun.identity.console.realm.RealmPropertiesBase;
 import com.sun.identity.console.policy.model.CachedPolicy;
 import com.sun.identity.console.policy.model.PolicyModel;
 import com.sun.identity.console.policy.model.PolicyModelImpl;
+import com.sun.identity.console.realm.HasEntitiesTabs;
+import com.sun.identity.console.realm.RealmPropertiesBase;
 import com.sun.identity.policy.Policy;
+import com.sun.web.ui.model.CCActionTableModel;
+import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCButton;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
-import com.sun.web.ui.model.CCActionTableModel;
-import com.sun.web.ui.model.CCPageTitleModel;
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -70,6 +73,8 @@ public class PolicyViewBean
 {
     public static final String DEFAULT_DISPLAY_URL =
         "/console/policy/Policy.jsp";
+
+    private static final String XUI_POLICY_EDITOR = "../policyEditor{0}#apps/";
 
     private static final String TF_FILTER = "tfFilter";
     private static final String BTN_SEARCH = "btnSearch";
@@ -148,7 +153,24 @@ public class PolicyViewBean
     public void beginDisplay(DisplayEvent event)
         throws ModelControlException
     {
-        super.beginDisplay(event);
+
+        String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+
+        if (!redirectRealm.endsWith("/")) {
+            redirectRealm += "/";
+        }
+
+        String redirectUrl = MessageFormat.format(XUI_POLICY_EDITOR, redirectRealm);
+
+        RequestContext rc = RequestManager.getRequestContext();
+        try {
+            rc.getResponse().sendRedirect(redirectUrl);
+            throw new CompleteRequestException();
+        } catch (IOException e) {
+            //never thrown, empty catch
+        }
+
+       /** super.beginDisplay(event);
         resetButtonState(TBL_BUTTON_DELETE);
         getPolicyNames();
 
@@ -167,7 +189,7 @@ public class PolicyViewBean
                     message);
             }
         }
-        setPageTitle(getModel(), "page.title.policy");
+        setPageTitle(getModel(), "page.title.policy"); **/
     }
 
     protected AMModel getModelInternal() {
