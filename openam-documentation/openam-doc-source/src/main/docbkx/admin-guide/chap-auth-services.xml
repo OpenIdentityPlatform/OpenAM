@@ -2010,7 +2010,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      </para>
     </listitem>
     <listitem>
-     <para><emphasis role="bold">HMAC One-Time Password (HOTP) - Required</emphasis>.
+     <para><emphasis role="bold">HMAC One-Time Password (HOTP) - Requisite</emphasis>.
       If the user's device does not match a stored profile,
       OpenAM presents the user with a HMAC One-Time Password (HOTP) screen either
       by SMS or email, prompting the user to enter a password.
