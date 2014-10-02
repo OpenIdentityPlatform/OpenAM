@@ -36,11 +36,12 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
         stepClass = '.accordion-step',
 
         collapse = function ($el) {
-            $el.removeClass(activeStepClass).slideUp();
+            $el.removeClass(activeStepClass).slideUp(300);
         },
 
-        expand = function ($el) {
-            $el.addClass(activeStepClass).slideDown();
+        expand = function ($el, init) {
+            var speed = init ? 0 : 300;
+            $el.addClass(activeStepClass).slideDown(speed);
         };
 
     Accordion = function ($el, options) {
@@ -62,7 +63,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
             this.disableSections();
         }
 
-        this.setActive(options.active ? options.active : 0);
+        this.setActive(options.active ? options.active : 0, true);
     };
 
     /**
@@ -116,7 +117,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
     /**
      * Collapses currently active step and expands requested step.
      */
-    Accordion.prototype.setActive = function (id) {
+    Accordion.prototype.setActive = function (id, init) {
         $(this).trigger('beforeChange', [id]);
 
         if (this.$activeSection) {
@@ -128,7 +129,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
         this.enableStep(this.activeId);
 
         this.$activeSection = $(this.$sections[this.activeId]);
-        expand(this.$activeSection);
+        expand(this.$activeSection, init);
 
         this.$headers.removeClass('step-active');
         $(this.$headers[id]).addClass('step-active').focus();

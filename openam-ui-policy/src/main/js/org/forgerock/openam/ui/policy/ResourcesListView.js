@@ -26,18 +26,24 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, form2js, _, js2form, document, console */
+/*global window, define, $, form2js, _, js2form, document, console, Handlebars */
 
 define("org/forgerock/openam/ui/policy/ResourcesListView", [
-    "org/forgerock/commons/ui/common/main/AbstractView"
-], function (AbstractView) {
+    "org/forgerock/commons/ui/common/main/AbstractView",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (AbstractView,eventManager,constants) {
+
     var ResourcesListView = AbstractView.extend({
         element: "#resourcesList",
         template: "templates/policy/ResourcesListTemplate.html",
         noBaseTemplate: true,
         events: {
-            'click .toggle-all-resources': 'toggleAllResources',
-            'click #deleteResources': 'deleteResources'
+            'click .icon-plus': 'addResource',
+            'keyup .icon-plus': 'addResource',
+            'keyup .editing input:last-of-type': 'addResource',
+            'click .icon-close ': 'deleteResource',
+            'keyup .icon-close ': 'deleteResource'
         },
 
         render: function (args, callback) {
@@ -47,34 +53,95 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
                 this.data.entity.resources = [];
             }
 
-            this.parentRender(callback);
+            var self = this;
+            
+            this.parentRender(function () {
+
+                //self.form = self.$el.find('#resourceListForm');
+
+                self.$el.find('.editing').find('input').autosizeInput({space:19});
+                self.$el.find('.editing').find('input:eq(0)').focus().select();
+
+                if(callback){
+                     callback();
+                }
+        
+            });
         },
 
-        /**
-         * Toggles all resources.
-         */
-        toggleAllResources: function (e) {
-            this.$el.find('[data-resource-index]').attr('checked', e.target.checked);
-        },
+        validate: function (inputs) {
+            // This is very simple native validation for supporting browsers for now. 
+            // More complexity to come later.
+            var self = this;
+                self.valid = true;
 
-        /**
-         * Deletes all selected resources.
-         */
-        deleteResources: function () {
-            var self = this,
-                selected = this.$el.find('[data-resource-index]:checked'),
-                resources = self.data.entity.resources,
-                resourcesToDelete = [];
-
-            _.each(selected, function (value, key, list) {
-                resourcesToDelete.push(resources[value.getAttribute('data-resource-index')]);
+            _.each(inputs, function(input){
+                // unsupporting browsers will return undefined not false
+                if ( input.checkValidity() === false) {
+                    self.valid = false;
+                    return;
+                }   
             });
 
-            this.data.entity.resources = _.difference(resources, resourcesToDelete);
+            return self.valid;
+        },
 
-            this.render(self.data);
+        addResource: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+
+            var resourceStr = this.$el.find('.editing').data().resource.replace('-*-', '̂'),
+                inputs = this.$el.find('.editing').find('input'),
+                strLength = resourceStr.length,
+                resource = '',
+                count = 0, 
+                i = 0;
+
+
+            if( this.validate(inputs) === false){
+                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+                return;
+            }
+            
+            for (i = 0; i < strLength; i++) {
+                
+                if (resourceStr[i] === '*'){
+                    resource += inputs[count].value; 
+                    count++;
+                } else if (resourceStr[i] === '̂'){
+                    resource += inputs[count].value === '̂' ? '-*-' : inputs[count].value ;
+                    count++;
+                } else {
+                    resource += resourceStr[i];
+                }
+            } 
+
+            if ( _.contains(this.data.entity.resources, resource) ) {
+                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateResource");
+                return; 
+            } else {
+                this.data.entity.resources.push(resource);
+                this.render(this.data);
+            }
+
+            
+        },
+ 
+        deleteResource: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            var resource = $(e.currentTarget).parent().data().resource;
+            this.data.entity.resources = _.without(this.data.entity.resources, resource);
+            this.render(this.data);
         }
+
     });
 
+    Handlebars.registerHelper('resourceHelper', function() {
+        var result  = this.options.newPattern.replace('-*-', '̂');
+        result = result.replace(/\*/g, '<input required type="text" value="*" placeholder="*" />');
+        result = result.replace('̂',   '<input required type="text" value="-*-" placeholder="-*-" pattern="[^\/]+" />');
+
+        return new Handlebars.SafeString(result);
+    });
+   
     return new ResourcesListView();
 });

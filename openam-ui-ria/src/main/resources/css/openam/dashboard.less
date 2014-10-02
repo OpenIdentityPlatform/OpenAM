@@ -18,7 +18,7 @@
   margin-bottom: 20px;
 }
 
-#trustedDevices {
+#trustedDevices, #oAuthTokens {
 
   table {
     border-collapse: collapse;
@@ -47,32 +47,4 @@
     &:hover{ background-color:#ffe; }
   }
 
-}#oAuthTokens {
-
-  table {
-    border-collapse: collapse;
-    width:100%;
-  }
-
-  table, th {
-    border: 1px solid #ccc;
-    padding: 10px 0;
-  }
-
-  th {
-    background-color:#ddd;
-    &:last-child{  width:120px;  }
-  }
-
-  td {
-    border-left: 1px solid #ccc;
-    padding: 10px;
-    &:last-child{ text-align:center; }
-  }
-
-  tr {
-    &:nth-child(odd){  background-color:#eee; }
-    &:nth-child(even){ background-color:#fff; }
-    &:hover{ background-color:#ffe; }
-  }
 }

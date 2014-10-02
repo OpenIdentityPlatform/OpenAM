@@ -33,8 +33,10 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
     "org/forgerock/openam/ui/policy/GenericGridView",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/openam/ui/policy/PolicyDelegate"
-], function (GenericGridView, uiUtils, router, policyDelegate) {
+    "org/forgerock/openam/ui/policy/PolicyDelegate",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (GenericGridView, uiUtils, router, policyDelegate, eventManager, constants) {
     var ManagePoliciesView = GenericGridView.extend({
         template: "templates/policy/ManagePoliciesTemplate.html",
 
@@ -82,6 +84,13 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         onSelectRow: function (rowid, status, e) {
                             self.onRowSelect(rowid, status, e);
                         },
+                        loadError: function (xhr, status, error){
+                            console.log('loadError', xhr.responseText, status, error);
+                            if( uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy") ){
+                                eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRetrievePolicy");
+                            }
+    
+                        },
                         multiselect: true,
                         sortname: 'name',
                         width: 920,
@@ -96,13 +105,11 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                     };
 
                 this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);
-
                 this.grid.on('jqGridAfterInsertRow', function (e, rowid, rowdata) {
                     self.selectRow(e, rowid, rowdata);
                 });
 
                 this.grid.jqGrid('setFrozenColumns');
-
                 this.reloadGlobalActionsTemplate();
             });
         },
@@ -122,7 +129,6 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             }
 
             var self = this, i, promises = [];
-
             for (i = 0; i < self.selectedItems.length; i++) {
                 promises.push(policyDelegate.deletePolicy(self.selectedItems[i]));
             }

@@ -46,7 +46,10 @@
                 "ruleHelperTryAndOr" : "If more than one child is required, try changing<br>it's type, or adding a child of type AND or OR.",
                 "edit": "Edit ",
                 "createApp": "Create Application",
-                "createPol": "Create Policy"
+                "createPol": "Create Policy",
+                "unableToRetrievePolicy" : "Unable to retrieve policy",
+                "invalidResource" : "Invalid resource",
+                "duplicateResource" : "Duplicate resource"
 
             }
         },

@@ -24,6 +24,8 @@
 
 /*global require, define, QUnit, $ */
 
+
+
 define([
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
@@ -45,114 +47,150 @@ define([
     "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
     "org/forgerock/openam/ui/policy/ManageSubjectsView",
     "org/forgerock/openam/ui/policy/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView,
-             editPolView, resListView, addNewResView, manageAppsView,
-             managePolView, actionsView, reviewInfoView) {
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, resListView, selectPatternsView, manageAppsView, managePolView, actionsView, reviewInfoView) {
     return {
         executeAll: function (server) {
 
-            module('Manage applications page');
+            module('Applications page');
 
             QUnit.asyncTest("Edit Application", function () {
                 editAppView.element = $("<div>")[0];
 
                 editAppView.render(['iPlanetAMWebAgentService'], function () {
-                    var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>');
 
-                    resListView.element = resListViewEl[0];
-                    addNewResView.element = addNewResViewEl[0];
+                    var  entity = editAppView.data.entity,
+                         options = editAppView.data.options;
+
+                    resListView.element = '<div></div>'; 
+                    selectPatternsView.element = '<div></div>'; 
 
                     QUnit.ok(editAppView.accordion.getActive() === 2, "Last step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
 
-                    var app = editAppView.data.entity,
-                        options = editAppView.data.options;
-
                     // Step 1
-                    QUnit.ok(editAppView.$el.find('#appName').val() === app.name, "Name is set");
-                    QUnit.ok(editAppView.$el.find('#appDescription').val() === (app.description ? app.description : ''), "Description is set");
-                    QUnit.ok(editAppView.$el.find('#appRealm').val() === app.realm, "Realm is set");
+                    QUnit.ok(editAppView.$el.find('#appName').val() === entity.name, "Name is set");
+                    QUnit.ok(editAppView.$el.find('#appDescription').val() === (entity.description ? entity.description : ''), "Description is set");
+                    QUnit.ok(editAppView.$el.find('#appRealm').val() === entity.realm, "Realm is set");
 
                     // Step 2
-                    resListView.render([], function () {
-                        var resources = resListView.$el.find('.res-name');
-                        QUnit.ok(resources.length === app.resources.length, "Correct number of resources is displayed");
+                    selectPatternsView.render([], function () {
 
-                        var resourcesPresent = true;
-                        _.each(resources, function (val, key, list) {
-                            resourcesPresent = resourcesPresent && _.contains(app.resources, val.innerHTML);
+                        var element = selectPatternsView.$el,
+                            listItems = element.find('.striped-list ul li'),
+                            selectedItem = element.find('.addPattern:eq(0)');
+                            values = [];
+
+                        _.each(listItems, function (item) {
+                             values.push($(item).find('.pattern').text());
                         });
-                        QUnit.ok(resourcesPresent, "Resources are displayed correctly");
-                    });
 
-                    addNewResView.render([], function () {
-                        var resPattern = addNewResView.$el.find('#urlResource');
+                        QUnit.ok(listItems.length >= 1, "At least one available pattern"); 
 
-                        QUnit.ok(resPattern.find('option').length === 1, "One available option for resource pattern");
-                        QUnit.ok(resPattern.find('option').val() === '*', "Selected value for resource pattern is *");
+                        // check number of rendered patterns = options.resourcePatterns.length
+                        // check options.resourcePatterns and avalible patterns are the same     
+                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All avaliable patterns are displayed correctly"); 
 
-                        var oldResourcesNumber = app.resources.length;
-                        addNewResView.$el.find('.resource-url-part').val('1234567890');
-                        addNewResView.$el.find('#addResource').trigger('click');
-
-                        QUnit.ok(oldResourcesNumber + 1 === app.resources.length, "New resource was added into an object");
-                        QUnit.ok(resListView.$el.find('.resources-grid').find('tbody tr').last()[0].children[1].innerHTML, "New resource was added to the table");
-
-                        // Delete resources
-                        oldResourcesNumber = app.resources.length;
-                        addNewResView.$el.find('.resource-url-part').val('del1');
-                        addNewResView.$el.find('#addResource').trigger('click');
-
-                        addNewResView.$el.find('.resource-url-part').val('del2');
-                        addNewResView.$el.find('#addResource').trigger('click');
-
-                        var selectResource = resListView.$el.find('[data-resource-index]');
-                        $(selectResource[0]).attr('checked', 'checked');
-                        $(selectResource[1]).attr('checked', 'checked');
-
-                        resListView.$el.find('#deleteResources').trigger('click');
-                        QUnit.ok(oldResourcesNumber === app.resources.length, "Manipulation with resources: " +
-                            "added 2, deleted 2, the remaining number of resources is the same");
-
-                        // Reload review step
-                        $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data));
-                    });
+                        // clicking on a pattern reloads the resource creation tool
+                        selectedItem.trigger('click');
+                        QUnit.ok( options.newPattern === selectedItem.find('.pattern').text(), "New pattern selected"); 
 
 
-                    // Step 3
-                    $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
-                        QUnit.ok(editAppView.$el.find('#reviewName').html() === app.name, "Correct name is displayed in the review step");
+                        resListView.render([], function () {
 
-                        if ((!editAppView.$el.find('#reviewDescr').html()) && (!app.description)) {
-                            // both are undefined.
-                            QUnit.ok(true, "Correct description is displayed in the review step");
-                        } else {
-                            QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (app.description ? app.description : ''), "Correct description is displayed in the review step");
-                        }
+                            var editing = resListView.$el.find('.editing'),
+                                listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
+                                plusButton = editing.find('.icon-plus'),
+                                resourceLength = entity.resources.length;
+                                values = [],
+                                valid = true,
+                                NEW_RESOURCE = 'newResource';
+                                
 
-                        // Realms
-                        if (app.realm.length) {
-                            var realms = [];
-                             _.each(editAppView.$el.find('ul#reviewRealm').find('li'), function (value, key) {
-                                realms[key] = value.innerHTML;
-                            });
-                             // Currently only one realm, so hardcoded to [0];
-                            QUnit.ok(realms[0] === app.realm, "Correct realm is displayed in the review step");
-                        }
-
-                        // Resources
-                        if (app.resources.length) {
-                            var resources = [];
-                            _.each(editAppView.$el.find('ul#reviewRes').find('li'), function (value, key) {
-                                resources[key] = value.innerHTML;
+                            _.each(listItems, function (item) {
+                                values.push(item.dataset.resource);
+                                if($(item).text() !== item.dataset.resource){
+                                    valid = false;
+                                } 
                             });
 
-                            QUnit.ok(_.isEqual(resources, app.resources), "Correct resources are displayed in the review step");
-                        }
-                        QUnit.start();
-                    }));
+                            valid = _.difference(values, entity.resources).length === 0 ? valid : false;
 
+                             _.each(listItems, function (item) {
+                                valid = valid && $(item).text() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
+                            });
+      
+                            QUnit.ok(valid, "All resources are displayed correctly");  
+
+                            QUnit.ok( options.newPattern === editing.data().resource, "Selected pattern displayed correctly"); 
+                   
+                            // Testing a new resource can be added. 
+                            // Testing duplication by trying to re-add entity.resources[0] the the entity.resources array.   
+                            editing.find('input')[0].value = entity.resources[0];
+                            plusButton.trigger('click');
+                            QUnit.ok(  _.uniq(entity.resources).length === entity.resources.length,  "Duplicate resource not added");
+
+                            // Adding a NEW_RESOURCE. 
+                            // Testing last input enter key trigger
+                            resourceLength = entity.resources.length;
+                            editing.find('input')[ editing.find('input').length-1 ].value = NEW_RESOURCE;
+                            var event = jQuery.Event("keyup");
+                                event.keyCode = 13 //enter key
+                            editing.find('input:last-of-type').trigger(event);
+
+                            valid = (entity.resources.length === (resourceLength + 1) && entity.resources[resourceLength] === NEW_RESOURCE)
+                            
+                            QUnit.ok( valid , "Pressing enter in the last inputs triggers addResource");
+                            QUnit.ok( valid , "Unique resource added");
+
+                            // Delete the NEW_RESOURCE
+                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)')
+                            var lastAddedItem = listItems.eq(listItems.length-1);
+                                resourceLength = entity.resources.length;
+
+                            lastAddedItem.find('.icon-close').trigger('click');
+                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, NEW_RESOURCE), 'Unique resource deleted');
+                                
+                        
+                            // Step 3
+                            $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
+                                
+                                var realms = [], 
+                                    resources = []; 
+
+                                QUnit.ok(editAppView.$el.find('#reviewName').html() === entity.name, "Correct name is displayed in the review step");
+
+                                if ((!editAppView.$el.find('#reviewDescr').html()) && (!entity.description)) {
+                                    // both are undefined.
+                                    QUnit.ok(true, "Correct description is displayed in the review step");
+                                } else {
+                                    QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
+                                }
+
+                                // Realms
+                                if (entity.realm.length) {
+                                     _.each(editAppView.$el.find('ul#reviewRealm').find('li'), function (value, key) {
+                                        realms[key] = value.innerHTML;
+                                    });
+                                     // Currently only one realm, so hardcoded to [0];
+                                    QUnit.ok(realms[0] === entity.realm, "Correct realm is displayed in the review step");
+                                }
+
+                                // Resources
+                                if (entity.resources.length) {
+                                    _.each(editAppView.$el.find('ul#reviewRes').find('li'), function (value, key) {
+                                        resources[key] = value.innerHTML;
+                                    });
+
+                                    QUnit.ok(_.isEqual(resources, entity.resources), "Correct resources are displayed in the review step");
+                                }
+
+                                QUnit.start();
+                        
+                            }));
+
+                        });
+
+                    });
 
                 });
             });
@@ -161,16 +199,14 @@ define([
                 editAppView.element = $("<div>")[0];
 
                 editAppView.render([], function () {
-                    var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>');
+                    
+                    var entity = editAppView.data.entity;
 
-                    resListView.element = resListViewEl[0];
-                    addNewResView.element = addNewResViewEl[0];
+                    resListView.element = '<div></div>'; 
+                    selectPatternsView.element = '<div></div>'; 
 
                     QUnit.ok(editAppView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editAppView.$el.find('#backButton').length, "Back button is available");
-
-                    var app = editAppView.data.entity;
 
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === '', "Name is empty");
@@ -181,7 +217,6 @@ define([
                     resListView.render([], function () {
                         var resources = resListView.$el.find('.res-name');
                         QUnit.ok(resources.length === 0, "No resources present");
-
                         QUnit.start();
                     });
                 });
@@ -202,9 +237,6 @@ define([
                         rowList = table.jqGrid('getGridParam', 'rowList'),
                         remaining = table.jqGrid('getGridParam', 'userData').remaining;
                        
-
-                    QUnit.ok(conf.globalData.policyEditorConfig, 'Configuration file loaded');
-
                     QUnit.ok(rowData.length > 0, "At least one application listed in the table");
                     QUnit.ok(rowData.length === table.find("tr[id]").length, "Number of rows in grid match number displayed");
 
@@ -242,7 +274,7 @@ define([
                 });
             });
 
-            module('Manage policies page');
+            module('Policies page');
 
             QUnit.asyncTest("Edit Policy", function () {
                 editPolView.element = $("<div>")[0];
@@ -250,72 +282,116 @@ define([
                 $("#qunit-fixture").append(editPolView.element);
 
                 editPolView.render(['sunIdentityServerLibertyPPService', 'anotherxamplePolicy'], function () {
-                    var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
-                        actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
+                    
+                    var entity = editPolView.data.entity,
+                        options = editPolView.data.options;
 
-                    resListView.element = resListViewEl[0];
-                    addNewResView.element = addNewResViewEl[0];
-                    actionsView.element = actionsViewEl[0];
+                    resListView.element = '<div></div>';
+                    selectPatternsView.element = '<div></div>';
+                    actionsView.element = '<div></div>';
 
                     QUnit.ok(editPolView.accordion.getActive() === 5, "Last step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
 
-                    var pol = editPolView.data.entity,
-                        options = editPolView.data.options;
-
                     // Step 1
-                    QUnit.ok(editPolView.$el.find('#policyName').val() === pol.name, "Name is set");
-                    QUnit.ok(editPolView.$el.find('#description').val() === (pol.description ? pol.description : ''), "Description is set");
+                    QUnit.ok(editPolView.$el.find('#policyName').val() === entity.name, "Name is set");
+                    QUnit.ok(editPolView.$el.find('#description').val() === (entity.description ? entity.description : ''), "Description is set");
 
                     // Step 2
                     resListView.render([], function () {
-                        var resources = resListView.$el.find('.res-name');
-                        QUnit.ok(resources.length === pol.resources.length, "Correct number of resources is displayed");
+        
+                        var listItems = resListView.$el.find('#createdResources ul li'),
+                            valid = true;
 
-                        var resourcesPresent = true;
-                        _.each(resources, function (val, key, list) {
-                            resourcesPresent = resourcesPresent && _.contains(pol.resources, val.innerHTML);
+                         _.each(listItems, function (item) {
+                            valid = valid && $(item).text() === item.dataset.resource &&_.contains(entity.resources, item.dataset.resource);
                         });
-                        QUnit.ok(resourcesPresent, "Resources are displayed correctly");
+
+                        QUnit.ok(listItems.length === entity.resources.length, "Correct number of resources are displayed");      
+                        QUnit.ok(valid, "Resources are displayed correctly"); 
+
+
                     });
 
-                    addNewResView.render([], function () {
-                        var resPattern = addNewResView.$el.find('#urlResource');
+                    selectPatternsView.render([], function () {
 
-                        QUnit.ok(resPattern.find('option').length === options.resourcePatterns.length, "Correct number of resource patterns");
+                        var element = selectPatternsView.$el,
+                            listItems = element.find('.striped-list ul li'),
+                            selectedItem = element.find('.addPattern:eq(2)');
+                            values = [];
 
-                        var resPatternPresent = true;
-                        _.each(resPattern.find('option'), function (val, key, list) {
-                            resPatternPresent = resPatternPresent && _.contains(options.resourcePatterns, val.innerHTML);
+                        _.each(listItems, function (item) {
+                             values.push($(item).find('.pattern').text());
                         });
-                        QUnit.ok(resPatternPresent, "Resource Patters are displayed correctly");
 
-                        var oldResourcesNumber = pol.resources.length;
-                        addNewResView.$el.find('.resource-url-part').val('1234567890');
-                        addNewResView.$el.find('#addResource').trigger('click');
+                        // check number of rendered patterns = options.resourcePatterns.length
+                        // check options.resourcePatterns and avalible patterns are the same     
+                        QUnit.ok( _.difference(values, options.resourcePatterns).length === 0, "All avaliable patterns are displayed correctly"); 
 
-                        QUnit.ok(oldResourcesNumber + 1 === pol.resources.length, "New resource was added into an object");
-                        QUnit.ok(resListView.$el.find('.resources-grid').find('tbody tr').last()[0].children[1].innerHTML, "New resource was added to the table");
+                        // clicking on a pattern reloads the resource creation tool
+                        selectedItem.trigger('click');
+                        QUnit.ok( options.newPattern === selectedItem.find('.pattern').text(), "New pattern selected"); 
 
-                        // Delete resources
-                        oldResourcesNumber = pol.resources.length;
-                        addNewResView.$el.find('.resource-url-part').val('del1');
-                        addNewResView.$el.find('#addResource').trigger('click');
+                        resListView.render([], function () {
 
-                        addNewResView.$el.find('.resource-url-part').val('del2');
-                        addNewResView.$el.find('#addResource').trigger('click');
+                            var editing = resListView.$el.find('.editing'),
+                                listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
+                                plusButton = editing.find('.icon-plus'),
+                                resourceLength = entity.resources.length;
+                                values = [],
+                                valid = true,
+                                NEW_STR = 'newResource',
+                                INVALID_STR = 'invalid/Resource';
+                                
 
-                        var selectResource = resListView.$el.find('[data-resource-index]');
-                        $(selectResource[0]).attr('checked', 'checked');
-                        $(selectResource[1]).attr('checked', 'checked');
+                            _.each(listItems, function (item) {
+                                values.push(item.dataset.resource);
+                                if($(item).text() !== item.dataset.resource){
+                                    valid = false;
+                                } 
+                            });
 
-                        resListView.$el.find('#deleteResources').trigger('click');
-                        QUnit.ok(oldResourcesNumber === pol.resources.length, "Manipulation with resources: " +
-                            "added 2, deleted 2, the remaining number of resources is the same");
+                            valid = _.difference(values, entity.resources).length === 0 ? valid : false;
 
-                        // Reload review step
-                        $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data));
+                             _.each(listItems, function (item) {
+                                valid = valid && $(item).text() === item.dataset.resource && _.contains(entity.resources, item.dataset.resource);
+                            });
+      
+                            QUnit.ok(valid, "All resources are displayed correctly");  
+
+                            QUnit.ok( options.newPattern === editing.data().resource, "Selected pattern displayed correctly"); 
+                   
+                            // Testing new resource can be added. 
+                            editing.find('input')[0].value = NEW_STR;
+                            editing.find('input')[1].value = NEW_STR;
+                            plusButton.trigger('click');
+                            QUnit.ok(  _.contains(entity.resources, 'http://www.hello.com/'+ NEW_STR +'/world/'+ NEW_STR),  "Unique resource added");
+
+      
+                            // Testing duplication by trying to re-add the previous resource
+                            editing.find('input')[0].value = NEW_STR;
+                            editing.find('input')[1].value = NEW_STR;
+                            plusButton.trigger('click');
+                            QUnit.ok(  _.uniq(entity.resources).length === entity.resources.length,  "Duplicate resource not added");
+
+
+                            // checking for invalid inputs
+                            resourceLength = entity.resources.length;
+                            editing.find('input')[0].value = INVALID_STR;
+                            editing.find('input')[1].value = NEW_STR;
+                            plusButton.trigger('click');
+                            QUnit.ok( resListView.validate( editing.find('input')) === false,  "Invalid resource not added");
+
+
+                            // Delete the NEW_RESOURCE
+                            resourceLength = entity.resources.length;
+                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
+                            var lastAddedItem = listItems.eq(listItems.length-1);
+                        
+                            lastAddedItem.find('.icon-close').trigger('click');
+                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, lastAddedItem.data().resource), 'Resource deleted');
+                                
+                        });
                     });
 
                     // Step 3
@@ -381,29 +457,29 @@ define([
                     });
 
                     $('#reviewPolicyInfo', editPolView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewPolicyStepTemplate.html', editPolView.data, function () {
-                        QUnit.ok(editPolView.$el.find('#reviewName').html() === pol.name, "Correct name is displayed in the review step");
-                        if ((!editPolView.$el.find('#reviewDesc').html()) && (!pol.description)) {
+                        QUnit.ok(editPolView.$el.find('#reviewName').html() === entity.name, "Correct name is displayed in the review step");
+                        if ((!editPolView.$el.find('#reviewDesc').html()) && (!entity.description)) {
                             // both are undefined.
                             QUnit.ok(true, "Correct description is displayed in the review step");
                         } else {
-                            QUnit.ok(editPolView.$el.find('#reviewDesc').html() === (pol.description ? pol.description : ''), "Correct description is displayed in the review step");
+                            QUnit.ok(editPolView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
                         }
 
                         // Resources
-                        if (pol.resources.length) {
+                        if (entity.resources.length) {
                             var resources = [];
                             _.each(editPolView.$el.find('ul#reviewRes').find('li'), function (value, key) {
                                 resources[key] = value.innerHTML;
                             });
 
-                            QUnit.ok(_.isEqual(resources, pol.resources), "Correct resources are displayed in the review step");
+                            QUnit.ok(_.isEqual(resources, entity.resources), "Correct resources are displayed in the review step");
                         }
 
 
                         // Actions
-                        if (pol.actions.length) {
+                        if (entity.actions.length) {
                             var actions = [],
-                                polSelectedActions = _.where(pol.actions, {selected: true}),
+                                polSelectedActions = _.where(entity.actions, {selected: true}),
                                 actionPair;
 
                             _.each(editPolView.$el.find('#reviewActions').find('li'), function (value) {
@@ -447,13 +523,10 @@ define([
                 editPolView.element = $("<div>")[0];
 
                 editPolView.render(['sunIdentityServerLibertyPPService'], function () {
-                    var resListViewEl = $('<div>').append('<table class="filter-sort-grid resources-grid"><thead><tr class="header-actions"><th colspan="3"><input id="deleteResources" type="button" class="button" value="Delete Selected"></th></tr><tr class="header-titles"><th><input class="toggle-all-resources" type="checkbox"/></th><th><a href="">Resource</a></th></tr><tr class="header-filter"><th></th><th><input type="text" value="" placeholder="Filter ..."/></th></tr></thead><tbody>{{#each entity.resources}}<tr><td><input type="checkbox" data-resource-index="{{@index}}"/></td><td class="res-name">{{this}}</td></tr>{{/each}}</tbody><tfoot></tfoot></table>'),
-                        addNewResViewEl = $('<div>').append('<fieldset class="fieldset"><legend>Add New</legend><div class="group-field-block"><label class="prop-name" for="urlResource">New URL resource:</label><select class="prop-val" id="urlResource">{{#each options.resourcePatterns}}<option value="{{this}}">{{this}}</option>{{/each}}</select></div><div class="group-field-block"><label class="prop-name">URL resource pattern:</label><span class="resource-pattern"><input class="resource-url-part" type="text"/></span></div><input type="button" class="button" value="Add" id="addResource"/></fieldset>'),
-                        actionsViewEl = $('<div>').append('<thead><tr class="header-titles"><th><input class="toggle-all-actions" type="checkbox"/></th><th><a href="">Action</a></th><th><a href="">Permission</a></th></tr></thead><tbody>{{#each entity.actions}}<tr><td><input class="toggle-action" type="checkbox"{{#if selected}}checked{{/if}}data-action-name="{{action}}"/></td><td class="action-name">{{action}}</td><td><div class="group-field-row"><input type="radio" name="action{{@index}}" id="allow{{@index}}" value="Allow" data-action-name="{{action}}"{{#if value}}checked{{/if}}/><label for="allow{{@index}}">Allow</label><input type="radio" name="action{{@index}}" id="deny{{@index}}" value="Deny" data-action-name="{{action}}"{{#unless value}}checked{{/unless}}/><label for="deny{{@index}}">Deny</label></div></td></tr>{{/each}}</tbody>');
-
-                    resListView.element = resListViewEl[0];
-                    addNewResView.element = addNewResViewEl[0];
-                    actionsView.element = actionsViewEl[0];
+                    
+                    resListView.element = '<div></div>';
+                    selectPatternsView.element = '<div></div>';
+                    actionsView.element = '<div></div>';
 
                     QUnit.ok(editPolView.accordion.getActive() === 0, "First step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
@@ -572,7 +645,6 @@ define([
                 QUnit.equal(router.getLink(router.configuration.routes.editApp, [null]), "app/", "Add App - no arguments provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editApp, ["calendar"]), "app/calendar", "Edit App with one argument provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editApp, ["test spaces"]), "app/test spaces", "Edit App with space in the name");
-
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", null]), "app/calendar/policy/", "Add policy with one argument provided");
                 QUnit.equal(router.getLink(router.configuration.routes.editPolicy, ["calendar", "testPolicy"]), "app/calendar/policy/testPolicy", "Edit policy with two arguments provided");
             });

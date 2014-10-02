@@ -41,6 +41,7 @@ require.config({
         moment: "libs/moment-2.8.1-min",
         jqueryui: "libs/jquery-ui-1.10.4.custom.min",
         clockPicker: "libs/jquery-clockpicker.0.0.7.min",
+        autosizeInput:  "libs/jquery.autosize.input.min",
         multiselect: "libs/ui.multiselect-0.3",
         jqgrid: "libs/jquery.jqGrid-4.5.4-min",
         LoginDialog: "org/forgerock/commons/ui/common/LoginDialog",
@@ -97,6 +98,10 @@ require.config({
             deps: ["jquery"],
             exports: "clockPicker"
         },
+        autosizeInput: {
+            deps: ["jquery"],
+            exports: "autosizeInput"
+        },
         multiselect: {
             deps: ["jqueryui"],
             exports: "multiselect"
@@ -128,6 +133,7 @@ require([
     "multiselect",
     "jqgrid",
     "clockPicker",
+    "autosizeInput",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -136,7 +142,7 @@ require([
     "org/forgerock/openam/ui/policy/main", 
     "ThemeManager",
     "config/main"
-], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker,
+], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput,
             i18nManager, constants, eventManager) {
 
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);

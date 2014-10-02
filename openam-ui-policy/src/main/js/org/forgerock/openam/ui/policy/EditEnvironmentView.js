@@ -250,6 +250,11 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                                 // Ignoring the required property and assumming it defaults to false. See AME-4324
                                 returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html", {data:value, title:key, selected:itemData[key]});
 
+                            } else if (value.type === 'array' ) {
+                                // TODO
+                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count, pattern:pattern});
+                                
+
                             } else {
                                 console.error('Unexpected data type:',key,value);
                             }
@@ -277,6 +282,9 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                         break;
                         case 'boolean':
                             itemData[key] = false;
+                        break;
+                        case 'array':
+                            itemData[key] = null;
                         break;
                         default:
                             console.error('Unexpected data type:',key,value);

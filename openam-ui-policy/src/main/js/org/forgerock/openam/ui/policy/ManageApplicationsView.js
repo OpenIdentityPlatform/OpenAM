@@ -129,6 +129,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             }
 
             var self = this, i, promises = [];
+
             for (i = 0; i < self.selectedItems.length; i++) {
                 promises.push(policyDelegate.deleteApplication(self.selectedItems[i]));
             }

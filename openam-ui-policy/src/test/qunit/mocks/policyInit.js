@@ -44,8 +44,7 @@ define([
     "text!templates/policy/PoliciesTableGlobalActionsTemplate.html",
     "text!templates/policy/ResourcesListTemplate.html",
     "text!templates/policy/ReviewApplicationStepTemplate.html",
-    "text!templates/policy/ReviewPolicyStepTemplate.html",
-    "text!configuration.json"
+    "text!templates/policy/ReviewPolicyStepTemplate.html"
 ], function () {
     /* an unfortunate need to duplicate the file names here, but I haven't
      yet found a way to fool requirejs into doing dynamic dependencies */
@@ -70,8 +69,7 @@ define([
             "templates/policy/PoliciesTableGlobalActionsTemplate.html",
             "templates/policy/ResourcesListTemplate.html",
             "templates/policy/ReviewApplicationStepTemplate.html",
-            "templates/policy/ReviewPolicyStepTemplate.html",
-            "configuration.json"
+            "templates/policy/ReviewPolicyStepTemplate.html"
         ],
         deps = arguments;
 
@@ -223,7 +221,7 @@ define([
                     "Content-API-Version": "protocol=1.0,resource=1.0",
                     "Content-Type": "application/json;charset=UTF-8"
                 },
-                "{\"name\":\"sunIdentityServerLibertyPPService\",\"resources\":[\"*\"],\"actions\":{\"QUERY_interactForConsent\":false,\"QUERY_interactForValue\":false,\"MODIFY_interactForValue\":false,\"QUERY_deny\":false,\"MODIFY_deny\":false,\"MODIFY_interactForConsent\":false,\"MODIFY_allow\":true,\"QUERY_allow\":true},\"applicationType\":\"sunIdentityServerLibertyPPService\",\"subjects\":[\"User\",\"NOT\",\"AND\",\"Attribute\",\"Role\",\"Group\",\"OR\"],\"creationDate\":1403298038012,\"lastModifiedDate\":1403298038012,\"entitlementCombiner\":\"DenyOverride\",\"attributeNames\":[],\"realm\":\"/\",\"createdBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModifiedBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"description\":null,\"conditions\":[\"Time\",\"NOT\",\"IP\",\"AND\",\"DNSName\",\"OR\"]}"
+                "{\"name\":\"sunIdentityServerLibertyPPService\",\"resources\":[\"*\", \"-*-\", \"http://www.hello.com/-*-/world/*\"],\"actions\":{\"QUERY_interactForConsent\":false,\"QUERY_interactForValue\":false,\"MODIFY_interactForValue\":false,\"QUERY_deny\":false,\"MODIFY_deny\":false,\"MODIFY_interactForConsent\":false,\"MODIFY_allow\":true,\"QUERY_allow\":true},\"applicationType\":\"sunIdentityServerLibertyPPService\",\"subjects\":[\"User\",\"NOT\",\"AND\",\"Attribute\",\"Role\",\"Group\",\"OR\"],\"creationDate\":1403298038012,\"lastModifiedDate\":1403298038012,\"entitlementCombiner\":\"DenyOverride\",\"attributeNames\":[],\"realm\":\"/\",\"createdBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"lastModifiedBy\":\"id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org\",\"description\":null,\"conditions\":[\"Time\",\"NOT\",\"IP\",\"AND\",\"DNSName\",\"OR\"]}"
             ]
         );
 

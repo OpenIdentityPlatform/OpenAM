@@ -61,6 +61,18 @@ define("config/messages/PolicyMessages", [], function () {
         "ruleHelperTryAndOr": {
             msg: "config.messages.PolicyMessages.ruleHelperTryAndOr",
             type: "info"
+        },
+        "unableToRetrievePolicy": {
+            msg: "config.messages.PolicyMessages.unableToRetrievePolicy",
+            type: "error"
+        },
+        "invalidResource": {
+            msg: "config.messages.PolicyMessages.invalidResource",
+            type: "error"
+        },
+        "duplicateResource": {
+            msg: "config.messages.PolicyMessages.duplicateResource",
+            type: "error"
         }
     };
 });

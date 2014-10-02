@@ -52,7 +52,7 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
         checkBoxUncheckedClass: 'icon-checkbox-unchecked',
 
         checkBoxFormatter: function (cellvalue, options, rowObject) {
-            return "<span data-selection='" + rowObject.name + "' class='icon-checkbox-unchecked'></span>";
+            return "<span data-selection='" + rowObject.name + "' class='icon-checkbox-unchecked' tabindex='0' ></span>";
         },
 
         initBaseView: function (globalActionsTemplate, storageKey) {

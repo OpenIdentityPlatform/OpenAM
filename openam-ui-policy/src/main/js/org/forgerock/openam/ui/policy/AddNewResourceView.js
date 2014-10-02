@@ -33,14 +33,16 @@ define("org/forgerock/openam/ui/policy/AddNewResourceView", [
     "org/forgerock/openam/ui/policy/ResourcesListView"
 ], function (AbstractView, resourcesListView) {
     var AddNewResourceView = AbstractView.extend({
-        element: "#addNewResource",
+        element: "#patterns",
         template: "templates/policy/AddNewResourceTemplate.html",
         noBaseTemplate: true,
         events: {
-            'click #addResource': 'addResource'
+            'click .addPattern': 'addPattern',
+            'keyup .addPattern': 'addPattern'
         },
 
         render: function (args, callback) {
+
             _.extend(this.data, args);
 
             this.parentRender(function () {
@@ -50,25 +52,15 @@ define("org/forgerock/openam/ui/policy/AddNewResourceView", [
                     callback();
                 }
             });
+
         },
 
-        /**
-         * Adds new resource based on a predefined template.
-         */
-        addResource: function () {
-            var newResource = this.$newResource.val(),
-                resources = this.data.entity.resources,
-                duplicate = _.find(resources, function (res) {
-                    return res === newResource;
-                });
-
-            if (newResource && !duplicate) {
-                resources.push(newResource);
-                this.$newResource.val('');
-
-                resourcesListView.render(this.data);
-            }
+        addPattern: function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            this.data.options.newPattern = $(e.currentTarget).find(".pattern").text();
+            resourcesListView.render(this.data);
         }
+
     });
 
     return new AddNewResourceView();

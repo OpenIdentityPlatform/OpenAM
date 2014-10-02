@@ -100,11 +100,10 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 });
 
                 data.options = {};
-
-                data.options.availableSubjects = subjects;
+                data.options.availableSubjects =     subjects;
                 data.options.availableEnvironments = conditions;
-                data.options.availableActions = actions;
-                data.options.resourcePatterns = app[0].resources;
+                data.options.availableActions =      actions;
+                data.options.resourcePatterns =      app[0].resources;
 
                 data.entity.applicationName = appName;
 
@@ -113,9 +112,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     manageSubjects.render(data);
                     manageEnvironments.render(data);
                     actionsView.render(data);
-                    resourcesListView.render(data);
                     addNewResourceView.render(data);
-
+                    resourcesListView.render(data);
+                    
                     data.subjectString = JSON.stringify(data.entity.subject, null, 2);
                     data.environmentString = JSON.stringify(data.entity.condition, null, 2);
 
