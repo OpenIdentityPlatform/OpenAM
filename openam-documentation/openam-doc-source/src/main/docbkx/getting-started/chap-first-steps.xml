@@ -39,14 +39,19 @@
  this chapter to learn how to protect a web site with OpenAM.</para>
 
  <important>
-  <para>You need a Linux, Solaris, or Windows system that can run the web policy
-  agent (see the <link xlink:show="new"
-  xlink:href="web-release-notes#platform-requirements-web-agents"
-  xlink:role="http://docbook.org/xlink/role/olink"
-  ><citetitle>Web Agents Platform Requirements</citetitle></link> if your system
-  does not have an x86 or x64 based processor for example) with a minimum of 1
-  GB of free RAM memory, a few hundred MB of free disk space, a web browser and
-  Internet connection to download software.</para>
+  <para>
+   You need a Linux, Solaris, or Windows system
+   that can run the web policy agent
+   (see the <citetitle>Web Policy Agent Release Notes</citetitle> section,
+   <link
+    xlink:show="new"
+    xlink:href="web-release-notes#web-pa-platform-requirements"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Web Policy Agents Platform Requirements</citetitle></link>)
+   with a minimum of 1 GB of free RAM memory,
+   a few hundred MB of free disk space,
+   a web browser and Internet connection to download software.
+  </para>
 
   <para>If you are running Mac OS X, set up a virtual machine running Linux to
   try these procedures because the web policy agent is not built for Apache HTTP

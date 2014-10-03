@@ -28,7 +28,8 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Java EE Policy Agents <?eval ${agentsDocTargetVersion}?></title>
 
  <para>This chapter concerns OpenAM Java EE policy agents. Java EE policy
@@ -105,82 +106,49 @@ Agreement (yes/no): [no]:</computeroutput>
  <section xml:id="before-you-start-javaee-agents">
  <title>Before You Install OpenAM Java EE Policy Agents</title>
 
-  <para>This section covers software and hardware prerequisites for installing
-  and running OpenAM Java EE Policy Agents.</para>
+  <para>
+   This section covers software and hardware prerequisites
+   for installing and running OpenAM Java EE Policy Agents.
+  </para>
+
+  <xinclude:include href="../shared/para-requirements-support.xml" />
+
+  <para>TODO: Update for release</para>
 
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
-   <para>Java EE policy agents run in a Java EE Web container and require Java
-   Development Kit 6 or Java Development Kit 7. ForgeRock recommends the most
-   recent update of Java 6 or 7 to ensure you have the latest security fixes.</para>
+   <para>
+    Java EE policy agents run in a Java EE Web container,
+    and require a Java Development Kit.
+   </para>
 
-   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+   <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
   </section>
 
   <section xml:id="browser-requirements-javaee-agents">
-   <title>Java EE Agents Browsers Tested</title>
+   <title>Java EE Agents Browser Requirements</title>
 
-   <itemizedlist>
-    <para>ForgeRock has tested this policy agent release with the following web
-    browsers.</para>
-    <listitem><para>Chrome release 16 and later</para></listitem>
-    <listitem><para>Firefox 3.6 and later</para></listitem>
-    <listitem><para>Internet Explorer 7 and later</para></listitem>
-   </itemizedlist>
+   <para>
+    The following table summarizes browser support.
+   </para>
+
+   <xinclude:include href="../shared/table-browser-requirements.xml" />
   </section>
 
-  <section xml:id="web-container-requirements-javaee-agents">
-   <title>Web Application Container Requirements</title>
+  <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
-   <itemizedlist>
-    <para>Java EE policy agents support the following Java EE application
-    containers.</para>
-
-    <listitem>
-     <para><?eval ${agentTomcatSupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentGlassFishSupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentWebSphereSupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentJBossSupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentJettySupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentWebLogicSupport}?></para>
-    </listitem>
-   </itemizedlist>
-  </section>
-
-  <section xml:id="platform-requirements-javaee-agents">
+  <section xml:id="jee-pa-platform-requirements">
    <title>Java EE Agents Platform Requirements</title>
 
-   <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
-   later, and on Microsoft Windows Server 2008 R2 and 2012.</para>
+   <para>
+    The following table summarizes platform support.
+   </para>
 
-   <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
-   or later.</para>
-
-   <para>Other Java EE policy agents have been tested on Linux 2.6 or
-   later.</para>
-
-   <para>Testing has focused on 64-bit operating systems.</para>
+   <xinclude:include href="../shared/table-jee-pa-platform-requirements.xml" />
   </section>
 
-  <section xml:id="hardware-requirements-javaee-agents">
-   <title>Java EE Agents Hardware Requirements</title>
-
-   <para>You can deploy OpenAM Java EE policy agents on any hardware supported
-   for the combination of software required.</para>
-
-    <para>ForgeRock has tested this release on x86 and x64 based systems.</para>
-  </section>
+  <xinclude:include href="../shared/sec-special-requests.xml" />
  </section>
 
  <section xml:id="javaee-agent-compatibility">
@@ -202,16 +170,6 @@ Agreement (yes/no): [no]:</computeroutput>
 
    <para>To do so for Java EE policy agents, set
    <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
-
-   <section xml:id="special-requests">
-    <title>Special Requests</title>
-
-    <para>
-     <emphasis role="strong">If you have a special request regarding support
-     for a combination not listed here, contact ForgeRock at
-     <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis>
-    </para>
-   </section>
   </section>
 
   <section xml:id="javaee-agent-deprecated">

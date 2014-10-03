@@ -134,19 +134,6 @@
 
         <opendjDocBase>http://docs.forgerock.org/en/opendj/${opendj.server.version}</opendjDocBase>
 
-        <agentApacheSupport>Apache HTTP Server 2.2, 2.4</agentApacheSupport>
-        <agentIISSupport>Microsoft IIS 6, 7, 8</agentIISSupport>
-        <agentNginxSupport>Nginx 1</agentNginxSupport>
-        <agentSunWebServerSupport>Oracle iPlanet Web Server 7.0 (also known as Sun Web Server)<!-- (deprecated)--></agentSunWebServerSupport>
-        <agentVarnishCacheSupport>Varnish Cache 3.0.3</agentVarnishCacheSupport>
-
-        <agentGlassFishSupport>GlassFish v2, v3 (at least 3.1)</agentGlassFishSupport>
-        <agentJBossSupport>JBoss Enterprise Application Platform 5 and 6, JBoss Application Server 7</agentJBossSupport>
-        <agentJettySupport>Jetty 7 (at least 7.6.13), 8 (at least 8.1.13)</agentJettySupport>
-        <agentTomcatSupport>Apache Tomcat 6, 7</agentTomcatSupport>
-        <agentWebLogicSupport>Oracle WebLogic Server 10g, 11g, 12c</agentWebLogicSupport>
-        <agentWebSphereSupport>IBM WebSphere Application Server 7, 8, 8.5</agentWebSphereSupport>
-
         <site-out>${project.build.outputDirectory}/site</site-out>
         <javadocBase>http://openam.forgerock.org/apidocs/</javadocBase>
         <dotnetFedletBase>http://openam.forgerock.org/dotnet-fedlet</dotnetFedletBase>

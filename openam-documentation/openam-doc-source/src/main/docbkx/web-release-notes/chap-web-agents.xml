@@ -28,7 +28,8 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'
-         xmlns:xlink='http://www.w3.org/1999/xlink'>
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Web Policy Agents <?eval ${agentsDocTargetVersion}?></title>
 
  <para>This chapter concerns OpenAM web policy agents. Web policy agents
@@ -241,131 +242,78 @@ Agreement (yes/no): [no]:</computeroutput>
  <section xml:id="before-you-start-web-agents">
   <title>Before You Install OpenAM Web Policy Agents</title>
 
-  <para>This section covers software and hardware prerequisites for installing
-  and running OpenAM web policy agents.</para>
+  <para>
+   This section covers software and hardware prerequisites
+   for installing and running OpenAM web policy agents.
+  </para>
+
+  <xinclude:include href="../shared/para-requirements-support.xml" />
+
+  <para>TODO: Update for release</para>
 
   <section xml:id="java-requirements-web-agents">
    <title>Web Agents Java Requirements</title>
 
-   <para> ForgeRock recommends the most recent update of the supported version of
-   Java to ensure you have the latest security fixes.</para>
+   <para>
+    All web policy agents except those associated with <!--Varnish Cache and-->
+    Microsoft IIS require a Java runtime environment for installation.
+   </para>
 
-   <para>All web policy agents except those associated with <!--Varnish Cache and-->
-   Microsoft IIS require a Java 6 or 7 runtime environment for installation.
-   ForgeRock recommends the most recent update of Java 6 or 7 to ensure you
-   have the latest security fixes.</para>
-
-   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+   <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
   </section>
 
   <section xml:id="browser-requirements-web-agents">
-   <title>Web Agents Browsers Tested</title>
+   <title>Web Agents Browser Requirements</title>
 
-   <itemizedlist>
-    <para>ForgeRock has tested this web policy agent release with the following
-    web browsers.</para>
-    <listitem><para>Chrome release 16 and later</para></listitem>
-    <listitem><para>Firefox 3.6 and later</para></listitem>
-    <listitem><para>Internet Explorer 7 and later</para></listitem>
-   </itemizedlist>
+   <para>
+    The following table summarizes browser support.
+   </para>
+
+   <xinclude:include href="../shared/table-browser-requirements.xml" />
   </section>
 
-  <section xml:id="web-server-requirements-web-agents">
-   <title>Web Server Requirements</title>
+  <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
-   <itemizedlist>
-    <para>Web policy agents support the following web servers.</para>
+  <section xml:id="web-pa-platform-requirements">
+   <title>Web Policy Agents Platform Requirements</title>
 
-    <listitem>
-     <para><?eval ${agentApacheSupport}?></para>
-    </listitem>
-    <listitem>
-     <para><?eval ${agentIISSupport}?></para>
-    </listitem>
- <!-- Pending OPENAM-1182
-    <listitem>
-     <para><?eval ${agentNginxSupport}?></para>
-    </listitem>
-  -->
-     <listitem>
-      <para><?eval ${agentSunWebServerSupport}?></para>
-     </listitem>
+   <para>
+    The following table summarizes platform support.
+   </para>
 
-<!--
-     <listitem>
-      <para><?eval ${agentVarnishCacheSupport}?></para>
-     </listitem>
--->
-    </itemizedlist>
-   </section>
+   <xinclude:include href="../shared/table-web-pa-platform-requirements.xml" />
 
-   <section xml:id="platform-requirements-web-agents">
-    <title>Web Agents Platform Requirements</title>
+   <para>
+    Before installing web policy agents on Linux,
+    make sure the system can run <command>gcc</command> 4.4.7.
+    <literal>libc.so.6</literal> must be available
+    and it must support the GLIBC_2.3 ABI.
+    You can check this by running the following command:
+    <command>strings libc.so.6 | grep GLIBC_2</command>.
+    Also, <literal>libstdc++.so.6</literal> must be available
+    and it must support GLIBCXX_3.4 and CXXABI_1.3.
+    You can check this by running the following commands:
+    <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
+    and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
+   </para>
 
-    <para>Apache HTTP web policy agents run on Linux 2.6.18 or later,
-    and on Oracle Solaris 10 or later.</para>
+   <para>
+    Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
+    make sure that the optional Application Development component of
+    Web Server (IIS) is installed.
+    In the Windows Server 2012 Server Manager for example,
+    Application Development is a component of Web Server (IIS) | Web Server.
+   </para>
 
-    <para>The Microsoft IIS 6 web policy agent has been tested on Windows Server
-    2003.</para>
-
-    <para>The Microsoft IIS 7 web policy agent has been tested on Windows Server
-    2008 R2.</para>
-
-    <para>The Microsoft IIS 8 web policy agent has been tested on Windows Server
-    2012.</para>
-
-<!--
-    <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
-    later, and on Oracle Solaris 10 or later.</para>
--->
-
-    <para>
-     Before installing web policy agents on Linux,
-     make sure the system can run <command>gcc</command> 4.4.7.
-     <literal>libc.so.6</literal> must be available
-     and it must support the GLIBC_2.3 ABI.
-     You can check this by running the following command:
-     <command>strings libc.so.6 | grep GLIBC_2</command>.
-     Also, <literal>libstdc++.so.6</literal> must be available
-     and it must support GLIBCXX_3.4 and CXXABI_1.3.
-     You can check this by running the following commands:
-     <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
-     and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
-    </para>
-
-    <para>
-     Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
-     make sure that the optional Application Development component of
-     Web Server (IIS) is installed.
-     In the Windows Server 2012 Server Manager for example,
-     Application Development is a component of Web Server (IIS) | Web Server.
-    </para>
-
-    <para>Before installing web policy agents on Solaris 10, make sure you have
-    applied the latest shared library patch for C++, at least 119963-16 on SPARC,
-    or 119964-12 on x86.</para>
+   <para>
+    Before installing web policy agents on Solaris 10,
+    make sure you have applied the latest shared library patch for C++,
+    at least 119963-16 on SPARC or 119964-12 on x64.
+   </para>
   </section>
 
-   <section xml:id="hardware-requirements-web-agents">
-    <title>Web Agents Hardware Requirements</title>
-
-    <para>You can deploy OpenAM web policy agents on any hardware supported for
-    the combination of software required.</para>
-
-    <para>ForgeRock has tested this release on x86 and x64 based systems,
-    and also on Solaris SPARC systems.</para>
-   </section>
-
-   <section xml:id="special-requests">
-    <title>Special Requests</title>
-
-    <para>
-     <emphasis role="strong">If you have a special request regarding support
-     for a combination not listed here, contact ForgeRock at
-     <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis>
-    </para>
-   </section>
-  </section>
+  <xinclude:include href="../shared/sec-special-requests.xml" />
+ </section>
 
   <section xml:id="web-agent-compatibility">
    <title>Web Policy Agent Compatibility</title>

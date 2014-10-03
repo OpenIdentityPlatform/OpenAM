@@ -31,211 +31,159 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Before You Install OpenAM <?eval ${serverDocTargetVersion}?> Software</title>
 
- <para>This chapter covers software and hardware prerequisites for installing
- and running OpenAM software.</para>
+ <para>
+  This chapter covers software and hardware prerequisites
+  for installing and running OpenAM server software.
+ </para>
  
+ <xinclude:include href="../shared/para-requirements-support.xml" />
+
+ <para>TODO: Update for release</para>
+
+ <section xml:id="os-requirements">
+  <title>Operating System Requirements</title>
+
+  <itemizedlist>
+   <para>
+    ForgeRock supports customers using OpenAM server software
+    on the following operating system versions.
+   </para>
+
+   <listitem>
+    <para>
+     CentOS 6, 7
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Microsoft Windows Server 2008, 2008 R2, 2012, 2012 R2
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Oracle Linux 6, 7
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Oracle Solaris x64 10, 11
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Oracle Solaris SPARC 10, 11
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Red Hat Enterprise Linux 6, 7
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     SuSE Linux 11
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Ubuntu Linux 12.04 LTS, 14.04 LTS
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
  <section xml:id="java-requirements">
   <title>Java Requirements</title>
 
-  <para>This release of OpenAM requires Java Development Kit 6 or
-  Java Development Kit 7. ForgeRock recommends the most recent update
-  of Java 6 or 7 to ensure you have the latest security fixes.</para>
-  
-  <para>ForgeRock has tested this release of OpenAM primarily with Oracle
-  Java SE JDK, and also tested OpenAM on WebSphere with IBM JDK.</para>
+  <para>
+   OpenAM server software runs in a Java EE Web container,
+   and requires a Java Development Kit.
+  </para>
 
-  <para>OpenAM Java SDK requires Java Development Kit 6 or 7.</para>
+  <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
  </section>
 
  <section xml:id="web-container-requirements">
   <title>Web Application Container Requirements</title>
 
   <itemizedlist>
-   <para>This release of OpenAM runs in the following web application
-   containers.</para>
+   <para>
+    ForgeRock supports customers using OpenAM server software
+    in the following web application container versions.
+   </para>
+
    <listitem>
-    <para>Apache Tomcat 6, 7 (ForgeRock's preferred web container for OpenAM)</para>
+    <para>
+     Apache Tomcat 6, 7, 8 (ForgeRock's preferred web container for OpenAM)
+    </para>
    </listitem>
+
    <listitem>
-    <para>GlassFish v2, v3</para>
+    <para>
+     IBM WebSphere Application Server 8, 8.5
+    </para>
    </listitem>
+
    <listitem>
-    <para>IBM WebSphere 8.0, 8.5</para>
+    <para>
+     JBoss Enterprise Application Platform 6
+    </para>
    </listitem>
+
    <listitem>
-    <para>JBoss Enterprise Application Platform 5, 6</para>
-    <para>JBoss Application Server 7</para>
+    <para>
+     JBoss Application Server 7
+    </para>
    </listitem>
+
    <listitem>
-    <para>Jetty 7 (7.6.13 or later)</para>
-    <para>Jetty 8 (8.1.13 or later)</para>
-    <!-- Pending OPENAM-3015 <para>Jetty 9</para> -->
+    <para>
+     Oracle WebLogic Server 11g, 12c
+    </para>
    </listitem>
+
    <listitem>
-    <para>Oracle WebLogic Server 11g (10.3.5)</para>
-    <para>Oracle WebLogic Server 12c (12.1.2)</para>
+    <para>
+     WildFly 8
+    </para>
    </listitem>
   </itemizedlist>
 
-  <para>If running as a non-root user, the web application container must be
-  able to write to its own home directory, where OpenAM stores configuration
-  files.</para>
+  <para>
+   The web application container
+   must be able to write to its own home directory,
+   where OpenAM stores configuration files.
+  </para>
  </section>
 
  <section xml:id="data-store-requirements">
   <title>Data Store Requirements</title>
 
+  <para>
+   The following table summarizes data store support.
+  </para>
 
-  <itemizedlist>
-   <para>This release of OpenAM works with the following CTS data stores.</para>
-    <listitem>
-     <para>Embedded (using ForgeRock OpenDJ for the data store)</para>
-    </listitem>
-    <listitem>
-     <para>External ForgeRock OpenDJ data store</para>
-     <para>Currently, CTS is only supported on OpenDJ, versions 2.6.0 and later.</para>
-    </listitem>
-  </itemizedlist>
-
-  <itemizedlist>
-   <para>This release of OpenAM works with the following configuration data
-   stores.</para>
-   <listitem>
-    <para>Embedded (using ForgeRock OpenDJ for the data store)</para>
-    <para>When using the embedded configuration store for CTS or configuration,
-    you must deploy OpenAM on a local file system and not on an NFS-mounted file
-    system.</para>
-   </listitem>
-   <listitem>
-    <para>External ForgeRock OpenDJ data store</para>
-    <para>ForgeRock recommends updating to the latest stable release.</para>
-   </listitem>
-   <listitem>
-    <para>External Oracle Unified Directory 11g or later</para>
-   </listitem>
-   <listitem>
-    <para>External Oracle Directory Server Enterprise Edition (ODSEE) data store,
-    version 6.3 or later</para>
-
-    <important><para>If you use ODSEE as an external configuration store, you
-     must still use OpenDJ for your external CTS store.
-    </para></important>
-   </listitem>
-  </itemizedlist>
-
-  <itemizedlist>
-   <para>This release of OpenAM works with the following user profile data
-   stores.</para>
-   <listitem>
-    <para>ForgeRock OpenDJ</para>
-   </listitem>
-   <listitem>
-    <para>Microsoft Active Directory (tested by ForgeRock on Windows Server
-    2008 R2 and 2012)</para>
-   </listitem>
-   <listitem>
-    <para>IBM Tivoli Directory Server 6.3</para>
-   </listitem>
-   <listitem>
-    <para>OpenDS, version 2 or later</para>
-   </listitem>
-   <listitem>
-    <para>Oracle Directory Server Enterprise Edition, version 6.3 or later</para>
-   </listitem>
-  </itemizedlist>
-
-  <para>OpenAM also works with other LDAPv3 compliant directory servers. Some
-  features of OpenAM depend on features supported by your directory service,
-  such as the following:</para>
-  <itemizedlist>
-   <listitem>
-    <para>Extensible LDAP schema, required to extend the schema for OpenAM.
-    First, install OpenAM to use a fresh instance of OpenDJ, such as the
-    embedded OpenDJ server. After installation, study the custom schema
-    definitions from the OpenDJ file,
-    <filename>config/schema/99-user.ldif</filename>, to see what schema
-    definitions you must add to your directory. You might need to adapt the
-    schema definition format before adding the definitions to your
-    directory.</para>
-   </listitem>
-   <listitem>
-    <para>The persistent search request control
-    (OID: <literal>2.16.840.1.113730.3.4.3</literal>).</para>
-   </listitem>
-   <listitem>
-    <para>The Behera Internet-Draft <link xlink:show="new"
-    xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
-    >Password Policy for LDAP Directories</link> (in the context of the LDAP
-    authentication module only)</para>
-   </listitem>
-  </itemizedlist>
-  <para>If you plan to deploy with OpenLDAP or other LDAPv3 directory for user
-  data, make sure you test your solution before you deploy to ensure all OpenAM
-  features that you use work as expected.</para>
+  <xinclude:include href="../shared/table-data-store-requirements.xml" />
  </section>
 
- <section xml:id="browsers-tested">
-  <title>Browsers Tested</title>
+ <section xml:id="browser-requirements">
+  <title>Browser Requirements</title>
 
-  <itemizedlist>
-   <para>ForgeRock has tested many browsers with OpenAM console and end user
-   pages, including the following browsers.</para>
-   <listitem>
-    <para>Chrome and Chromium 16 and later</para>
-   </listitem>
-   <listitem>
-    <para>Firefox 3.6 and later</para>
-   </listitem>
-   <listitem>
-    <para>Internet Explorer 7 and later</para>
-   </listitem>
-   <listitem>
-    <para>Safari 5 and later</para>
-   </listitem>
-  </itemizedlist>
+  <para>
+   The following table summarizes browser support.
+  </para>
+
+  <xinclude:include href="../shared/table-browser-requirements.xml" />
  </section>
 
- <section xml:id="platform-requirements">
-  <title>Platform Requirements</title>
+ <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
-  <itemizedlist>
-   <para>ForgeRock has tested this release of OpenAM on the following
-   platforms.</para>
-   <listitem>
-    <para>Linux 2.6, 3.0</para>
-   </listitem>
-   <listitem>
-    <para>Microsoft Windows Server 2008 R2, 2012</para>
-   </listitem>
-   <listitem>
-    <para>Oracle Solaris 10, 11</para>
-   </listitem>
-  </itemizedlist>
- </section>
-
- <section xml:id="hardware-requirements">
-  <title>Hardware Requirements</title>
-
-  <para>You can deploy OpenAM on any hardware supported for the combination of
-  software required. Deploying OpenAM requires a minimum of 1 GB free RAM over
-  and above the RAM used by all other software on the system.</para>
-
-  <para>Minimum requirements are enough to start and to evaluate OpenAM.
-  Recommended hardware resources depend on your specific deployment
-  requirements. For more information, see the <citetitle>Administration
-  Guide</citetitle> chapter on <link xlink:href="admin-guide#chap-tuning"
-  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Tuning
-  OpenAM</citetitle></link>.</para>
-
-  <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
-  based systems.</para>
- </section>
-
- <section xml:id="special-requests">
-  <title>Special Requests</title>
-
-  <para><emphasis role="strong">If you have a special request regarding support
-  for a component or combination not listed here, contact ForgeRock at <link
-  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis></para>
- </section>
+ <xinclude:include href="../shared/sec-special-requests.xml" />
 </chapter>
