@@ -26,7 +26,7 @@
 
 define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
-    "org/forgerock/openam/ui/user/login/AuthNDelegate",
+    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",

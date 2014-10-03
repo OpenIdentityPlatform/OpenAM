@@ -29,7 +29,7 @@ define("org/forgerock/openam/ui/user/main", [
     //"./oauth2/TokensView",
     "./delegates/TokenDelegate",
     "./delegates/SessionDelegate",
-    "./login/AuthNDelegate",
+    "./delegates/AuthNDelegate",
     "./login/RESTLoginHelper",
     "./login/RESTLoginView",
     "./login/RESTConfirmLoginView",

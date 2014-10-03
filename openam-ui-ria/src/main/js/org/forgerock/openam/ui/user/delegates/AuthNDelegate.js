@@ -28,7 +28,7 @@
 
 /*global document, $, define, _, window */
 
-define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
+define("org/forgerock/openam/ui/user/delegates/AuthNDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",

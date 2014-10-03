@@ -25,7 +25,7 @@
 /*global define, _, window, $ */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
-    "./AuthNDelegate",
+    "org/forgerock/openam/ui/user/delegates/AuthNDelegate",
     "UserDelegate",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
