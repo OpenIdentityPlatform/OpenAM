@@ -74,7 +74,8 @@ public class PolicyViewBean
     public static final String DEFAULT_DISPLAY_URL =
         "/console/policy/Policy.jsp";
 
-    private static final String XUI_POLICY_EDITOR = "../policyEditor{0}#apps/";
+    public static final String XUI_POLICY_EDITOR = "../policyEditor/#apps/";
+    public static final String XUI_POLICY_REALM = "&realm={0}";
 
     private static final String TF_FILTER = "tfFilter";
     private static final String BTN_SEARCH = "btnSearch";
@@ -150,21 +151,22 @@ public class PolicyViewBean
         return view;
     }
 
-    public void beginDisplay(DisplayEvent event)
-        throws ModelControlException
+    public void beginDisplay(DisplayEvent event) throws ModelControlException
     {
+
+        StringBuilder redirect = new StringBuilder(XUI_POLICY_EDITOR);
 
         String redirectRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
 
-        if (!redirectRealm.endsWith("/")) {
-            redirectRealm += "/";
+        //if it's root we won't include anything in the replacement otherwise strip any slashes
+        if (!"/".equals(redirectRealm)) {
+            redirectRealm = redirectRealm.replace("/", "");
+            redirect.append(MessageFormat.format(XUI_POLICY_REALM,redirectRealm));
         }
-
-        String redirectUrl = MessageFormat.format(XUI_POLICY_EDITOR, redirectRealm);
 
         RequestContext rc = RequestManager.getRequestContext();
         try {
-            rc.getResponse().sendRedirect(redirectUrl);
+            rc.getResponse().sendRedirect(redirect.toString());
             throw new CompleteRequestException();
         } catch (IOException e) {
             //never thrown, empty catch
