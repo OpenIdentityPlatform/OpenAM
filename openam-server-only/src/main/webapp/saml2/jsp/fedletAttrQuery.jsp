@@ -137,9 +137,9 @@ function checkEmptySubjectDN() {
               CircleOfTrustManager cotManager = new CircleOfTrustManager();
               Set members = cotManager.getAllCirclesOfTrust("/");
               if ((members == null) || members.isEmpty()) {
-                  out.print("Misconfiguration - No circle of trust for root realm.");
+                  out.print("Misconfiguration - No circle of trust.");
               } else {
-                  out.print("Circle of trust names for root realm: ");
+                  out.print("Circle of trust names: ");
                   boolean isFirst = true;
                   for (Object member : members) {
                       if (isFirst) {
