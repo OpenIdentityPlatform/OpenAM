@@ -157,7 +157,7 @@ public final class ReferralPrivilegeManager implements IPrivilegeManager<Referra
     @Override
     public boolean canFindByName(String name) throws EntitlementException {
         SearchFilter filter = new SearchFilter("name", name);
-        return searchNames(asSet(filter)).isEmpty();
+        return !searchNames(asSet(filter)).isEmpty();
     }
 
     /**

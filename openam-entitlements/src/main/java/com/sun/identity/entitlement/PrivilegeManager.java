@@ -119,7 +119,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
     @Override
     public boolean canFindByName(String name) throws EntitlementException {
         SearchFilter filter = new SearchFilter("name", name);
-        return searchNames(asSet(filter)).isEmpty();
+        return !searchNames(asSet(filter)).isEmpty();
     }
 
     protected void validate(Privilege privilege) throws EntitlementException {
