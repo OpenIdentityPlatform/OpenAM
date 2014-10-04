@@ -155,7 +155,16 @@ namespace Sun.Identity.Saml2
                     System.Security.Cryptography.X509Certificates.X509Chain chain,
                     System.Net.Security.SslPolicyErrors sslPolicyErrors)
                     {
-                        return true;
+                        if (ServiceProvider.TrustAllCerts
+                            || sslPolicyErrors.HasFlag(System.Net.Security.SslPolicyErrors.None))
+                            {
+                                return true;
+                            }
+
+                        StringBuilder logErrorMessage = new StringBuilder();
+                        logErrorMessage.Append("SSLPolicyError: ").Append(sslPolicyErrors);
+                        FedletLogger.Error(logErrorMessage.ToString());
+                        return false;
                     };
                 }
 
@@ -1099,7 +1108,16 @@ namespace Sun.Identity.Saml2
                     System.Security.Cryptography.X509Certificates.X509Chain chain,
                     System.Net.Security.SslPolicyErrors sslPolicyErrors)
                     {
-                        return true;
+                        if (ServiceProvider.TrustAllCerts
+                            || sslPolicyErrors.HasFlag(System.Net.Security.SslPolicyErrors.None))
+                            {
+                                return true;
+                            }
+                        
+                        StringBuilder logErrorMessage = new StringBuilder();
+                        logErrorMessage.Append("SSLPolicyError: ").Append(sslPolicyErrors);
+                        FedletLogger.Error(logErrorMessage.ToString());
+                        return false;
                     };
                 }
 
@@ -1373,7 +1391,16 @@ namespace Sun.Identity.Saml2
                     System.Security.Cryptography.X509Certificates.X509Chain chain,
                     System.Net.Security.SslPolicyErrors sslPolicyErrors)
                     {
-                        return true;
+                        if (ServiceProvider.TrustAllCerts
+                            || sslPolicyErrors.HasFlag(System.Net.Security.SslPolicyErrors.None))
+                            {
+                                return true;
+                            }
+
+                        StringBuilder logErrorMessage = new StringBuilder();
+                        logErrorMessage.Append("SSLPolicyError: ").Append(sslPolicyErrors);
+                        FedletLogger.Error(logErrorMessage.ToString());
+                        return false;
                     };
                 }
 

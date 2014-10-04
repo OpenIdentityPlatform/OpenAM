@@ -128,5 +128,8 @@
         <Attribute name="signatureCanonicalizationMethod">
             <Value>http://www.w3.org/2001/10/xml-exc-c14n#</Value>
         </Attribute>
+        <Attribute name="trustAllCerts">
+            <Value>false</Value>
+        </Attribute>
     </SPSSOConfig>
 </EntityConfig>

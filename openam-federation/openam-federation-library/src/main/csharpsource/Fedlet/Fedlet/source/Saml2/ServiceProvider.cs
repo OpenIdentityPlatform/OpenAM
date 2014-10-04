@@ -511,6 +511,27 @@ namespace Sun.Identity.Saml2
             }
         }
         
+        /// <summary>
+        /// Gets a value indicating whether the extended metadata value for 
+        /// TrustAllCerts is true or false.
+        /// </summary>
+        public bool TrustAllCerts
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='trustAllCerts']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+
+                if (node != null)
+                {
+                    string value = node.InnerText.Trim();
+                    return Saml2Utils.GetBoolean(value);
+                }
+
+                return false;
+            }
+        }        
         #endregion
 
         #region Methods
