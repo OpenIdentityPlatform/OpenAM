@@ -199,6 +199,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             cleaned.callbacks = [];
             _.each(reqs.callbacks, function (element) {
 
+                if (element.type === "RedirectCallback") {
+                    window.location.replace(element.output[0].value);
+                }
+
                 if (element.type === "ConfirmationCallback") {
                     implicitConfirmation = false;
                 }
