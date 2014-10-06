@@ -36,6 +36,7 @@ import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.forgerock.openam.entitlement.conditions.environment.OAuth2ScopeCondition;
+import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -415,13 +416,13 @@ public class JsonPolicyParserTest {
     @Test
     public void shouldParseSimpleSubjects() throws Exception {
         // Given
-        JsonValue content = json(object(field("subject", object(field("type", "AnyUser")))));
+        JsonValue content = json(object(field("subject", object(field("type", "AuthenticatedUsers")))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
 
         // Then
-        assertThat(result.getSubject()).isInstanceOf(AnyUserSubject.class);
+        assertThat(result.getSubject()).isInstanceOf(AuthenticatedUsers.class);
     }
 
     @Test
@@ -430,7 +431,7 @@ public class JsonPolicyParserTest {
         JsonValue content = json(object(field("subject",
                 object(field("type", "AND"),
                        field("subjects",
-                               Arrays.asList(object(field("type", "AnyUser"))))))));
+                               Arrays.asList(object(field("type", "AuthenticatedUsers"))))))));
 
         // When
         Privilege result = parser.parsePolicy(POLICY_NAME, content);
@@ -439,7 +440,7 @@ public class JsonPolicyParserTest {
         assertThat(result.getSubject()).isInstanceOf(AndSubject.class);
         AndSubject and = (AndSubject) result.getSubject();
         assertThat(and.getESubjects()).hasSize(1);
-        assertThat(and.getESubjects().iterator().next()).isInstanceOf(AnyUserSubject.class);
+        assertThat(and.getESubjects().iterator().next()).isInstanceOf(AuthenticatedUsers.class);
     }
 
     @Test
@@ -687,13 +688,13 @@ public class JsonPolicyParserTest {
     public void shouldPrintSimpleSubjects() throws Exception {
         // Given
         Privilege policy = new StubPrivilege();
-        policy.setSubject(new AnyUserSubject());
+        policy.setSubject(new AuthenticatedUsers());
 
         // When
         JsonValue result = parser.printPolicy(policy);
 
         // Then
-        assertThat(result.get(new JsonPointer("subject/type")).asString()).isEqualTo("AnyUser");
+        assertThat(result.get(new JsonPointer("subject/type")).asString()).isEqualTo("AuthenticatedUsers");
     }
 
     @Test
