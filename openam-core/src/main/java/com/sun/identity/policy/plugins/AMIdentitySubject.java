@@ -70,7 +70,7 @@ import java.security.AccessController;
  * membership in a set of <code>AMIdentity</code> objects using the underlying
  * Identity repository service.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject} instead.
+ * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.IdentitySubject} instead.
  */
 @Deprecated
 public class AMIdentitySubject implements Subject {

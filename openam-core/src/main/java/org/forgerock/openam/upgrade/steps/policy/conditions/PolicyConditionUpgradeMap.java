@@ -37,8 +37,8 @@ import org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCond
 import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
+import org.forgerock.openam.entitlement.conditions.subject.IdentitySubject;
 import org.forgerock.openam.network.ipv4.IPv4Condition;
-import org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.ArrayList;
@@ -358,7 +358,7 @@ class PolicyConditionUpgradeMap {
                     @Override
                     public EntitlementSubject migrate(PolicySubject subject, MigrationReport migrationReport) {
 
-                        AMIdentitySubject eSubject = new AMIdentitySubject();
+                        IdentitySubject eSubject = new IdentitySubject();
 
                         Set<String> subjects = subject.getValues();
 
@@ -366,7 +366,7 @@ class PolicyConditionUpgradeMap {
 
                         migrationReport.migratedSubjectCondition(
                                 com.sun.identity.policy.plugins.AMIdentitySubject.class.getName(),
-                                AMIdentitySubject.class.getName());
+                                IdentitySubject.class.getName());
                         return eSubject;
                     }
                 });

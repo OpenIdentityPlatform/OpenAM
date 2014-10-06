@@ -32,11 +32,10 @@ import org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCond
 import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition;
 import org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition;
-import org.forgerock.openam.entitlement.conditions.subject.AMIdentitySubject;
+import org.forgerock.openam.entitlement.conditions.subject.IdentitySubject;
 import org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,7 +53,7 @@ public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
     public Collection<Class<? extends EntitlementSubject>> getSubjectConditions() {
         Set<Class<? extends EntitlementSubject>> conditions = new HashSet<Class<? extends EntitlementSubject>>();
 
-        conditions.add(AMIdentitySubject.class);
+        conditions.add(IdentitySubject.class);
         conditions.add(AuthenticatedUsers.class);
 
         return conditions;

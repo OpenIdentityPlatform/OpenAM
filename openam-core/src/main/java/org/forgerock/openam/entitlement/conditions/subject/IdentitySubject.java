@@ -1,17 +1,29 @@
-/*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright 2006 Sun Microsystems Inc
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: AMIdentitySubject.java,v 1.3 2008/06/25 05:43:50 qcheng Exp $
+ *
  */
 /*
  * Portions Copyright 2011-2014 ForgeRock AS
@@ -52,14 +64,14 @@ import java.util.Set;
 /**
  * This class represents an Identity to be used in the entitlements policy engine
  */
-public class AMIdentitySubject implements EntitlementSubject {
+public class IdentitySubject implements EntitlementSubject {
 
     private Set<String> subjectValues = new HashSet<String>();
 
     private static Debug debug = Debug.getInstance(
             PolicyManager.POLICY_DEBUG_NAME);
 
-    public AMIdentitySubject() {
+    public IdentitySubject() {
     }
 
     /**
@@ -74,7 +86,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                 newState.add(jo.getString(i));
             }
         } catch (JSONException e) {
-            debug.error("AMIdentitySubject.setState", e);
+            debug.error("IdentitySubject.setState", e);
         }
 
         subjectValues = newState;
@@ -127,9 +139,9 @@ public class AMIdentitySubject implements EntitlementSubject {
 
         if (tokenID == null) {
             if (debug.warningEnabled()) {
-                debug.warning("AMIdentitySubject.isMember():"
+                debug.warning("IdentitySubject.isMember():"
                         + "tokenID is null");
-                debug.warning("AMIdentitySubject.isMember():"
+                debug.warning("IdentitySubject.isMember():"
                         + "returning false");
             }
             return new SubjectDecision(false, Collections.EMPTY_MAP);
@@ -145,9 +157,9 @@ public class AMIdentitySubject implements EntitlementSubject {
             }
             if (userDN == null) {
                 if (debug.warningEnabled()) {
-                    debug.warning("AMIdentitySubject.isMember():"
+                    debug.warning("IdentitySubject.isMember():"
                             + "userDN is null");
-                    debug.warning("AMIdentitySubject.isMember():"
+                    debug.warning("IdentitySubject.isMember():"
                             + "returning false");
                 }
                 return new SubjectDecision(false, Collections.EMPTY_MAP);
@@ -179,9 +191,9 @@ public class AMIdentitySubject implements EntitlementSubject {
                 }
 
                 if ((matchFound = SubjectEvaluationCache.isMember(
-                        tokenID, "AMIdentitySubject", subjectValue)) != null) {
+                        tokenID, "IdentitySubject", subjectValue)) != null) {
                     if (debug.messageEnabled()) {
-                        debug.message("AMIdentitySubject.isMember():"
+                        debug.message("IdentitySubject.isMember():"
                                 + "got membership from SubjectEvaluationCache "
                                 + " for userDN = " + userDN
                                 + ", subjectValue = " + subjectValue
@@ -202,7 +214,7 @@ public class AMIdentitySubject implements EntitlementSubject {
 
                 // got here so entry not in subject evalauation cache
                 if (debug.messageEnabled()) {
-                    debug.message("AMIdentitySubject:isMember():entry for "
+                    debug.message("IdentitySubject:isMember():entry for "
                             + subjectValue + " not in subject evaluation "
                             + "cache, so compute using IDRepo api");
                 }
@@ -213,10 +225,10 @@ public class AMIdentitySubject implements EntitlementSubject {
                             EntitlementUtils.getAdminToken(), subjectValue);
                     if (subjectIdentity == null) {
                         if (debug.messageEnabled()) {
-                            debug.message("AMidentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "subjectIdentity is null for "
                                     + "subjectValue = " + subjectValue);
-                            debug.message("AMidentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "returning false");
                         }
                         return new SubjectDecision(false, Collections.EMPTY_MAP);
@@ -229,16 +241,16 @@ public class AMIdentitySubject implements EntitlementSubject {
                             EntitlementUtils.getAdminToken(), univId);
                     if (userIdentity == null) {
                         if (debug.messageEnabled()) {
-                            debug.message("AMidentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "userIdentity is null");
-                            debug.message("AMidentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "returning false");
                         }
                         return new SubjectDecision(false, Collections.EMPTY_MAP);
                     }
 
                     if (debug.messageEnabled()) {
-                        debug.message("AMidentitySubject.isMember():"
+                        debug.message("IdentitySubject.isMember():"
                                 + "user uuid = "
                                 + IdUtils.getUniversalId(userIdentity)
                                 + ", subject uuid = "
@@ -250,7 +262,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                     Set allowedMemberTypes = null;
                     if (userIdentity.equals(subjectIdentity)) {
                         if (debug.messageEnabled()) {
-                            debug.message("AMidentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "userIdentity equals subjectIdentity:"
                                     + "membership=true");
                         }
@@ -261,7 +273,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                                     && allowedMemberTypes.contains(userIdType)) {
                         subjectMatch = userIdentity.isMember(subjectIdentity);
                         if (debug.messageEnabled()) {
-                            debug.message("AMIdentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "userIdentity type " + userIdType +
                                     " can be a member of "
                                     + "subjectIdentityType " + subjectIdType
@@ -270,7 +282,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                     } else {
                         subjectMatch = false;
                         if (debug.messageEnabled()) {
-                            debug.message("AMIdentitySubject.isMember():"
+                            debug.message("IdentitySubject.isMember():"
                                     + "userIdentity type " + userIdType +
                                     " can not be a member of "
                                     + "subjectIdentityType " + subjectIdType
@@ -279,14 +291,14 @@ public class AMIdentitySubject implements EntitlementSubject {
                     }
 
                     if (debug.messageEnabled()) {
-                        debug.message("AMIdentitySubject.isMember: adding "
+                        debug.message("IdentitySubject.isMember: adding "
                                 + "entry in SubjectEvaluationCache for "
                                 + ", for userDN = " + userDN
                                 + ", subjectValue = " + subjectValue
                                 + ", subjectMatch = " + subjectMatch);
                     }
                     SubjectEvaluationCache.addEntry(tokenID,
-                            "AMIdentitySubject", subjectValue, subjectMatch);
+                            "IdentitySubject", subjectValue, subjectMatch);
                     if (!listenerAdded) {
                         if (!PolicyEvaluator.ssoListenerRegistry.containsKey(
                                 tokenID)) {
@@ -295,7 +307,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                             PolicyEvaluator.ssoListenerRegistry.put(
                                     tokenID, PolicyEvaluator.ssoListener);
                             if (debug.messageEnabled()) {
-                                debug.message("AMIdentitySubject.isMember():"
+                                debug.message("IdentitySubject.isMember():"
                                         + " sso listener added ");
                             }
                             listenerAdded = true;
@@ -305,7 +317,7 @@ public class AMIdentitySubject implements EntitlementSubject {
                         break;
                     }
                 } catch (IdRepoException ire) {
-                    debug.warning("AMidentitySubject.isMember():"
+                    debug.warning("IdentitySubject.isMember():"
                             + "can not check membership for user "
                             + userDN + ", subject "
                             + subjectValue, ire);
@@ -318,10 +330,10 @@ public class AMIdentitySubject implements EntitlementSubject {
         }
         if (debug.messageEnabled()) {
             if (!subjectMatch) {
-                debug.message("AMIdentitySubject.isMember(): user " + userDN
+                debug.message("IdentitySubject.isMember(): user " + userDN
                         + " is not a member of this subject");
             } else {
-                debug.message("AMIdentitySubject.isMember(): User " + userDN
+                debug.message("IdentitySubject.isMember(): User " + userDN
                         + " is a member of this subject");
             }
         }
