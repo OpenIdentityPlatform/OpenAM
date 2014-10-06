@@ -24,10 +24,7 @@
 
    $Id: default.jsp,v 1.3 2008/10/29 03:11:52 veiming Exp $
 
---%>
-
-<%--
-      Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS.
 --%>
 
 <%@page
@@ -57,6 +54,12 @@ org.owasp.esapi.ESAPI"
 	%>
 	<%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString("missingMessageParam")) %>
 	<%
+    }
+    String relayState = (String) request.getAttribute(SAML2Constants.RELAY_STATE);
+    if (relayState != null && !relayState.isEmpty()) {
+        %>
+        <a href="<%= relayState %>"><%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString("followRelayState")) %></a>
+        <%
     }
 %>
 

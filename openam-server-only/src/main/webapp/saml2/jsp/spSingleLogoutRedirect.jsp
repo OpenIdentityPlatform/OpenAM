@@ -24,7 +24,7 @@
 
    $Id: spSingleLogoutRedirect.jsp,v 1.14 2009/06/17 03:10:28 exu Exp $
 
-   Portions Copyrighted 2013-2014 ForgeRock AS
+   Portions Copyrighted 2013-2014 ForgeRock AS.
 --%>
 
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
@@ -93,6 +93,7 @@
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
+        boolean sloFailed = false;
         try {
         /**
          * Gets and processes the Single <code>LogoutResponse</code> from IDP,
@@ -124,11 +125,13 @@
           }          
         } catch (SAML2Exception sse) {
             SAML2Utils.debug.error("Error processing LogoutResponse :", sse);
-            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                "LogoutResponseProcessingError",
-                SAML2Utils.bundle.getString("LogoutResponseProcessingError") +
-                " " + sse.getMessage());
-            return;
+            if ("sloFailed".equals(sse.getErrorCode())) {
+                sloFailed = true;
+            } else {
+                SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST, "LogoutResponseProcessingError",
+                        SAML2Utils.bundle.getString("LogoutResponseProcessingError") + " " + sse.getMessage());
+                return;
+            }
         } catch (Exception e) {
             SAML2Utils.debug.error("Error processing LogoutResponse ",e);
             SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
@@ -156,7 +159,14 @@
                     && SAML2Utils.isRelayStateURLValid(metaAlias, relayState, SAML2Constants.SP_ROLE)
                     && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true);
         }
-        if (isRelayStateURLValid) {
+        if (sloFailed) {
+            if (isRelayStateURLValid) {
+                request.setAttribute(SAML2Constants.RELAY_STATE, relayState);
+            }
+            %>
+            <jsp:forward page="/saml2/jsp/default.jsp?message=sloFailed" />
+            <%
+        } else if (isRelayStateURLValid) {
             try {
                  response.sendRedirect(relayState);
             } catch (java.io.IOException ioe) {
