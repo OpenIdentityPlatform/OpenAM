@@ -54,6 +54,30 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-secure-cookie"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a004">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema
+                        name="openam-auth-persistent-cookie-http-only-cookie"
+                        cosQualifier="default" type="single"
+                        syntax="boolean" i18nKey="a005">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema
                             name="openam-auth-persistent-cookie-idle-time"
@@ -81,6 +105,30 @@
                         </BooleanValues>
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-secure-cookie"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a004">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                            name="openam-auth-persistent-cookie-http-only-cookie"
+                            cosQualifier="default" type="single"
+                            syntax="boolean" i18nKey="a005">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

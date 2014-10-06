@@ -62,6 +62,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     private static final String COOKIE_IDLE_TIMEOUT_SETTING_KEY = "openam-auth-persistent-cookie-idle-time";
     private static final String COOKIE_MAX_LIFE_SETTING_KEY = "openam-auth-persistent-cookie-max-life";
     private static final String ENFORCE_CLIENT_IP_SETTING_KEY = "openam-auth-persistent-cookie-enforce-ip";
+    private static final String SECURE_COOKIE_KEY = "openam-auth-persistent-cookie-secure-cookie";
+    private static final String HTTP_ONLY_COOKIE_KEY = "openam-auth-persistent-cookie-http-only-cookie";
 
     private static final String OPENAM_USER_CLAIM_KEY = "openam.usr";
     private static final String OPENAM_AUTH_TYPE_CLAIM_KEY = "openam.aty";
@@ -74,6 +76,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
     private Integer tokenIdleTime;
     private Integer maxTokenLife;
     private boolean enforceClientIP;
+    private boolean secureCookie;
+    private boolean httpOnlyCookie;
 
     private Principal principal;
 
@@ -112,7 +116,6 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
 
         String idleTimeString = CollectionHelper.getMapAttr(options, COOKIE_IDLE_TIMEOUT_SETTING_KEY);
         String maxLifeString = CollectionHelper.getMapAttr(options, COOKIE_MAX_LIFE_SETTING_KEY);
-        final String enforceClientIPString = CollectionHelper.getMapAttr(options, ENFORCE_CLIENT_IP_SETTING_KEY);
         if (StringUtils.isEmpty(idleTimeString)) {
             DEBUG.warning("Cookie Idle Timeout not set. Defaulting to 0");
             idleTimeString = "0";
@@ -123,10 +126,13 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         }
         tokenIdleTime = Integer.parseInt(idleTimeString) * MINUTES_IN_HOUR;
         maxTokenLife = Integer.parseInt(maxLifeString) * MINUTES_IN_HOUR;
-        enforceClientIP = Boolean.parseBoolean(enforceClientIPString);
+        enforceClientIP = CollectionHelper.getBooleanMapAttr(options, ENFORCE_CLIENT_IP_SETTING_KEY, false);
+        secureCookie = CollectionHelper.getBooleanMapAttr(options, SECURE_COOKIE_KEY, true);
+        httpOnlyCookie = CollectionHelper.getBooleanMapAttr(options, HTTP_ONLY_COOKIE_KEY, true);
 
         try {
-            return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP, getRequestOrg());
+            return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), enforceClientIP, getRequestOrg(),
+                    secureCookie, httpOnlyCookie);
         } catch (SMSException e) {
             DEBUG.error("Error initialising Authentication Module", e);
             return null;
@@ -141,12 +147,17 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
      *
      * @param tokenIdleTime The number of seconds the JWT can be not used for before becoming invalid.
      * @param maxTokenLife The number of seconds the JWT can be used for before becoming invalid.
+     * @param enforceClientIP The enforcement client IP.
+     * @param realm The realm for the persistent cookie.
+     * @param secureCookie {@code true} if the persistent cookie should be set as secure.
+     * @param httpOnlyCookie {@code true} if the persistent cookie should be set as http only.
      * @return A Map containing the configuration information for the JWTSessionModule.
      * @throws SMSException If there is a problem getting the key alias.
      * @throws SSOException If there is a problem getting the key alias.
      */
     private Map<String, Object> initialize(final String tokenIdleTime, final String maxTokenLife,
-            final boolean enforceClientIP,  final String realm) throws SMSException, SSOException {
+            final boolean enforceClientIP,  final String realm, boolean secureCookie, boolean httpOnlyCookie)
+            throws SMSException, SSOException {
 
         Map<String, Object> config = new HashMap<String, Object>();
         config.put(JwtSessionModule.KEY_ALIAS_KEY, getKeyAlias(realm));
@@ -156,6 +167,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         config.put(JwtSessionModule.KEYSTORE_PASSWORD_KEY, new String(amKeyProvider.getKeystorePass()));
         config.put(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime);
         config.put(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife);
+        config.put(JwtSessionModule.SECURE_COOKIE_KEY, secureCookie);
+        config.put(JwtSessionModule.HTTP_ONLY_COOKIE_KEY, httpOnlyCookie);
         config.put(ENFORCE_CLIENT_IP_SETTING_KEY, enforceClientIP);
 
         return config;
@@ -177,6 +190,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, tokenIdleTime.toString());
             setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, maxTokenLife.toString());
             setUserSessionProperty(ENFORCE_CLIENT_IP_SETTING_KEY, Boolean.toString(enforceClientIP));
+            setUserSessionProperty(SECURE_COOKIE_KEY, Boolean.toString(secureCookie));
+            setUserSessionProperty(HTTP_ONLY_COOKIE_KEY, Boolean.toString(httpOnlyCookie));
             final Subject clientSubject = new Subject();
             MessageInfo messageInfo = prepareMessageInfo(getHttpServletRequest(), getHttpServletResponse());
             if (process(messageInfo, clientSubject, callbacks)) {
@@ -292,8 +307,10 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             final String maxTokenLife = ssoToken.getProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY);
             final boolean enforceClientIP = Boolean.parseBoolean(ssoToken.getProperty(ENFORCE_CLIENT_IP_SETTING_KEY));
             final String realm = ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY);
+            boolean secureCookie = Boolean.parseBoolean(ssoToken.getProperty(SECURE_COOKIE_KEY));
+            boolean httpOnlyCookie = Boolean.parseBoolean(ssoToken.getProperty(HTTP_ONLY_COOKIE_KEY));
 
-            return initialize(tokenIdleTime, maxTokenLife, enforceClientIP, realm);
+            return initialize(tokenIdleTime, maxTokenLife, enforceClientIP, realm, secureCookie, httpOnlyCookie);
 
         } catch (SSOException e) {
             DEBUG.error("Could not initialise the Auth Module", e);
