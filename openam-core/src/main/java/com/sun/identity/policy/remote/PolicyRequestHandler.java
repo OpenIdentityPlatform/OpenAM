@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.policy.remote;
@@ -358,7 +358,7 @@ public class PolicyRequestHandler implements RequestHandler {
                     if (debug.warningEnabled()) {
                         debug.warning(
                             "PolicyRequestHandler: Invalid user sso token, " +
-                            userSSOTokenIDStr);
+                            userSSOTokenIDStr, pe);
                     }
                     throw new PolicyEvaluationException(ResBundleUtils.rbName,
                         "user_sso_token_invalid", null, null, requestId);
@@ -705,7 +705,7 @@ public class PolicyRequestHandler implements RequestHandler {
                 idString, context);
         } catch (Exception e) {
             throw new PolicyException(ResBundleUtils.rbName,
-                "invalid_sso_token", null, null);
+                "invalid_sso_token", null, e);
         }
         return token;
     }
