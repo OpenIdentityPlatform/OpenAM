@@ -22,12 +22,13 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 ({
-	appDir : "../../../target/xui",
-	baseUrl : ".",
-	dir : "../../../target/xui_minified",
-	mainConfigFile : '../../../target/xui/main.js',
-	preserveLicenseComments: false,
-	modules : [ {
-		name : "main"
-	} ]
+    appDir : "../../../target/xui",
+    baseUrl : ".",
+    dir : "../../../target/xui_minified",
+    mainConfigFile : '../../../target/xui/main.js',
+    waitSeconds: 0, // disable load timeouts
+    preserveLicenseComments: false,
+    modules : [ {
+        name : "main"
+    } ]
 })
