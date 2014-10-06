@@ -36,7 +36,8 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
@@ -58,12 +59,22 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.Hash;
-import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.openam.utils.ClientUtils;
+import org.forgerock.openam.utils.IPRange;
+import org.forgerock.openam.utils.ValidateIPaddress;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.text.DateFormat;
@@ -78,14 +89,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.forgerock.openam.utils.IPRange;
 
 public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterface {
 
@@ -141,7 +144,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String REQ_HEADER_SCORE = "openam-auth-adaptive-req-header-score";
     private static final String REQ_HEADER_INVERT = "openam-auth-adaptive-req-header-invert";
     private static Debug debug = Debug.getInstance(ADAPTIVE);
-    private static LookupService lookupService = null;
+    private static DatabaseReader lookupService = null;
     private String userUUID = null;
     private String userName = null;
     private AMIdentity amAuthIdentity = null;
@@ -203,6 +206,8 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private static final String IP_START = "IPStart";
     private static final String IP_END = "IPEnd";
     private static final String IP_TYPE = "Type";
+
+    private static final String UNKNOWN_COUNTRY_CODE = "--";
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -568,18 +573,26 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         return retVal;
     }
 
-    protected int checkGeoLocation() {
+    private String getCountryCode(DatabaseReader db, String ipAddress) throws IOException, GeoIp2Exception {
+        try {
+            return db.country(InetAddress.getByName(ipAddress)).getCountry().getIsoCode();
+        } catch (UnknownHostException e) {
+            return UNKNOWN_COUNTRY_CODE;
+        }
+    }
+
+    protected int checkGeoLocation() throws IOException, GeoIp2Exception {
         int retVal = 0;
-        String countryCode = "";
+        String countryCode;
 
         debug.message("GeoLocation database location = " + geoLocationDatabase);
 
-        LookupService db = getLookupService(geoLocationDatabase);
+        DatabaseReader db = getLookupService(geoLocationDatabase);
 
         if (db == null) {
             debug.message("GeoLocation database lookup returns null");
         } else {
-            countryCode = db.getCountry(clientIP).getCode();
+            countryCode = getCountryCode(db, clientIP);
             debug.message(ADAPTIVE + ".checkGeoLocation: " + clientIP + " returns " + countryCode);
 
             if (geoLocationValues != null) {
@@ -1241,10 +1254,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
     }
 
-    private static synchronized LookupService getLookupService(String dbLocation) {
+    private static synchronized DatabaseReader getLookupService(String dbLocation) {
         try {
             if (lookupService == null) {
-                lookupService = new LookupService(dbLocation, LookupService.GEOIP_MEMORY_CACHE);
+                lookupService = new DatabaseReader.Builder(new File(dbLocation)).build();
             }
         } catch (IOException ioe) {
             //don't log the stacktrace, since it will occur on any module invocation

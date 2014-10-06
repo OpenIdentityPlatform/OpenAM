@@ -76,8 +76,8 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.kohsuke</groupId>
-            <artifactId>geoip</artifactId>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
