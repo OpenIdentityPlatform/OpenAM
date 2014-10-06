@@ -73,6 +73,10 @@ define("config/messages/PolicyMessages", [], function () {
         "duplicateResource": {
             msg: "config.messages.PolicyMessages.duplicateResource",
             type: "error"
+        },
+        "duplicateAttribute": {
+            msg: "config.messages.PolicyMessages.duplicateAttribute",
+            type: "error"
         }
     };
 });

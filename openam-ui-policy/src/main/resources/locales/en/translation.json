@@ -49,8 +49,8 @@
                 "createPol": "Create Policy",
                 "unableToRetrievePolicy" : "Unable to retrieve policy",
                 "invalidResource" : "Invalid resource",
-                "duplicateResource" : "Duplicate resource"
-
+                "duplicateResource" : "Duplicate resource",
+                "duplicateAttribute": "Duplicate attribute"
             }
         },
         "AppConfiguration" : {

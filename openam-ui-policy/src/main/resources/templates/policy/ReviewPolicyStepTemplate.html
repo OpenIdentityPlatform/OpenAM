@@ -49,4 +49,24 @@
         {{/if}}
     </div>
 
+    <div class="review-row clearfix" tabindex="0" >
+        <h2>Response attributes</h2>
+        {{#if userAttributes}}
+        <h3>User attributes</h3>
+        <ul>
+            {{#each userAttributes}}
+            <li>{{propertyName}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
+
+        {{#if staticAttributes}}
+        <h3>Static attributes</h3>
+        <ul>
+            {{#each staticAttributes}}
+            <li>{{propertyName}}: {{propertyValues}}</li>
+            {{/each}}
+        </ul>
+        {{/if}}
+    </div>
 </div>

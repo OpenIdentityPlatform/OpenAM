@@ -41,13 +41,16 @@ define([
     "org/forgerock/openam/ui/policy/ManageApplicationsView",
     "org/forgerock/openam/ui/policy/ManagePoliciesView",
     "org/forgerock/openam/ui/policy/ActionsView",
+    "org/forgerock/openam/ui/policy/ManageResponseAttrsView",
     "org/forgerock/openam/ui/policy/ReviewInfoView",
     "org/forgerock/openam/ui/policy/EditEnvironmentView",
     "org/forgerock/openam/ui/policy/EditSubjectView",
     "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
     "org/forgerock/openam/ui/policy/ManageSubjectsView",
     "org/forgerock/openam/ui/policy/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, resListView, selectPatternsView, manageAppsView, managePolView, actionsView, reviewInfoView) {
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView,
+             resListView, selectPatternsView, manageAppsView, managePolView, actionsView, manageResponseAttrsView,
+             reviewInfoView) {
     return {
         executeAll: function (server) {
 
@@ -289,8 +292,9 @@ define([
                     resListView.element = '<div></div>';
                     selectPatternsView.element = '<div></div>';
                     actionsView.element = '<div></div>';
+                    manageResponseAttrsView.element = '<div></div>';
 
-                    QUnit.ok(editPolView.accordion.getActive() === 5, "Last step of accordion is selected");
+                    QUnit.ok(editPolView.accordion.getActive() === 6, "Last step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
 
                     // Step 1
@@ -337,7 +341,7 @@ define([
                             var editing = resListView.$el.find('.editing'),
                                 listItems = resListView.$el.find('#createdResources ul li:not(.editing)'),
                                 plusButton = editing.find('.icon-plus'),
-                                resourceLength = entity.resources.length;
+                                resourceLength = entity.resources.length,
                                 values = [],
                                 valid = true,
                                 NEW_STR = 'newResource',
@@ -392,6 +396,47 @@ define([
                             QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, lastAddedItem.data().resource), 'Resource deleted');
                                 
                         });
+                    });
+
+                    manageResponseAttrsView.init([], function(){
+                        var editing = manageResponseAttrsView.$el.find('.editing'),
+                            key = editing.find('[data-attr-add-key]'),
+                            val = editing.find('[data-attr-add-val]'),
+                            addBtn = editing.find('.icon-plus'),
+                            deleteBtn,
+                            attrsLengthOld = manageResponseAttrsView.data.staticAttributes.length;
+
+                        // add new static attribute
+                        key.val('testKey');
+                        val.val('testVal');
+                        addBtn.trigger('click');
+                        QUnit.ok(attrsLengthOld + 1 === manageResponseAttrsView.data.staticAttributes.length,
+                            "Static attribute can be added");
+
+                        editing = manageResponseAttrsView.$el.find('.editing');
+                        key = editing.find('[data-attr-add-key]');
+                        val = editing.find('[data-attr-add-val]');
+                        addBtn = editing.find('.icon-plus');
+                        key.val('testKey');
+                        val.val('testVal');
+                        addBtn.trigger('click');
+                        QUnit.ok(attrsLengthOld + 1 === manageResponseAttrsView.data.staticAttributes.length,
+                            "Can't add duplicate static attribute");
+                        attrsLengthOld++;
+
+                        editing = manageResponseAttrsView.$el.find('.editing');
+                        key = editing.find('[data-attr-add-key]');
+                        val = editing.find('[data-attr-add-val]');
+                        addBtn = editing.find('.icon-plus');
+                        key.val('testKey2');
+                        val.val('testVal2');
+                        addBtn.trigger('click');
+
+                        // delete static attribute
+                        deleteBtn = _.first(manageResponseAttrsView.$el.find('.striped-list[data-attr-type="Static"]').find('.icon-close'));
+                        $(deleteBtn).trigger('click');
+                        QUnit.ok(attrsLengthOld === manageResponseAttrsView.data.staticAttributes.length,
+                            "Static attribute can be deleted");
                     });
 
                     // Step 3

@@ -34,6 +34,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
     "org/forgerock/openam/ui/policy/ActionsView",
     "org/forgerock/openam/ui/policy/ResourcesListView",
     "org/forgerock/openam/ui/policy/AddNewResourceView",
+    "org/forgerock/openam/ui/policy/ManageResponseAttrsView",
     "org/forgerock/openam/ui/policy/ReviewInfoView",
     "org/forgerock/openam/ui/policy/PolicyDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
@@ -43,7 +44,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router"
-], function (AbstractView, actionsView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants, eventManager, router) {
+], function (AbstractView, actionsView, resourcesListView, addNewResourceView, manageResponseAttrsView,
+             reviewInfoView, policyDelegate, uiUtils, Accordion, manageSubjects, manageEnvironments, constants,
+             eventManager, router) {
     var EditPolicyView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/EditPolicyTemplate.html",
@@ -53,9 +56,9 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             'click .review-row': 'reviewRowClick',
             'keyup .review-row': 'reviewRowClick'
         },
-        data:{},
+        data: {},
 
-        REVIEW_INFO_STEP: 5,
+        REVIEW_INFO_STEP: 6,
 
         render: function (args, callback) {
             var self = this,
@@ -79,6 +82,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     data.entity = policy;
                     data.entityName = policyName;
 
+                    data.resourceAttributes = policy.resourceAttributes;
                 } else {
                     data.entity = {};
                     data.entityName = null;
@@ -114,7 +118,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     actionsView.render(data);
                     addNewResourceView.render(data);
                     resourcesListView.render(data);
-                    
+                    manageResponseAttrsView.init(data);
+
                     data.subjectString = JSON.stringify(data.entity.subject, null, 2);
                     data.environmentString = JSON.stringify(data.entity.condition, null, 2);
 
@@ -180,10 +185,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             this.data.environmentString = JSON.stringify(this.data.entity.condition, null, 2);
         },
 
-        /**
-         * Opens next accordion step.
-         * TODO: some validation probably will be done here
-         */
         openNextStep: function (e) {
             this.accordion.setActive(this.accordion.getActive() + 1);
         },
@@ -206,14 +207,14 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 persistedPolicy = _.clone(policy);
 
             persistedPolicy.actions = {};
-
             _.each(policy.actions, function (action) {
                 if (action.selected) {
                     persistedPolicy.actions[action.action] = action.value;
                 }
             });
-
             persistedPolicy.actionValues = persistedPolicy.actions;
+
+            persistedPolicy.resourceAttributes = manageResponseAttrsView.getCombinedResponseAttrs();
 
             if (this.data.entityName) {
                 policyDelegate.updatePolicy(this.data.entityName, persistedPolicy).done(function () {
@@ -230,7 +231,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             }
         }
     });
-
 
     return new EditPolicyView();
 });

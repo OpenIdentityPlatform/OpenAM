@@ -1,0 +1,35 @@
+<div class="striped-list created-items" data-attr-type="{{attrType.USER}}">
+    <h3>User attributes</h3>
+    <ul>
+        {{#if userAttributes}}
+        {{#each userAttributes}}
+        <li data-attr-key="{{propertyName}}">{{propertyName}}<span tabindex="0" class="icon-close float-right"></span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">There are no user attributes...</li>
+        {{/if}}
+    </ul>
+</div>
+
+<div class="striped-list created-items" data-attr-type="{{attrType.STATIC}}">
+    <h3>Static attributes</h3>
+    <ul>
+        {{#if staticAttributes}}
+        {{#each staticAttributes}}
+        <li data-attr-key="{{propertyName}}" data-attr-val="{{propertyValues}}">
+            {{propertyName}}: {{propertyValues}}
+            <span tabindex="0" class="icon-close float-right"></span>
+        </li>
+        {{/each}}
+        {{else}}
+        <li class="disabled">There are no static attributes...</li>
+        {{/if}}
+
+        <li class="editing clearfix">
+            <input required type="text" placeholder="Key" data-attr-add-key/>
+            <input required type="text" placeholder="Value" data-attr-add-val/>
+            <span tabindex="0" class="icon-plus float-right"></span>
+        </li>
+    </ul>
+</div>
