@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 
+@Deprecated
 public class AnyUserSubject implements SubjectImplementation {
 
     public SubjectDecision evaluate(

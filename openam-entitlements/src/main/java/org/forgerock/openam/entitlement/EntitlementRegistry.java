@@ -98,7 +98,6 @@ public final class EntitlementRegistry {
 
         // Standard OpenAM subjects
         registry.registerSubjectType("NONE", NoSubject.class);
-        registry.registerSubjectType(AnyUserSubject.class);
         registry.registerSubjectType(AttributeSubject.class);
 
         // Standard OpenAM resource attribute types
