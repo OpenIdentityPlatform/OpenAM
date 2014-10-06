@@ -48,7 +48,8 @@ import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
  *
  * @since 12.0.0
  */
-@UpgradeStepInfo
+@UpgradeStepInfo(dependsOn = {"org.forgerock.openam.upgrade.steps.ResavePoliciesStep",
+        "org.forgerock.openam.upgrade.steps.UpgradeEntitlementsStep"})
 public class OldPolicyConditionMigrationUpgradeStep extends AbstractUpgradeStep {
 
     private static final String ENTITLEMENT_DATA = "%ENTITLEMENT_DATA%";
