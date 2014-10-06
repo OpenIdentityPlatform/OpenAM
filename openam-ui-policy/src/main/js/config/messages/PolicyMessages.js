@@ -70,12 +70,17 @@ define("config/messages/PolicyMessages", [], function () {
             msg: "config.messages.PolicyMessages.invalidResource",
             type: "error"
         },
+        "duplicateAttribute": {
+            msg: "config.messages.PolicyMessages.duplicateAttribute",
+            type: "error"
+        },
         "duplicateResource": {
             msg: "config.messages.PolicyMessages.duplicateResource",
             type: "error"
+
         },
-        "duplicateAttribute": {
-            msg: "config.messages.PolicyMessages.duplicateAttribute",
+        "unableToPersistPolicy": {
+            msg: "config.messages.PolicyMessages.unableToPersistPolicy",
             type: "error"
         }
     };

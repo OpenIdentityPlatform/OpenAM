@@ -1,13 +1,11 @@
 <div class="content-bg">
-    {{#if entity.name}}
-    <h1>{{t "config.messages.PolicyMessages.edit"}}{{entity.name}}</h1>
-    {{else}}
-    <h1>{{t "config.messages.PolicyMessages.createApp"}}</h1>
-    {{/if}}
+    
+    <h1>{{#if entity.name}}{{t "config.messages.PolicyMessages.edit"}}{{entity.name}}{{else}}{{t "config.messages.PolicyMessages.createApp"}}{{/if}}</h1>
+
     <div class="clearfix">
         <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
             service. This template is then used when policies are created for the service. To create an application, begin
-            with Step 1 and progress through step 7. Modifications can be made after the application has been created.</p>
+            with Step 1 and progress through step 3. Modifications can be made after the application has been created.</p>
 
         <a href="#apps/" class="button float-right" id="backButton">Back</a>
     </div>
@@ -16,25 +14,33 @@
         <div class="accordion">
             <a class="accordion-header" href="">Step 1: Define an Application Name</a>
             <section class="accordion-step clearfix">
-                <div class="group-field-block">
-                    <label class="prop-name" for="appName">Name:</label>
-                    <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name"/>
+
+
+                <div class="clearfix">
+                    <div class="group-field-block col2 ">
+                        <label class="prop-name" for="appName">Name:</label>
+                        <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name" placeholder="required" required autofocus/>
+                    </div>
+
+                     <div class="group-field-block col2">
+                        <label class="prop-name" for="appRealm">Realm</label>
+                        <input class="prop-val" id="appRealm" type="text" value="{{entity.realm}}" data-field="realm"  />
+                    </div>
+                    
+
                 </div>
+
                 <div class="group-field-block">
                     <label class="prop-name" for="appDescription">Description (optional):</label>
                     <textarea class="prop-val" id="appDescription" data-field="description">{{entity.description}}</textarea>
                 </div>
 
-                <div class="group-field-block">
-                    <label class="prop-name" for="appRealm">Realm</label>
-                    <input class="prop-val" id="appRealm" type="text" value="{{entity.realm}}" data-field="realm"/>
-                </div>
                 <input type="button" value="Next" name="nextButton" class="button"/>
             </section>
 
-            <a class="accordion-header" href="">Step 2: Add Resources</a>
+            <a class="accordion-header" href="">Step 2: Add Application Base</a>
             <section class="accordion-step clearfix">
-    
+     
                 <div class="col2" id="patterns"></div>
                 <div class="col2" id="resourcesList"></div>
 

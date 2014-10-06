@@ -35,171 +35,115 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/openam/json");
 
-    obj.getApplicationType = function (applicationType, successCallback, errorCallback) {
+    obj.ERROR_HANDLERS = { 
+        "Bad Request":              { status: "400" },
+        "Not found":                { status: "404" },
+        "Gone":                     { status: "410" },
+        "Internal Server Error":    { status: "500" },
+        "Service Unavailable":      { status: "503" }  
+    };
+
+
+    obj.getApplicationType = function (type) {
         return obj.serviceCall({
-            url: "/applicationtypes/" + applicationType,
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            url: "/applicationtypes/" + type,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.getApplicationByName = function (name, successCallback, errorCallback) {
+    obj.getApplicationByName = function (name) {
         return obj.serviceCall({
             url: "/applications/" + name,
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.updateApplication = function (name, data, successCallback, errorCallback) {
+    obj.updateApplication = function (name, data) {
         return obj.serviceCall({
             url: "/applications/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 
-    obj.createApplication = function (data, successCallback, errorCallback) {
+    obj.createApplication = function (data) {
         return obj.serviceCall({
             url: "/applications/?_action=create",
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "POST",
             data: JSON.stringify(data),
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 
-    obj.deleteApplication = function (name, successCallback, errorCallback) {
+    obj.deleteApplication = function (name) {
         return obj.serviceCall({
             url: "/applications/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "DELETE",
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            type: "DELETE"
         });
     };
 
-    obj.getDecisionCombiners = function (successCallback, errorCallback) {
+    obj.getDecisionCombiners = function () {
         return obj.serviceCall({
             url: "/decisioncombiners/?_queryId=&_fields=title",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.getEnvironmentConditions = function (successCallback, errorCallback) {
+    obj.getEnvironmentConditions = function () {
         return obj.serviceCall({
             url: "/conditiontypes?_queryID=&_fields=title,logical,config",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.getSubjectConditions = function (successCallback, errorCallback) {
+    obj.getSubjectConditions = function () {
         return obj.serviceCall({
             url: "/subjecttypes?_queryID=&_fields=title,logical,config",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
         });
     };
 
-    obj.getPolicyByName = function (name, successCallback, errorCallback) {
+    obj.getPolicyByName = function (name) {
+        return obj.serviceCall({
+            url: "/policies/" + name,
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
+
+    obj.updatePolicy = function (name, data) {
         return obj.serviceCall({
             url: "/policies/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
-        });
-    };
-
-    obj.updatePolicy = function (policyName, data, successCallback, errorCallback) {
-        return obj.serviceCall({
-            url: "/policies/" + policyName,
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
             type: "PUT",
             data: JSON.stringify(data),
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 
-    obj.createPolicy = function (data, successCallback, errorCallback) {
+    obj.createPolicy = function (data) {
         return obj.serviceCall({
             url: "/policies/" + data.name,
             headers: { "If-None-Match": "*", "Accept-API-Version": "protocol=1.0,resource=1.0" },
             type: "PUT",
             data: JSON.stringify(data),
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 
-    obj.deletePolicy = function (name, successCallback, errorCallback) {
+    obj.deletePolicy = function (name) {
         return obj.serviceCall({
             url: "/policies/" + name,
             headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"},
-            type: "DELETE",
-            success: function (data) {
-                if (successCallback) {
-                    successCallback(data);
-                }
-            },
-            error: errorCallback
+            type: "DELETE"
         });
     };
+
+
+    
 
     return obj;
 });

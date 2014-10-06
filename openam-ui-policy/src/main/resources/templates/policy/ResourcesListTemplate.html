@@ -4,10 +4,10 @@
     <ul>
     {{#if entity.resources}}
         {{#each entity.resources}}
-        <li data-resource="{{this}}">{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
+        <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="justAdded"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
         {{/each}}
     {{else}}
-        <li class="disabled">There are no resources...</li>
+        <li class="invalid">There are no resources...</li>
     {{/if}}
 
     {{#if options.newPattern}}

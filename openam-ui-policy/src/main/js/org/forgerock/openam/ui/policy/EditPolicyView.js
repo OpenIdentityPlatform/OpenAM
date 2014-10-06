@@ -76,9 +76,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     conditions = [];
 
                 if (policyName) {
-
                     policy.actions = policy.actionValues;
-
                     data.entity = policy;
                     data.entityName = policyName;
 
@@ -204,7 +202,8 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
 
         submitForm: function () {
             var policy = this.data.entity,
-                persistedPolicy = _.clone(policy);
+                persistedPolicy = _.clone(policy),
+                self = this;
 
             persistedPolicy.actions = {};
             _.each(policy.actions, function (action) {
@@ -217,19 +216,59 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
             persistedPolicy.resourceAttributes = manageResponseAttrsView.getCombinedResponseAttrs();
 
             if (this.data.entityName) {
-                policyDelegate.updatePolicy(this.data.entityName, persistedPolicy).done(function () {
-                    router.routeTo(router.configuration.routes.managePolicies,
-                        {args: [persistedPolicy.applicationName], trigger: true});
+                policyDelegate.updatePolicy(this.data.entityName, persistedPolicy)
+                .done( function (e) {
+                    console.log(e);
+                    router.routeTo(router.configuration.routes.managePolicies, {args: [persistedPolicy.applicationName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyUpdated");
+                })
+                .fail( function(e) {
+                    self.errorHandler(e);
                 });
+
             } else {
-                policyDelegate.createPolicy(persistedPolicy).done(function () {
-                    router.routeTo(router.configuration.routes.managePolicies,
-                        {args: [persistedPolicy.applicationName], trigger: true});
+                policyDelegate.createPolicy(persistedPolicy)
+                .done( function (e) {
+                    router.routeTo( router.configuration.routes.managePolicies, { args: [persistedPolicy.applicationName], trigger: true});
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policyCreated");
+                })
+                .fail( function (e) {
+                    self.errorHandler(e);
                 });
             }
+        },
+
+        errorHandler : function (e) {
+            
+            if( e.status === 500){
+
+                if (uiUtils.responseMessageMatch( e.responseText,"Unable to persist policy")){
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToPersistPolicy");
+                } else{
+                    console.error(e.responseJSON, e.responseText, e);
+                }
+                
+            } else if (e.status === 400 || e.status === 404){
+
+                if ( uiUtils.responseMessageMatch( e.responseText,"Invalid Resource") ) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+              
+                    var message = JSON.parse(e.responseText).message;
+                    this.data.options.invalidResource = message.substr(17);
+                    reviewInfoView.render(this.data, null, this.$el.find('#reviewPolicyInfo'), "templates/policy/ReviewPolicyStepTemplate.html");
+                    resourcesListView.render(this.data);
+                    delete this.data.options.invalidResource;
+
+                } else {
+                    console.log(e.responseJSON, e.responseText, e);
+                }
+                
+            } else {
+                console.log(e.responseJSON, e.responseText, e);
+            }
         }
+                        
+                    
     });
 
     return new EditPolicyView();

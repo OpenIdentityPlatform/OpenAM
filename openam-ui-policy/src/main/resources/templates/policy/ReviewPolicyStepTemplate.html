@@ -1,18 +1,20 @@
 {{! The IDs are used for testing }}
 <div class="col2">
-    <div class="review-row clearfix" tabindex="0" >
+    <div class="review-row clearfix{{#equals '' entity.name}} invalid{{/equals}}" tabindex="0" >
         <h2>Name</h2> 
         <p id="reviewName">{{entity.name}}</p>
-        {{#if entity.description}}<p id="reviewDesc">{{entity.description}}</p>{{/if}}
-
+        {{#if entity.description}}
+        <h2>Description</h2> 
+        <p id="reviewDesc">{{entity.description}}</p>
+        {{/if}}
     </div>
 
-    <div class="review-row clearfix" tabindex="0" >
+    <div class="review-row clearfix{{#if options.invalidResource}} invalid{{/if}}{{#unless entity.resources}} invalid{{/unless}}" tabindex="0" >
         <h2>Resources</h2>
         {{#if entity.resources}}
         <ul id="reviewRes">
             {{#each entity.resources}}
-            <li>{{this}}</li>
+            <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
             {{/each}}
         </ul> 
         {{/if}}
@@ -30,7 +32,6 @@
         </ul>
         {{/if}}
     </div>
-
 </div>
 
 <div class="col2">

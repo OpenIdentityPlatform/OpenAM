@@ -215,7 +215,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                     returnVal = '';
 
-                    if (itemData.type === "Time") {
+                    if (itemData.type === "SimpleTime") {
 
                         returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
                             weekdays:self.weekdays,
@@ -321,7 +321,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                     self.$el.find('#typeSelector').after( html );
 
-                    if (itemData.type === "Time") {
+                    if (itemData.type === "SimpleTime") {
                         self.initClockPickers();
                         self.initDatePickers();
                         self.getTimeZones();

@@ -140,18 +140,20 @@ define([
                                 event.keyCode = 13 //enter key
                             editing.find('input:last-of-type').trigger(event);
 
-                            valid = (entity.resources.length === (resourceLength + 1) && entity.resources[resourceLength] === NEW_RESOURCE)
+                            valid = (entity.resources.length === (resourceLength + 1) && _.contains(entity.resources, NEW_RESOURCE) );
                             
                             QUnit.ok( valid , "Pressing enter in the last inputs triggers addResource");
                             QUnit.ok( valid , "Unique resource added");
 
                             // Delete the NEW_RESOURCE
-                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)')
-                            var lastAddedItem = listItems.eq(listItems.length-1);
-                                resourceLength = entity.resources.length;
+                            listItems = resListView.$el.find('#createdResources ul li:not(.editing)');
+                            resourceLength = entity.resources.length;
+                            var newItem = _.find(listItems,function(item){
+                                return item.dataset.resource === NEW_RESOURCE;
+                            });
 
-                            lastAddedItem.find('.icon-close').trigger('click');
-                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, NEW_RESOURCE), 'Unique resource deleted');
+                            $(newItem).find('.icon-close').trigger('click');
+                            QUnit.ok( entity.resources.length === resourceLength - 1 && !_.contains(entity.resources, NEW_RESOURCE), 'New resource deleted');
                                 
                         
                             // Step 3

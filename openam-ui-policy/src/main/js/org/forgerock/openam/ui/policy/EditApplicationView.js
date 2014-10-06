@@ -105,16 +105,15 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                 deferred = $.Deferred();
 
             if (appName) {
-                policyDelegate.getApplicationByName(appName).done(function (app) {
+                policyDelegate.getApplicationByName(appName)
+                .done(function (app) {
                     self.data.entity = app;
                     self.data.entityName = appName;
-
                     deferred.resolve();
                 });
             } else {
                 self.data.entity = {};
                 self.data.entityName = null;
-
                 deferred.resolve();
             }
 
@@ -209,20 +208,49 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
 
         submitForm: function () {
             var app = this.data.entity,
-                persistedApp = _.clone(app);
-
-
+                persistedApp = _.clone(app),
+                self = this;
 
             if (this.data.entityName) {
-                policyDelegate.updateApplication(this.data.entityName, persistedApp).done(function () {
+                policyDelegate.updateApplication( this.data.entityName, persistedApp )
+                .done(function (e) {
                     eventManager.sendEvent(constants.EVENT_HANDLE_DEFAULT_ROUTE);
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "applicationUpdated");
+                })
+                .fail(function (e) {
+                    self.errorHandler(e);
                 });
             } else {
-                policyDelegate.createApplication(persistedApp).done(function () {
+                policyDelegate.createApplication(persistedApp)
+                .done(function (e) {
+                    console.log(e);
                     eventManager.sendEvent(constants.EVENT_HANDLE_DEFAULT_ROUTE);
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "applicationCreated");
+                })
+                .fail(function (e) {
+                    self.errorHandler(e);
                 });
+            }
+        },
+        errorHandler : function (e) {
+          
+            if (e.status === 500) {
+               console.error(e.responseJSON, e.responseText, e);     
+            } else if (e.status === 400 || e.status === 404) {
+                
+                if ( uiUtils.responseMessageMatch( e.responseText,"Invalid Resource") ) {
+
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+                    var message = JSON.parse(e.responseText).message;
+                    this.data.options.invalidResource = message.substr(17);
+                    reviewInfoView.render(this.data, null, this.$el.find('#reviewInfo'), 'templates/policy/ReviewApplicationStepTemplate.html');
+                    delete this.data.options.invalidResource;
+
+                } else {
+                    console.log(e.responseJSON, e.responseText, e);
+                }
+            } else {
+                console.log(e.responseJSON, e.responseText, e);
             }
         }
     });

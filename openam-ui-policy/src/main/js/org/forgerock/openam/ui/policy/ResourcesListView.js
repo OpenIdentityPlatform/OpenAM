@@ -51,13 +51,20 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
 
             if (!this.data.entity.resources) {
                 this.data.entity.resources = [];
+            } else {
+                this.data.entity.resources = _.sortBy(this.data.entity.resources);
             }
+
 
             var self = this;
             
             this.parentRender(function () {
 
-                //self.form = self.$el.find('#resourceListForm');
+                delete self.data.options.justAdded;
+                
+                $.doTimeout('justAdded', 2000, function() {
+                   self.$el.find('.justAdded').removeClass('justAdded');
+                });
 
                 self.$el.find('.editing').find('input').autosizeInput({space:19});
                 self.$el.find('.editing').find('input:eq(0)').focus().select();
@@ -96,9 +103,9 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
                 count = 0, 
                 i = 0;
 
-
             if( this.validate(inputs) === false){
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
+                this.flashEditAsInvalid();
                 return;
             }
             
@@ -117,12 +124,13 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
 
             if ( _.contains(this.data.entity.resources, resource) ) {
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateResource");
+                this.flashEditAsInvalid();
                 return; 
             } else {
                 this.data.entity.resources.push(resource);
+                this.data.options.justAdded = resource;
                 this.render(this.data);
             }
-
             
         },
  
@@ -131,6 +139,14 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
             var resource = $(e.currentTarget).parent().data().resource;
             this.data.entity.resources = _.without(this.data.entity.resources, resource);
             this.render(this.data);
+        },
+
+        flashEditAsInvalid: function () {
+            var self = this;
+            self.$el.find('.editing').addClass('invalid');
+            $.doTimeout('invalid', 2000, function() {
+                self.$el.find('.editing').removeClass('invalid');
+            });
         }
 
     });

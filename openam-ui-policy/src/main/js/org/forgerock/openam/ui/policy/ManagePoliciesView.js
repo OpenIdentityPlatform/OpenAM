@@ -85,9 +85,11 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                             self.onRowSelect(rowid, status, e);
                         },
                         loadError: function (xhr, status, error){
-                            console.log('loadError', xhr.responseText, status, error);
-                            if( uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy") ){
+                            
+                            if ( uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy") ){
                                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRetrievePolicy");
+                            } else {
+                                console.log('loadError', xhr.responseText, status, error);
                             }
     
                         },

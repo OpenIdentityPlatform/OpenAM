@@ -50,7 +50,9 @@
                 "unableToRetrievePolicy" : "Unable to retrieve policy",
                 "invalidResource" : "Invalid resource",
                 "duplicateResource" : "Duplicate resource",
-                "duplicateAttribute": "Duplicate attribute"
+                "duplicateAttribute": "Duplicate attribute",
+                "unableToPersistPolicy" : "Unable to persist policy in datastore"
+
             }
         },
         "AppConfiguration" : {
@@ -63,7 +65,7 @@
     "templates" : {
         "user" : {
             "LoginDialog" : {
-                "refreshOnLogin" : "Should refresh on login" 
+                "refreshOnLogin" : "Should refresh on login"
             },
             "LoginTemplate" : {
                 "loginRemember" : "Remember my username",

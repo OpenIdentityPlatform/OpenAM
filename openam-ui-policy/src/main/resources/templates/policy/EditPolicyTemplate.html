@@ -5,8 +5,7 @@
     <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
     {{/if}}
     <div class="clearfix">
-        <p>To designate the conditions that define access to a protected resource, begin with Step 1 and
-            progress through step 6. Modifications can be made after it has been created.
+        <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.
         </p>
         <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button float-right">Back</a>
     </div>
@@ -19,7 +18,7 @@
 
                 <div class="group-field-block">
                     <label class="short" for="policyName">Name</label>
-                    <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name"/>
+                    <input class="prop-val" id="policyName" type="text" value="{{entity.name}}" data-field="name" autofocus required/>
                 </div>
                 <div class="group-field-block">
                     <label class="short" for="description">Description (optional)</label>
@@ -62,8 +61,6 @@
             <section class="accordion-step clearfix">
 
                 <div id="environmentContainer"></div>
-
-
                 <input class="button" type="button" value="Next" name="nextButton">
 
             </section>
