@@ -24,10 +24,7 @@
  *
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -669,8 +666,7 @@ public class SPSingleLogout {
                 postSingleLogoutSuccess(spEntityID, realm, request, response, 
                     userId, logoutReq, logoutRes, binding); 
             } else {
-                throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("sloFailed"));
+                throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "sloFailed", null);
             }
         } else {
             // obtain fedlet adapter
@@ -685,8 +681,7 @@ public class SPSingleLogout {
                     fedletAdapter.onFedletSLOFailure(
                         request, response, logoutReq, logoutRes,
                         spEntityID, idpEntityID, binding);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("sloFailed"));
+                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "sloFailed", null);
                 }
             }
         }
