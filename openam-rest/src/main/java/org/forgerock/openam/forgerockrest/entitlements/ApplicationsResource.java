@@ -119,28 +119,29 @@ public class ApplicationsResource extends RealmAwareResource {
     public void createInstance(ServerContext context, CreateRequest request, ResultHandler<Resource> handler) {
 
         //auth
-        final Subject mySubject = getContextSubject(context);
+        final Subject callingSubject = getContextSubject(context);
 
-        if (mySubject == null) {
+        if (callingSubject == null) {
             debug.error("ApplicationsResource :: CREATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
-        //select
         final String realm = getRealm(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
+
+        //select
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
         final JsonValue creationRequest = request.getContent();
 
         final ApplicationWrapper wrapp;
         try {
-            wrapp = createApplicationWrapper(creationRequest, mySubject, realm);
+            wrapp = createApplicationWrapper(creationRequest, callingSubject);
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                 ": Application failed to create the resource specified. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
@@ -151,8 +152,17 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
+        if (!realm.equals(wrapp.getApplication().getRealm())) {
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Attempted to create Application in different Realm from the request. ");
+            }
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return;
+        }
+
         try {
-            appManager.saveApplication(mySubject, realm, wrapp.getApplication());
+            appManager.saveApplication(callingSubject, wrapp.getApplication());
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
@@ -197,18 +207,17 @@ public class ApplicationsResource extends RealmAwareResource {
      *
      * @param jsonValue The JSON to deserialize
      * @param mySubject The subject authorizing the request
-     * @param realm The realm in which the request is occuring
      * @return An ApplicationWrapper containing an Application, null
      * @throws IOException If there were issues generating the
      */
-    protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject, String realm)
+    protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
             throws IOException, EntitlementException {
 
         final ApplicationWrapper wrapp = createApplicationWrapper(jsonValue);
 
         final JsonValue appTypeValue = jsonValue.get("applicationType");
 
-        if (appTypeValue == null || appTypeValue.asString().isEmpty()
+        if (appTypeValue.getObject() == null || appTypeValue.asString().isEmpty()
                 || !wrapp.setApplicationType(mySubject, appTypeValue.asString())) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource.createApplicationWrapper() : " +
@@ -216,8 +225,6 @@ public class ApplicationsResource extends RealmAwareResource {
             }
             throw new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
         }
-
-        wrapp.setRealm(realm);
 
         return wrapp;
     }
@@ -255,7 +262,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: DELETE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
@@ -306,7 +313,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
@@ -380,7 +387,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: READ : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
@@ -429,22 +436,21 @@ public class ApplicationsResource extends RealmAwareResource {
 
         if (mySubject == null) {
             debug.error("ApplicationsResource :: UPDATE : Unknown Subject");
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
-        final String realm = getRealm(context);
         final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
 
         final ApplicationWrapper wrapp;
         try {
-            wrapp = createApplicationWrapper(request.getContent(), mySubject, realm);
+            wrapp = createApplicationWrapper(request.getContent(), mySubject);
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Application Type not correctly specified in request.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
@@ -457,7 +463,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
         final Application oldApplication;
         try {
-            oldApplication = appManager.getApplication(mySubject, realm, resourceId);
+            oldApplication = appManager.getApplication(mySubject, getRealm(context), resourceId);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
@@ -468,7 +474,6 @@ public class ApplicationsResource extends RealmAwareResource {
         }
 
         if (oldApplication == null) {
-
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
                         ": Error retrieving Application to update.");
@@ -477,8 +482,17 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
+        if (!getRealm(context).equals(wrapp.getApplication().getRealm())) {
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Attempted to modify Application to be in a different Realm from the request. ");
+            }
+            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            return;
+        }
+
         try {
-            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject, realm);
+            appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
