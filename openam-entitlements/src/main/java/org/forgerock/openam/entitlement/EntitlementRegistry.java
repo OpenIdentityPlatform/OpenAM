@@ -91,14 +91,19 @@ public final class EntitlementRegistry {
         registry.registerSubjectType("OR", OrSubject.class);
         registry.registerSubjectType("NOT", NotSubject.class);
 
+        /* These conditions are not tested and were removed for OpenAM 12 release.
+           They might be reintroduced in a future release.
+
         // Standard OpenAM entitlement conditions (policy conditions will be loaded later)
         registry.registerConditionType(NumericAttributeCondition.class);
         registry.registerConditionType(AttributeLookupCondition.class);
         registry.registerConditionType(StringAttributeCondition.class);
+        // Standard OpenAM subjects
+        registry.registerSubjectType(AttributeSubject.class);
+        */
 
         // Standard OpenAM subjects
         registry.registerSubjectType("NONE", NoSubject.class);
-        registry.registerSubjectType(AttributeSubject.class);
 
         // Standard OpenAM resource attribute types
         registry.registerAttributeType("User", UserAttributes.class);
