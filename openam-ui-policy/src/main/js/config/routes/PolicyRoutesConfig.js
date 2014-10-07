@@ -24,7 +24,9 @@
 
 /*global define*/
 
-define("config/routes/PolicyRoutesConfig", function () {
+define("config/routes/PolicyRoutesConfig", [
+    "org/forgerock/commons/ui/common/util/Constants"
+],function (constants) {
     return {
         "manageApps": {
             view: "org/forgerock/openam/ui/policy/ManageApplicationsView",
@@ -50,6 +52,10 @@ define("config/routes/PolicyRoutesConfig", function () {
             defaults: ["", ""],
             role: "ui-admin",
             pattern: "app/?/policy/?"
+        },
+        "amConsole": {
+            url: "console",
+            event: constants.EVENT_RETURN_TO_AM_CONSOLE
         }
     };
 });

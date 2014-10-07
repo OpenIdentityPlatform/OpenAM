@@ -35,8 +35,9 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/openam/ui/policy/PolicyDelegate",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (GenericGridView, uiUtils, router, policyDelegate, eventManager, constants) {
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration"
+], function (GenericGridView, uiUtils, router, policyDelegate, eventManager, constants, conf) {
     var ManagePoliciesView = GenericGridView.extend({
         template: "templates/policy/ManagePoliciesTemplate.html",
 
@@ -45,7 +46,12 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
         },
 
         render: function (args, callback) {
-            var self = this;
+            var self = this,
+                subrealm = "";
+
+            if (conf.globalData.auth.realm !== "/") {
+                subrealm = conf.globalData.auth.realm;
+            }
 
             _.extend(this.data, {appName: args[0]});
 
@@ -55,7 +61,7 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 this.setGridButtonSet();
 
                 var options = {
-                        url: '/openam/json/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + this.data.appName + '"'),
+                        url: '/openam/json' + subrealm + '/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + this.data.appName + '"'),
                         colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
                             'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                         colModel: [

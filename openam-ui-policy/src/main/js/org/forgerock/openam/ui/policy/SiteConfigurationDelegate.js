@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2014 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2014 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,18 +22,27 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define*/
+/*global define */
 
-define("org/forgerock/openam/ui/common/util/Constants", [
-    "org/forgerock/commons/ui/common/util/Constants"
-], function (commonConstants) {
-    commonConstants.context = "openam";
-    commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
-    commonConstants.CONSOLE_PATH = '/' + commonConstants.context + '/console';
-    commonConstants.CONSOLE_USERS = ['amadmin']; 
-    commonConstants.OPENAM_HEADER_PARAM_CUR_PASSWORD = "currentpassword";
-    commonConstants.OPENAM_STORAGE_KEY_PREFIX = "FR-OpenAM-";
-    commonConstants.EVENT_RETURN_TO_AM_CONSOLE = "EVENT_RETURN_TO_AM_CONSOLE";
+define("org/forgerock/openam/ui/policy/SiteConfigurationDelegate", [
+    "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/main/EventManager",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(constants, conf, eventManager, uiUtils) {
+    return { 
+        getConfiguration: function(successCallback, errorCallback) {
+            var urlParams = uiUtils.convertCurrentUrlToJSON().params;
+            if (urlParams) {
+                conf.globalData.auth.realm = urlParams.realm;
+            } else {
+                conf.globalData.auth.realm = undefined;
+            }
 
-    return commonConstants;
+            successCallback({ lang: "en" });
+        }
+    };
 });
+
+
+

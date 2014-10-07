@@ -29,9 +29,10 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/policy/PolicyDelegate", [
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate"
-], function (constants, AbstractDelegate) {
+], function (conf, constants, AbstractDelegate) {
 
     var obj = new AbstractDelegate(constants.host + "/openam/json");
 
@@ -41,6 +42,14 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         "Gone":                     { status: "410" },
         "Internal Server Error":    { status: "500" },
         "Service Unavailable":      { status: "503" }  
+    };
+
+    obj.serviceCall = function (args) {
+        var realm = conf.globalData.auth.realm;
+        if (realm !== "/") { // prevents urls like /openam/json//applications
+            args.url = realm + args.url;
+        }
+        return AbstractDelegate.prototype.serviceCall.call(this, args);
     };
 
 

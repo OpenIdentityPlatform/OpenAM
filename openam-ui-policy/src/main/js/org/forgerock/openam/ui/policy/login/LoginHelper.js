@@ -49,7 +49,9 @@ define("org/forgerock/openam/ui/policy/login/LoginHelper", [
 
     obj.getLoggedUser = function (successCallback, errorCallback) {
         return sessionDelegate.getProfile(function (user) {
-            conf.globalData.auth.realm = user.userid.realm;
+            if (conf.globalData.auth.realm === undefined) {
+                conf.globalData.auth.realm = user.userid.realm;
+            }
             if (successCallback) {
                 successCallback(user);
             }

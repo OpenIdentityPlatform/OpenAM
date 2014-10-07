@@ -36,7 +36,18 @@ define("config/process/PolicyConfig", [
                 "org/forgerock/commons/ui/common/main/Router"
             ],
             processDescription: function (event, router) {
-                router.routeTo(router.configuration.routes.manageApps, {trigger: true});
+                eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.manageApps});
+            }
+        },
+        {
+            startEvent: constants.EVENT_RETURN_TO_AM_CONSOLE,
+            description: "",
+            dependencies: [
+                "org/forgerock/commons/ui/common/main/Configuration"
+            ],
+            processDescription: function (event, conf) {
+                var realm = conf.globalData.auth.realm;
+                window.location.href = "/openam/realm/RMRealm?RMRealm.tblDataActionHref=" + encodeURIComponent(realm);
             }
         }
     ];

@@ -33,9 +33,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/openam/ui/policy/PolicyDelegate"
-], function (GenericGridView, uiUtils, router, constants, eventManager, policyDelegate) {
+], function (GenericGridView, uiUtils, router, constants, conf, eventManager, policyDelegate) {
     var ManageApplicationsView = GenericGridView.extend({
         template: "templates/policy/ManageApplicationsTemplate.html",
 
@@ -54,10 +55,18 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             this.initBaseView('templates/policy/ApplicationTableGlobalActionsTemplate.html', 'PE-mng-apps-sel');
 
             this.parentRender(function () {
+                var subrealm = "",
+                    options,
+                    additionalOptions;
+
+                if (conf.globalData.auth.realm !== "/") {
+                    subrealm = conf.globalData.auth.realm;
+                }
+
                 this.setGridButtonSet();
 
-                var options = {
-                        url: '/openam/json/applications?_queryFilter=true',
+                options = {
+                        url: '/openam/json' + subrealm + '/applications?_queryFilter=true',
                         colNames: ['', '', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                         colModel: [
                             {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
@@ -89,8 +98,9 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         width: 920,
                         shrinkToFit: false,
                         pager: '#appsPager'
-                    },
-                    additionalOptions = {
+                    };
+
+                additionalOptions = {
                         columnChooserOptions: {
                             width: 501,
                             height: 180
