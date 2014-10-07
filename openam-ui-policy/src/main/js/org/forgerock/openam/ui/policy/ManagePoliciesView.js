@@ -103,7 +103,8 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                         columnChooserOptions: {
                             width: 501,
                             height: 230
-                        }
+                        },
+                        storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-pols-sel-col-' + this.data.appName
                     };
 
                 this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#managePolicies', options, additionalOptions, callback);

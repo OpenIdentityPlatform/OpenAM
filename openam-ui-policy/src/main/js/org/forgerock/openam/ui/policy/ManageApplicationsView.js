@@ -94,7 +94,8 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                         columnChooserOptions: {
                             width: 501,
                             height: 180
-                        }
+                        },
+                        storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col'
                     };
 
                 this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, additionalOptions, callback);
