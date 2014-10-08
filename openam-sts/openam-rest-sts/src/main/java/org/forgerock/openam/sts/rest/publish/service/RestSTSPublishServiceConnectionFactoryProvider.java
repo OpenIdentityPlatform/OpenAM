@@ -24,6 +24,7 @@ import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
 import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
+import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
 import org.slf4j.Logger;
@@ -39,6 +40,7 @@ public class RestSTSPublishServiceConnectionFactoryProvider {
         final RequestHandler publishRequestHandler =
                 new RestSTSPublishServiceRequestHandler(
                     RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
+                    RestSTSInjectorHolder.getInstance(Key.get(RestRealmValidator.class)),
                     RestSTSInjectorHolder.getInstance(Key.get(Logger.class)));
         router.route("/publish")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)

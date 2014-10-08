@@ -36,6 +36,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.STSPublishException;
 import org.forgerock.openam.sts.rest.RestSTS;
@@ -66,13 +67,15 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
     private static final String EMPTY_STRING = "";
 
     private final RestSTSInstancePublisher publisher;
+    private final RestRealmValidator realmValidator;
     private final Logger logger;
 
     /*
     No Injection, as ctor called from the RestSTSPublishServiceConnectionFactory (params obtained from RestSTSInjectorHolder).
      */
-    RestSTSPublishServiceRequestHandler(RestSTSInstancePublisher publisher, Logger logger) {
+    RestSTSPublishServiceRequestHandler(RestSTSInstancePublisher publisher, RestRealmValidator realmValidator, Logger logger) {
         this.publisher = publisher;
+        this.realmValidator = realmValidator;
         this.logger = logger;
     }
 
@@ -96,6 +99,12 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
             handler.handleError(e);
             return;
         }
+        if (!realmValidator.isRealm(instanceConfig.getDeploymentConfig().getRealm())) {
+            logger.warn("Publish of Rest STS instance " + instanceConfig.getDeploymentSubPath() + " to realm "
+                    + instanceConfig.getDeploymentConfig().getRealm() + " rejected because realm does not exist.");
+            handler.handleError(new NotFoundException("The specified realm does not exist."));
+            return;
+        }
         Injector instanceInjector;
         try {
             instanceInjector = createInjector(instanceConfig);
@@ -113,6 +122,12 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
     public void handleDelete(ServerContext context, DeleteRequest request, ResultHandler<Resource> handler) {
         String stsId = request.getResourceName();
         String realm = getRealmFromResourceName(request.getResourceName());
+        /*
+        Don't reject invocation for specious realm here. It is possible that a user deletes a realm, and then
+        re-creates it, and wants to re-publish a rest-sts instance with the same id. Not rejecting this invocation
+        allows the RestSTSInstancePublisherImpl to purge its Route cache referencing previously published instances.
+        And a specious delete that is not occurring in the context of this scenario will result in a 404 exception.
+         */
         try {
             boolean removeOnlyFromRouter = false;
             publisher.removeInstance(stsId, realm, removeOnlyFromRouter);
@@ -155,8 +170,15 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                  */
                 handler.handleResult(new Resource(PUBLISHED_INSTANCES, EMPTY_STRING, jsonObject.build()));
             } else {
+                final String realm = getRealmFromResourceName(request.getResourceName());
+                if (!realmValidator.isRealm(realm)) {
+                    logger.warn("Read of rest STS instance state for instance " + request.getResourceName() +
+                            " in realm " + realm + " rejected because realm does not exist");
+                    handler.handleError(new NotFoundException("The specified realm does not exist."));
+                    return;
+                }
                 RestSTSInstanceConfig instanceConfig =
-                        publisher.getPublishedInstance(request.getResourceName(), getRealmFromResourceName(request.getResourceName()));
+                        publisher.getPublishedInstance(request.getResourceName(), realm);
                 handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
                         Integer.toString(instanceConfig.hashCode()),
                         JsonValueBuilder.jsonValue().put(instanceConfig.getDeploymentSubPath(), instanceConfig.toJson().toString()).build()));
@@ -177,6 +199,12 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
     public void handleUpdate(ServerContext context, UpdateRequest request, ResultHandler<Resource> handler) {
         String stsId = request.getResourceName();
         String realm = getRealmFromResourceName(request.getResourceName());
+        if (!realmValidator.isRealm(realm)) {
+            logger.warn("Update of rest STS instance state for instance " + stsId +
+                    " in realm " + realm + " rejected because realm does not exist");
+            handler.handleError(new NotFoundException("The specified realm does not exist."));
+            return;
+        }
         /*
         Insure that the instance is published before performing an update.
          */

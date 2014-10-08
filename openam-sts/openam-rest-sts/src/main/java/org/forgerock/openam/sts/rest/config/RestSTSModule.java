@@ -27,6 +27,7 @@ import com.sun.identity.sm.ServiceListener;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.rest.router.RestRealmValidator;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.MapMarshaller;
 import org.forgerock.openam.sts.publish.STSInstanceConfigStore;
@@ -79,6 +80,11 @@ public class RestSTSModule extends AbstractModule {
          */
         bind(ServiceListener.class).annotatedWith(Names.named(REST_STS_PUBLISH_LISTENER))
                 .to(RestSTSPublishServiceListener.class).in(Scopes.SINGLETON);
+
+        /*
+        The RestSTSPublishServiceRequestHandler uses the RestRealmValidator to insure that invocation-specified realms do exist
+         */
+        bind(RestRealmValidator.class);
     }
 
     /*
