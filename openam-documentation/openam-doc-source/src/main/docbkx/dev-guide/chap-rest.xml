@@ -389,22 +389,22 @@
         <row>
          <entry>/json</entry>
          <entry>/authenticate</entry>
-         <entry>1.0</entry>
+         <entry>1.1, 2.0</entry>
         </row>
         <row>
          <entry> </entry>
          <entry>/users</entry>
-         <entry>1.0</entry>
+         <entry>1.1, 2.0</entry>
         </row>
         <row>
          <entry> </entry>
          <entry>/groups</entry>
-         <entry>1.0</entry>
+         <entry>1.1, 2.0</entry>
         </row>
         <row>
          <entry> </entry>
          <entry>/agents</entry>
-         <entry>1.0</entry>
+         <entry>1.1, 2.0</entry>
         </row>
         <row>
          <entry> </entry>
@@ -419,7 +419,7 @@
         <row>
          <entry> </entry>
          <entry>/sessions</entry>
-         <entry>1.0</entry>
+         <entry>1.1</entry>
         </row>
         <row>
          <entry> </entry>
@@ -429,7 +429,7 @@
         <row>
          <entry> </entry>
          <entry>/serverinfo</entry>
-         <entry>1.0</entry>
+         <entry>1.1</entry>
         </row>
         <row>
          <entry> </entry>
@@ -498,17 +498,17 @@
    <para>You can specify which version of the REST API to use by adding an
     <literal>Accept-API-Version</literal> header to the request, as in the
     following example, which is requesting <emphasis>resource</emphasis> version
-    1.0 and <emphasis>protocol</emphasis> version 1.0.</para>
+    2.0 and <emphasis>protocol</emphasis> version 1.0.</para>
 
-   <screen>
-   $ <userinput>curl \
-    --request POST \
-    --header "Content-Type: application/json" \
-    --header "X-OpenAM-Username: demo" \
-    --header "X-OpenAM-Password: changeit" \
-    --header "Accept-API-Version: resource=1.0, protocol=1.0" \
-    https://openam.example.com:8443/openam/json/authenticate</userinput>
-  </screen>
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: resource=2.0, protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+</screen>
 
    <para>You can configure the default behavior OpenAM will take when a REST
     call does not specify explicit version information. For more
@@ -518,8 +518,141 @@
      xlink:role="http://docbook.org/xlink/role/olink"
      ><citetitle>Configuring REST APIs</citetitle></link>
     in the <citetitle>OpenAM Administration Guide</citetitle>.</para>
+
   </section>
 
+ <section xml:id="rest-api-versioning-messages">
+  <title>REST API Versioning Messages</title>
+  <para>OpenAM provides REST API version messages -
+   either in the JSON response to a REST API call,
+   or in the response headers.</para>
+
+  <para>Messages include:</para>
+
+  <itemizedlist>
+   <listitem><para>Details of the REST API versions used to service a
+    REST API call.</para></listitem>
+   <listitem><para>Warning messages if REST API version information is not specified
+    or is incorrect in a REST API call.</para></listitem>
+  </itemizedlist>
+
+  <para>The <literal>resource</literal> and <literal>protocol</literal> version
+   used to service a REST API call are returned in the
+   <literal>Content-API-Version</literal> header, as shown below.</para>
+<screen>
+$ <userinput>curl \
+ -i \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: resource=2.0, protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>HTTP/1.1 200 OK
+Content-API-Version: protocol=1.0,resource=2.0
+Server: Restlet-Framework/2.1.7
+Content-Type: application/json;charset=UTF-8
+
+{
+ "tokenId":"AQIC5wM...TU3OQ*",
+ "successUrl":"/openam/console"
+}</computeroutput>
+</screen>
+
+  <para>If the default REST API version behavior is set to <literal>None</literal>,
+   and a REST API call does not include the <literal>Accept-API-Version</literal>
+   header, or does not specify a <literal>resource</literal> version, then a
+   <literal>400 Bad Request</literal> status code is returned, as well as a
+   <literal>Warning</literal> header, as shown below.</para>
+
+<screen>
+$ <userinput>curl \
+ -i \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>HTTP/1.1 400 Bad Request
+Warning: 100 OpenAM REST No requested version specified and behavior set to NONE.
+Server: Restlet-Framework/2.1.7
+Content-Type: application/json;charset=UTF-8
+Connection: close
+
+{
+ "code":400,
+ "reason":"Bad Request",
+ "message":"No Accept-API-Version found and behaviour set to NONE"
+}</computeroutput>
+</screen>
+
+  <para>If a REST API call does include the <literal>Accept-API-Version</literal>
+   header, but does not specify a valid <literal>resource</literal> or
+   <literal>protocol</literal> version, then a <literal>406 Not Acceptable</literal>
+   status code is returned, as well as a <literal>Warning</literal> header, as shown
+   below.</para>
+
+<screen>
+$ <userinput>curl \
+ -i \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: protocol=1.0, resource=999.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>HTTP/1.1 406 Not Acceptable
+Warning: 100 OpenAM REST Requested version "999.0" does not match any routes.
+Server: Restlet-Framework/2.1.7
+Content-Type: application/json;charset=UTF-8
+
+{
+ "code":406,
+ "reason":"Not Acceptable",
+ "message":"Accept-API-Version: Requested version \"999.0\" does not match any routes."
+}</computeroutput>
+</screen>
+
+  <para>If the default REST API version behavior is not set to <literal>None
+  </literal>,and a REST API call specifies a version that is unavailable, or
+   does not specify both <literal>protocol</literal> and <literal>resource</literal> versions,
+   then a <literal>Warning</literal> header is returned showing which versions
+   were selected, as shown below.</para>
+
+<screen>
+$ <userinput>curl \
+ -i \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: protocol=1.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>HTTP/1.1 200 OK
+Content-API-Version: protocol=1.0,resource=2.0
+Warning: 100 OpenAM REST Accept-API-Version: Requested version 'null', resolved version '2.0'
+Server: Restlet-Framework/2.1.7
+Content-Type: application/json;charset=UTF-8
+
+{
+ "tokenId":"AQIC5wM...TU3OQ*",
+ "successUrl":"/openam/console"
+}</computeroutput>
+</screen>
+
+   <tip><para>For more information on setting the default REST API
+   version behavior, see <link
+     xlink:show="new"
+     xlink:href="admin-guide#chap-rest"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Configuring REST APIs</citetitle></link>
+    in the <citetitle>OpenAM Administration Guide</citetitle>.</para></tip>
+  </section>
  </section>
 
  <section xml:id="c66-encoding">
@@ -1479,6 +1612,32 @@ $ <userinput>curl \
      <listitem>
       <para>The HTTP method is not allowed for the requested resource.</para>
      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+    <term>406 Not Acceptable</term>
+    <listitem>
+    <para>The request contains parameters that are not acceptable as in
+     the following example, which specifies an API version parameter that
+     is not supported by OpenAM.</para>
+
+<screen>
+$ <userinput>curl \
+ --request POST \
+ --header "Content-Type: application/json" \
+ --header "X-OpenAM-Username: demo" \
+ --header "X-OpenAM-Password: changeit" \
+ --header "Accept-API-Version: protocol=1.0, resource=999.0" \
+ https://openam.example.com:8443/openam/json/authenticate</userinput>
+
+<computeroutput>{
+ "code":406,
+ "reason":"Not Acceptable",
+ "message":"Accept-API-Version: Requested version \"999.0\" does not match any routes."
+}</computeroutput>
+</screen>
+
+    </listitem>
     </varlistentry>
 
     <varlistentry>
