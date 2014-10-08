@@ -41,8 +41,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport.ImportStep;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import com.sun.identity.entitlement.xacml3.XACMLReaderWriter;
 import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
@@ -104,15 +104,15 @@ public class CreateXACML extends AuthenticatedCommand {
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
-            XACMLImportExport xacmlImportExport = new XACMLImportExport(
-                    new XACMLImportExport.PrivilegeManagerFactory(),
-                    new XACMLImportExport.ReferralPrivilegeManagerFactory(),
+            XACMLExportImport xacmlExportImport = new XACMLExportImport(
+                    new XACMLExportImport.PrivilegeManagerFactory(),
+                    new XACMLExportImport.ReferralPrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),
                     PrivilegeManager.debug);
 
-            importSteps = xacmlImportExport.importXacml(realm, xacmlInputStream, adminSubject, isDryRun());
+            importSteps = xacmlExportImport.importXacml(realm, xacmlInputStream, adminSubject, isDryRun());
         } catch (EntitlementException e) {
             debugError("CreateXACML.handleRequest", e);
             logException(realm, e);

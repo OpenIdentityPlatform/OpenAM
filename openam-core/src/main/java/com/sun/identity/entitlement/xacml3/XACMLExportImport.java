@@ -38,14 +38,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Utility for handling the Import and Export of Policies into the OpenAM Entitlements
- * framework.
+ * Utility for handling the Export and subsequent Import of Policies into
+ * the OpenAM Entitlements framework.
  *
  * @since 12.0.0
  */
-public class XACMLImportExport {
+public class XACMLExportImport {
 
-    public static final String PREFIX = XACMLImportExport.class.getSimpleName();
+    public static final String PREFIX = XACMLExportImport.class.getSimpleName();
 
     // Injected
     private final XACMLReaderWriter xacmlReaderWriter;
@@ -56,7 +56,7 @@ public class XACMLImportExport {
     private final ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory;
 
     /**
-     * Creates an instance of the XACMLImportExport with dependencies provided.
+     * Creates an instance of the XACMLExportImport with dependencies provided.
      *
      * @param privilegeManagerFactory Non null, required to create PrivilegeManager instances.
      * @param referralPrivilegeManagerFactory Non null, required to create ReferralPrivilegeManager instances.
@@ -66,7 +66,7 @@ public class XACMLImportExport {
      * @param debug Non null.
      */
     @Inject
-    public XACMLImportExport(PrivilegeManagerFactory privilegeManagerFactory,
+    public XACMLExportImport(PrivilegeManagerFactory privilegeManagerFactory,
                              ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory,
                              XACMLReaderWriter xacmlReaderWriter,
                              PrivilegeValidator privilegeValidator,

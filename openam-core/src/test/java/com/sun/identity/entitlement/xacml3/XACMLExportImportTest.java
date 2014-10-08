@@ -34,7 +34,7 @@ import java.util.List;
 
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryPrivilege;
 import static com.sun.identity.entitlement.xacml3.FactoryMethods.createArbitraryReferralPrivilege;
-import static com.sun.identity.entitlement.xacml3.XACMLImportExport.*;
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.*;
 import static java.util.Arrays.asList;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -44,7 +44,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.fail;
 
-public class XACMLImportExportTest {
+public class XACMLExportImportTest {
 
     private static final String ROOT_REALM = "/";
     private static final Subject NULL_SUBJECT = null;
@@ -60,7 +60,7 @@ public class XACMLImportExportTest {
     private ReferralPrivilegeManagerFactory rpmFactory;
     private Debug debug;
 
-    private XACMLImportExport xacmlImportExport;
+    private XACMLExportImport xacmlExportImport;
 
     @BeforeMethod
     public void setUp() throws EntitlementException {
@@ -80,7 +80,7 @@ public class XACMLImportExportTest {
 
         // Class under test
 
-        xacmlImportExport = new XACMLImportExport(pmFactory, rpmFactory,
+        xacmlExportImport = new XACMLExportImport(pmFactory, rpmFactory,
                 xacmlReaderWriter, validator, searchFilterFactory, debug);
 
         // Given (shared test state)
@@ -107,7 +107,7 @@ public class XACMLImportExportTest {
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
 
         // When
-        List<ImportStep> importSteps = xacmlImportExport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, false);
+        List<ImportStep> importSteps = xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, false);
 
         // Then
         assertThat(importSteps).hasSize(4);
@@ -144,7 +144,7 @@ public class XACMLImportExportTest {
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(privilegeSet);
 
         // When
-        List<ImportStep> importSteps = xacmlImportExport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
+        List<ImportStep> importSteps = xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
 
         // Then
         assertThat(importSteps).hasSize(4);
@@ -175,7 +175,7 @@ public class XACMLImportExportTest {
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(set);
 
         // When
-        xacmlImportExport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
+        xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
 
         // Then
         fail("Expected validation exception");
@@ -192,7 +192,7 @@ public class XACMLImportExportTest {
         given(xacmlReaderWriter.read(eq(NULL_INPUT))).willReturn(set);
 
         // When
-        xacmlImportExport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
+        xacmlExportImport.importXacml(ROOT_REALM, NULL_INPUT, NULL_SUBJECT, true);
 
         // Then
         fail("Expected validation exception");

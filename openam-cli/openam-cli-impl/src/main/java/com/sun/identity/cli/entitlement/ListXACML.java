@@ -44,7 +44,7 @@ import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.XACMLReaderWriter;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
@@ -293,9 +293,9 @@ public class ListXACML extends AuthenticatedCommand {
         try {
             PrivilegeValidator privilegeValidator = new PrivilegeValidator(
                     new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
-            XACMLImportExport importExport = new XACMLImportExport(
-                    new XACMLImportExport.PrivilegeManagerFactory(),
-                    new XACMLImportExport.ReferralPrivilegeManagerFactory(),
+            XACMLExportImport importExport = new XACMLExportImport(
+                    new XACMLExportImport.PrivilegeManagerFactory(),
+                    new XACMLExportImport.ReferralPrivilegeManagerFactory(),
                     new XACMLReaderWriter(),
                     privilegeValidator,
                     new SearchFilterFactory(),

@@ -19,8 +19,8 @@ package org.forgerock.openam.forgerockrest;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport.ImportStep;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
@@ -53,7 +53,7 @@ import java.util.Map;
  */
 public class XacmlService extends ServerResource {
     public static final String QUERY_PARAM_STRING = "filter";
-    private final XACMLImportExport importExport;
+    private final XACMLExportImport importExport;
     private final AdminTokenAction admin;
     private final Debug debug;
 
@@ -65,7 +65,7 @@ public class XacmlService extends ServerResource {
      * @param debug The debug instance for logging.
      */
     @Inject
-    public XacmlService(XACMLImportExport importExport, AdminTokenAction adminTokenAction,
+    public XacmlService(XACMLExportImport importExport, AdminTokenAction adminTokenAction,
             @Named("frRest") Debug debug) {
         this.importExport = importExport;
         this.admin = adminTokenAction;
@@ -107,7 +107,7 @@ public class XacmlService extends ServerResource {
         }
 
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        for (XACMLImportExport.ImportStep step : steps) {
+        for (XACMLExportImport.ImportStep step : steps) {
             Map<String, String> stepResult = new HashMap<String, String>();
             stepResult.put("status", String.valueOf(step.getDiffStatus().getCode()));
             stepResult.put("name", step.getPrivilege().getName());

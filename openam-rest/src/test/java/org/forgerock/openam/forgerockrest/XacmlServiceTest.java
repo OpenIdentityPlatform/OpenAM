@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.EntitlementException;
-import com.sun.identity.entitlement.xacml3.XACMLImportExport;
+import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
@@ -51,7 +51,7 @@ import java.util.concurrent.ConcurrentMap;
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
-import static com.sun.identity.entitlement.xacml3.XACMLImportExport.ImportStep;
+import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 
 public class XacmlServiceTest {
 
@@ -61,7 +61,7 @@ public class XacmlServiceTest {
 
     private AdminTokenAction adminTokenAction;
     private XacmlService service;
-    private XACMLImportExport importExport;
+    private XACMLExportImport importExport;
     private Debug debug;
     private Response response;
     private Request request;
@@ -78,7 +78,7 @@ public class XacmlServiceTest {
 
     @BeforeMethod
     public void setup() throws Exception {
-        this.importExport = mock(XACMLImportExport.class);
+        this.importExport = mock(XACMLExportImport.class);
         this.debug = mock(Debug.class);
         this.adminTokenAction = mock(AdminTokenAction.class);
         doAnswer(ssoTokenAnswer).when(adminTokenAction).run();
@@ -102,8 +102,8 @@ public class XacmlServiceTest {
 
         StubPrivilege privilege = new StubPrivilege();
         privilege.setName("fred");
-        XACMLImportExport.ImportStep importStep = mock(XACMLImportExport.ImportStep.class);
-        doReturn(XACMLImportExport.DiffStatus.ADD).when(importStep).getDiffStatus();
+        XACMLExportImport.ImportStep importStep = mock(XACMLExportImport.ImportStep.class);
+        doReturn(XACMLExportImport.DiffStatus.ADD).when(importStep).getDiffStatus();
         doReturn(privilege).when(importStep).getPrivilege();
 
         List<ImportStep> steps = Arrays.asList(importStep);
@@ -128,8 +128,8 @@ public class XacmlServiceTest {
 
         StubPrivilege privilege = new StubPrivilege();
         privilege.setName("fred");
-        XACMLImportExport.ImportStep importStep = mock(XACMLImportExport.ImportStep.class);
-        doReturn(XACMLImportExport.DiffStatus.ADD).when(importStep).getDiffStatus();
+        XACMLExportImport.ImportStep importStep = mock(XACMLExportImport.ImportStep.class);
+        doReturn(XACMLExportImport.DiffStatus.ADD).when(importStep).getDiffStatus();
         doReturn(privilege).when(importStep).getPrivilege();
 
         List<ImportStep> steps = Arrays.asList(importStep);
