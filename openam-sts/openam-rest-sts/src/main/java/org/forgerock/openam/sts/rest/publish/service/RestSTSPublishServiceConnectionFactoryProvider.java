@@ -17,10 +17,13 @@
 package org.forgerock.openam.sts.rest.publish.service;
 
 import com.google.inject.Key;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
+import org.forgerock.openam.rest.authz.AdminOnlyAuthzModule;
+import org.forgerock.openam.rest.fluent.LoggingFluentRouter;
 import org.forgerock.openam.sts.rest.config.RestSTSInjectorHolder;
 import org.forgerock.openam.sts.rest.publish.RestSTSInstancePublisher;
 import org.slf4j.Logger;
@@ -30,11 +33,17 @@ import org.slf4j.Logger;
  * SingletonResourceProvider.
  */
 public class RestSTSPublishServiceConnectionFactoryProvider {
+    private static final String VERSION_STRING = "1.0";
     public static ConnectionFactory getConnectionFactory() {
-        final Router router = new Router();
-        router.addRoute(RoutingMode.STARTS_WITH, "/publish",
-                new RestSTSPublishServiceRequestHandler(RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
-                        RestSTSInjectorHolder.getInstance(Key.get(Logger.class))));
+        final LoggingFluentRouter router = InjectorHolder.getInstance(LoggingFluentRouter.class);
+        final RequestHandler publishRequestHandler =
+                new RestSTSPublishServiceRequestHandler(
+                    RestSTSInjectorHolder.getInstance(Key.get(RestSTSInstancePublisher.class)),
+                    RestSTSInjectorHolder.getInstance(Key.get(Logger.class)));
+        router.route("/publish")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion(VERSION_STRING)
+                .to(RoutingMode.STARTS_WITH, publishRequestHandler);
         return Resources.newInternalConnectionFactory(router);
     }
 }

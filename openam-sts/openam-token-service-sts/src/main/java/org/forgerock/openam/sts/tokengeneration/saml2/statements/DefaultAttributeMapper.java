@@ -16,7 +16,10 @@
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.plugins.DefaultLibraryIDPAttributeMapper;
@@ -40,7 +43,6 @@ import java.util.Map;
  *
  */
 public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper implements AttributeMapper {
-    private static final String FAUX_REALM = "faux_realm";
     private static final String FAUX_HOST_ENTITY_ID = "faux_host_entity_id";
     private static final String FAUX_REMOTE_ENTITY_ID = "faux_remote_entity_id";
 
@@ -63,8 +65,14 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
      */
     public List<Attribute> getAttributes(SSOToken token, Map<String, String> attributeMap) throws TokenCreationException {
         try {
-            return (List<Attribute>)super.getAttributes(token, FAUX_HOST_ENTITY_ID, FAUX_REMOTE_ENTITY_ID, FAUX_REALM);
+            return (List<Attribute>)super.getAttributes(token, FAUX_HOST_ENTITY_ID, FAUX_REMOTE_ENTITY_ID, new AMIdentity(token).getRealm());
         } catch (SAML2Exception e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
+        } catch (SSOException e) {
+            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
+        } catch (IdRepoException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
         }
@@ -75,7 +83,9 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
      * the AttributeMap in the id-repo. User accounts in a given realm can be set to by dynamic or ignored, which means that no id-repo
      * state exists corresponding to these accounts. The DefaultLibraryIDPAttributeMapper will only consult id-repo state
      * if this method returns false.
-     * @param realm The realm for which profile state should be looked-up
+     * @param realm The realm for which profile state should be looked-up - will be the realm for the principal for
+     *              whom the token is being generated - the realm value corresponds to the realm passed in the super.getAttributes call
+     *              above.
      * @return whether the dynamic or ignored profile has been set up for user accounts in this realm
      */
     @Override

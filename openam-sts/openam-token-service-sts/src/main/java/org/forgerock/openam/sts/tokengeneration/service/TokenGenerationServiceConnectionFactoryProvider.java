@@ -18,9 +18,12 @@ package org.forgerock.openam.sts.tokengeneration.service;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.SingletonResourceProvider;
+import org.forgerock.openam.rest.authz.SpecialUserOnlyAuthzModule;
+import org.forgerock.openam.rest.fluent.FluentRouter;
 import org.forgerock.openam.sts.tokengeneration.config.TokenGenerationServiceInjectorHolder;
 import org.forgerock.openam.sts.tokengeneration.saml2.RestSTSInstanceState;
 import org.forgerock.openam.sts.tokengeneration.saml2.SAML2TokenGeneration;
@@ -32,14 +35,17 @@ import org.slf4j.Logger;
  * which initializes the guice injector to create the bindings defined in the TokenGenerationModule.
  */
 public class TokenGenerationServiceConnectionFactoryProvider {
+    private static final String VERSION_STRING = "1.0";
     public static ConnectionFactory getConnectionFactory() {
-        final Router router = new Router();
-        //TODO: this route must reflect the OpenAM rest naming conventions.
-        router.addRoute("/issue/",
+        final FluentRouter router = InjectorHolder.getInstance(FluentRouter.class);
+        final SingletonResourceProvider tokenGenerationService =
                 new TokenGenerationService(TokenGenerationServiceInjectorHolder.getInstance(Key.get(SAML2TokenGeneration.class)),
                         TokenGenerationServiceInjectorHolder.getInstance(Key.get(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){})),
-                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class))));
+                        TokenGenerationServiceInjectorHolder.getInstance(Key.get(Logger.class)));
+        router.route("/issue/")
+                .through(SpecialUserOnlyAuthzModule.class, SpecialUserOnlyAuthzModule.NAME)
+                .forVersion(VERSION_STRING)
+                .to(tokenGenerationService);
         return Resources.newInternalConnectionFactory(router);
     }
-
 }

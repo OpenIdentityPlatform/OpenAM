@@ -17,6 +17,7 @@
 package org.forgerock.openam.sts.rest.token.provider;
 
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.security.AdminTokenAction;
 import org.apache.cxf.sts.token.provider.TokenProvider;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderResponse;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.AccessController;
 import java.util.Map;
 
 /**
@@ -171,10 +173,10 @@ public class AMSAMLTokenProvider implements TokenProvider {
         switch (subjectConfirmation) {
             case BEARER:
                 return tokenGenerationServiceConsumer.getSAML2BearerAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, realm, authnContextClassRef);
+                        stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case SENDER_VOUCHES:
                 return tokenGenerationServiceConsumer.getSAML2SenderVouchesAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, realm, authnContextClassRef);
+                        stsInstanceId, realm, authnContextClassRef, getAdminToken());
             case HOLDER_OF_KEY:
                 Object proofTokenStateObject = additionalProperties.get(AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 if (!(proofTokenStateObject instanceof ProofTokenState)) {
@@ -183,9 +185,13 @@ public class AMSAMLTokenProvider implements TokenProvider {
                                     + AMSTSConstants.PROOF_TOKEN_STATE_KEY);
                 }
                 return tokenGenerationServiceConsumer.getSAML2HolderOfKeyAssertion(threadLocalAMTokenCache.getAMToken(),
-                        stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject);
+                        stsInstanceId, realm, authnContextClassRef, (ProofTokenState)proofTokenStateObject, getAdminToken());
         }
         throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                 "Unexpected SAML2SubjectConfirmation in AMSAMLTokenProvider: " + subjectConfirmation);
+    }
+
+    private String getAdminToken() {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance()).getTokenID().toString();
     }
 }

@@ -16,8 +16,11 @@
 
 package org.forgerock.openam.sts.token.provider;
 
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
@@ -25,19 +28,17 @@ import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
-import org.restlet.data.MediaType;
-import org.restlet.engine.header.Header;
-import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
-import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import static org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState.TokenGenerationServiceInvocationStateBuilder;
 
@@ -46,6 +47,8 @@ import static org.forgerock.openam.sts.service.invocation.TokenGenerationService
  * @see org.forgerock.openam.sts.token.provider.TokenGenerationServiceConsumer
  */
 public class TokenGenerationServiceConsumerImpl implements TokenGenerationServiceConsumer {
+    private static final String COOKIE = "Cookie";
+
     private final String tokenGenerationServiceEndpoint;
     private final String crestVersion;
 
@@ -61,7 +64,8 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
     public String getSAML2BearerAssertion(String ssoTokenString,
                                           String stsInstanceId,
                                           String realm,
-                                          String authnContextClassRef) throws TokenCreationException {
+                                          String authnContextClassRef,
+                                          String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
                 buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.BEARER,
@@ -69,13 +73,14 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         stsInstanceId,
                         realm,
                         ssoTokenString);
-        return makeInvocation(invocationStateBuilder.build().toJson().toString());
+        return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
     public String getSAML2SenderVouchesAssertion(String ssoTokenString,
                                                  String stsInstanceId,
                                                  String realm,
-                                                 String authnContextClassRef) throws TokenCreationException {
+                                                 String authnContextClassRef,
+                                                 String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
                 buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.SENDER_VOUCHES,
@@ -83,14 +88,15 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         stsInstanceId,
                         realm,
                         ssoTokenString);
-        return makeInvocation(invocationStateBuilder.build().toJson().toString());
+        return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
     public String getSAML2HolderOfKeyAssertion(String ssoTokenString,
                                                String stsInstanceId,
                                                String realm,
                                                String authnContextClassRef,
-                                               ProofTokenState proofTokenState) throws TokenCreationException {
+                                               ProofTokenState proofTokenState,
+                                               String callerSSOTokenString) throws TokenCreationException {
         final TokenGenerationServiceInvocationStateBuilder invocationStateBuilder =
                 buildCommonSaml2InvocationState(
                         SAML2SubjectConfirmation.HOLDER_OF_KEY,
@@ -99,7 +105,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                         realm,
                         ssoTokenString);
         invocationStateBuilder.proofTokenState(proofTokenState);
-        return makeInvocation(invocationStateBuilder.build().toJson().toString());
+        return makeInvocation(invocationStateBuilder.build().toJson().toString(), callerSSOTokenString);
     }
 
     private TokenGenerationServiceInvocationStateBuilder buildCommonSaml2InvocationState(SAML2SubjectConfirmation subjectConfirmation,
@@ -117,25 +123,51 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                 .ssoTokenString(ssoTokenString);
     }
 
-    private String makeInvocation(String invocationString) throws TokenCreationException {
-        final ClientResource resource = new ClientResource(tokenGenerationServiceEndpoint);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
-        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
-
+    private String makeInvocation(String invocationString, String callerSSOTokenString) throws TokenCreationException {
         try {
-            final Representation representation = resource.post(
-                    new StringRepresentation(invocationString, MediaType.APPLICATION_JSON));
-            return parseTokenResponse(representation.getText());
-        } catch (ResourceException e) {
-            throw new TokenCreationException(e.getStatus().getCode(), "Exception caught invoking TokenGenerationService: " + e, e);
+            HttpURLConnection connection = (HttpURLConnection) new URL(tokenGenerationServiceEndpoint).openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+            connection.setRequestProperty(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            connection.setRequestProperty(COOKIE, createAMSessionCookie(callerSSOTokenString));
+            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(invocationString);
+            writer.close();
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return parseTokenResponse(getSuccessMessage(connection));
+            } else {
+                return getErrorMessage(connection);
+            }
         } catch (IOException e) {
             throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
-                    "Exception caught getting text from string returned from TokenGenerationService: " + e, e);
+                    "Exception caught invoking TokenGenerationService: " + e);
         }
+    }
+
+    private String getSuccessMessage(HttpURLConnection connection) throws IOException {
+        return readInputStream(connection.getInputStream());
+    }
+
+    private String getErrorMessage(HttpURLConnection connection) throws IOException {
+        if (connection.getErrorStream() != null) {
+            return readInputStream(connection.getErrorStream());
+        } else {
+            return readInputStream(connection.getInputStream());
+        }
+    }
+
+    private String readInputStream(InputStream inputStream) throws IOException {
+        if (inputStream == null) {
+            throw new IOException("Empty error stream");
+        } else {
+            return IOUtils.readStream(inputStream);
+        }
+    }
+
+    private String createAMSessionCookie(String callerSSOTokenString) {
+        return SystemPropertiesManager.get(Constants.AM_COOKIE_NAME) + AMSTSConstants.EQUALS + callerSSOTokenString;
     }
 
     private String parseTokenResponse(String response) throws TokenCreationException {

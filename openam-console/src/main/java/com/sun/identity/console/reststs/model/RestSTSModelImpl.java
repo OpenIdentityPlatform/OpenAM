@@ -22,6 +22,8 @@ import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMServiceProfileModelImpl;
 import com.sun.identity.console.base.model.AMSystemConfig;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
@@ -55,6 +57,9 @@ import static org.forgerock.json.fluent.JsonValue.object;
  *
  */
 public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestSTSModel {
+    private static final String COOKIE = "Cookie";
+    private static final String EQUALS = "=";
+
     public RestSTSModelImpl(HttpServletRequest req, Map map) throws AMConsoleException {
         super(req, AMAdminConstants.REST_STS_SERVICE, map);
     }
@@ -292,6 +297,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
         writer.write(invocationPayload);
         writer.close();
@@ -309,6 +315,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("DELETE");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         connection.connect();
 
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -324,6 +331,7 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         connection.setDoOutput(true);
         connection.setRequestMethod("PUT");
         connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
+        connection.setRequestProperty(COOKIE, getAdminSessionTokenCookie());
         OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
         writer.write(invocationPayload);
         writer.close();
@@ -333,5 +341,9 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
         } else {
             return RestSTSModelResponse.failure(getErrorMessage(connection));
         }
+    }
+
+    private String getAdminSessionTokenCookie() {
+        return SystemPropertiesManager.get(Constants.AM_COOKIE_NAME) + EQUALS + getUserSSOToken().getTokenID().toString();
     }
 }

@@ -176,6 +176,15 @@
         <filter-name>CommonsAuthenticationFilter</filter-name>
         <url-pattern>/frrest/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthenticationFilter</filter-name>
+        <url-pattern>/rest-sts-publish/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthenticationFilter</filter-name>
+        <url-pattern>/sts-tokengen/*</url-pattern>
+    </filter-mapping>
+
     <!-- filter mapping -->
 
     <listener>

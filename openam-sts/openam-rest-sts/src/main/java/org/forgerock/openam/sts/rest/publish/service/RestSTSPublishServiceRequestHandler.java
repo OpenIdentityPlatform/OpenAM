@@ -158,7 +158,8 @@ class RestSTSPublishServiceRequestHandler implements RequestHandler {
                 RestSTSInstanceConfig instanceConfig =
                         publisher.getPublishedInstance(request.getResourceName(), getRealmFromResourceName(request.getResourceName()));
                 handler.handleResult(new Resource(instanceConfig.getDeploymentSubPath(),
-                        Integer.toString(instanceConfig.hashCode()), instanceConfig.toJson()));
+                        Integer.toString(instanceConfig.hashCode()),
+                        JsonValueBuilder.jsonValue().put(instanceConfig.getDeploymentSubPath(), instanceConfig.toJson().toString()).build()));
             }
         } catch (STSPublishException e) {
             String message = "Exception caught obtaining rest sts instance corresponding to id: " +

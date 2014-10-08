@@ -20,6 +20,7 @@ import com.google.inject.name.Names;
 import org.forgerock.authz.filter.crest.AuthorizationFilters;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.SingletonResourceProvider;
 
@@ -85,6 +86,26 @@ public final class FluentTo {
         }
 
         return route;
+    }
+
+    /**
+     * Method to route to a specific {@link RequestHandler} with the specified routingMode for the route and version
+     * represented by this class.
+     *
+     * @param routingMode The RoutingMode
+     * @param requestHandler The RequestHandler - the targeted endpoint
+     * @return a FluentRoute to the provider
+     */
+    public FluentVersion to(RoutingMode routingMode, RequestHandler requestHandler) {
+        if (route.getModules().length > 0) {
+            route.addVersion(routingMode, version,
+                    AuthorizationFilters.createFilter(requestHandler, route.getModules()));
+        } else {
+            route.addVersion(routingMode, version, requestHandler);
+        }
+
+        return route;
+
     }
 
     private <T> T get(Class<T> resourceClass, String named) {
