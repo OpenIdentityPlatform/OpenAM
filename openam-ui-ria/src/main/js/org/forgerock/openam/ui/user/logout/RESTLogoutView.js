@@ -56,10 +56,9 @@ define("org/forgerock/openam/ui/user/logout/RESTLogoutView", [
             }
 
             conf.setProperty('loggedUser', null);
-            eventManager.sendEvent(constants.EVENT_CHANGE_VIEW, {route: router.configuration.routes.login });
-            eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
             delete conf.gotoURL;
-            window.location.hash += urlParams;
+            eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true});
+            router.navigate(router.getLink(router.configuration.routes.login) + urlParams, {trigger: true});
         }
     });
 
