@@ -53,7 +53,8 @@ class PrivilegeEvaluator {
     private Subject adminSubject;
     private Subject subject;
     private String applicationName;
-    private String resourceName;
+    private String normalisedResourceName;
+    private String requestedResourceName;
     private Map<String, Set<String>> envParameters;
     private ResourceSearchIndexes indexes;
     private List<List<Entitlement>> resultQ = new
@@ -99,11 +100,12 @@ class PrivilegeEvaluator {
     /**
      * Initializes the evaluator.
      *
-     * @param adminSubject Administrator subject which is used fo evcaluation.
+     * @param adminSubject Administrator subject which is used fo evaluation.
      * @param subject Subject to be evaluated.
      * @param realm Realm Name
      * @param applicationName Application Name.
-     * @param resourceName Rsource name.
+     * @param normalisedResourceName The normalised resource name.
+     * @param requestedResourceName The requested resource name.
      * @param actions Action names.
      * @param envParameters Environment parameters.
      * @param recursive <code>true</code> for sub tree evaluation
@@ -115,7 +117,8 @@ class PrivilegeEvaluator {
         Subject subject,
         String realm,
         String applicationName,
-        String resourceName,
+        String normalisedResourceName,
+        String requestedResourceName,
         Set<String> actions,
         Map<String, Set<String>> envParameters,
         boolean recursive
@@ -124,7 +127,8 @@ class PrivilegeEvaluator {
         this.subject = subject;
         this.realm = realm;
         this.applicationName = applicationName;
-        this.resourceName = resourceName;
+        this.normalisedResourceName = normalisedResourceName;
+        this.requestedResourceName = requestedResourceName;
         this.envParameters = envParameters;
 
         Application appl = getApplication();
@@ -137,7 +141,8 @@ class PrivilegeEvaluator {
         }
 
         entitlementCombiner = appl.getEntitlementCombiner();
-        entitlementCombiner.init(realm, applicationName, resourceName, this.actionNames, recursive);
+        entitlementCombiner.init(realm, applicationName, normalisedResourceName, requestedResourceName,
+                this.actionNames, recursive);
         this.recursive = recursive;
 
         if (PrivilegeManager.debug.messageEnabled()) {
@@ -146,7 +151,8 @@ class PrivilegeEvaluator {
             debug.message("[PolicyEval] subject: " + getPrincipalId(subject), null);
             debug.message("[PolicyEval] realm: " + realm, null);
             debug.message("[PolicyEval] applicationName: " + applicationName, null);
-            debug.message("[PolicyEval] resourceName: " + resourceName, null);
+            debug.message("[PolicyEval] normalisedResourceName: " + this.normalisedResourceName, null);
+            debug.message("[PolicyEval] requestedResourceName: " + this.requestedResourceName, null);
             debug.message("[PolicyEval] actions: " + actionNames, null);
             if ((envParameters != null) && !envParameters.isEmpty()) {
                 debug.message("[PolicyEval] envParameters: " +
@@ -187,7 +193,7 @@ class PrivilegeEvaluator {
         Map<String, Set<String>> envParameters
     ) throws EntitlementException {
         init(adminSubject, subject, realm, applicationName,
-            entitlement.getResourceName(), 
+            entitlement.getResourceName(), entitlement.getRequestedResourceName(),
             entitlement.getActionValues().keySet(), envParameters, false);
         entitlement.setApplicationName(applicationName);
 
@@ -214,7 +220,8 @@ class PrivilegeEvaluator {
      * @param adminSubject Administrator subject which is used for evaluation.
      * @param subject Subject to be evaluated.
      * @param applicationName Application Name.
-     * @param resourceName Resource name.
+     * @param normalisedResourceName The normalised resource name.
+     * @param requestedResourceName The requested resource name.
      * @param envParameters Environment parameters.
      * @param recursive <code>true</code> for sub tree evaluation.
      * @return <code>true</code> if the subject has privilege to have the
@@ -227,15 +234,16 @@ class PrivilegeEvaluator {
         Subject adminSubject,
         Subject subject,
         String applicationName,
-        String resourceName,
+        String normalisedResourceName,
+        String requestedResourceName,
         Map<String, Set<String>> envParameters,
         boolean recursive
     ) throws EntitlementException {
 
 
         init(adminSubject, subject, realm, applicationName,
-            resourceName, null, envParameters, recursive);        
-        indexes = getApplication().getResourceSearchIndex(resourceName, realm);
+            normalisedResourceName, requestedResourceName, null, envParameters, recursive);
+        indexes = getApplication().getResourceSearchIndex(normalisedResourceName, realm);
 
         return evaluate(realm);
 
@@ -281,7 +289,7 @@ class PrivilegeEvaluator {
         Set<IPrivilege> referralPrivileges = null;
         boolean tasksSubmitted = false;
         PrivilegeEvaluatorContext ctx =
-                new PrivilegeEvaluatorContext(realm, resourceName, applicationName);
+                new PrivilegeEvaluatorContext(realm, normalisedResourceName, applicationName);
         Object appToken = AppTokenHandler.getAndClear();
 
         while (true) {
@@ -415,7 +423,8 @@ class PrivilegeEvaluator {
                     List<Entitlement> entitlements = eval.evaluate(
                                             parent.adminSubject,
                                             parent.realm, parent.subject,
-                                            parent.applicationName, parent.resourceName,
+                                            parent.applicationName, parent.normalisedResourceName,
+                                            parent.requestedResourceName,
                                             parent.actionNames, parent.envParameters,
                                             parent.recursive, context);
 

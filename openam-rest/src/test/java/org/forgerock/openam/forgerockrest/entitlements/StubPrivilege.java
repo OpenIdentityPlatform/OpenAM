@@ -45,8 +45,9 @@ public class StubPrivilege extends Privilege {
 
     @Override
     public List<Entitlement> evaluate(Subject adminSubject, String realm, Subject subject, String applicationName,
-                                      String resourceName, Set<String> actionNames, Map<String,
-            Set<String>> environment, boolean recursive, Object context) throws EntitlementException {
+                                      String normalisedResourceName, String requestedResourceName,
+                                      Set<String> actionNames, Map<String, Set<String>> environment, boolean recursive,
+                                      Object context) throws EntitlementException {
 
         return Collections.emptyList();
     }

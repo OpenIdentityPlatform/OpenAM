@@ -208,11 +208,11 @@ public class Evaluator {
         }
 
         // Normalise the incoming resource URL.
-        resourceName = application.getResourceComparator().canonicalize(resourceName);
+        String normalisedResourceName = application.getResourceComparator().canonicalize(resourceName);
 
         PrivilegeEvaluator evaluator = new PrivilegeEvaluator();
         List<Entitlement> results = evaluator.evaluate(realm, adminSubject, subject,
-                applicationName, resourceName, environment, recursive);
+                applicationName, normalisedResourceName, resourceName, environment, recursive);
 
         if (configWrapper.isMonitoringRunning()) {
             policyMonitor.addEvaluation(System.currentTimeMillis() - startTime, realm, applicationName, resourceName,

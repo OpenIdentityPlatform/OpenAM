@@ -86,7 +86,8 @@ public class OpenSSOPrivilege extends Privilege {
         final String realm,
         final Subject subject,
         final String applicationName,
-        final String resourceName,
+        final String normalisedResourceName,
+        final String requestedResourceName,
         final Set<String> actionNames,
         final Map<String, Set<String>> environment,
         final boolean recursive,
@@ -103,7 +104,7 @@ public class OpenSSOPrivilege extends Privilege {
                                                     realm,
                                                     subject,
                                                     applicationName,
-                                                    resourceName,
+                                                    normalisedResourceName,
                                                     actionNames,
                                                     environment,
                                                     recursive

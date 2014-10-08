@@ -63,31 +63,34 @@ public abstract class EntitlementCombiner {
      *
      * @param realm Realm name.
      * @param applicationName Application Name.
-     * @param resourceName Resource name to be evaluated.
+     * @param normalisedResourceName The normalised resource name.
+     * @param requestedResourceName The requested resource name.
      * @param actions Action names to be evaluated.
      * @param isRecursive <code>true<</code> for subtree evaluation.
      */
-    public void init(String realm, String applicationName, String resourceName, Set<String> actions,
-                     boolean isRecursive) throws EntitlementException {
+    public void init(String realm, String applicationName, String normalisedResourceName, String requestedResourceName,
+                     Set<String> actions, boolean isRecursive) throws EntitlementException {
         Application application = ApplicationManager.getApplication(
                 PrivilegeManager.superAdminSubject, realm, applicationName);
-        init(resourceName, actions, isRecursive, application);
+        init(normalisedResourceName, requestedResourceName, actions, isRecursive, application);
     }
 
     /**
      * Initializes the combiner.
      *
-     * @param resourceName Resource name to be evaluated.
+     * @param normalisedResourceName The normalised resource name.
+     * @param requestedResourceName The requested resource name.
      * @param actions Action names to be evaluated.
      * @param isRecursive <code>true<</code> for subtree evaluation.
      * @param application The defining application.
      */
-    public void init(String resourceName, Set<String> actions, boolean isRecursive,
-                     Application application) throws EntitlementException {
+    public void init(String normalisedResourceName, String requestedResourceName, Set<String> actions,
+                     boolean isRecursive, Application application) throws EntitlementException {
         this.isRecursive = isRecursive;
         this.actions = new HashSet<String>();
 
-        rootE = new Entitlement(application.getName(), resourceName, Collections.EMPTY_MAP);
+        rootE = new Entitlement(application.getName(), normalisedResourceName, Collections.EMPTY_MAP);
+        rootE.setRequestedResourceName(requestedResourceName);
         resourceComparator = application.getResourceComparator();
 
         if (!isRecursive) { // single level

@@ -569,7 +569,7 @@ public class SimpleTimeCondition extends EntitlementConditionAdaptor {
     public void setEndDate(String endDate) {
         try {
             Date date = dateFormat.parse(endDate);
-            Calendar endDateCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+            endDateCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
             endDateCal.setTime(date);
             this.endDate = endDate;
         } catch (ParseException e) {

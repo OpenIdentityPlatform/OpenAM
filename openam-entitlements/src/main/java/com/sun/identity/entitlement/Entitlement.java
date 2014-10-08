@@ -36,10 +36,10 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,6 +71,7 @@ public class Entitlement {
     private String name;
     private String applicationName = ApplicationTypeManager.URL_APPLICATION_TYPE_NAME;
     private Set<String> resourceNames;
+    private Set<String> requestedResourceNames;
     private Map<String, Boolean> actionValues;
     private Map<String, Set<String>> advices;
     private Map<String, Set<String>> attributes;
@@ -219,6 +220,50 @@ public class Entitlement {
             return null;
         }
         return resourceNames.iterator().next();
+    }
+
+    /**
+     * Sets the non normalised resource names.
+     *
+     * @param requestedResourceNames Non normalised resource names.
+     */
+    public void setRequestedResourceNames(Set<String> requestedResourceNames) {
+        this.requestedResourceNames = requestedResourceNames;
+    }
+
+    /**
+     * Returns non normalised resource names. If this has not been set the resource names (which is most
+     * probably normalised) will be returned.
+     *
+     * @return Non normalised resource names or if that has not been set, the normalised resource names.
+     */
+    public Set<String> getRequestedResourceNames() {
+        if (requestedResourceNames == null || requestedResourceNames.isEmpty()) {
+            return getResourceNames();
+        }
+        return requestedResourceNames;
+    }
+
+    /**
+     * Sets non normalised resource name.
+     *
+     * @param requestedResourceName Non normalised resource name.
+     */
+    public void setRequestedResourceName(String requestedResourceName) {
+        setRequestedResourceNames(Collections.singleton(requestedResourceName));
+    }
+
+    /**
+     * Returns non normalised resource name. If this has not been set the resource name (which is most
+     * probably normalised) will be returned.
+     *
+     * @return Non normalised resource name or if that has not been set, the normalised resource name.
+     */
+    public String getRequestedResourceName() {
+        if (requestedResourceNames == null || requestedResourceNames.isEmpty()) {
+            return getResourceName();
+        }
+        return requestedResourceNames.iterator().next();
     }
 
     /**

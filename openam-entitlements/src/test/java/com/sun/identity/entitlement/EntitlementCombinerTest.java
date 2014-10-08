@@ -20,7 +20,6 @@ import org.forgerock.openam.utils.CollectionUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +43,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 public class EntitlementCombinerTest {
 
     private static final String APP_NAME = "testAppName";
-    private static final String RESOURCE_NAME = "http://test.web.com:8080/hello/world/page.html";
+    private static final String NORMALISED_RESOURCE_NAME = "http://test.web.com:80/hello/world/page.html";
+    private static final String REQUESTED_RESOURCE_NAME = "http://test.web.com/hello/world/page.html";
     private static final boolean SELF_MODE = false;
 
     private EntitlementCombiner combiner;
@@ -62,8 +62,10 @@ public class EntitlementCombinerTest {
         given(app.getName()).willReturn(APP_NAME);
         given(app.getResourceComparator()).willReturn(resourceName);
         given(app.getActions()).willReturn(EMPTY_MAP);
+    }
 
-        combiner.init(RESOURCE_NAME, EMPTY_SET, SELF_MODE, app);
+    private void postSetup(String requestedResourceName) throws EntitlementException {
+        combiner.init(NORMALISED_RESOURCE_NAME, requestedResourceName, EMPTY_SET, SELF_MODE, app);
 
         verify(app).getName();
         verify(app).getResourceComparator();
@@ -78,6 +80,7 @@ public class EntitlementCombinerTest {
     @Test
     public void addUsingSelfModeNoAdvice() throws EntitlementException {
         // Given
+        postSetup(NORMALISED_RESOURCE_NAME);
         given(invoker.combine(Boolean.TRUE, Boolean.TRUE)).willReturn(Boolean.TRUE);
         given(invoker.isCompleted()).willReturn(false).willReturn(true);
 
@@ -87,8 +90,8 @@ public class EntitlementCombinerTest {
         actionNames.put("POST", Boolean.TRUE);
 
         List<Entitlement> entitlements = Arrays.asList(
-                new Entitlement(APP_NAME, "http://test.web.com:8080/hello/*", actionNames),
-                new Entitlement(APP_NAME, "http://test.web.com:8080/hello/world/page.html", actionNames));
+                new Entitlement(APP_NAME, "http://test.web.com:80/hello/*", actionNames),
+                new Entitlement(APP_NAME, "http://test.web.com:80/hello/world/page.html", actionNames));
 
         combiner.add(entitlements);
         entitlements = combiner.getResults();
@@ -97,7 +100,7 @@ public class EntitlementCombinerTest {
         assertThat(entitlements).hasSize(1);
         Entitlement entitlement = entitlements.get(0);
         assertThat(entitlement.getApplicationName()).isEqualTo(APP_NAME);
-        assertThat(entitlement.getResourceName()).isEqualTo(RESOURCE_NAME);
+        assertThat(entitlement.getResourceName()).isEqualTo(NORMALISED_RESOURCE_NAME);
         assertThat(entitlement.getActionValues()).isEqualTo(actionNames);
         assertThat(entitlement.getAdvices()).isEmpty();
 
@@ -113,6 +116,7 @@ public class EntitlementCombinerTest {
     @Test
     public void addUsingSelfModeWithAdvice() throws EntitlementException {
         // Given
+        postSetup(NORMALISED_RESOURCE_NAME);
         given(invoker.isCompleted()).willReturn(false).willReturn(true);
 
         // When
@@ -123,8 +127,8 @@ public class EntitlementCombinerTest {
         Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
         advices.put("someAdvice", CollectionUtils.asSet("property1", "property2"));
 
-        Entitlement eWithoutAdvice = new Entitlement(APP_NAME, "http://test.web.com:8080/hello/*", actionNames);
-        Entitlement eWithAdvice = new Entitlement(APP_NAME, "http://test.web.com:8080/hello/world/page.html", EMPTY_MAP);
+        Entitlement eWithoutAdvice = new Entitlement(APP_NAME, "http://test.web.com:80/hello/*", actionNames);
+        Entitlement eWithAdvice = new Entitlement(APP_NAME, "http://test.web.com:80/hello/world/page.html", EMPTY_MAP);
         eWithAdvice.setAdvices(advices);
 
         List<Entitlement> entitlements = Arrays.asList(eWithoutAdvice, eWithAdvice);
@@ -136,7 +140,76 @@ public class EntitlementCombinerTest {
         assertThat(entitlements).hasSize(1);
         Entitlement entitlement = entitlements.get(0);
         assertThat(entitlement.getApplicationName()).isEqualTo(APP_NAME);
-        assertThat(entitlement.getResourceName()).isEqualTo(RESOURCE_NAME);
+        assertThat(entitlement.getResourceName()).isEqualTo(NORMALISED_RESOURCE_NAME);
+        assertThat(entitlement.getActionValues()).isEqualTo(EMPTY_MAP);
+        assertThat(entitlement.getAdvices()).isEqualTo(advices);
+
+        verify(invoker, times(2)).isCompleted();
+        verifyNoMoreInteractions(invoker, app, resourceName);
+    }
+
+    @Test
+    public void shouldMergeNormalisedResourceEntitlementsWithNoAdvice() throws EntitlementException {
+        // Given
+        postSetup(REQUESTED_RESOURCE_NAME);
+        given(invoker.combine(Boolean.TRUE, Boolean.TRUE)).willReturn(Boolean.TRUE);
+        given(invoker.isCompleted()).willReturn(false).willReturn(true);
+
+        // When
+        Map<String, Boolean> actionNames = new HashMap<String, Boolean>();
+        actionNames.put("GET", Boolean.TRUE);
+        actionNames.put("POST", Boolean.TRUE);
+
+        List<Entitlement> entitlements = Arrays.asList(
+                new Entitlement(APP_NAME, "http://test.web.com:80/hello/*", actionNames),
+                new Entitlement(APP_NAME, "http://test.web.com:80/hello/world/page.html", actionNames));
+
+        combiner.add(entitlements);
+        entitlements = combiner.getResults();
+
+        // Then
+        assertThat(entitlements).hasSize(1);
+        Entitlement entitlement = entitlements.get(0);
+        assertThat(entitlement.getApplicationName()).isEqualTo(APP_NAME);
+        assertThat(entitlement.getResourceName()).isEqualTo(NORMALISED_RESOURCE_NAME);
+        assertThat(entitlement.getRequestedResourceName()).isEqualTo(REQUESTED_RESOURCE_NAME);
+        assertThat(entitlement.getActionValues()).isEqualTo(actionNames);
+        assertThat(entitlement.getAdvices()).isEmpty();
+
+        verify(invoker, times(2)).combine(Boolean.TRUE, Boolean.TRUE);
+        verify(invoker, times(2)).isCompleted();
+        verifyNoMoreInteractions(invoker, app, resourceName);
+    }
+
+    @Test
+    public void shouldMergeNormalisedResourceEntitlementsWithAdvice() throws EntitlementException {
+        // Given
+        postSetup(REQUESTED_RESOURCE_NAME);
+        given(invoker.isCompleted()).willReturn(false).willReturn(true);
+
+        // When
+        Map<String, Boolean> actionNames = new HashMap<String, Boolean>();
+        actionNames.put("GET", Boolean.TRUE);
+        actionNames.put("POST", Boolean.TRUE);
+
+        Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
+        advices.put("someAdvice", CollectionUtils.asSet("property1", "property2"));
+
+        Entitlement eWithoutAdvice = new Entitlement(APP_NAME, "http://test.web.com:80/hello/*", actionNames);
+        Entitlement eWithAdvice = new Entitlement(APP_NAME, "http://test.web.com:80/hello/world/page.html", EMPTY_MAP);
+        eWithAdvice.setAdvices(advices);
+
+        List<Entitlement> entitlements = Arrays.asList(eWithoutAdvice, eWithAdvice);
+
+        combiner.add(entitlements);
+        entitlements = combiner.getResults();
+
+        // Then
+        assertThat(entitlements).hasSize(1);
+        Entitlement entitlement = entitlements.get(0);
+        assertThat(entitlement.getApplicationName()).isEqualTo(APP_NAME);
+        assertThat(entitlement.getResourceName()).isEqualTo(NORMALISED_RESOURCE_NAME);
+        assertThat(entitlement.getRequestedResourceName()).isEqualTo(REQUESTED_RESOURCE_NAME);
         assertThat(entitlement.getActionValues()).isEqualTo(EMPTY_MAP);
         assertThat(entitlement.getAdvices()).isEqualTo(advices);
 

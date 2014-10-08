@@ -262,7 +262,8 @@ public abstract class Privilege implements IPrivilege {
      * @param realm Realm Name
      * @param subject Subject who is under evaluation.
      * @param applicationName Application name.
-     * @param resourceName Resource name.
+     * @param normalisedResourceName The normalised resource name.
+     * @param requestedResourceName The requested resource name.
      * @param actionNames Set of action names.
      * @param environment Environment parameters.
      * @param recursive <code>true</code> to perform evaluation on sub resources
@@ -276,7 +277,8 @@ public abstract class Privilege implements IPrivilege {
         String realm,
         Subject subject,
         String applicationName,
-        String resourceName,
+        String normalisedResourceName,
+        String requestedResourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
         boolean recursive,

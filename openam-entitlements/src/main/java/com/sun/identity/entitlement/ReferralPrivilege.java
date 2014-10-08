@@ -419,7 +419,8 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
         String realm,
         Subject subject,
         String applicationName,
-        String resourceName,
+        String normalisedResourceName,
+        String requestedResourceName,
         Set<String> actionNames,
         Map<String, Set<String>> environment,
         boolean recursive,
@@ -436,7 +437,8 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             PrivilegeManager.superAdminSubject, realm, applicationName);
         EntitlementCombiner entitlementCombiner =
             application.getEntitlementCombiner();
-        entitlementCombiner.init("/", applicationName, resourceName, actionNames, recursive);
+        entitlementCombiner.init("/", applicationName, normalisedResourceName, requestedResourceName, actionNames,
+                recursive);
         for (String rlm : realms) {
             EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
                 PrivilegeManager.superAdminSubject, rlm);
@@ -448,15 +450,12 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                         ResourceName comp = getResourceComparator(adminSubject,
                             rlm,
                             app);
-                        String resName = comp.canonicalize(resourceName).
-                            toLowerCase();
                         Set<String> resources = tagswapResourceNames(subject,
                             resourceNames);
 
                         boolean applicable = false;
                         for (String r : resources) {
-                            ResourceMatch match = comp.compare(resName,
-                                comp.canonicalize(r), true);
+                            ResourceMatch match = comp.compare(normalisedResourceName, comp.canonicalize(r), true);
                             if (!recursive) {
                                 applicable = match.equals(
                                     ResourceMatch.EXACT_MATCH) ||
@@ -492,7 +491,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
                             List<Entitlement> entitlements = evaluator.evaluate(
                                 rlm,
                                 adminSubject, subjectSubRealm, applicationName,
-                                resName, environment, recursive);
+                                normalisedResourceName, requestedResourceName, environment, recursive);
                             
                             if (savedConfig != null) {
                                 ec.restoreSavedPolicyConfig(environment, savedConfig);

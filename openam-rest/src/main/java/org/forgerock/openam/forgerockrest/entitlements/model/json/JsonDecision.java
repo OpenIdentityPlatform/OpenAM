@@ -38,7 +38,7 @@ public final class JsonDecision {
     }
 
     public String getResource() {
-        return entitlement.getResourceName();
+        return entitlement.getRequestedResourceName();
     }
 
     public Map<String, Boolean> getActions() {

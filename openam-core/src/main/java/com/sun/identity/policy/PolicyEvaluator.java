@@ -1491,7 +1491,7 @@ public class PolicyEvaluator {
     private ResourceResult entitlementToResourceResult(
         Entitlement entitlement
     ) throws PolicyException {
-        return new ResourceResult(entitlement.getResourceName(),
+        return new ResourceResult(entitlement.getRequestedResourceName(),
             entitlementToPolicyDecision(entitlement, Collections.EMPTY_SET));
     }
     
