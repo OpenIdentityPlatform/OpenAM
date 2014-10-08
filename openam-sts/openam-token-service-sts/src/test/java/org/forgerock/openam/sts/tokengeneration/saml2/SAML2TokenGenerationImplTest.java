@@ -40,8 +40,6 @@ import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultConditio
 import org.forgerock.openam.sts.tokengeneration.saml2.statements.DefaultSubjectProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSignerImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
@@ -86,7 +84,6 @@ public class SAML2TokenGenerationImplTest {
                 throw new IllegalStateException("Could not mock SSOTokenIdentity: " + e, e);
             }
             bind(SAML2TokenGeneration.class).to(SAML2TokenGenerationImpl.class);
-            bind(SAML2AssertionSigner.class).to(SAML2AssertionSignerImpl.class);
             bind(RestSTSInstanceStateFactory.class).to(RestSTSInstanceStateFactoryImpl.class);
             bind(STSKeyProviderFactory.class).to(STSKeyProviderFactoryImpl.class);
             bind(SSOTokenIdentity.class).toInstance(mockTokenIdentity);

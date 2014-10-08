@@ -46,8 +46,6 @@ import org.forgerock.openam.sts.tokengeneration.saml2.StatementProvider;
 import org.forgerock.openam.sts.tokengeneration.saml2.StatementProviderImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.KeyInfoFactoryImpl;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSigner;
-import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.SAML2AssertionSignerImpl;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactory;
 import org.forgerock.openam.sts.tokengeneration.saml2.xmlsig.STSKeyProviderFactoryImpl;
 import org.slf4j.Logger;
@@ -64,7 +62,6 @@ public class TokenGenerationModule extends AbstractModule {
         bind(StatementProvider.class).to(StatementProviderImpl.class);
         bind(new TypeLiteral<STSInstanceStateProvider<RestSTSInstanceState>>(){}).to(RestSTSInstanceStateProvider.class)
                 .in(Scopes.SINGLETON);
-//        bind(SAML2AssertionSigner.class).to(SAML2AssertionSignerImpl.class);
         /*
         Once the TokenGenerationService gets called by the SOAP STS, I will need to bind a
         STSInstanceConfigPersister<SoapSTSInstanceConfig> class.
