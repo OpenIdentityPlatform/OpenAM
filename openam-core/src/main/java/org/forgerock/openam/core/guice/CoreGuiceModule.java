@@ -32,11 +32,14 @@ import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.XACMLConstants;
+import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.forgerock.guice.core.GuiceModule;
@@ -82,6 +85,7 @@ import org.forgerock.util.thread.ExecutorServiceFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -273,6 +277,25 @@ public class CoreGuiceModule extends AbstractModule {
         }
 
         return result;
+    }
+
+    /**
+     * Provides instances of the OrganizationConfigManager which requires an Admin
+     * token to perform its operations.
+     *
+     * Used by {@link RealmValidator}
+     *
+     * @param provider Non null.
+     * @return Non null.
+     */
+    @Provides @Inject
+    OrganizationConfigManager getOrganizationConfigManager(AdminTokenProvider provider) {
+        SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        try {
+            return new OrganizationConfigManager(token, "/");
+        } catch (SMSException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

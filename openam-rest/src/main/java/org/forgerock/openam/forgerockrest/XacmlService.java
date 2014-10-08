@@ -20,25 +20,21 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
 import com.sun.identity.entitlement.xacml3.XACMLImportExport;
+import com.sun.identity.entitlement.xacml3.XACMLImportExport.ImportStep;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.xerces.dom.DocumentImpl;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.rest.service.RestletRealmRouter;
 import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.ext.xml.DomRepresentation;
-import org.restlet.representation.EmptyRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,7 +44,9 @@ import java.io.OutputStream;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides XACML based services
@@ -91,19 +89,32 @@ public class XacmlService extends ServerResource {
     @Post
     public Representation importXACML(Representation entity) throws ResourceException {
         String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
+        boolean dryRun = "true".equalsIgnoreCase(getQuery().getFirstValue("dryrun"));
+        List<ImportStep> steps;
+
         try {
-            if (importExport.importXacml(realm, entity.getStream(), getAdminToken())) {
-                getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
-                return new EmptyRepresentation();
-            }
-            throw ResourceException.getException(ResourceException.BAD_REQUEST, "No policies found in XACML document");
+            steps = importExport.importXacml(realm, entity.getStream(), getAdminToken(), dryRun);
         } catch (EntitlementException e) {
             debug.warning("Importing XACML to policies failed", e);
             throw ResourceException.getException(ResourceException.BAD_REQUEST, e.getMessage());
         } catch (IOException e) {
             debug.warning("Reading XACML import failed", e);
-            throw ResourceException.getException(ResourceException.INTERNAL_ERROR, e.getMessage());
+            throw ResourceException.getException(ResourceException.BAD_REQUEST, e.getMessage());
         }
+
+        if (steps.isEmpty()) {
+            throw ResourceException.getException(ResourceException.BAD_REQUEST, "No policies found in XACML document");
+        }
+
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        for (XACMLImportExport.ImportStep step : steps) {
+            Map<String, String> stepResult = new HashMap<String, String>();
+            stepResult.put("status", String.valueOf(step.getDiffStatus().getCode()));
+            stepResult.put("name", step.getPrivilege().getName());
+            result.add(stepResult);
+        }
+        getResponse().setStatus(Status.SUCCESS_OK);
+        return new JacksonRepresentation<List<Map<String, String>>>(result);
     }
 
     /**

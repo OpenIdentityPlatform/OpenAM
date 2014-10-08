@@ -16,23 +16,23 @@
 
 package com.sun.identity.entitlement.xacml3;
 
-import com.google.inject.Inject;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.IPrivilege;
+import com.sun.identity.entitlement.IPrivilegeManager;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.ReferralPrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
-import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
 import com.sun.identity.shared.debug.Debug;
-import org.json.JSONException;
-
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.security.auth.Subject;
-import javax.xml.bind.JAXBException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,97 +40,110 @@ import java.util.Set;
 /**
  * Utility for handling the Import and Export of Policies into the OpenAM Entitlements
  * framework.
+ *
+ * @since 12.0.0
  */
 public class XACMLImportExport {
 
-    public static final int JSON_PARSE_ERROR = EntitlementException.JSON_PARSE_ERROR;
-    public static final int INVALID_XML = EntitlementException.INVALID_XML;
     public static final String PREFIX = XACMLImportExport.class.getSimpleName();
 
     // Injected
+    private final XACMLReaderWriter xacmlReaderWriter;
     private final SearchFilterFactory searchFilterFactory;
     private final Debug debug;
+    private final PrivilegeValidator privilegeValidator;
+    private final PrivilegeManagerFactory privilegeManagerFactory;
+    private final ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory;
 
     /**
      * Creates an instance of the XACMLImportExport with dependencies provided.
      *
+     * @param privilegeManagerFactory Non null, required to create PrivilegeManager instances.
+     * @param referralPrivilegeManagerFactory Non null, required to create ReferralPrivilegeManager instances.
+     * @param xacmlReaderWriter Non null, required for translating privileges to/from XACML XML.
+     * @param privilegeValidator Non null, required for validation of imported privileges.
      * @param searchFilterFactory Non null, required for SearchFilter operations.
      * @param debug Non null.
      */
     @Inject
-    public XACMLImportExport(SearchFilterFactory searchFilterFactory, @Named(XACMLConstants.DEBUG) Debug debug) {
-        this.searchFilterFactory = searchFilterFactory;
-        this.debug = debug;
-    }
+    public XACMLImportExport(PrivilegeManagerFactory privilegeManagerFactory,
+                             ReferralPrivilegeManagerFactory referralPrivilegeManagerFactory,
+                             XACMLReaderWriter xacmlReaderWriter,
+                             PrivilegeValidator privilegeValidator,
+                             SearchFilterFactory searchFilterFactory,
+                             @Named(XACMLConstants.DEBUG) Debug debug) {
 
-    /**
-     * Default constructor.
-     *
-     * Note: Typically the Guice constructor is preferred but as this code is
-     * also called from a non-Guice context, both must be provided.
-     */
-    public XACMLImportExport() {
-        this(new SearchFilterFactory(), PrivilegeManager.debug);
+        this.privilegeManagerFactory = privilegeManagerFactory;
+        this.referralPrivilegeManagerFactory = referralPrivilegeManagerFactory;
+        this.xacmlReaderWriter = xacmlReaderWriter;
+        this.searchFilterFactory = searchFilterFactory;
+        this.privilegeValidator = privilegeValidator;
+        this.debug = debug;
     }
 
     /**
      * Performs the Import based on the given Stream. The stream must contain XML in XACML.
      *
      * @param realm Non null Realm to populate with the Policies.
-     * @param xacmlStream Non null stream to read.
+     * @param xacml Non null stream to read.
      * @param admin Non null admin Subject.
-     * @return True if import completed successfully, otherwise false.
+     * @param dryRun boolean flag, indicating import steps should be reported but not applied.
+     * @return The sequence steps that could or have been used to carry out the import.
      * @throws EntitlementException If there was any unexpected error.
      */
-    public boolean importXacml(String realm, InputStream xacmlStream, Subject admin) throws EntitlementException {
-        try {
-            PolicySet ps = XACMLPrivilegeUtils.streamToPolicySet(xacmlStream);
+    public List<ImportStep> importXacml(String realm, InputStream xacml, Subject admin, boolean dryRun)
+            throws EntitlementException {
 
-            if (ps == null) {
-                return false;
-            }
+        PrivilegeSet privilegeSet = xacmlReaderWriter.read(xacml);
+        List<ImportStep> importSteps = generateImportSteps(realm, privilegeSet, admin);
 
-            PrivilegeManager pm = PrivilegeManager.getInstance(realm, admin);
-            ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, admin);
-
-            Set<Policy> policySet = XACMLPrivilegeUtils.getPoliciesFromPolicySet(ps);
-            message("Import: Policies to Import {0}", policySet.size());
-
-            for (Policy policy : policySet) {
-                if (XACMLPrivilegeUtils.isReferralPolicy(policy)) {
-
-                    ReferralPrivilege referralPrivilege = XACMLPrivilegeUtils.policyToReferral(policy);
-                    String name = referralPrivilege.getName();
-
-                    if (rpm.canFindByName(name)) {
-                        message("Import: Modify Referral {0}", name);
-                        rpm.modify(referralPrivilege);
-                    } else {
-                        message("Import: Add Referral {0}", name);
-                        rpm.add(referralPrivilege);
-                    }
-
-                } else {
-
-                    Privilege privilege = XACMLPrivilegeUtils.policyToPrivilege(policy);
-                    String name = privilege.getName();
-                    if (pm.canFindByName(name)) {
-                        message("Import: Modify Privilege {0}", name);
-                        pm.modify(privilege);
-                    } else {
-                        message("Import: Add Privilege {0}", name);
-                        pm.add(privilege);
-                    }
-
-                }
+        if (!dryRun) {
+            message("Import: Policies to Import {0}", importSteps.size());
+            for (ImportStep importStep : importSteps) {
+                ((ImportStepImpl) importStep).apply();
             }
             message("Import: Complete");
-            return true;
-        } catch (JSONException e) {
-            throw new EntitlementException(JSON_PARSE_ERROR, e);
-        } catch (JAXBException e) {
-            throw new EntitlementException(INVALID_XML, e);
         }
+
+        return importSteps;
+    }
+
+    /**
+     * Establishes the sequence of ImportSteps required to import the provided privileges into the specified realm.
+     *
+     * @param realm Non null Realm to populate with the Policies.
+     * @param privilegeSet Non null, collection of Privileges and ReferralPrivileges to import.
+     * @param admin Non null admin Subject.
+     * @return The sequence steps that can be used to carry out the import.
+     * @throws EntitlementException If there was any unexpected error.
+     */
+    private List<ImportStep> generateImportSteps(String realm, PrivilegeSet privilegeSet, Subject admin)
+            throws EntitlementException {
+
+        List<ImportStep> importSteps = new ArrayList<ImportStep>();
+
+        PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
+        ReferralPrivilegeManager rpm = referralPrivilegeManagerFactory.createPrivilegeManager(realm, admin);
+
+        for (ReferralPrivilege referralPrivilege : privilegeSet.getReferralPrivileges()) {
+            privilegeValidator.validateReferralPrivilege(referralPrivilege);
+            if (rpm.canFindByName(referralPrivilege.getName())) {
+                importSteps.add(referralImportStep(rpm, DiffStatus.UPDATE, referralPrivilege));
+            } else {
+                importSteps.add(referralImportStep(rpm, DiffStatus.ADD, referralPrivilege));
+            }
+        }
+
+        for (Privilege privilege : privilegeSet.getPrivileges()) {
+            privilegeValidator.validatePrivilege(privilege);
+            if (pm.canFindByName(privilege.getName())) {
+                importSteps.add(privilegeImportStep(pm, DiffStatus.UPDATE, privilege));
+            } else {
+                importSteps.add(privilegeImportStep(pm, DiffStatus.ADD, privilege));
+            }
+        }
+
+        return importSteps;
     }
 
     /**
@@ -146,8 +159,8 @@ public class XACMLImportExport {
     public PolicySet exportXACML(String realm, Subject admin, List<String> filters)
             throws EntitlementException {
 
-        PrivilegeManager pm = PrivilegeManager.getInstance(realm, admin);
-        ReferralPrivilegeManager rpm = new ReferralPrivilegeManager(realm, admin);
+        PrivilegeManager pm = privilegeManagerFactory.createReferralPrivilegeManager(realm, admin);
+        ReferralPrivilegeManager rpm = referralPrivilegeManagerFactory.createPrivilegeManager(realm, admin);
 
         Set<SearchFilter> filterSet = new HashSet<SearchFilter>();
         if (filters != null) {
@@ -163,27 +176,20 @@ public class XACMLImportExport {
         message("Export: Privilege Matches {0}", privilegeNames.size());
         message("Export: Referral Matches {0}", referralNames.size());
 
-        Set<Privilege> privileges = new HashSet<Privilege>();
+        PrivilegeSet privilegeSet = new PrivilegeSet();
         for (String name : privilegeNames) {
             Privilege privilege = pm.findByName(name, admin);
             message("Export: Privilege {0}", privilege.getName());
-            privileges.add(privilege);
+            privilegeSet.addPrivilege(privilege);
         }
 
-        PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet(realm, privileges);
         for (String name : referralNames) {
             ReferralPrivilege referralPrivilege = rpm.findByName(name);
+            privilegeSet.addReferralPrivilege(referralPrivilege);
             message("Export: Referral {0}", referralPrivilege.getName());
-            try {
-                Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
-                XACMLPrivilegeUtils.addPolicyToPolicySet(policy, policySet);
-            } catch (JSONException e) {
-                throw new EntitlementException(JSON_PARSE_ERROR, e);
-            } catch (JAXBException e) {
-                throw new EntitlementException(JSON_PARSE_ERROR, e);
-            }
         }
 
+        PolicySet policySet = xacmlReaderWriter.toXACML(realm, privilegeSet);
         message("Export: Complete");
         return policySet;
     }
@@ -193,4 +199,116 @@ public class XACMLImportExport {
             debug.message(MessageFormat.format(PREFIX + format, args));
         }
     }
+
+    /**
+     * Factory method for ReferralPrivilege ImportStep
+     */
+    private ImportStep referralImportStep(ReferralPrivilegeManager rpm, DiffStatus type, ReferralPrivilege referral) {
+        return new ImportStepImpl<ReferralPrivilege>(rpm, type, referral, "Referral");
+    }
+
+    /**
+     * Factory method for Privilege ImportStep
+     */
+    private ImportStep privilegeImportStep(PrivilegeManager pm, DiffStatus type, Privilege privilege) {
+        return new ImportStepImpl<Privilege>(pm, type, privilege, "Privilege");
+    }
+
+    /**
+     * Factory to allow PrivilegeManager to be mocked in tests
+     */
+    public static class PrivilegeManagerFactory {
+
+        PrivilegeManager createReferralPrivilegeManager(String realm, Subject admin) {
+            return PrivilegeManager.getInstance(realm, admin);
+        }
+    }
+
+    /**
+     * Factory to allow ReferralPrivilegeManager to be mocked in tests
+     */
+    public static class ReferralPrivilegeManagerFactory {
+
+        ReferralPrivilegeManager createPrivilegeManager(String realm, Subject admin) {
+            return new ReferralPrivilegeManager(realm, admin);
+        }
+    }
+
+    /**
+     * Diff status types used to describe the change in state of a single resource.
+     */
+    public static enum DiffStatus {
+
+        ADD('A'), UPDATE('U');
+
+        private final char code;
+
+        private DiffStatus(char code) {
+            this.code = code;
+        }
+
+        /**
+         * Single character description of diff status.
+         *
+         * @return Character code description of diff status.
+         */
+        public char getCode() {
+            return code;
+        }
+
+    }
+
+    /**
+     * Describes how a Privilege or ReferralPrivilege read from XACML will be imported into OpenAM.
+     */
+    public interface ImportStep {
+
+        public DiffStatus getDiffStatus();
+
+        public IPrivilege getPrivilege();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private final class ImportStepImpl<T extends IPrivilege> implements ImportStep {
+
+        private final IPrivilegeManager<T> privilegeManager;
+        private final DiffStatus diffStatus;
+        private final T privilege;
+        private final String privilegeType;
+
+        public ImportStepImpl(IPrivilegeManager<T> manager, DiffStatus diffStatus, T privilege, String privilegeType) {
+            this.privilegeManager = manager;
+            this.diffStatus = diffStatus;
+            this.privilege = privilege;
+            this.privilegeType = privilegeType;
+        }
+
+        @Override
+        public DiffStatus getDiffStatus() {
+            return diffStatus;
+        }
+
+        @Override
+        public IPrivilege getPrivilege() {
+            return privilege;
+        }
+
+        private void apply() throws EntitlementException {
+
+            message("Import: {0} {1} {2}", diffStatus.name(), privilegeType, privilege.getName());
+            switch (diffStatus) {
+                case ADD:
+                    privilegeManager.add(privilege);
+                    break;
+                case UPDATE:
+                    privilegeManager.modify(privilege);
+                    break;
+            }
+        }
+
+    }
+
 }

@@ -23,8 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ReferralPrivilegeManager.java,v 1.7 2010/01/20 17:01:35 veiming Exp $
- */
-/**
+ *
  * Portions Copyrighted 2012-2014 ForgeRock AS
  */
 package com.sun.identity.entitlement;
@@ -45,7 +44,7 @@ import static org.forgerock.openam.utils.CollectionUtils.asSet;
 /**
  * Referral Privilege Manager manages referral privilege.
  */
-public final class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivilege> {
+public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivilege> {
 
     private String realm;
     private Subject adminSubject;
@@ -153,6 +152,7 @@ public final class ReferralPrivilegeManager implements IPrivilegeManager<Referra
      *
      * @param name name of the privilege.
      * @throws com.sun.identity.entitlement.EntitlementException if search failed.
+     * @return true if a privilege with the specified name exists, false otherwise.
      */
     @Override
     public boolean canFindByName(String name) throws EntitlementException {

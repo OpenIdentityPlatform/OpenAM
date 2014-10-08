@@ -24,11 +24,7 @@
  *
  * $Id: ListXACML.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  *
- * Portions Copyrighted 2014 ForgeRock AS
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.cli.entitlement;
 
@@ -50,7 +46,12 @@ import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.entitlement.xacml3.SearchFilterFactory;
 import com.sun.identity.entitlement.xacml3.XACMLImportExport;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
+import com.sun.identity.entitlement.xacml3.XACMLReaderWriter;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
+import com.sun.identity.entitlement.xacml3.validation.PrivilegeValidator;
+import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 
 import javax.security.auth.Subject;
 import java.io.FileNotFoundException;
@@ -80,7 +81,6 @@ public class ListXACML extends AuthenticatedCommand {
     private String outfile;
     private IOutput outputWriter;
     private final SearchFilterFactory searchFilterFactory = new SearchFilterFactory();
-    private final XACMLImportExport importExport = new XACMLImportExport();
 
     /**
      * Services a Commandline Request.
@@ -291,12 +291,26 @@ public class ListXACML extends AuthenticatedCommand {
 
         PolicySet policySet = null;
         try {
+            PrivilegeValidator privilegeValidator = new PrivilegeValidator(
+                    new RealmValidator(new OrganizationConfigManager(adminSSOToken, "/")));
+            XACMLImportExport importExport = new XACMLImportExport(
+                    new XACMLImportExport.PrivilegeManagerFactory(),
+                    new XACMLImportExport.ReferralPrivilegeManagerFactory(),
+                    new XACMLReaderWriter(),
+                    privilegeValidator,
+                    new SearchFilterFactory(),
+                    PrivilegeManager.debug);
+
             policySet = importExport.exportXACML(realm, adminSubject, filters);
         } catch (EntitlementException e) {
             String[] args = {realm, e.getMessage()};
             debugError("ListXACML.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                    "FAILED_GET_POLICY_IN_REALM", args);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_GET_POLICY_IN_REALM", args);
+            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+        } catch (SMSException e) {
+            String[] args = {realm, e.getMessage()};
+            debugError("ListXACML.handleRequest", e);
+            writeLog(LogWriter.LOG_ERROR, Level.INFO, "FAILED_GET_POLICY_IN_REALM", args);
             throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
 

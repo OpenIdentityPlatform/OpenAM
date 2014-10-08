@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementException.java,v 1.2 2009/09/03 17:06:23 veiming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -103,6 +105,9 @@ public class EntitlementException extends Exception {
 
     public static final int PROPERTY_IS_NOT_AN_INTEGER = 800;
     public static final int PROPERTY_IS_NOT_A_SET = 801;
+
+    public static final int INTERNAL_ERROR = 900;
+    public static final int REALM_NOT_FOUND = 901;
 
     private int errorCode;
     private String message;

@@ -12,41 +12,30 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 Nomura Research Institute, Ltd.
- */
-
-/*
+ *
  * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
-import com.sun.identity.entitlement.Entitlement;
-import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
-import com.sun.identity.entitlement.ResourceAttribute;
 import com.sun.identity.entitlement.xacml3.core.Match;
 import com.sun.identity.entitlement.xacml3.core.Policy;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
-import org.forgerock.openam.entitlement.conditions.environment.IPCondition;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
+import static com.sun.identity.entitlement.xacml3.Assertions.*;
+import static com.sun.identity.entitlement.xacml3.FactoryMethods.*;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.testng.Assert.*;
 
 /**
@@ -61,9 +50,7 @@ import static org.testng.Assert.*;
  */
 public class XACMLPrivilegeUtilsTest {
 
-    public static final String VERSION_TIMESTAMP_FORMAT = "yyyy.MM.dd.HH.mm.ss.SSS";
-    long now = Calendar.getInstance().getTimeInMillis();
-    public static final int NUMBER_OF_PRIVILEGES_IN_ARBITRARY_PRIVILEGE_SET = 2;
+    private long now = Calendar.getInstance().getTimeInMillis();
 
     @Test
     public void shouldReturnEmptyListWhenNull() {
@@ -77,7 +64,7 @@ public class XACMLPrivilegeUtilsTest {
     public void shouldResultInEquivalentPrivilegesWhenValidPrivilegeSetSerializedToXACMLThenDeserialized()
             throws EntitlementException {
         //Given
-        Set<Privilege> privileges = createArbitraryPrivilegeSet();
+        Set<Privilege> privileges = createArbitraryPrivilegeSet(now);
         PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet("/", privileges);
         List<Policy> policies = getPoliciesFromPolicySet(policySet);
         List<Privilege> deserializedPrivileges = new ArrayList<Privilege>();
@@ -86,28 +73,26 @@ public class XACMLPrivilegeUtilsTest {
             deserializedPrivileges.add(XACMLPrivilegeUtils.policyToPrivilege(policy));
         }
         //Then
-        assertDeserializedPrivilegesMatchOriginalPrivileges(deserializedPrivileges, privileges);
+        assertAllPrivilegesEquivalent(deserializedPrivileges, privileges);
     }
 
     @Test
     public void shouldResultInEquivalentReferralPrivilegeWhenValidReferralPrivilegeSerializedToXACMLThenDeserialized()
             throws JSONException, EntitlementException {
         //Given
-        ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege();
-        Policy policy = null;
-        policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
+        ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege("ReferralPrivilege1", now);
+        Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
         ReferralPrivilege deserializedReferralPrivilege = null;
         //When
         deserializedReferralPrivilege = XACMLPrivilegeUtils.policyToReferral(policy);
         //Then
-        assertDeserializedReferralPrivilegeMatchesOriginalReferralPrivilege(deserializedReferralPrivilege,
-                referralPrivilege);
+        assertReferralPrivilegesEquivalent(deserializedReferralPrivilege, referralPrivilege);
     }
 
     @Test
-    public void shouldReturnXACMLPolicySetWhenGivenValidPrivilegeSet() {
+    public void shouldReturnXACMLPolicySetWhenGivenValidPrivilegeSet() throws EntitlementException {
         //Given
-        Set<Privilege> privileges = createArbitraryPrivilegeSet();
+        Set<Privilege> privileges = createArbitraryPrivilegeSet(now);
         //When
         PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet("/", privileges);
         //Then
@@ -127,10 +112,9 @@ public class XACMLPrivilegeUtilsTest {
     @Test
     public void shouldReturnXACMLPolicyWhenGivenValidReferralPrivilegeSet() throws JSONException, EntitlementException {
         //Given
-        ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege();
-        Policy policy = null;
+        ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege("ReferralPrivilege1", now);
         //When
-        policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
+        Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
         //Then
         assertPolicyContentMatchesReferralPrivilegeContent(policy, referralPrivilege);
     }
@@ -139,9 +123,8 @@ public class XACMLPrivilegeUtilsTest {
     public void shouldReturnNullWhenGivenNullAsReferralPrivilege() throws JSONException {
         //Given
         ReferralPrivilege referralPrivilege = null;
-        Policy policy = null;
         //When
-        policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
+        Policy policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
         //Then
         assertNull(policy, "Expected Policy to be null.");
     }
@@ -172,7 +155,7 @@ public class XACMLPrivilegeUtilsTest {
     @Test
     public void shouldIndicateReferralPolicyWhenGivenReferralPrivilege() throws EntitlementException, JSONException {
         //Given
-        Policy policy = getArbitraryReferralPrivilegeAsPolicy();
+        Policy policy = getArbitraryReferralPrivilegeAsPolicy(now);
         //When
         boolean answer = XACMLPrivilegeUtils.isReferralPolicy(policy);
         //Then
@@ -180,9 +163,9 @@ public class XACMLPrivilegeUtilsTest {
     }
 
     @Test
-    public void shouldIndicateNotAReferralPolicyWhenGivenPolicy() {
+    public void shouldIndicateNotAReferralPolicyWhenGivenPolicy() throws EntitlementException {
         //Given
-        Policy policy = getArbitraryPrivilegeAsPolicy();
+        Policy policy = getArbitraryPrivilegeAsPolicy(now);
         //When
         boolean answer = XACMLPrivilegeUtils.isReferralPolicy(policy);
         //Then
@@ -250,158 +233,4 @@ public class XACMLPrivilegeUtilsTest {
                 "to be added.");
     }
 
-    private void assertDeserializedPrivilegesMatchOriginalPrivileges(List<Privilege> deserializedPrivileges,
-            Set<Privilege> originalPrivileges) {
-        assertEquals(deserializedPrivileges.size(), originalPrivileges.size(), "Expected deserialized Privileges " +
-                "List to contain the same number of Privileges as the original list.");
-
-        List<Privilege> originalPrivilegesMatched = new ArrayList<Privilege>();
-        Set<Privilege> deserializedPrivilegesMatched = new HashSet<Privilege>();
-        for (Privilege deserializedPrivilege : deserializedPrivileges) {
-            for (Privilege originalPrivilege : originalPrivileges) {
-                if (originalPrivilege.getName().equals(deserializedPrivilege.getName())) {
-                    originalPrivilegesMatched.add(originalPrivilege);
-                    deserializedPrivilegesMatched.add(deserializedPrivilege);
-                }
-            }
-        }
-        originalPrivileges.removeAll(originalPrivilegesMatched);
-        deserializedPrivileges.removeAll(deserializedPrivilegesMatched);
-        assertEquals(originalPrivileges.size(), 0, "Original Privileges found which were not represented in the " +
-                "list of deserialized Privileges.");
-        assertEquals(deserializedPrivileges.size(), 0, "Deserialized Privileges contained Privileges which were not " +
-                "present in the original set.");
-    }
-
-    private void assertDeserializedReferralPrivilegeMatchesOriginalReferralPrivilege(
-            ReferralPrivilege deserializedReferralPrivilege, ReferralPrivilege originalReferralPrivilege) {
-        assertEquals(deserializedReferralPrivilege.getName(), originalReferralPrivilege.getName(),
-                "Deserialized ReferralPrivilege name does not match name of original ReferralPrivilege.");
-
-        Map<String, Set<String>> deserializedMapApplNameToResources =
-                deserializedReferralPrivilege.getMapApplNameToResources();
-        Map<String, Set<String>> originalMapApplNameToResources = originalReferralPrivilege.getMapApplNameToResources();
-        assertEquals(deserializedMapApplNameToResources.size(), originalMapApplNameToResources.size(),
-                "Deserialized ReferralPrivilege map of application names to resources' size does not match original.");
-        Set<String> deserializedMapApplNameToResourcesKeySet = deserializedMapApplNameToResources.keySet();
-        Set<String> originalMapApplNameToResourcesKeySet = originalMapApplNameToResources.keySet();
-        assertTrue(deserializedMapApplNameToResourcesKeySet.containsAll(originalMapApplNameToResourcesKeySet),
-                "The application name entries in deserialized ReferralPrivilege map of application names to " +
-                        "resources' do not match originals.");
-        for (String key : deserializedMapApplNameToResourcesKeySet) {
-            assertTrue(deserializedMapApplNameToResources.get(key).containsAll(
-                    originalMapApplNameToResources.get(key)));
-        }
-        assertEquals(deserializedReferralPrivilege.getRealms().size(), originalReferralPrivilege.getRealms().size(),
-                "Deserialized ReferralPrivilege list of realms' size does not match original.");
-        assertTrue(originalReferralPrivilege.getRealms().containsAll(deserializedReferralPrivilege.getRealms()),
-                "Realms were specified in the deserialized ReferralPrivilege which were not in the original " +
-                        "ReferralPrivilege.");
-        assertEquals(deserializedReferralPrivilege.getCreationDate(), originalReferralPrivilege.getCreationDate(),
-                "Deserialized ReferralPrivilege creation date does not match original ReferralPrivilege creation " +
-                        "date.");
-        assertEquals(deserializedReferralPrivilege.getLastModifiedDate(),
-                originalReferralPrivilege.getLastModifiedDate(), "Deserialized ReferralPrivilege last modified date " +
-                        "does not match original ReferralPrivilege last modified date.");
-        assertEquals(deserializedReferralPrivilege.getCreatedBy(), originalReferralPrivilege.getCreatedBy(),
-                "Deserialized ReferralPrivilege created by field does not match original ReferralPrivilege created " +
-                        "by field.");
-    }
-
-    private Set<Privilege> createArbitraryPrivilegeSet() {
-        Set<Privilege> privilegeSet = new HashSet<Privilege>();
-
-        for (int privilegeNumber = 1; privilegeNumber <= NUMBER_OF_PRIVILEGES_IN_ARBITRARY_PRIVILEGE_SET;
-             privilegeNumber++) {
-            Privilege privilege = createArbitraryPrivilege("Privilege" + privilegeNumber);
-            privilegeSet.add(privilege);
-        }
-
-        return privilegeSet;
-    }
-
-    private Privilege createArbitraryPrivilege(String name) {
-        Privilege privilege = null;
-        try {
-            privilege = Privilege.getNewInstance();
-            privilege.setName(name);
-            privilege.setDescription("Privilege " + name);
-            privilege.setCreatedBy("creatingAuthor");
-            privilege.setLastModifiedBy("modifyingAuthor");
-            privilege.setCreationDate(now);
-            privilege.setLastModifiedDate(now);
-            privilege.setActive(true);
-
-            Set<String> applicationIndexes = new HashSet<String>();
-            applicationIndexes.add("arbitraryApplicationIndex");
-            privilege.setApplicationIndexes(applicationIndexes);
-
-            EntitlementCondition entitlementCondition = new IPCondition();
-            privilege.setCondition(entitlementCondition);
-
-            Set<ResourceAttribute> resourceAttributes = new HashSet<ResourceAttribute>();
-            privilege.setResourceAttributes(resourceAttributes);
-
-            Entitlement entitlement = new Entitlement();
-            entitlement.setName("arbitraryEntitlementName");
-            Map<String,Boolean> actionValues = new HashMap<String, Boolean>();
-            actionValues.put("arbitraryAction", true);
-            entitlement.setActionValues(actionValues);
-            privilege.setEntitlement(entitlement);
-        } catch (EntitlementException ee) {
-            fail("Unable to create arbitrary Privilege Set.", ee);
-        }
-        return privilege;
-    }
-
-    private ReferralPrivilege createArbitraryReferralPrivilege() throws EntitlementException {
-        ReferralPrivilege referralPrivilege = null;
-        String name = "ReferralPrivilege1";
-        HashSet<String> realms = new HashSet<String>();
-        realms.add("arbitraryRealm");
-        Map<String, Set<String>> appNameToResources = new HashMap<String, Set<String>>();
-        Set<String> resources = new HashSet<String>();
-        resources.add("arbitraryResource1");
-        resources.add("arbitraryResource2");
-        appNameToResources.put("arbitraryApplicationName", resources);
-        referralPrivilege = new ReferralPrivilege(name, appNameToResources, realms);
-        referralPrivilege.setDescription("ReferralPrivilege " + name);
-        referralPrivilege.setCreatedBy("creatingAuthor");
-        referralPrivilege.setLastModifiedBy("modifyingAuthor");
-        referralPrivilege.setCreationDate(now);
-        referralPrivilege.setLastModifiedDate(now);
-        referralPrivilege.setActive(true);
-        return referralPrivilege;
-    }
-
-    private Policy getArbitraryReferralPrivilegeAsPolicy() throws JSONException, EntitlementException {
-        ReferralPrivilege referralPrivilege = createArbitraryReferralPrivilege();
-        Policy policy = null;
-        policy = XACMLPrivilegeUtils.referralToPolicy(referralPrivilege);
-        return policy;
-    }
-
-    private Policy getArbitraryPrivilegeAsPolicy() {
-        Set<Privilege> privileges = createArbitraryPrivilegeSet();
-        PolicySet policySet = XACMLPrivilegeUtils.privilegesToPolicySet("/", privileges);
-        Policy policy = (Policy) policySet.getPolicySetOrPolicyOrPolicySetIdReference().get(0).getValue();
-        return policy;
-    }
-
-    private List<Policy> getPoliciesFromPolicySet(PolicySet policySet) {
-        List<JAXBElement<?>> policySetOrPolicyOrPolicySetIdReference =
-                policySet.getPolicySetOrPolicyOrPolicySetIdReference();
-
-        List<Policy> policies = new ArrayList<Policy>();
-        for (JAXBElement element : policySetOrPolicyOrPolicySetIdReference) {
-            policies.add((Policy) element.getValue());
-        }
-        return policies;
-    }
-
-    private String formatMillisecondsAsTimestamp(long creationDate) {
-        SimpleDateFormat sdf = new SimpleDateFormat(VERSION_TIMESTAMP_FORMAT);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return sdf.format(creationDate);
-    }
 }

@@ -115,6 +115,7 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
      *
      * @param name name of the privilege.
      * @throws com.sun.identity.entitlement.EntitlementException if search failed.
+     * @return true if a privilege with the specified name exists, false otherwise.
      */
     @Override
     public boolean canFindByName(String name) throws EntitlementException {

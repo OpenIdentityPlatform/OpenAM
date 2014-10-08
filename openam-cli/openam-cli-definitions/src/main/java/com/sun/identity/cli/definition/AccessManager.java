@@ -2984,11 +2984,15 @@ public class AccessManager {
             "xmlfile|X|s|File that contains the policy XACML definition. In the console, paste the XML into the text field instead."},
         optionAliases={},
         macro="authentication",
-        optionalOptions={},
+        optionalOptions={
+                "dryrun|n|u|Provide a summary of the policies and referral policies which would be updated, and those which would be added, as a result of the create-xacml command without the 'dryrun' option specified. Nothing will be updated or added when using this option.",
+                "outfile|o|s|Filename where the output of a 'dryrun' command will be sent to. If no 'dryrun' command is specified, the outfile will not be used for anything."
+        },
         resourceStrings={
             "create-xacml-not-supported-in-legacy-policy-mode=add-xacml not supported in legacy policy mode",
             "subcmd-create-policies-__web__-xmlfile=Policy XML",
-            "create-policy-in-realm-succeed=Policies were created under realm, {0}."})
+            "create-policy-in-realm-succeed=Policies were created under realm, {0}.",
+            "no-policies-provided=No policies provided"})
     private String create_xacml;
 
     @SubCommandInfo(

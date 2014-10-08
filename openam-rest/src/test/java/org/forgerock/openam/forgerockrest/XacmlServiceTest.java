@@ -24,6 +24,7 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.entitlements.StubPrivilege;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -31,7 +32,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
-import org.restlet.representation.EmptyRepresentation;
+import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,6 +42,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,6 +51,7 @@ import java.util.concurrent.ConcurrentMap;
 import static org.fest.assertions.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
+import static com.sun.identity.entitlement.xacml3.XACMLImportExport.ImportStep;
 
 public class XacmlServiceTest {
 
@@ -70,6 +74,7 @@ public class XacmlServiceTest {
             return ssoToken;
         }
     };
+    private Form query;
 
     @BeforeMethod
     public void setup() throws Exception {
@@ -83,6 +88,9 @@ public class XacmlServiceTest {
         this.response = mock(Response.class);
         service.setRequest(request);
         service.setResponse(response);
+        query = new Form();
+        service = spy(service);
+        doReturn(query).when(service).getQuery();
     }
 
     @Test
@@ -91,14 +99,49 @@ public class XacmlServiceTest {
         Representation representation = mock(Representation.class);
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
-        doReturn(true).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class));
+
+        StubPrivilege privilege = new StubPrivilege();
+        privilege.setName("fred");
+        XACMLImportExport.ImportStep importStep = mock(XACMLImportExport.ImportStep.class);
+        doReturn(XACMLImportExport.DiffStatus.ADD).when(importStep).getDiffStatus();
+        doReturn(privilege).when(importStep).getPrivilege();
+
+        List<ImportStep> steps = Arrays.asList(importStep);
+        doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
 
         //when
         Representation result = service.importXACML(representation);
 
         //then
-        assertThat(result).isInstanceOf(EmptyRepresentation.class);
-        verify(response).setStatus(Status.SUCCESS_NO_CONTENT);
+        assertThat(result).isInstanceOf(JacksonRepresentation.class);
+        assertThat(result.getText()).contains("{\"status\":\"A\",\"name\":\"fred\"}");
+        verify(response).setStatus(Status.SUCCESS_OK);
+    }
+
+    @Test
+    public void testImportXACMLDryRun() throws Exception {
+        //given
+        query.add("dryrun", "true");
+        Representation representation = mock(Representation.class);
+        InputStream is = new ByteArrayInputStream("Hello World".getBytes());
+        doReturn(is).when(representation).getStream();
+
+        StubPrivilege privilege = new StubPrivilege();
+        privilege.setName("fred");
+        XACMLImportExport.ImportStep importStep = mock(XACMLImportExport.ImportStep.class);
+        doReturn(XACMLImportExport.DiffStatus.ADD).when(importStep).getDiffStatus();
+        doReturn(privilege).when(importStep).getPrivilege();
+
+        List<ImportStep> steps = Arrays.asList(importStep);
+        doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(true));
+
+        //when
+        Representation result = service.importXACML(representation);
+
+        //then
+        assertThat(result).isInstanceOf(JacksonRepresentation.class);
+        assertThat(result.getText()).contains("{\"status\":\"A\",\"name\":\"fred\"}");
+        verify(response).setStatus(Status.SUCCESS_OK);
     }
 
     @Test
@@ -114,7 +157,7 @@ public class XacmlServiceTest {
             //then
             fail("Expect exception");
         } catch (ResourceException e) {
-            assertThat(e.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+            assertThat(e.getCode()).isEqualTo(ResourceException.BAD_REQUEST);
         }
     }
 
@@ -124,7 +167,7 @@ public class XacmlServiceTest {
         Representation representation = mock(Representation.class);
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
-        doReturn(false).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class));
+        doReturn(Collections.emptyList()).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
 
         try {
             //when
@@ -145,7 +188,7 @@ public class XacmlServiceTest {
         InputStream is = new ByteArrayInputStream("Hello World".getBytes());
         doReturn(is).when(representation).getStream();
         EntitlementException failure = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
-        doThrow(failure).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class));
+        doThrow(failure).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
 
         try {
             //when
@@ -162,11 +205,8 @@ public class XacmlServiceTest {
     @Test
     public void testExportXACML() throws Exception {
         //given
-        Form query = new Form();
         query.add(XacmlService.QUERY_PARAM_STRING, "test1");
         query.add(XacmlService.QUERY_PARAM_STRING, "test2");
-        service = spy(service);
-        doReturn(query).when(service).getQuery();
         PolicySet policySet = new PolicySet();
         doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
 
@@ -188,9 +228,6 @@ public class XacmlServiceTest {
     @Test
     public void testExportXACMLEntitlementException() throws Exception {
         //given
-        Form query = new Form();
-        service = spy(service);
-        doReturn(query).when(service).getQuery();
         EntitlementException ee = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
         doThrow(ee).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
 

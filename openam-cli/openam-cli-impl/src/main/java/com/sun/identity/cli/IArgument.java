@@ -24,10 +24,7 @@
  *
  * $Id: IArgument.java,v 1.12 2009/12/18 07:13:25 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 
 package com.sun.identity.cli;
@@ -236,6 +233,11 @@ public interface IArgument {
      * File option name.
      */
     String FILE = "file";
+
+    /**
+     * Dry run option.
+     */
+    String DRY_RUN = "dryrun";
 
     /**
      * Names Only option

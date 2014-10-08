@@ -23,8 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
- */
-/**
+ *
  * Portions Copyrighted 2011-2014 ForgeRock AS
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
@@ -73,6 +72,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -173,8 +173,7 @@ public class XACMLPrivilegeUtils {
         return policy;
     }
 
-    private static Policy privilegeToPolicyInternal(Privilege privilege) throws
-            JAXBException, EntitlementException  {
+    private static Policy privilegeToPolicyInternal(Privilege privilege) throws JAXBException, EntitlementException  {
 
         /*
          * See entitelement meeting minutes - 22apr09
@@ -214,18 +213,15 @@ public class XACMLPrivilegeUtils {
             entitlementName = entitlement.getName();
         }
 
-        String policyId = privilegeNameToPolicyId(privilegeName,
-                applicationName);
+        String policyId = privilegeNameToPolicyId(privilegeName, applicationName);
         policy.setPolicyId(policyId);
 
         String description = privilege.getDescription();
         policy.setDescription(description);
 
-        List<Object> vrList
-            = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
+        List<Object> vrList = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(
-                XACMLConstants.XACML3_CORE_PKG);
+        JAXBContext jaxbContext = JAXBContext.newInstance(XACMLConstants.XACML3_CORE_PKG);
 
         if (applicationName != null) {
             VariableDefinition appName = new VariableDefinition();
@@ -234,8 +230,7 @@ public class XACMLPrivilegeUtils {
             AttributeValue cbv = new AttributeValue();
             cbv.setDataType(XACMLConstants.XS_STRING);
             cbv.getContent().add(applicationName);
-            JAXBElement<AttributeValue> cbve
-                    = objectFactory.createAttributeValue(cbv);
+            JAXBElement<AttributeValue> cbve = objectFactory.createAttributeValue(cbv);
             appName.setExpression(cbve);
         }
 
@@ -245,9 +240,8 @@ public class XACMLPrivilegeUtils {
             entName.setVariableId(XACMLConstants.ENTITLEMENT_NAME);
             AttributeValue cbv = new AttributeValue();
             cbv.setDataType(XACMLConstants.XS_STRING);
-            cbv.getContent().add(applicationName);
-            JAXBElement<AttributeValue> cbve
-                    = objectFactory.createAttributeValue(cbv);
+            cbv.getContent().add(entitlementName);
+            JAXBElement<AttributeValue> cbve = objectFactory.createAttributeValue(cbv);
             entName.setExpression(cbve);
         }
 
@@ -257,8 +251,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue cbv = new AttributeValue();
         cbv.setDataType(XACMLConstants.XS_STRING);
         cbv.getContent().add(privilege.getCreatedBy());
-        JAXBElement<AttributeValue> cbve
-                = objectFactory.createAttributeValue(cbv);
+        JAXBElement<AttributeValue> cbve = objectFactory.createAttributeValue(cbv);
         createdBy.setExpression(cbve);
 
         VariableDefinition lastModifiedBy = new VariableDefinition();
@@ -267,9 +260,8 @@ public class XACMLPrivilegeUtils {
         AttributeValue lmbv = new AttributeValue();
         lmbv.setDataType(XACMLConstants.XS_STRING);
         lmbv.getContent().add(privilege.getLastModifiedBy());
-        JAXBElement<AttributeValue> lmbve
-                = objectFactory.createAttributeValue(lmbv);
-        lastModifiedBy.setExpression(cbve);
+        JAXBElement<AttributeValue> lmbve = objectFactory.createAttributeValue(lmbv);
+        lastModifiedBy.setExpression(lmbve);
 
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -287,22 +279,19 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getCreationDate())
                 + "T"
                 + sdf2.format(privilege.getCreationDate()));
-        JAXBElement<AttributeValue> cdve
-                = objectFactory.createAttributeValue(cdv);
+        JAXBElement<AttributeValue> cdve = objectFactory.createAttributeValue(cdv);
         creationDate.setExpression(cdve);
 
         VariableDefinition lastModifiedDate = new VariableDefinition();
         vrList.add(lastModifiedDate);
-        lastModifiedDate.setVariableId(
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
+        lastModifiedDate.setVariableId(XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
         AttributeValue lmdv = new AttributeValue();
         lmdv.setDataType(XACMLConstants.XS_DATE_TIME);
         lmdv.getContent().add(
                 sdf1.format(privilege.getLastModifiedDate())
                 + "T"
                 + sdf2.format(privilege.getLastModifiedDate()));
-        JAXBElement<AttributeValue> lmdve
-                = objectFactory.createAttributeValue(lmdv);
+        JAXBElement<AttributeValue> lmdve = objectFactory.createAttributeValue(lmdv);
         lastModifiedDate.setExpression(lmdve);
 
         // PolicyIssuer policyIssuer = null;  // optional, TODO
@@ -346,8 +335,7 @@ public class XACMLPrivilegeUtils {
         Set<String> resources = entitlement.getResourceNames();
 
 
-        List<AnyOf> anyOfResourceList = resourceNamesToAnyOfList(resources,
-                applicationName);
+        List<AnyOf> anyOfResourceList = resourceNamesToAnyOfList(resources, applicationName);
         if (anyOfResourceList != null) {
             targetAnyOfList.addAll(anyOfResourceList);
         }
@@ -379,8 +367,7 @@ public class XACMLPrivilegeUtils {
             }
         }
 
-        Condition condition = eSubjectConditionToXCondition(
-                privilege.getSubject(), privilege.getCondition());
+        Condition condition = eSubjectConditionToXCondition(privilege.getSubject(), privilege.getCondition());
 
         // Include resource attributes (ResourceProvider) as AdviceExpressions
         Set<ResourceAttribute> ra = privilege.getResourceAttributes();
@@ -767,30 +754,19 @@ public class XACMLPrivilegeUtils {
         return privileges;
     }
 
-    public static Privilege policyToPrivilege(Policy policy)
-            throws EntitlementException {
+    public static Privilege policyToPrivilege(Policy policy) throws EntitlementException {
 
         String policyId = policy.getPolicyId();
         String privilegeName = policyIdToPrivilegeName(policyId);
         String description = policy.getDescription();
 
-        String createdBy = getVariableById(policy,
-                XACMLConstants.PRIVILEGE_CREATED_BY);
+        String createdBy = getVariableById(policy, XACMLConstants.PRIVILEGE_CREATED_BY);
+        long createdAt = dateStringToLong(getVariableById(policy, XACMLConstants.PRIVILEGE_CREATION_DATE));
+        String lastModifiedBy = getVariableById(policy, XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
+        long lastModifiedAt = dateStringToLong(getVariableById(policy, XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
 
-        long createdAt = dateStringToLong(getVariableById(policy,
-                XACMLConstants.PRIVILEGE_CREATION_DATE));
-
-        String lastModifiedBy = getVariableById(policy,
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
-
-        long lastModifiedAt = dateStringToLong(getVariableById(policy,
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
-
-        String entitlementName = getVariableById(policy,
-                XACMLConstants.ENTITLEMENT_NAME);
-
-        String applicationName = getVariableById(policy,
-                XACMLConstants.APPLICATION_NAME);
+        String entitlementName = getVariableById(policy, XACMLConstants.ENTITLEMENT_NAME);
+        String applicationName = getVariableById(policy, XACMLConstants.APPLICATION_NAME);
 
         List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
         Set<String> resourceNames = getResourceNamesFromMatches(policyMatches);
@@ -815,6 +791,12 @@ public class XACMLPrivilegeUtils {
 
         Privilege privilege = new XACMLOpenSSOPrivilege();
         privilege.setName(privilegeName);
+        privilege.setDescription(description);
+        privilege.setCreatedBy(createdBy);
+        privilege.setCreationDate(createdAt);
+        privilege.setLastModifiedBy(lastModifiedBy);
+        privilege.setLastModifiedDate(lastModifiedAt);
+
         privilege.setEntitlement(entitlement);
         privilege.setSubject(es);
         privilege.setCondition(ec);
@@ -860,7 +842,7 @@ public class XACMLPrivilegeUtils {
         return time;
     }
 
-    public static PolicySet privilegesToPolicySet(String realm, Set<Privilege> privileges) {
+    public static PolicySet privilegesToPolicySet(String realm, Collection<Privilege> privileges) {
         PolicySet policySet = null;
         try {
             policySet = privilegesToPolicySetInternal(realm, privileges);
@@ -871,7 +853,7 @@ public class XACMLPrivilegeUtils {
     }
 
     private static PolicySet privilegesToPolicySetInternal(String realm,
-            Set<Privilege> privileges) throws JAXBException {
+            Collection<Privilege> privileges) throws JAXBException {
         if (privileges == null) {
             return null;
         }
@@ -1309,8 +1291,7 @@ public class XACMLPrivilegeUtils {
         return policy;
     }
 
-    public static Policy referralToPolicyInternal(ReferralPrivilege privilege)
-            throws JAXBException, JSONException {
+    public static Policy referralToPolicyInternal(ReferralPrivilege privilege) throws JAXBException, JSONException {
 
         if (privilege == null) {
             return null;
@@ -1320,18 +1301,15 @@ public class XACMLPrivilegeUtils {
 
         String privilegeName = privilege.getName();
 
-        String policyId = privilegeNameToPolicyId(privilegeName,
-                null);
+        String policyId = privilegeNameToPolicyId(privilegeName, null);
         policy.setPolicyId(policyId);
 
         String description = privilege.getDescription();
         policy.setDescription(description);
 
-        List<Object> vrList
-            = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
+        List<Object> vrList = policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition();
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(
-                XACMLConstants.XACML3_CORE_PKG);
+        JAXBContext jaxbContext = JAXBContext.newInstance(XACMLConstants.XACML3_CORE_PKG);
 
         VariableDefinition createdBy = new VariableDefinition();
         vrList.add(createdBy);
@@ -1339,8 +1317,7 @@ public class XACMLPrivilegeUtils {
         AttributeValue cbv = new AttributeValue();
         cbv.setDataType(XACMLConstants.XS_STRING);
         cbv.getContent().add(privilege.getCreatedBy());
-        JAXBElement<AttributeValue> cbve
-                = objectFactory.createAttributeValue(cbv);
+        JAXBElement<AttributeValue> cbve = objectFactory.createAttributeValue(cbv);
         createdBy.setExpression(cbve);
 
         VariableDefinition lastModifiedBy = new VariableDefinition();
@@ -1349,9 +1326,8 @@ public class XACMLPrivilegeUtils {
         AttributeValue lmbv = new AttributeValue();
         lmbv.setDataType(XACMLConstants.XS_STRING);
         lmbv.getContent().add(privilege.getLastModifiedBy());
-        JAXBElement<AttributeValue> lmbve
-                = objectFactory.createAttributeValue(lmbv);
-        lastModifiedBy.setExpression(cbve);
+        JAXBElement<AttributeValue> lmbve = objectFactory.createAttributeValue(lmbv);
+        lastModifiedBy.setExpression(lmbve);
 
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -1369,33 +1345,28 @@ public class XACMLPrivilegeUtils {
                 sdf1.format(privilege.getCreationDate())
                 + "T"
                 + sdf2.format(privilege.getCreationDate()));
-        JAXBElement<AttributeValue> cdve
-                = objectFactory.createAttributeValue(cdv);
+        JAXBElement<AttributeValue> cdve = objectFactory.createAttributeValue(cdv);
         creationDate.setExpression(cdve);
 
         VariableDefinition lastModifiedDate = new VariableDefinition();
         vrList.add(lastModifiedDate);
-        lastModifiedDate.setVariableId(
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
+        lastModifiedDate.setVariableId(XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE);
         AttributeValue lmdv = new AttributeValue();
         lmdv.setDataType(XACMLConstants.XS_DATE_TIME);
         lmdv.getContent().add(
                 sdf1.format(privilege.getLastModifiedDate())
                 + "T"
                 + sdf2.format(privilege.getLastModifiedDate()));
-        JAXBElement<AttributeValue> lmdve
-                = objectFactory.createAttributeValue(lmdv);
+        JAXBElement<AttributeValue> lmdve = objectFactory.createAttributeValue(lmdv);
         lastModifiedDate.setExpression(lmdve);
 
         VariableDefinition isReferralPolicy = new VariableDefinition();
         vrList.add(isReferralPolicy);
-        isReferralPolicy.setVariableId(
-                XACMLConstants.IS_REFERRAL_POLICY);
+        isReferralPolicy.setVariableId(XACMLConstants.IS_REFERRAL_POLICY);
         AttributeValue irdv = new AttributeValue();
         irdv.setDataType(XACMLConstants.XS_BOOLEAN_TYPE);
         irdv.getContent().add(XACMLConstants.XS_BOOLEAN_TRUE);
-        JAXBElement<AttributeValue> irdve
-                = objectFactory.createAttributeValue(irdv);
+        JAXBElement<AttributeValue> irdve = objectFactory.createAttributeValue(irdv);
         isReferralPolicy.setExpression(irdve);
 
         // PolicyIssuer policyIssuer = null;  // optional, TODO
@@ -1420,20 +1391,16 @@ public class XACMLPrivilegeUtils {
         List<AnyOf> targetAnyOfList = target.getAnyOf();
 
         Set<String> realms = privilege.getRealms();
-        Map<String, Set<String>> appsResources
-                = privilege.getOriginalMapApplNameToResources();
+        Map<String, Set<String>> appsResources = privilege.getOriginalMapApplNameToResources();
 
-
-        AnyOf anyOfRealmsAppsResources
-                = realmsAppsResourcesToAnyOf(realms, appsResources);
+        AnyOf anyOfRealmsAppsResources = realmsAppsResourcesToAnyOf(realms, appsResources);
         if (anyOfRealmsAppsResources != null) {
             targetAnyOfList.add(anyOfRealmsAppsResources);
         }
 
         Rule permitRule = new Rule();
         vrList.add(permitRule);
-        permitRule.setRuleId(privilegeName + ":"
-                + XACMLConstants.PREMIT_RULE_SUFFIX);
+        permitRule.setRuleId(privilegeName + ":" + XACMLConstants.PREMIT_RULE_SUFFIX);
         permitRule.setDescription(XACMLConstants.PERMIT_RULE_DESCRIPTION);
         permitRule.setEffect(EffectType.PERMIT);
         Target permitTarget = new Target();
@@ -1448,32 +1415,24 @@ public class XACMLPrivilegeUtils {
         return XACMLConstants.XS_BOOLEAN_TRUE.equalsIgnoreCase(s);
     }
 
-    public static ReferralPrivilege policyToReferral(Policy policy)
-            throws EntitlementException, JSONException {
+    public static ReferralPrivilege policyToReferral(Policy policy) throws EntitlementException, JSONException {
+
         String policyId = policy.getPolicyId();
         String privilegeName = policyIdToPrivilegeName(policyId);
         String description = policy.getDescription();
 
-        String createdBy = getVariableById(policy,
-                XACMLConstants.PRIVILEGE_CREATED_BY);
-
-        long createdAt = dateStringToLong(getVariableById(policy,
-                XACMLConstants.PRIVILEGE_CREATION_DATE));
-
-        String lastModifiedBy = getVariableById(policy,
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
-
-        long lastModifiedAt = dateStringToLong(getVariableById(policy,
-                XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
+        String createdBy = getVariableById(policy, XACMLConstants.PRIVILEGE_CREATED_BY);
+        long createdAt = dateStringToLong(getVariableById(policy, XACMLConstants.PRIVILEGE_CREATION_DATE));
+        String lastModifiedBy = getVariableById(policy, XACMLConstants.PRIVILEGE_LAST_MODIFIED_BY);
+        long lastModifiedAt = dateStringToLong(getVariableById(policy, XACMLConstants.PRIVILEGE_LAST_MODIFIED_DATE));
 
         List<Match> policyMatches = getAllMatchesFromTarget(policy.getTarget());
         JSONObject jo = getRealmsAppsResources(policyMatches);
 
         Set<String> realms = JSONUtils.getSet(jo, "realms");
-        Map<String, Set<String>> appsResources
-                = JSONUtils.getMapStringSetString(jo, "appsResources");
-        ReferralPrivilege  referral = new ReferralPrivilege(privilegeName,
-                appsResources, realms);
+        Map<String, Set<String>> appsResources = JSONUtils.getMapStringSetString(jo, "appsResources");
+        ReferralPrivilege referral = new ReferralPrivilege(privilegeName, appsResources, realms);
+        referral.setDescription(description);
         referral.setCreatedBy(createdBy);
         referral.setCreationDate(createdAt);
         referral.setLastModifiedBy(lastModifiedBy);
