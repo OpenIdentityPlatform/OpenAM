@@ -337,7 +337,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-active-directory"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Active Directory Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -346,7 +346,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-adam"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Active Directory Application Mode (ADAM) Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -355,7 +355,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-db"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Database Repository (Early Access) Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -364,7 +364,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-generic-ldapv3"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Generic LDAPv3 Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -373,7 +373,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-opendj"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring OpenDJ Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -382,7 +382,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-dsee"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Sun/Oracle DSEE Data Stores</citetitle></link>
      </para>
     </listitem>
 
@@ -391,7 +391,7 @@
       <link
        xlink:href="admin-guide#sec-data-stores-tivoli"
        xlink:role="http://docbook.org/xlink/role/olink"
-       />
+      ><citetitle>Hints for Configuring Tivoli Directory Server Data Stores</citetitle></link>
      </para>
     </listitem>
    </itemizedlist>

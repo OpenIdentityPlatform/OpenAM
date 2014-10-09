@@ -28,7 +28,7 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook
                              http://docbook.org/xml/5.0/xsd/docbook.xsd'>
- <title>Hints for Configuring Sun DS with OpenAM schema Data Stores</title>
+ <title>Hints for Configuring Sun/Oracle DSEE Data Stores</title>
 
  <para>
   Use these hints when configuring Data Stores
