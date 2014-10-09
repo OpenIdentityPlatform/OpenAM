@@ -25,6 +25,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.entitlements.StubPrivilege;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -45,12 +46,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.fest.assertions.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
 import static com.sun.identity.entitlement.xacml3.XACMLExportImport.ImportStep;
 
 public class XacmlServiceTest {
@@ -114,7 +115,8 @@ public class XacmlServiceTest {
 
         //then
         assertThat(result).isInstanceOf(JacksonRepresentation.class);
-        assertThat(result.getText()).contains("{\"status\":\"A\",\"name\":\"fred\"}");
+        Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
+        assertThat(resultMap).contains(entry("status", "A"), entry("name", "fred"));
         verify(response).setStatus(Status.SUCCESS_OK);
     }
 
@@ -140,7 +142,8 @@ public class XacmlServiceTest {
 
         //then
         assertThat(result).isInstanceOf(JacksonRepresentation.class);
-        assertThat(result.getText()).contains("{\"status\":\"A\",\"name\":\"fred\"}");
+        Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
+        assertThat(resultMap).contains(entry("status", "A"), entry("name", "fred"));
         verify(response).setStatus(Status.SUCCESS_OK);
     }
 
