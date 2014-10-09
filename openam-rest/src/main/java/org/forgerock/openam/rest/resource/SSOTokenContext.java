@@ -74,6 +74,7 @@ public class SSOTokenContext extends ServerContext implements SubjectContext {
      * @throws SSOException
      *         if there is no SSO token associated with this request.
      */
+    @Override
     public SSOToken getCallerSSOToken() throws SSOException {
         return getCallerSSOToken(SSOTokenManager.getInstance());
     }

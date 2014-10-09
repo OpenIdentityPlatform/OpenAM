@@ -115,6 +115,38 @@ public class CollectionUtilsTest {
         CollectionUtils.transformList(someList, new FailMapping());
     }
 
+    @Test
+    public void mapStringToIntWithinSet() {
+        // Given...
+        Set<String> setOfStrings = new HashSet<String>();
+        setOfStrings.add("12");
+        setOfStrings.add("34");
+        setOfStrings.add("56");
+        setOfStrings.add("78");
+        setOfStrings.add("90");
+
+        // When...
+        Set<Integer> setOfInt = CollectionUtils.transformSet(setOfStrings, new MapStringToInt());
+
+        // Then...
+        assertThat(setOfInt.size()).isEqualTo(5);
+        assertThat(setOfInt.contains(12)).isTrue();
+        assertThat(setOfInt.contains(34)).isTrue();
+        assertThat(setOfInt.contains(56)).isTrue();
+        assertThat(setOfInt.contains(78)).isTrue();
+        assertThat(setOfInt.contains(90)).isTrue();
+    }
+
+    @Test(expectedExceptions = SomeCheckedException.class)
+    public void mappingFailsWithinSet() throws SomeCheckedException {
+        // Given...
+        Set<String> someSet = new HashSet<String>();
+        someSet.add("abc");
+
+        // When...
+        CollectionUtils.transformSet(someSet, new FailMapping());
+    }
+
     /**
      * Mapper that maps a list of strings to a set of strings.
      */

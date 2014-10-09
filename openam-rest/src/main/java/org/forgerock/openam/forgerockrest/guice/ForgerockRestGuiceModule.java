@@ -22,6 +22,8 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.PrivilegeManager;
@@ -59,6 +61,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
 import org.forgerock.openam.rest.RestEndpointServlet;
 import org.forgerock.openam.rest.RestEndpoints;
+import org.forgerock.openam.rest.authz.PrivilegeDefinition;
 import org.forgerock.openam.rest.router.CTSPersistentStoreProxy;
 import org.forgerock.openam.rest.router.RestEndpointManager;
 import org.forgerock.openam.rest.router.RestEndpointManagerProxy;
@@ -129,6 +132,7 @@ public class ForgerockRestGuiceModule extends AbstractModule {
 
         bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
         bind(VersionSelector.class).in(Singleton.class);
+        bind(DelegationEvaluator.class).to(DelegationEvaluatorImpl.class).in(Singleton.class);
     }
 
     @Provides
@@ -230,44 +234,57 @@ public class ForgerockRestGuiceModule extends AbstractModule {
         return new EntitlementsResourceErrorMappingProvider().get();
     }
 
+    @Provides
+    @Singleton
+    public Map<String, PrivilegeDefinition> getPrivilegeDefinitions() {
+        final Map<String, PrivilegeDefinition> definitions = new HashMap<String, PrivilegeDefinition>();
+
+        final PrivilegeDefinition evaluateDefinition = PrivilegeDefinition
+                .getInstance("evaluate", PrivilegeDefinition.Action.READ);
+        definitions.put("evaluate", evaluateDefinition);
+        definitions.put("evaluateTree", evaluateDefinition);
+
+        return definitions;
+    }
+
     /**
      * Provides the mapping between entitlements exceptions and CREST resource exceptions, based on the entitlements
      * error code. Anything not explicitly mapped here will be treated as an internal server error.
      */
-    private static class EntitlementsResourceErrorMappingProvider implements  Provider<Map<Integer, Integer>> {
+    private static class EntitlementsResourceErrorMappingProvider implements Provider<Map<Integer, Integer>> {
         @Override
         public Map<Integer, Integer> get() {
             final Map<Integer, Integer> handlers = new HashMap<Integer, Integer>();
 
-            handlers.put(EntitlementException.EMPTY_PRIVILEGE_NAME,         ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.NULL_ENTITLEMENT,             ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.UNSUPPORTED_OPERATION,        ResourceException.NOT_SUPPORTED);
-            handlers.put(EntitlementException.INVALID_XML,                  ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_WSDL_LOCATION,        ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.MISSING_PRIVILEGE_JSON,       ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.SESSION_HAS_EXPIRED,          ResourceException.FORBIDDEN);
-            handlers.put(EntitlementException.INVALID_JSON,                 ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.MISSING_PRIVILEGE_NAME,       ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.NO_SUCH_POLICY,               ResourceException.NOT_FOUND);
-            handlers.put(EntitlementException.APPLICATION_ALREADY_EXISTS,   ResourceException.CONFLICT);
-            handlers.put(EntitlementException.NO_SUCH_REFERRAL_PRIVILEGE,   ResourceException.NOT_FOUND);
-            handlers.put(EntitlementException.INCONSISTENT_WILDCARDS,       ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_PORT,                 ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.MALFORMED_URL,                ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_RESOURCE,             ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.NO_SUCH_APPLICATION,          ResourceException.NOT_FOUND);
-            handlers.put(EntitlementException.NOT_FOUND,                    ResourceException.NOT_FOUND);
-            handlers.put(EntitlementException.PERMISSION_DENIED,            ResourceException.FORBIDDEN);
-            handlers.put(EntitlementException.SUBJECT_REQUIRED,             ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_SEARCH_FILTER,        ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.INVALID_PROPERTY_VALUE,       ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.START_DATE_AFTER_END_DATE,    ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.MISSING_RESOURCE,             ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.JSON_PARSE_ERROR,             ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.AUTHENTICATION_ERROR,         ResourceException.FORBIDDEN);
-            handlers.put(EntitlementException.INVALID_VALUE,                ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.POLICY_NAME_MISMATCH,         ResourceException.BAD_REQUEST);
-            handlers.put(EntitlementException.APP_RETRIEVAL_ERROR,          ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.EMPTY_PRIVILEGE_NAME, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.NULL_ENTITLEMENT, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.UNSUPPORTED_OPERATION, ResourceException.NOT_SUPPORTED);
+            handlers.put(EntitlementException.INVALID_XML, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_WSDL_LOCATION, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.MISSING_PRIVILEGE_JSON, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.SESSION_HAS_EXPIRED, ResourceException.FORBIDDEN);
+            handlers.put(EntitlementException.INVALID_JSON, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.MISSING_PRIVILEGE_NAME, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.NO_SUCH_POLICY, ResourceException.NOT_FOUND);
+            handlers.put(EntitlementException.APPLICATION_ALREADY_EXISTS, ResourceException.CONFLICT);
+            handlers.put(EntitlementException.NO_SUCH_REFERRAL_PRIVILEGE, ResourceException.NOT_FOUND);
+            handlers.put(EntitlementException.INCONSISTENT_WILDCARDS, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_PORT, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.MALFORMED_URL, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_RESOURCE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.NO_SUCH_APPLICATION, ResourceException.NOT_FOUND);
+            handlers.put(EntitlementException.NOT_FOUND, ResourceException.NOT_FOUND);
+            handlers.put(EntitlementException.PERMISSION_DENIED, ResourceException.FORBIDDEN);
+            handlers.put(EntitlementException.SUBJECT_REQUIRED, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_SEARCH_FILTER, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.INVALID_PROPERTY_VALUE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.START_DATE_AFTER_END_DATE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.MISSING_RESOURCE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.JSON_PARSE_ERROR, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.AUTHENTICATION_ERROR, ResourceException.FORBIDDEN);
+            handlers.put(EntitlementException.INVALID_VALUE, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.POLICY_NAME_MISMATCH, ResourceException.BAD_REQUEST);
+            handlers.put(EntitlementException.APP_RETRIEVAL_ERROR, ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.UNKNOWN_POLICY_CLASS,         ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_CAST_EXCEPTION,  ResourceException.BAD_REQUEST);
             handlers.put(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,ResourceException.BAD_REQUEST);

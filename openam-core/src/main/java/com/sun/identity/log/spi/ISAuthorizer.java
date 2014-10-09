@@ -40,7 +40,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.shared.Constants;
@@ -109,7 +109,7 @@ public class ISAuthorizer implements IAuthorizer {
                                 thisSubConfig,              // subConfig name
                                 actSet,                     // actions
                                 tmap);                      // extensions
-                    DelegationEvaluator de = new DelegationEvaluator();
+                    DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
                     if (de.isAllowed(ssoToken, dp, null)) {
                         return true;
                     } else {

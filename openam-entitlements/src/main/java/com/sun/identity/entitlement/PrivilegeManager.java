@@ -215,7 +215,9 @@ public abstract class PrivilegeManager implements IPrivilegeManager<Privilege> {
 
         List<Privilege> results = new ArrayList<Privilege>(privilegeNames.size());
 
-        ApplicationPrivilegeManager applPrivilegeMgr = ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
+        ApplicationPrivilegeManager applPrivilegeMgr = ApplicationPrivilegeManager
+                .getInstance(realm, PrivilegeManager.superAdminSubject);
 
         for (String name : privilegeNames) {
             Privilege privilege = findByName(name, PrivilegeManager.superAdminSubject);

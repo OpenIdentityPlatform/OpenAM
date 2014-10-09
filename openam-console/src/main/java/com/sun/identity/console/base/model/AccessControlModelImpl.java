@@ -30,7 +30,7 @@ package com.sun.identity.console.base.model;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.security.AdminTokenAction;
@@ -84,8 +84,8 @@ public class AccessControlModelImpl
                 canView = true;
             } else {
                 try {
-                    DelegationEvaluator delegationEvaluator =
-                        new DelegationEvaluator();
+                    DelegationEvaluatorImpl delegationEvaluator =
+                        new DelegationEvaluatorImpl();
                     DelegationPermission delegationPermission =
                         new DelegationPermission();
                     delegationPermission.setVersion("*");
@@ -131,7 +131,7 @@ public class AccessControlModelImpl
     }
 
     private boolean hasPermission(
-        DelegationEvaluator delegationEvaluator,
+        DelegationEvaluatorImpl delegationEvaluator,
         DelegationPermission delegationPermission,
         String serviceName,
         String privilege

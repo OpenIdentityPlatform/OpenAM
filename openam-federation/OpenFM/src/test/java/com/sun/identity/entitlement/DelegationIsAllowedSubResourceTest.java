@@ -31,7 +31,7 @@ package com.sun.identity.entitlement;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.entitlement.opensso.OpenSSOUserSubject;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
@@ -169,7 +169,7 @@ public class DelegationIsAllowedSubResourceTest {
             "sunEntitlementService", "1.0", "application", 
             "default/application/*",
             actions, null);
-        DelegationEvaluator de = new DelegationEvaluator();
+        DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
         if (!de.isAllowed(token, dp, Collections.EMPTY_MAP, true)) {
             throw new Exception(
                 "DelegationIsAllowedSubResourceTest.test: failed");

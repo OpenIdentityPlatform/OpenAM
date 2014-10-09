@@ -80,8 +80,10 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
     public void addPolicy(Subject subject, String realm,
         Privilege privilege)
         throws EntitlementException {
+
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager applPrivilegeMgr =
-            ApplicationPrivilegeManager.getInstance(realm, subject);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
 
         if (!applPrivilegeMgr.hasPrivilege(privilege,
             ApplicationPrivilege.Action.MODIFY)) {
@@ -300,8 +302,9 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             throw new EntitlementException(211, params);
         }
 
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager applPrivilegeMgr =
-            ApplicationPrivilegeManager.getInstance(realm, subject);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
 
         if (!applPrivilegeMgr.hasPrivilege(privilege,
             ApplicationPrivilege.Action.MODIFY)) {
@@ -367,9 +370,10 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             Object[] params = {name};
             throw new EntitlementException(260, params);
         }
-        
+
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager applPrivilegeMgr =
-            ApplicationPrivilegeManager.getInstance(realm, subject);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
 
         if (!applPrivilegeMgr.hasPrivilege(referral,
             ApplicationPrivilege.Action.MODIFY)) {
@@ -446,8 +450,10 @@ public class OpenSSOPolicyDataStore extends PolicyDataStore {
             Object[] params = {name};
             throw new EntitlementException(266, params);
         }
+
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager applPrivilegeMgr =
-            ApplicationPrivilegeManager.getInstance(realm, subject);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
 
         if (!applPrivilegeMgr.hasPrivilege(referral,
             ApplicationPrivilege.Action.MODIFY)) {

@@ -31,8 +31,13 @@
  */
 package com.sun.identity.delegation;
 
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.DNMapper;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +51,11 @@ import java.util.Set;
 
 public class DelegationPermission {
 
-    String orgName;
+    private static String WILDCARD = "*";
+
+    private final Function<String, String, NeverThrowsException> orgNameToDNFunc;
+
+    private String orgName;
 
     private String serviceName;
 
@@ -60,15 +69,14 @@ public class DelegationPermission {
 
     private Map extensions;
 
-    static final Debug debug = DelegationManager.debug;
-
-    static String WILDCARD = "*";
 
     /**
      * Default constructor for <code>DelegationPermission</code>.
      */
-
     public DelegationPermission() {
+        orgNameToDNFunc = InjectorHolder.getInstance(
+                Key.get(new TypeLiteral<Function<String, String, NeverThrowsException>>() {},
+                        Names.named("orgNameToDN")));
     }
 
     /**
@@ -76,22 +84,24 @@ public class DelegationPermission {
      * delegation permission object with a realm name, a service name, a service
      * version number, a config type, a subconfig name, a set of actions, and a
      * <code>Map</code> for extensions.
-     * 
-     * @param orgName The realm name in the delegation permission
      *
-     * @param serviceName The service name in the delegation permission
+     * @param orgName
+     *         The realm name in the delegation permission
+     * @param serviceName
+     *         The service name in the delegation permission
+     * @param version
+     *         The service version in the delegation permission
+     * @param configType
+     *         The config type in the delegation permission
+     * @param subConfigName
+     *         The subconfig name in the delegation permission
+     * @param actions
+     *         The action names in the delegation permission
+     * @param extensions
+     *         a placeholder for future extensions
      *
-     * @param version The service version in the delegation permission
-     *
-     * @param configType The config type in the delegation permission
-     *
-     * @param subConfigName The subconfig name in the delegation permission
-     *
-     * @param actions The action names in the delegation permission
-     *
-     * @param extensions a placeholder for future extensions
-     *
-     * @throws DelegationException if unable to create the <code>
+     * @throws DelegationException
+     *         if unable to create the <code>
      *         DelegationPermission</code> object.
      */
     public DelegationPermission(
@@ -103,6 +113,52 @@ public class DelegationPermission {
             Set actions,
             Map extensions
     ) throws DelegationException {
+        this();
+        setOrganizationName(orgName);
+        this.serviceName = serviceName;
+        this.serviceVersion = version;
+        this.configType = configType;
+        this.subConfigName = subConfigName;
+        this.actions = actions;
+        this.extensions = extensions;
+    }
+
+    /**
+     * Constructor for <code>DelegationPermission</code>. Constructs a
+     * delegation permission object with a realm name, a service name, a service
+     * version number, a config type, a subconfig name, a set of actions, and a
+     * <code>Map</code> for extensions.
+     *
+     * @param orgName
+     *         The realm name in the delegation permission
+     * @param serviceName
+     *         The service name in the delegation permission
+     * @param version
+     *         The service version in the delegation permission
+     * @param configType
+     *         The config type in the delegation permission
+     * @param subConfigName
+     *         The subconfig name in the delegation permission
+     * @param actions
+     *         The action names in the delegation permission
+     * @param extensions
+     *         a placeholder for future extensions
+     *
+     * @throws DelegationException
+     *         if unable to create the <code>
+     *         DelegationPermission</code> object.
+     */
+    public DelegationPermission(
+            String orgName,
+            String serviceName,
+            String version,
+            String configType,
+            String subConfigName,
+            Set actions,
+            Map extensions,
+            Function<String, String, NeverThrowsException> orgNameToDNFunc
+    ) throws DelegationException {
+        this.orgNameToDNFunc = orgNameToDNFunc;
         setOrganizationName(orgName);
         this.serviceName = serviceName;
         this.serviceVersion = version;
@@ -114,38 +170,32 @@ public class DelegationPermission {
 
     /**
      * Returns the realm name in the permission
-     * 
+     *
      * @return <code>String</code> representing the realm name in the permission
      */
-
     public String getOrganizationName() {
         return orgName;
     }
 
     /**
      * Sets the realm name in the permission
-     * 
-     * @param name  <code>String</code> representing the realm name in the 
-              <code>DelegationPermission</code>.
-     * @throws DelegationException if name is invalid
+     *
+     * @param name
+     *         <code>String</code> representing the realm name in the
+     *         <code>DelegationPermission</code>.
+     *
+     * @throws DelegationException
+     *         if name is invalid
      */
-
     public void setOrganizationName(String name) throws DelegationException {
-        if (name != null) {
-            int index = name.indexOf(WILDCARD);
-            if (index != -1) {
-                orgName = name;
-                return;
-            }
-        }
-        orgName = DNMapper.orgNameToDN(name);
+        orgName = (name != null && name.contains(WILDCARD)) ? name : orgNameToDNFunc.apply(name);
     }
 
     /**
      * Returns the service name in the permission
-     * 
-     * @return <code>String</code> representing the service name in the 
-               <code>DelegationPermission</code>
+     *
+     * @return <code>String</code> representing the service name in the
+     * <code>DelegationPermission</code>
      */
 
     public String getServiceName() {
@@ -154,9 +204,12 @@ public class DelegationPermission {
 
     /**
      * Sets the service name in the permission
-     * 
-     * @param name  The service name in the delegation permission
-     * @throws DelegationException if name is invalid
+     *
+     * @param name
+     *         The service name in the delegation permission
+     *
+     * @throws DelegationException
+     *         if name is invalid
      */
 
     public void setServiceName(String name) throws DelegationException {
@@ -165,7 +218,7 @@ public class DelegationPermission {
 
     /**
      * Returns the service version in the permission
-     * 
+     *
      * @return the service version in the permission
      */
 
@@ -175,9 +228,12 @@ public class DelegationPermission {
 
     /**
      * Sets the service version in the permission
-     * 
-     * @param version The service version in the delegation permission
-     * @throws DelegationException if version is invalid
+     *
+     * @param version
+     *         The service version in the delegation permission
+     *
+     * @throws DelegationException
+     *         if version is invalid
      */
 
     public void setVersion(String version) throws DelegationException {
@@ -186,7 +242,7 @@ public class DelegationPermission {
 
     /**
      * Returns the config type in the permission
-     * 
+     *
      * @return the config type in the permission
      */
 
@@ -196,9 +252,12 @@ public class DelegationPermission {
 
     /**
      * Sets the config type in the permission
-     * 
-     * @param configType  The config type in the delegation permission
-     * @throws DelegationException if config type is invalid
+     *
+     * @param configType
+     *         The config type in the delegation permission
+     *
+     * @throws DelegationException
+     *         if config type is invalid
      */
 
     public void setConfigType(String configType) throws DelegationException {
@@ -207,7 +266,7 @@ public class DelegationPermission {
 
     /**
      * Returns the subconfig name in the permission
-     * 
+     *
      * @return the subconfig name in the permission
      */
 
@@ -217,9 +276,12 @@ public class DelegationPermission {
 
     /**
      * Sets the subconfig name in the permission
-     * 
-     * @param name The subconfig name in the delegation permission
-     * @throws DelegationException if subconfig name is invalid
+     *
+     * @param name
+     *         The subconfig name in the delegation permission
+     *
+     * @throws DelegationException
+     *         if subconfig name is invalid
      */
 
     public void setSubConfigName(String name) throws DelegationException {
@@ -228,7 +290,7 @@ public class DelegationPermission {
 
     /**
      * Returns the action names in the permission
-     * 
+     *
      * @return the action names in the permission
      */
 
@@ -238,9 +300,12 @@ public class DelegationPermission {
 
     /**
      * Sets the action names in the permission
-     * 
-     * @param actions  The action names in the delegation permission
-     * @throws DelegationException if an action name is invalid
+     *
+     * @param actions
+     *         The action names in the delegation permission
+     *
+     * @throws DelegationException
+     *         if an action name is invalid
      */
 
     public void setActions(Set actions) throws DelegationException {
@@ -249,7 +314,7 @@ public class DelegationPermission {
 
     /**
      * Returns the extensions in the permission
-     * 
+     *
      * @return the extensions in the permission
      */
 
@@ -259,22 +324,81 @@ public class DelegationPermission {
 
     /**
      * Sets the extensions in the permission
-     * 
-     * @param extensions   The extensions in the delegation permission
-     * @throws DelegationException if some info in extensions is invalid
+     *
+     * @param extensions
+     *         The extensions in the delegation permission
+     *
+     * @throws DelegationException
+     *         if some info in extensions is invalid
      */
 
     public void setExtensions(Map extensions) throws DelegationException {
         this.extensions = extensions;
     }
 
-     /**
-      * Returns the <code>String</code> representation of this
-      * object.
-      *
-      * @return the <code>String</code> representation of the
-      * <code>DelegationPermission</code> object.
-      */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof DelegationPermission)) {
+            return false;
+        }
+
+        final DelegationPermission other = (DelegationPermission)o;
+
+        if (orgName == null ? other.orgName != null : !orgName.equals(other.orgName)) {
+            return false;
+        }
+
+        if (serviceName == null ? other.serviceName != null : !serviceName.equals(other.serviceName)) {
+            return false;
+        }
+
+        if (serviceVersion == null ? other.serviceVersion != null : !serviceVersion.equals(other.serviceVersion)) {
+            return false;
+        }
+
+        if (configType == null ? other.configType != null : !configType.equals(other.configType)) {
+            return false;
+        }
+
+        if (subConfigName == null ? other.subConfigName != null : !subConfigName.equals(other.subConfigName)) {
+            return false;
+        }
+
+        if (actions == null ? other.actions != null : !actions.equals(other.actions)) {
+            return false;
+        }
+
+        if (extensions == null ? other.extensions != null : !extensions.equals(other.extensions)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + (orgName != null ? orgName.hashCode() : 0);
+        result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
+        result = 31 * result + (serviceVersion != null ? serviceVersion.hashCode() : 0);
+        result = 31 * result + (configType != null ? configType.hashCode() : 0);
+        result = 31 * result + (subConfigName != null ? subConfigName.hashCode() : 0);
+        result = 31 * result + (actions != null ? actions.hashCode() : 0);
+        result = 31 * result + (extensions != null ? extensions.hashCode() : 0);
+        return result;
+    }
+
+    /**
+     * Returns the <code>String</code> representation of this
+     * object.
+     *
+     * @return the <code>String</code> representation of the
+     * <code>DelegationPermission</code> object.
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder(200);
         sb.append("\nDelegationPermission Object:");

@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
 import java.security.AccessController;
+
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.shared.ldap.util.DN;
 
 import com.iplanet.sso.SSOToken;
@@ -46,7 +48,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.am.util.Cache;
 import com.iplanet.am.util.SystemProperties;
 
-import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.security.AdminTokenAction;
 
 import com.sun.identity.idm.AMIdentityRepository;
@@ -1167,7 +1168,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
             "sunAMRealmService", "1.0", "organizationconfig", null,
              action, Collections.EMPTY_MAP);
         // Call DelegationEvaluator to handle super and internal users
-        DelegationEvaluator evaluator = new DelegationEvaluator();
+        DelegationEvaluatorImpl evaluator = new DelegationEvaluatorImpl();
         return (evaluator.isAllowed(token, de, Collections.EMPTY_MAP));
     }
 }

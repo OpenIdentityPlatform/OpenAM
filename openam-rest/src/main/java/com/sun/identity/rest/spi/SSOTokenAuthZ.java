@@ -31,7 +31,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.rest.ISubjectable;
@@ -88,7 +88,7 @@ public class SSOTokenAuthZ implements IAuthorization {
             try {
                 Subject clientSubject =
                     ((ISubjectable) clientPrincipal).createSubject();
-                DelegationEvaluator eval = new DelegationEvaluator();
+                DelegationEvaluatorImpl eval = new DelegationEvaluatorImpl();
                 SSOToken token = SubjectUtils.getSSOToken(clientSubject);
 
                 String action = mapMethodToAction.get((

@@ -147,4 +147,35 @@ public class CollectionUtils {
         return newList;
     }
 
+    /**
+     * Maps the values of a non-null set from one type to another type using a non-null mapper function.
+     *
+     * @param set
+     *         the non-null original set
+     * @param mapper
+     *         the non-null mapping function
+     * @param <I>
+     *         the type of the initial value
+     * @param <M>
+     *         the type of the mapped value
+     * @param <E>
+     *         the type of exception that the function may throw
+     *
+     * @return a new list with the mapped values
+     *
+     * @throws E
+     *         should an exception occur during the mapping process
+     */
+    public static <I, M, E extends Exception> Set<M> transformSet(final Set<I> set,
+                                                                  final Function<I, M, E> mapper) throws E {
+        Reject.ifNull(set, mapper);
+        final Set<M> newSet = new HashSet<M>(set.size());
+
+        for (I value : set) {
+            newSet.add(mapper.apply(value));
+        }
+
+        return newSet;
+    }
+
 }

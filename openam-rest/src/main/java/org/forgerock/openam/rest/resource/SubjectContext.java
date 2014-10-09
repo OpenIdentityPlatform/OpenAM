@@ -16,6 +16,8 @@
 
 package org.forgerock.openam.rest.resource;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import org.forgerock.json.resource.Context;
 
 import javax.security.auth.Subject;
@@ -44,5 +46,15 @@ public interface SubjectContext extends Context {
      * @return the corresponding subject, or null if the token Id is invalid
      */
     Subject getSubject(String tokenId);
+
+    /**
+     * Returns the authenticated subjects sso token associated with this request.
+     *
+     * @return the SSO token associated with this request
+     *
+     * @throws SSOException
+     *         should an error occur retrieving the token
+     */
+    SSOToken getCallerSSOToken() throws SSOException;
 
 }

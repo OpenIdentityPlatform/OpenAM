@@ -117,6 +117,7 @@ public class ConfigureData {
         createRealm(HIDDEN_REALM);
         createPolicies(HIDDEN_REALM, baseDir + "/defaultDelegationPolicies.xml");
         createPolicies(HIDDEN_REALM, baseDir + "/validationServiceDelegationPolicy.xml");
+        createPolicies(HIDDEN_REALM, baseDir + "/policyServiceDelegationPolicies.xml");
     }
 
     private void setRealmAttributes()

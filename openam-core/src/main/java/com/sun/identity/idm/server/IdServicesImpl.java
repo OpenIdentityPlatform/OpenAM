@@ -40,6 +40,7 @@ import java.util.Set;
 
 import javax.security.auth.callback.Callback;
 
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 
@@ -50,7 +51,6 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.common.DNUtils;
-import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.delegation.DelegationPermission;
@@ -2764,7 +2764,7 @@ public class IdServicesImpl implements IdServices {
            thisAction = WRITE_ACTION;
        }
        try {
-           DelegationEvaluator de = new DelegationEvaluator();
+           DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
            String resource = type.getName();
            if (name != null) {
                resource += "/" + name;

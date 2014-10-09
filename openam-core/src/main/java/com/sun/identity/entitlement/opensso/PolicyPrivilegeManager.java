@@ -152,8 +152,9 @@ public class PolicyPrivilegeManager extends PrivilegeManager {
 
             if (adminSubject != PrivilegeManager.superAdminSubject) {
                 if (privilege != null) {
+                    // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
                     ApplicationPrivilegeManager applPrivilegeMgr =
-                            ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+                            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
                     if (!applPrivilegeMgr.hasPrivilege(privilege,
                         ApplicationPrivilege.Action.READ)) {
                         throw new EntitlementException(326);

@@ -27,19 +27,23 @@ import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ConfigurationObserver;
+import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.entitlement.EntitlementConfiguration;
 import com.sun.identity.entitlement.opensso.SubjectUtils;
 import com.sun.identity.entitlement.xacml3.XACMLConstants;
 import com.sun.identity.entitlement.xacml3.validation.RealmValidator;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import org.forgerock.guice.core.GuiceModule;
@@ -80,6 +84,8 @@ import org.forgerock.openam.sm.SMSConfigurationFactory;
 import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.forgerock.openam.utils.Config;
 import org.forgerock.opendj.ldap.SearchResultHandler;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 
 import javax.inject.Inject;
@@ -206,6 +212,28 @@ public class CoreGuiceModule extends AbstractModule {
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
+
+        bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
+                .annotatedWith(Names.named("orgNameToDN"))
+                .toInstance(new Function<String, String, NeverThrowsException>() {
+
+                    @Override
+                    public String apply(String orgName) {
+                        return DNMapper.orgNameToDN(orgName);
+    }
+
+                });
+
+        bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
+                .annotatedWith(Names.named("tagSwapFunc"))
+                .toInstance(new Function<String, String, NeverThrowsException>() {
+
+                    @Override
+                    public String apply(String text) {
+                        return ServicesDefaultValues.tagSwap(text, true);
+                    }
+
+                });
     }
 
     @Provides @Inject @Named(PolicyMonitorImpl.EXECUTOR_BINDING_NAME)
@@ -277,6 +305,21 @@ public class CoreGuiceModule extends AbstractModule {
         }
 
         return result;
+    }
+
+    @Provides
+    @Inject
+    @Named(DelegationManager.DELEGATION_SERVICE)
+    ServiceConfigManager getServiceConfigManagerForDelegation(final PrivilegedAction<SSOToken> adminTokenAction) {
+        try {
+            final SSOToken adminToken = AccessController.doPrivileged(adminTokenAction);
+            return new ServiceConfigManager(DelegationManager.DELEGATION_SERVICE, adminToken);
+
+        } catch (SMSException smsE) {
+            throw new IllegalStateException("Failed to retrieve the service config manager for delegation", smsE);
+        } catch (SSOException ssoE) {
+            throw new IllegalStateException("Failed to retrieve the service config manager for delegation", ssoE);
+        }
     }
 
     /**

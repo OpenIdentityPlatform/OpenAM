@@ -41,7 +41,7 @@ import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.shared.debug.Debug;
@@ -675,7 +675,7 @@ public class OrgConfigViaAMSDK {
         boolean answer = false;
         if (token != null) {
             try {
-                DelegationEvaluator de = new DelegationEvaluator();
+                DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
                 DelegationPermission dp = new DelegationPermission(realm,
                     com.sun.identity.sm.SMSEntry.REALM_SERVICE, "1.0", "*",
                     "*", action, Collections.EMPTY_MAP);

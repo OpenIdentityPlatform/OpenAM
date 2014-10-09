@@ -200,7 +200,9 @@ public class Evaluator {
 
         long startTime = System.currentTimeMillis();
 
-        Application application = ApplicationManager.getApplication(adminSubject, realm, applicationName);
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
+        Application application = ApplicationManager
+                .getApplication(PrivilegeManager.superAdminSubject, realm, applicationName);
 
         if (application == null) {
             // App retrieval error.

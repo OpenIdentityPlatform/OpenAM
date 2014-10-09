@@ -25,7 +25,8 @@
    "Portions Copyrighted [year] [name of copyright owner]"
   
    $Id: amDelegation.xml,v 1.15 2009/12/21 22:02:42 veiming Exp $
-  
+
+   Portions copyright 2014 ForgeRock AS.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -324,6 +325,46 @@
                             <Value>READ</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceModify" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/modify</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>MODIFY</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="PolicyResourceEvaluate" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/policies/evaluate</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationResourceRead" id="Permission">
+                        <AttributeValuePair>
+                            <Attribute name="resource" />
+                            <Value>REALM/rest/1.0/applications/read</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="actions" />
+                            <Value>READ</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
                 </SubConfiguration>
                 <SubConfiguration name="Privileges">
                     <SubConfiguration name="RealmAdmin" id="Privilege">
@@ -396,18 +437,27 @@
                             <Value>EntitlementRESTDecisions</Value>
                             <Value>EntitlementRESTEntitlement</Value>
                             <Value>EntitlementRESTEntitlements</Value>
+                            <Value>PolicyResourceEvaluate</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="PrivilegeRestReadAccess" id="Privilege">
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>EntitlementRESTPrivilegeRead</Value>
+                            <Value>PolicyResourceRead</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="PrivilegeRestAccess" id="Privilege">
                         <AttributeValuePair>
                             <Attribute name="listOfPermissions" />
                             <Value>EntitlementRESTPrivilegeWrite</Value>
+                            <Value>PolicyResourceModify</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="ApplicationReadAccess" id="Privilege">
+                        <AttributeValuePair>
+                            <Attribute name="listOfPermissions" />
+                            <Value>ApplicationResourceRead</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
                 </SubConfiguration>

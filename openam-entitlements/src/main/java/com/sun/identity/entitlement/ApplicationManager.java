@@ -83,9 +83,10 @@ public final class ApplicationManager {
             return ec.searchApplicationNames(adminSubject, filters);
         }
 
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager apm =
             ApplicationPrivilegeManager.getInstance(realm,
-            adminSubject);
+            PrivilegeManager.superAdminSubject);
         Set<String> applNames = apm.getApplications(
             ApplicationPrivilege.Action.READ);
         return filterApplicationNames(realm, applNames, filters);
@@ -269,8 +270,9 @@ public final class ApplicationManager {
         }
 
         Set<Application> accessible = new HashSet<Application>();
+        // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
         ApplicationPrivilegeManager apm =
-            ApplicationPrivilegeManager.getInstance(realm, adminSubject);
+            ApplicationPrivilegeManager.getInstance(realm, PrivilegeManager.superAdminSubject);
         Set<String> accessibleApplicationNames =
             apm.getApplications(ApplicationPrivilege.Action.READ);
 
@@ -394,7 +396,7 @@ public final class ApplicationManager {
         boolean allow = (adminSubject == PrivilegeManager.superAdminSubject);
         
         if (!allow) {
-            ApplicationPrivilegeManager apm = 
+            ApplicationPrivilegeManager apm =
                 ApplicationPrivilegeManager.getInstance(realm, adminSubject);
             if (isNewApplication(realm, application)) {
                 allow = apm.canCreateApplication(realm);
@@ -602,7 +604,8 @@ public final class ApplicationManager {
     ) throws EntitlementException {
         boolean allowed = (adminSubject == PrivilegeManager.superAdminSubject);
         if (!allowed) {
-            allowed = hasAccessToApplication(parentRealm, adminSubject,
+            // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
+            allowed = hasAccessToApplication(parentRealm, PrivilegeManager.superAdminSubject,
                 applicationName, ApplicationPrivilege.Action.MODIFY);
         }
 
@@ -638,7 +641,8 @@ public final class ApplicationManager {
     ) throws EntitlementException {
         boolean allowed = (adminSubject == PrivilegeManager.superAdminSubject);
         if (!allowed) {
-            allowed = hasAccessToApplication(referRealm, adminSubject,
+            // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
+            allowed = hasAccessToApplication(referRealm, PrivilegeManager.superAdminSubject,
                 applicationName, ApplicationPrivilege.Action.MODIFY);
         }
 
@@ -666,7 +670,8 @@ public final class ApplicationManager {
     ) throws EntitlementException {
         boolean allowed = (adminSubject == PrivilegeManager.superAdminSubject);
         if (!allowed) {
-            allowed = hasAccessToApplication(realm, adminSubject,
+            // Delegation to applications is currently not configurable, passing super admin (see AME-4959)
+            allowed = hasAccessToApplication(realm, PrivilegeManager.superAdminSubject,
                 applicationTypeName, ApplicationPrivilege.Action.READ);
         }
 

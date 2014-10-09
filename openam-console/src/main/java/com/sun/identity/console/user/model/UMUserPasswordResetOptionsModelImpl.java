@@ -34,7 +34,7 @@ import com.sun.identity.console.base.model.AMAdminConstants;
 import com.sun.identity.console.base.model.AMAdminUtils;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.base.model.AMModelBase;
-import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
@@ -530,7 +530,7 @@ public class UMUserPasswordResetOptionsModelImpl
         try {
             Set actionNames = new HashSet();
             actionNames.add("MODIFY");
-            DelegationEvaluator de = new DelegationEvaluator();
+            DelegationEvaluatorImpl de = new DelegationEvaluatorImpl();
             DelegationPermission permission =
                     new DelegationPermission(token.getProperty(
                     Constants.ORGANIZATION), "sunAMRealmService",
