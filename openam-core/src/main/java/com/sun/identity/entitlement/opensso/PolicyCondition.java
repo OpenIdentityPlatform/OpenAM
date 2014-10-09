@@ -51,6 +51,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.sun.identity.entitlement.EntitlementException.UNKNOWN_POLICY_CLASS;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_CAST_EXCEPTION;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE;
+import static com.sun.identity.entitlement.EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE;
+import static com.sun.identity.entitlement.EntitlementException.INVALID_PROPERTY_VALUE_UNKNOWN_VALUE;
+
 /**
  * This condition wraps all OpenSSO policy condition.
  */
@@ -234,8 +240,16 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
             Condition cond = Class.forName(className).asSubclass(Condition.class).newInstance();
             cond.setProperties(properties);
             return cond;
-        } catch (Exception ex) {
-            throw new EntitlementException(510, ex);
+        } catch (ClassNotFoundException cnfe) {
+            throw new EntitlementException(UNKNOWN_POLICY_CLASS, new String[]{className}, cnfe);
+        } catch (ClassCastException cce) {
+            throw new EntitlementException(POLICY_CLASS_CAST_EXCEPTION, new String[]{className, Condition.class.getName()}, cce);
+        } catch (InstantiationException ie) {
+            throw new EntitlementException(POLICY_CLASS_NOT_INSTANTIABLE, new String[]{className}, ie);
+        } catch (IllegalAccessException iae) {
+            throw new EntitlementException(POLICY_CLASS_NOT_ACCESSIBLE, new String[]{className}, iae);
+        } catch (PolicyException pe) {
+            throw new EntitlementException(INVALID_PROPERTY_VALUE_UNKNOWN_VALUE, new String[]{className}, pe);
         }
     }
 }

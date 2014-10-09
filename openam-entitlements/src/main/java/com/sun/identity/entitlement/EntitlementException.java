@@ -79,9 +79,13 @@ public class EntitlementException extends Exception {
     public static final int INVALID_SEARCH_FILTER = 328;
     public static final int UNKNOWN_POLICY_CLASS = 329;
     public static final int UNKNOWN_RESOURCE_ATTRIBUTE_CLASS = 330;
+    public static final int POLICY_CLASS_CAST_EXCEPTION = 331;
+    public static final int POLICY_CLASS_NOT_INSTANTIABLE = 332;
+    public static final int POLICY_CLASS_NOT_ACCESSIBLE = 333;
     public static final int INVALID_PROPERTY_VALUE = 400;
     public static final int INVALID_VALUE = 401;
     public static final int START_DATE_AFTER_END_DATE = 402;
+    public static final int INVALID_PROPERTY_VALUE_UNKNOWN_VALUE = 405;
 
     public static final int MISSING_RESOURCE = 420;
     public static final int JSON_PARSE_ERROR = 425;
