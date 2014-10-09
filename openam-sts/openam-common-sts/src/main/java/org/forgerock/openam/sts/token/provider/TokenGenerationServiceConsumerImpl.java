@@ -16,30 +16,29 @@
 
 package org.forgerock.openam.sts.token.provider;
 
-import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.shared.sts.SharedSTSConstants;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenCreationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.service.invocation.ProofTokenState;
 import org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState;
 import org.forgerock.openam.sts.token.SAML2SubjectConfirmation;
 import org.forgerock.openam.sts.token.UrlConstituentCatenator;
-import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.forgerock.openam.sts.service.invocation.TokenGenerationServiceInvocationState.TokenGenerationServiceInvocationStateBuilder;
 
@@ -52,14 +51,17 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     private final String tokenGenerationServiceEndpoint;
     private final String crestVersion;
+    private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
     TokenGenerationServiceConsumerImpl(UrlConstituentCatenator urlConstituentCatenator,
                                        @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
                                        @Named(AMSTSConstants.REST_TOKEN_GENERATION_SERVICE_URI_ELEMENT) String tokenGenServiceUriElement,
-                                       @Named(AMSTSConstants.CREST_VERSION) String crestVersion) {
+                                       @Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+                                       HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
         tokenGenerationServiceEndpoint = urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, tokenGenServiceUriElement);
         this.crestVersion = crestVersion;
+        this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
     public String getSAML2BearerAssertion(String ssoTokenString,
@@ -126,44 +128,26 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     private String makeInvocation(String invocationString, String callerSSOTokenString) throws TokenCreationException {
         try {
-            HttpURLConnection connection = HttpURLConnectionManager.getConnection(new URL(tokenGenerationServiceEndpoint));
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);
-            connection.setRequestProperty(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
-            connection.setRequestProperty(COOKIE, createAMSessionCookie(callerSSOTokenString));
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(invocationString);
-            writer.close();
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(COOKIE, createAMSessionCookie(callerSSOTokenString));
 
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                return parseTokenResponse(getSuccessMessage(connection));
+            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
+                    .httpURLConnectionWrapper(new URL(tokenGenerationServiceEndpoint))
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.POST)
+                    .setRequestPayload(invocationString)
+                    .makeInvocation();
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return parseTokenResponse(connectionResult.getResult());
             } else {
-                return getErrorMessage(connection);
+                return connectionResult.getResult();
             }
         } catch (IOException e) {
             throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "Exception caught invoking TokenGenerationService: " + e);
-        }
-    }
-
-    private String getSuccessMessage(HttpURLConnection connection) throws IOException {
-        return readInputStream(connection.getInputStream());
-    }
-
-    private String getErrorMessage(HttpURLConnection connection) throws IOException {
-        if (connection.getErrorStream() != null) {
-            return readInputStream(connection.getErrorStream());
-        } else {
-            return readInputStream(connection.getInputStream());
-        }
-    }
-
-    private String readInputStream(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
-            throw new IOException("Empty error stream");
-        } else {
-            return IOUtils.readStream(inputStream);
         }
     }
 
@@ -186,7 +170,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
                             + response + "; The exception: " + e);
         }
         JsonValue assertionJson = responseContent.get(AMSTSConstants.ISSUED_TOKEN);
-        if (assertionJson.isNull() || !assertionJson.isString()) {
+        if (!assertionJson.isString()) {
             throw new TokenCreationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
                     "The json response returned from the TokenGenerationService did not have " +
                             "a non-null string element for the " + AMSTSConstants.ISSUED_TOKEN + " key. The json: "

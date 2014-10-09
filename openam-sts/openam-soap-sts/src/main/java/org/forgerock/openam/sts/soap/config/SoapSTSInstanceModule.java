@@ -48,8 +48,17 @@ import org.forgerock.openam.sts.soap.STSEndpoint;
 import org.forgerock.openam.sts.soap.SoapSTSCallbackHandler;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisher;
 import org.forgerock.openam.sts.soap.publish.STSInstancePublisherImpl;
-import org.forgerock.openam.sts.soap.token.config.*;
-import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.soap.token.config.TokenIssueOperationProvider;
+import org.forgerock.openam.sts.soap.token.config.TokenOperationFactory;
+import org.forgerock.openam.sts.soap.token.config.TokenOperationFactoryImpl;
+import org.forgerock.openam.sts.soap.token.config.TokenRenewOperationProvider;
+import org.forgerock.openam.sts.soap.token.config.TokenValidateOperationProvider;
+import org.forgerock.openam.sts.token.AMTokenParser;
+import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
@@ -70,8 +79,8 @@ import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.soap.config.user.SoapSTSInstanceConfig;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -110,8 +119,8 @@ public class SoapSTSInstanceModule extends AbstractModule {
         //we want only one instance of the TokenStore shared among all token operations
         bind(TokenStore.class).to(DefaultInMemoryTokenStore.class).in(Scopes.SINGLETON);
 
-        bind(AuthenticationUriProvider.class)
-                .to(AuthenticationUriProviderImpl.class);
+        bind(AuthenticationUrlProvider.class)
+                .to(AuthenticationUrlProviderImpl.class);
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
                 .to(UsernameTokenAuthenticationRequestDispatcher.class);

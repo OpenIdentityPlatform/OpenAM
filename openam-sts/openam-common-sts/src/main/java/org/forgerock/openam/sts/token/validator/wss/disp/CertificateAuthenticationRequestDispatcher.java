@@ -16,21 +16,21 @@
 
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
-import org.restlet.engine.header.Header;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-
-import java.net.URI;
-
-import org.restlet.util.Series;
 import org.slf4j.Logger;
 
 import javax.inject.Named;
@@ -42,20 +42,24 @@ import javax.inject.Named;
  */
 public class CertificateAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<X509Certificate[]> {
     private final String crestVersion;
+    private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
     private final Logger logger;
 
     @Inject
     public CertificateAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+                                                      HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory,
                                                       Logger logger) {
         this.crestVersion = crestVersion;
+        this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
         this.logger = logger;
     }
 
     @Override
-    public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) throws TokenValidationException {
+    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) throws TokenValidationException {
         /*
         The common practice in the cxf-sts and wss4j is just to use the first element in the array, as this is the leaf
-        cert, and all others correspond to CAs, which will be in the targeted destination's trust store.
+        cert, and all others correspond to CAs, which will be in the targeted destination's trust store. TODO: this should
+        be revisited when OPENAM-4597 is fixed.
          */
         if (certificates.length > 1) {
             StringBuilder stringBuilder = new StringBuilder("Dealing with more than a single certificate. Their DNs:");
@@ -64,11 +68,12 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
             }
             logger.warn(stringBuilder.toString());
         }
-        return postCertInHeader(uri, certificates[0], target);
+        return postCertInHeader(url, certificates[0], target);
     }
 
-    private Representation postCertInHeader(URI uri, X509Certificate certificate,
-                                            AuthTargetMapping.AuthTarget target) throws TokenValidationException {
+    private String postCertInHeader(URL url, X509Certificate certificate, AuthTargetMapping.AuthTarget target)
+            throws TokenValidationException {
+
         final String base64Certificate;
         try {
             base64Certificate = Base64.encode(certificate.getEncoded());
@@ -76,15 +81,6 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.BAD_REQUEST,
                     "Could not obtain the base64-encoded representation of the client certificate: " + e, e);
         }
-        ClientResource resource = new ClientResource(uri);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
-        headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
-
         if (target == null) {
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.BAD_REQUEST,
                     "When validatating X509 Certificates, an AuthTarget needs to be configured with a Map containing a String " +
@@ -98,12 +94,27 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
                             "entry referenced by key" + AMSTSConstants.X509_TOKEN_AUTH_TARGET_HEADER_KEY +
                             " which specifies the header name which will reference the client's X509 Certificate.");
         }
-        headers.set((String)headerKey, base64Certificate);
+
         try {
-            return resource.post(null);
-        } catch (org.restlet.resource.ResourceException e) {
-            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting X509 Certificate " +
-                    "to rest authN: " + e, e);
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put((String)headerKey, base64Certificate);
+            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
+                    .httpURLConnectionWrapper(url)
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.POST)
+                    .makeInvocation();
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new TokenValidationException(responseCode, "Non-200 response from posting x509 token " +
+                        "to rest authN.");
+            } else {
+                return connectionResult.getResult();
+            }
+        } catch (IOException e) {
+            throw new TokenValidationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                    "Exception caught posting x509 token to rest authN: " + e, e);
         }
     }
 }

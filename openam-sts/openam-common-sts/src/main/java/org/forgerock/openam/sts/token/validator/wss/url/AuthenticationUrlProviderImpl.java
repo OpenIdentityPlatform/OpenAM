@@ -14,7 +14,7 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.validator.wss.uri;
+package org.forgerock.openam.sts.token.validator.wss.url;
 
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
@@ -24,12 +24,12 @@ import org.forgerock.openam.sts.token.UrlConstituentCatenator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  */
-public class AuthenticationUriProviderImpl implements AuthenticationUriProvider {
+public class AuthenticationUrlProviderImpl implements AuthenticationUrlProvider {
     private static final Character QUESTION_MARK = '?';
     private static final Character AMPERSAND = '&';
     private static final String AUTH_INDEX_TYPE_PARAM = "authIndexType=";
@@ -44,7 +44,7 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
 
 
     @Inject
-    public AuthenticationUriProviderImpl(
+    public AuthenticationUrlProviderImpl(
             @Named(AMSTSConstants.AM_DEPLOYMENT_URL) String amDeploymentUrl,
             @Named(AMSTSConstants.REST_AUTHN_URI_ELEMENT) String restAuthnUriElement,
             AuthTargetMapping authTargetMapping,
@@ -60,7 +60,7 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
     }
 
     @Override
-    public URI authenticationUri(Object token) throws TokenValidationException {
+    public URL authenticationUrl(Object token) throws TokenValidationException {
         StringBuilder stringBuilder =
                 new StringBuilder(urlConstituentCatenator.catenateUrlConstituents(amDeploymentUrl, jsonRoot));
         if (!AMSTSConstants.ROOT_REALM.equals(realm)) {
@@ -74,8 +74,8 @@ public class AuthenticationUriProviderImpl implements AuthenticationUriProvider 
             stringBuilder.append(AMPERSAND).append(AUTH_INDEX_VALUE_PARAM).append(target.getAuthIndexValue());
         }
         try {
-            return new URI(stringBuilder.toString());
-        } catch (URISyntaxException e) {
+            return new URL(stringBuilder.toString());
+        } catch (MalformedURLException e) {
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR, e.getMessage(), e);
         }
     }

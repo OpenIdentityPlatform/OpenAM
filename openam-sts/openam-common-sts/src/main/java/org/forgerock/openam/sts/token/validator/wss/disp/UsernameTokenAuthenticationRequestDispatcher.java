@@ -17,18 +17,21 @@
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
 import org.apache.ws.security.message.token.UsernameToken;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.restlet.engine.header.Header;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
-import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.URI;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This class is responsible for dispatching the credential state encapsulated in UsernameTokens to the
  * OpenAM REST authN context.
@@ -38,30 +41,38 @@ public class UsernameTokenAuthenticationRequestDispatcher implements TokenAuthen
     private static final String PASSWORD = "X-OpenAM-Password";
 
     private final String crestVersion;
+    private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
-    UsernameTokenAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion) {
+    UsernameTokenAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+                                                 HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
         this.crestVersion = crestVersion;
+        this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
     @Override
-    public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
-        ClientResource resource = new ClientResource(uri);
-        resource.setFollowingRedirects(false);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
-        headers.set(USERNAME, token.getName());
-        headers.set(PASSWORD, token.getPassword());
-        headers.set(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
-        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
         try {
-            return resource.post(null);
-        } catch (ResourceException e) {
-            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting UsernameToken " +
-                    "to rest authN: " + e, e);
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put(USERNAME, token.getName());
+            headerMap.put(PASSWORD, token.getPassword());
+            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
+                    .httpURLConnectionWrapper(url)
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.POST)
+                    .makeInvocation();
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new TokenValidationException(responseCode, "Non-200 response from posting Username token " +
+                        "to rest authN.");
+            } else {
+                return connectionResult.getResult();
+            }
+        } catch (IOException e) {
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
+                    "Exception caught posting UsernameToken to rest authN: " + e, e);
         }
     }
 }

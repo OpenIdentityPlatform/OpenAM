@@ -17,7 +17,6 @@
 package org.forgerock.openam.sts.token;
 
 import org.forgerock.openam.sts.TokenValidationException;
-import org.restlet.representation.Representation;
 
 /**
  * This interface defines the ability to take the Representation result of a dispatched REST authN request and to
@@ -26,10 +25,9 @@ import org.restlet.representation.Representation;
 public interface AMTokenParser {
     /**
      *
-     * @param representation The value returned by a successful invocation of the ClientResource corresponding to the
-     *                       authentication request.
+     * @param authNResponse The value returned by a successful invocation of the rest authN
      * @return Returns the string corresponding to the OpenAM session.
      * @throws TokenValidationException Thrown when authentication unsuccessful or the OpenAM session id could not be pulled from the response.
      */
-    String getSessionFromAuthNResponse(Representation representation) throws TokenValidationException;
+    String getSessionFromAuthNResponse(String authNResponse) throws TokenValidationException;
 }

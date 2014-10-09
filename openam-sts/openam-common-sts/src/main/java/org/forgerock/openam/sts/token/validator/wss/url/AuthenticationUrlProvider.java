@@ -14,13 +14,11 @@
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.sts.token.validator.wss.uri;
+package org.forgerock.openam.sts.token.validator.wss.url;
 
-import org.apache.ws.security.handler.RequestData;
 import org.forgerock.openam.sts.TokenValidationException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * This interface defines the means for the AuthenticationHandler to obtain the URI to pass to the
@@ -31,13 +29,13 @@ import java.net.URISyntaxException;
  * be validated against an authIndexType=module and authIndexValue=MySpecialCertModule, etc.)
  *
   */
-public interface AuthenticationUriProvider {
+public interface AuthenticationUrlProvider {
     /**
      * Returns the String representing the URL against which the authentication invocation will be made.
      * @param token The to-be-validated Token. These will ultimately be class instances in the org.apache.ws.security.message.token
      *              package, but there is no interface common to all these token classes, so Object must suffice.
-     * @return The URI targeted by the authentication request - e.g. with the appropriate
+     * @return The URL targeted by the authentication request - e.g. with the appropriate
      * ?realm=phill&authIndexType=service&authIndexValue=[SERVICE_NAME] elements appended onto the httpBasePath.
      */
-    URI authenticationUri(Object token) throws TokenValidationException;
+    URL authenticationUrl(Object token) throws TokenValidationException;
 }

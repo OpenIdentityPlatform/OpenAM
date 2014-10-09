@@ -17,18 +17,19 @@
 package org.forgerock.openam.sts.token.validator.wss.disp;
 
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
-import org.restlet.engine.header.Header;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ClientResource;
-import org.restlet.resource.ResourceException;
-import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.net.URI;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class is responsible for dispatching OpenID Connect ID Tokens to the OpenAM Rest authN context. The OpenIDConnect
@@ -37,21 +38,17 @@ import java.net.URI;
  */
 public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthenticationRequestDispatcher<OpenIdConnectIdToken> {
     private final String crestVersion;
+    private final HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory;
 
     @Inject
-    OpenIdConnectAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion) {
+    OpenIdConnectAuthenticationRequestDispatcher(@Named(AMSTSConstants.CREST_VERSION) String crestVersion,
+                                                 HttpURLConnectionWrapperFactory httpURLConnectionWrapperFactory) {
         this.crestVersion = crestVersion;
+        this.httpURLConnectionWrapperFactory = httpURLConnectionWrapperFactory;
     }
 
     @Override
-    public Representation dispatch(URI uri, AuthTargetMapping.AuthTarget target, OpenIdConnectIdToken token) throws TokenValidationException {
-        ClientResource resource = new ClientResource(uri);
-        resource.setFollowingRedirects(false);
-        Series<Header> headers = (Series<Header>)resource.getRequestAttributes().get(AMSTSConstants.RESTLET_HEADER_KEY);
-        if (headers == null) {
-            headers = new Series<Header>(Header.class);
-            resource.getRequestAttributes().put(AMSTSConstants.RESTLET_HEADER_KEY, headers);
-        }
+    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, OpenIdConnectIdToken token) throws TokenValidationException {
         if (target == null) {
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.BAD_REQUEST,
                     "When validatating OIDC tokens, an AuthTarget needs to be configured with a Map containing a String " +
@@ -65,13 +62,26 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
                             "entry referenced by key" + AMSTSConstants.OPEN_ID_CONNECT_ID_TOKEN_AUTH_TARGET_HEADER_KEY +
                             " which specifies the header name which will reference the OIDC ID Token.");
         }
-        headers.set((String)headerKey, token.getTokenValue());
-        headers.set(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
         try {
-            return resource.post(null);
-        } catch (ResourceException e) {
-            throw new TokenValidationException(e.getStatus().getCode(), "Exception caught posting OpenIdConnectIdToken " +
-                    "to rest authN: " + e, e);
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
+            headerMap.put(AMSTSConstants.CREST_VERSION_HEADER_KEY, crestVersion);
+            headerMap.put((String)headerKey, token.getTokenValue());
+            HttpURLConnectionWrapper.ConnectionResult connectionResult =  httpURLConnectionWrapperFactory
+                    .httpURLConnectionWrapper(url)
+                    .setRequestHeaders(headerMap)
+                    .setRequestMethod(AMSTSConstants.POST)
+                    .makeInvocation();
+            final int responseCode = connectionResult.getStatusCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new TokenValidationException(responseCode, "Non-200 response from posting OIDC token " +
+                        "to rest authN.");
+            } else {
+                return connectionResult.getResult();
+            }
+        } catch (IOException e) {
+            throw new TokenValidationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
+                    "Exception caught posting OIDC token to rest authN: " + e, e);
         }
     }
 }

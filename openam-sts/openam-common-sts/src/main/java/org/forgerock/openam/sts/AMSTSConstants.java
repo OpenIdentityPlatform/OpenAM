@@ -80,6 +80,7 @@ public class AMSTSConstants {
     public static final String ACCEPT = "Accept";
     public static final String APPLICATION_JSON = SharedSTSConstants.APPLICATION_JSON;
     public static final String COOKIE = "Cookie";
+    public static final String POST = "POST";
     public static final String EQUALS = "=";
     public static final String PIPE = "|";
     /*

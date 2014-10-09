@@ -50,8 +50,8 @@ import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.disp.CertificateAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.OpenIdConnectAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
@@ -89,8 +89,8 @@ public class TokenTransformFactoryImplTest {
                     .to(new TypeLiteral<AuthenticationHandlerImpl<X509Certificate[]>>() {
                     });
 
-            bind(AuthenticationUriProvider.class)
-                    .to(AuthenticationUriProviderImpl.class);
+            bind(AuthenticationUrlProvider.class)
+                    .to(AuthenticationUrlProviderImpl.class);
             bind(AMTokenParser.class).to(AMTokenParserImpl.class);
             bind(new TypeLiteral<XmlMarshaller<OpenIdConnectIdToken>>(){}).to(OpenIdConnectIdTokenMarshaller.class);
             bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);

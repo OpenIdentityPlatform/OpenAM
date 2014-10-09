@@ -18,15 +18,12 @@ package org.forgerock.openam.sts.token;
 
 import javax.inject.Inject;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.restlet.representation.Representation;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.slf4j.Logger;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * AMTokenParser implementation. Responsible for parsing out the OpenAM session id from all successful authentication
@@ -42,28 +39,20 @@ public class AMTokenParserImpl implements AMTokenParser {
     }
 
     @Override
-    public String getSessionFromAuthNResponse(Representation representation) throws TokenValidationException {
-        String responseBody;
+    public String getSessionFromAuthNResponse(String authNResponse) throws TokenValidationException {
+        JsonValue responseJson;
         try {
-            responseBody = representation.getText();
-        } catch (IOException e) {
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught pulling text from Representation in the context of " +
-                    "parsing the AM Session from the authentication response: " + e.getMessage(), e);
+            responseJson = JsonValueBuilder.toJsonValue(authNResponse);
+        } catch (JsonException e) {
+            String message = "Exception caught getting the text of the json authN response: " + e;
+            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message, e);
         }
-        Map<String,Object> responseAsMap = null;
-        try {
-            responseAsMap = new ObjectMapper().readValue(responseBody,
-                    new TypeReference<Map<String,Object>>() {});
-        } catch (IOException ioe) {
-            String message = "Exception caught getting the text of the json authN response: " + ioe;
-            throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message, ioe);
-        }
-        String sessionId = (String)responseAsMap.get(TOKEN_ID);
-        if (sessionId == null) {
-            String message = "REST authN response does not contain " + TOKEN_ID + " entry. The response map: " + responseAsMap;
+        JsonValue sessionIdJsonValue = responseJson.get(TOKEN_ID);
+        if (!sessionIdJsonValue.isString()) {
+            String message = "REST authN response does not contain " + TOKEN_ID + " string entry. The obtained entry: "
+                    + sessionIdJsonValue.toString() + "; The response: " + responseJson.toString();
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR, message);
         }
-        return sessionId;
+        return sessionIdJsonValue.asString();
     }
 }

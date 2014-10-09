@@ -22,18 +22,18 @@ import org.forgerock.openam.sts.TokenValidationException;
 import org.forgerock.openam.sts.token.AMTokenParser;
 import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
-import org.restlet.representation.Representation;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
 import javax.inject.Inject;
-import java.net.URI;
+import java.net.URL;
+
 import org.slf4j.Logger;
 
 /**
  * @see org.forgerock.openam.sts.token.validator.wss.AuthenticationHandler
  */
 public class AuthenticationHandlerImpl<T> implements AuthenticationHandler<T> {
-    private final AuthenticationUriProvider authenticationUrlProvider;
+    private final AuthenticationUrlProvider authenticationUrlProvider;
     private final TokenAuthenticationRequestDispatcher<T> requestDispatcher;
 //    private final AMTokenCache tokenCache;
     private final ThreadLocalAMTokenCache tokenCache;
@@ -43,7 +43,7 @@ public class AuthenticationHandlerImpl<T> implements AuthenticationHandler<T> {
 
     @Inject
     public AuthenticationHandlerImpl(
-            AuthenticationUriProvider urlProvider,
+            AuthenticationUrlProvider urlProvider,
             TokenAuthenticationRequestDispatcher<T> requestDispatcher,
             //AMTokenCache tokenCache,
             ThreadLocalAMTokenCache tokenCache,
@@ -59,10 +59,10 @@ public class AuthenticationHandlerImpl<T> implements AuthenticationHandler<T> {
     }
 
     public void authenticate(RequestData requestData, T token) throws TokenValidationException {
-        URI authUrl = authenticationUrlProvider.authenticationUri(token);
+        URL authUrl = authenticationUrlProvider.authenticationUrl(token);
         logger.debug("STSAuthenticationHandler: The authUri: " + authUrl.toString());
-        Representation representation = requestDispatcher.dispatch(authUrl, authTargetMapping.getAuthTargetMapping(token.getClass()), token);
-        tokenCache.cacheAMToken(tokenParser.getSessionFromAuthNResponse(representation));
+        String response = requestDispatcher.dispatch(authUrl, authTargetMapping.getAuthTargetMapping(token.getClass()), token);
+        tokenCache.cacheAMToken(tokenParser.getSessionFromAuthNResponse(response));
         //tokenCache.cacheAMSessionId(requestData, tokenParser.getSessionFromAuthNResponse(representation));
     }
 }

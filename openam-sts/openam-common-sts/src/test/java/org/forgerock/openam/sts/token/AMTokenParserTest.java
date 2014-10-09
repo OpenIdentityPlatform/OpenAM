@@ -19,9 +19,6 @@ package org.forgerock.openam.sts.token;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import org.forgerock.openam.sts.TokenValidationException;
-import org.forgerock.openam.sts.token.AMTokenParser;
-import org.forgerock.openam.sts.token.AMTokenParserImpl;
-import org.restlet.representation.Representation;
 import org.slf4j.Logger;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -29,7 +26,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class AMTokenParserTest {
     AMTokenParser tokenParser;
@@ -49,11 +45,6 @@ public class AMTokenParserTest {
 
     @Test
     void testParse() throws TokenValidationException, IOException {
-        //given
-        Representation representation = mock(Representation.class);
-        //when
-        when(representation.getText()).thenReturn(authNResponse);
-        //then
-        tokenParser.getSessionFromAuthNResponse(representation).equals("da_token_id");
+        tokenParser.getSessionFromAuthNResponse(authNResponse).equals("da_token_id");
     }
 }

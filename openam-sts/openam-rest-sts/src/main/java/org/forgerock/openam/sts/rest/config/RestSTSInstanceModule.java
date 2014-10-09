@@ -37,6 +37,7 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.message.token.UsernameToken;
 
 import org.forgerock.openam.sts.AMSTSConstants;
+import org.forgerock.openam.sts.HttpURLConnectionWrapperFactory;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.JsonMarshaller;
 import org.forgerock.openam.sts.XMLUtilities;
@@ -51,7 +52,12 @@ import org.forgerock.openam.sts.rest.operation.TokenTransformFactory;
 import org.forgerock.openam.sts.rest.operation.TokenTransformFactoryImpl;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperation;
 import org.forgerock.openam.sts.rest.operation.TokenTranslateOperationImpl;
-import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.token.AMTokenParser;
+import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.model.OpenIdConnectIdToken;
@@ -70,8 +76,8 @@ import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequ
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
 
 import java.security.cert.X509Certificate;
 import java.util.Set;
@@ -109,8 +115,8 @@ public class RestSTSInstanceModule extends AbstractModule {
         bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class).in(Scopes.SINGLETON);
 
 
-        bind(AuthenticationUriProvider.class)
-                .to(AuthenticationUriProviderImpl.class);
+        bind(AuthenticationUrlProvider.class)
+                .to(AuthenticationUrlProviderImpl.class);
 
         bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
                 .to(UsernameTokenAuthenticationRequestDispatcher.class);
@@ -152,6 +158,9 @@ public class RestSTSInstanceModule extends AbstractModule {
 
         bind(TokenGenerationServiceConsumer.class).to(TokenGenerationServiceConsumerImpl.class);
         bind(XMLUtilities.class).to(XMLUtilitiesImpl.class);
+
+        //bind the class responsible for producing HttpURLConnectionWrapper instances
+        bind(HttpURLConnectionWrapperFactory.class).in(Scopes.SINGLETON);
     }
 
     /**

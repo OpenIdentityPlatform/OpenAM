@@ -16,7 +16,10 @@
 
 package org.forgerock.openam.sts.soap.token.config;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Provides;
+import com.google.inject.TypeLiteral;
 import org.apache.cxf.sts.token.provider.SAMLTokenProvider;
 import org.apache.cxf.sts.token.renewer.SAMLTokenRenewer;
 import org.apache.ws.security.message.token.UsernameToken;
@@ -25,7 +28,12 @@ import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.STSInitializationException;
 import org.forgerock.openam.sts.TokenType;
 import org.forgerock.openam.sts.XmlMarshaller;
-import org.forgerock.openam.sts.token.*;
+import org.forgerock.openam.sts.token.AMTokenParser;
+import org.forgerock.openam.sts.token.AMTokenParserImpl;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCache;
+import org.forgerock.openam.sts.token.ThreadLocalAMTokenCacheImpl;
+import org.forgerock.openam.sts.token.UrlConstituentCatenator;
+import org.forgerock.openam.sts.token.UrlConstituentCatenatorImpl;
 import org.forgerock.openam.sts.token.model.OpenAMSessionToken;
 import org.forgerock.openam.sts.token.model.OpenAMSessionTokenMarshaller;
 import org.forgerock.openam.sts.token.provider.AMTokenProvider;
@@ -36,8 +44,8 @@ import org.forgerock.openam.sts.token.validator.wss.AuthenticationHandlerImpl;
 import org.forgerock.openam.sts.token.validator.wss.UsernameTokenValidator;
 import org.forgerock.openam.sts.token.validator.wss.disp.TokenAuthenticationRequestDispatcher;
 import org.forgerock.openam.sts.token.validator.wss.disp.UsernameTokenAuthenticationRequestDispatcher;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProvider;
-import org.forgerock.openam.sts.token.validator.wss.uri.AuthenticationUriProviderImpl;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProvider;
+import org.forgerock.openam.sts.token.validator.wss.url.AuthenticationUrlProviderImpl;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -57,8 +65,8 @@ public class TokenOperationFactoryImplTest {
             bind(ThreadLocalAMTokenCache.class).to(ThreadLocalAMTokenCacheImpl.class);
             bind(new TypeLiteral<XmlMarshaller<OpenAMSessionToken>>(){}).to(OpenAMSessionTokenMarshaller.class);
 
-            bind(AuthenticationUriProvider.class)
-                    .to(AuthenticationUriProviderImpl.class);
+            bind(AuthenticationUrlProvider.class)
+                    .to(AuthenticationUrlProviderImpl.class);
 
             bind(new TypeLiteral<TokenAuthenticationRequestDispatcher<UsernameToken>>(){})
                     .to(UsernameTokenAuthenticationRequestDispatcher.class);

@@ -15,6 +15,6 @@
  */
 
 /**
- * Contains the classes related to obtaining the Uris corresponding to the REST authN targets for the various token types.
+ * Contains the classes related to obtaining the URLs corresponding to the REST authN targets for the various token types.
  */
-package org.forgerock.openam.sts.token.validator.wss.uri;
+package org.forgerock.openam.sts.token.validator.wss.url;
