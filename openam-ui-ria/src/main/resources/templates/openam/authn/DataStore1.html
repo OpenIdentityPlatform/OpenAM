@@ -26,8 +26,19 @@
             {{/if}}
 
             {{/each}}
+
+            {{#if socialImplementations}}
+                <div class="authn">
+                    <div class="authn-border"></div>
+                    <span class="authn-header">or login with:</span>
+                    {{#each socialImplementations}}    
+                        <a href="/openam/XUI/#login/&service={{authnChain}}" title="{{displayName}}" ><span><img src="/openam/{{iconPath}}" /></span></a>                         
+                    {{/each}}
+                </div>
+            {{/if}}
             
         </fieldset>
     </form>
 
 </div>
+
