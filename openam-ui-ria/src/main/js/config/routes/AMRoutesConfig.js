@@ -40,6 +40,7 @@ define("config/routes/AMRoutesConfig", [
             url: /forgotPassword(\/[^\&]*)(\&.+)?/,
             pattern: "forgotPassword??",
             forceUpdate: true,
+            defaults: ["/",""],
             argumentNames: ["realm", "additionalParameters"]
         },
         "forgotPasswordChange": {
@@ -47,6 +48,7 @@ define("config/routes/AMRoutesConfig", [
             url: /forgotPasswordChange(\/[^\&]*)(\&.+)?/,
             pattern: "forgotPasswordChange??",
             forceUpdate: true,
+            defaults: ["/",""],
             argumentNames: ["realm", "additionalParameters"]
         },
         "continueSelfRegister": {
@@ -54,6 +56,7 @@ define("config/routes/AMRoutesConfig", [
             url: /continueRegister(\/[^\&]*)(\&.+)?/,
             pattern: "continueRegister??",
             forceUpdate: true,
+            defaults: ["/",""],
             argumentNames: ["realm", "additionalParameters"]
         },
         "confirmLogin": {
