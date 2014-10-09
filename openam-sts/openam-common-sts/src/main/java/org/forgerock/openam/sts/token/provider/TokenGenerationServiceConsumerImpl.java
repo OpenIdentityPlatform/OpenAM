@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.sts.token.provider;
 
+import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import org.forgerock.json.fluent.JsonException;
@@ -125,7 +126,7 @@ public class TokenGenerationServiceConsumerImpl implements TokenGenerationServic
 
     private String makeInvocation(String invocationString, String callerSSOTokenString) throws TokenCreationException {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(tokenGenerationServiceEndpoint).openConnection();
+            HttpURLConnection connection = HttpURLConnectionManager.getConnection(new URL(tokenGenerationServiceEndpoint));
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setRequestProperty(SharedSTSConstants.CONTENT_TYPE, SharedSTSConstants.APPLICATION_JSON);

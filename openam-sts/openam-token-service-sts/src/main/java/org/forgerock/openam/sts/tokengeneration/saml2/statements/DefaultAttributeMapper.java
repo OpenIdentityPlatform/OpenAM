@@ -18,8 +18,6 @@ package org.forgerock.openam.sts.tokengeneration.saml2.statements;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.plugins.DefaultLibraryIDPAttributeMapper;
@@ -45,7 +43,7 @@ import java.util.Map;
 public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper implements AttributeMapper {
     private static final String FAUX_HOST_ENTITY_ID = "faux_host_entity_id";
     private static final String FAUX_REMOTE_ENTITY_ID = "faux_remote_entity_id";
-
+    private static final String ORGANIZATION = "Organization";
     private final Map<String, String> attributeMap;
 
     public DefaultAttributeMapper(Map<String, String> attributeMap) {
@@ -65,14 +63,11 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
      */
     public List<Attribute> getAttributes(SSOToken token, Map<String, String> attributeMap) throws TokenCreationException {
         try {
-            return (List<Attribute>)super.getAttributes(token, FAUX_HOST_ENTITY_ID, FAUX_REMOTE_ENTITY_ID, new AMIdentity(token).getRealm());
+            return (List<Attribute>)super.getAttributes(token, FAUX_HOST_ENTITY_ID, FAUX_REMOTE_ENTITY_ID, token.getProperty(ORGANIZATION));
         } catch (SAML2Exception e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
         } catch (SSOException e) {
-            throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
-                    "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
-        } catch (IdRepoException e) {
             throw new TokenCreationException(ResourceException.INTERNAL_ERROR,
                     "Exception caught getting attributes in DefaultAttributeMapper: " + e, e);
         }

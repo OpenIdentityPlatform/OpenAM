@@ -37,6 +37,7 @@ import org.forgerock.util.promise.Promises;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.net.HttpURLConnection;
 
 /**
  * This AuthzModule checks for the presence of the user corresponding to the token returned from
@@ -97,11 +98,11 @@ public class SpecialUserOnlyAuthzModule implements CrestAuthorizationModule {
             SSOToken token = tokenContext.getCallerSSOToken();
             userId = token.getPrincipal().getName();
         } catch (SSOException e) {
-            if (debug.errorEnabled()) {
-                debug.error("SpecialUserOnlyAuthzModule :: Unable to authorize as Special user using SSO Token.", e);
+            if (debug.messageEnabled()) {
+                debug.message("SpecialUserOnlyAuthzModule :: Unable to authorize as Special user using SSO Token.", e);
             }
             return Promises.newFailedPromise(ResourceException
-                    .getException(ResourceException.FORBIDDEN, e.getMessage(), e));
+                    .getException(HttpURLConnection.HTTP_UNAUTHORIZED, e.getMessage(), e));
         }
 
         if (AuthD.getAuth().isSpecialUser(userId)) {
