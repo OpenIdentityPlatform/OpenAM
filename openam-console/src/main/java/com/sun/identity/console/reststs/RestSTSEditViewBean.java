@@ -33,11 +33,9 @@ import com.sun.identity.console.base.model.AMPropertySheetModel;
 import com.sun.identity.console.reststs.model.RestSTSModel;
 import com.sun.identity.console.reststs.model.RestSTSModelImpl;
 import com.sun.identity.console.reststs.model.RestSTSModelResponse;
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
-import org.forgerock.openam.shared.sts.SharedSTSConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -163,27 +161,32 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         submitCycle = true;
         final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
         final String instanceName = (String)getPageSessionAttribute(RestSTSHomeViewBean.INSTANCE_NAME);
-        Map<String, Set<String>> configurationState = getUpdatedConfigurationState(currentRealm, instanceName);
-        if (configurationState.isEmpty()) {
-            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "Property values have not been updated!");
-        } else {
-            RestSTSModel model = (RestSTSModel) getModel();
-            RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
-            if (validationResponse.isSuccessful()) {
-                try {
-                    RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
-                    if (creationResponse.isSuccessful()) {
-                        setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
-                        disableSaveButton();
-                    } else {
-                        setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
-                    }
-                } catch (AMConsoleException e) {
-                    throw new ModelControlException(e);
-                }
+        try {
+            Map<String, Set<String>> configurationState = getUpdatedConfigurationState(currentRealm, instanceName);
+            if (configurationState.isEmpty()) {
+                setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "Property values have not been updated!");
             } else {
-                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+                RestSTSModel model = (RestSTSModel) getModel();
+                RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+                if (validationResponse.isSuccessful()) {
+                    try {
+                        RestSTSModelResponse creationResponse = model.updateInstance(configurationState, currentRealm, instanceName);
+                        if (creationResponse.isSuccessful()) {
+                            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
+                            disableSaveButton();
+                        } else {
+                            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
+                        }
+                    } catch (AMConsoleException e) {
+                        throw new ModelControlException(e);
+                    }
+                } else {
+                    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+                }
             }
+        } catch (AMConsoleException e) {
+            //getUpdatedConfigurationState will throw this exception if passwords are mis-matched.
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();
     }
@@ -192,12 +195,16 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
         disableButton("button1", true);
     }
 
-
-    /*
-    Called to harvest the full set of configuration properties. If no properties have been updated in the property-sheet,
-    an empty-set will be returned.
+    /**
+     * Called to harvest the full set of updated configuration properties.
+     * @param realm
+     * @param instanceName
+     * @return The set up updated properties. An empty-set will be returned if no properties updated.
+     * @throws ModelControlException thrown by AMPropertySheet#getAttributeValues if model for property-sheet cannot be
+     * obtained
+     * @throws AMConsoleException thrown by AMPropertySheet#getAttributeValues if passwords are mis-matched.
      */
-    private Map<String, Set<String>> getUpdatedConfigurationState(String realm, String instanceName) throws ModelControlException {
+    private Map<String, Set<String>> getUpdatedConfigurationState(String realm, String instanceName) throws ModelControlException, AMConsoleException {
         RestSTSModel model = (RestSTSModel)getModel();
         Map<String, Set<String>> currentPersistedInstanceState;
         try {
@@ -206,43 +213,14 @@ public class RestSTSEditViewBean extends AMPrimaryMastHeadViewBean {
             throw new ModelControlException(e.getMessage(), e);
         }
         AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
-        try {
-            Map<String, Set<String>> updatedValues = ps.getAttributeValues(currentPersistedInstanceState, model);
-            removeCannedPasswordEntriesFromConfigurationState(updatedValues);
-            if (updatedValues.isEmpty()) {
-                return updatedValues;
-            } else {
-                currentPersistedInstanceState.putAll(updatedValues);
-                return currentPersistedInstanceState;
-            }
-        } catch (AMConsoleException e) {
-            throw new ModelControlException(e.getMessage(), e);
+        Map<String, Set<String>> updatedValues = ps.getAttributeValues(currentPersistedInstanceState, model);
+        if (updatedValues.isEmpty()) {
+            return updatedValues;
+        } else {
+            currentPersistedInstanceState.putAll(updatedValues);
+            return currentPersistedInstanceState;
         }
     }
-
-    /*
-    The AMPropertySheet sets passwords to AMPropertySheetModel.passwordRandom for display, and thus these values are
-    always returned as updated, as they don't match the original password. I will remove these entries from the
-    configurationState, as we don't want to update the password to these values.
-
-    TODO: it seems that this is more robustly handled by password confirm fields - I should probably add those to the
-    password fields for robustness, and to insure that no-one actually sets the password to AMPropertySheetModel.passwordRandom,
-    as updating a password to the passwordRandom field would result in passwords not being updated.
-     */
-    private void removeCannedPasswordEntriesFromConfigurationState(Map<String, Set<String>> configurationState) {
-        if (configurationState == null) {
-            return;
-        }
-        String password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_KEYSTORE_PASSWORD);
-        if (AMPropertySheetModel.passwordRandom.equals(password)) {
-            configurationState.remove(SharedSTSConstants.SAML2_KEYSTORE_PASSWORD);
-        }
-        password = CollectionHelper.getMapAttr(configurationState, SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD);
-        if (AMPropertySheetModel.passwordRandom.equals(password)) {
-            configurationState.remove(SharedSTSConstants.SAML2_SIGNATURE_KEY_PASSWORD);
-        }
-    }
-
 
     public void handleButton2Request(RequestInvocationEvent event)
             throws ModelControlException, AMConsoleException {

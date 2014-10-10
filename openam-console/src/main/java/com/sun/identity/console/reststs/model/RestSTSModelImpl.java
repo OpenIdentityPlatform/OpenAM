@@ -59,6 +59,10 @@ import static org.forgerock.json.fluent.JsonValue.object;
 public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestSTSModel {
     private static final String COOKIE = "Cookie";
     private static final String EQUALS = "=";
+    private static final String USERNAME = "USERNAME";
+    private static final String OPENAM = "OPENAM";
+    private static final String OPENIDCONNECT = "OPENIDCONNECT";
+    private static final String X509 = "X509";
 
     public RestSTSModelImpl(HttpServletRequest req, Map map) throws AMConsoleException {
         super(req, AMAdminConstants.REST_STS_SERVICE, map);
@@ -186,11 +190,53 @@ public class RestSTSModelImpl extends AMServiceProfileModelImpl implements RestS
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.saml2.encryptioncombinations.message"));
         }
 
-        if (isNullOrEmpty(configurationState.get(SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS))) {
+        final Set<String> supportedTokenTransforms = configurationState.get(SharedSTSConstants.SUPPORTED_TOKEN_TRANSFORMS);
+        if (isNullOrEmpty(supportedTokenTransforms)) {
             return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.tokentransforms.message"));
+        }
+        /*
+        Need to check if selected transforms include both the validate_interim_session and !invalidate_interim_session
+        flavors. If the token transformation set includes two entries for a specific input token type, then this is the
+        case, and the configuration must be rejected.
+         */
+        if (duplicateTransformsSpecified(supportedTokenTransforms)) {
+            return RestSTSModelResponse.failure(getLocalizedString("rest.sts.validation.tokentransforms.duplicate.message"));
         }
 
         return RestSTSModelResponse.success();
+    }
+
+    /**
+     * The set of possible token transformation definition selections, as defined in the supported-token-transforms property
+     * in propertyRestSecurityTokenService.xml, is as follow:
+     *      USERNAME|SAML2|true
+     *      USERNAME|SAML2|false
+     *      OPENIDCONNECT|SAML2|true
+     *      OPENIDCONNECT|SAML2|false
+     *      OPENAM|SAML2|true
+     *      OPENAM|SAML2|false
+     *      X509|SAML2|true
+     *      X509|SAML2|false
+     * This method will return true if the supportedTokenTransforms method specified by the user contains more than a single
+     * entry for a given input token type.
+     * @param supportedTokenTransforms The set of supported token transformations specified by the user
+     * @return true if duplicate transformations are specified - i.e. the user cannot specify token transformations with
+     * USERNAME input which specify that interim OpenAM sessions should be, and should not be, invalidated.
+     */
+    private boolean duplicateTransformsSpecified(Set<String> supportedTokenTransforms) {
+        int numUsername = 0, numOidc = 0, numOpenam = 0, numx509 = 0;
+        for (String transform : supportedTokenTransforms) {
+            if (transform.startsWith(OPENAM)) {
+                numOpenam++;
+            } else if (transform.startsWith(OPENIDCONNECT)) {
+                numOidc++;
+            } else if (transform.startsWith(X509)) {
+                numx509++;
+            } else if (transform.startsWith(USERNAME)) {
+                numUsername++;
+            }
+        }
+        return (numOidc > 1) || (numOpenam > 1) || (numUsername > 1) || (numx509 > 1);
     }
 
     /*

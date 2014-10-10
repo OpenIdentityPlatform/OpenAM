@@ -85,6 +85,9 @@ provided for required attributes upon service registration.
                 </AttributeSchema>
                 <AttributeSchema name="saml2-token-lifetime-seconds"
                                  type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="saml2-custom-conditions-provider-class-name"
                                  type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">
@@ -213,6 +216,9 @@ provided for required attributes upon service registration.
                     </AttributeSchema>
                     <AttributeSchema name="saml2-token-lifetime-seconds"
                                      type="single" syntax="number" i18nKey="saml2_token_lifetime_seconds">
+                        <DefaultValues>
+                            <Value>600</Value>
+                        </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="saml2-custom-conditions-provider-class-name"
                                      type="single" syntax="string" i18nKey="saml2_custom_conditions_provider_class_name">

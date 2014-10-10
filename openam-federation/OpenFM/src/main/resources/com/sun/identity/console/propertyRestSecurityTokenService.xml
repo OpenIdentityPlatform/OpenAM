@@ -215,6 +215,19 @@
         </property>
 
         <property>
+            <label name="lblSAML2AttributeMap"
+                   defaultValue="rest.sts.saml2.AttributeMap"
+                   labelFor="saml2-attribute-map"/>
+            <cc name="saml2-attribute-map"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpSAML2AttributeMap" defaultValue="rest.sts.saml2.AttributeMap.help" />
+        </property>
+
+        <property>
             <label name="lblSAML2SignAssertion"
                    defaultValue="rest.sts.saml2.SignAssertion"
                    labelFor="saml2-sign-assertion"/>
@@ -285,6 +298,18 @@
                 tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
             </cc>
         </property>
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
+        <property>
+            <label name="lblSAML2KeystorePasswordConfirm"
+                   defaultValue="rest.sts.saml2.keystore.password.confirm"
+                   labelFor="saml2-keystore-password_confirm"/>
+            <cc name="saml2-keystore-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
+            </cc>
+        </property>
 
         <property>
             <label name="lblSAML2KeystoreEncryptionKeyAlias"
@@ -315,17 +340,17 @@
             </cc>
         </property>
 
+        <!--
+            note that the name of the password confirmation field must be the name of the password field + _confirm.
+            See AMPropertySheet.getAttributeValues for details.
+        -->
         <property>
-            <label name="lblSAML2AttributeMap"
-                   defaultValue="rest.sts.saml2.AttributeMap"
-                   labelFor="saml2-attribute-map"/>
-            <cc name="saml2-attribute-map"
-                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
-                <attribute name="name" value="list" />
-                <attribute name="listboxLabel" value="label.current.value" />
-                <attribute name="textboxLabel" value="label.new.value" />
+            <label name="lblKeystoreSignatureKeyPasswordConfirm"
+                   defaultValue="rest.sts.saml2.keystore.SignatureKeyPassword.confirm"
+                   labelFor="saml2-signature-key-password_confirm"/>
+            <cc name="saml2-signature-key-password_confirm"
+                tagclass="com.sun.web.ui.taglib.html.CCPasswordTag">
             </cc>
-            <fieldhelp name="helpSAML2AttributeMap" defaultValue="rest.sts.saml2.AttributeMap.help" />
         </property>
     </section>
 </propertysheet>

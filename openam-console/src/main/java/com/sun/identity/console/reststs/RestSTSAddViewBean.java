@@ -95,24 +95,29 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
      */
     public void handleButton1Request(RequestInvocationEvent event) throws ModelControlException {
         submitCycle = true;
-        Map<String, Set<String>> configurationState = (Map<String, Set<String>>)getAttributeSettings();
-        RestSTSModel model = (RestSTSModel)getModel();
-        RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
-        if (validationResponse.isSuccessful()) {
-            final String currentRealm = (String)getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-            try {
-                RestSTSModelResponse creationResponse = model.createInstance(configurationState, currentRealm);
-                if (creationResponse.isSuccessful()) {
-                    setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
-                    disableSaveAndResetButtons();
-                } else {
-                    setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
+        try {
+            Map<String, Set<String>> configurationState = (Map<String, Set<String>>) getAttributeSettings();
+            RestSTSModel model = (RestSTSModel) getModel();
+            RestSTSModelResponse validationResponse = model.validateConfigurationState(configurationState);
+            if (validationResponse.isSuccessful()) {
+                final String currentRealm = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
+                try {
+                    RestSTSModelResponse creationResponse = model.createInstance(configurationState, currentRealm);
+                    if (creationResponse.isSuccessful()) {
+                        setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", creationResponse.getMessage());
+                        disableSaveAndResetButtons();
+                    } else {
+                        setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", creationResponse.getMessage());
+                    }
+                } catch (AMConsoleException e) {
+                    throw new ModelControlException(e);
                 }
-            } catch (AMConsoleException e) {
-                throw new ModelControlException(e);
+            } else {
+                setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
             }
-        } else {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", validationResponse.getMessage());
+        } catch (AMConsoleException e) {
+            //will be entered if getAttributeSettings throws a AMConsoleException because passwords are mis-matched.
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();
     }
@@ -124,18 +129,15 @@ public class RestSTSAddViewBean extends AMServiceProfileViewBeanBase {
 
     /*
     Returns a map of all settings, including those not changed from the default values in the model.
+    AMConsoleException will be thrown if passwords are mis-matched.
      */
-    private Map getAttributeSettings() throws ModelControlException {
+    private Map getAttributeSettings() throws ModelControlException, AMConsoleException {
         Map values = null;
         AMServiceProfileModel model = (AMServiceProfileModel)getModel();
 
         if (model != null) {
             AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTE);
-            try {
-                values = ps.getAttributeValues(model.getAttributeValues(), false, model);
-            } catch (AMConsoleException e) {
-                throw new ModelControlException(e.getMessage(), e);
-            }
+            values = ps.getAttributeValues(model.getAttributeValues(), false, model);
         }
         return values;
     }
