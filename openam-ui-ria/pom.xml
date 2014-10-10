@@ -71,6 +71,7 @@
         </testResources>
 
         <plugins>
+
             <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>jslint-maven-plugin</artifactId>
@@ -84,7 +85,7 @@
                </configuration>
                <executions>
                    <execution>
-                       <phase>package</phase>
+                       <phase>validate</phase>
                        <goals>
                            <goal>jslint</goal>
                        </goals>
@@ -96,7 +97,7 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>resources</goal>
                         </goals>
@@ -110,7 +111,7 @@
                 <executions>
                     <execution>
                         <id>unpack</id>
-                        <phase>package</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -125,61 +126,6 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>js optimization</id>
-                        <phase>package</phase>
-
-                        <configuration>
-                            <target name="optimize">
-                                <property name="requirejs.dir" value="${basedir}/src/main/optimization" />
-                                <property name="classes.dir" value="${basedir}/target/classes" />
-                                <property name="dependency.dir" value="${basedir}/target/dependency" />
-                                <property name="xui.dir" value="${basedir}/target/xui" />
-
-                                <delete dir="${classes.dir}/qunit" />
-                                <delete dir="${dependency.dir}/qunit" />
-                                 
-                                 <copy todir="${xui.dir}">
-                                  <fileset dir="${dependency.dir}" includes="**/*" />
-                                 </copy>
-                                
-                                 <copy todir="${xui.dir}" overwrite="true">
-                                  <fileset dir="${classes.dir}" includes="**/*" />
-                                 </copy>
-                                
-                                <java classname="org.mozilla.javascript.tools.shell.Main"
-                                    failonerror="true">
-                                    <classpath refid="maven.compile.classpath" />
-                                    <arg value="${requirejs.dir}/r.js" />
-                                    <arg value="-o" />
-                                    <arg value="${requirejs.dir}/app.build.js" />
-                                </java>
-                                
-                                <concat destfile="${xui.dir}_minified/main_with_licenses.js">
-                                    <fileset file="${requirejs.dir}/license" />
-                                    <fileset file="${xui.dir}_minified/main.js" />
-                                </concat>
-                                
-                                <move   file="${xui.dir}_minified/main_with_licenses.js" 
-                                        tofile="${xui.dir}_minified/main.js" />
-
-                                <delete dir="${xui.dir}" />
-
-                                <move   file="${xui.dir}_minified" 
-                                        tofile="${xui.dir}" />
-
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -202,5 +148,66 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>js/css optimization</id>
+                                <phase>prepare-package</phase>
+
+                                <configuration>
+                                  <target name="optimize">
+                                      <property name="requirejs.dir" value="${basedir}/src/main/optimization" />
+                                      <property name="classes.dir" value="${basedir}/target/classes" />
+                                      <property name="dependency.dir" value="${basedir}/target/dependency" />
+                                      <property name="minified.dir" value="${basedir}/target/xui_minified" />
+
+                                      <copy todir="${classes.dir}">
+                                        <fileset dir="${dependency.dir}" includes="**/*" />
+                                      </copy>
+
+                                      <java classname="org.mozilla.javascript.tools.shell.Main"
+                                          failonerror="true">
+                                          <classpath refid="maven.compile.classpath" />
+                                          <arg value="${requirejs.dir}/r.js" />
+                                          <arg value="-o" />
+                                          <arg value="${requirejs.dir}/app.build.js" />
+                                      </java>
+                                      
+                                      <concat destfile="${minified.dir}/main_with_licenses.js">
+                                          <fileset file="${requirejs.dir}/license" />
+                                          <fileset file="${minified.dir}/main.js" />
+                                      </concat>
+                                      
+                                      <move   file="${minified.dir}/main_with_licenses.js" 
+                                              tofile="${minified.dir}/main.js" />
+
+                                      <delete dir="${classes.dir}" />
+                                      <delete dir="${dependency.dir}" />
+
+                                      <move   file="${minified.dir}" 
+                                              tofile="${classes.dir}" />
+
+                                  </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
 

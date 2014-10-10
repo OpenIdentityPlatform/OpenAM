@@ -34,8 +34,12 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${basedir}/target/xui</directory>
-            <outputDirectory>.</outputDirectory>
+            <directory>${basedir}/target/classes</directory>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/target/dependency</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
