@@ -159,8 +159,6 @@ public class RestAuthenticationHandler {
             return processAuthentication(request, response, postBody, authId, loginProcess, loginConfiguration);
 
         } catch (RestAuthException e) {
-            DEBUG.error(e.getMessage());
-
             if (loginProcess != null) {
                 String failureUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
                         loginProcess.getFailureURL(), null);
@@ -168,17 +166,13 @@ public class RestAuthenticationHandler {
             }
             throw e;
         } catch (L10NMessageImpl e) {
-            DEBUG.error(e.getMessage(), e);
             throw new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
                     e.getErrorCode()), e);
         } catch (JsonException e)  {
-            DEBUG.error(e.getMessage(), e);
             throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         } catch (SignatureException e) {
-            DEBUG.error(e.getMessage(), e);
             throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         } catch (AuthLoginException e) {
-            DEBUG.error(e.getMessage(), e);
             throw new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
                     e.getErrorCode()), e);
         }

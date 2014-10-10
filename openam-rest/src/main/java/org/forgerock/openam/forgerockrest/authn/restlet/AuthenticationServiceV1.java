@@ -140,11 +140,11 @@ public class AuthenticationServiceV1 extends ServerResource {
             DEBUG.message("AuthenticationService.authenticate() :: Exception from CallbackHandler", e);
             return handleErrorResponse(new Status(e.getStatusCode()), e);
         } catch (RestAuthException e) {
-            DEBUG.error("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
+            DEBUG.message("AuthenticationService.authenticate() :: Rest Authentication Exception", e);
             return handleErrorResponse(Status.CLIENT_ERROR_UNAUTHORIZED, e);
         } catch (JSONException e) {
-            DEBUG.error("Internal Error", e);
-            return handleErrorResponse(Status.SERVER_ERROR_INTERNAL, e);
+            DEBUG.message("AuthenticationService.authenticate() :: JSON parsing error", e);
+            return handleErrorResponse(Status.CLIENT_ERROR_BAD_REQUEST, e);
         } catch (IOException e) {
             DEBUG.error("AuthenticationService.authenticate() :: Internal Error", e);
             return handleErrorResponse(Status.SERVER_ERROR_INTERNAL, e);
