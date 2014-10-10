@@ -23,9 +23,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2010-2014 ForgeRock AS.
- */
-
-/*
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  */
 package com.sun.identity.saml2.common;
@@ -4565,7 +4562,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         String role) throws SAML2Exception {
 
         // Check for the validity of the RelayState URL.
-        if (relayState != null) {
+        if (relayState != null && !relayState.isEmpty()) {
             if (!RELAY_STATE_VALIDATOR.isRedirectUrlValid(relayState,
                     SAMLEntityInfo.from(orgName, hostEntityId, role))) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));
