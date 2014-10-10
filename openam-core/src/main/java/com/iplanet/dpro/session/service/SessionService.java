@@ -2183,7 +2183,7 @@ public class SessionService {
                     sessionServiceID.toString() :
                     SiteConfiguration.getSiteIdByURL(adminToken,
                             sessionServiceID.toString());
-            ServiceConfig subConfig = serviceConfig.getSubConfig(subCfgName);
+            ServiceConfig subConfig = (subCfgName != null) ? serviceConfig.getSubConfig(subCfgName) : null;
 
             if ((subConfig != null) && subConfig.exists()) {
 
