@@ -536,8 +536,9 @@ class ServiceConfigImpl implements ServiceListener {
                 entry.clear();
                 configImpls.remove(cacheName);
 
-                debug.error("ServiceConfigImpl::getInstance: couldn't find subschema sunConfigId="+subConfigId 
-                        + "\n cached SMS entry=" + sentry);
+                if (debug.messageEnabled()) {
+                    debug.message("ServiceConfigImpl::getInstance: couldn't find subschema : " + dn);
+                }
                 return (null);
             }
         }
