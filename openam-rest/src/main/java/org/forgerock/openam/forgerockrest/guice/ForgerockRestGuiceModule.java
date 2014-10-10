@@ -22,6 +22,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.entitlement.Application;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationEvaluatorImpl;
 import com.sun.identity.entitlement.EntitlementException;
@@ -123,12 +124,16 @@ public class ForgerockRestGuiceModule extends AbstractModule {
                 .annotatedWith(Names.named(EntitlementsResourceErrorHandler.REQUEST_TYPE_ERROR_OVERRIDES))
                 .toInstance(errorCodeOverrides);
 
-
         bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
                 .annotatedWith(Names.named(PrivilegePolicyStoreProvider.POLICY_QUERY_ATTRIBUTES))
                 .toProvider(PolicyQueryAttributesMapProvider.class)
                 .asEagerSingleton();
         bind(PolicyEvaluatorFactory.class).to(EntitlementEvaluatorFactory.class).in(Singleton.class);
+
+        bind(new TypeLiteral<Map<String, QueryAttribute>>() {})
+                .annotatedWith(Names.named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES))
+                .toProvider(ApplicationQueryAttributesMapProvider.class)
+                .asEagerSingleton();
 
         bind(RestEndpointManager.class).to(RestEndpointManagerProxy.class);
         bind(VersionSelector.class).in(Singleton.class);
@@ -226,8 +231,9 @@ public class ForgerockRestGuiceModule extends AbstractModule {
     @Inject
     @Singleton
     public ApplicationsResource getApplicationsResource(@Named("frRest") Debug debug,
-            ApplicationManagerWrapper appManager, ApplicationTypeManagerWrapper appTypeManagerWrapper) {
-        return new ApplicationsResource(debug, appManager, appTypeManagerWrapper);
+            ApplicationManagerWrapper appManager, ApplicationTypeManagerWrapper appTypeManagerWrapper,
+            @Named(ApplicationsResource.APPLICATION_QUERY_ATTRIBUTES) Map<String, QueryAttribute> queryAttributes) {
+        return new ApplicationsResource(debug, appManager, appTypeManagerWrapper, queryAttributes);
     }
 
     public static Map<Integer, Integer> getEntitlementsErrorHandlers() {
@@ -311,6 +317,25 @@ public class ForgerockRestGuiceModule extends AbstractModule {
             attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Privilege.CREATION_DATE_ATTRIBUTE));
             attributes.put("lastModifiedBy", new QueryAttribute(STRING, Privilege.LAST_MODIFIED_BY_ATTRIBUTE));
             attributes.put("lastModified", new QueryAttribute(TIMESTAMP, Privilege.LAST_MODIFIED_DATE_ATTRIBUTE));
+
+            return attributes;
+        }
+    }
+
+    /**
+     * Defines all allowed query attributes in queries against the application endpoint.
+     */
+    private static class ApplicationQueryAttributesMapProvider implements Provider<Map<String, QueryAttribute>> {
+        @Override
+        public Map<String, QueryAttribute> get() {
+            final Map<String, QueryAttribute> attributes = new HashMap<String, QueryAttribute>();
+
+            attributes.put("name", new QueryAttribute(STRING, Application.NAME_ATTRIBUTE));
+            attributes.put("description", new QueryAttribute(STRING, Application.DESCRIPTION_ATTRIBUTE));
+            attributes.put("createdBy", new QueryAttribute(STRING, Application.CREATED_BY_ATTRIBUTE));
+            attributes.put("creationDate", new QueryAttribute(TIMESTAMP, Application.CREATION_DATE_ATTRIBUTE));
+            attributes.put("lastModifiedBy", new QueryAttribute(STRING, Application.LAST_MODIFIED_BY_ATTRIBUTE));
+            attributes.put("lastModified", new QueryAttribute(TIMESTAMP, Application.LAST_MODIFIED_DATE_ATTRIBUTE));
 
             return attributes;
         }

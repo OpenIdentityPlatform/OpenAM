@@ -17,19 +17,24 @@ package org.forgerock.openam.forgerockrest.entitlements;
 
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryFilter;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -40,6 +45,8 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryResultHandlerBuilder;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
@@ -59,18 +66,23 @@ import org.forgerock.util.Reject;
  */
 public class ApplicationsResource extends RealmAwareResource {
 
+    public static final String APPLICATION_QUERY_ATTRIBUTES = "ApplicationQueryAttributes";
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private final ApplicationManagerWrapper appManager;
     private final ApplicationTypeManagerWrapper appTypeManagerWrapper;
+    private final Map<String, QueryAttribute> queryAttributes;
     private final Debug debug;
 
     /**
      * @param debug Debug instance
      * @param appManager Wrapper for the static {@link com.sun.identity.entitlement.ApplicationManager}. Cannot be null.
      * @param appTypeManagerWrapper instantiable version of the static ApplicationTypeManager class. Cannot be null.
+     * @param queryAttributes Definition of Application fields that can be queried
      */
     public ApplicationsResource(Debug debug, ApplicationManagerWrapper appManager,
-                                ApplicationTypeManagerWrapper appTypeManagerWrapper) {
+                                ApplicationTypeManagerWrapper appTypeManagerWrapper,
+                                Map<String, QueryAttribute> queryAttributes) {
 
         Reject.ifNull(appManager);
         Reject.ifNull(appTypeManagerWrapper);
@@ -78,6 +90,7 @@ public class ApplicationsResource extends RealmAwareResource {
         this.debug = debug;
         this.appManager = appManager;
         this.appTypeManagerWrapper = appTypeManagerWrapper;
+        this.queryAttributes = queryAttributes;
 
         mapper.disable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
@@ -324,7 +337,7 @@ public class ApplicationsResource extends RealmAwareResource {
         List<ApplicationWrapper> apps = new LinkedList<ApplicationWrapper>();
 
         try {
-            final Set<String> appNames = appManager.getApplicationNames(mySubject, realm);
+            final Set<String> appNames = query(request, mySubject, realm);
 
             for (String appName : appNames) {
                 final Application application = appManager.getApplication(mySubject, realm, appName);
@@ -516,4 +529,82 @@ public class ApplicationsResource extends RealmAwareResource {
 
     }
 
+    /**
+     * Query-based wrapper for the method {@link ApplicationManagerWrapper#search(Subject, String, Set)}.
+     *
+     * @param request the query request.
+     * @param subject The subject authorizing the update - will be validated for permission.
+     * @param realm The realm from which to gather the {@link Application} names.
+     * @return the names of those Applications that match the query.
+     * @throws EntitlementException if an error occurs or the query is invalid.
+     * @since 12.0.0
+     */
+    Set<String> query(QueryRequest request, Subject subject, String realm) throws EntitlementException {
+
+        QueryFilter queryFilter = request.getQueryFilter();
+        if (queryFilter == null) {
+            // Return everything
+            queryFilter = QueryFilter.alwaysTrue();
+        }
+
+        try {
+            Set<SearchFilter> searchFilters = queryFilter.accept(
+                    new ApplicationQueryBuilder(queryAttributes),
+                    new HashSet<SearchFilter>());
+            return appManager.search(subject, realm, searchFilters);
+
+        } catch (UnsupportedOperationException ex) {
+            throw new EntitlementException(EntitlementException.INVALID_SEARCH_FILTER, new Object[]{ ex.getMessage() });
+
+        } catch (IllegalArgumentException ex) {
+            throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[] { ex.getMessage() });
+        }
+    }
+
+    /**
+     * Converts a set of CREST {@link QueryFilter} into a set of entitlement {@link SearchFilter}.
+     *
+     * @since 12.0.0
+     */
+    private static final class ApplicationQueryBuilder extends QueryFilterVisitorAdapter {
+
+        ApplicationQueryBuilder(Map<String, QueryAttribute> queryAttributes) {
+            super("application", queryAttributes);
+        }
+
+        @Override
+        public Set<SearchFilter> visitEqualsFilter(Set<SearchFilter> filters, JsonPointer field,
+                                                   Object valueAssertion) {
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.EQUAL_OPERATOR, valueAssertion));
+            return filters;
+        }
+
+        @Override
+        public Set<SearchFilter> visitGreaterThanFilter(Set<SearchFilter> filters, JsonPointer field,
+                                                        Object valueAssertion) {
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.GREATER_THAN_OPERATOR, valueAssertion));
+            return filters;
+        }
+
+        @Override
+        public Set<SearchFilter> visitGreaterThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
+                                                                 Object valueAssertion) {
+            // Treat as greater-than (both are >= in the underlying implementation)
+            return visitGreaterThanFilter(filters, field, valueAssertion);
+        }
+
+        @Override
+        public Set<SearchFilter> visitLessThanFilter(Set<SearchFilter> filters, JsonPointer field,
+                                                     Object valueAssertion) {
+            filters.add(comparison(field.leaf(), SearchFilter.Operator.LESSER_THAN_OPERATOR, valueAssertion));
+            return filters;
+        }
+
+        @Override
+        public Set<SearchFilter> visitLessThanOrEqualToFilter(Set<SearchFilter> filters, JsonPointer field,
+                                                              Object valueAssertion) {
+            return visitLessThanFilter(filters, field, valueAssertion);
+        }
+
+    }
 }

@@ -19,9 +19,16 @@ package org.forgerock.openam.forgerockrest.entitlements;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.PrivilegeManager;
+import com.sun.identity.entitlement.util.SearchFilter;
+import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 import java.io.IOException;
+import java.util.Collections;
+
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
 import static org.fest.assertions.Assertions.assertThat;
@@ -30,6 +37,8 @@ import static org.forgerock.json.fluent.JsonValue.json;
 import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.QueryFilter;
+import static org.forgerock.json.resource.QueryFilter.*;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -38,12 +47,14 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeManagerWrapper;
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import org.forgerock.openam.utils.CollectionUtils;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.mockito.ArgumentCaptor;
@@ -60,12 +71,17 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import org.testng.Assert;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
  */
 public class ApplicationsResourceTest {
+
+    private static final String STRING_ATTRIBUTE = "stringAttribute";
+    private static final String DATE_ATTRIBUTE = "dateAttribute";
+    private static final String NUMERIC_ATTRIBUTE = "numberAttribute";
 
     private ApplicationsResource applicationsResource;
 
@@ -74,6 +90,7 @@ public class ApplicationsResourceTest {
     private ApplicationTypeManagerWrapper applicationTypeManagerWrapper;
     private ResultHandler<Resource> mockResultHandler;
     private ApplicationWrapper applicationWrapper;
+    private Map<String, QueryAttribute> queryAttributes;
 
     @BeforeMethod
     public void setUp() {
@@ -83,8 +100,14 @@ public class ApplicationsResourceTest {
         applicationTypeManagerWrapper = mock(ApplicationTypeManagerWrapper.class);
         applicationWrapper = mock(ApplicationWrapper.class);
 
-        applicationsResource = new ApplicationsResource(debug, applicationManagerWrapper,
-                applicationTypeManagerWrapper) {
+        queryAttributes = new HashMap<String, QueryAttribute>();
+        queryAttributes.put(STRING_ATTRIBUTE, new QueryAttribute(AttributeType.STRING, STRING_ATTRIBUTE));
+        queryAttributes.put(NUMERIC_ATTRIBUTE, new QueryAttribute(AttributeType.NUMBER, NUMERIC_ATTRIBUTE));
+        queryAttributes.put(DATE_ATTRIBUTE, new QueryAttribute(AttributeType.TIMESTAMP, DATE_ATTRIBUTE));
+
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
+
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
                     throws IOException, EntitlementException {
@@ -130,8 +153,9 @@ public class ApplicationsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
-        applicationsResource = new ApplicationsResource(debug, applicationManagerWrapper,
-                applicationTypeManagerWrapper) {
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
+
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
                     throws IOException, EntitlementException {
@@ -159,8 +183,9 @@ public class ApplicationsResourceTest {
 
         given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
 
-        applicationsResource = new ApplicationsResource(debug, applicationManagerWrapper,
-                applicationTypeManagerWrapper) {
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
+
             @Override
             protected ApplicationWrapper createApplicationWrapper(JsonValue jsonValue, Subject mySubject)
                     throws IOException, EntitlementException {
@@ -639,7 +664,7 @@ public class ApplicationsResourceTest {
 
         // Override the creation of the application wrapper so to return a mocked version.
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper) {
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(
@@ -677,8 +702,8 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
-        Set<String> appNames = CollectionUtils.asOrderedSet("app1", "app2", "app3", "app4", "app5");
-        given(applicationManagerWrapper.getApplicationNames(eq(subject), eq("/abc"))).willReturn(appNames);
+        Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5");
+        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
             Application app = mock(Application.class);
@@ -691,14 +716,13 @@ public class ApplicationsResourceTest {
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then
-        verify(applicationManagerWrapper).getApplicationNames(eq(subject), eq("/abc"));
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
         verify(applicationManagerWrapper, times(5)).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
         verify(handler, times(3)).handleResource(resourceCapture.capture());
 
-        List<String> selectedApps = CollectionUtils
-                .transformList(resourceCapture.getAllValues(), new ResourceToIdMapper());
+        List<String> selectedApps = transformList(resourceCapture.getAllValues(), new ResourceToIdMapper());
         assertThat(selectedApps).containsOnly("app2", "app3", "app4");
 
         ArgumentCaptor<QueryResult> resultCapture = ArgumentCaptor.forClass(QueryResult.class);
@@ -727,7 +751,7 @@ public class ApplicationsResourceTest {
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
         EntitlementException exception = new EntitlementException(EntitlementException.APP_RETRIEVAL_ERROR);
-        given(applicationManagerWrapper.getApplicationNames(eq(subject), eq("/abc"))).willThrow(exception);
+        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willThrow(exception);
 
         // When
         applicationsResource.queryCollection(serverContext, request, handler);
@@ -745,7 +769,7 @@ public class ApplicationsResourceTest {
     public void shouldHandleJsonParsingFailure() throws EntitlementException {
         // Override the creation of the application wrapper so to return a mocked version.
         applicationsResource = new ApplicationsResource(
-                debug, applicationManagerWrapper, applicationTypeManagerWrapper) {
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
 
             @Override
             protected ApplicationWrapper createApplicationWrapper(
@@ -784,8 +808,8 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
-        Set<String> appNames = CollectionUtils.asOrderedSet("app1", "app2", "app3", "app4", "app5");
-        given(applicationManagerWrapper.getApplicationNames(eq(subject), eq("/abc"))).willReturn(appNames);
+        Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5");
+        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
             Application app = mock(Application.class);
@@ -798,7 +822,7 @@ public class ApplicationsResourceTest {
         applicationsResource.queryCollection(serverContext, request, handler);
 
         // Then
-        verify(applicationManagerWrapper).getApplicationNames(eq(subject), eq("/abc"));
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
         verify(applicationManagerWrapper, times(5)).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<ResourceException> exceptionCapture = ArgumentCaptor.forClass(ResourceException.class);
@@ -806,6 +830,206 @@ public class ApplicationsResourceTest {
 
         ResourceException resourceException = exceptionCapture.getValue();
         assertThat(resourceException.getCode()).isEqualTo(ResourceException.INTERNAL_ERROR);
+    }
+
+    @Test
+    public void shouldTranslateAlwaysTrueQueryFilterToEmptySearchFilters() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(alwaysTrue());
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(Collections.<SearchFilter>emptySet()));
+    }
+
+    @Test
+    public void shouldSendAllMatchingPoliciesToQueryHandler() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(alwaysTrue());
+        Subject subject = new Subject();
+
+        Set<String> applications = asSet("one", "two", "three");
+        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(applications);
+
+        // When
+        Set<String> result = applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        assertThat(result).isEqualTo(applications);
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*'false' not supported.*")
+    public void shouldRejectAlwaysFalseQueryFilters() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(alwaysFalse());
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    @Test
+    public void shouldHandleStringEquality() throws Exception {
+        // Given
+        String value = "testValue";
+        QueryRequest request = mockQueryRequest(equalTo(STRING_ATTRIBUTE, value));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        SearchFilter searchFilter = new SearchFilter(STRING_ATTRIBUTE, value);
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+    }
+
+    @DataProvider(name = "SupportedQueryOperators")
+    public static Object[][] supportedQueryOperators() {
+        return new Object[][] {
+                { "eq", SearchFilter.Operator.EQUAL_OPERATOR },
+                // Treat >= and > as both greater-than-or-equals as that is all the search filters support
+                { "gt", SearchFilter.Operator.GREATER_THAN_OPERATOR },
+                { "ge", SearchFilter.Operator.GREATER_THAN_OPERATOR },
+                // Same for <= and <.
+                { "lt", SearchFilter.Operator.LESSER_THAN_OPERATOR },
+                { "le", SearchFilter.Operator.LESSER_THAN_OPERATOR }
+        };
+    }
+
+    @Test(dataProvider = "SupportedQueryOperators")
+    public void shouldTranslateSupportedOperators(String queryOperator, SearchFilter.Operator expectedOperator)
+            throws Exception {
+        // Given
+        long value = 123l;
+        QueryRequest request = mockQueryRequest(comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, value));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        SearchFilter searchFilter = new SearchFilter(NUMERIC_ATTRIBUTE, value, expectedOperator);
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+    }
+
+    @DataProvider(name = "UnsupportedOperators")
+    public static Object[][] unsupportedQueryOperators() {
+        // We do not support starts-with, contains or any extended operators
+        return new Object[][] {{ "sw" }, { "co" }, { "someExtendedOperator" }};
+    }
+
+    @Test(dataProvider = "UnsupportedOperators",
+            expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectUnsupportedQueryOperators(String queryOperator) throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(comparisonFilter(NUMERIC_ATTRIBUTE, queryOperator, 123l));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*Unknown query field.*")
+    public void shouldRejectUnknownAttributes() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(equalTo("unknown", "a value"));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    @Test(dataProvider = "SupportedQueryOperators")
+    public void shouldSupportDateQueries(String queryOperator, SearchFilter.Operator expectedOperator)
+            throws Exception {
+        // Given
+        Date value = new Date(123456789000l); // Note: only second accuracy supported in timestamp format
+        QueryRequest request = mockQueryRequest(comparisonFilter(DATE_ATTRIBUTE, queryOperator,
+                DateUtils.toUTCDateFormat(value)));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        // Date should be converted into a time-stamp long value
+        SearchFilter searchFilter = new SearchFilter(DATE_ATTRIBUTE, value.getTime(), expectedOperator);
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter)));
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectPresenceQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(present(STRING_ATTRIBUTE));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    @Test
+    public void shouldHandleAndQueries() throws Exception {
+        // Given
+        String value1 = "value1";
+        String value2 = "value2";
+        QueryRequest request = mockQueryRequest(
+                and(equalTo(STRING_ATTRIBUTE, value1), equalTo(STRING_ATTRIBUTE, value2)));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then
+        SearchFilter searchFilter1 = new SearchFilter(STRING_ATTRIBUTE, value1);
+        SearchFilter searchFilter2 = new SearchFilter(STRING_ATTRIBUTE, value2);
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), eq(asSet(searchFilter1, searchFilter2)));
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*'Or' not supported.*")
+    public void shouldRejectOrQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(QueryFilter.or(QueryFilter.alwaysTrue(), QueryFilter.alwaysTrue()));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    @Test(expectedExceptions = EntitlementException.class,
+            expectedExceptionsMessageRegExp = ".*not supported.*")
+    public void shouldRejectNotQueries() throws Exception {
+        // Given
+        QueryRequest request = mockQueryRequest(QueryFilter.not(QueryFilter.alwaysTrue()));
+        Subject subject = new Subject();
+
+        // When
+        applicationsResource.query(request, subject, "/abc");
+
+        // Then - exception
+    }
+
+    private QueryRequest mockQueryRequest(QueryFilter filter) {
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(filter);
+        return request;
     }
 
     /**

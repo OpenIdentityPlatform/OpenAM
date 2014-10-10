@@ -18,6 +18,8 @@ package org.forgerock.openam.forgerockrest.entitlements.wrappers;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.ApplicationManager;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.util.SearchFilter;
+
 import java.util.Set;
 import javax.security.auth.Subject;
 
@@ -27,7 +29,7 @@ import javax.security.auth.Subject;
 public class ApplicationManagerWrapper {
 
     /**
-     * Wrapper for the static
+     * Wrapper for the static method
      * {@link ApplicationManager#saveApplication(javax.security.auth.Subject, String, Application)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
@@ -40,7 +42,7 @@ public class ApplicationManagerWrapper {
     }
 
     /**
-     * Wrapper for the static
+     * Wrapper for the static method
      * {@link ApplicationManager#deleteApplication(javax.security.auth.Subject, String, String)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
@@ -54,7 +56,7 @@ public class ApplicationManagerWrapper {
     }
 
     /**
-     * Wrapper for the static
+     * Wrapper for the static method
      * {@link ApplicationManager#getApplication(javax.security.auth.Subject, String, String)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
@@ -69,7 +71,7 @@ public class ApplicationManagerWrapper {
     }
 
     /**
-     * Wrapper for the static
+     * Wrapper for the static method
      * {@link ApplicationManager#getApplicationNames(javax.security.auth.Subject, String)}.
      *
      * @param adminSubject An admin-level {@link Subject}.
@@ -77,12 +79,13 @@ public class ApplicationManagerWrapper {
      * @return a set of names of applications within the given realm
      * @throws EntitlementException if there were problems retrieving the names
      */
-    public Set<String> getApplicationNames(Subject adminSubject, String realm) throws EntitlementException {
+    public Set<String> getApplicationNames(Subject adminSubject, String realm)
+            throws EntitlementException {
         return ApplicationManager.getApplicationNames(adminSubject, realm);
     }
 
     /**
-     * Wrapper for the static
+     * Wrapper for the static method
      * {@link ApplicationManager#updateApplication(Application, Application, Subject, String)}.
      *
      * @param oldApplication The (existing) application, to update
@@ -90,9 +93,25 @@ public class ApplicationManagerWrapper {
      * @param subject The subject authorizing the update - will be validated for permission.
      * @throws EntitlementException if there was a problem deleting the old resource
      */
-    public void updateApplication(Application oldApplication, Application newApplication,
-                                     Subject subject) throws EntitlementException {
+    public void updateApplication(Application oldApplication, Application newApplication, Subject subject)
+            throws EntitlementException {
         ApplicationManager.updateApplication(oldApplication, newApplication, subject, newApplication.getRealm());
+    }
+
+    /**
+     * Wrapper for the static method
+     * {@link ApplicationManager#search(Subject, String, Set)}.
+     *
+     * @param subject The subject authorizing the update - will be validated for permission.
+     * @param realm The realm from which to gather the {@link Application} names.
+     * @param searchFilters The constraints that must match Application attribute values.
+     * @return the names of those Applications that match the filter.
+     * @throws EntitlementException if there were problems retrieving the names
+     * @since 12.0.0
+     */
+    public Set<String> search(Subject subject, String realm, Set<SearchFilter> searchFilters)
+            throws EntitlementException {
+        return ApplicationManager.search(subject, realm, searchFilters);
     }
 
 }

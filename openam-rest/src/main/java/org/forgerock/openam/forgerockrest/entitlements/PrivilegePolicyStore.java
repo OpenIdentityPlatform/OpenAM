@@ -22,10 +22,9 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import org.forgerock.json.fluent.JsonPointer;
 import org.forgerock.json.resource.QueryFilter;
-import org.forgerock.json.resource.QueryFilterVisitor;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
-import org.forgerock.util.Reject;
+import org.forgerock.openam.forgerockrest.entitlements.query.QueryFilterVisitorAdapter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -102,38 +101,12 @@ final class PrivilegePolicyStore implements PolicyStore {
     }
 
     /**
-     * Converts a CREST query filter into a set of entitlement search filters.
+     * Converts a set of CREST {@link QueryFilter} into a set of entitlement {@link SearchFilter}.
      */
-    private static final class PrivilegeQueryBuilder
-            implements QueryFilterVisitor<Set<SearchFilter>, Set<SearchFilter>> {
-        private final Map<String, QueryAttribute> queryAttributes;
+    private static final class PrivilegeQueryBuilder extends QueryFilterVisitorAdapter {
 
         PrivilegeQueryBuilder(Map<String, QueryAttribute> queryAttributes) {
-            this.queryAttributes = queryAttributes;
-        }
-
-        @Override
-        public Set<SearchFilter> visitAndFilter(Set <SearchFilter> filters, List<QueryFilter> subFilters) {
-            for (QueryFilter queryFilter : subFilters) {
-                queryFilter.accept(this, filters);
-            }
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitBooleanLiteralFilter(Set<SearchFilter> filters, boolean value) {
-            if (!value) {
-                throw new UnsupportedOperationException("'false' not supported in policy queries");
-            }
-            // Nothing to do for 'true' case as we only support AND expressions and 'anything AND true' is just the
-            // original expression ('anything').
-            return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitContainsFilter(Set <SearchFilter> filters, JsonPointer field,
-                                                     Object valueAssertion) {
-            throw new UnsupportedOperationException("'Contains' filters not supported for policies");
+            super("policy", queryAttributes);
         }
 
         @Override
@@ -141,12 +114,6 @@ final class PrivilegePolicyStore implements PolicyStore {
                                                    Object valueAssertion) {
             filters.add(comparison(field.leaf(), SearchFilter.Operator.EQUAL_OPERATOR, valueAssertion));
             return filters;
-        }
-
-        @Override
-        public Set<SearchFilter> visitExtendedMatchFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                          String operator, Object valueAssertion) {
-            throw new UnsupportedOperationException("Extended match not supported in policy queries");
         }
 
         @Override
@@ -176,41 +143,5 @@ final class PrivilegePolicyStore implements PolicyStore {
             return visitLessThanFilter(filters, field, valueAssertion);
         }
 
-        @Override
-        public Set<SearchFilter> visitNotFilter(Set<SearchFilter> filters, QueryFilter subFilter) {
-            throw new UnsupportedOperationException("Negation not supported in policy queries");
-        }
-
-        @Override
-        public Set<SearchFilter> visitOrFilter(Set<SearchFilter> filters, List<QueryFilter> subFilters) {
-            throw new UnsupportedOperationException("'Or' not supported in policy queries");
-        }
-
-        @Override
-        public Set<SearchFilter> visitPresentFilter(Set<SearchFilter> filters, JsonPointer field) {
-            throw new UnsupportedOperationException("'Presence' not supported in policy queries");
-        }
-
-        @Override
-        public Set<SearchFilter> visitStartsWithFilter(Set<SearchFilter> filters, JsonPointer field,
-                                                       Object valueAssertion) {
-            throw new UnsupportedOperationException("'Starts with' not supported in policy queries");
-        }
-
-        /**
-         * Attempts to convert the given field name, operator and value into an appropriate SearchFilter instance.
-         * The conversion used depends on the {@link QueryAttribute} configured for this field in the queryAttributes
-         * map.
-         */
-        private SearchFilter comparison(String field, SearchFilter.Operator operator, Object value) {
-            Reject.ifNull(field, operator, value);
-
-            QueryAttribute attribute = queryAttributes.get(field);
-            if (attribute == null) {
-                throw new UnsupportedOperationException("Unknown query field '" + field + "'");
-            }
-
-            return attribute.getFilter(operator, value);
-        }
     }
 }
