@@ -272,7 +272,7 @@
      is the server that continues to manage that user's session,
      unless the server is no longer available.
      The load balancer should send subsequent requests to that server
-     to avoid cross-talk traffic resulting from the server that gets the request
+     to avoid crosstalk traffic resulting from the server that gets the request
      being different from the server that authenticated the user.
     </para>
 
@@ -334,6 +334,36 @@
     </para>
    </step>
   </procedure>
+  <note>
+   <para>Sticky load balancing based on the value of the
+    <literal>amlbcookie</literal> cookie does not guarantee request forwarding
+    to the corresponding OpenAM server in all cases. For example,
+    ForgeRock Common REST API calls do not typically use cookies. Therefore,
+    load balancers are not able to route these calls to the OpenAM server
+    on which a user's session resides.
+   </para>
+   <para>
+    When an OpenAM request arrives at a server that does not hold the
+    user's session, the OpenAM server attempts to locate the session from the
+    Core Token Service session store by default.
+   </para>
+   <para>
+    OpenAM servers can also use crosstalk to locate
+    remote sessions. With crosstalk, OpenAM servers
+    communicate with each other through a back channel to locate remote sessions.
+    Because crosstalk generates network traffic, locating sessions from the
+    Core Token Service session store is preferred for performance reasons.
+   </para>
+   <para>
+   See
+   <link
+    xlink:show="new"
+    xlink:href="install-guide#chap-session-failover"
+    xlink:role="http://docbook.org/xlink/role/olink"
+    ><citetitle>Setting Up OpenAM Session Failover</citetitle></link>
+   for information about configuring remote session location options.
+  </para>
+  </note>
  </section>
 
  <section xml:id="handle-request-headers">

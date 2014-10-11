@@ -168,25 +168,82 @@
   <step>
    <para>
     To activate the Session Persistence and High Availability Failover option,
-    click the Enabled box.
+    check the Enabled box.
    </para>
   </step>
 
   <step>
-   <para>To enable crosstalk between OpenAM instances, click the Enabled box. This
-    ensures that OpenAM instances talk with each other to resolve any non-local
-    sessions, rather than using session persistence.</para>
+   <para>To ensure that local OpenAM instances resolve sessions from the Core
+    Token Service session store rather than by using crosstalk, check the Reduce
+    Crosstalk Enabled box. For more information about crosstalk, see the section,
+    <link
+     xlink:show="new"
+     xlink:href="install-guide#chap-install-multiple"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Configure Site Load Balancing</citetitle></link>.
+   </para>
 
-   <para>Note that if you have a large numbers of requests (for example, millions
-    of requests per hour), the crosstalk could adversely affect server performance
-    with the increase in network traffic.</para>
-
-   <para>If session persistence is enabled, the crosstalk option is not enabled by default.
-    If session persistence is <emphasis>not</emphasis> enabled, crosstalk is
-    automatically enabled by default. If both session persistence and crosstalk is enabled,
-    both features will be implemented, which could result in more network traffic.
+   <para>Do not disable reduced crosstalk unless advised to do so by ForgeRock
+    Technical Support.
    </para>
   </step>
+
+  <step>
+   <para>
+    Set reduced crosstalk options.
+   </para>
+   <para>
+    Session logout/destroy broadcasting enables
+    notification to all servers in an OpenAM site when a user logs out or
+    her session is destroyed by the OpenAM server. The broadcast notifications
+    are in addition to normal session logout/destroy notifications sent to
+    interested clients and servers.
+   </para>
+   <para>
+    Without session logout/destroy broadcasting,
+    it is possible for a user to log out
+    from one OpenAM server and then access her session on another server during
+    the brief window between the logout and session store replication.
+    Enabling session
+    logout/destroy broadcasting ensures that logged out and destroyed sessions
+    have the correct state on all OpenAM servers.
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Select Disabled if you do not want the OpenAM server to broadcast session
+      logout/destroy messages. Session logout/destroy broadcasting is disabled
+      by default. Disabling broadcasting is suitable when you do not need the
+      highest level of security. Disable broadcasting when you do not expect
+      users to maliciously attempt to access logged out or destroyed sessions.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Specify one of the two broadcast options to achieve a higher level of
+      security, at a cost of incurring additional network I/O. Select
+      "Broadcast only to local site servers" if your session store
+      supports a single OpenAM site. Select
+      "Broadcast to servers in all sites" if your session store
+      supports multiple OpenAM sites.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   <para>
+    The Reduced Crosstalk Purge
+    Delay option specifies the amount of time (in minutes) before
+    sessions are purged from OpenAM servers after the server receives
+    session logout/destroy broadcast notification. The delay ensures that
+    sessions are in memory during the time between
+    session logout/destruction and session store replication.
+   </para>
+   <para>
+    The default purge delay is 1 minute, which should be adequate unless
+    session store replication is abnormally slow on your network.
+   </para>
+  </step>
+
   <step>
    <para>
     Click Add to save your work.
