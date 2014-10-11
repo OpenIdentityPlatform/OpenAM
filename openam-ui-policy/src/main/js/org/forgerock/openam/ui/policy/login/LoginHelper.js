@@ -42,7 +42,6 @@ define("org/forgerock/openam/ui/policy/login/LoginHelper", [
     };
 
     obj.logout = function (successCallback) {
-        conf.loggedUser = null;
         // Do not invoke the successCallback, because we don't want the default forgerock-ui behavior
         sessionDelegate.logout().always(reauthenticate);
     };

@@ -44,7 +44,7 @@ define("org/forgerock/openam/ui/policy/login/SessionDelegate", [
             errorsHandlers: {"Bad Request": {status: 400}, "Unauthorized": {status: 401}}
         })
         .always(function () {
-            console.log("Successfully logged out");
+            configuration.loggedUser = null;
             _.each(configuration.globalData.auth.cookieDomains,function(cookieDomain){
                 cookieHelper.deleteCookie(configuration.globalData.auth.cookieName, "/", cookieDomain);
             });

@@ -25,9 +25,10 @@
 /*global window, define, $*/
 
 define("org/forgerock/openam/ui/policy/login/LoginDialog", [
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/util/Constants"
-], function(uiUtils, constants) {
+], function(conf, uiUtils, constants) {
 
     var newDialog,
         closeDialog = function() {
@@ -36,7 +37,7 @@ define("org/forgerock/openam/ui/policy/login/LoginDialog", [
         LoginDialog = {
             template: "templates/policy/LoginDialog.html",
             data : {
-                reauthUrl: constants.host + "/"+ constants.context + "?goto=" + window.location.href
+                reauthUrl: constants.host + "/"+ constants.context + "?goto=" + encodeURIComponent(window.location.href)
             },
             close: closeDialog,
             render: function () {
@@ -49,7 +50,9 @@ define("org/forgerock/openam/ui/policy/login/LoginDialog", [
                     title: 'Session Expired',
                     autoOpen: true,
                     open: function () {
-                        uiUtils.renderTemplate(_this.template, $(this), _this.data);
+                        uiUtils.renderTemplate(_this.template, $(this), _this.data, function () {
+                            delete conf.globalData.authorizationFailurePending;
+                        });
                     },
                     close: closeDialog
                 });
