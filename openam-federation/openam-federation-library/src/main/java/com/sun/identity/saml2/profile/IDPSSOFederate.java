@@ -22,10 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/**
- * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 
 package com.sun.identity.saml2.profile;
@@ -638,8 +635,8 @@ public class IDPSSOFederate {
                                     false);
                         } else {
                             try {
-                                sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm,
-                                        authnReq, relayState, spEntityID);
+                                IDPSSOUtil.sendNoPassiveResponse(request, response, idpMetaAlias, idpEntityID,
+                                        realm, authnReq, relayState, spEntityID);
                             } catch (SAML2Exception sme) {
                                 SAML2Utils.debug.error(classMethod, sme);
                                 sendError(request, response,
@@ -796,8 +793,8 @@ public class IDPSSOFederate {
                                 return;
                             } else {
                                 try {
-                                    sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm,
-                                            authnReq, relayState, spEntityID);
+                                    IDPSSOUtil.sendNoPassiveResponse(request, response, idpMetaAlias,
+                                            idpEntityID, realm, authnReq, relayState, spEntityID);
                                 } catch (SAML2Exception sme) {
                                     SAML2Utils.debug.error(classMethod, sme);
                                     sendError(request, response,
@@ -923,8 +920,8 @@ public class IDPSSOFederate {
                         // Send an appropriate response to the passive request
                         String spEntityID = authnReq.getIssuer().getValue();
                         try {
-                            sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm, authnReq,
-                                    relayState, spEntityID);
+                            IDPSSOUtil.sendNoPassiveResponse(request, response, idpMetaAlias, idpEntityID,
+                                    realm, authnReq, relayState, spEntityID);
                         } catch (SAML2Exception sme) {
                             SAML2Utils.debug.error(classMethod, sme);
                             sendError(request, response, SAML2Constants.SERVER_FAULT, "metaDataError", null, isFromECP,
@@ -1090,21 +1087,6 @@ public class IDPSSOFederate {
         } catch (SOAPException soapex) {
             SAML2Utils.debug.error("IDPSSOFederate.doSSOFederate:" , soapex);
         }
-    }
-
-    private static void sendPassiveResponse(HttpServletRequest request, HttpServletResponse response,
-            Object session, String idpMetaAlias,
-            String idpEntityID, String realm,
-            AuthnRequest authnReq, String relayState,
-            String spEntityID) throws SAML2Exception {
-        // Construct the response
-        Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
-                idpEntityID);
-        StringBuffer returnedBinding = new StringBuffer();
-        String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
-        String acsBinding = returnedBinding.toString();
-        IDPSSOUtil.sendResponse(request, response, acsBinding, spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
-                acsURL, res, session);
     }
 
     private static void sendError(HttpServletRequest request,

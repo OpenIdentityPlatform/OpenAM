@@ -24,9 +24,8 @@
 
    $Id: spAssertionConsumer.jsp,v 1.17 2010/01/23 00:07:06 exu Exp $
 
-   Portions Copyrighted 2012-2013 ForgeRock AS
+   Portions Copyrighted 2012-2014 ForgeRock AS.
 --%>
-
 
 <%@page
 import="com.sun.identity.shared.encode.URLEncDec,
@@ -195,38 +194,51 @@ java.util.logging.Level
         return;
     }
     Object newSession = null;
+    Response saml2Resp = respInfo.getResponse();
+    String requestID = saml2Resp.getInResponseTo();
+    boolean isProxyOn = IDPProxyUtil.isIDPProxyEnabled(requestID);
     try {
         newSession = SPACSUtils.processResponse(
             request, response, new PrintWriter(out, true), metaAlias, token, respInfo,
             orgName, hostEntityId, metaManager);
     } catch (SAML2Exception se) {
         SAML2Utils.debug.error("spAssertionConsumer.jsp: SSO failed.", se);
-        String[] data = {hostEntityId,se.getMessage(),""};
+        String[] data = {hostEntityId, se.getMessage(), ""};
         if (LogUtil.isErrorLoggable(Level.FINE)) {
-            data[2] = respInfo.getResponse().toXMLString(true, true);
+            data[2] = saml2Resp.toXMLString(true, true);
         }
         LogUtil.error(Level.INFO,
-                    LogUtil.SP_SSO_FAILED,
-                    data,
-                    null);
+                LogUtil.SP_SSO_FAILED,
+                data,
+                null);
         if (se.isRedirectionDone()) {
             // response had been redirected already.
             return;
         }
+        if (isProxyOn) {
+            if ("noPassiveResponse".equals(se.getErrorCode())) {
+                try {
+                    IDPProxyUtil.sendNoPassiveProxyResponse(request, response, requestID, metaAlias, hostEntityId,
+                            orgName);
+                } catch (SAML2Exception samle) {
+                    SAML2Utils.debug.error("Failed to send nopassive proxy response", samle);
+                }
+                return;
+            }
+        }
         if (se.getMessage().equals(SAML2Utils.bundle.getString("noUserMapping"))) {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message("spAssertionConsumer.jsp:need "
-                    + " local login!!");
+                SAML2Utils.debug.message("spAssertionConsumer.jsp:need local login!!");
             }
             // logging?
             FSUtils.forwardRequest(request, response, getLocalLoginUrl(
-                orgName, hostEntityId, metaManager, respInfo,
-                requestURL, relayState));
+                    orgName, hostEntityId, metaManager, respInfo,
+                    requestURL, relayState));
             return;
         }
-        SAMLUtils.sendError(request, response, 
-            response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
-            SAML2Utils.bundle.getString("SSOFailed"));
+        SAMLUtils.sendError(request, response,
+                response.SC_INTERNAL_SERVER_ERROR, "SSOFailed",
+                SAML2Utils.bundle.getString("SSOFailed"));
         return;
     }
     if (newSession == null) {
@@ -249,16 +261,13 @@ java.util.logging.Level
         // response redirected already in SPAdapter
         return;
     }
-    Response saml2Resp = respInfo.getResponse();
-    String requestID = saml2Resp.getInResponseTo();
-    boolean isProxyOn = IDPProxyUtil.isIDPProxyEnabled(requestID);
     if (isProxyOn) { 
-    try { 
-        IDPProxyUtil.generateProxyResponse(request, response, new PrintWriter(out, true), metaAlias,
-             respInfo,newSession);
-    } catch (SAML2Exception se) {
-        SAML2Utils.debug.message("Failed sending proxy response"); 
-    }
+        try {
+            IDPProxyUtil.generateProxyResponse(request, response, new PrintWriter(out, true), metaAlias, respInfo,
+                    newSession);
+        } catch (SAML2Exception se) {
+            SAML2Utils.debug.error("Failed sending proxy response", se);
+        }
         return;  
     } 
     // redirect to relay state

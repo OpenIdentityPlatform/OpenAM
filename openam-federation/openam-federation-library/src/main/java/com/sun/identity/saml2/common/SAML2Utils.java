@@ -399,14 +399,10 @@ public class SAML2Utils extends SAML2SDKUtils {
         }
         
         Status status = response.getStatus();
-        if (status == null || !status.getStatusCode().getValue().equals(
-                SAML2Constants.SUCCESS)) {
-            String statusCode =
-                    (status == null)?"":status.getStatusCode().getValue();
+        if (status == null || !status.getStatusCode().getValue().equals(SAML2Constants.SUCCESS)) {
+            String statusCode = (status == null) ? "" : status.getStatusCode().getValue();
             if (debug.messageEnabled()) {
-                debug.message(method
-                        + "Response's status code is not success."
-                        + statusCode);
+                debug.message(method + "Response's status code is not success: " + statusCode);
             }
             String[] data = {respID, ""};
             if (LogUtil.isErrorLoggable(Level.FINE)) {
@@ -416,8 +412,17 @@ public class SAML2Utils extends SAML2SDKUtils {
                     LogUtil.WRONG_STATUS_CODE,
                     data,
                     null);
-            throw new SAML2Exception(
-                    bundle.getString("invalidStatusCodeInResponse"));
+            if (SAML2Constants.RESPONDER.equals(statusCode)) {
+                //In case of passive authentication the NoPassive response will be sent using two StatusCode nodes:
+                //the outer StatusCode will be Responder and the inner StatusCode will contain the NoPassive URN
+                StatusCode secondLevelStatusCode = status.getStatusCode().getStatusCode();
+                if (secondLevelStatusCode != null
+                        && SAML2Constants.NOPASSIVE.equals(secondLevelStatusCode.getValue())) {
+                    throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "noPassiveResponse", null);
+                }
+            }
+
+            throw new SAML2Exception(bundle.getString("invalidStatusCodeInResponse"));
         }
         
         if (saml2MetaManager == null) {

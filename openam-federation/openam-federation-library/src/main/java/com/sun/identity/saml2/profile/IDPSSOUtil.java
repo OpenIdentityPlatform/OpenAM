@@ -487,7 +487,6 @@ public class IDPSSOUtil {
 
     }
 
-
     private static boolean setCOTCookie(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -561,6 +560,31 @@ public class IDPSSOUtil {
                     "Unable to send redirect: ", ioe);
         }
         return false;
+    }
+
+    /**
+     * A convenience method to construct NoPassive SAML error responses for SAML passive authentication requests.
+     *
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @param idpMetaAlias The IdP's metaAlias.
+     * @param idpEntityID The IdP's entity ID.
+     * @param realm The realm where the IdP belongs to.
+     * @param authnReq The SAML AuthnRequest sent by the SP.
+     * @param relayState The RelayState value.
+     * @param spEntityID The SP's entity ID.
+     * @throws SAML2Exception If there was an error while creating or sending the response back to the SP.
+     */
+    public static void sendNoPassiveResponse(HttpServletRequest request, HttpServletResponse response,
+            String idpMetaAlias, String idpEntityID, String realm, AuthnRequest authnReq, String relayState,
+            String spEntityID) throws SAML2Exception {
+        Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
+                idpEntityID);
+        StringBuffer returnedBinding = new StringBuffer();
+        String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
+        String acsBinding = returnedBinding.toString();
+        sendResponse(request, response, acsBinding, spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
+                acsURL, res, null);
     }
 
     /**
