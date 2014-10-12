@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AgentDumpViewBean.java,v 1.1 2008/12/10 18:25:14 farble1670 Exp $
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ *
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.console.agentconfig;
 
@@ -44,6 +42,10 @@ import com.sun.web.ui.model.CCPageTitleModel;
 import com.sun.web.ui.view.html.CCStaticTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.alert.CCAlert;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -161,7 +163,10 @@ public class AgentDumpViewBean extends AMPrimaryMastHeadViewBean
 
     private static String getFormattedAttributes(Map<String,Set<String>> values) {
         StringBuilder b = new StringBuilder();
-        for (String key: values.keySet()) {
+        // Used to generated a sorted list of property names for easier viewing
+        List<String> sortedKeys = new ArrayList<String>(values.keySet());
+        Collections.sort(sortedKeys);
+        for (String key: sortedKeys) {
             Set<String> vals = values.get(key);
             if (vals == null || vals.isEmpty()) {
                 b.append(key);

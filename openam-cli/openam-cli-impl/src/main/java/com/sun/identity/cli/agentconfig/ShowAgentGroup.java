@@ -24,10 +24,7 @@
  *
  * $Id: ShowAgentGroup.java,v 1.5 2008/06/25 05:42:10 qcheng Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS.
  */
 package com.sun.identity.cli.agentconfig;
 
@@ -51,7 +48,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -103,8 +103,10 @@ public class ShowAgentGroup extends AuthenticatedCommand {
 
             if ((values != null) && !values.isEmpty()) {
                 StringBuilder buff = new StringBuilder();
-                for (Iterator i = values.keySet().iterator(); i.hasNext();) {
-                    String attrName = (String)i.next();
+                // Used to generated a sorted list of property names for easier viewing
+                List<String> sortedKeys = new ArrayList<String>(values.keySet());
+                Collections.sort(sortedKeys);
+                for (String attrName : sortedKeys) {
 
                     if (passwords.contains(attrName)) {
                         buff.append(attrName).append("=********\n");
