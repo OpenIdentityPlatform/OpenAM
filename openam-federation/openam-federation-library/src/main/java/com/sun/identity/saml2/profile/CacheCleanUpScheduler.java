@@ -24,6 +24,7 @@
  *
  * $Id: CacheCleanUpScheduler.java,v 1.8 2009/05/14 17:23:44 exu Exp $
  *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 
@@ -54,7 +55,6 @@ public class CacheCleanUpScheduler {
         pool.schedule(IDPCache.responsesByArtifacts, nextRun);
         pool.schedule(IDPCache.mniRequestHash, nextRun);
         pool.schedule(IDPCache.responseCache, nextRun);
-        pool.schedule(IDPCache.proxySPDescCache, nextRun);
         pool.schedule(IDPCache.proxySPAuthnReqCache, nextRun);
         pool.schedule(IDPCache.proxySPLogoutReqCache, nextRun);
         pool.schedule(IDPCache.SOAPMessageByLogoutRequestID, nextRun);

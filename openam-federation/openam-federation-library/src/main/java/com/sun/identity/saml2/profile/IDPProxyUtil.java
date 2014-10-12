@@ -199,9 +199,6 @@ public class IDPProxyUtil {
         // retrieved later when the user successfully authenticates
         IDPCache.authnRequestCache.put(requestID, newAuthnRequest);
 
-        // save the SP descriptor in IDPCache
-        IDPCache.proxySPDescCache.put(requestID, spSSODescriptor);
-
         // save the original AuthnRequest
         IDPCache.proxySPAuthnReqCache.put(requestID, authnRequest);
 
@@ -491,12 +488,7 @@ public class IDPProxyUtil {
      * @return true if the proxying is enabled.
      */
     public static boolean isIDPProxyEnabled(String requestID) {
-        if (IDPCache.proxySPDescCache != null && 
-            (!IDPCache.proxySPDescCache.isEmpty())) {
-            return IDPCache.proxySPDescCache.containsKey(requestID);
-        }  else  {
-            return false;
-        }
+        return IDPCache.proxySPAuthnReqCache.containsKey(requestID);
     }
  
     /**
@@ -507,8 +499,8 @@ public class IDPProxyUtil {
      * @param out the print writer for writing out presentation
      * @param requestID request ID 
      * @param idpMetaAlias meta Alias 
-     * @param newSess Session object
-     * @exception SAML2Exception for any SAML2 failure.
+     * @param newSession Session object
+     * @throws SAML2Exception for any SAML2 failure.
      */
     private static void sendProxyResponse(
         HttpServletRequest request,
@@ -516,7 +508,7 @@ public class IDPProxyUtil {
         PrintWriter out,
         String requestID,
         String idpMetaAlias,
-        Object newSess, 
+        Object newSession,
         String nameIDFormat)
         throws SAML2Exception 
     { 
@@ -534,11 +526,6 @@ public class IDPProxyUtil {
             }
         }
         IDPCache.proxySPAuthnReqCache.remove(requestID);
-        SPSSODescriptorElement proxyDescriptor = null; 
-        proxyDescriptor =
-            (SPSSODescriptorElement)
-            IDPCache.proxySPDescCache.get(requestID);
-        IDPCache.proxySPDescCache.remove(requestID);      
         String proxySPEntityId = origRequest.getIssuer().getValue();
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message( classMethod
@@ -546,9 +533,7 @@ public class IDPProxyUtil {
                 + proxySPEntityId);
         }
         // Save the SP provider id based on the token id
-        IDPCache.spSessionPartnerBySessionID.put(
-            (String) sessionProvider.getSessionID(newSess), 
-             proxySPEntityId);
+        IDPCache.spSessionPartnerBySessionID.put(sessionProvider.getSessionID(newSession), proxySPEntityId);
  
         //TODO: set AuthnContext
         /*AuthnContext authnContextStm;
@@ -567,9 +552,29 @@ public class IDPProxyUtil {
                                   idpMetaAlias, 
                                   nameIDFormat, 
                                   relayState,
-                                  newSess); 
+                                  newSession);
     }
-    
+
+    /**
+     * Sends back a NoPassive response for the original AuthnRequest.
+     *
+     * @param request The request.
+     * @param response The response.
+     * @param requestID The requestID of the proxied AuthnRequest.
+     * @param idpMetaAlias The IdP's metaAlias.
+     * @param hostEntityID The IdP's entity ID.
+     * @param realm The realm where the IdP belongs to.
+     * @throws SAML2Exception If there was an error while sending the NoPassive response.
+     */
+    public static void sendNoPassiveProxyResponse(HttpServletRequest request, HttpServletResponse response,
+            String requestID, String idpMetaAlias, String hostEntityID, String realm) throws SAML2Exception {
+        AuthnRequest origRequest = (AuthnRequest) IDPCache.proxySPAuthnReqCache.remove(requestID);
+        String relayState = (String) IDPCache.relayStateCache.remove(origRequest.getID());
+
+        IDPSSOUtil.sendNoPassiveResponse(request, response, idpMetaAlias, hostEntityID, realm,
+                origRequest, relayState, origRequest.getIssuer().getValue());
+    }
+
     /**
      * Generates the AuthnResponse by the IDP Proxy and send to the 
      * service provider. 

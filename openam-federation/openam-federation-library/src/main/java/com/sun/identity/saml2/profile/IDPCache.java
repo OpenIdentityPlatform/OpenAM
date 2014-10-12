@@ -24,10 +24,7 @@
  *
  * $Id: IDPCache.java,v 1.18 2009/05/14 17:23:45 exu Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS.
  */
 package com.sun.identity.saml2.profile;
 
@@ -197,15 +194,6 @@ public class IDPCache {
      */
     public static Hashtable oldIDPSessionCache = new Hashtable();
     
-    /**
-      * Cache saves the SP descriptor coming to proxy IDP 
-      * key   : requestID (String)
-      * value : SP descriptor 
-      */
-    public static PeriodicCleanUpMap proxySPDescCache =
-         new PeriodicCleanUpMap(
-         SPCache.interval * 1000, SPCache.interval * 1000); 
-
     /**
       * Cache saves the original AuthnRequest coming from SP to IDP proxy
       * key   : requestID (String) 
