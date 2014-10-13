@@ -67,7 +67,6 @@
                         <Value>org.forgerock.openam.authentication.modules.deviceprint.DeviceIdSave</Value>
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
-                        <Value>com.sun.identity.authentication.modules.securid.SecurID</Value>
                         <Value>org.forgerock.openam.authentication.modules.adaptive.Adaptive</Value>
                         <Value>org.forgerock.openam.authentication.modules.oauth2.OAuth</Value>
                         <Value>org.forgerock.openam.authentication.modules.oath.OATH</Value>

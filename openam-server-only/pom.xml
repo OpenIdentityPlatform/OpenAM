@@ -373,6 +373,30 @@
                     </unpack>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/services</directory>
+                                    <includes>
+                                        <include>amAuth.xml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <resources>
@@ -392,10 +416,138 @@
                     <exclude>*.conf</exclude>
                 </excludes>
             </resource>
-
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources/config</directory>
+                <includes>
+                    <include>serviceNames.properties</include>
+                </includes>
+                <targetPath>${project.build.directory}/classes</targetPath>
+            </resource>
         </resources>
     </build>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <dependencies>
+                <dependency>
+                    <artifactId>openam-auth-securid</artifactId>
+                    <groupId>org.forgerock.openam</groupId>
+                </dependency>
+            </dependencies>
+            <properties>
+                <auth.securID.xml>amAuthSecurID.xml</auth.securID.xml>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Transform the 'amAuth.xml' to add the SecurID auth module -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>transform</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <catalogs>
+                                <catalog>src/main/xslt/catalog.xml</catalog>
+                            </catalogs>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>${project.build.outputDirectory}</dir>
+                                    <includes>
+                                        <include>amAuth.xml</include>
+                                    </includes>
+                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
+                                    <outputDir>${project.build.outputDirectory}</outputDir>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </plugin>
+                    <!-- Transform the 'serviceNames.xml' to add the SecurID auth module -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>transform</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <catalogs>
+                                <catalog>src/main/xslt/catalog.xml</catalog>
+                            </catalogs>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>${project.build.outputDirectory}</dir>
+                                    <includes>
+                                        <include>amAuth.xml</include>
+                                    </includes>
+                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
+                                    <outputDir>${project.build.outputDirectory}</outputDir>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>development</id>
+            <dependencies>
+                <dependency>
+                    <artifactId>openam-auth-securid</artifactId>
+                    <groupId>org.forgerock.openam</groupId>
+                </dependency>
+            </dependencies>
+            <properties>
+                <auth.securID.xml>amAuthSecurID.xml</auth.securID.xml>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Transform the 'amAuth.xml' to add the SecurID auth module -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>transform</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <catalogs>
+                                <catalog>src/main/xslt/catalog.xml</catalog>
+                            </catalogs>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>${project.build.outputDirectory}</dir>
+                                    <includes>
+                                        <include>amAuth.xml</include>
+                                    </includes>
+                                    <stylesheet>src/main/xslt/amAuthTransform.xslt</stylesheet>
+                                    <outputDir>${project.build.outputDirectory}</outputDir>
+                                </transformationSet>
+                            </transformationSets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <properties>
+        <!-- By default this property is empty so as not to include the SecurID auth module -->
+        <auth.securID.xml></auth.securID.xml>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -596,11 +748,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-radius</artifactId>
-        </dependency>
-
-        <dependency>
-            <artifactId>openam-auth-securid</artifactId>
-            <groupId>org.forgerock.openam</groupId>
         </dependency>
 
         <dependency>

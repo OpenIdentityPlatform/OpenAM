@@ -58,7 +58,6 @@
         <module>openam-auth-oath</module>
         <module>openam-auth-oauth2</module>
         <module>openam-auth-radius</module>
-        <module>openam-auth-securid</module>
         <module>openam-auth-windowsdesktopsso</module>
         <module>openam-auth-persistentcookie</module>
         <module>deviceprint</module>
@@ -66,6 +65,21 @@
         <module>openam-auth-scripted</module>
         <module>openam-auth-device-id</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <modules>
+                <module>openam-auth-securid</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>development</id>
+            <modules>
+                <module>openam-auth-securid</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>

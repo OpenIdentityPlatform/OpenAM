@@ -237,6 +237,24 @@
             <properties>
                 <generate.clientsdk.sources>true</generate.clientsdk.sources>
             </properties>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
+            <dependencyManagement>
+                <dependencies>
+                    <!-- Don't include the authapi*.jar in the war for a release build -->
+                    <dependency>
+                        <groupId>external</groupId>
+                        <artifactId>authapi</artifactId>
+                        <version>${authapi.version}</version>
+                        <scope>provided</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
 
         <!-- When building an Enterprise binary download, include the correct binary license terms. -->
@@ -255,6 +273,17 @@
                 <forgerock.license.artifactId>binary-license</forgerock.license.artifactId>
                 <forgerock.license.version>1.0.0</forgerock.license.version>
             </properties>
+        </profile>
+
+        <profile>
+            <id>development</id>
+            <repositories>
+                <repository>
+                    <id>forgerock-internal</id>
+                    <name>Forgerock Internal Repository</name>
+                    <url>http://maven.forgerock.org/repo/internal</url>
+                </repository>
+            </repositories>
         </profile>
     </profiles>
 
