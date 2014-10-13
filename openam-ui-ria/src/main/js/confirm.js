@@ -33,7 +33,7 @@ require.config({
     paths: { 
 
         i18next: "libs/i18next-1.7.3-min",
-        backbone: "libs/backbone-1.1.0-min",
+        backbone: "libs/backbone-1.1.2-min",
         underscore: "libs/lodash-2.4.1-min",
         js2form: "libs/js2form-2.0",
         form2js: "libs/form2js-2.0",
