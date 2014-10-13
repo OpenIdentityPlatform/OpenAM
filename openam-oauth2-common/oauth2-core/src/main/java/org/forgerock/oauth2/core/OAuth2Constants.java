@@ -176,6 +176,11 @@ public class OAuth2Constants {
          */
         public static final String OPENID = "openid";
 
+        /**
+         * Parameter usage location: OpenId Connect request
+         */
+        public static final String LOGIN_HINT = "login_hint";
+
     }
 
     public class CoreTokenParams{
@@ -701,6 +706,13 @@ public class OAuth2Constants {
 
         public static final String AUDIENCE = "audience";
         public static final String USER_ID = "user_id";
+
+        /**
+         * The cookie name that contains any login_hint parameter that was provided
+         * with an OpenID Connect authorize request, set so that authentication
+         * modules in the authentication chain can use its value to improve UX.
+         */
+        public static final String LOGIN_HINT_COOKIE = "oidcLoginHint";
 
     }
 

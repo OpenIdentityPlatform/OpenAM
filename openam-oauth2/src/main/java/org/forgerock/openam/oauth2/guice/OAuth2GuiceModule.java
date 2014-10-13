@@ -51,8 +51,10 @@ import org.forgerock.oauth2.core.ResourceOwnerSessionValidator;
 import org.forgerock.oauth2.core.TokenInfoService;
 import org.forgerock.oauth2.core.TokenInfoServiceImpl;
 import org.forgerock.oauth2.core.TokenStore;
+import org.forgerock.oauth2.restlet.AuthorizeRequestHook;
 import org.forgerock.oauth2.restlet.RestletHeaderAccessTokenVerifier;
 import org.forgerock.oauth2.restlet.RestletOAuth2RequestFactory;
+import org.forgerock.oauth2.restlet.TokenRequestHook;
 import org.forgerock.openam.oauth2.ClientAuthenticatorImpl;
 import org.forgerock.openam.oauth2.OpenAMClientDAO;
 import org.forgerock.openam.oauth2.OpenAMClientRegistrationStore;
@@ -73,6 +75,7 @@ import org.forgerock.openidconnect.OpenIdConnectTokenStore;
 import org.forgerock.openidconnect.OpenIdResourceOwnerConsentVerifier;
 import org.forgerock.openidconnect.UserInfoService;
 import org.forgerock.openidconnect.UserInfoServiceImpl;
+import org.forgerock.openidconnect.restlet.LoginHintHook;
 import org.restlet.Request;
 
 import javax.inject.Inject;
@@ -137,13 +140,19 @@ public class OAuth2GuiceModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), PasswordCredentialsRequestValidator.class);
         passwordCredentialsRequestValidators.addBinding().to(PasswordCredentialsRequestValidatorImpl.class);
 
-
         final MapBinder<String, GrantTypeHandler> grantTypeHandlers =
                 MapBinder.newMapBinder(binder(), String.class, GrantTypeHandler.class);
         grantTypeHandlers.addBinding("client_credentials").to(ClientCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("password").to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("authorization_code").to(AuthorizationCodeGrantTypeHandler.class);
 
+        final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
+                binder(), AuthorizeRequestHook.class);
+        authorizeRequestHooks.addBinding().to(LoginHintHook.class);
+
+        final Multibinder<TokenRequestHook> tokenRequestHooks = Multibinder.newSetBinder(
+                binder(), TokenRequestHook.class);
+        tokenRequestHooks.addBinding().to(LoginHintHook.class);
     }
 
     @Inject

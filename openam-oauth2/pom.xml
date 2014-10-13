@@ -49,6 +49,10 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openid-connect-restlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>oauth2-restlet</artifactId>
         </dependency>
         <dependency>

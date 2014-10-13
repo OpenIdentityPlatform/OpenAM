@@ -33,6 +33,7 @@ import org.restlet.util.Series;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles requests to the OAuth2 token endpoint for requesting access tokens.
@@ -44,6 +45,7 @@ public class TokenEndpointResource extends ServerResource {
     private final OAuth2RequestFactory<Request> requestFactory;
     private final AccessTokenService accessTokenService;
     private final ExceptionHandler exceptionHandler;
+    private final Set<TokenRequestHook> hooks;
 
     /**
      * Constructs a new instance of the TokenEndpointResource.
@@ -54,10 +56,11 @@ public class TokenEndpointResource extends ServerResource {
      */
     @Inject
     public TokenEndpointResource(OAuth2RequestFactory<Request> requestFactory, AccessTokenService accessTokenService,
-            ExceptionHandler exceptionHandler) {
+            ExceptionHandler exceptionHandler, Set<TokenRequestHook> hooks) {
         this.requestFactory = requestFactory;
         this.accessTokenService = accessTokenService;
         this.exceptionHandler = exceptionHandler;
+        this.hooks = hooks;
     }
 
     /**
@@ -74,6 +77,11 @@ public class TokenEndpointResource extends ServerResource {
         final OAuth2Request request = requestFactory.create(getRequest());
         try {
             final AccessToken accessToken = accessTokenService.requestAccessToken(request);
+
+            for (TokenRequestHook hook : hooks) {
+                hook.afterTokenHandling(request, getRequest(), getResponse());
+            }
+
             return new JacksonRepresentation<Map<String, Object>>(accessToken.toMap());
 
         } catch (RedirectUriMismatchException e) {

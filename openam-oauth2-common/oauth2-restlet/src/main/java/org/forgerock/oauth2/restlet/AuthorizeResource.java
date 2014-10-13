@@ -53,6 +53,7 @@ public class AuthorizeResource extends ServerResource {
     private final AuthorizationService authorizationService;
     private final ExceptionHandler exceptionHandler;
     private final OAuth2Representation representation;
+    private final Set<AuthorizeRequestHook> hooks;
 
     /**
      * Constructs a new AuthorizeResource.
@@ -64,11 +65,12 @@ public class AuthorizeResource extends ServerResource {
      */
     @Inject
     public AuthorizeResource(OAuth2RequestFactory<Request> requestFactory, AuthorizationService authorizationService,
-            ExceptionHandler exceptionHandler, OAuth2Representation representation) {
+            ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks) {
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
         this.exceptionHandler = exceptionHandler;
         this.representation = representation;
+        this.hooks = hooks;
     }
 
     /**
@@ -84,12 +86,24 @@ public class AuthorizeResource extends ServerResource {
     public Representation authorize() throws OAuth2RestletException {
 
         final OAuth2Request request = requestFactory.create(getRequest());
+
+        for (AuthorizeRequestHook hook : hooks) {
+            hook.beforeAuthorizeHandling(request, getRequest(), getResponse());
+        }
+
         try {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request);
 
             final String redirectUri = getQueryValue("redirect_uri");
-            return representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
+
+            Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
                     redirectUri);
+
+            for (AuthorizeRequestHook hook : hooks) {
+                hook.afterAuthorizeSuccess(request, getRequest(), getResponse());
+            }
+
+            return response;
 
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("client_id")) {
@@ -166,6 +180,10 @@ public class AuthorizeResource extends ServerResource {
 
         final OAuth2Request request = requestFactory.create(getRequest());
 
+        for (AuthorizeRequestHook hook : hooks) {
+            hook.beforeAuthorizeHandling(request, getRequest(), getResponse());
+        }
+
         final boolean consentGiven = "allow".equalsIgnoreCase(request.<String>getParameter("decision"));
         final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
 
@@ -174,8 +192,14 @@ public class AuthorizeResource extends ServerResource {
                     saveConsent);
 
             final String redirectUri = request.getParameter("redirect_uri");
-            return representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
+            Representation response = representation.toRepresentation(getContext(), getRequest(), getResponse(), authorizationToken,
                     redirectUri);
+
+            for (AuthorizeRequestHook hook : hooks) {
+                hook.afterAuthorizeSuccess(request, getRequest(), getResponse());
+            }
+
+            return response;
 
         } catch (ResourceOwnerAuthenticationRequired e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
