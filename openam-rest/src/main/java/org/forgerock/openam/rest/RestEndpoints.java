@@ -32,6 +32,7 @@ import org.forgerock.openam.forgerockrest.entitlements.ApplicationsResource;
 import org.forgerock.openam.forgerockrest.entitlements.ConditionTypesResource;
 import org.forgerock.openam.forgerockrest.entitlements.DecisionCombinersResource;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyResource;
+import org.forgerock.openam.forgerockrest.entitlements.SubjectAttributesResourceV1;
 import org.forgerock.openam.forgerockrest.entitlements.SubjectTypesResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
@@ -172,6 +173,10 @@ public class RestEndpoints {
         rootRealmRouter.route("/subjecttypes")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
                 .forVersion("1.0").to(SubjectTypesResource.class);
+
+        rootRealmRouter.route("/subjectattributes")
+                .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
+                .forVersion("1.0").to(SubjectAttributesResourceV1.class);
 
         rootRealmRouter.route("/tokens")
                 .through(AdminOnlyAuthzModule.class, AdminOnlyAuthzModule.NAME)
