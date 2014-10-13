@@ -159,9 +159,9 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         return persistentStore.getSTSInstanceConfig(stsId, realm);
     }
 
-    /*
-    This method is only to be called by the RestSTSInstanceRepublishServlet, which calls it only to re-publish
-    previously-published Rest STS instances during OpenAM startup.
+    /**
+     * This method is only to be called by the RestSTSSetupListener, which calls it only to re-publish
+     * previously-published Rest STS instances during OpenAM startup.
      */
     public void republishExistingInstances() throws STSPublishException {
         /*
@@ -198,20 +198,9 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
         return persistentStore.isInstancePresent(normalizeDeploymentSubPath(stsId), realm);
     }
 
-    /*
-    This method is called by the RestSTSInstanceRepublishServlet, but only if AMSetupServlet.isCurrentConfigurationValid() -
-    i.e. not during installation. The registerServiceListener method requires the Admin SSO token, which is not available
-    during installation. The problem with this approach is that the ServiceListener will not be registered immediately after
-    installation - it will require an OpenAM restart for the registration to occur. The only way I could get around this
-    would be to check if ServiceListener registration has occurred in some of the methods above - but even then, in a
-    site deployment, if another instance is targeted to publish/remove rest-sts instances, the ServiceListener will not
-    be registered, which is precisely the case in which the ServiceListener should be registered. It does appear that
-    customers are encouraged to restart OpenAM following installation, so given that there is no good solution, I will
-    leave things as they are, until a good solution presents itself. TODO
-    A possible solution: see AMSetupServlet.registerListeners, and the com.sun.identity.setup.SetupListener file in
-    resources/META-INF.services under openam-core. The SubRealmObserver is specified here, and this class registers
-    a ServiceListener, so it must be that the Admin SSO Token is available at this juncture, which would seem to be
-    the solution to my problem.
+    /**
+     * This method is only called by the RestSTSSetupListener, called during OpenAM startup by the AMSetupServlet. It
+     * registers a ServiceListener to publish rest-sts instances published to servers in another site.
      */
     public void registerServiceListener() {
         try {

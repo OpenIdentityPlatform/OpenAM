@@ -33,7 +33,9 @@ import org.slf4j.Logger;
 import javax.inject.Inject;
 
 /**
- * This ServiceListener implementation will be registered by the RestSTSInstancePublisherImpl ctor, and will add
+ * This ServiceListener implementation will be registered in RestSTSInstancePublisherImpl#registerServiceListener, which
+ * is called by the RestSTSSetupListener, which is called by the AMSetupServlet upon OpenAM startup (once the current
+ * configuration is valid). It will add
  * rest-sts instances to the CREST router which are published at other site servers. In other words, LDAP replication
  * will insure that rest-sts-instance-configuration written to LDAP at another site's server is replicated to the current
  * server's LDAP. Yet for the rest-sts-instance to be operational, it must be hung off of the CREST router for
