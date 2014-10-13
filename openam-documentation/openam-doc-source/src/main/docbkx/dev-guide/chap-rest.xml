@@ -428,7 +428,7 @@
         </row>
         <row>
          <entry> </entry>
-         <entry>/serverinfo</entry>
+         <entry>/serverinfo/*</entry>
          <entry>1.1</entry>
         </row>
         <row>
@@ -669,13 +669,15 @@ Content-Type: application/json;charset=UTF-8
   reserved characters per se, but substitutions are still required). To c66encode this token,
   you would substitute certain characters for others, as follows:</para>
 
-  <programlisting language="none">+ is replaced with -
-/ is replaced with _
-= is replaced with .
-@ is replaced with *
-# is replaced with *
-* (first instance) is replaced with @
-* (subsequent instances) is replaced with #</programlisting>
+  <simplelist>
+   <member><keycap>+</keycap> is replaced with <keycap>-</keycap></member>
+   <member><keycap>/</keycap> is replaced with <keycap>_</keycap></member>
+   <member><keycap>=</keycap> is replaced with <keycap>.</keycap></member>
+   <member><keycap>@</keycap> is replaced with <keycap>*</keycap></member>
+   <member><keycap>#</keycap> is replaced with <keycap>*</keycap></member>
+   <member><keycap>*</keycap> (first instance) is replaced with <keycap>@</keycap></member>
+   <member><keycap>*</keycap> (subsequent instances) is replaced with <keycap>#</keycap></member>
+  </simplelist>
 
   <para>In this case, the translated token would appear as shown here:</para>
 
@@ -1121,6 +1123,36 @@ $ <userinput>curl \
  https://openam.example.com:8443/openam/identity/logout</userinput>
     </screen>
   </section>
+ </section>
+
+ <section xml:id="rest-api-serverinfo">
+  <title>Server Information</title>
+
+  <para>You can retrieve OpenAM server information by using HTTP GET on
+   <literal>/json/serverinfo/*</literal>.</para>
+
+<screen>
+$ <userinput>curl https://openam.example.com:8443/openam/json/serverinfo/*</userinput>
+<computeroutput>{
+    "domains": [
+        ".example.com"
+    ],
+    "protectedUserAttributes": [],
+    "cookieName": "iPlanetDirectoryPro",
+    "forgotPassword": "false",
+    "selfRegistration": "false",
+    "lang": "en",
+    "successfulUserRegistrationDestination": "default",
+    "socialImplementations": [
+        {
+            "iconPath": "XUI/images/dashboard/facebook.png",
+            "authnChain": "FacebookSocialAuthenticationService",
+            "displayName": "Facebook",
+            "valid": true
+        }
+    ]
+}</computeroutput>
+</screen>
  </section>
 
  <section xml:id="rest-api-cookie-info">
