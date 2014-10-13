@@ -600,19 +600,28 @@ $ <userinput>curl \
  <section xml:id="openid-connect-examples">
   <title>Relying Party Examples</title>
 
-  <para>OpenID Connect Authorization Code Flow and Implicit Flow define how clients
-  interact with the provider to obtain end user authorization and profile
-  information. Although you can run the simple example relying parties mentioned in
-  this section without setting up Transport Layer Security, do not deploy
-  relying parties in production without securing the transport.</para>
+  <para>
+   OpenID Connect Authorization Code Flow and Implicit Flow
+   define how clients interact with the provider
+   to obtain end user authorization and profile information.
+   Although you can run the simple example relying parties
+   that are mentioned in this section
+   without setting up Transport Layer Security,
+   do not deploy relying parties in production without securing the transport.
+  </para>
 
-  <para>Code for the relying party examples shown here is <link xlink:show="new"
-  xlink:href="https://github.com/markcraig/openid/">available online</link>.
-  Clone the example project to deploy it in the same web container as
-  OpenAM. Edit the configuration at the outset of the .js files in the project,
-  register a corresponding profile for the example relying party as described in
-  <xref linkend="register-openid-connect-clients"/>, and browse the deployment
-  URL to see the initial page.</para>
+  <para>
+   Code for the relying party examples shown here is
+   <link
+    xlink:show="new"
+    xlink:href="https://github.com/markcraig/openid/"
+   >available online</link>.
+   Clone the example project to deploy it in the same web container as OpenAM.
+   Edit the configuration at the outset of the .js files in the project,
+   register a corresponding profile for the example relying party
+   as described in <xref linkend="register-openid-connect-clients"/>,
+   and browse the deployment URL to see the initial page.
+  </para>
 
   <mediaobject xml:id="figure-openid-connect-example-start-page">
    <alt>OpenID Connect Client Profiles Start Page</alt>
@@ -620,26 +629,37 @@ $ <userinput>curl \
     <imagedata fileref="images/openid-connect-example-start-page.png" format="PNG" />
    </imageobject>
    <textobject>
-    <para>The OpenID Connect Client Profiles Start Page lets you choose whether
-    to try the Basic Client Profile (Authorization Code Flow)
-     or the Implicit Client Profile (Implicit Code Flow).</para>
+    <para>
+     The OpenID Connect Client Profiles Start Page
+     lets you choose whether to try
+     the Basic Client Profile (Authorization Code Flow)
+     or the Implicit Client Profile (Implicit Code Flow).
+    </para>
    </textobject>
   </mediaobject>
 
   <section xml:id="openid-basic-profile-example">
    <title>Authorization Code Flow Example</title>
 
-   <para>OpenID Connect Authorization Code Flow is designed for web-based
-   relying parties that use the OAuth 2.0 Authorization Code grant type.
-   This grant type makes it possible for the relying party to get the access code
-   by using the authorization code directly, without passing through the end
-   user's browser. To protect its client secret (password), part of the
-   relying party must run on a server.</para>
+   <para>
+    OpenID Connect Authorization Code Flow is designed
+    for web-based relying parties
+    that use the OAuth 2.0 Authorization Code grant type.
+    This grant type makes it possible for the relying party
+    to get the access code by using the authorization code directly,
+    without passing through the end user's browser.
+    To protect its client secret (password),
+    part of the relying party must run on a server.
+   </para>
 
-   <para>In the example, the Basic Client Profile Start Page describes the
-   prerequisite configuration, which must be part of the relying party profile stored
-   in the OpenAM realm where you set up the OpenID Provider. In OpenAM console,
-   check that the OAuth 2.0 client profile matches the settings described.</para>
+   <para>
+    In the example, the Basic Client Profile Start Page
+    describes the prerequisite configuration,
+    which must be part of the relying party profile
+    that is stored in the OpenAM realm where you set up the OpenID Provider.
+    In OpenAM console,
+    check that the OAuth 2.0 client profile matches the settings described.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-basic-start-page">
     <alt>OpenID Connect Basic Client Profile Start Page</alt>
@@ -647,28 +667,40 @@ $ <userinput>curl \
      <imagedata fileref="images/openid-connect-basic-start-page.png" format="PNG" />
     </imageobject>
     <textobject>
-     <para>The Basic Client Profile start page describes the configuration
-     required.</para>
+     <para>
+      The Basic Client Profile start page describes the configuration required.
+     </para>
     </textobject>
    </mediaobject>
 
-   <para>Logout of OpenAM, and click the link at the bottom of the page to
-   request authorization. The link sends an HTTP GET request asking for
-   <literal>openid profile</literal> scopes to the OpenID Provider
-   authorization URI.</para>
+   <para>
+    Logout of OpenAM,
+    and click the link at the bottom of the page to request authorization.
+    The link sends an HTTP GET request
+    asking for <literal>openid profile</literal> scopes
+    to the OpenID Provider authorization URI.
+   </para>
 
-   <para>If everything is configured correctly, OpenAM's OpenID Provider
-   has you authenticate as an end user, such as the demo user with username
-   <literal>demo</literal> and password <literal>changeit</literal>, and
-   grant (Allow) the relying party access to your profile.</para>
+   <para>
+    If everything is configured correctly,
+    OpenAM's OpenID Provider has you authenticate as an end user,
+    such as the demo user
+    with username <literal>demo</literal> and password <literal>changeit</literal>,
+    and grant (Allow) the relying party access to your profile.
+   </para>
 
-   <para>If you successfully authenticate and allow the example relying party access
-   to your profile, OpenAM returns an authorization code to the example relying party.
-   The example relying party then uses the authorization code to request an access
-   token and an ID token. It shows the response to that request, and also
-   decodes the ID token to show the content and to perform some validation.
-   Finally it uses the access token to request information about the end user
-   who authenticated, and displays the result.</para>
+   <para>
+    If you successfully authenticate
+    and allow the example relying party access to your profile,
+    OpenAM returns an authorization code to the example relying party.
+    The example relying party then uses the authorization code
+    to request an access token and an ID token.
+    It shows the response to that request,
+    and also decodes the ID token to show the content and to perform some validation.
+    Finally it uses the access token
+    to request information about the end user who authenticated,
+    and displays the result.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-basic-response-page">
     <alt>OpenID Connect Basic Client Profile Response Page</alt>
@@ -683,25 +715,35 @@ $ <userinput>curl \
     </textobject>
    </mediaobject>
 
-   <para>Notice that in addition to the standard payload, the ID token indicates
-   the end user's OpenAM realm, in this case <literal>"realm": "/"</literal>.</para>
+   <para>
+    Notice that in addition to the standard payload,
+    the ID token indicates the end user's OpenAM realm,
+    in this case <literal>"realm": "/"</literal>.
+   </para>
   </section>
 
   <section xml:id="openid-implicit-profile-example">
    <title>Implicit Flow Example</title>
 
-   <para>OpenID Connect Implicit Flow is designed for relying
-   parties that use the OAuth 2.0 Implicit grant type. This grant type is
-   designed for relying parties implemented in a browser. Rather than protect a
-   client secret, the client profile must register a protected redirect URI
-   in advance with the OpenID Provider.</para>
+   <para>
+    OpenID Connect Implicit Flow is designed
+    for relying parties that use the OAuth 2.0 Implicit grant type.
+    This grant type is designed for relying parties implemented in a browser.
+    Rather than protect a client secret, the client profile must
+    register a protected redirect URI in advance with the OpenID Provider.
+   </para>
 
-   <para>In the example, the Implicit Client Profile Start Page describes the
-   prerequisite configuration, which must be part of the relying party profile stored
-   in the OpenAM realm where you set up the OpenID Provider. In OpenAM console,
-   check that the OAuth 2.0 client profile matches the settings described.
-   If you have already configured the agent profile for the Authorization Code Flow example
-   then you still need to add the redirect URI for the Implicit Flow.</para>
+   <para>
+    In the example,
+    the Implicit Client Profile Start Page describes the prerequisite configuration,
+    which must be part of the relying party profile
+    that is stored in the OpenAM realm where you set up the OpenID Provider.
+    In OpenAM console,
+    check that the OAuth 2.0 client profile matches the settings described.
+    If you have already configured the agent profile
+    for the Authorization Code Flow example
+    then you still need to add the redirect URI for the Implicit Flow.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-implicit-start-page">
     <alt>OpenID Connect Implicit Client Profile Start Page</alt>
@@ -716,25 +758,36 @@ $ <userinput>curl \
     </textobject>
    </mediaobject>
 
-   <para>Logout of OpenAM, and click the link at the bottom of the page to
-   request authorization. The link sends an HTTP GET request asking for
-   <literal>id_token token</literal> response types and <literal>openid
-   profile</literal> scopes to the OpenID Provider authorization
-   URI.</para>
+   <para>
+    Logout of OpenAM,
+    and click the link at the bottom of the page to request authorization.
+    The link sends an HTTP GET request asking
+    for <literal>id_token token</literal> response types
+    and <literal>openid profile</literal> scopes
+    to the OpenID Provider authorization URI.
+   </para>
 
-   <para>If everything is configured correctly, OpenAM's OpenID Provider
-   has you authenticate as an end user, such as the demo user with username
-   <literal>demo</literal> and password <literal>changeit</literal>, and
-   grant (Allow) the relying party access to your profile.</para>
+   <para>
+    If everything is configured correctly,
+    OpenAM's OpenID Provider has you authenticate as an end user,
+    such as the demo user
+    with username <literal>demo</literal> and password <literal>changeit</literal>,
+    and grant (Allow) the relying party access to your profile.
+   </para>
 
-   <para>If you successfully authenticate and allow the example relying party access
-   to your profile, OpenAM returns the access token and ID token directly in
-   the fragment (after <literal>#</literal>) of the redirect URI. The relying party
-   does not get an authorization code. The relying party shows the response to the
-   request, and also decodes the ID token to show the content and to perform
-   some validation (though it does not check the ID token signature). Finally
-   the relying party uses the access token to request information about the end user
-   who authenticated, and displays the result.</para>
+   <para>
+    If you successfully authenticate
+    and allow the example relying party access to your profile,
+    OpenAM returns the access token and ID token
+    directly in the fragment (after <literal>#</literal>) of the redirect URI.
+    The relying party does not get an authorization code.
+    The relying party shows the response to the request,
+    and also decodes the ID token to show the content
+    and to perform some validation (though it does not check the ID token signature).
+    Finally the relying party uses the access token
+    to request information about the end user who authenticated,
+    and displays the result.
+   </para>
 
    <mediaobject xml:id="figure-openid-connect-implicit-response-page">
     <alt>OpenID Connect Implicit Client Profile Response Page</alt>
@@ -752,7 +805,7 @@ $ <userinput>curl \
    <para>
     As for the Authorization Code Flow example,
     the ID Token indicates the end user's
-   OpenAM realm in addition to the standard information.
+    OpenAM realm in addition to the standard information.
    </para>
   </section>
  </section>
