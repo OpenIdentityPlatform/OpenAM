@@ -44,7 +44,6 @@ public class HttpURLConnectionWrapperFactory {
             httpURLConnection = HttpURLConnectionManager.getConnection(url);
         }
 
-
         @Override
         public HttpURLConnectionWrapper setExpectedResponseCode(int responseCode) {
             expectedResponseCode = responseCode;
@@ -74,14 +73,33 @@ public class HttpURLConnectionWrapperFactory {
 
         @Override
         public ConnectionResult makeInvocation() throws IOException {
-            if (requestPayload == null) {
-                httpURLConnection.connect();
-            } else {
-                OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream());
-                writer.write(requestPayload);
-                writer.close();
+            int responseCode;
+            try {
+                if (requestPayload == null) {
+                    httpURLConnection.connect();
+                } else {
+                    OutputStreamWriter writer = null;
+                    try {
+                        writer = new OutputStreamWriter(httpURLConnection.getOutputStream());
+                        writer.write(requestPayload);
+                    } finally {
+                        IOUtils.closeIfNotNull(writer);
+                    }
+                }
+                responseCode = httpURLConnection.getResponseCode();
+            } catch (IOException e) {
+                /*
+                See 'What's new in Tiger' section of http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
+                for an explanation of the logic below. Summary: facilitate connection re-use when an IOException occurs, the
+                error stream should be obtained, drained, and then closed. This occurs when getErrorMessage() is called.
+                 */
+                try {
+                    getErrorMessage();
+                } catch (IOException ioe) {
+                    //ignore - first exception the important exception
+                }
+                throw e;
             }
-            final int responseCode = httpURLConnection.getResponseCode();
             if (responseCode == expectedResponseCode) {
                 return new ConnectionResult(responseCode, getSuccessMessage());
             } else {
@@ -108,7 +126,6 @@ public class HttpURLConnectionWrapperFactory {
                 return IOUtils.readStream(inputStream);
             }
         }
-
     }
 
     /**
