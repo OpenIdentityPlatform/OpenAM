@@ -1,6 +1,6 @@
 <div class="content-bg">
     {{#if entity.name}}
-    <h1>{{t "config.messages.PolicyMessages.edit"}}{{entity.name}}</h1>
+    <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}<span></h1>
     {{else}}
     <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
     {{/if}}
@@ -13,7 +13,7 @@
     <form class="form">
 
         <div id="policy-steps" class="accordion">
-            <a href="" class="accordion-header">Step 1: Define a Policy Name and Description</a>
+            <a class="accordion-header">Step 1: Define a Policy Name and Description</a>
             <section class="accordion-step clearfix">
 
                 <div class="group-field-block">
@@ -29,7 +29,7 @@
 
             </section>
 
-            <a href="" class="accordion-header">Step 2: Add Resources</a>
+            <a class="accordion-header">Step 2: Add Resources</a>
             <section class="accordion-step clearfix">
 
                 <div class="clearfix">
@@ -41,7 +41,7 @@
 
             </section>
 
-            <a href="" class="accordion-header">Step 3: Configure Actions</a>
+            <a class="accordion-header">Step 3: Configure Actions</a>
             <section class="accordion-step clearfix">
 
                 <table id="actions" class="filter-sort-grid actions-grid"></table>
@@ -49,36 +49,35 @@
 
             </section>
 
-            <a href="" class="accordion-header">Step 4: Select Subjects</a>
+            <a class="accordion-header">Step 4: Select Subjects</a>
             <section class="accordion-step clearfix">
 
-                <div id="subjectContainer"></div>
+                <div id="subjectContainer" class="clearfix"></div>
                 <input class="button" type="button" value="Next" name="nextButton">
 
             </section>
 
-            <a href="" class="accordion-header">Step 5: Environmental Conditions</a>
+            <a class="accordion-header">Step 5: Environmental Conditions</a>
             <section class="accordion-step clearfix">
 
-                <div id="environmentContainer"></div>
+                <div id="environmentContainer" class="clearfix"></div>
                 <input class="button" type="button" value="Next" name="nextButton">
 
             </section>
 
-            <a href="" class="accordion-header">Step 6: Response Attributes</a>
+            <a class="accordion-header">Step 6: Response Attributes</a>
             <section class="accordion-step clearfix">
 
-                <div id="responseAttrs"></div>
+                <div id="responseAttrs" class="clearfix"></div>
 
                 <input class="button" type="button" value="Next" name="nextButton">
             </section>
 
-            <a href="" class="accordion-header">Step 7: Summary and Confirmation View</a>
+            <a class="accordion-header">Step 7: Summary and Confirmation View</a>
             <section class="accordion-step clearfix">
 
                 <p> Review the policy configuration and click Finish to save.</p>
-
-                <div class="column-layout" id="reviewPolicyInfo"></div>
+                <div id="reviewPolicyInfo" class="clearfix"></div>
 
                 <input class="button" type="button" value="Finish" name="submitForm">
             </section>

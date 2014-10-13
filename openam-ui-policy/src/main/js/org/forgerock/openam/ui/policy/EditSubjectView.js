@@ -75,23 +75,43 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
             item.focus(); //  Required to trigger changeInput.
             this.data.subjects = allSubjects;
-            var html = '';
-            if (item.data().itemData) {
-                _.map(item.data().itemData, function(value, key) {
-                    html += '<div><h3>'+key+'</h3><span>'+value+'</span></div>\n';
-                });
-            }
-            if (html === '') {
-                html = '<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>';
-            }
+            var html = uiUtils.fillTemplateWithData("templates/policy/ListItem.html", {data:item.data().itemData});
             item.find('.item-data').html(html);
-            this.setElement('#'+item.attr('id') );
+            this.setElement('#'+item.attr('id'));
             this.delegateEvents();
         },
 
         changeInput: function(e) {
-            var label = $(e.currentTarget).prev('label').text();
+            var label = $(e.currentTarget).prev('label').data().title;
             this.$el.data().itemData[label] = e.currentTarget.value;
+        },
+
+        initSelectize: function() {
+
+            var self = this,
+                title = '';
+
+            this.$el.find('.selectize').each(function(){
+
+                $(this).selectize({
+                    plugins: ['restore_on_backspace'],
+                    delimiter: ',',
+                    persist: false,
+                    create: function(input) {
+                        return {
+                            value: input,
+                            text: input
+                        };
+                    },
+                    onChange: function(value){
+                        title = this.$input.parent().find('label')[0].dataset.title;
+                        if(title !== ''){
+                             self.$el.data().itemData[title] = value;
+                        }
+                    }
+                });
+
+            });
         },
 
         changeType: function(e) {
@@ -100,17 +120,27 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                 itemData     = {},
                 schema       = {},
                 html         = '',
+                selectize    = false,
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
                 buildHTML    = function(schemaProps) {
 
                     var count = 0,
-                        returnVal = '';
+                        returnVal = '<div class="no-float">';
 
                     _.map(schemaProps, function(value, key) {
-                        returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count});
+                        if (value.type === 'string' ) {
+                            returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count});
+                        } else if (value.type === 'array' ) {
+                            returnVal += '\n'+ uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html", {data:itemData[key], title:key, id:count, tempData:self.weekdays});  
+                        } else {
+                            console.error('Unexpected data type:',key,value);
+                        }
+
                         count++;
                     });
+
+                    returnVal += '</div>';
 
                     return returnVal;
                 };
@@ -127,6 +157,9 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                         case 'string':
                             itemData[key] = '';
                         break;
+                        case 'array':
+                            itemData[key] = [];
+                        break;
                         default:
                             console.error('Unexpected data type:',key,value);
                         break;
@@ -139,6 +172,9 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
                 html = buildHTML(schema.config.properties);
 
+                this.$el.find('.no-float').fadeOut(500);
+                this.$el.find('.clear-left').fadeOut(500);
+
                 this.$el.find('.field-float-pattern input')
                     .addClass('placeholderText')
                     .prop('readonly', true)
@@ -147,8 +183,20 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
 
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
-                    self.$el.find('.field-float-pattern').remove();
+
+                    self.$el.find('.no-float').remove();
+                    self.$el.find('.clear-left').remove();
                     self.$el.find('.field-float-select').after( html );
+
+                    selectize =  _.find(schema.config.properties, function(item){
+                        return item.type === 'array'; 
+                    });
+
+                    if(selectize){
+                        self.initSelectize();
+                    }  
+
+                    
 
                     setTimeout( function() {
 

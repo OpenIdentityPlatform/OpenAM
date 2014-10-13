@@ -6,7 +6,7 @@
 			<label for="selection" >Type</label>
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >select...</option>
-				{{#subjects}}<option value="{{title}}">{{title}}</option>{{/subjects}}
+				{{#subjects}}<option value="{{title}}">{{camelCaseToTitle title}}</option>{{/subjects}}
 			</select>
 		</div>
 

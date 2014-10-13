@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/policy/OperatorRulesView", [
 
         noBaseTemplate: true,
         events: {
-            'change    select' : 'onSelect',
+            'change    > select' : 'onSelect',
             'onfocus   select' : 'checkOptions',
             'mousedown select' : 'checkOptions'
         },

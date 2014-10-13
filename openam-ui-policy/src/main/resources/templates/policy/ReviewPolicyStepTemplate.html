@@ -17,6 +17,8 @@
             <li{{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}>{{this}}</li>
             {{/each}}
         </ul> 
+        {{else}}
+        <pre>There are no resources...</pre>
         {{/if}}
     </div>
 
@@ -47,13 +49,22 @@
         <h2>Environments</h2>
         {{#if environmentString}}
         <pre>{{environmentString}}</pre>
+        {{else}}
+        <pre>There are no environment conditions...</pre>
         {{/if}}
     </div>
 
     <div class="review-row clearfix" tabindex="0" >
-        <h2>Response attributes</h2>
+
+        {{#unless userAttributes}}
+             {{#unless staticAttributes}}
+            <h2>Response attributes</h2>
+            <pre>There are no response attributes...</pre>
+            {{/unless}}
+        {{/unless}}
+
         {{#if userAttributes}}
-        <h3>User attributes</h3>
+        <h2>User attributes</h3>
         <ul>
             {{#each userAttributes}}
             <li>{{propertyName}}</li>
@@ -62,12 +73,13 @@
         {{/if}}
 
         {{#if staticAttributes}}
-        <h3>Static attributes</h3>
+        <h2>Static attributes</h2>
         <ul>
             {{#each staticAttributes}}
             <li>{{propertyName}}: {{propertyValues}}</li>
             {{/each}}
         </ul>
         {{/if}}
+
     </div>
 </div>

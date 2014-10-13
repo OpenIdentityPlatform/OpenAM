@@ -84,7 +84,6 @@
     background-color: #fff;
     border: 1px solid #BCBEC0;
     border-bottom: none;
-    overflow: hidden;
     .rounded-corners(5px);
 
     .accordion-header {
@@ -94,6 +93,7 @@
         padding: 0 0 0 10px;
         background-color: #d5d5d5;
         color: #666;
+        cursor:pointer;
 
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
@@ -133,9 +133,6 @@
             border-bottom: none;
         }
 
-        [data-attr-type="Static"] {
-            margin-top: 20px;
-        }
     }
 
     .group-field-block {
@@ -205,17 +202,10 @@
         }
 
         h2 {
-            float: left;
             font-size: 15px;
             line-height: 20px;
             padding: 8px 10px 8px 0;
-        }
-
-        h3 {
-            clear: left;
-            margin-top: 10px;
-            font-size: 13px;
-            line-height: 13px;
+            clear:bothl
         }
 
         ul, p, pre {
@@ -495,6 +485,11 @@ span.item-button-panel {
         padding-right: 10px;
     }
 
+    .key{
+        font-weight: bold;
+        padding-right: 4px;
+    }
+
   }
 
   &.created-items {
@@ -503,6 +498,7 @@ span.item-button-panel {
 
       &#createdResources {
           li.editing, li.editing:hover {
+              min-height: 36px;
               input {
                   width: 27px;
                   min-width: 27px;
@@ -514,7 +510,7 @@ span.item-button-panel {
 
       &[data-attr-type="Static"] {
           li.editing input {
-              width: 400px;
+              width: 176px;
           }
       }
 
@@ -523,8 +519,19 @@ span.item-button-panel {
         border-top:none;
         transition: background 1s linear;
 
-        &.justAdded {
+        &.highlight-info {
             background:#ffc;
+            transition: background 0.2s linear;
+        }
+
+        &.highlight-warning {
+            background:#fcc;
+            transition: background 0.2s linear;
+        }
+
+        &.highlight-good {
+            background:#CCFFDE;
+            transition: background 0.2s linear;
         }
 
         .icon-plus {
@@ -595,4 +602,39 @@ input[type="text"]:invalid:required{
 #globalActions{
     margin: 20px 0 0 -5px;
     display: block;
+}
+
+.content-bg h1 span{
+    font-weight:normal;
+    color: #80b7ab;
+}
+
+/// this needs to be integrated into the above 
+
+.selectize-control.multi .selectize-input {
+
+    padding: 6px 5px 2px 5px;
+    margin: 5px 0 0 0;
+    border-radius: 0;
+    border-top-color: #b7b7b7;
+    border-left-color: #b7b7b7;
+
+    &.has-items{
+        padding: 3px 15px 0px 3px;
+    }
+    
+}
+
+.selectize-input > input {
+    margin: 0 5px 0 5px !important;
+}
+
+
+.selectize-control.multi .selectize-input > div {
+    cursor: pointer;
+    margin: 0 2px 2px 0;
+    padding: 1px 5px 0;
+    background: #D7E9F8;
+    color: #303030;
+    border: 1px solid #d0d0d0;
 }

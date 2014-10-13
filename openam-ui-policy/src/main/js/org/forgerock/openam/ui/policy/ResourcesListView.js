@@ -49,11 +49,13 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         render: function (args, callback) {
             _.extend(this.data, args);
 
-            if (!this.data.entity.resources) {
-                this.data.entity.resources = [];
-            } else {
+            if (this.data.entity.resources) {
                 this.data.entity.resources = _.sortBy(this.data.entity.resources);
+            } else {
+                this.data.entity.resources = [];
             }
+
+            this.count = 0;
 
 
             var self = this;
@@ -61,11 +63,8 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
-                
-                $.doTimeout('justAdded', 2000, function() {
-                   self.$el.find('.justAdded').removeClass('justAdded');
-                });
-
+                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good' );
+    
                 self.$el.find('.editing').find('input').autosizeInput({space:19});
                 self.$el.find('.editing').find('input:eq(0)').focus().select();
 
@@ -82,7 +81,7 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
             var self = this;
                 self.valid = true;
 
-            _.each(inputs, function(input){
+            _.find(inputs, function(input){
                 // unsupporting browsers will return undefined not false
                 if ( input.checkValidity() === false) {
                     self.valid = false;
@@ -101,11 +100,12 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
                 strLength = resourceStr.length,
                 resource = '',
                 count = 0, 
-                i = 0;
+                i = 0,
+                duplicateIndex = -1;
 
             if( this.validate(inputs) === false){
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidResource");
-                this.flashEditAsInvalid();
+                this.flashDomItem( this.$el.find('.editing'), 'invalid' );
                 return;
             }
             
@@ -122,10 +122,11 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
                 }
             } 
 
-            if ( _.contains(this.data.entity.resources, resource) ) {
+            duplicateIndex = _.indexOf(this.data.entity.resources, resource);
+
+            if ( duplicateIndex >= 0 ) {
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateResource");
-                this.flashEditAsInvalid();
-                return; 
+                this.flashDomItem( this.$el.find('#createdResources ul li:eq('+duplicateIndex+')'), 'highlight-warning' );
             } else {
                 this.data.entity.resources.push(resource);
                 this.data.options.justAdded = resource;
@@ -141,12 +142,14 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
             this.render(this.data);
         },
 
-        flashEditAsInvalid: function () {
+        flashDomItem: function ( item, className ) {
             var self = this;
-            self.$el.find('.editing').addClass('invalid');
-            $.doTimeout('invalid', 2000, function() {
-                self.$el.find('.editing').removeClass('invalid');
+            item.addClass(className);
+            $.doTimeout(className+this.count, 2000, function() {
+                item.removeClass(className);
             });
+
+            this.count++;
         }
 
     });

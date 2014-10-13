@@ -68,7 +68,7 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                     }
 
                     if (!appName){
-                        data.entity.actions = appType[0].actions;
+                        data.entity.actions = _.sortBy(appType[0].actions);
                     }
                     self.processConditions(data, envConditions[0].result, subjConditions[0].result);
 

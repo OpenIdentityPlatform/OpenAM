@@ -74,6 +74,8 @@ body.editing{
 		display: block;
 		float: left;
 		padding: 0 5px 0 0;
+		text-align:left;
+		white-space: nowrap;
 	}
 
 	input[type="text"], textarea, select {
@@ -85,9 +87,9 @@ body.editing{
 
 	ol ol{
 		padding: 1px;
-	  background: white;
-	  margin: 5px 0 0;
-	  min-height: 8px;
+		background: white;
+		margin: 5px 0 0;
+		min-height: 8px;
 	}
 
 	#pickup-area{
@@ -141,7 +143,7 @@ body.editing{
 
 	li.editing   span.item-button-panel{
 		position: absolute;
-
+		top: 5px;
 		right: 0;
 	}
 
@@ -236,7 +238,7 @@ body.editing{
 
 		padding: 7px 5px 0 5px;
 
-		> div{
+		> div {
 			color: #444;
 			font-size:11px;
 			line-height: 11px;
@@ -244,7 +246,7 @@ body.editing{
 			padding-right: 10px;
 			margin-right: 10px;
 			float:left;
-
+			
 			&:last-of-type{
 				border-right: none;
 			}
@@ -260,11 +262,32 @@ body.editing{
 				padding-bottom: 5px;
 			}
 
-			span{
+			> span {
 				min-height: 11px;
 				display: block;
 				padding-bottom: 5px;
+
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				overflow: hidden;
+				max-width:500px;
+
 			}
+
+			&.no-float{
+				float:none;
+				margin:0 0 0 203px;
+			}
+		}
+
+		 div.field-float-selectize {
+			float: left;
+			min-width: 133px;
+			max-width: 588px;  // margin-bottom:0; required for clearing
+			margin: 5px 5px 0 5px; 
+			
+			
+
 		}
 
 	}
@@ -273,7 +296,7 @@ body.editing{
 		padding: 0;
 	}
 
-	.field-float-pattern, .field-float-select {
+	.field-float-pattern, .field-float-select, .field-float-selectize{
 
 		label {
 		  	font-size:11px;
@@ -282,7 +305,7 @@ body.editing{
 		  	font-weight:bold;
 		  	padding: 0;
 			line-height: 11px;
-			margin: 0 0 0 5px;
+			margin: 0;
 		}
 
 	}
@@ -307,8 +330,8 @@ body.editing{
 
 		input{
 
-			margin-top: 15px;
-			width:150px;
+			margin-top: 16px;
+			width:133px;
 
 			/* Stop chromes autofill adding yellow backgrounds to datalists */
 			&:-webkit-autofill{
@@ -326,8 +349,8 @@ body.editing{
 
 		select {
 
-			margin-top: 15px;
-			min-width:145px;
+			margin-top: 16px;
+			min-width: 177px;
 			clear:left;
 			float:left;
 			padding:5px 20px 5px 5px;
@@ -342,8 +365,15 @@ body.editing{
 				border-color: transparent;
 				box-shadow: none;
 			}
+
+			&:invalid{
+				.invalid-background;
+				transition: background 0.3s ease-in-out 0s;
+			}
 		}
 	}
+
+
 
 }
 
@@ -359,7 +389,7 @@ section.active-step{
 
 #condition-management ol.condition-management-group ul.buttonControl{
 
-	margin-top: 13px;
+	margin-top: 16px;
 	font-size: 0;
 
  	li{
@@ -400,7 +430,10 @@ section.active-step{
 			}
 		}
 
+	}
 
+	a.button {
+		line-height:12px;
 	}
 }
 
@@ -472,5 +505,7 @@ section.active-step{
     overflow-x: hidden;
     z-index:710;
 }
+
+
 
 

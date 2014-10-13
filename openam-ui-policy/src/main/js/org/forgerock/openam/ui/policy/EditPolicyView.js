@@ -89,23 +89,11 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     actions.push({action: key, selected: false, value: value});
                 });
 
-                _.each(allSubjects[0].result, function (value) {
-                   if ( _.contains(app[0].subjects, value.title) ){
-                       subjects.push(value);
-                   }
-                });
-
-                _.each(allEnvironments[0].result, function (value) {
-                   if ( _.contains(app[0].conditions, value.title) ){
-                       conditions.push(value);
-                   }
-                });
-
                 data.options = {};
-                data.options.availableSubjects =     subjects;
-                data.options.availableEnvironments = conditions;
-                data.options.availableActions =      actions;
-                data.options.resourcePatterns =      app[0].resources;
+                data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
+                data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                data.options.availableActions =      _.sortBy(actions, "action");
+                data.options.resourcePatterns =      _.sortBy(app[0].resources);
 
                 data.entity.applicationName = appName;
 

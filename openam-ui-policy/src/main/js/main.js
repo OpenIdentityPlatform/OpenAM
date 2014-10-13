@@ -26,27 +26,28 @@
 
 require.config({
     paths: {
-        i18next: "libs/i18next-1.7.3-min",
-        i18nGrid: "libs/i18n/grid.locale-en",
-        backbone: "libs/backbone-1.1.0-min",
-        underscore: "libs/lodash-2.4.1-min",
-        js2form: "libs/js2form-2.0",
-        form2js: "libs/form2js-2.0",
-        spin: "libs/spin-2.0.1-min",
-        jquery: "libs/jquery-1.11.1-min",
-        xdate: "libs/xdate-0.8-min",
-        sortable: "libs/jquery-sortable-0.9.12",
-        doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
-        handlebars: "libs/handlebars-1.3.0-min",
-        moment: "libs/moment-2.8.1-min",
-        jqueryui: "libs/jquery-ui-1.10.4.custom.min",
-        clockPicker: "libs/jquery-clockpicker.0.0.7.min",
+        i18next:        "libs/i18next-1.7.3-min",
+        i18nGrid:       "libs/i18n/grid.locale-en",
+        backbone:       "libs/backbone-1.1.0-min",
+        underscore:     "libs/lodash-2.4.1-min",
+        js2form:        "libs/js2form-2.0",
+        form2js:        "libs/form2js-2.0",
+        spin:           "libs/spin-2.0.1-min",
+        jquery:         "libs/jquery-1.11.1-min",
+        xdate:          "libs/xdate-0.8-min",
+        sortable:       "libs/jquery-sortable-0.9.12",
+        doTimeout:      "libs/jquery.ba-dotimeout-1.0-min",
+        handlebars:     "libs/handlebars-1.3.0-min",
+        moment:         "libs/moment-2.8.1-min",
+        jqueryui:       "libs/jquery-ui-1.10.4.custom.min",
+        clockPicker:    "libs/jquery-clockpicker.0.0.7.min",
         autosizeInput:  "libs/jquery.autosize.input.min",
-        multiselect: "libs/ui.multiselect-0.3",
-        jqgrid: "libs/jquery.jqGrid-4.5.4-min",
-        LoginDialog: "org/forgerock/commons/ui/common/LoginDialog",
-        LoginView: "org/forgerock/commons/ui/common/LoginView",
-        ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager"
+        multiselect:    "libs/ui.multiselect-0.3",
+        jqgrid:         "libs/jquery.jqGrid-4.5.4-min",
+        selectize:      "libs/selectize-0.11.2-min",
+        LoginDialog:    "org/forgerock/commons/ui/common/LoginDialog",
+        LoginView:      "org/forgerock/commons/ui/common/LoginView",
+        ThemeManager:   "org/forgerock/openam/ui/common/util/ThemeManager"
     },
 
     shim: {
@@ -108,6 +109,9 @@ require.config({
         },
         jqgrid: {
             deps: ["jquery", "jqueryui", "i18nGrid", "multiselect"]
+        },
+        selectize: {
+            deps: ["jquery"]
         }
 
     }
@@ -134,6 +138,7 @@ require([
     "jqgrid",
     "clockPicker",
     "autosizeInput",
+    "selectize",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
@@ -142,8 +147,7 @@ require([
     "org/forgerock/openam/ui/policy/main", 
     "ThemeManager",
     "config/main"
-], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput,
-            i18nManager, constants, eventManager) {
+], function ( _, Backbone, form2js, js2form, spin, xdate, moment, doTimeout, Handlebars, i18n, sortable, jqueryui, multiselect, jqgrid, clockPicker, autosizeInput, selectize, i18nManager, constants, eventManager) {
 
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });

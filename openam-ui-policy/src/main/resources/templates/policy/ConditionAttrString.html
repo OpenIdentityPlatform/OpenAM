@@ -1,4 +1,4 @@
 <div class="field-float-pattern data-obj">
-    <label for="selection_{{id}}">{{title}}</label>
+    <label for="selection_{{id}}" data-title="{{title}}">{{camelCaseToTitle title}}</label>
     <input required type="text" id="selection_{{id}}" name="selection_{{id}}" value="{{data}}" readonly=true class="placeholderText" {{#if pattern}}pattern="{{pattern}}"{{/if}}/>
 </div>

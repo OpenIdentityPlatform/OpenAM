@@ -40,7 +40,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
         events: {
             'change select#selection' :       'changeType',
-            'change select:not(#selection)' : 'changeInput',
+            'change select:not(#selection):not(.selectize)' : 'changeInput',
             'change input':                   'changeInput',
             'keyup  input':                   'changeInput',
             'autocompletechange input':       'changeInput',
@@ -92,24 +92,19 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
             item.focus(); //  Required to trigger changeInput.
             this.data.conditions = allEnvironments;
-            var html = '';
-            if (item.data().itemData) {
-                _.map(item.data().itemData, function(value, key) {
-                    html += '<div><h3>'+key+'</h3><span>'+value+'</span></div>\n';
-                });
-            }
-            if (html === '') {
-                html = '<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>';
-            }
+            var html = uiUtils.fillTemplateWithData("templates/policy/ListItem.html", {data:item.data().itemData});
             item.find('.item-data').html(html);
-            this.setElement('#'+item.attr('id') );
+            this.setElement('#'+item.attr('id'));
             this.delegateEvents();
         },
 
         changeInput: function(e) {
 
             e.stopPropagation();
-            var label = $(e.currentTarget).parent().children('label').text(),
+            if($(e.currentTarget).parent().children('label').length === 0){
+                return; // this is a temporay workaround needed for a event leakage
+            }
+            var label = $(e.currentTarget).parent().children('label').data().title,
                 inputGroup = $(e.currentTarget).closest('div.input-group'),
                 ifPopulated = false;
 
@@ -130,7 +125,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
             if (e.type === 'keyup' && e.keyCode !== 13) { return;}
             var target = $(e.currentTarget),
                 buttonControl = target.closest('ul.buttonControl'),
-                label = buttonControl.prev('label').text();
+                label = buttonControl.prev('label').data().title;
             this.$el.data().itemData[ label ] = e.currentTarget.innerText === "true";
             buttonControl.find('li a').removeClass('selected');
             target.addClass('selected');
@@ -199,6 +194,34 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
         },
 
+        initSelectize: function() {
+
+            var self = this,
+                title = '';
+
+            this.$el.find('.selectize').each(function(){
+
+                $(this).selectize({
+                    plugins: ['restore_on_backspace'],
+                    delimiter: ',',
+                    persist: false,
+                    create: function(input) {
+                        return {
+                            value: input,
+                            text: input
+                        };
+                    },
+                    onChange: function(value){
+                        title = this.$input.parent().find('label')[0].dataset.title;
+                        if(title !== ''){
+                             self.$el.data().itemData[title] = value;
+                        }
+                    }
+                });
+
+            });
+        },
+
         changeType: function(e) {
             e.stopPropagation();
             var self         = this,
@@ -206,6 +229,7 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                 schema       = {},
                 html         = '',
                 returnVal    = '',
+                selectize    = false,
                 selectedType = e.target.value,
                 delay        = self.$el.find('.field-float-pattern').length > 0 ? 500 : 0,
                 buildHTML    = function(schemaProps) {
@@ -225,11 +249,14 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                     } else {
 
+                        returnVal += '<div class="no-float">';
+
                         _.map(schemaProps, function(value, key) {
 
                             returnVal += '\n';
 
-                            if (value.type === 'string' || value.type === 'number') {
+                            if (value.type === 'string' || value.type === 'number' || value.type === 'integer') {
+
 
                                 if (value["enum"]) {
 
@@ -240,6 +267,8 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                                        pattern="^(((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d)))((\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){3}|(\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){5})";
                                     } else if( value.type === 'number' ){
                                        pattern="[-+]?[0-9]*[.,]?[0-9]+";
+                                    } else if( value.type === 'integer' ){
+                                       pattern="\\d+";
                                     } else {
                                        pattern = null;
                                     }
@@ -251,16 +280,22 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                                 returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrBoolean.html", {data:value, title:key, selected:itemData[key]});
 
                             } else if (value.type === 'array' ) {
+                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrArray.html", {data:itemData[key], title:key, id:count, tempData:self.weekdays});  
+
+                            } else if (value.type === 'object' ) {
                                 // TODO
-                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", {data:itemData[key], title:key, id:count, pattern:pattern});
-                                
+                                console.error('TODO : Data type object');
+                                returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrString.html", { title:key, id:count});                      
 
                             } else {
                                 console.error('Unexpected data type:',key,value);
+
                             }
 
                             count++;
                         });
+
+                        returnVal += '</div>';
                     }
 
                     return returnVal;
@@ -278,13 +313,17 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                             itemData[key] = '';
                         break;
                         case 'number':
+                        case 'integer':
                             itemData[key] = 0;
                         break;
                         case 'boolean':
                             itemData[key] = false;
                         break;
                         case 'array':
-                            itemData[key] = null;
+                            itemData[key] = [];
+                        break;
+                        case 'object':
+                            itemData[key] = {};
                         break;
                         default:
                             console.error('Unexpected data type:',key,value);
@@ -298,26 +337,26 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                 html = buildHTML(schema.config.properties);
 
+                // all items expect the title selector are contained inside either a no-float or a clear-left
+                this.$el.find('.no-float').fadeOut(500);
+                this.$el.find('.clear-left').fadeOut(500);
+
                 this.$el.find('.field-float-pattern')
                     .find('label').removeClass('showLabel')
-                    .next('input')
-                    .addClass('placeholderText')
-                    .prop('readonly', true);
+                    .next('input') 
+                    .addClass('placeholderText');
+                    //.prop('readonly', true);
 
                 this.$el.find('.field-float-select select:not(#selection)')
                     .addClass('placeholderText')
                     .prev('label')
                     .removeClass('showLabel');
 
-
-                this.$el.find('.ruleHelperText').fadeOut(500);
-
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
 
-                    self.$el.find('#conditionAttrTimeDate').remove();
-                    self.$el.find('.field-float-pattern').remove();
-                    self.$el.find('.field-float-select:not(#typeSelector)').remove();
+                    self.$el.find('.no-float').remove();
+                    self.$el.find('.clear-left').remove();
 
                     self.$el.find('#typeSelector').after( html );
 
@@ -325,6 +364,16 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                         self.initClockPickers();
                         self.initDatePickers();
                         self.getTimeZones();
+                    } else {
+
+                        selectize =  _.find(schema.config.properties, function(item){
+                            return item.type === 'array'; 
+                        });
+
+                        if(selectize){
+                            self.initSelectize();
+                        }  
+
                     }
 
                     setTimeout( function() {

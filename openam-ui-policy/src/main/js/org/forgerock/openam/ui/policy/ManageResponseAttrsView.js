@@ -38,6 +38,8 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
         template: "templates/policy/ManageResponseAttrsTemplate.html",
         noBaseTemplate: true,
         events: {
+            'change input' : 'checkedRequired',
+            'keyup input' : 'checkedRequired',
             'click .icon-plus': 'addStaticAttr',
             'keyup .icon-plus': 'addStaticAttr',
             'keyup .editing input:last-of-type': 'addStaticAttr',
@@ -59,7 +61,17 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
         },
 
         render: function (args, callback) {
+
+            var self = this;
+            this.count = 0;
+            this.data.staticAttributes = _.sortBy(this.data.staticAttributes, 'propertyName');
+
             this.parentRender(function () {
+
+                delete self.data.options.justAdded;
+
+                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good' );
+    
                 if (callback) {
                     callback();
                 }
@@ -74,19 +86,33 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             var editing = this.$el.find('.editing'),
                 key = editing.find('[data-attr-add-key]'),
                 val = editing.find('[data-attr-add-val]'),
-                attr = {};
+                attr = {},
+                duplicateIndex = -1,
+                count = 0;
 
-            if (!this.isValid(key) || !this.isValid(val)) {
+            if (!this.isValid(key) || !this.isValid(val) ||  key.val() === '' || val.val() === ''){
                 return;
             }
 
             attr.propertyName = key.val();
             attr.propertyValues = val.val();
 
-            if (_.findWhere(this.data.staticAttributes, attr)) {
+            _.each(this.data.staticAttributes, function(item){
+                
+                if(item.propertyName === attr.propertyName && item.propertyValues === attr.propertyValues){
+                    duplicateIndex = count;
+                    return;
+                }
+                count++;
+                 
+            });
+
+           if ( duplicateIndex >= 0 ) {
                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "duplicateAttribute");
+                this.flashDomItem( this.$el.find('#attrTypeStatic ul li:eq('+duplicateIndex+')'), 'highlight-warning' );
             } else {
                 this.data.staticAttributes.push(attr);
+                this.data.options.justAdded = attr;
                 this.render(this.data);
             }
         },
@@ -144,6 +170,19 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             return data;
         },
 
+        checkedRequired: function (e) {
+            var inputs = $(e.currentTarget).parent().find('input'),
+                required = false;
+
+            _.find(inputs,function(input){
+                if(input.value !== ''){
+                    required = true;
+                }
+            });
+
+            inputs.prop('required', required);
+        },
+
         getCombinedResponseAttrs: function () {
             var staticAttrsToSave = [],
                 groupedByName = _.groupBy(this.data.staticAttributes, function (attr) {
@@ -166,6 +205,16 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             });
 
             return _.union(staticAttrsToSave, this.data.userAttributes);
+        },
+
+        flashDomItem: function ( item, className ) {
+            var self = this;
+            item.addClass(className);
+            $.doTimeout(className+this.count, 2000, function() {
+                item.removeClass(className);
+            });
+
+            this.count++;
         }
     });
 

@@ -1,0 +1,26 @@
+{{#each this}}
+
+	{{#if this}}
+
+		{{#each this}}
+
+	    <div>
+			<h3>{{camelCaseToTitle @key}}</h3>
+			<span>{{this}}</span>
+		</div>
+
+	    {{/each}}
+
+	{{else}}
+
+		<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>
+
+	{{/if}}
+  
+{{/each}}
+
+
+
+
+
+

@@ -4,7 +4,7 @@
     <ul>
     {{#if entity.resources}}
         {{#each entity.resources}}
-        <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="justAdded"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
+        <li data-resource="{{this}}" {{#equals this ../../options.invalidResource}} class="invalid"{{/equals}}{{#equals this ../../options.justAdded}}class="highlight-good"{{/equals}} >{{this}}<span tabindex="0" class="icon-close float-right"></span></li>
         {{/each}}
     {{else}}
         <li class="invalid">There are no resources...</li>
