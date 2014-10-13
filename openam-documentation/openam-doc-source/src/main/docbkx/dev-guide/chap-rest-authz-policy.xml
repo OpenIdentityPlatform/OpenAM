@@ -1815,6 +1815,60 @@ $ <userinput>curl \
 }</computeroutput>
    </screen>
 
+    <tip><para>You can rename a policy by sending a new value in the
+     <emphasis>name</emphasis> attribute of the JSON body,
+     as shown below.</para>
+
+<screen>
+$ <userinput>curl \
+ --request PUT \
+ --header "iPlanetDirectoryPro: AQIC5w..." \
+ --header "Content-Type: application/json" \
+ --data '{
+     "name": "new-example",
+     "active": true,
+     "description": "Renamed example policy",
+     "resources": [
+         "http://www.example.com:80/*",
+         "http://www.example.com:80/*?*"
+     ],
+     "actionValues": {
+         "POST": true,
+         "GET": true
+     },
+     "subject": {
+         "type": "User",
+         "subjectName": "Bob Dobbs"
+     }
+ }' \
+ https://openam.example.com:8443/openam/json/realm/policies/example
+</userinput>
+<computeroutput>{
+    "name" : "new-example",
+    "active" : true,
+    "description" : "Renamed example policy",
+    "resources" : [
+        "http://www.example.com:80/*",
+        "http://www.example.com:80/*?*"
+    ],
+    "applicationName" : "iPlanetAMWebAgentService",
+    "actionValues" : {
+        "POST" : true,
+        "GET" : true
+    },
+    "subject" : {
+        "type" : "User",
+        "subjectName" : "Bob Dobbs"
+    },
+    "lastModifiedBy" :
+    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+    "lastModified" : "2014-04-24T16:48:01Z",
+    "createdBy" :
+    "id=demo,ou=user,o=realm,ou=services,dc=openam,dc=forgerock,dc=org",
+    "creationDate" : "2014-04-24T16:23:34Z"
+}</computeroutput>
+   </screen></tip>
+
    <para>
     You can use the query string parameters
     <literal>_prettyPrint=true</literal> to make the output easier to read,
