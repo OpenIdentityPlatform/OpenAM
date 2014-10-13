@@ -26,7 +26,7 @@
  * @author Eugenia Sergueeva
  */
 
-/*global define*/
+/*global define, _*/
 
 define("org/forgerock/openam/ui/policy/PolicyDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
@@ -46,12 +46,12 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     obj.serviceCall = function (args) {
         var realm = conf.globalData.auth.realm;
-        if (realm !== "/") { // prevents urls like /openam/json//applications
+        if (realm !== "/" && // prevents urls like /openam/json//applicationtypes
+            _.indexOf(["policies","applications"], args.url.replace(/^\/(.*?)\//, "$1")) !== -1) { // the only two options which are currently realm "aware"
             args.url = realm + args.url;
         }
         return AbstractDelegate.prototype.serviceCall.call(this, args);
     };
-
 
     obj.getApplicationType = function (type) {
         return obj.serviceCall({
