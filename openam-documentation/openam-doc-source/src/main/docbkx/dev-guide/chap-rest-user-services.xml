@@ -251,7 +251,7 @@ $ <userinput>curl \
   </indexterm>
 
   <para>
-   The OpenAM REST API for users provides an action
+   The OpenAM REST API provides an action
    for handling forgotten passwords
    as long as the user has a valid email address in their profile.
    This is an alternative to the password reset capability described in
@@ -261,14 +261,14 @@ $ <userinput>curl \
    >Configuring Password Reset</citetitle></link>.
   </para>
 
-  <para>
-   <link xlink:show="new" xlink:href="dev-guide#rest-api-change-password"
-         xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-    >Changing Passwords</citetitle></link>.
-  </para>
+  <tip><para>If the current password is known, use the
+   <link xlink:show="new"
+         xlink:href="dev-guide#rest-api-change-password"
+         xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Change Password</citetitle></link>
+   feature to change a password.</para></tip>
 
   <para>The option is disabled by default. You can enable it in the OpenAM Console
-  globally via Configuration > Global > REST Security.</para>
+  globally by using Configuration > Global > REST Security.</para>
 
   <para>Alternatively, you can enable it for an individual realm under
   Access Control > <replaceable>Realm Name</replaceable> > Services > Add >

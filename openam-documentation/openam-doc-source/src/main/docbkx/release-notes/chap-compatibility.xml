@@ -332,6 +332,16 @@
 
   <itemizedlist>
    <listitem>
+    <para>Changing Passwords</para>
+    <para>Changing passwords by using a PUT REST API call is no longer
+     supported.</para>
+    <para>Use a POST request to
+     <literal>/json/<replaceable>subrealm</replaceable
+      >/users/<replaceable>username</replaceable>?_action=changePassword</literal>
+     to change a password.</para>
+   </listitem>
+
+   <listitem>
     <para><literal>/json/authenticate</literal></para>
     <para>The response returned when submitting incorrect credentials has
      changed.</para>
@@ -352,24 +362,24 @@
       <tbody>
        <row>
         <entry>
-         <screen>
-          <computeroutput>{
-           "errorMessage": "Authentication Failed!!",
-           "failureUrl": "https://openam.example.com:8443"
-           }</computeroutput>
-         </screen>
+<screen>
+<computeroutput>{
+ "errorMessage": "Authentication Failed!!",
+ "failureUrl": "https://openam.example.com:8443"
+}</computeroutput>
+</screen>
         </entry>
         <entry>
-         <screen>
-          <computeroutput>{
-           "code": 401,
-           "reason": "Unauthorized",
-           "message": "Authentication Failed!!",
-           "detail": {
-           "failureUrl": "https://openam.example.com:8443"
-           }
-           }</computeroutput>
-         </screen>
+<screen>
+<computeroutput>{
+ "code": 401,
+ "reason": "Unauthorized",
+ "message": "Authentication Failed!!",
+ "detail": {
+  "failureUrl": "https://openam.example.com:8443"
+ }
+}</computeroutput>
+</screen>
         </entry>
        </row>
       </tbody>

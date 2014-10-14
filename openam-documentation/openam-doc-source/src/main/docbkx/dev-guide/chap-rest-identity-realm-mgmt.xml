@@ -1107,17 +1107,16 @@ $ <userinput>curl \
    </indexterm>
 
    <para>
-    OpenAM administrator, by default <literal>amadmin</literal>,
-    can reset a user's password or a user can change their own password
-    with an HTTP PUT to <literal>/json/<replaceable>subrealm</replaceable
-    >/users/<replaceable>username</replaceable></literal>
-    including the new password as the value of "userpassword" in the request data.
+   A user can change their own password
+    with an HTTP POST to <literal>/json/<replaceable>subrealm</replaceable
+    >/users/<replaceable>username</replaceable>?_action=changePassword</literal>
+    including the new password as the value of <literal>userpassword</literal> in the request
+    data.</para>
 
-    OpenAM administrator can reset the password without the old password.
+   <para> A user must provide the current password, which is set in the request
+    as the value of the <literal>currentpassword</literal>.</para>
 
-    A user must provide the current password, which is set in the request
-    as the value of the <literal>olduserpassword</literal> header.
-    For the case where the user has forgotten their password, see
+   <para>For the case where the user has forgotten their password, see
     <link
      xlink:show="new"
      xlink:href="dev-guide#rest-api-password-reset"
@@ -1126,76 +1125,32 @@ $ <userinput>curl \
    </para>
 
    <para>
-    The following example shows a successful request to change the demo user's
-    password to <literal>password</literal>.
+    The following example shows a successful request to change the <emphasis>demo</emphasis>
+    user's password to <emphasis>password</emphasis>.
    </para>
 
    <screen>
 $ <userinput>curl \
- --request PUT \
+ --request POST \
  --header "iPlanetDirectoryPro: AQIC5w...NTcy*" \
  --header "Content-Type: application/json" \
- --header "olduserpassword: changeit" \
- --data '{"userpassword":"newpassword"}' \
- https://openam.example.com:8443/openam/json/users/demo</userinput>
-<computeroutput>{
-    "username": "demo",
-    "realm": "/",
-    "uid": [
-        "demo"
-    ],
-    "mail": [
-        "demo@example.com"
-    ],
-    "sn": [
-        "demo"
-    ],
-    "userPassword": [
-        "{SSHA}OrBR9VdMLs95iMq/VKYLwJkr4fTOfGS91+9grg=="
-    ],
-    "cn": [
-        "demo"
-    ],
-    "inetUserStatus": [
-        "Active"
-    ],
-    "dn": [
-        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
-    ],
-    "objectClass": [
-        "devicePrintProfilesContainer",
-        "person",
-        "sunIdentityServerLibertyPPService",
-        "inetorgperson",
-        "sunFederationManagerDataStore",
-        "iPlanetPreferences",
-        "iplanet-am-auth-configuration-service",
-        "organizationalperson",
-        "sunFMSAML2NameIdentifier",
-        "inetuser",
-        "forgerock-am-dashboard-service",
-        "iplanet-am-managed-person",
-        "iplanet-am-user-service",
-        "sunAMAuthAccountLockout",
-        "top"
-    ],
-    "universalid": [
-        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
-    ]
-}</computeroutput>
+ --data '{
+     "currentpassword":"changeit",
+     "userpassword":"password"
+ }' \
+ https://openam.example.com:8443/openam/json/users/demo?_action=changePassword</userinput>
+<computeroutput>{}</computeroutput>
    </screen>
 
    <para>
-    As shown in the examples, OpenAM returns
-    the JSON representation of the resource list if successful.
+    On success, the response is an empty JSON object {} as shown in the
+    example.</para>
 
-    On failure, OpenAM returns a JSON representation of the error including the
+   <para>On failure, OpenAM returns a JSON representation of the error including the
     <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
-    xlink:show="new">HTTP status code</link>.
-
-    See also <link xlink:show="new"
-                   xlink:href="dev-guide#rest-api-status-codes"
-                   xlink:role="http://docbook.org/xlink/role/olink">REST Status Codes</link>
+    xlink:show="new">HTTP status code</link>. See also <link xlink:show="new"
+    xlink:href="dev-guide#rest-api-status-codes"
+    xlink:role="http://docbook.org/xlink/role/olink">REST Status Codes</link>
     for more information.
    </para>
   </section>
