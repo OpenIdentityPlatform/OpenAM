@@ -98,7 +98,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         final ClientRegistration clientRegistration = clientAuthenticator.authenticate(request);
 
         final String tokenId = request.getParameter("refresh_token");
-        final RefreshToken refreshToken = tokenStore.readRefreshToken(tokenId);
+        final RefreshToken refreshToken = tokenStore.readRefreshToken(request, tokenId);
 
         if (refreshToken == null) {
             logger.error("Refresh token does not exist for id: " + tokenId);

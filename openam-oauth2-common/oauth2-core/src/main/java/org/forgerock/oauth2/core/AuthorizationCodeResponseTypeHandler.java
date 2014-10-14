@@ -47,8 +47,9 @@ public class AuthorizationCodeResponseTypeHandler implements ResponseTypeHandler
     /**
      * {@inheritDoc}
      */
-    public Map.Entry<String, Token> handle(String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException {
+    public Map.Entry<String, Token> handle(Token accessToken, String tokenType, Set<String> scope,
+                                           String resourceOwnerId, String clientId, String redirectUri, String nonce,
+                                           OAuth2Request request) throws ServerException {
 
         final AuthorizationCode authorizationCode = tokenStore.createAuthorizationCode(scope, resourceOwnerId, clientId,
                 redirectUri, nonce, request);

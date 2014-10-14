@@ -16,19 +16,23 @@
 
 package org.forgerock.oauth2.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.ID_TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.TOKEN;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.OPENID;
+import static org.forgerock.oauth2.core.OAuth2Constants.Params.RESPONSE_TYPE;
 import org.forgerock.oauth2.core.OAuth2Constants.UrlLocation;
-
-import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.AuthorizationEndpoint.*;
-import static org.forgerock.oauth2.core.OAuth2Constants.Params.*;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.FRAGMENT;
+import static org.forgerock.oauth2.core.OAuth2Constants.UrlLocation.QUERY;
 
 /**
  * Utility class containing common utility functions.
@@ -190,6 +194,22 @@ public final class Utils {
     public static UrlLocation getRequiredUrlLocation(Set<String> responseTypes, ClientRegistration clientRegistration) {
         return (isOpenIdConnectClient(clientRegistration) && isOpenIdConnectFragmentErrorType(responseTypes))
                 || isOAuth2FragmentErrorType(responseTypes) ? FRAGMENT : QUERY;
+    }
+
+    /**
+     * Converts a collection of comparable items into a list, using the given comparator to order the
+     * items.
+     *
+     * @param collection The collection to sort
+     * @param comp The comparator to use
+     * @param <T> The type of the collection.
+     * @return A sorted list including all elements from the collection.
+     */
+    public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> collection,
+                                                                         Comparator<? super T> comp) {
+        List<T> list = new ArrayList<T>(collection);
+        Collections.sort(list, comp);
+        return list;
     }
 
 }

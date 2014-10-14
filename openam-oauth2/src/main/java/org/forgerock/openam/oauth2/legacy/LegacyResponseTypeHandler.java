@@ -16,6 +16,11 @@
 
 package org.forgerock.openam.oauth2.legacy;
 
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResponseTypeHandler;
@@ -23,12 +28,6 @@ import org.forgerock.openam.oauth2.CookieExtractor;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.restlet.Request;
 import org.restlet.ext.servlet.ServletUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Adapter between old {@link ResponseType} and the new {@link ResponseTypeHandler}.
@@ -51,8 +50,9 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
         this.cookieExtractor = cookieExtractor;
     }
 
-    public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(String tokenType, Set<String> scope,
-            String resourceOwnerId, String clientId, String redirectUri, String nonce, OAuth2Request request) {
+    public Map.Entry<String, org.forgerock.oauth2.core.Token> handle(org.forgerock.oauth2.core.Token accessToken,
+            String tokenType, Set<String> scope, String resourceOwnerId, String clientId, String redirectUri,
+            String nonce, OAuth2Request request) {
 
         final Map<String, Object> data = new HashMap<String, Object>();
         data.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
@@ -67,7 +67,7 @@ public class LegacyResponseTypeHandler implements ResponseTypeHandler {
         final HttpServletRequest req = ServletUtils.getRequest(request.<Request>getRequest());
         data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, cookieExtractor.extract(req, ssoCookieName));
 
-        final CoreToken token = responseType.createToken(data);
+        final CoreToken token = responseType.createToken(accessToken, data);
         return new AbstractMap.SimpleEntry<String, org.forgerock.oauth2.core.Token>(responseType.URIParamValue(),
                 new LegacyToken(token));
     }

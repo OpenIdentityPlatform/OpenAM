@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.security.SignatureException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
@@ -60,9 +61,11 @@ public class OpenIdConnectToken extends JsonValue implements Token {
      * @param ath The authenticated time.
      * @param nonce The nonce.
      * @param ops The ops.
+     * @param acr The acr.
+     * @param amr The amr.
      */
     public OpenIdConnectToken(byte[] clientSecret, String algorithm, String iss, String sub, String aud, String azp,
-            long exp, long iat, long ath, String nonce, String ops) {
+            long exp, long iat, long ath, String nonce, String ops, String atHash, String acr, List<String> amr) {
         super(new HashMap<String, Object>());
         this.clientSecret = clientSecret;
         this.algorithm = algorithm;
@@ -75,9 +78,14 @@ public class OpenIdConnectToken extends JsonValue implements Token {
         setAth(ath);
         setNonce(nonce);
         setOps(ops);
+        setAtHash(atHash);
+        setAcr(acr);
+        setAmr(amr);
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
     }
+
+
 
     /**
      * Sets a value on the OpenId Connect token if the value is not null or an empty String.
@@ -162,6 +170,34 @@ public class OpenIdConnectToken extends JsonValue implements Token {
     private void setNonce(String nonce) {
         set(OAuth2Constants.JWTTokenParams.NONCE, nonce);
     }
+
+    /**
+     * Sets the at_hash.
+     *
+     * @param atHash The at_hash.
+     */
+    private void setAtHash(String atHash) {
+        set(OAuth2Constants.JWTTokenParams.AT_HASH, atHash);
+    }
+
+    /**
+     * Sets the acr.
+     *
+     * @param acr The acr.
+     */
+    private void setAcr(String acr) {
+        set(OAuth2Constants.JWTTokenParams.ACR, acr);
+    }
+
+    /**
+     * Sets the amr.
+     *
+     * @param amr The amr.
+     */
+    private void setAmr(List<String> amr) {
+        put(OAuth2Constants.JWTTokenParams.AMR, amr);
+    }
+
 
     /**
      * Sets the ops.

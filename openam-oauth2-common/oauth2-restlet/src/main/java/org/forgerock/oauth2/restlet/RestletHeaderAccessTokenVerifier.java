@@ -73,7 +73,7 @@ public class RestletHeaderAccessTokenVerifier implements AccessTokenVerifier {
 
         try {
             //verify token
-            final AccessToken accessToken = tokenStore.readAccessToken(tokenId);
+            final AccessToken accessToken = tokenStore.readAccessToken(request, tokenId);
             //is token expired?
             return !accessToken.isExpired();
         } catch (BadRequestException e) {

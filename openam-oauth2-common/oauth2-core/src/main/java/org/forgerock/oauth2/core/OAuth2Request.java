@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.guava.common.collect.ClassToInstanceMap;
+import org.forgerock.guava.common.collect.MutableClassToInstanceMap;
 import org.forgerock.json.fluent.JsonValue;
 
 /**
@@ -24,7 +26,9 @@ import org.forgerock.json.fluent.JsonValue;
  *
  * @since 12.0.0
  */
-public interface OAuth2Request {
+public abstract class OAuth2Request {
+
+    private final ClassToInstanceMap<Token> tokens = MutableClassToInstanceMap.create();
 
     /**
      * Gets the actual underlying request.
@@ -32,7 +36,7 @@ public interface OAuth2Request {
      * @param <T> The type of the underlying request.
      * @return The underlying request.
      */
-    <T> T getRequest();
+    public abstract <T> T getRequest();
 
     /**
      * Gets the specified parameter from the request.
@@ -44,7 +48,7 @@ public interface OAuth2Request {
      * @param <T> The type of the parameter.
      * @return The parameter value.
      */
-    <T> T getParameter(String name);
+    public abstract <T> T getParameter(String name);
 
     /**
      * Gets the body of the request.
@@ -57,5 +61,25 @@ public interface OAuth2Request {
      *
      * @return The body of the request.
      */
-    JsonValue getBody();
+    public abstract JsonValue getBody();
+
+    /**
+     * Set a Token that is in play for this request.
+     * @param tokenClass The token type.
+     * @param token The token instance.
+     * @param <T> The type of token.
+     */
+    public <T extends Token> void setToken(Class<T> tokenClass, T token) {
+        tokens.putInstance(tokenClass, token);
+    }
+
+    /**
+     * Set a Token that is in play for this request.
+     * @param tokenClass The token type.
+     * @param <T> The type of token.
+     * @return The token instance.
+     */
+    public <T extends Token> T getToken(Class<T> tokenClass) {
+        return tokens.getInstance(tokenClass);
+    }
 }

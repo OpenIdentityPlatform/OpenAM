@@ -189,6 +189,7 @@
         <java-ipv6.version>0.14</java-ipv6.version>
         <json.version>20090211</json.version>
         <javax.inject.version>1</javax.inject.version>
+        <forgerock.guava.version>18.0.1</forgerock.guava.version>
 
         <openam.version>OpenAM ${project.version}</openam.version>
         <!--  Project web site -->
@@ -1647,6 +1648,11 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-openid-connect-module</artifactId>
                 <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons.guava</groupId>
+                <artifactId>forgerock-guava-collect</artifactId>
+                <version>${forgerock.guava.version}</version>
             </dependency>
 
             <!-- JASPIC -->

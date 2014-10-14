@@ -86,13 +86,14 @@ public interface TokenStore {
     /**
      * Creates an Authorization Code and stores it in the OAuth2 Provider's store.
      *
+     * @param request The current request.
      * @param code The authorization code identifier.
      * @return The Authorization Code.
      * @throws InvalidGrantException If a problem occurs whilst retrieving the Authorization Code or if the read token
      * is not an Authorization Code.
      * @throws ServerException If any internal server error occurs.
      */
-    AuthorizationCode readAuthorizationCode(String code) throws InvalidGrantException, ServerException;
+    AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) throws InvalidGrantException, ServerException;
 
     /**
      * Updates an Authorization Code.
@@ -133,20 +134,22 @@ public interface TokenStore {
     /**
      * Reads an Access Token from the OAuth2 Provider's store with the specified identifier.
      *
+     * @param request The current request.
      * @param tokenId The token identifier.
      * @return The Access Token.
      * @throws InvalidGrantException If the read token is not an Access Token.
      */
-    AccessToken readAccessToken(String tokenId) throws ServerException, BadRequestException,
+    AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException,
             InvalidGrantException;
 
     /**
      * Reads a Refresh Token from the OAuth2 Provider's store with the specified identifier.
      *
+     * @param request The current request.
      * @param tokenId The token identifier.
      * @return The Refresh Token.
      * @throws InvalidGrantException If the read token is not a Refresh Token.
      */
-    RefreshToken readRefreshToken(String tokenId) throws BadRequestException, InvalidRequestException,
+    RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException,
             InvalidGrantException;
 }

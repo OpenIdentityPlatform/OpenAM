@@ -84,7 +84,7 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
         final String code = request.getParameter("code");
         final String redirectUri = request.getParameter("redirect_uri");
 
-        final AuthorizationCode authorizationCode = tokenStore.readAuthorizationCode(code);
+        final AuthorizationCode authorizationCode = tokenStore.readAuthorizationCode(request, code);
 
         if (authorizationCode == null) {
             logger.error("Authorization code doesn't exist, " + code);

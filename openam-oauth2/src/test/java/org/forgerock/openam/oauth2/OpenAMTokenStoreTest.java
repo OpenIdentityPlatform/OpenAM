@@ -16,24 +16,25 @@
 
 package org.forgerock.openam.oauth2;
 
+import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
+import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.InvalidGrantException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.oauth2.restlet.RestletOAuth2Request;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
+import org.restlet.Request;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.forgerock.json.fluent.JsonValue.array;
-import static org.forgerock.json.fluent.JsonValue.field;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.*;
+import static org.forgerock.json.fluent.JsonValue.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -45,6 +46,8 @@ public class OpenAMTokenStoreTest {
     private OAuth2ProviderSettingsFactory providerSettingsFactory;
     private OpenIdConnectClientRegistrationStore clientRegistrationStore;
     private RealmNormaliser realmNormaliser;
+    private SSOTokenManager ssoTokenManager;
+    private Request request;
 
     @BeforeMethod
     public void setUp() {
@@ -53,34 +56,37 @@ public class OpenAMTokenStoreTest {
         providerSettingsFactory = mock(OAuth2ProviderSettingsFactory.class);
         clientRegistrationStore = mock(OpenIdConnectClientRegistrationStore.class);
         realmNormaliser = mock(RealmNormaliser.class);
+        ssoTokenManager = mock(SSOTokenManager.class);
+        request = mock(Request.class);
 
         openAMtokenStore = new OpenAMTokenStore(tokenStore, providerSettingsFactory, clientRegistrationStore,
-                realmNormaliser);
+                realmNormaliser, ssoTokenManager);
     }
 
     @Test
     public void shouldReadAccessToken() throws Exception {
-
         //Given
         JsonValue token = json(object(field("tokenName", Collections.singleton("access_token"))));
-
         given(tokenStore.read("TOKEN_ID")).willReturn(token);
 
+        OAuth2Request request = new RestletOAuth2Request(this.request);
+
         //When
-        AccessToken accessToken = openAMtokenStore.readAccessToken("TOKEN_ID");
+        AccessToken accessToken = openAMtokenStore.readAccessToken(request, "TOKEN_ID");
 
         //Then
         assertThat(accessToken).isNotNull();
+        assertThat(request.getToken(AccessToken.class)).isSameAs(accessToken);
     }
 
     @Test (expectedExceptions = InvalidGrantException.class)
     public void shouldReadAccessTokenWhenNull() throws Exception {
-
         //Given
         given(tokenStore.read("TOKEN_ID")).willReturn(null);
+        OAuth2Request request = new RestletOAuth2Request(this.request);
 
         //When
-        openAMtokenStore.readAccessToken("TOKEN_ID");
+        openAMtokenStore.readAccessToken(request, "TOKEN_ID");
 
         //Then
         //Expected InvalidGrantException
@@ -91,9 +97,10 @@ public class OpenAMTokenStoreTest {
 
         //Given
         doThrow(CoreTokenException.class).when(tokenStore).read("TOKEN_ID");
+        OAuth2Request request = new RestletOAuth2Request(this.request);
 
         //When
-        openAMtokenStore.readAccessToken("TOKEN_ID");
+        openAMtokenStore.readAccessToken(request, "TOKEN_ID");
 
         //Then
         //Expected ServerException

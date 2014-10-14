@@ -19,8 +19,10 @@ package org.forgerock.oauth2.restlet;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
 import org.restlet.Request;
+import org.restlet.ext.servlet.ServletUtils;
 
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * A factory for creating OAuth2Request instances from Restlet requests.
@@ -30,10 +32,19 @@ import javax.inject.Singleton;
 @Singleton
 public class RestletOAuth2RequestFactory implements OAuth2RequestFactory<Request> {
 
+    private static final String OAUTH2_REQ_ATTR = "OAUTH2_REQ_ATTR";
+
     /**
      * {@inheritDoc}
      */
     public OAuth2Request create(Request request) {
-        return new RestletOAuth2Request(request);
+        HttpServletRequest req = ServletUtils.getRequest(request);
+        OAuth2Request o2request = (OAuth2Request) req.getAttribute(OAUTH2_REQ_ATTR);
+        if (o2request == null) {
+            o2request = new RestletOAuth2Request(request);
+            req.setAttribute(OAUTH2_REQ_ATTR, o2request);
+        }
+        return o2request;
     }
+
 }

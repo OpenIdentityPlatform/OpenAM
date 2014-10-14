@@ -322,4 +322,23 @@ public interface OAuth2ProviderSettings {
      * @throws ServerException If any internal server error occurs.
      */
     boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException;
+
+    /**
+     * Returns a mapping from Authentication Context Class Reference (ACR) values (typically a Level of Assurance
+     * value) to concrete authentication methods.
+     */
+    Map<String, AuthenticationMethod> getAcrMapping() throws ServerException;
+
+    /**
+     * The default Authentication Context Class Reference (ACR) values to use for authentication if none is specified
+     * in the request. This is a space-separated list of values in preference order.
+     */
+    String getDefaultAcrValues() throws ServerException;
+
+    /**
+     * The mappings between amr values and auth module names.
+     * @return
+     */
+    Map<String, String> getAMRAuthModuleMappings() throws ServerException;
+
 }

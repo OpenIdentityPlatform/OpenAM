@@ -59,15 +59,15 @@ public class IDTokenResponseType implements ResponseType {
         this.requestFactory = requestFactory;
     }
 
-    public CoreToken createToken(Map<String, Object> data) {
+    public CoreToken createToken(org.forgerock.oauth2.core.Token accessToken, Map<String, Object> data) {
 
         final String resourceOwnerId = (String) data.get(OAuth2Constants.CoreTokenParams.USERNAME);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(null, null, resourceOwnerId, clientId, null,
-                    nonce, requestFactory.create(Request.getCurrent()));
+            final Map.Entry<String,Token> tokenEntry = handler.handle(accessToken, null, null, resourceOwnerId, clientId,
+                    null, nonce, requestFactory.create(Request.getCurrent()));
 
             return new LegacyJwtTokenAdapter((OpenIdConnectToken) tokenEntry.getValue());
 

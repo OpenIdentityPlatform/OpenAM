@@ -47,12 +47,13 @@ public class TokenResponseTypeHandler implements ResponseTypeHandler {
     /**
      * {@inheritDoc}
      */
-    public Map.Entry<String, Token> handle(String tokenType, Set<String> scope, String resourceOwnerId, String clientId,
-            String redirectUri, String nonce, OAuth2Request request) throws ServerException {
+    public Map.Entry<String, Token> handle(Token accessToken, String tokenType, Set<String> scope,
+                                           String resourceOwnerId, String clientId, String redirectUri, String nonce,
+                                           OAuth2Request request) throws ServerException {
 
-        final AccessToken accessToken = tokenStore.createAccessToken("token", tokenType, null, resourceOwnerId,
+        final AccessToken generatedAccessToken = tokenStore.createAccessToken("token", tokenType, null, resourceOwnerId,
                 clientId, redirectUri, scope, null, nonce, request);
-        return new AbstractMap.SimpleEntry<String, Token>("access_token", accessToken);
+        return new AbstractMap.SimpleEntry<String, Token>("access_token", generatedAccessToken);
     }
 
     /**

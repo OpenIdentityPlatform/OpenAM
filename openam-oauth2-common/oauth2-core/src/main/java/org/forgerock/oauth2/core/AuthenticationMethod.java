@@ -16,30 +16,15 @@
 
 package org.forgerock.oauth2.core;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertNull;
-
 /**
+ * Abstract interface for indicating that some authentication method should be used to perform authentication.
+ *
  * @since 12.0.0
  */
-public class NoneResponseTypeHandlerTest {
+public interface AuthenticationMethod {
 
-    private NoneResponseTypeHandler responseTypeHandler;
-
-    @BeforeMethod
-    public void setUp() {
-        responseTypeHandler = new NoneResponseTypeHandler();
-    }
-
-    @Test
-    public void handleShouldReturnNull() {
-        assertNull(responseTypeHandler.handle(null, null, null, null, null, null, null, null));
-    }
-
-    @Test
-    public void getReturnLocationShouldReturnNull() {
-        assertNull(responseTypeHandler.getReturnLocation());
-    }
+    /**
+     * The name of the authentication method (e.g., the name of a login module or service).
+     */
+    String getName();
 }

@@ -28,9 +28,9 @@
 
 package org.forgerock.openam.oauth2.provider;
 
-import org.forgerock.openam.oauth2.legacy.CoreToken;
-
 import java.util.Map;
+import org.forgerock.oauth2.core.Token;
+import org.forgerock.openam.oauth2.legacy.CoreToken;
 
 /**
  * This class provides the functions that need to be implemented to create a response type for the authorize
@@ -46,7 +46,7 @@ public interface ResponseType {
      * @param data The data needed to create the token
      * @return  the created token
      */
-    public CoreToken createToken(Map<String, Object> data);
+    public CoreToken createToken(Token accessToken, Map<String, Object> data);
 
     /**
      * Returns the location in the HTTP response the token should be returned

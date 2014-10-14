@@ -62,7 +62,7 @@ public class AuthorizationCodeResponseTypeHandlerTest {
                 .willReturn(authorizationCode);
 
         //When
-        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(tokenType, scope, resourceOwnerId,
+        final Map.Entry<String, Token> tokenEntry = responseTypeHandler.handle(null, tokenType, scope, resourceOwnerId,
                 clientId, redirectUri, nonce, request);
 
         //Then

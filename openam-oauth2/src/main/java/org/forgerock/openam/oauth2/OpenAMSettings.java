@@ -20,6 +20,7 @@ import com.iplanet.sso.SSOException;
 import com.sun.identity.sm.SMSException;
 
 import java.security.KeyPair;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -75,6 +76,18 @@ public interface OpenAMSettings {
      * @throws SMSException If there is a problem getting the setting value.
      */
     Boolean getBooleanSetting(String realm, String attributeName) throws SSOException, SMSException;
+
+    /**
+     * Gets a setting from the given realm and parses it as into a Map from string keys to string values, according
+     * to the {@link com.sun.identity.common.configuration.MapValueParser} format.
+     *
+     * @param realm the realm.
+     * @param attributeName the attribute name.
+     * @return The {@code Map} of values parsed from the attribute.
+     * @throws SSOException If there is a problem getting the setting value.
+     * @throws SMSException If there is a problem getting the setting value.
+     */
+    Map<String, String> getMapSetting(String realm, String attributeName) throws SSOException, SMSException;
 
     /**
      * Gets the key pair that OpenAM is configured to use for the specified realm.

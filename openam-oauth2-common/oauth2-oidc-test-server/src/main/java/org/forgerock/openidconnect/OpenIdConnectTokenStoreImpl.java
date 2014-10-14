@@ -16,17 +16,25 @@
 
 package org.forgerock.openidconnect;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.utils.Utils;
 import org.forgerock.oauth2.TokenStoreImpl;
+import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
+import org.forgerock.oauth2.core.Token;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
+import org.forgerock.util.encode.Base64url;
 import org.restlet.Request;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * @since 12.0.0
@@ -45,13 +53,14 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         this.clientRegistrationStore = clientRegistrationStore;
     }
 
-    public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId, String authorizationParty,
-            String nonce, String ops, OAuth2Request request) throws ServerException, InvalidClientException {
+    public OpenIdConnectToken createOpenIDToken(String resourceOwnerId, String clientId,
+                                                String authorizationParty, String nonce, String ops,
+                                                OAuth2Request request) throws ServerException, InvalidClientException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId, request);
         final String algorithm = clientRegistration.getIDTokenSignedResponseAlgorithm();
-        final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Charset.forName("UTF-8"));
+        final byte[] clientSecret = clientRegistration.getClientSecret().getBytes(Utils.CHARSET);
 
         final long timeInSeconds = System.currentTimeMillis()/1000;
         final long tokenLifetime = providerSettings.getOpenIdTokenLifetime();
@@ -63,7 +72,47 @@ public class OpenIdConnectTokenStoreImpl extends TokenStoreImpl implements OpenI
         final Request req = request.getRequest();
         final String iss = req.getHostRef().toString() + "/" + req.getResourceRef().getSegments().get(0);
 
+        final String atHash = generateAtHash(algorithm, request, request.getToken(AccessToken.class), providerSettings);
+
+        // todo support acr/amr, should be 0 or one of the space-seperated values from acr_values in the request
+        final String acr = null;
+        final List<String> amr = null;
+
         return new OpenIdConnectToken(clientSecret, algorithm, iss, resourceOwnerId, clientId,  authorizationParty, exp,
-                iat, ath, nonce, ops);
+                iat, ath, nonce, ops, atHash, acr, amr);
     }
+
+    /**
+     * Generates at_hash values, by hashing the accessToken using the requests's "alg"
+     * parameter.
+     */
+    private String generateAtHash(String algorithm, OAuth2Request request,
+                                  Token accessToken, OAuth2ProviderSettings providerSettings)
+            throws ServerException {
+
+        if (request == null || accessToken == null) {
+            return null;
+        }
+
+        if (!providerSettings.getSupportedIDTokenSigningAlgorithms().contains(algorithm)) {
+            return null;
+        }
+
+        final JwsAlgorithm alg = JwsAlgorithm.valueOf(algorithm);
+        final String accessTokenValue = ((String) accessToken.getTokenInfo().get("access_token"));
+
+
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance(alg.getMdAlgorithm());
+        } catch (NoSuchAlgorithmException e) {
+            throw new ServerException("Algorithm not supported.");
+        }
+
+        final byte[] result = digest.digest(accessTokenValue.getBytes(Utils.CHARSET));
+        final byte[] toEncode = Arrays.copyOfRange(result, 0, result.length / 2);
+
+        return Base64url.encode(toEncode);
+    }
+
 }

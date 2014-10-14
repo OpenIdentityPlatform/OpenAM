@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.configuration.MapValueParser;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -53,6 +54,8 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
     private final static String DEFAULT_KEYSTORE_PASS_FILE_PROP = "com.sun.identity.saml.xmlsig.storepass";
     private final static String DEFAULT_KEYSTORE_TYPE_PROP = "com.sun.identity.saml.xmlsig.storetype";
     private final static String DEFAULT_PRIVATE_KEY_PASS_FILE_PROP  = "com.sun.identity.saml.xmlsig.keypass";
+
+    private static final MapValueParser MAP_VALUE_PARSER = new MapValueParser();
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final String serviceName;
@@ -107,6 +110,13 @@ public class OpenAMSettingsImpl implements OpenAMSettings {
      */
     public Boolean getBooleanSetting(String realm, String attributeName) throws SSOException, SMSException {
         return Boolean.valueOf(getStringSetting(realm, attributeName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Map<String, String> getMapSetting(String realm, String attributeName) throws SSOException, SMSException {
+        return MAP_VALUE_PARSER.parse(getSetting(realm, attributeName));
     }
 
     /**

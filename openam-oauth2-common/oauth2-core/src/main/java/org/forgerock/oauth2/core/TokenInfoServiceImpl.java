@@ -67,7 +67,7 @@ public class TokenInfoServiceImpl implements TokenInfoService {
             logger.error("Missing access token in request");
             throw new InvalidRequestException("Missing access_token");
         } else {
-            AccessToken accessToken = tokenStore.readAccessToken(token);
+            AccessToken accessToken = tokenStore.readAccessToken(request, token);
 
             if (accessToken == null) {
                 logger.error("Unable to read token from token store for id: " + token);

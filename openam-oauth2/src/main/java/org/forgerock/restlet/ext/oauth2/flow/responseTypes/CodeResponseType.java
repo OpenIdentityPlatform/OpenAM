@@ -59,7 +59,7 @@ public class CodeResponseType implements ResponseType {
         this.requestFactory = requestFactory;
     }
 
-    public CoreToken createToken(Map<String, Object> data) {
+    public CoreToken createToken(Token accessToken, Map<String, Object> data) {
         final Set<String> scope = (Set<String>) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
         final String resourceOwnerId = (String) data.get(OAuth2Constants.CoreTokenParams.USERNAME);
         final String clientId = (String) data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID);
@@ -67,7 +67,7 @@ public class CodeResponseType implements ResponseType {
         final String nonce = (String) data.get(OAuth2Constants.Custom.NONCE);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(null, scope, resourceOwnerId, clientId,
+            final Map.Entry<String,Token> tokenEntry = handler.handle(null, null, scope, resourceOwnerId, clientId,
                     redirectUri, nonce, requestFactory.create(Request.getCurrent()));
 
             return new LegacyAuthorizationTokenAdapter((AuthorizationCode) tokenEntry.getValue());

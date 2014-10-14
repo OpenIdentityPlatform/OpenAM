@@ -52,13 +52,14 @@ public class TokenStoreImpl implements TokenStore {
         this.providerSettingsFactory = providerSettingsFactory;
     }
 
-    public AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId, String redirectUri, String nonce, OAuth2Request request) throws ServerException {
+    public AuthorizationCode createAuthorizationCode(Set<String> scope, String resourceOwnerId, String clientId,
+            String redirectUri, String nonce, OAuth2Request request) throws ServerException {
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String code = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
         final AuthorizationCode authorizationCode = new AuthorizationCode(code, resourceOwnerId, clientId, redirectUri,
-                scope, expiryTime, nonce);
+                scope, expiryTime, nonce, null);
 
         authorizationCodes.put(code, authorizationCode);
 
@@ -89,15 +90,17 @@ public class TokenStoreImpl implements TokenStore {
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
 
-        final RefreshToken refreshToken = new RefreshToken(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType);
+        final RefreshToken refreshToken = new RefreshToken(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, null);
 
         refreshTokens.put(id, refreshToken);
 
         return refreshToken;
     }
 
-    public AuthorizationCode readAuthorizationCode(String code) throws InvalidGrantException, ServerException {
-        return authorizationCodes.get(code);
+    public AuthorizationCode readAuthorizationCode(OAuth2Request request, String code) throws InvalidGrantException, ServerException {
+        AuthorizationCode token = authorizationCodes.get(code);
+        request.setToken(AuthorizationCode.class, token);
+        return token;
     }
 
     public void updateAuthorizationCode(AuthorizationCode authorizationCode) {
@@ -129,11 +132,15 @@ public class TokenStoreImpl implements TokenStore {
         refreshTokens.remove(refreshTokenId);
     }
 
-    public AccessToken readAccessToken(String tokenId) throws ServerException, BadRequestException {
-        return accessTokens.get(tokenId);
+    public AccessToken readAccessToken(OAuth2Request request, String tokenId) throws ServerException, BadRequestException {
+        AccessToken token = accessTokens.get(tokenId);
+        request.setToken(AccessToken.class, token);
+        return token;
     }
 
-    public RefreshToken readRefreshToken(String tokenId) throws BadRequestException, InvalidRequestException {
-        return refreshTokens.get(tokenId);
+    public RefreshToken readRefreshToken(OAuth2Request request, String tokenId) throws BadRequestException, InvalidRequestException {
+        RefreshToken token = refreshTokens.get(tokenId);
+        request.setToken(RefreshToken.class, token);
+        return token;
     }
 }

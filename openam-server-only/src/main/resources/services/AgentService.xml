@@ -144,6 +144,7 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+
               <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.grantTypes"
@@ -409,19 +410,20 @@
                   </DefaultValues>
               </AttributeSchema>
 
-                   <AttributeSchema name="sunIdentityServerDeviceStatus"
-                                     type="single_choice"
-                                     syntax="string"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a101">
-                       <ChoiceValues>
-                           <ChoiceValue i18nKey="a102">Active</ChoiceValue>
-                           <ChoiceValue i18nKey="a103">Inactive</ChoiceValue>
-                       </ChoiceValues>
-                       <DefaultValues>
-                           <Value>Active</Value>
-                       </DefaultValues>
-                   </AttributeSchema>
+              <AttributeSchema name="sunIdentityServerDeviceStatus"
+                               type="single_choice"
+                               syntax="string"
+                               validator="RequiredValueValidator"
+                               i18nKey="a101">
+                  <ChoiceValues>
+                      <ChoiceValue i18nKey="a102">Active</ChoiceValue>
+                      <ChoiceValue i18nKey="a103">Inactive</ChoiceValue>
+                  </ChoiceValues>
+                  <DefaultValues>
+                      <Value>Active</Value>
+                  </DefaultValues>
+              </AttributeSchema>
+
           </SubSchema>
 
 	      <SubSchema name="WebAgent" inheritance="multiple">

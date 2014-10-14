@@ -16,19 +16,19 @@
 
 package org.forgerock.oauth2.core;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Singleton;
+import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import static org.forgerock.oauth2.core.Utils.splitResponseType;
 
 /**
  * Issues Authorization Tokens requested by OAuth2 authorize requests.
@@ -79,7 +79,13 @@ public class AuthorizationTokenIssuer {
 
         final Map<String, Token> tokens = new HashMap<String, Token>();
         boolean returnAsFragment = false;
-        for (final String responseType : requestedResponseTypes) {
+
+        final List<String> sortedResponseTypes =
+                Utils.asSortedList(requestedResponseTypes, new KeyStringComparator("token"));
+
+        Token accessToken = null;
+
+        for (final String responseType : sortedResponseTypes) {
 
             if (Utils.isEmpty(responseType)) {
                 throw new UnsupportedResponseTypeException("Response type is not supported");
@@ -87,10 +93,15 @@ public class AuthorizationTokenIssuer {
 
             final ResponseTypeHandler responseTypeHandler = allowedResponseTypes.get(responseType);
 
-            final Map.Entry<String, Token> token = responseTypeHandler.handle(tokenType, validatedScope,
+            final Map.Entry<String, Token> token = responseTypeHandler.handle(accessToken, tokenType, validatedScope,
                     resourceOwnerId, clientId, redirectUri, nonce, request);
 
             if (token != null) {
+
+                if (token.getKey().equals("access_token")) {
+                    accessToken = token.getValue();
+                }
+
                 if (tokens.containsKey(token.getKey())) {
                     logger.debug("Returning multiple response types with the same url value");
                     throw new UnsupportedResponseTypeException("Returning multiple response types with the same url "
@@ -103,6 +114,7 @@ public class AuthorizationTokenIssuer {
                     final OAuth2Constants.UrlLocation returnLocation = responseTypeHandler.getReturnLocation();
                     returnAsFragment = OAuth2Constants.UrlLocation.FRAGMENT.equals(returnLocation);
                 }
+
             }
         }
 
@@ -162,6 +174,31 @@ public class AuthorizationTokenIssuer {
                 }
             }
         }
+
         return tokenMap;
+    }
+
+    /**
+     * Comparator that takes a given String in its ctor which is moved to the front
+     * of the list. The order of other elements is undetermined.
+     */
+    private class KeyStringComparator implements Comparator<String> {
+
+        private final String key;
+
+        public KeyStringComparator(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public int compare(String first, String second) {
+            if (first.equals(key)) {
+                return -1;
+            } else if (second.equals(key)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 }

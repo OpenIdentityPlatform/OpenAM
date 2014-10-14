@@ -56,7 +56,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param nonce The nonce.
      */
     public AuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri,
-            Set<String> scope, long expiryTime, String nonce) {
+            Set<String> scope, long expiryTime, String nonce, String authModules) {
         super(new HashMap<String, Object>());
         setCode(code);
         setResourceOwnerId(resourceOwnerId);
@@ -67,6 +67,7 @@ public class AuthorizationCode extends JsonValue implements Token {
         setTokenType("Bearer");
         setTokenName(OAuth2Constants.Token.OAUTH_CODE_TYPE);
         setNonce(nonce);
+        setAuthModules(authModules);
     }
 
     /**
@@ -75,7 +76,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param code The authorization code.
      */
     protected void setCode(String code) {
-        put(OAuth2Constants.CoreTokenParams.ID, code);
+        setStringProperty(OAuth2Constants.CoreTokenParams.ID, code);
     }
 
     /**
@@ -84,7 +85,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param resourceOwnerId The resource owner's id.
      */
     protected void setResourceOwnerId(String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
+        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
     }
 
     /**
@@ -93,7 +94,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param clientId The client's id.
      */
     protected void setClientId(String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
+        setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
     }
 
     /**
@@ -102,7 +103,42 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @param redirectUri The redirect uri.
      */
     protected void setRedirectUri(String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+        setStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+    }
+
+    /**
+     * Sets the token type.
+     *
+     * @param tokenType The token type.
+     */
+    protected void setTokenType(String tokenType) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+    }
+
+    /**
+     * Sets the token name.
+     *
+     * @param tokenName The token name.
+     */
+    protected void setTokenName(String tokenName) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+    }
+
+    /**
+     * Sets the auth modules
+     * @param authModules The auth modules string.
+     */
+    protected void setAuthModules(String authModules) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
+    }
+
+    /**
+     * Sets the nonce.
+     *
+     * @param nonce The nonce.
+     */
+    protected void setNonce(String nonce) {
+        setStringProperty(OAuth2Constants.Custom.NONCE, nonce);
     }
 
     /**
@@ -121,33 +157,6 @@ public class AuthorizationCode extends JsonValue implements Token {
      */
     protected void setExpiryTime(long expiryTime) {
         put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, expiryTime);
-    }
-
-    /**
-     * Sets the token type.
-     *
-     * @param tokenType The token type.
-     */
-    protected void setTokenType(String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
-    }
-
-    /**
-     * Sets the token name.
-     *
-     * @param tokenName The token name.
-     */
-    protected void setTokenName(String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
-    }
-
-    /**
-     * Sets the nonce.
-     *
-     * @param nonce The nonce.
-     */
-    protected void setNonce(String nonce) {
-        put(OAuth2Constants.Custom.NONCE, nonce);
     }
 
     /**
@@ -175,10 +184,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * {@inheritDoc}
      */
     public String getTokenId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.ID)) {
-            return get(OAuth2Constants.CoreTokenParams.ID).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.ID);
     }
 
     /**
@@ -187,20 +193,14 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The token type.
      */
     public String getTokenType() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_TYPE)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
     }
 
     /**
      * {@inheritDoc}
      */
     public String getTokenName() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_NAME)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_NAME).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
     }
 
     /**
@@ -234,10 +234,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The redirect uri.
      */
     public String getRedirectUri() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.REDIRECT_URI)) {
-            return get(OAuth2Constants.CoreTokenParams.REDIRECT_URI).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
     }
 
     /**
@@ -246,10 +243,7 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The client's id.
      */
     public String getClientId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.CLIENT_ID)) {
-            return get(OAuth2Constants.CoreTokenParams.CLIENT_ID).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID);
     }
 
     /**
@@ -258,12 +252,16 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The resource owner's id.
      */
     public String getResourceOwnerId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.USERNAME)) {
-            return get(OAuth2Constants.CoreTokenParams.USERNAME).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
     }
 
+    /**
+     * Get the auth modules string.
+     * @return The pipe-separated list of auth modules.
+     */
+    public String getAuthModules() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
+    }
     /**
      * Sets the authorization code as issued.
      */
@@ -277,10 +275,15 @@ public class AuthorizationCode extends JsonValue implements Token {
      * @return The nonce.
      */
     public String getNonce() {
-        if (isDefined(OAuth2Constants.Custom.NONCE)) {
-            return get(OAuth2Constants.Custom.NONCE).asString();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.Custom.NONCE);
+    }
+
+    protected String getStringProperty(String key) {
+        return isDefined(key) ? get(key).asString() : null;
+    }
+
+    protected void setStringProperty(String key, String value) {
+        put(key, value);
     }
 
     /**
@@ -315,4 +318,5 @@ public class AuthorizationCode extends JsonValue implements Token {
         tokenInfo.put(getResourceString(OAuth2Constants.CoreTokenParams.SCOPE), getScope());
         return tokenInfo;
     }
+
 }

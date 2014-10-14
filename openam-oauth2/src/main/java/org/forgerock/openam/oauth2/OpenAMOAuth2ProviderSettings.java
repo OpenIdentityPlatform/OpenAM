@@ -18,6 +18,7 @@ package org.forgerock.openam.oauth2;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
@@ -27,8 +28,10 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.NoneResponseTypeHandler;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
@@ -39,8 +42,6 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
-import org.forgerock.oauth2.core.OAuth2Constants;
-import org.forgerock.openam.oauth2.OAuthProblemException;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 import org.forgerock.openam.oauth2.legacy.LegacyAccessTokenAdapter;
 import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
@@ -699,6 +700,52 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
     public boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException {
         try {
             return getBooleanSetting(realm, OAuth2Constants.OAuth2ProviderService.GENERATE_REGISTRATION_ACCESS_TOKENS);
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public Map<String, AuthenticationMethod> getAcrMapping() throws ServerException {
+        try {
+            final Map<String, String> map = getMapSetting(realm,
+                    OAuth2Constants.OAuth2ProviderService.ACR_VALUE_MAPPING);
+            final Map<String, AuthenticationMethod> methods = new HashMap<String, AuthenticationMethod>(map.size());
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                methods.put(entry.getKey(),
+                        new OpenAMAuthenticationMethod(entry.getValue(), AuthContext.IndexType.SERVICE));
+            }
+            return methods;
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public String getDefaultAcrValues() throws ServerException {
+        try {
+            return getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.DEFAULT_ACR);
+        } catch (SSOException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        } catch (SMSException e) {
+            logger.message(e.getMessage());
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
+    public Map<String, String> getAMRAuthModuleMappings() throws ServerException {
+        try {
+            return getMapSetting(realm, OAuth2Constants.OAuth2ProviderService.AMR_VALUE_MAPPING);
         } catch (SSOException e) {
             logger.message(e.getMessage());
             throw new ServerException(e);

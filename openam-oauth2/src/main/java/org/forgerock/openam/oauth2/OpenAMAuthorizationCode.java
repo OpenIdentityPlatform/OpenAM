@@ -58,43 +58,12 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param expiryTime The expiry time.
      * @param nonce The nonce.
      * @param realm The realm.
+     * @param authModules The list of auth modules used.
      */
     OpenAMAuthorizationCode(String code, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String nonce, String realm) {
-        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce);
+            long expiryTime, String nonce, String realm, String authModules) {
+        super(code, resourceOwnerId, clientId, redirectUri, scope, expiryTime, nonce, authModules);
         setRealm(realm);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setCode(String code) {
-        put(OAuth2Constants.CoreTokenParams.ID, stringToSet(code));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setResourceOwnerId(String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, stringToSet(resourceOwnerId));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setClientId(String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, stringToSet(clientId));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setRedirectUri(String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, stringToSet(redirectUri));
     }
 
     /**
@@ -114,30 +83,6 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setTokenType(String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, stringToSet(tokenType));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setTokenName(String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, stringToSet(tokenName));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setNonce(String nonce) {
-        put(OAuth2Constants.Custom.NONCE, stringToSet(nonce));
-    }
-
-    /**
      * Sets the realm.
      * <br/>
      * If the specified realm is {@code null} or an empty String, '/' is used instead.
@@ -145,11 +90,15 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @param realm The realm.
      */
     private void setRealm(String realm) {
-        if (realm == null || realm.isEmpty()) {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet("/"));
-        } else {
-            this.put(OAuth2Constants.CoreTokenParams.REALM, stringToSet(realm));
-        }
+        setStringProperty(OAuth2Constants.CoreTokenParams.REALM, realm == null || realm.isEmpty() ? "/" : realm);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIssued() {
+        this.put(OAuth2Constants.CoreTokenParams.ISSUED, stringToSet("true"));
     }
 
     /**
@@ -158,11 +107,7 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * @return The realm.
      */
     public String getRealm() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.REALM);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+        return getStringProperty(OAuth2Constants.CoreTokenParams.REALM);
     }
 
     /**
@@ -191,48 +136,24 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
      * {@inheritDoc}
      */
     @Override
-    public String getTokenId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenType() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenName() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Set<String> getScope() {
         final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
         if (value != null && !value.isEmpty()) {
             return value;
         }
         return Collections.emptySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isIssued() {
+        if (getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null) {
+            return Boolean.parseBoolean(getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next());
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -257,71 +178,17 @@ public class OpenAMAuthorizationCode extends AuthorizationCode {
         return RESOURCE_BUNDLE.getString(s);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean isIssued() {
-        if (getParameter(OAuth2Constants.CoreTokenParams.ISSUED) != null) {
-            return Boolean.parseBoolean(getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next());
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getRedirectUri() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
+    protected String getStringProperty(String key) {
+        final Set<String> value = getParameter(key);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String getClientId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getResourceOwnerId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setIssued() {
-        this.put(OAuth2Constants.CoreTokenParams.ISSUED, stringToSet("true"));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getNonce() {
-        final Set<String> value = getParameter(OAuth2Constants.Custom.NONCE);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
+    protected void setStringProperty(String key, String value) {
+        put(key, stringToSet(value));
     }
 }

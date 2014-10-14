@@ -16,18 +16,18 @@
 
 package org.forgerock.oauth2.core;
 
-import org.testng.annotations.Test;
-
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -158,4 +158,26 @@ public class UtilsTest {
         expectedResponseTypes.add("c");
         assertEquals(Utils.stringToSet("a b c"), expectedResponseTypes);
     }
+
+    @Test
+    public void shouldSortCollectionIntoSet() {
+        final String result = "abdejz";
+
+        List<String> sortedList = Utils.asSortedList(Utils.stringToSet("d e a z j b b"), new TestComparator());
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : sortedList) {
+            sb.append(s);
+        }
+
+        assertEquals(sb.toString(), result);
+    }
+
+    class TestComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.compareTo(o2);
+        }
+    }
+
 }

@@ -58,44 +58,14 @@ public class OpenAMRefreshToken extends RefreshToken {
      * @param tokenType The token type.
      * @param tokenName The token name.
      * @param grantType The grant type.
+     * @param authModules The pipe-separated list of auth modules.
      * @param realm The realm.
      */
     public OpenAMRefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType, String realm) {
-        super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType);
+            long expiryTime, String tokenType, String tokenName, String grantType, String realm, String authModules) {
+        super(id, resourceOwnerId, clientId, redirectUri, scope, expiryTime, tokenType, tokenName, grantType,
+                authModules);
         setRealm(realm);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setTokenId(String id) {
-        put(OAuth2Constants.CoreTokenParams.ID, stringToSet(id));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setResourceOwnerId(String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, stringToSet(resourceOwnerId));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setClientId(String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, stringToSet(clientId));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setRedirectUri(String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, stringToSet(redirectUri));
     }
 
     /**
@@ -112,30 +82,6 @@ public class OpenAMRefreshToken extends RefreshToken {
     @Override
     protected void setExpiryTime(long expiryTime) {
         put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, stringToSet(String.valueOf(expiryTime)));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setTokenType(String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, stringToSet(tokenType));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setTokenName(String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, stringToSet(tokenName));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setGrantType(String grantType) {
-        put(OAuth2Constants.Params.GRANT_TYPE, stringToSet(grantType));
     }
 
     /**
@@ -175,66 +121,6 @@ public class OpenAMRefreshToken extends RefreshToken {
      * {@inheritDoc}
      */
     @Override
-    public String getClientId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getResourceOwnerId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getRedirectUri() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenId() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.ID);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTokenName() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
-        if (value != null && !value.isEmpty()) {
-            return value.iterator().next();
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public long getExpiryTime() {
         final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
         if (value != null && !value.isEmpty()) {
@@ -247,12 +133,18 @@ public class OpenAMRefreshToken extends RefreshToken {
      * {@inheritDoc}
      */
     @Override
-    public String getTokenType() {
-        final Set<String> value = getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+    protected void setStringProperty(String key, String value) {
+        put(key, stringToSet(value));
+    }
+
+    @Override
+    protected String getStringProperty(String key) {
+        final Set<String> value = getParameter(key);
         if (value != null && !value.isEmpty()) {
             return value.iterator().next();
         }
         return null;
+
     }
 
     /**

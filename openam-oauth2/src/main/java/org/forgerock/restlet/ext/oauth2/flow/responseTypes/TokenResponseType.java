@@ -63,7 +63,7 @@ public class TokenResponseType implements ResponseType {
         this.requestFactory = requestFactory;
     }
 
-    public CoreToken createToken(Map<String, Object> data) {
+    public CoreToken createToken(Token accessToken, Map<String, Object> data) {
 
         final String tokenType = (String) data.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
         final Set<String> scope = (Set<String>) data.get(OAuth2Constants.CoreTokenParams.SCOPE);
@@ -72,7 +72,7 @@ public class TokenResponseType implements ResponseType {
         final String redirectUri = (String) data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
 
         try {
-            final Map.Entry<String,Token> tokenEntry = handler.handle(tokenType, scope, resourceOwnerId, clientId,
+            final Map.Entry<String,Token> tokenEntry = handler.handle(null, tokenType, scope, resourceOwnerId, clientId,
                     redirectUri, null, requestFactory.create(Request.getCurrent()));
 
             return new LegacyAccessTokenAdapter((AccessToken) tokenEntry.getValue());

@@ -130,7 +130,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
 
         //When
         accessTokenService.refreshToken(request);
@@ -149,7 +149,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("OTHER_CLIENT_ID");
 
@@ -170,7 +170,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() - 10);
@@ -194,7 +194,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
@@ -225,7 +225,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
@@ -261,7 +261,7 @@ public class AccessTokenServiceImplTest {
 
         given(request.getParameter("refresh_token")).willReturn("REFRESH_TOKEN_ID");
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readRefreshToken("REFRESH_TOKEN_ID")).willReturn(refreshToken);
+        given(tokenStore.readRefreshToken(request, "REFRESH_TOKEN_ID")).willReturn(refreshToken);
         given(refreshToken.getClientId()).willReturn("CLIENT_ID");
         given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
         given(refreshToken.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);

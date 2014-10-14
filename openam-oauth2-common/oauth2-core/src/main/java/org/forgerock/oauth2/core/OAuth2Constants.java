@@ -177,6 +177,15 @@ public class OAuth2Constants {
         public static final String OPENID = "openid";
 
         /**
+         * Parameter usage location: OpenID Connect authentication request parameter. Used to specify Authentication
+         * Context Class Reference (ACR) values. These represent requested Level of Assurance (LoA), which is similar
+         * in concept to AuthLevel, but is may be mapped to any auth type (auth level, auth chain, module, etc).
+         *
+         * @see <a href="http://openid.net/specs/openid-connect-core-1_0.html#AuthRequest">3.1.2.1 Authentication Request</a>
+         */
+        public static final String ACR_VALUES = "acr_values";
+        
+        /**
          * Parameter usage location: OpenId Connect request
          */
         public static final String LOGIN_HINT = "login_hint";
@@ -197,6 +206,7 @@ public class OAuth2Constants {
         public static final String ID = "id";
         public static final String CLIENT_ID = "clientID";
         public static final String TOKEN_NAME = "tokenName";
+        public static final String AUTH_MODULES = "authModules";
 
     }
 
@@ -728,7 +738,7 @@ public class OAuth2Constants {
      * Stores the constants for the OAuth2 Provider Service
      * @author Jason Lemay
      */
-    public class OAuth2ProviderService{
+    public class OAuth2ProviderService {
         //service name and version
         public static final String NAME = "OAuth2Provider";
         public static final String VERSION = "1.0";
@@ -754,6 +764,9 @@ public class OAuth2Constants {
         public static final String KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
         public static final String OPEN_DYNAMIC_REGISTRATION_ALLOWED = "forgerock-oauth2-provider-allow-open-dynamic-registration";
         public static final String GENERATE_REGISTRATION_ACCESS_TOKENS = "forgerock-oauth2-provider-generate-registration-access-tokens";
+        public static final String AMR_VALUE_MAPPING = "forgerock-oauth2-provider-amr-mappings";
+        public static final String ACR_VALUE_MAPPING = "forgerock-oauth2-provider-loa-mapping";
+        public static final String DEFAULT_ACR = "forgerock-oauth2-provider-default-acr";
     }
 
     /**
@@ -762,7 +775,7 @@ public class OAuth2Constants {
     public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
 
-    public class OAuth2Client{
+    public class OAuth2Client {
         public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";
         public static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
         public static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
@@ -807,7 +820,8 @@ public class OAuth2Constants {
         public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
     }
 
-    public class JWTTokenParams{
+    public class JWTTokenParams {
+
         public static final String JWT_TOKEN = "JWTToken";
         public static final String ID_TOKEN = "id_token";
         public static final String ISS = "iss";
@@ -819,6 +833,9 @@ public class OAuth2Constants {
         public static final String ATH = "ath";
         public static final String NONCE = "nonce";
         public static final String OPS = "ops";
+        public static final String ACR = "acr";
+        public static final String AMR = "amr";
+        public static final String AT_HASH = "at_hash";
 
     }
 

@@ -20,6 +20,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.oauth2.core.AccessToken;
+import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -36,6 +37,7 @@ import org.forgerock.server.ConfigurationResource;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -248,5 +250,20 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     @Override
     public boolean isRegistrationAccessTokenGenerationEnabled() throws ServerException {
         return false;
+    }
+
+    @Override
+    public Map<String, AuthenticationMethod> getAcrMapping() throws ServerException {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public String getDefaultAcrValues() throws ServerException {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getAMRAuthModuleMappings() throws ServerException {
+        return Collections.emptyMap();
     }
 }

@@ -80,7 +80,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         AuthorizationCode authorizationCode = null;
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
 
         //When
         grantTypeHandler.handle(request);
@@ -100,7 +100,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(true);
 
         try {
@@ -127,7 +127,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("OTHER_REDIRECT_URI");
 
@@ -150,7 +150,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -175,7 +175,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -204,7 +204,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -247,7 +247,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
@@ -288,7 +288,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
         given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
-        given(tokenStore.readAuthorizationCode(anyString())).willReturn(authorizationCode);
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willReturn(authorizationCode);
         given(authorizationCode.isIssued()).willReturn(false);
         given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
         given(authorizationCode.getClientId()).willReturn("CLIENT_ID");

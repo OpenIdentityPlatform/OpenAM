@@ -68,7 +68,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new ServerException("Access Token not valid");
         }
 
-        final AccessToken token = tokenStore.readAccessToken(tokenId);
+        final AccessToken token = tokenStore.readAccessToken(request, tokenId);
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         return new JsonValue(providerSettings.getUserInfo(token, request));

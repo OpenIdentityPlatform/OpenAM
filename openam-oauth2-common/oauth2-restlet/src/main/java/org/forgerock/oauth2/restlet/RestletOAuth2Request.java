@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @since 12.0.0
  */
-public class RestletOAuth2Request implements OAuth2Request {
+public class RestletOAuth2Request extends OAuth2Request {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final Request request;

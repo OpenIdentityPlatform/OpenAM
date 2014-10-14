@@ -229,6 +229,45 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="MapValueValidator"
+                                 type="validator"
+                                 syntax="string">
+                    <DefaultValues>
+                        <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-loa-mapping"
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 i18nKey="a117">
+                    <ChoiceValues>
+                        <ChoiceValuesClassName
+                                className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+                    </ChoiceValues>
+                </AttributeSchema>
+
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-default-acr"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a118">
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-amr-mappings"
+                                 type="list"
+                                 syntax="string"
+                                 uitype="maplist"
+                                 validator="MapValueValidator"
+                                 i18nKey="a119">
+                    <ChoiceValues>
+                        <ChoiceValuesClassName
+                                className="com.sun.identity.authentication.service.AllConfiguredModuleInstances"/>
+                    </ChoiceValues>
+                </AttributeSchema>
+
                 <SubSchema name="serverconfig" inheritance="multiple">
 
                     <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
@@ -431,6 +470,48 @@
                         <DefaultValues>
                             <Value>true</Value>
                         </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="MapValueValidator"
+                                     type="validator"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.sun.identity.common.configuration.MapValueValidator</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-loa-mapping"
+                                     type="list"
+                                     syntax="string"
+                                     uitype="maplist"
+                                     validator="MapValueValidator"
+                                     i18nKey="a117">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="com.sun.identity.authentication.service.ConfiguredAuthServices"/>
+                        </ChoiceValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-default-acr"
+                            type="single"
+                            syntax="string"
+                            i18nKey="a118">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-amr-mappings"
+                                     type="list"
+                                     syntax="string"
+                                     uitype="maplist"
+                                     validator="MapValueValidator"
+                                     i18nKey="a119">
+                        <ChoiceValues>
+                            <ChoiceValuesClassName
+                                    className="com.sun.identity.authentication.service.AllConfiguredModuleInstances"/>
+                        </ChoiceValues>
                     </AttributeSchema>
 
                 </SubSchema>

@@ -59,7 +59,7 @@ public class RefreshToken extends JsonValue implements Token {
      * @param grantType The grant type.
      */
     public RefreshToken(String id, String resourceOwnerId, String clientId, String redirectUri, Set<String> scope,
-            long expiryTime, String tokenType, String tokenName, String grantType) {
+            long expiryTime, String tokenType, String tokenName, String grantType, String authModules) {
         super(new HashMap<String, Object>());
         setTokenId(id);
         setResourceOwnerId(resourceOwnerId);
@@ -70,6 +70,7 @@ public class RefreshToken extends JsonValue implements Token {
         setTokenType(tokenType);
         setTokenName(tokenName);
         setGrantType(grantType);
+        setAuthModules(authModules);
     }
 
     /**
@@ -77,8 +78,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param tokenId The token id.
      */
-    protected void setTokenId(final String tokenId) {
-        put(OAuth2Constants.CoreTokenParams.ID, tokenId);
+    protected final void setTokenId(final String tokenId) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.ID, tokenId);
     }
 
     /**
@@ -86,8 +87,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param resourceOwnerId The resource owner's id.
      */
-    protected void setResourceOwnerId(final String resourceOwnerId) {
-        put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
+    protected final void setResourceOwnerId(final String resourceOwnerId) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
     }
 
     /**
@@ -95,8 +96,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param clientId The client's id.
      */
-    protected void setClientId(final String clientId) {
-        put(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
+    protected final void setClientId(final String clientId) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID, clientId);
     }
 
     /**
@@ -104,8 +105,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param redirectUri The redirect uri.
      */
-    protected void setRedirectUri(final String redirectUri) {
-        put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
+    protected final void setRedirectUri(final String redirectUri) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI, redirectUri);
     }
 
     /**
@@ -131,8 +132,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param tokenType The token type.
      */
-    protected void setTokenType(final String tokenType) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+    protected final void setTokenType(final String tokenType) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
     }
 
     /**
@@ -140,8 +141,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param tokenName The token name.
      */
-    protected void setTokenName(final String tokenName) {
-        put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+    protected final void setTokenName(final String tokenName) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
     }
 
     /**
@@ -149,8 +150,16 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @param grantType The grant type.
      */
-    protected void setGrantType(final String grantType) {
-        put(OAuth2Constants.Params.GRANT_TYPE, grantType);
+    protected final void setGrantType(final String grantType) {
+        setStringProperty(OAuth2Constants.Params.GRANT_TYPE, grantType);
+    }
+
+    /**
+     * Sets the auth modules used for authentication.
+     * @param authModules A pipe-delimited string of auth module names.
+     */
+    public final void setAuthModules(String authModules) {
+        setStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES, authModules);
     }
 
     /**
@@ -171,11 +180,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @return The client's id.
      */
-    public String getClientId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.CLIENT_ID)) {
-            return get(OAuth2Constants.CoreTokenParams.CLIENT_ID).asString();
-        }
-        return null;
+    public final String getClientId() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.CLIENT_ID);
     }
 
     /**
@@ -183,11 +189,8 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @return The resource owner's id.
      */
-    public String getResourceOwnerId() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.USERNAME)) {
-            return get(OAuth2Constants.CoreTokenParams.USERNAME).asString();
-        }
-        return null;
+    public final String getResourceOwnerId() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.USERNAME);
     }
 
     /**
@@ -195,31 +198,22 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @return The client's redirect uri.
      */
-    public String getRedirectUri() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.REDIRECT_URI)) {
-            return get(OAuth2Constants.CoreTokenParams.REDIRECT_URI).asString();
-        }
-        return null;
+    public final String getRedirectUri() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.REDIRECT_URI);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getTokenId() {
-        if (isDefined(OAuth2Constants.Params.ID)) {
-            return get(OAuth2Constants.Params.ID).asString();
-        }
-        return null;
+    public final String getTokenId() {
+        return getStringProperty(OAuth2Constants.Params.ID);
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getTokenName() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_NAME)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_NAME).asString();
-        }
-        return null;
+    public final String getTokenName() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
     }
 
     /**
@@ -248,11 +242,16 @@ public class RefreshToken extends JsonValue implements Token {
      *
      * @return The token type.
      */
-    public String getTokenType() {
-        if (isDefined(OAuth2Constants.CoreTokenParams.TOKEN_TYPE)) {
-            return get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).asString();
-        }
-        return null;
+    public final String getTokenType() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+    }
+
+    /**
+     * Gets the auth modules used for authentication.
+     * @return A pipe-delimited string of auth module names.
+     */
+    public final String getAuthModules() {
+        return getStringProperty(OAuth2Constants.CoreTokenParams.AUTH_MODULES);
     }
 
     /**
@@ -263,6 +262,27 @@ public class RefreshToken extends JsonValue implements Token {
      */
     protected String getResourceString(final String s) {
         return s;
+    }
+
+    /**
+     * Get a string property from the store.
+     * @param key The property key.
+     * @return The value.
+     */
+    protected String getStringProperty(String key) {
+        if (isDefined(key)) {
+            return get(key).asString();
+        }
+        return null;
+    }
+
+    /**
+     * Set a string property in the store.
+     * @param key The property key.
+     * @param value The value.
+     */
+    protected void setStringProperty(String key, String value) {
+        put(key, value);
     }
 
     /**
