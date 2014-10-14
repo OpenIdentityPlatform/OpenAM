@@ -42,15 +42,14 @@ define([
     "org/forgerock/openam/ui/policy/ManagePoliciesView",
     "org/forgerock/openam/ui/policy/ActionsView",
     "org/forgerock/openam/ui/policy/ManageResponseAttrsView",
+    "org/forgerock/openam/ui/policy/ResponseAttrsUserView",
     "org/forgerock/openam/ui/policy/ReviewInfoView",
     "org/forgerock/openam/ui/policy/EditEnvironmentView",
     "org/forgerock/openam/ui/policy/EditSubjectView",
     "org/forgerock/openam/ui/policy/ManageEnvironmentsView",
     "org/forgerock/openam/ui/policy/ManageSubjectsView",
     "org/forgerock/openam/ui/policy/OperatorRulesView"
-], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView,
-             resListView, selectPatternsView, manageAppsView, managePolView, actionsView, manageResponseAttrsView,
-             reviewInfoView) {
+], function (eventManager, constants, conf, router, loginHelper, uiUtils, policyDelegate, editAppView, editPolView, resListView, selectPatternsView, manageAppsView, managePolView, actionsView, responseAttrsStaticView, responseAttrsUserView, reviewInfoView) {
     return {
         executeAll: function (server) {
 
@@ -294,7 +293,8 @@ define([
                     resListView.element = '<div></div>';
                     selectPatternsView.element = '<div></div>';
                     actionsView.element = '<div></div>';
-                    manageResponseAttrsView.element = '<div></div>';
+                    responseAttrsStaticView.element = '<div></div>';
+                    responseAttrsUserView.element = '<div></div>';
 
                     QUnit.ok(editPolView.accordion.getActive() === 6, "Last step of accordion is selected");
                     QUnit.ok(editPolView.$el.find('#cancelButton').length, "Cancel button is available");
@@ -400,33 +400,31 @@ define([
                         });
                     });
 
-                    manageResponseAttrsView.init([], function(){
-                        var editing = manageResponseAttrsView.$el.find('.editing'),
+                    responseAttrsStaticView.render([], function(){
+                        var editing = responseAttrsStaticView.$el.find('.editing'),
                             key = editing.find('[data-attr-add-key]'),
                             val = editing.find('[data-attr-add-val]'),
                             addBtn = editing.find('.icon-plus'),
                             deleteBtn,
-                            attrsLengthOld = manageResponseAttrsView.data.staticAttributes.length;
+                            attrsLengthOld = responseAttrsStaticView.data.staticAttributes.length;
 
                         // add new static attribute
                         key.val('testKey');
                         val.val('testVal');
                         addBtn.trigger('click');
-                        QUnit.ok(attrsLengthOld + 1 === manageResponseAttrsView.data.staticAttributes.length,
-                            "Static attribute can be added");
+                        QUnit.ok(attrsLengthOld + 1 === responseAttrsStaticView.data.staticAttributes.length, "Static attribute can be added");
 
-                        editing = manageResponseAttrsView.$el.find('.editing');
+                        editing = responseAttrsStaticView.$el.find('.editing');
                         key = editing.find('[data-attr-add-key]');
                         val = editing.find('[data-attr-add-val]');
                         addBtn = editing.find('.icon-plus');
                         key.val('testKey');
                         val.val('testVal');
                         addBtn.trigger('click');
-                        QUnit.ok(attrsLengthOld + 1 === manageResponseAttrsView.data.staticAttributes.length,
-                            "Can't add duplicate static attribute");
+                        QUnit.ok(attrsLengthOld + 1 === responseAttrsStaticView.data.staticAttributes.length, "Can't add duplicate static attribute");
                         attrsLengthOld++;
 
-                        editing = manageResponseAttrsView.$el.find('.editing');
+                        editing = responseAttrsStaticView.$el.find('.editing');
                         key = editing.find('[data-attr-add-key]');
                         val = editing.find('[data-attr-add-val]');
                         addBtn = editing.find('.icon-plus');
@@ -435,10 +433,30 @@ define([
                         addBtn.trigger('click');
 
                         // delete static attribute
-                        deleteBtn = _.first(manageResponseAttrsView.$el.find('.striped-list[data-attr-type="Static"]').find('.icon-close'));
+                        deleteBtn = _.first(responseAttrsStaticView.$el.find('#attrTypeStatic ul li:first').find('.icon-close'));
                         $(deleteBtn).trigger('click');
-                        QUnit.ok(attrsLengthOld === manageResponseAttrsView.data.staticAttributes.length,
-                            "Static attribute can be deleted");
+                        QUnit.ok(attrsLengthOld === responseAttrsStaticView.data.staticAttributes.length, "Static attribute can be deleted");
+
+                        editing = responseAttrsStaticView.$el.find('.editing');
+                        key = editing.find('[data-attr-add-key]');
+                        val = editing.find('[data-attr-add-val]');
+                        addBtn = editing.find('.icon-plus');
+                        key.val('');
+                        val.val('incompleteVal');
+                        addBtn.trigger('click');
+
+                        QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteVal" }), "Static attributes with no key can't be added");
+    
+                        editing = responseAttrsStaticView.$el.find('.editing');
+                        key = editing.find('[data-attr-add-key]');
+                        val = editing.find('[data-attr-add-val]');
+                        addBtn = editing.find('.icon-plus');
+                        key.val('incompleteKey');
+                        val.val('');
+                        addBtn.trigger('click');
+
+                        QUnit.ok(!_.find(responseAttrsStaticView.data.staticAttributes, { propertyName: "incompleteKey" }), "Static attributes with no value can't be added");
+                    
                     });
 
                     // Step 3

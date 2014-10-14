@@ -17,9 +17,9 @@
 
     <form class="form">
         <div class="accordion">
-            <a class="accordion-header">Step 1: Define an Application Name</a>
-            <section class="accordion-step clearfix">
 
+            <h1 class="accordion-header" tabindex="0">Step 1: Define an Application Name</h1>
+            <section class="accordion-step clearfix">
 
                 <div class="clearfix">
                     <div class="group-field-block col2 ">
@@ -31,19 +31,17 @@
                         <label class="prop-name" for="appRealm">Realm</label>
                         <input class="prop-val" id="appRealm" type="text" value="{{entity.realm}}" data-field="realm"  />
                     </div>
-                    
-
                 </div>
 
                 <div class="group-field-block">
                     <label class="prop-name" for="appDescription">Description (optional):</label>
                     <textarea class="prop-val" id="appDescription" data-field="description">{{entity.description}}</textarea>
                 </div>
-
                 <input type="button" value="Next" name="nextButton" class="button"/>
+
             </section>
 
-            <a class="accordion-header">Step 2: Add Application Base</a>
+            <h1 class="accordion-header" tabindex="0">Step 2: Add Application Base</h1>
             <section class="accordion-step clearfix">
 
                 <div class="clearfix">
@@ -54,13 +52,13 @@
                 <input type="button" class="button" value="Next" name="nextButton"/>
             </section>
 
-            <a class="accordion-header">Step 3: Review Configuration</a>
+            <h1 class="accordion-header" tabindex="0">Step 3: Review Configuration</h1>
             <section class="accordion-step clearfix">
+
                 <p>Review the application configuration and click Finish to save.</p>
-
                 <div id="reviewInfo" class="clearfix"></div>
-
                 <input type="button" class="button" value="Finish" name="submitForm"/>
+
             </section>
         </div>
     </form>

@@ -56,29 +56,29 @@
 
     <div class="review-row clearfix" tabindex="0" >
 
-        {{#unless userAttributes}}
-             {{#unless staticAttributes}}
-            <h2>Response attributes</h2>
-            <pre>There are no response attributes...</pre>
-            {{/unless}}
-        {{/unless}}
-
-        {{#if userAttributes}}
-        <h2>User attributes</h3>
+        <h2>Static attributes</h2>
+        {{#if combinedStaticAttrs}} 
         <ul>
-            {{#each userAttributes}}
+        {{#each combinedStaticAttrs}}
+            <li>
+                <span>{{propertyName}}:</span>
+                {{#each propertyValues}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+            </li> 
+        {{/each}}
+        </ul>
+        {{else}}
+        <pre>There are no static attributes..</pre>  
+        {{/if}}
+
+        <h2>User attributes</h2>
+        {{#if userAttrs}} 
+        <ul>
+            {{#each userAttrs}}
             <li>{{propertyName}}</li>
             {{/each}}
         </ul>
-        {{/if}}
-
-        {{#if staticAttributes}}
-        <h2>Static attributes</h2>
-        <ul>
-            {{#each staticAttributes}}
-            <li>{{propertyName}}: {{propertyValues}}</li>
-            {{/each}}
-        </ul>
+        {{else}}
+        <pre>There are no user attributes..</pre>
         {{/if}}
 
     </div>

@@ -13,7 +13,8 @@
     <form class="form">
 
         <div id="policy-steps" class="accordion">
-            <a class="accordion-header">Step 1: Define a Policy Name and Description</a>
+            
+            <h1 class="accordion-header" tabindex="0">Step 1: Define a Policy Name and Description</h1>
             <section class="accordion-step clearfix">
 
                 <div class="group-field-block">
@@ -29,19 +30,18 @@
 
             </section>
 
-            <a class="accordion-header">Step 2: Add Resources</a>
+            <h1 class="accordion-header" tabindex="0">Step 2: Add Resources</h1>
             <section class="accordion-step clearfix">
 
                 <div class="clearfix">
                     <div class="col2" id="patterns"></div>
                     <div class="col2" id="resourcesList"></div>
                 </div>
-
                 <input class="button" type="button" value="Next" name="nextButton">
 
             </section>
 
-            <a class="accordion-header">Step 3: Configure Actions</a>
+            <h1 class="accordion-header" tabindex="0">Step 3: Configure Actions</h1>
             <section class="accordion-step clearfix">
 
                 <table id="actions" class="filter-sort-grid actions-grid"></table>
@@ -49,7 +49,7 @@
 
             </section>
 
-            <a class="accordion-header">Step 4: Select Subjects</a>
+            <h1 class="accordion-header" tabindex="0">Step 4: Select Subjects</h1>
             <section class="accordion-step clearfix">
 
                 <div id="subjectContainer" class="clearfix"></div>
@@ -57,7 +57,7 @@
 
             </section>
 
-            <a class="accordion-header">Step 5: Environmental Conditions</a>
+            <h1 class="accordion-header" tabindex="0">Step 5: Environmental Conditions</h1>
             <section class="accordion-step clearfix">
 
                 <div id="environmentContainer" class="clearfix"></div>
@@ -65,21 +65,25 @@
 
             </section>
 
-            <a class="accordion-header">Step 6: Response Attributes</a>
+            <h1 class="accordion-header" tabindex="0">Step 6: Response Attributes</h1>
             <section class="accordion-step clearfix">
 
-                <div id="responseAttrs" class="clearfix"></div>
-
+                <div class="clearfix">
+                    <div class="col2" id="userAttrs"></div>
+                    <div class="col2" id="staticAttrs"></div>
+                </div>
+                
                 <input class="button" type="button" value="Next" name="nextButton">
+
             </section>
 
-            <a class="accordion-header">Step 7: Summary and Confirmation View</a>
+            <h1 class="accordion-header" tabindex="0">Step 7: Summary and Confirmation View</h1>
             <section class="accordion-step clearfix">
 
                 <p> Review the policy configuration and click Finish to save.</p>
                 <div id="reviewPolicyInfo" class="clearfix"></div>
-
                 <input class="button" type="button" value="Finish" name="submitForm">
+
             </section>
         </div>
     </form>

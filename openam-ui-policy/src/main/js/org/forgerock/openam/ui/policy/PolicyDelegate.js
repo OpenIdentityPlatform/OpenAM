@@ -151,8 +151,12 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-
-    
+    obj.getAllUserAttributes = function () {
+        return obj.serviceCall({
+            url: "/subjectattributes?_queryID",
+            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+        });
+    };
 
     return obj;
 });

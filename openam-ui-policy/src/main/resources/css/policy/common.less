@@ -86,7 +86,7 @@
     border-bottom: none;
     .rounded-corners(5px);
 
-    .accordion-header {
+    h1.accordion-header {
         height: 30px;
         line-height: 30px;
         display: block;
@@ -94,6 +94,9 @@
         background-color: #d5d5d5;
         color: #666;
         cursor:pointer;
+        font-weight:normal;
+        font-size:100%;
+
 
         border-bottom: 1px solid #bebebe;
         text-decoration: none;
@@ -195,8 +198,7 @@
 
         &.invalid{
             .invalid-background;
-
-            .invalid{
+            .invalid {
                 color: red;
             }
         }
@@ -205,7 +207,7 @@
             font-size: 15px;
             line-height: 20px;
             padding: 8px 10px 8px 0;
-            clear:bothl
+            clear:both;
         }
 
         ul, p, pre {
@@ -217,6 +219,9 @@
         p, li {
             font-family: monospace;
             display: block;
+            span {
+                font-weight:bold;
+            }
         }
 
         pre {
@@ -508,7 +513,7 @@ span.item-button-panel {
           }
       }
 
-      &[data-attr-type="Static"] {
+      &#attrTypeStatic{
           li.editing input {
               width: 176px;
           }
@@ -638,3 +643,18 @@ input[type="text"]:invalid:required{
     color: #303030;
     border: 1px solid #d0d0d0;
 }
+
+#userAttrs .selectize-control.multi .selectize-input:not(.dropdown-active):not(.has-items):after {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: block;
+    width: 0;
+    height: 0;
+    margin-top: -3px;
+    border-color: #808080 transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px 5px 0 5px;
+    content: ' ';
+}
+

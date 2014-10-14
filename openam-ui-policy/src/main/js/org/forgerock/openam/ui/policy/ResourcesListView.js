@@ -55,9 +55,6 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
                 this.data.entity.resources = [];
             }
 
-            this.count = 0;
-
-
             var self = this;
             
             this.parentRender(function () {
@@ -145,11 +142,9 @@ define("org/forgerock/openam/ui/policy/ResourcesListView", [
         flashDomItem: function ( item, className ) {
             var self = this;
             item.addClass(className);
-            $.doTimeout(className+this.count, 2000, function() {
+            $.doTimeout(_.uniqueId(className), 2000, function() {
                 item.removeClass(className);
             });
-
-            this.count++;
         }
 
     });

@@ -101,6 +101,7 @@ define("config/AppConfiguration", function () {
                         "templates/policy/EditEnvironmentTemplate.html",
                         "templates/policy/OperatorRulesTemplate.html",
                         "templates/policy/ConditionAttrTimeDate.html",
+                        "templates/policy/ConditionTypePolicy.html",
                         "templates/policy/ConditionAttrEnum.html",
                         "templates/policy/ConditionAttrString.html",
                         "templates/policy/ConditionAttrBoolean.html",

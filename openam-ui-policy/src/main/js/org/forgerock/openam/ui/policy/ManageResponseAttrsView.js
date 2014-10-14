@@ -34,7 +34,7 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
     "org/forgerock/commons/ui/common/util/Constants"
 ], function (AbstractView, eventManager, constants) {
     var ManageResponseAttrsView = AbstractView.extend({
-        element: "#responseAttrs",
+        element: "#staticAttrs",
         template: "templates/policy/ManageResponseAttrsTemplate.html",
         noBaseTemplate: true,
         events: {
@@ -47,30 +47,19 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             'keyup .icon-close ': 'deleteAttr'
         },
 
-        attrType: {STATIC: "Static", USER: "User"},
+        attrType: "Static",
 
-        init: function (args, callback) {
-            _.extend(this.data, args);
-
-            var attrsPresent = this.data.resourceAttributes && this.data.resourceAttributes.length > 0;
-            this.data.staticAttributes = attrsPresent ? this.splitStaticAttrs() : [];
-            this.data.userAttributes = attrsPresent ? _.where(this.data.resourceAttributes, {type: this.attrType.USER}) : [];
-            this.data.attrType = this.attrType;
-
-            this.render(this.data, callback);
-        },
-
-        render: function (args, callback) {
+        render: function (staticAttributes, callback) {
 
             var self = this;
-            this.count = 0;
-            this.data.staticAttributes = _.sortBy(this.data.staticAttributes, 'propertyName');
+
+            this.data.staticAttributes = _.sortBy(staticAttributes, 'propertyName');
 
             this.parentRender(function () {
 
                 delete self.data.options.justAdded;
 
-                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good' );
+                self.flashDomItem( self.$el.find('.highlight-good'), 'highlight-good');
     
                 if (callback) {
                     callback();
@@ -88,7 +77,7 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
                 val = editing.find('[data-attr-add-val]'),
                 attr = {},
                 duplicateIndex = -1,
-                count = 0;
+                counter = 0;
 
             if (!this.isValid(key) || !this.isValid(val) ||  key.val() === '' || val.val() === ''){
                 return;
@@ -100,10 +89,10 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             _.each(this.data.staticAttributes, function(item){
                 
                 if(item.propertyName === attr.propertyName && item.propertyValues === attr.propertyValues){
-                    duplicateIndex = count;
+                    duplicateIndex = counter;
                     return;
                 }
-                count++;
+                counter++;
                  
             });
 
@@ -113,7 +102,7 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             } else {
                 this.data.staticAttributes.push(attr);
                 this.data.options.justAdded = attr;
-                this.render(this.data);
+                this.render(this.data.staticAttributes);
             }
         },
 
@@ -126,40 +115,26 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
                 return;
             }
 
-            var type = $(e.currentTarget).parents('.striped-list').data().attrType,
-                data = $(e.currentTarget).parent().data(),
-                name,
-                value;
+            var data = $(e.currentTarget).parent().data(),
+                key = data.attrKey.toString(),
+                val = data.attrVal.toString();
 
-            switch (type) {
-                case this.attrType.STATIC:
-                    name = data.attrKey.toString();
-                    value = data.attrVal.toString();
-                    this.data.staticAttributes = _.without(this.data.staticAttributes,
-                        _.findWhere(this.data.staticAttributes, {propertyName: name, propertyValues: value}));
-                    break;
-                case this.attrType.USER:
-                    name = data.attrKey.toString();
-                    this.data.userAttributes = _.without(this.data.userAttributes,
-                        _.findWhere(this.data.userAttributes, {propertyName: name}));
-                    break;
-            }
 
-            this.render(this.data);
+            this.data.staticAttributes = _.without(this.data.staticAttributes, _.findWhere(this.data.staticAttributes, {propertyName: key, propertyValues: val}));
+            this.render(this.data.staticAttributes);
         },
 
-        splitStaticAttrs: function () {
+        splitAttrs: function (attrs) {
             var data = [],
                 prop,
                 i,
-                length,
-                attrs = _.where(this.data.resourceAttributes, {type: this.attrType.STATIC});
+                length;
 
             for (prop in attrs) {
                 if (attrs.hasOwnProperty(prop)) {
                     for (i = 0, length = attrs[prop].propertyValues.length; i < length; i++) {
                         data.push({
-                            "type": this.attrType.STATIC,
+                            "type": "Static",
                             "propertyName": attrs[prop].propertyName,
                             "propertyValues": attrs[prop].propertyValues[i]
                         });
@@ -168,6 +143,30 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             }
 
             return data;
+        },
+
+        getCombinedAttrs: function () {
+
+            var data = [],
+                groupedByName = _.groupBy(this.data.staticAttributes, function (attribute) {
+                    return attribute.propertyName;
+                }),
+                attribute,
+                i,
+                length,
+                self = this;
+
+            _.each(groupedByName, function (value, key) {
+                attribute = {type:self.attrType };
+                attribute.propertyName = key;
+                attribute.propertyValues = [];
+                for (i = 0, length = value.length; i < length; i++) {
+                    attribute.propertyValues.push(value[i].propertyValues);
+                }
+                data.push(attribute);
+            });
+
+            return data; 
         },
 
         checkedRequired: function (e) {
@@ -183,39 +182,14 @@ define("org/forgerock/openam/ui/policy/ManageResponseAttrsView", [
             inputs.prop('required', required);
         },
 
-        getCombinedResponseAttrs: function () {
-            var staticAttrsToSave = [],
-                groupedByName = _.groupBy(this.data.staticAttributes, function (attr) {
-                    return attr.propertyName;
-                }),
-                attr,
-                i,
-                length,
-                self = this;
-
-            _.each(groupedByName, function (value, key, list) {
-                attr = {};
-                attr.type = self.attrType.STATIC;
-                attr.propertyName = key;
-                attr.propertyValues = [];
-                for (i = 0, length = value.length; i < length; i++) {
-                    attr.propertyValues.push(value[i].propertyValues);
-                }
-                staticAttrsToSave.push(attr);
-            });
-
-            return _.union(staticAttrsToSave, this.data.userAttributes);
-        },
-
         flashDomItem: function ( item, className ) {
             var self = this;
             item.addClass(className);
-            $.doTimeout(className+this.count, 2000, function() {
+            $.doTimeout(_.uniqueId(className), 2000, function() {
                 item.removeClass(className);
             });
-
-            this.count++;
         }
+
     });
 
     return new ManageResponseAttrsView();

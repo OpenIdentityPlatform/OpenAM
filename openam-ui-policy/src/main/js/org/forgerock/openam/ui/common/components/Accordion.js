@@ -53,6 +53,10 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
         this.$headers.on('click', function (e) {
             self.expandCollapse(e);
         });
+        this.$headers.on('keyup', function (e) {
+            if (e.type === 'keyup' && e.keyCode !== 13) { return;}
+            self.expandCollapse(e);
+        });
 
         this.$sections = $el.find(stepClass).hide();
         this.$sections.each(function (id, el) {
@@ -71,6 +75,7 @@ define("org/forgerock/openam/ui/common/components/Accordion", function () {
      */
     Accordion.prototype.expandCollapse = function (e) {
         e.preventDefault();
+        
 
         var $this = $(e.target),
             disabled = $this.hasClass(disabledStepClass),

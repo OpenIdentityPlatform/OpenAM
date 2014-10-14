@@ -240,7 +240,8 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                     returnVal = '';
 
                     if (itemData.type === "SimpleTime") {
-
+                        // 'SimpleTime' is a special case and requires its own template. 
+                        // This is because the endpoint only describes the inputs as strings, however in order to build a helpful UI we need to do more.
                         returnVal += uiUtils.fillTemplateWithData("templates/policy/ConditionAttrTimeDate.html", {
                             weekdays:self.weekdays,
                             data:itemData,
