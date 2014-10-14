@@ -695,8 +695,9 @@ $ <userinput>curl \
     OpenAM returns an authorization code to the example relying party.
     The example relying party then uses the authorization code
     to request an access token and an ID token.
-    It shows the response to that request,
-    and also decodes the ID token to show the content and to perform some validation.
+    It shows the response to that request.
+    It also validates the ID token signature using the default (HS256) algorithm,
+    and decodes the ID token to validate its content and show it in the output.
     Finally it uses the access token
     to request information about the end user who authenticated,
     and displays the result.
@@ -781,9 +782,9 @@ $ <userinput>curl \
     OpenAM returns the access token and ID token
     directly in the fragment (after <literal>#</literal>) of the redirect URI.
     The relying party does not get an authorization code.
-    The relying party shows the response to the request,
-    and also decodes the ID token to show the content
-    and to perform some validation (though it does not check the ID token signature).
+    The relying party shows the response to the request.
+    It also validates the ID token signature using the default (HS256) algorithm,
+    and decodes the ID token to validate its content and show it in the output.
     Finally the relying party uses the access token
     to request information about the end user who authenticated,
     and displays the result.
@@ -805,7 +806,7 @@ $ <userinput>curl \
    <para>
     As for the Authorization Code Flow example,
     the ID Token indicates the end user's
-    OpenAM realm in addition to the standard information.
+    OpenAM realm and OpenAM token ID in addition to the standard information.
    </para>
   </section>
  </section>
