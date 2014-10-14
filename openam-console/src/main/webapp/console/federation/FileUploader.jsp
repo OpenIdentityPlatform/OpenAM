@@ -25,6 +25,7 @@
    $Id: FileUploader.jsp,v 1.8 2009/08/07 23:44:08 asyhuang Exp $
 
 --%>
+<%-- Portions Copyrighted 2014 ForgeRock AS. --%>
 
 <%@ page info="FileUploader" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
@@ -82,9 +83,15 @@
                         }
                         var parent = opener.document.forms[0];
                         var field = parent.elements[parent.name + '.' + fldName];
-                        field.value = data + '<!-- ' + filename + ' -->';
+                        field.value = data + '<!-- ' + escapeHtml(filename) + ' -->';
                         if (labelName) {
-                            opener.document.getElementById(labelName).innerHTML = filename;
+                            var labelWidget = opener.document.getElementById(labelName);
+                            // innerText is an IEism but implemented in most browsers. Firefox uses textContent instead.
+                            if (labelWidget.innerText) {
+                                labelWidget.innerText = filename;
+                            } else {
+                                labelWidget.textContent = filename;
+                            }
                         }
                         if (methodName) {
                             eval("opener." + methodName + '()');
@@ -92,6 +99,13 @@
                         self.close();
                     }
                 }
+            }
+
+            function escapeHtml(unsafe) {
+                var tn = document.createTextNode(unsafe);
+                var p = document.createElement('p');
+                p.appendChild(tn);
+                return p.innerHTML;
             }
         </script>
 
