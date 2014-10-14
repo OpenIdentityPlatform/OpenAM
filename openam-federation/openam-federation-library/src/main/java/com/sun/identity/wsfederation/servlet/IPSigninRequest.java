@@ -38,7 +38,6 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.wsfederation.plugins.IDPAccountMapper;
@@ -168,16 +167,21 @@ public class IPSigninRequest extends WSFederationAction {
             // the user has not logged in yet, redirect to auth
             redirectAuthentication(idpEntityID, realm);
             return;
-        }        
-        // TODO
-        boolean sessionUpgrade = false;
+        }
 
-        if (!sessionUpgrade) {
+        String sessionRealm = getSessionRealm(session);
+        // If we are in the same realm as the users existing session then we can continue processing
+        if (realm.equalsIgnoreCase(sessionRealm)) {
             // set session property for multi-federation protocol hub
-            MultiProtocolUtils.addFederationProtocol(session,
-                SingleLogoutManager.WS_FED);
-            sendResponse(session, idpEntityID, spEntityID, idpMetaAlias, 
-                realm);
+            MultiProtocolUtils.addFederationProtocol(session, SingleLogoutManager.WS_FED);
+            sendResponse(session, idpEntityID, spEntityID, idpMetaAlias, realm);
+        } else {
+            // Trigger a re-auth to the new realm if the session realm value is different
+            if (debug.messageEnabled()) {
+                debug.message(classMethod + "The users realm: " + sessionRealm + " was different to the IDP's realm: "
+                        + realm + ", will re-authenticate to IDP: " + idpEntityID);
+            }
+            redirectAuthentication(idpEntityID, realm);
         }
     }
 
@@ -527,5 +531,23 @@ public class IPSigninRequest extends WSFederationAction {
                 WSFederationUtils.bundle.getString("failedAttrMapper"));
         }
         return attrMapper;
+    }
+
+    /**
+     * Return the realm from the session if it can be read
+     */
+    private static String getSessionRealm(Object session) {
+
+        String classMethod = "IPSigninRequest.getSessionRealm: ";
+        String sessionRealm = null;
+
+        try {
+            sessionRealm = WSFederationUtils.sessionProvider.
+                    getProperty(session, SAML2Constants.ORGANIZATION)[0];
+        } catch (SessionException ex) {
+            debug.error(classMethod + "Could not retrieve the session information", ex);
+        }
+
+        return sessionRealm;
     }
 }
