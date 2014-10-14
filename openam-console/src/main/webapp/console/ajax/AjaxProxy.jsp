@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2014 ForgeRock AS
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
@@ -43,13 +43,19 @@
 <%@page import="com.sun.identity.workflow.WorkflowException" %>
 <%@page import="java.security.AccessController"%>
 <%@page import="java.util.*" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="com.sun.identity.shared.debug.Debug" %>
 
 <%
-		response.setContentType("text/html; charset=UTF-8");
+		response.setContentType("text/plain; charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         String locale = request.getParameter("locale");
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + locale, locale, "HTTPParameterValue", 200,
+                true)) {
+            locale = null;
+        }
         Locale resLocale = null;
-        if ((locale != null) && (locale.length() > 0)) {
+        if ((locale != null) && (!locale.isEmpty())) {
             StringTokenizer st = new StringTokenizer(locale, "|");
             int cnt = st.countTokens();
             if (cnt == 1) {
@@ -120,7 +126,8 @@
         }
 
         String clazzName = request.getParameter("class");
-        if (clazzName == null) {          
+        if (clazzName == null || !ESAPI.validator().isValidInput("HTTP Parameter Value: " + clazzName,
+                clazzName, "HTTPParameterValue", 2000, false)) {
             String redirectUrl = request.getScheme() + "://" +
                     request.getServerName() + ":" +
                     request.getServerPort() +
@@ -146,13 +153,18 @@
             out.println("0|" + task.execute(resLocale, map));
         } catch (WorkflowException e) {
             out.write("1|" + AMViewBeanBase.stringToHex(
-                    e.getL10NMessage(resLocale)));
+                    ESAPI.encoder().encodeForHTML(e.getL10NMessage(resLocale))));
         } catch (IllegalAccessException e) {
-            out.write("1|" + e.getMessage());
+            out.write("1|" + ESAPI.encoder().encodeForHTML(e.getMessage()));
         } catch (InstantiationException e) {
-            out.write("1|" + e.getMessage());
+            out.write("1|" + ESAPI.encoder().encodeForHTML(e.getMessage()));
         } catch (ClassNotFoundException e) {
-            out.write("1|" + e.getMessage());
+            out.write("1|" + ESAPI.encoder().encodeForHTML(e.getMessage()));
+        } catch (ClassCastException e) {
+            out.write("1|" + ESAPI.encoder().encodeForHTML(e.getMessage()));
+        } catch (Exception e) {
+            Debug.getInstance("workflow").error("Uncaught exception in AjaxProxy", e);
+            response.sendRedirect(request.getContextPath() + "/base/AMUncaughtException");
         }
 
 %>
