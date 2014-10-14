@@ -1980,7 +1980,8 @@ $ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinp
        </para>
    <listitem>
        <para>Create a WebLogic descriptor file, <literal>/WEB-INF/weblogic.xml</literal>.</para>
-       <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?>
+       <programlisting language="xml">
+&lt;?xml version="1.0" encoding="UTF-8"?>
   &lt;weblogic-web-app xmlns="http://xmlns.oracle.com/weblogic/weblogic-web-app"
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-web-app
@@ -1988,9 +1989,6 @@ $ <userinput>java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</userinp
         &lt;context-root>/openam&lt;/context-root>
         &lt;container-descriptor>
            &lt;prefer-web-inf-classes>true&lt;/prefer-web-inf-classes>
-           &lt;prefer-application-packages>
-             &lt;package-name>org.apache.commons.lang.*&lt;/package-name>
-           &lt;/prefer-application-packages>
         &lt;/container-descriptor>
   &lt;/weblogic-web-app></programlisting>
    </listitem>
