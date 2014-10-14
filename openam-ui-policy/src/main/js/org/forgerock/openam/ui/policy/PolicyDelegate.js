@@ -36,12 +36,12 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/openam/json");
 
-    obj.ERROR_HANDLERS = { 
+    obj.ERROR_HANDLERS = {
         "Bad Request":              { status: "400" },
         "Not found":                { status: "404" },
         "Gone":                     { status: "410" },
         "Internal Server Error":    { status: "500" },
-        "Service Unavailable":      { status: "503" }  
+        "Service Unavailable":      { status: "503" }
     };
 
     obj.serviceCall = function (args) {
@@ -151,10 +151,13 @@ define("org/forgerock/openam/ui/policy/PolicyDelegate", [
         });
     };
 
-    obj.getAllUserAttributes = function () {
+    obj.importPolicies = function (data) {
         return obj.serviceCall({
-            url: "/subjectattributes?_queryID",
-            headers: {"Accept-API-Version": "protocol=1.0,resource=1.0"}
+            serviceUrl: constants.host + "/openam/",
+            url: "xacml/policies",
+            type: "POST",
+            data: data,
+            errorsHandlers: obj.ERROR_HANDLERS
         });
     };
 

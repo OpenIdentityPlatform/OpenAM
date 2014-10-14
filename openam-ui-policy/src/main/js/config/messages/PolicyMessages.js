@@ -82,6 +82,10 @@ define("config/messages/PolicyMessages", [], function () {
         "unableToPersistPolicy": {
             msg: "config.messages.PolicyMessages.unableToPersistPolicy",
             type: "error"
+        },
+        "policiesUploaded": {
+            msg: "config.messages.PolicyMessages.policiesUploaded",
+            type: "info"
         }
     };
 });

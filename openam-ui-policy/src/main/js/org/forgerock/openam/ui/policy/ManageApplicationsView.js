@@ -26,7 +26,7 @@
  * @author Eugenia Sergueeva
  */
 
-/*global window, define, $, _, document, console, sessionStorage */
+/*global window, define, $, _, document, console, sessionStorage, FileReader */
 
 define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
     "org/forgerock/openam/ui/policy/GenericGridView",
@@ -43,7 +43,10 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
         events: {
             'click .icon-pencil': 'editApplication',
             'click .icon-file': 'viewPolicies',
-            'click #deleteItems': 'deleteApplications'
+            'click #deleteItems': 'deleteApplications',
+            'click #importPolicies': 'startImportPolicies',
+            'click #exportPolicies': 'exportPolicies',
+            'change #realImport': 'readImportFile'
         },
 
         render: function (args, callback) {
@@ -55,58 +58,59 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             this.initBaseView('templates/policy/ApplicationTableGlobalActionsTemplate.html', 'PE-mng-apps-sel');
 
             this.parentRender(function () {
-                var subrealm = "",
-                    options,
+                var options,
                     additionalOptions;
 
                 if (conf.globalData.auth.realm !== "/") {
-                    subrealm = conf.globalData.auth.realm;
+                    this.subrealm = conf.globalData.auth.realm;
+                } else {
+                    this.subrealm = "";
                 }
 
                 this.setGridButtonSet();
 
                 options = {
-                        url: '/openam/json' + subrealm + '/applications?_queryFilter=true',
-                        colNames: ['', '', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
-                        colModel: [
-                            {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
-                            {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
-                            {name: 'name', width: 230, frozen: true},
-                            {name: 'realm', width: 150},
-                            {name: 'description', width: 170, sortable: false},
-                            {name: 'resources', width: 240, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'createdBy', width: 250, hidden: true},
-                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
-                            {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true}
-                        ],
-                        gridComplete: function () {
-                            $(this).jqGrid('hideCol', 'cb');
-                        },
-                        beforeSelectRow: function (rowId, e) {
-                            var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
-                            if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
-                                self.viewPolicies(e);
-                            }
+                    url: '/openam/json' + this.subrealm + '/applications?_queryFilter=true',
+                    colNames: ['', '', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
+                    colModel: [
+                        {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
+                        {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
+                        {name: 'name', width: 230, frozen: true},
+                        {name: 'realm', width: 150},
+                        {name: 'description', width: 170, sortable: false},
+                        {name: 'resources', width: 240, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                        {name: 'createdBy', width: 250, hidden: true},
+                        {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
+                        {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true}
+                    ],
+                    gridComplete: function () {
+                        $(this).jqGrid('hideCol', 'cb');
+                    },
+                    beforeSelectRow: function (rowId, e) {
+                        var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
+                        if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
+                            self.viewPolicies(e);
+                        }
 
-                            return checkBoxCellSelected;
-                        },
-                        onSelectRow: function (rowid, status, e) {
-                            self.onRowSelect(rowid, status, e);
-                        },
-                        multiselect: true,
-                        sortname: 'name',
-                        width: 920,
-                        shrinkToFit: false,
-                        pager: '#appsPager'
-                    };
+                        return checkBoxCellSelected;
+                    },
+                    onSelectRow: function (rowid, status, e) {
+                        self.onRowSelect(rowid, status, e);
+                    },
+                    multiselect: true,
+                    sortname: 'name',
+                    width: 920,
+                    shrinkToFit: false,
+                    pager: '#appsPager'
+                };
 
                 additionalOptions = {
-                        columnChooserOptions: {
-                            width: 501,
-                            height: 180
-                        },
-                        storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col'
-                    };
+                    columnChooserOptions: {
+                        width: 501,
+                        height: 180
+                    },
+                    storageKey: constants.OPENAM_STORAGE_KEY_PREFIX + 'PE-mng-apps-sel-col'
+                };
 
                 this.grid = uiUtils.buildRestResponseBasedJQGrid(this, '#manageApps', options, additionalOptions, callback);
 
@@ -145,6 +149,32 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 promises.push(policyDelegate.deleteApplication(self.selectedItems[i]));
             }
             this.deleteItems(e, promises);
+        },
+
+        startImportPolicies: function () {
+            // Triggering the click on the hidden input with type "file" to upload the file
+            this.$el.find("#realImport").trigger("click");
+        },
+
+        importPolicies: function (e) {
+            policyDelegate.importPolicies( e.target.result)
+                .done( function () {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
+                });
+        },
+
+        readImportFile: function () {
+            var file = this.$el.find("#realImport")[0].files[0],
+                reader = new FileReader();
+            reader.onload = this.importPolicies;
+            if (file) {
+                reader.readAsText(file, "UTF-8");
+            }
+
+        },
+
+        exportPolicies: function () {
+            this.$el.find("#exportPolicies").attr('href', constants.host + "/openam" + this.subrealm + "/xacml/policies");
         }
     });
 

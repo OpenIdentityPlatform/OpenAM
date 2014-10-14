@@ -51,7 +51,8 @@
                 "invalidResource" : "Invalid resource",
                 "duplicateResource" : "Duplicate resource",
                 "duplicateAttribute": "Duplicate attribute",
-                "unableToPersistPolicy" : "Unable to persist policy in datastore"
+                "unableToPersistPolicy" : "Unable to persist policy in datastore",
+                "policiesUploaded" : "Policies uploaded successfully"
 
             }
         },
