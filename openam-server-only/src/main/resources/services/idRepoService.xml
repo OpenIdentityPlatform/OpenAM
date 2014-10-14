@@ -1037,6 +1037,8 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1686,6 +1688,8 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2203,6 +2207,8 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2715,6 +2721,8 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3229,6 +3237,8 @@
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
                             <Value>devicePrintProfiles</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3681,6 +3691,8 @@
                             <Value>uid</Value>
                             <Value>userPassword</Value>
                             <Value>userCertificate</Value>
+                            <Value>modifyTimestamp</Value>
+                            <Value>createTimestamp</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

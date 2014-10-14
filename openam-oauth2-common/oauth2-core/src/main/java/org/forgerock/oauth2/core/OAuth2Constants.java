@@ -757,6 +757,9 @@ public class OAuth2Constants {
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
         public static final String SUPPORTED_SCOPE = "forgerock-oauth2-provider-supported-scopes";
         public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
+        public static final String CREATED_TIMESTAMP_ATTRIBUTE_NAME = "forgerock-oauth2-provider-created-attribute-name";
+        public static final String MODIFIED_TIMESTAMP_ATTRIBUTE_NAME =
+                "forgerock-oauth2-provider-modified-attribute-name";
         public static final String SUBJECT_TYPES_SUPPORTED = "forgerock-oauth2-provider-subject-types-supported";
         public static final String ID_TOKEN_SIGNING_ALGORITHMS =
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
@@ -833,10 +836,10 @@ public class OAuth2Constants {
         public static final String ATH = "ath";
         public static final String NONCE = "nonce";
         public static final String OPS = "ops";
+        public static final String UPDATED_AT = "updated_at";
         public static final String ACR = "acr";
         public static final String AMR = "amr";
         public static final String AT_HASH = "at_hash";
-
     }
 
     /**

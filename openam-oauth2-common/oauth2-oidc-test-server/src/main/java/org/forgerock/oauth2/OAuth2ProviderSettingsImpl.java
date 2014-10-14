@@ -22,6 +22,7 @@ import org.forgerock.json.jose.utils.KeystoreManager;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.AuthenticationMethod;
 import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ResourceOwner;
@@ -231,6 +232,14 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
 
     public String getJWKSUri() throws ServerException {
         return configurationResource.getConfiguration().get("jwksUri").asString();
+    }
+
+    public String getCreatedTimestampAttributeName() throws ServerException {
+        return configurationResource.getConfiguration().get(OAuth2Constants.OAuth2ProviderService.CREATED_TIMESTAMP_ATTRIBUTE_NAME).asString();
+    }
+
+    public String getModifiedTimestampAttributeName() throws ServerException {
+        return configurationResource.getConfiguration().get(OAuth2Constants.OAuth2ProviderService.MODIFIED_TIMESTAMP_ATTRIBUTE_NAME).asString();
     }
 
     public String getClientRegistrationEndpoint() {

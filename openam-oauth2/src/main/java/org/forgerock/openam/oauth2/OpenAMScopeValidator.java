@@ -16,12 +16,23 @@
 
 package org.forgerock.openam.oauth2;
 
+import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdSearchControl;
+import com.sun.identity.idm.IdSearchResults;
+import com.sun.identity.idm.IdType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.oauth2.core.AccessToken;
 import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Constants;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.ScopeValidator;
 import org.forgerock.oauth2.core.Token;
@@ -32,6 +43,8 @@ import org.forgerock.openidconnect.OpenIDTokenIssuer;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.security.AccessController;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +64,8 @@ public class OpenAMScopeValidator implements ScopeValidator {
 
     private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
     private static Map<String, Object> scopeToUserUserProfileAttributes;
+    private static final String DEFAULT_TIMESTAMP = "0";
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     static {
         scopeToUserUserProfileAttributes = new HashMap<String, Object>();
@@ -79,9 +94,11 @@ public class OpenAMScopeValidator implements ScopeValidator {
      * @param openIDTokenIssuer An instance of the OpenIDTokenIssuer.
      */
     @Inject
-    public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer) {
+    public OpenAMScopeValidator(IdentityManager identityManager, OpenIDTokenIssuer openIDTokenIssuer,
+            OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.identityManager = identityManager;
         this.openIDTokenIssuer = openIDTokenIssuer;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
@@ -138,7 +155,9 @@ public class OpenAMScopeValidator implements ScopeValidator {
                 ((OpenAMAccessToken) token).getRealm());
 
         //add the subject identifier to the response
-        response.put("sub", token.getResourceOwnerId());
+        response.put(OAuth2Constants.JWTTokenParams.SUB, token.getResourceOwnerId());
+        response.put(OAuth2Constants.JWTTokenParams.UPDATED_AT, getUpdatedAt(token.getResourceOwnerId(),
+                ((OpenAMAccessToken) token).getRealm(), request));
         for(String scope: scopes){
 
             //get the attribute associated with the scope
@@ -262,6 +281,72 @@ public class OpenAMScopeValidator implements ScopeValidator {
             if (tokenEntry != null) {
                 accessToken.addExtraData(tokenEntry.getKey(), tokenEntry.getValue());
             }
+        }
+    }
+
+    private String getUpdatedAt(String username, String realm, OAuth2Request request) {
+        try {
+            final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+            String modifyTimestampAttributeName = null;
+            String createdTimestampAttributeName = null;
+            try {
+                modifyTimestampAttributeName = providerSettings.getModifiedTimestampAttributeName();
+                createdTimestampAttributeName = providerSettings.getCreatedTimestampAttributeName();
+            } catch (ServerException e) {
+                logger.error("Unable to read last modified attribute from datastore",
+                        e);
+                return DEFAULT_TIMESTAMP;
+            }
+
+            final AMHashMap timestamps = getTimestamps(username, realm, modifyTimestampAttributeName,
+                    createdTimestampAttributeName);
+            final String modifyTimestamp = CollectionHelper.getMapAttr(timestamps, modifyTimestampAttributeName);
+
+            if (modifyTimestamp != null) {
+                return modifyTimestamp;
+            } else {
+                final String createTimestamp = CollectionHelper.getMapAttr(timestamps, createdTimestampAttributeName);
+
+                if (createTimestamp != null) {
+                    return createTimestamp;
+                } else {
+                    return DEFAULT_TIMESTAMP;
+                }
+            }
+        } catch (IdRepoException e) {
+            if (logger.errorEnabled()) {
+                logger.error("ScopeValidatorImpl" +
+                                ".getUpdatedAt: " +
+                                "error searching Identities with username : " +
+                                username,
+                        e
+                );
+            }
+        } catch (SSOException e) {
+            logger.warning("Error getting updatedAt attribute",
+                    e);
+        }
+
+        return null;
+    }
+
+    private AMHashMap getTimestamps(String username, String realm, String modifyTimestamp,
+            String createTimestamp) throws IdRepoException,
+            SSOException {
+        final SSOToken token = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        final AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
+        final IdSearchControl searchConfig = new IdSearchControl();
+        searchConfig.setReturnAttributes(new HashSet<String>(Arrays.asList(modifyTimestamp, createTimestamp)));
+        searchConfig.setMaxResults(0);
+        final IdSearchResults searchResults = amIdRepo.searchIdentities(IdType.USER, username, searchConfig);
+
+        final Iterator searchResultsItr = searchResults.getResultAttributes().values().iterator();
+
+        if (searchResultsItr.hasNext()) {
+            return (AMHashMap) searchResultsItr.next();
+        } else {
+            logger.warning("Error retrieving timestamps from datastore");
+            throw new IdRepoException();
         }
     }
 }

@@ -107,6 +107,7 @@ public class ScopeValidatorImpl implements ScopeValidator {
 
         //add the subject identifier to the response
         response.put("sub", token.getResourceOwnerId());
+        response.put("updated_at", user.getModifiedTimestamp());
         for(String scope: scopes){
 
             //get the attribute associated with the scope

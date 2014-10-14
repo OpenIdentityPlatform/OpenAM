@@ -46,4 +46,8 @@ public class ResourceOwnerImpl implements ResourceOwner {
     public String getAttribute(String attribute) {
         return attributes.get(attribute);
     }
+
+    public String getModifiedTimestamp() {
+        return "0";
+    }
 }

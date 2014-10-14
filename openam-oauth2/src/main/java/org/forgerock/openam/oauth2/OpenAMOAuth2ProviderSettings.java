@@ -42,6 +42,7 @@ import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
+import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openam.oauth2.legacy.CoreToken;
 import org.forgerock.openam.oauth2.legacy.LegacyAccessTokenAdapter;
 import org.forgerock.openam.oauth2.legacy.LegacyCoreTokenAdapter;
@@ -659,6 +660,29 @@ public class OpenAMOAuth2ProviderSettings extends OpenAMSettingsImpl implements 
             logger.error(e.getMessage());
             throw new ServerException(e);
         }
+    }
+
+    public String getCreatedTimestampAttributeName() throws ServerException {
+        try {
+            return getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.CREATED_TIMESTAMP_ATTRIBUTE_NAME);
+        } catch (SSOException e) {
+            e.printStackTrace();
+        } catch (SMSException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public String getModifiedTimestampAttributeName() throws ServerException {
+        try {
+            return getStringSetting(realm, OAuth2Constants.OAuth2ProviderService.MODIFIED_TIMESTAMP_ATTRIBUTE_NAME);
+        } catch (SSOException e) {
+            e.printStackTrace();
+        } catch (SMSException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

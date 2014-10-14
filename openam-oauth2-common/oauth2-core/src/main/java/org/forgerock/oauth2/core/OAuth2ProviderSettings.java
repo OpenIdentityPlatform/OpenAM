@@ -292,6 +292,20 @@ public interface OAuth2ProviderSettings {
     String getJWKSUri() throws ServerException;
 
     /**
+     * Gets the created timestamp attribute name.
+     *
+     * @return The created attribute timestamp attribute name.
+     */
+    String getCreatedTimestampAttributeName() throws ServerException;
+
+    /**
+     * Gets the modified timestamp attribute name.
+     *
+     * @return The modified attribute timestamp attribute name.
+     */
+    String getModifiedTimestampAttributeName() throws ServerException;
+
+    /**
      * Gets the OpenID Connect client registration endpoint.
      *
      * @return The OpenID Connect client registration endpoint.
