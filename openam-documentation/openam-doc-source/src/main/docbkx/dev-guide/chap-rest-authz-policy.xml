@@ -93,7 +93,6 @@
     <xref linkend="rest-api-authz-legacy" />
    </para>
   </listitem>
-
  </itemizedlist>
 
  <section xml:id="rest-api-authz">
@@ -2121,6 +2120,419 @@ $ <userinput>curl \
   </section>
  </section>
 
+ <section xml:id="rest-api-manage-xacml">
+  <title>Managing Entitlements through REST</title>
+
+  <para>
+   OpenAM's entitlements engine supports the ability to import
+   eXtensible Access Control Markup Language (XACML) 3.0-based
+   formatted policies as well as export OpenAM entitlements to XACML 3.0 format
+   through its <literal>/xacml/policies</literal> REST endpoint.
+   The endpoint's functionally is identical to that of the
+   <!--  Update when AME-4741 -->
+   <literal>ssoadm</literal> <literal>import-xacml</literal> and
+   <literal>export-xacml</literal> commands.
+   For more information, see
+   <link xlink:show="new" xlink:href="admin-guide#managing-entitlements-cli"
+         xlink:role="http://docbook.org/xlink/role/olink">Managing Entitlements on the Command Line</link>
+  </para>
+
+  <para>
+   OpenAM runs its imports and exports by mapping the XACML 3.0 policy
+   elements to OpenAM privileges (i.e., entitlements) and vice-versa. The
+   mappings are as follows:
+  </para>
+
+  <!-- Consider a new table format -->
+  <table xml:id="xacml-mappings">
+   <title>Entitlements to XACML Mappings</title>
+   <tgroup cols="2">
+    <colspec colnum="1" colwidth="1*"/>
+    <colspec colnum="2" colwidth="1*"/>
+    <thead>
+     <row>
+      <entry>XACML Policy</entry>
+      <entry>OpenAM Privilege</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>Policy ID</entry>
+      <entry>Privilege Name</entry>
+     </row>
+     <row>
+      <entry>Description</entry>
+      <entry>Privilege Description</entry>
+     </row>
+     <row>
+      <entry>Version</entry>
+      <entry>Current Time (yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+     </row>
+     <row>
+      <entry>entitlement excluded resource names</entry>
+      <entry>xacml rule target</entry>
+     </row>
+     <row>
+      <entry>Rule Combining Algorithm ID</entry>
+      <entry>Rule Deny Overrides</entry>
+     </row>
+     <row>
+      <entry>Target</entry>
+      <entry>
+       <para>Any of:
+        <itemizedlist>
+         <listitem>
+          <para>Entitlement Subject</para>
+         </listitem>
+         <listitem>
+          <para>Resource Names</para>
+         </listitem>
+         <listitem>
+          <para>Application Names</para>
+         </listitem>
+         <listitem>
+          <para>Action Values</para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>Variable Definitions</entry>
+      <entry>
+       <para>Any of:
+        <itemizedlist>
+        <listitem>
+         <para>Application Name</para>
+        </listitem>
+        <listitem>
+         <para>Entitlement Name</para>
+        </listitem>
+        <listitem>
+         <para>Privilege Created By</para>
+        </listitem>
+        <listitem>
+         <para>Privilege Modified By</para>
+        </listitem>
+        <listitem>
+         <para>Privilege Creation Date</para>
+        </listitem>
+        <listitem>
+         <para>Privilege Last Modification Date</para>
+        </listitem>
+       </itemizedlist>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>Rules</entry>
+      <entry>
+       Single Level Permit/Deny Actions converted
+       to Policy Rules
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+  <note>
+   <para>
+    XACML obligation is not supported. Also, only one XACML match is defined for
+    each privilege action, and only one XACML rule for each privilege action value.
+   </para>
+  </note>
+
+
+  <section xml:id="xacml-import">
+   <title>XACML Import</title>
+
+   <para>
+    OpenAM supports the import of XACML 3.0-based policy sets into
+    OpenAM entitlements using the REST <literal>/xacml/policies</literal>
+    endpoint.
+    To test an import, OpenAM provides a dry-run feature that runs an import
+    without saving the changes to the database. The dry-run feature provides a
+    summary of the import so that you can troubleshoot any potential mismatches
+    prior to the actual import.
+   </para>
+   <para>
+    You can import a XACML policy using an HTTP POST request for the root realm
+    or a specific realm at the following endpoints:
+   </para>
+
+   <programlisting>
+http://openam.example.com:8080/openam/xacml/policies
+http://openam.example.com:8080/openam/xacml/{realm}/policies
+
+where {realm} is the name of the specific realm
+   </programlisting>
+
+   <procedure xml:id="procedure-xacml-import">
+    <title>To Import a XACML 3.0 Policy</title>
+    <step>
+     <para>You can do a dry-run using the <literal>dryrun=true</literal> query to
+      test the import. The dry-run option outputs in JSON format and displays the status
+      of each import policy, where "U" indicates "Updated"; "A" for "Added". The
+      dry-run does not actually update to the database. When you are ready for an
+      actual import, you need to re-run the command
+      without the <literal>dryrun=true</literal> query.
+     </para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/policies?dryrun=true</userinput>
+<computeroutput>[
+ {
+   "status":"U",
+   "name":"testHelpDeskreferralpolicy"
+ },
+ {
+   "status":"U",
+   "name":"test_Referral"
+ },
+ {
+   "status":"U",
+   "name":"testexternalreferralpolicy"
+ },
+ {
+   "status":"U",
+   "name":"testregexternalreferralpolicy"
+ }
+]</computeroutput>
+     </programlisting>
+    </step>
+    <step>
+     <para>
+Use the <literal>/xacml/policies</literal> endpoint to import a XACML policy:
+     </para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/policies</userinput>
+     </programlisting>
+    </step>
+    <step>
+     <para>You can import a XACML policy into a realm as follows:</para>
+     <programlisting>
+$ <userinput>curl \
+  --request POST \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/xml" \
+  --data @xacml-policy.xml
+  http://openam.example.com:8080/openam/xacml/{realm}/policies</userinput>
+     </programlisting>
+    </step>
+   </procedure>
+
+  </section>
+
+  <section xml:id="xacml-export">
+   <title>XACML Export</title>
+   <para>
+    OpenAM supports the export of its entitlement policies into XACML 3.0 format.
+
+    OpenAM only exports a PolicySet that contains policy definitions. No other
+    types can be included in the PolicySet, such as sub-policySet or rules.
+    The PolicySet mapping is as follows:
+   </para>
+
+   <table xml:id="xacml-export-mappings">
+    <title>PolicySet Mappings</title>
+    <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="2*"/>
+     <thead>
+      <row>
+       <entry>XACML</entry>
+       <entry>OpenAM</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>PolicySet ID</entry>
+       <entry>Realm:&lt;timestamp>(yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+      </row>
+      <row>
+       <entry>Version</entry>
+       <entry>Current Time (yyyy.MM.dd.HH.mm.ss.SSS)</entry>
+      </row>
+      <row>
+       <entry>Policy Combining Algorithm ID</entry>
+       <entry>Deny Overrides</entry>
+      </row>
+      <row>
+       <entry>Target</entry>
+       <entry>No targets defined</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>
+    The export service is accessible at the <literal>/xacml/policies</literal>
+    endpoint using a HTTP GET request
+    at the following endpoint for the root realm or a specific realm:
+   </para>
+
+   <programlisting>
+http://openam.example.com:8080/openam/xacml/policies
+http://openam.example.com:8080/openam/xacml/{realm}/policies
+
+  where {realm} is the name of the specific realm
+   </programlisting>
+
+   <para>
+    You can filter your XACML exports using query search filters. Note the
+    following points about the search filters:
+   </para>
+
+   <itemizedlist>
+   <listitem>
+    <para><emphasis role="bold">LDAP-based Searches</emphasis>.
+     The search filters follow the standard
+     guidelines for LDAP searches as they are applied to the
+     entitlements index in the LDAP configuration backend, located at:
+     <literal>ou=default,ou=OrganizationalConfig,ou=1.0,ou=sunEntitlement Indexes,
+      ou=services,dc=openam,dc=forgerock,dc=org</literal>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <emphasis role="bold">Search Filter Format</emphasis>. You can specify
+     a single search filter or multiple filters in the HTTP URL parameters.
+     The format for the search filter is as follows:
+    </para>
+    <programlisting>
+[attribute name][operator][attribute value]
+    </programlisting>
+
+    <table xml:id="export-search-filter-format">
+     <title>XACML Export Search Filter Format</title>
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="1*"/>
+      <colspec colnum="2" colwidth="2*"/>
+      <thead>
+       <row>
+        <entry>Element</entry>
+        <entry>Description</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Attribute Name</entry>
+        <entry>
+         <para>
+          The name of the attribute to be searched for. The only permissible
+          values are: <literal>application</literal>, <literal>createdby</literal>,
+          <literal>lastmodifiedby</literal>, <literal>creationdate</literal>,
+          <literal>lastmodifieddate</literal>, <literal>name</literal>,
+          <literal>description</literal>.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>Operator</entry>
+        <entry>
+         <para>The type of comparison operation to perform.</para>
+         <itemizedlist>
+          <listitem>
+           <para>= Equals (text)</para>
+          </listitem>
+          <listitem>
+           <para>&lt; Less Than or Equal To (numerical)</para>
+          </listitem>
+          <listitem>
+           <para>&gt; Greater Than or Equal To (numerical)</para>
+          </listitem>
+         </itemizedlist>
+        </entry>
+       </row>
+       <row>
+        <entry>Attribute Value</entry>
+        <entry>
+         <para>
+          The matching value. Asterisk wildcards are supported.
+         </para>
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+   </listitem>
+  </itemizedlist>
+
+   <procedure xml:id="export-policies">
+   <title>To Export Policies</title>
+
+   <step>
+    <para>
+     Use the <literal>/xacml/policies</literal> endpoint to export the OpenAM entitlement
+     policies into XACML 3.0 format. The following curl command exports the policies
+     and returns the XACML response (truncated for display purposes).
+    </para>
+   <programlisting>
+$ <userinput>curl \
+  --request GET \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/json" \
+  http://openam.example.com:8080/openam/xacml/policies
+  </userinput>
+  <computeroutput>
+&lt;&#63;xml version="1.0" encoding="UTF-8" standalone="yes"&#63;>
+&lt;PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+ PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-overrides"
+ Version="2014.10.08.21.59.39.231" PolicySetId="/:2014.10.08.21.59.39.231">
+ &lt;Target/>
+ &lt;Policy RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-overrides"
+  Version="2014.10.08.18.01.03.626"
+  PolicyId="Rockshop_Checkout_https://forgerock-rockshop.openrock.org:443/wp-login.php*&#63;*">
+  ...</computeroutput>
+    </programlisting>
+   </step>
+  </procedure>
+
+   <procedure xml:id="export-policies-search-filter">
+   <title>To Export Policies with Search Filters</title>
+   <step>
+    <para>
+     Use the <literal>/xacml/policies</literal> endpoint to export the policies
+     into XACML 3.0 format with a search filter. This command only exports policies
+     that were created by "amadmin".
+    </para>
+    <programlisting>
+$ <userinput>curl \
+  --request GET \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/json" \
+  http://openam.example.com:8080/openam/xacml/policies&#63;filter=createdby=amadmin
+  </userinput>
+   </programlisting>
+   </step>
+   <step>
+    <para>
+     You can also specify more than one search filter by logically ANDing the filters
+     as follows:
+    </para>
+    <programlisting>
+$ <userinput>curl \
+  --request GET \
+  --header "iPlanetDirectoryPro: AQIC5..." \
+  --header "Content-Type: application/json" \
+  http://openam.example.com:8080/openam/xacml/policies&#63;filter=createdby=amadmin&#38;
+  filter=creationdate=135563832</userinput>
+    </programlisting>
+    </step>
+   </procedure>
+  </section>
+ </section>
+
  <section xml:id="rest-api-authz-applications">
   <title>Defining Applications</title>
 
@@ -3953,8 +4365,9 @@ $ <userinput>curl \
          xlink:role="http://docbook.org/xlink/role/olink"
    >REST APIs for Authentication &amp; Logout</link>.
   </para>
+ </section>
 
-  <section xml:id="rest-api-policy-management-create">
+ <section xml:id="rest-api-policy-management-create">
    <title>Creating Policies (Legacy API)</title>
 
    <para>
@@ -4029,7 +4442,7 @@ $ <userinput>curl \
    </screen>
   </section>
 
-  <section xml:id="rest-api-policy-management-read">
+ <section xml:id="rest-api-policy-management-read">
    <title>Reading Policies (Legacy API)</title>
 
    <para>
@@ -4103,7 +4516,7 @@ $ <userinput>curl \
    </screen>
   </section>
 
-  <section xml:id="rest-api-policy-management-update">
+ <section xml:id="rest-api-policy-management-update">
    <title>Updating Policies (Legacy API)</title>
 
    <para>
@@ -4146,7 +4559,7 @@ $ <userinput>curl \
    </screen>
   </section>
 
-  <section xml:id="rest-api-policy-management-delete">
+ <section xml:id="rest-api-policy-management-delete">
    <title>Deleting Policies</title>
 
    <para>
@@ -4163,7 +4576,7 @@ $ <userinput>curl \
    </screen>
   </section>
 
-  <section xml:id="rest-api-policy-management-query">
+ <section xml:id="rest-api-policy-management-query">
    <title>Querying Policies</title>
 
    <para>
@@ -4209,6 +4622,5 @@ $ <userinput>curl \
 }</computeroutput>
    </screen>
   </section>
- </section>
 
 </chapter>
