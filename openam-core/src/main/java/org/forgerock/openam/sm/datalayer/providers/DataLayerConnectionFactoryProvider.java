@@ -38,17 +38,18 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * Responsible for generating ConnectionFactory instances. The instances generated are tailored to
  * the {@link ConnectionType} required by the caller.
- *
+ * <p/>
  * This factory provider is aware of two main use cases for the service management layer (also known
  * as Data Layer).
- *
+ * <p/>
  * Default - Uses the service management configuration for connections. This will connect to the
  * defined LDAP server, whether that is embedded or external.
- *
+ * <p/>
  * External - Uses CTS Configuration for CTS connections which are pointed towards an external
  * LDAP server. Uses service management configuration for {@link StoreMode#DEFAULT} connections.
  */
 public class DataLayerConnectionFactoryProvider implements ConnectionFactoryProvider {
+
     // Injected
     private final TimeoutConfig timeoutConfig;
     private final ConnectionConfigFactory configFactory;

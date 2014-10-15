@@ -18,14 +18,24 @@ package org.forgerock.openam.sm;
 
 import com.iplanet.am.util.AMPasswordUtil;
 import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionConstants;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.utils.ModifiedProperty;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -45,39 +55,54 @@ public class ExternalCTSConfig implements ConnectionConfig {
      */
     public static final int INVALID = -1;
 
-    private ModifiedProperty<String> hostname = new ModifiedProperty<String>();
-    private ModifiedProperty<String> port = new ModifiedProperty<String>();
+    private final Debug debug;
+
+    private ModifiedProperty<String> hosts = new ModifiedProperty<String>();
     private ModifiedProperty<String> username = new ModifiedProperty<String>();
     private ModifiedProperty<String> password = new ModifiedProperty<String>();
     private ModifiedProperty<String> maxConnections = new ModifiedProperty<String>();
     private ModifiedProperty<Boolean> sslMode = new ModifiedProperty<Boolean>();
     private ModifiedProperty<Integer> heartbeat = new ModifiedProperty<Integer>();
 
-    /**
-     * The hostname of the server to connect to.
-     *
-     * @see LDAPURL
-     *
-     * @return A set of exactly one hostname or null if the port was not assigned.
-     */
-    public Set<LDAPURL> getLDAPURLs() {
-        Integer port = getPort();
-        if (port == null) {
-            return null;
-        }
-        String host = hostname.get();
-        boolean sslMode = isSslMode();
-
-        LDAPURL ldapurl = LDAPURL.valueOf(host, port, sslMode);
-        return Collections.singleton(ldapurl);
+    @Inject
+    public ExternalCTSConfig(@Named(SessionConstants.SESSION_DEBUG) Debug debug) {
+        this.debug = debug;
     }
 
     /**
-     * @return The External Token Store port, or null if not set.
-     * @throws IllegalArgumentException If the port was not a number.
+     * The hosts to connect to.
+     * @return A set of connection details with serverId/siteId preferences.
      */
-    public Integer getPort() {
-        return parseNumber(port.get());
+    public Set<LDAPURL> getLDAPURLs() {
+        String serverId = null;
+        String siteId = "";
+        try {
+            serverId = WebtopNaming.getAMServerID();
+            siteId = WebtopNaming.getSiteID(serverId);
+        } catch (ServerEntryNotFoundException senfe) {
+            if (debug.warningEnabled()) {
+                debug.warning("ServerEntryNotFoundException, serverId=" + serverId
+                        + ", siteId=" + siteId);
+            }
+        }
+
+        String hosts = this.hosts.get();
+        Set<String> urls = new LinkedHashSet<String>();
+        urls.addAll(Arrays.asList(hosts.split(",")));
+
+        boolean isSSL = isSSLMode();
+
+        Set<LDAPURL> ldapurls = new LinkedHashSet<LDAPURL>();
+        for (LDAPURL url : LDAPUtils.prioritizeServers(urls, serverId, siteId)) {
+            ldapurls.add(LDAPURL.valueOf(url.getHost(), url.getPort(), isSSL));
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("Priotized server list [" + hosts + "] using server ID [" + serverId +
+                    "] and site ID [" + siteId + "]");
+        }
+
+        return ldapurls;
     }
 
     /**
@@ -116,7 +141,7 @@ public class ExternalCTSConfig implements ConnectionConfig {
     /**
      * @return True indicates the External Token Store should use SSL for its connection.
      */
-    public boolean isSslMode() {
+    public boolean isSSLMode() {
         return sslMode.get();
     }
 
@@ -124,8 +149,7 @@ public class ExternalCTSConfig implements ConnectionConfig {
      * @return True if the configuration is now in a changed state.
      */
     public boolean hasChanged() {
-        return hostname.hasChanged() ||
-               port.hasChanged() ||
+        return hosts.hasChanged() ||
                username.hasChanged() ||
                password.hasChanged() ||
                maxConnections.hasChanged() ||
@@ -137,8 +161,7 @@ public class ExternalCTSConfig implements ConnectionConfig {
      * Causes this instance to refresh its configuration using System Properties.
      */
     public void update() {
-        hostname.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
-        port.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_PORT));
+        hosts.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_HOSTNAME));
         username.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_USERNAME));
         password.set(AMPasswordUtil.decrypt(SystemProperties.get(CoreTokenConstants.CTS_STORE_PASSWORD)));
         maxConnections.set(SystemProperties.get(CoreTokenConstants.CTS_STORE_MAX_CONNECTIONS));
@@ -178,8 +201,7 @@ public class ExternalCTSConfig implements ConnectionConfig {
     @Override
     public String toString() {
         return "ExternalTokenConfig{" +
-                "hostname=" + hostname +
-                ", port=" + port +
+                "hosts=" + hosts +
                 ", username=" + username +
                 ", password=" + password +
                 ", maxConnections=" + maxConnections +
