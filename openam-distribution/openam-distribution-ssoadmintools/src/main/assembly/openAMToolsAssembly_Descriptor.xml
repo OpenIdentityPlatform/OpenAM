@@ -81,7 +81,9 @@
                 <include>org.slf4j:slf4j-nop</include>
                 <include>org.apache.santuario:xmlsec</include>
                 <include>commons-logging:commons-logging-api</include>
-
+                <include>org.mozilla:rhino</include>
+                <include>org.codehaus.groovy:groovy-all</include>
+                <include>org.kohsuke:groovy-sandbox</include>
             </includes>
         </dependencySet>
         <dependencySet>
