@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2014 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.utils;
 
@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 
 /**
  * A simple utility class to simplify interactions with collections.
@@ -49,6 +50,21 @@ public class CollectionUtils {
             return new ArrayList<T>(0);
         } else {
             return new ArrayList<T>(Arrays.asList(values));
+        }
+    }
+
+    /**
+     * Collects the passed in objects into a case insensitive hash set.  Unfortunately case insensitive hash sets
+     * are not generic.
+     *
+     * @param values An unbounded amount of objects that needs to be converted to a case insensitive hash set.
+     * @return Either an empty set (if there was no value passed in), or a Set that holds all the values passed in.
+     */
+    public static Set asCaseInsensitiveHashSet(Object... values) {
+        if (values == null) {
+            return new CaseInsensitiveHashSet(0);
+        } else {
+            return new CaseInsensitiveHashSet(Arrays.asList(values));
         }
     }
 

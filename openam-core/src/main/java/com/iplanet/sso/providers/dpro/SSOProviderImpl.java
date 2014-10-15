@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions copyright 2013-2014 ForgeRock AS.
  */
 package com.iplanet.sso.providers.dpro;
 
@@ -49,7 +49,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This <code>final</code> class <code>SSOProviderImpl</code> implements 
+ * This <code>final</code> class <code>SSOProviderImpl</code> implements
  * <code>SSOProvider</code> interface and provides implementation of the methods
  * to create , destroy , check the validity of a single sign on token.
  *
@@ -57,10 +57,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class SSOProviderImpl implements SSOProvider {
 
-    /** Debug SSOProvider */
+    /**
+     * Debug SSOProvider
+     */
     public static Debug debug = null;
 
-    /** Check to see if the clientIPCheck is enabled */
+    /**
+     * Check to see if the clientIPCheck is enabled
+     */
     private static boolean checkIP = Boolean.valueOf(
             SystemProperties.get("com.iplanet.am.clientIPCheckEnabled"))
             .booleanValue();
@@ -72,9 +76,8 @@ public final class SSOProviderImpl implements SSOProvider {
 
     /**
      * Constructs a instance of <code>SSOProviderImpl</code>
-     * 
-     * @throws SSOException
      *
+     * @throws SSOException
      * @supported.api
      */
     public SSOProviderImpl() throws SSOException {
@@ -85,7 +88,7 @@ public final class SSOProviderImpl implements SSOProvider {
      *
      * @param request <code>HttpServletRequest</code>
      * @return single sign on token for the request
-     * @exception SSOException if the single sign on token cannot be created.
+     * @throws SSOException if the single sign on token cannot be created.
      */
     public SSOToken createSSOToken(HttpServletRequest request)
             throws SSOException {
@@ -114,23 +117,23 @@ public final class SSOProviderImpl implements SSOProvider {
         }
     }
 
-    /** Creates a single sign on token with user or service as the entity
-     * 
-     * @param user Principal representing a user or service
+    /**
+     * Creates a single sign on token with user or service as the entity
+     *
+     * @param user     Principal representing a user or service
      * @param password password string.
      * @return single sign on token
-     * @exception SSOException if the single sign on token cannot be created.
-     * @exception UnsupportedOperationException Thrown to indicate that the 
-     * requested operation is not supported.
+     * @throws SSOException                  if the single sign on token cannot be created.
+     * @throws UnsupportedOperationException Thrown to indicate that the
+     *                                       requested operation is not supported.
      * @deprecated This method has been deprecated. Please use the
-     * regular LDAP authentication mechanism instead. More information 
+     * regular LDAP authentication mechanism instead. More information
      * on how to use the authentication programming interfaces as well as the
-     *             code samples can be obtained from the "Authentication
-     *             Service" chapter of the OpenSSO Developer's Guide.
+     * code samples can be obtained from the "Authentication
+     * Service" chapter of the OpenSSO Developer's Guide.
      */
     public SSOToken createSSOToken(java.security.Principal user,
-            String password) throws SSOException, UnsupportedOperationException 
-    {
+                                   String password) throws SSOException, UnsupportedOperationException {
         try {
             SSOTokenImpl ssoToken = new SSOTokenImpl(user, password);
             if (debug.messageEnabled()) {
@@ -140,8 +143,9 @@ public final class SSOProviderImpl implements SSOProvider {
             return ssoToken;
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("could not create SSOTOken for user "
-                        + user.getName(), e);
+                debug.message("could not create SSOToken for user \""
+                        + user.getName()
+                        + "\"", e);
             }
             throw new SSOException(e);
         }
@@ -149,59 +153,81 @@ public final class SSOProviderImpl implements SSOProvider {
 
     /**
      * Creates a single sign on token. Note: this method should remain private
-     * and get called only by the AuthContext API.
-     * 
-     * @param tokenId single sign on token ID.
+     * and get called only by the AuthContext API. Note also: this method may reset
+     * the idle time of the session.
+     *
+     * @param tokenId       single sign on token ID.
      * @param invokedByAuth boolean flag indicating that this method has
-     *        been invoked by the AuthContext.getSSOToken() API.
+     *                      been invoked by the AuthContext.getSSOToken() API.
      * @return single sign on token.
-     * @exception SSOException if the single sign on token cannot be created.
-     * @exception UnsupportedOperationException Thrown to indicate that the 
-     * requested operation is not supported.
+     * @throws SSOException                  if the single sign on token cannot be created.
+     * @throws UnsupportedOperationException Thrown to indicate that the
+     *                                       requested operation is not supported.
      */
-    public SSOToken createSSOToken(String tokenId, boolean invokedByAuth) 
-            throws SSOException, UnsupportedOperationException 
-    {
+    public SSOToken createSSOToken(String tokenId, boolean invokedByAuth)
+            throws SSOException, UnsupportedOperationException {
+        return createSSOToken(tokenId, invokedByAuth, true);
+    }
+
+    /**
+     * Creates a single sign on token.
+     *
+     * @param tokenId       single sign on token ID.
+     * @param invokedByAuth boolean flag indicating that this method has been invoked by the AuthContext.getSSOToken()
+     * API.
+     * @param possiblyResetIdleTime If true, the idle time of the token/session may be reset to zero.  If false, the
+     * idle time will never be reset.
+     * @return single sign on token.
+     * @throws SSOException if the single sign on token cannot be created for any reason.
+     * @throws java.lang.UnsupportedOperationException only here to satisfy the interface, this is never thrown.
+     */
+    public SSOToken createSSOToken(String tokenId, boolean invokedByAuth, boolean possiblyResetIdleTime)
+            throws SSOException, UnsupportedOperationException {
+
         try {
             SessionID sessionId = new SessionID(tokenId);
             sessionId.setComingFromAuth(invokedByAuth);
-            Session session = Session.getSession(sessionId);
+            Session session = Session.getSession(sessionId, false, possiblyResetIdleTime);
             SSOToken ssoToken = new SSOTokenImpl(session);
             return ssoToken;
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("SSOProviderImpl.createSSOToken(tokenId, boolean)"
-                    +"could not create SSOTOken for token ID " + tokenId, e);
+                debug.message("SSOProviderImpl.createSSOToken(tokenId, "
+                        + invokedByAuth
+                        + ", "
+                        + possiblyResetIdleTime
+                        + ") could not create SSOToken for token ID \""
+                        + tokenId
+                        + "\"", e);
             }
             throw new SSOException(e);
         }
     }
 
-     /**
-      * Creates a single sign on token.
-      *
-      * @param tokenId single sign on token ID.
-      * @return single sign on token.
-      * @exception SSOException if the single sign on token cannot be created.
-      * @exception UnsupportedOperationException
-      * @deprecated Use #createSSOToken(String, String)
-      */
-     public SSOToken createSSOToken(String tokenId)
-                                    throws SSOException,
-                                    UnsupportedOperationException {
-         return createSSOToken(tokenId, false);
-     }
+    /**
+     * Creates a single sign on token.
+     *
+     * @param tokenId single sign on token ID.
+     * @return single sign on token.
+     * @throws SSOException                  if the single sign on token cannot be created.
+     * @throws UnsupportedOperationException
+     * @deprecated Use #createSSOToken(String, String)
+     */
+    public SSOToken createSSOToken(String tokenId)
+            throws SSOException,
+            UnsupportedOperationException {
+        return createSSOToken(tokenId, false);
+    }
 
     /**
      * Creates a single sign on token.
-     * 
-     * @param tokenId
-     *            single sign on token ID.
+     *
+     * @param tokenId  single sign on token ID.
      * @param clientIP client IP address
      * @return single sign on token.
-     * @exception SSOException if the single sign on token cannot be created.
-     * @exception UnsupportedOperationException Thrown to indicate that the 
-     * requested operation is not supported.
+     * @throws SSOException                  if the single sign on token cannot be created.
+     * @throws UnsupportedOperationException Thrown to indicate that the
+     *                                       requested operation is not supported.
      * @deprecated Use #createSSOToken(String, String)
      */
     public SSOToken createSSOToken(String tokenId, String clientIP)
@@ -216,36 +242,49 @@ public final class SSOProviderImpl implements SSOProvider {
             return ssoToken;
         } catch (Exception e) {
             if (debug.messageEnabled()) {
-                debug.message("could not create SSOTOken for token ID "
-                        + tokenId, e);
+                debug.message("could not create SSOToken for token ID \""
+                        + tokenId
+                        + "\"", e);
             }
             throw new SSOException(e);
         }
     }
 
-   /**
-    * Checks the validity of the single sign on token
-    * @param token The single sign on token object to be validated
-    * @return Returns true if the <code>SSOToken</code> is valid
-    */
+    /**
+     * Checks the validity of the single sign on token
+     *
+     * @param token The single sign on token object to be validated
+     * @return Returns true if the <code>SSOToken</code> is valid
+     */
+    @Override
     public boolean isValidToken(SSOToken token) {
+        return isValidToken(token, true);
+    }
+
+    /**
+     * Checks the validity of the single sign on token
+     *
+     * @param token   The single sign on token object to be validated
+     * @param refresh Flag indicating whether refreshing the token is allowed
+     * @return Returns true if the <code>SSOToken</code> is valid, false otherwise
+     */
+    @Override
+    public boolean isValidToken(SSOToken token, boolean refresh) {
         /*
-         * if the token was created from createSSOToken(Principal, password)
-         * there is no association with session. Use this temp solution now. if
-         * this method is going to go away, we can remove that method. otheriwse
+         * If the token was created from createSSOToken(Principal, password)
+         * there is no association with session. Use this temp solution for now.
+         * If this method is going to go away, we can remove that method, otherwise
          * a better mechanism has to be implemented.
          */
         SSOTokenImpl tokenImpl = (SSOTokenImpl) token;
-        return (tokenImpl.isValid());
+        return (tokenImpl.isValid(refresh));
     }
 
     /**
      * Checks if the single sign on token is valid.
-     * 
-     * @param token
-     *            single sign on token.
-     * @exception SSOException
-     *                if the single sign on token is not valid.
+     *
+     * @param token single sign on token.
+     * @throws SSOException if the single sign on token is not valid.
      */
     public void validateToken(SSOToken token) throws SSOException {
         try {
@@ -266,7 +305,8 @@ public final class SSOProviderImpl implements SSOProvider {
         }
     }
 
-    /** Destroys a single sign on token
+    /**
+     * Destroys a single sign on token
      *
      * @param token The single sign on token object to be destroyed
      * @throws SSOException if the given token cannot be destroyed
@@ -291,16 +331,16 @@ public final class SSOProviderImpl implements SSOProvider {
         }
     }
 
-     /**
-      * Validate the IP address of the client with the IP stored in Session.
-      * @param sess Session object associated with the token
-      * @param clientIP IP address of the current client who made 
-      * <code>HttpRequest</code>.
-      * @return Returns true if the IP is valid else false.
-      * @throws SSOException if IP cannot be validated for the given session
-      */
-    public boolean isIPValid(Session sess, String clientIP) throws SSOException
-    {
+    /**
+     * Validate the IP address of the client with the IP stored in Session.
+     *
+     * @param sess     Session object associated with the token
+     * @param clientIP IP address of the current client who made
+     *                 <code>HttpRequest</code>.
+     * @return Returns true if the IP is valid else false.
+     * @throws SSOException if IP cannot be validated for the given session
+     */
+    public boolean isIPValid(Session sess, String clientIP) throws SSOException {
         boolean check = false;
         try {
             InetAddress sessIPAddress = InetAddress.getByName(sess
@@ -320,25 +360,39 @@ public final class SSOProviderImpl implements SSOProvider {
     /**
      * Refresh the Session corresponding to the single sign on token from the
      * Session Server.
+     *
      * @param token single sign on token for which session need to be refreshed
      * @throws SSOException if the session cannot be refreshed
-     * 
      */
+    @Override
     public void refreshSession(SSOToken token) throws SSOException {
+        refreshSession(token, true);
+    }
+
+    /**
+     * Refresh the Session corresponding to the single sign on token from the
+     * Session Server.
+     *
+     * @param token single sign on token for which session need to be refreshed.
+     * @param possiblyResetIdleTime if true, the idle time may be reset, if false it will never be.
+     * @throws SSOException if the session cannot be refreshed.
+     */
+    @Override
+    public void refreshSession(SSOToken token, boolean possiblyResetIdleTime) throws SSOException {
         try {
             SSOTokenID tokenId = token.getTokenID();
             SessionID sid = new SessionID(tokenId.toString());
             Session session = Session.getSession(sid);
-            session.refresh(true);
+            session.refresh(possiblyResetIdleTime);
         } catch (Exception e) {
-            debug.error("Error in refreshing the session from sessions erver");
+            debug.error("Error in refreshing the session from sessions server");
             throw new SSOException(e);
         }
     }
 
     /**
      * Destroys a single sign on token.
-     * 
+     *
      * @param destroyer
      *            The single sign on token object used to authorize the
      *            operation
@@ -366,7 +420,7 @@ public final class SSOProviderImpl implements SSOProvider {
      * which correspond to valid Sessions accessible to requester. single sign
      * on token objects returned are restricted: they can only be used to
      * retrieve properties and destroy sessions they represent.
-     * 
+     *
      * @param requester
      *            The single sign on token object used to authorize the
      *            operation

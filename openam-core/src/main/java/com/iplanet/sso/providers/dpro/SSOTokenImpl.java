@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyright 2011-2014 ForgeRock AS.
  */
 
 package com.iplanet.sso.providers.dpro;
@@ -49,8 +49,8 @@ import java.util.HashMap;
 import javax.security.auth.login.LoginException;
 
 /**
- * This class <code>SSOTokenImpl</code> implements the interface 
- * <code>SSOToken</code> represents the sso token created for the given 
+ * This class <code>SSOTokenImpl</code> implements the interface
+ * <code>SSOToken</code> represents the sso token created for the given
  * <code>Session</code> or through a ldap bind
  *
  * @see com.iplanet.sso.SSOToken
@@ -65,7 +65,7 @@ class SSOTokenImpl implements SSOToken {
      private boolean ldapConnect = false;
 
     /** ldapbind ssotoken */
-     private SSOToken ssoToken = null; 
+     private SSOToken ssoToken = null;
 
     /** ldapbind */
      private java.security.Principal ldapBindDN;
@@ -76,7 +76,7 @@ class SSOTokenImpl implements SSOToken {
     /**
      *
      * Creates <code>SSOTokenImpl</code> for a given <code>Session</code>
-     * @param Session
+     * @param sess
      * @see com.iplanet.dpro.session.Session
      *
      */
@@ -86,9 +86,9 @@ class SSOTokenImpl implements SSOToken {
     }
 
     /**
-     * Creates a <code>SSOTokenImpl</code> with regular LDAP authentication 
+     * Creates a <code>SSOTokenImpl</code> with regular LDAP authentication
      * service
-     * @param Principal representing a Principal object
+     * @param principal representing a Principal object
      * @param password password string.
      * @exception SSOException if the single sign on token cannot be created.
      */
@@ -145,7 +145,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the principal name of the SSOToken
-     * 
+     *
      * @return The Principal name
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the Principal.
@@ -166,7 +166,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the authentication method used for the authentication.
-     * 
+     *
      * @return The authentication method.
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the authentication method.
@@ -196,7 +196,7 @@ class SSOTokenImpl implements SSOToken {
     /**
      * Returns the authentication level of the authentication method used for
      * for authentication.
-     * 
+     *
      * @return The authentication level.
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the authentication level.
@@ -217,7 +217,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the IP Address of the client(browser) which sent the request.
-     * 
+     *
      * @return The IP Address of the client
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the IP Address of the client.
@@ -241,7 +241,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the host name of the client(browser) which sent the request.
-     * 
+     *
      * @return The host name of the client
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the host name of the client.
@@ -265,11 +265,9 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the time left for this session based on max session time
-     * 
+     *
      * @return The time left for this session
-     * @exception A
-     *                SSOException is thrown if the SSOToken is not VALID or if
-     *                there are errors in getting the maximum session time.
+     * @throws SSOException if the SSOToken is not VALID or if there are errors in getting the maximum session time.
      */
     public long getTimeLeft() throws SSOException {
         checkTokenType("getTimeLeft");
@@ -283,7 +281,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the maximum session time in minutes.
-     * 
+     *
      * @return The maximum session time.
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the maximum session time.
@@ -300,7 +298,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the session idle time in seconds.
-     * 
+     *
      * @return The session idle time.
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the idle time.
@@ -317,7 +315,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the maximum session idle time in minutes.
-     * 
+     *
      * @return The maximum session idle time.
      * @throws SSOException if the SSOToken is not VALID or if
      *         there are errors in getting the maximum idle time.
@@ -334,7 +332,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns SSOToken ID object
-     * 
+     *
      * @return SSOTokenID
      */
     public SSOTokenID getTokenID() {
@@ -349,7 +347,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Sets a property for this token.
-     * 
+     *
      * @param name
      *            The property name.
      * @param value
@@ -387,7 +385,7 @@ class SSOTokenImpl implements SSOToken {
                     property = SSOSession.getProperty(name);
                 } catch (Exception e) {
                     if(logError){
-                	    SSOProviderImpl.debug.error("Can't get property: " + name);	
+                	    SSOProviderImpl.debug.error("Can't get property: " + name);
                     }else{
                         if (SSOProviderImpl.debug.messageEnabled()) {
                             SSOProviderImpl.debug.message("Can't get property: " + name);
@@ -399,11 +397,11 @@ class SSOTokenImpl implements SSOToken {
         }
         return property;
     }
-    
-    
+
+
     /**
      * Returns the property stored in this token.
-     * 
+     *
      * @param name
      *            The property name.
      * @return The property value in String format.
@@ -413,14 +411,14 @@ class SSOTokenImpl implements SSOToken {
     public String getProperty(String name)
             throws SSOException {
         return getPropertyInternal(name, true);
-    }    
+    }
 
     /**
      * Returns the property stored in this token.
-     * 
+     *
      * @param name
      *            The property name.
-     * @param ignoreState 
+     * @param ignoreState
 	 *            ignoreState flag.
      * @return The property value in String format.
      * @throws SSOException if the SSOToken is not VALID and if
@@ -440,7 +438,7 @@ class SSOTokenImpl implements SSOToken {
             if(ignoreState) {
                 if (SSOProviderImpl.debug.messageEnabled()) {
                     SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():"
-                        + " getProperty(name) failed because of:" + 
+                        + " getProperty(name) failed because of:" +
                             e.getMessage());
                     SSOProviderImpl.debug.message("SSOTokenImpl.getProperty():"
                         + " Falling back to getPropertyWithoutValidation()");
@@ -451,7 +449,7 @@ class SSOTokenImpl implements SSOToken {
                         + " Value of " + name + " is: " + property);
                 }
             } else {
-                throw e; 
+                throw e;
             }
         }
         return property;
@@ -459,7 +457,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Adds a sso token listener for the token change events.
-     * 
+     *
      * @param listener
      *            A reference to a SSOTokenListener object.
      * @throws SSOException if the SSOToken is not VALID or if
@@ -480,18 +478,26 @@ class SSOTokenImpl implements SSOToken {
     }
 
     /**
-     * Returns true if the SSOToken is valid.
-     * 
+     * Returns true if the SSOToken is valid, allowing the token to be refreshed if necessary.
+     *
      * @return true if the SSOToken is valid.
-     * @deprecated THIS METHOD WILL BE REMOVED ON 3/15/01. INSTEAD USE
-     *             SSOTokenManager.getInstance().isValidToken(SSOToken)
      */
     public boolean isValid() {
+        return isValid(true);
+    }
+
+    /**
+     * Returns true if the SSOToken is valid, allowing the idle time to be reset only if the flag is true.
+     *
+     * @param possiblyResetIdleTime possibly reset the idle time if true, never reset it if false
+     * @return true if the SSOToken is valid, false otherwise.
+     */
+    public boolean isValid(boolean possiblyResetIdleTime) {
         try {
-            if (ldapConnect == true) {
+            if (ldapConnect) {
                 return true;
             }
-            int state = SSOSession.getState(true);
+            int state = SSOSession.getState(possiblyResetIdleTime);
             return (state == Session.VALID) || (state == Session.INACTIVE);
         } catch (Exception e) {
             return false;
@@ -500,7 +506,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Checks if the SSOTOken is valid
-     * 
+     *
      * @throws SSOException is thrown if the SSOToken is not valid
      * @deprecated THIS METHOD WILL BE REMOVED ON 3/15/01. INSTEAD USE
      *             SSOTokenManager.getInstance().validateToken(SSOToken)
@@ -542,8 +548,8 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the encoded URL , rewritten to include the session id.
-     * 
-     * @param url 
+     *
+     * @param url
      *            the URL to be encoded
      * @return the encoded URL if cookies are not supported or the url if
      *         cookies are supported.
@@ -556,7 +562,7 @@ class SSOTokenImpl implements SSOToken {
     /**
      * Check if the token is created by direct ldap connection. If yes then
      * throw unsupported exception
-     * 
+     *
      * @param methodName Name of the method calling this check.
      */
     public void checkTokenType(String methodName) {
@@ -571,7 +577,7 @@ class SSOTokenImpl implements SSOToken {
 
     /**
      * Returns the Session Object.
-     * 
+     *
      * @return Session object.
      */
     Session getSession() {

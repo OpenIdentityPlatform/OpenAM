@@ -24,6 +24,7 @@
  *
  * $Id: SSOTokenManager.java,v 1.7 2009/02/18 23:59:36 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
  */
 
 package com.iplanet.sso;
@@ -43,16 +44,16 @@ import java.util.Set;
  * which in turn returns the results to the SSO client. This decouples the SSO
  * clients from the actual SSO providers. You should be able to replace the SSO
  * provider without having to modify the SSO client. However, the clients can
- * invoke the class methods on the objects returned by the SSOTokenManager. 
+ * invoke the class methods on the objects returned by the SSOTokenManager.
  * <p>
  * SSOTokenManager is a singleton class; there can be, at most, only one
  * instance of SSOTokenManager in any given JVM. <p> SSOTokenManager currently
  * supports only two kinds of provider, one for Grappa and another for Sun
- * OpenSSO. In the future, this will be extended to support 
- * <p> It is assumed that the provider classes or the JAR file is in the 
- * CLASSPATH so that they can be found automatically. Providers can be 
- * configured using <code>providerimplclass</code> property. 
- * This property must be set to the complete (absolute) package name of the 
+ * OpenSSO. In the future, this will be extended to support
+ * <p> It is assumed that the provider classes or the JAR file is in the
+ * CLASSPATH so that they can be found automatically. Providers can be
+ * configured using <code>providerimplclass</code> property.
+ * This property must be set to the complete (absolute) package name of the
  * main class of the provider. For example, if the provider class is
  * com.iplanet.sso.providers.dpro.SSOProviderImpl, that entire class name
  * including package prefixes MUST be specified. The main class MUST implement
@@ -73,7 +74,7 @@ import java.util.Set;
  * @supported.api
  */
 public class SSOTokenManager {
-    
+
     /*
      * SSOTokenManager is not a real provider but implements SSOProvider for
      * consistency in the methods.
@@ -83,7 +84,7 @@ public class SSOTokenManager {
      * Grappa SSOProvider class that will be used by default if
      * providerimplclass property is not present.
      */
-    static final String GRAPPA_PROVIDER_PACKAGE = 
+    static final String GRAPPA_PROVIDER_PACKAGE =
         "com.sun.identity.authentication.internal";
 
     static SSOProvider grappaProvider = null;
@@ -102,7 +103,7 @@ public class SSOTokenManager {
     /**
      * Returns the singleton instance of
      * <code>SSOTokenManager</code>.
-     * 
+     *
      * @return The singleton <code>SSOTokenManager</code> instance
      * @throws SSOException
      *             if unable to get the singleton <code>SSOTokenManager</code>
@@ -159,7 +160,7 @@ public class SSOTokenManager {
         Throwable dProException = null;
         // Obtain the Grappa provider class
         try {
-            grappaProvider = new 
+            grappaProvider = new
                 com.sun.identity.authentication.internal.AuthSSOProvider();
             if (debug.messageEnabled()) {
                 debug.message("Obtained Grappa SSO Provider");
@@ -203,11 +204,9 @@ public class SSOTokenManager {
      * @param token Single signon SSOToken
      * @exception SSOException in case of erros when getting the provider
      */
-    protected static SSOProvider getProvider(SSOToken token)
-            throws SSOException {
+    private SSOProvider getProvider(SSOToken token) throws SSOException {
         if (token == null) {
-            throw new SSOException(SSOProviderBundle.rbName, "ssotokennull",
-                    null);
+            throw new SSOException(SSOProviderBundle.rbName, "ssotokennull", null);
         }
         String packageName = token.getClass().getName();
         if (packageName.startsWith(GRAPPA_PROVIDER_PACKAGE)) {
@@ -223,7 +222,7 @@ public class SSOTokenManager {
 
     /**
      * Creates a single sign on token from <code>HttpServletRequest</code>
-     * 
+     *
      * @param request
      *            The <code>HttpServletRequest</code> object which contains
      *            the session string.
@@ -252,17 +251,17 @@ public class SSOTokenManager {
      * within the context of the calling application. Once the process exits the
      * token will be destroyed. If token is created using this constructor then
      * ONLY these methods of single sign on token is supported -
-     * 
+     *
      * <pre>
-     *  getAuthType(), 
-     *  getHostName(), 
-     *  getIPAddress(), 
-     *  setProperty(String name, String value), 
-     *  getProperty(String name), 
-     *  isValid(), 
-     *  validate(). 
+     *  getAuthType(),
+     *  getHostName(),
+     *  getIPAddress(),
+     *  setProperty(String name, String value),
+     *  getProperty(String name),
+     *  isValid(),
+     *  validate().
      * </pre>
-     * 
+     *
      * @param user
      *            Principal representing a user or service
      * @param password
@@ -292,7 +291,7 @@ public class SSOTokenManager {
      * the single sign on token then use
      * <code>creatSSOToken(String, String)</code> OR
      * <code>createSSOToken(HttpServletRequest)</code>.
-     * 
+     *
      * @param tokenId
      *            Token ID of the single sign on token
      * @return single sign on token
@@ -312,7 +311,7 @@ public class SSOTokenManager {
     /**
      * Creates a single sign on token from the single sign
      * on token ID.
-     * 
+     *
      * @param tokenId
      *            Token ID of the single sign on token
      * @param clientIP
@@ -333,24 +332,56 @@ public class SSOTokenManager {
     }
 
     /**
-     * Returns true if a single sign on token is valid.
-     * 
+     * Call this function if you want to retrieve a token whose id you know, you expect to be valid
+     * (this function will not create a new token for you) and you don't want its idle time accidentally
+     * reset.
+     *
+     * @param tokenId The token id of the token you suspect is valid.
+     * @return The valid token, or null if the token id turned out to be rubbish.
+     */
+    public SSOToken retrieveValidTokenWithoutResettingIdleTime(String tokenId)
+            throws UnsupportedOperationException, SSOException {
+        if (dProProvider != null)
+            return (dProProvider.createSSOToken(tokenId, false, false));
+        else
+            return (grappaProvider.createSSOToken(tokenId, false, false));
+    }
+
+    /**
+     * Returns true if a single sign on token is valid.  Your token may have its idle time reset.
+     * You have been warned.
+     *
      * @param token
      *            The single sign on token object to be validated.
      * @return true if the single sign on token is valid.
      * @supported.api
      */
     public boolean isValidToken(SSOToken token) {
+        return isValidToken(token, true);
+    }
+
+    /**
+     * Returns true if a single sign on token is valid, resetting the token's idle time
+     * if and only if the flag allows us to.
+     *
+     * @param token The single sign on token object to be validated.
+     *
+     * @return true if the single sign on token is valid.
+     * @supported.api
+     * @since 12.0.0
+     */
+    public boolean isValidToken(SSOToken token, boolean resetIdleTime) {
         try {
-            return (getProvider(token).isValidToken(token));
-        } catch (SSOException ssoe) {
+            return (getProvider(token).isValidToken(token, resetIdleTime));
+        } catch (SSOException ignored) {
             return (false);
         }
     }
 
+
     /**
      * Returns true if the single sign on token is valid.
-     * 
+     *
      * @param token
      *            The single sign on token object to be validated.
      * @exception SSOException
@@ -363,7 +394,7 @@ public class SSOTokenManager {
 
     /**
      * Destroys a single sign on token.
-     * 
+     *
      * @param token
      *            The single sign on token object to be destroyed.
      * @exception SSOException
@@ -383,7 +414,7 @@ public class SSOTokenManager {
      * any changes made to the session properties in the session server. If the
      * client is remote, calling this method results in an over the wire request
      * to the session server.
-     * 
+     *
      * @param token
      *            single sign on token
      * @exception SSOException
@@ -402,8 +433,28 @@ public class SSOTokenManager {
     }
 
     /**
+     * This function will never reset the idle time of the refreshed token.  Otherwise, see
+     * {@link com.iplanet.sso.SSOTokenManager#refreshSession(SSOToken)}
+     *
+     * @param token single sign on token
+     * @exception SSOException
+     *                if the session reached its maximum session time, or the
+     *                session was destroyed, or there was an error while
+     *                refreshing the session.
+     * @since 12.0.0
+     */
+    public void refreshSessionWithoutIdleReset(SSOToken token) throws SSOException {
+        try {
+            getProvider(token).refreshSession(token, false);
+        } catch (Exception e) {
+            debug.error("Error in refreshing the session from session server");
+            throw new SSOException(e);
+        }
+    }
+
+    /**
      * Destroys a single sign on token.
-     * 
+     *
      * @param destroyer
      *            The single sign on token object used to authorize the
      *            operation
@@ -424,7 +475,7 @@ public class SSOTokenManager {
      * which correspond to valid Sessions accessible to requester. Single sign
      * on tokens returned are restricted: they can only be used to retrieve
      * properties and destroy sessions they represent.
-     * 
+     *
      * @param requester
      *            The single sign on token object used to authorize the
      *            operation

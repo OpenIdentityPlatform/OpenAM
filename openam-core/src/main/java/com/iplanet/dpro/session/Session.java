@@ -24,7 +24,7 @@
  *
  * $Id: Session.java,v 1.25 2009/08/14 17:53:35 weisun2 Exp $
  *
- * Portions Copyrighted 2010-2014 ForgeRock AS.
+ * Portions copyright 2010-2014 ForgeRock AS.
  */
 
 package com.iplanet.dpro.session;
@@ -85,16 +85,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * client ID (user ID or application ID), session idle time, time left on the
  * session, and session state. It also allows applications to add listener for
  * session events.
- * 
+ *
  * <pre>
  *  The following is the state diagram for a session:
- * 
+ *
  *                     |
  *                     |
  *                     |
  *                     V
  *       ---------- invalid
- *      |              |  
+ *      |              |
  *      |              |creation (authentication OK)
  *      |              |
  *      |max login time|   max idle time
@@ -105,12 +105,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *      |              |                            |
  *      |              | logout                     | destroy
  *      |              | destroy                    | max session time
- *      |              | max session time           | 
+ *      |              | max session time           |
  *      |              V                            |
- *       ---------&gt;  destroy  &lt;---------------------       
- * 
+ *       ---------&gt;  destroy  &lt;---------------------
+ *
  * </pre>
- * 
+ *
  * @see com.iplanet.dpro.session.SessionID
  * @see com.iplanet.dpro.session.SessionListener
  */
@@ -237,7 +237,7 @@ public class Session extends GeneralTaskRunnable {
 
     /*
      * indicates whether to use local or remote calls to Session Service
-     * 
+     *
      */
     private boolean sessionIsLocal = false;
 
@@ -267,7 +267,7 @@ public class Session extends GeneralTaskRunnable {
 
     private static final boolean resetLBCookie =
             SystemProperties.getAsBoolean("com.sun.identity.session.resetLBCookie", false);
-    
+
     private String cookieStr;
 
     Boolean cookieMode = null;
@@ -290,12 +290,12 @@ public class Session extends GeneralTaskRunnable {
      * client cache
      */
     private static boolean pollingEnabled = false;
-    
+
     private static boolean pollerPoolInitialized = false;
-    
+
     private static final String ENABLE_POLLING_PROPERTY =
         "com.iplanet.am.session.client.polling.enable";
-    
+
     /**
      * Indicates whether to enable or disable the session cleanup thread.
      */
@@ -336,8 +336,8 @@ public class Session extends GeneralTaskRunnable {
             SystemProperties.getAsBoolean("com.iplanet.am.session.client.polling.cacheBased", false);
 
     private static long appSSOTokenRefreshTime;
-    
-    private SessionPollerSender sender = null;    
+
+    private SessionPollerSender sender = null;
 
     static {
         purgeDelay = SystemProperties.getAsLong("com.iplanet.am.session.purgedelay", 120);
@@ -357,7 +357,7 @@ public class Session extends GeneralTaskRunnable {
 
         return serverid;
     }
-    
+
     /**
      * Enables the Session Polling
      * @param b if <code>true</code> polling is enabled, disabled otherwise
@@ -373,23 +373,23 @@ public class Session extends GeneralTaskRunnable {
     protected boolean getIsPolling() {
         return isPolling;
     }
-    
+
     /**
      * Checks if Polling is enabled
      * @return <code> true if polling is enabled , <code>false<code> otherwise
-     */    
-    protected static boolean isPollingEnabled(){   	
-        // This is only a transitional solution before the complete 
+     */
+    protected static boolean isPollingEnabled(){
+        // This is only a transitional solution before the complete
         // implementation for making the session properties
-        // hot-swappable is in place    	
+        // hot-swappable is in place
         if (!isServerMode()) {
             pollingEnabled = SystemProperties.getAsBoolean(ENABLE_POLLING_PROPERTY, false);
         }
         if (sessionDebug.messageEnabled()) {
             sessionDebug.message("Session.isPollingEnabled is "
                 + pollingEnabled);
-        }        
-        
+        }
+
         if(!pollerPoolInitialized){
             if (pollingEnabled) {
                 int poolSize = SystemProperties.getAsInt(Constants.POLLING_THREADPOOL_SIZE, DEFAULT_POOL_SIZE);
@@ -411,9 +411,9 @@ public class Session extends GeneralTaskRunnable {
                     sessionDebug.message("Session Cache cleanup is set to "
                         + sessionCleanupEnabled);
                 }
-            }	        
+            }
         }
-        
+
         return pollingEnabled;
     }
 
@@ -455,19 +455,19 @@ public class Session extends GeneralTaskRunnable {
     public boolean addElement(Object obj) {
         return false;
     }
-    
+
     public boolean removeElement(Object obj) {
         return false;
     }
-    
+
     public boolean isEmpty() {
         return true;
     }
-    
+
     public long getRunPeriod() {
         return -1;
     }
-    
+
     public void run() {
         if (isPollingEnabled()) {
             try {
@@ -561,7 +561,7 @@ public class Session extends GeneralTaskRunnable {
      * @return load balancer cookie value.
      * @throws SessionException if session is invalid.
      */
-    public static String getLBCookie(String sid) 
+    public static String getLBCookie(String sid)
              throws SessionException {
         return getLBCookie(new SessionID(sid));
     }
@@ -580,13 +580,13 @@ public class Session extends GeneralTaskRunnable {
             sessionDebug.message("Session.getLBCookie()" +
                 "lbCookieName is:" + lbCookieName);
         }
-        
+
         if(sid == null || sid.toString() == null ||
             sid.toString().length() == 0) {
             throw new SessionException(SessionBundle.rbName,
         	    "invalidSessionID", null);
         }
-         
+
         if(isServerMode() &&
             !SessionService.getSessionService().isSiteEnabled()) {
                 cookieValue = WebtopNaming.getLBCookieValue(
@@ -596,19 +596,19 @@ public class Session extends GeneralTaskRunnable {
 
         if(resetLBCookie) {
             if (isServerMode()) {
-                SessionService ss = SessionService.getSessionService();            
+                SessionService ss = SessionService.getSessionService();
                 if (ss.isSessionFailoverEnabled() && ss.isLocalSite(sid)) {
                     cookieValue = WebtopNaming.getLBCookieValue(
                         ss.getCurrentHostServer(sid));
-                }    
-            } else {            
+                }
+            } else {
                 Session sess = readSession(sid);
                 if (sess != null) {
                     cookieValue = sess.getProperty(lbCookieName);
                 }
             }
-        }    
-        
+        }
+
         if(cookieValue == null || cookieValue.length() == 0) {
             cookieValue = WebtopNaming.getLBCookieValue(
                 sid.getExtension(SessionID.PRIMARY_ID));
@@ -616,7 +616,7 @@ public class Session extends GeneralTaskRunnable {
 
         return lbCookieName + "=" + cookieValue;
     }
-    
+
     /**
      * Returns the session ID.
      * @return The session ID.
@@ -627,7 +627,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the session type.
-     * 
+     *
      * @return The session type.
      */
     public int getType() {
@@ -636,7 +636,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the client ID in the session.
-     * 
+     *
      * @return The client ID in the session.
      */
     public String getClientID() {
@@ -645,7 +645,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the client domain in the session.
-     * 
+     *
      * @return The client domain in the session.
      */
     public String getClientDomain() {
@@ -654,7 +654,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the maximum session time in minutes.
-     * 
+     *
      * @return The maximum session time.
      */
     public long getMaxSessionTime() {
@@ -663,9 +663,9 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the maximum session idle time in minutes.
-     * 
+     *
      * @return The maximum session idle time.
-     */    
+     */
     public long getMaxIdleTime() {
         return maxIdleTime;
     }
@@ -722,7 +722,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the maximum session caching time in minutes.
-     * 
+     *
      * @return The maximum session caching time.
      */
     public long getMaxCachingTime() {
@@ -731,7 +731,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the session idle time in seconds.
-     * 
+     *
      * @return The session idle time.
      * @exception SessionException if the session reached its maximum session
      *            time, or the session was destroyed, or there was an error
@@ -746,7 +746,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the time left for this session in seconds.
-     * 
+     *
      * @return The time left for this session.
      * @exception SessionException is thrown if the session reached its
      *            maximum session time, or the session was destroyed, or
@@ -754,7 +754,7 @@ public class Session extends GeneralTaskRunnable {
      *            service.
      */
     public long getTimeLeft() throws SessionException {
-        if (!cacheBasedPolling && maxCachingTimeReached()) {            
+        if (!cacheBasedPolling && maxCachingTimeReached()) {
             refresh(false);
         }
         return sessionTimeLeft;
@@ -762,7 +762,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the state of the session.
-     * 
+     *
      * @param reset
      *            This parameter indicates that whether the Session Service
      *            needs to reset the latest access time on this session.
@@ -775,7 +775,7 @@ public class Session extends GeneralTaskRunnable {
      */
     public int getState(boolean reset) throws SessionException {
         if (!cacheBasedPolling && maxCachingTimeReached()) {
-            
+
             refresh(reset);
         } else {
             if (reset) {
@@ -792,7 +792,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Returns the type of the event which caused the state change of this
      * session.
-     * 
+     *
      * @return The type of the event. The event types are defined in class
      *         SessionEvent as static integers : SESSION_CREATION, IDLE_TIMEOUT,
      *         MAX_TIMEOUT, LOGOUT, ACTIVATION, REACTIVATION, and DESTROY.
@@ -803,7 +803,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Gets the property stored in this session.
-     * 
+     *
      * @param name The property name.
      * @return The property value in String format.
      * @exception SessionException is thrown if the session reached its
@@ -813,11 +813,11 @@ public class Session extends GeneralTaskRunnable {
      */
     public String getProperty(String name) throws SessionException {
         if (name == null ? lbCookieName != null : !name.equals(lbCookieName)) {
-            if ((!cacheBasedPolling && maxCachingTimeReached()) || 
+            if ((!cacheBasedPolling && maxCachingTimeReached()) ||
                 !sessionProperties.containsKey(name)) {
                 refresh(false);
             }
-        }    
+        }
         return sessionProperties.get(name);
     }
 
@@ -859,10 +859,10 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Gets the property stored in this session.
-     * 
+     *
      * @param name The property name.
      * @return The property value in String format only
-     *         when run in the server mode else return null  
+     *         when run in the server mode else return null
      */
     public String getPropertyWithoutValidation(String name) {
         if (isServerMode()) {
@@ -873,7 +873,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Sets a property for this session.
-     * 
+     *
      * @param name The property name.
      * @param value The property value.
      * @exception SessionException if the session reached its maximum session
@@ -893,7 +893,7 @@ public class Session extends GeneralTaskRunnable {
             throw new SessionException(e);
         }
     }
-    
+
     /**
      * Used to find out if the maximum caching time has reached or not.
      */
@@ -905,10 +905,10 @@ public class Session extends GeneralTaskRunnable {
         else
             return false;
     }
-    
+
     /**
      * Gets the Session Service URL for this session object.
-     * 
+     *
      * @return The Session Service URL for this session.
      * @exception SessionException when cannot get Session URL.
      */
@@ -929,7 +929,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Destroys a session.
-     * 
+     *
      * @param session The session to be destroyed.
      * @exception SessionException if there was an error during
      *            communication with session service, or the corresponding
@@ -950,7 +950,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Logs out a session.
-     * 
+     *
      * @throws SessionException if there was an error during communication
      *         with session service. If the session logged out already,
      *         no exception will be thrown.
@@ -1081,7 +1081,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Adds a session listener for session change events.
-     * 
+     *
      * @param listener Session Listener object.
      * @exception SessionException if the session state is not valid.
      */
@@ -1106,7 +1106,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns a session based on a Session ID object.
-     * 
+     *
      * @param sid Session ID.
      * @return A Session object.
      * @throws SessionException if the Session ID object does not contain a
@@ -1130,6 +1130,25 @@ public class Session extends GeneralTaskRunnable {
      *         communication with session service.
      */
     public static Session getSession(SessionID sessionID, boolean allowInvalidSessions) throws SessionException {
+        return getSession(sessionID, allowInvalidSessions, true);
+    }
+
+    /**
+     * This function will get a session based on the session id.  It will allow invalid sessions to be returned,
+     * and allow the caller to specify whether the session can be updated (and therefore have the idle time
+     * refreshed).
+     *
+     * @param sessionID The Session id.
+     * @param allowInvalidSessions If true, allow invalid Sessions to be returned.
+     * @param possiblyResetIdleTime If true, the idle time of the session can be reset, if false, it is never reset.
+     * @return A session object.
+     * @throws SessionException If the Session ID object does not contain a
+     *         valid session string, or the session string was valid before
+     *         but has been destroyed, or there was an error during
+     *         communication with session service.
+     */
+    public static Session getSession(SessionID sessionID, boolean allowInvalidSessions, boolean possiblyResetIdleTime)
+        throws SessionException {
 
         if (sessionID.toString() == null || sessionID.toString().length() == 0) {
             throw new SessionException(SessionBundle.rbName,
@@ -1181,7 +1200,7 @@ public class Session extends GeneralTaskRunnable {
         session = new Session(sessionID);
 
         if (!allowInvalidSessions) {
-            session.refresh(true);
+            session.refresh(possiblyResetIdleTime);
         }
         session.context = RestrictedTokenContext.getCurrent();
 
@@ -1229,7 +1248,7 @@ public class Session extends GeneralTaskRunnable {
      * Returns a Session Response object based on the XML document received from
      * remote Session Server. This is in response to a request that we send to
      * the session server.
-     * 
+     *
      * @param svcurl The URL of the Session Service.
      * @param sreq The Session Request XML document.
      * @return a Vector of responses from the remote server
@@ -1244,7 +1263,7 @@ public class Session extends GeneralTaskRunnable {
                 SessionID sessionID = new SessionID(sreq.getSessionID());
                 cookies = cookies + ";" + Session.getLBCookie(sessionID);
             }
- 
+
             Request req = new Request(sreq.toXMLString());
             RequestSet set = new RequestSet(SESSION_SERVICE);
             set.addRequest(req);
@@ -1262,7 +1281,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Gets all valid sessions from the specified session server. This session
      * is subject to access control in order to get all sessions.
-     * 
+     *
      * @param server
      *            The session server name. If the server name contains protocol
      *            and port, the protocol and port will be used. Otherwise, the
@@ -1293,14 +1312,14 @@ public class Session extends GeneralTaskRunnable {
                 port = port.substring(0, pos1);
             }
         }
-        
+
         URL svcurl = getSessionServiceURL(protocol, host, port, uri);
         return getValidSessions(svcurl, pattern);
     }
 
     /**
      * Get all the event listeners for this Session.
-     * 
+     *
      * @return SessionEventListener vector
      */
     Set<SessionListener> getSessionEventListeners() {
@@ -1309,7 +1328,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Get all the event listeners for all the Sessions.
-     * 
+     *
      * @return SessionEventListener vector
      */
     static Set<SessionListener> getAllSessionEventListeners() {
@@ -1318,7 +1337,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns Session Service URL for a Session ID.
-     * 
+     *
      * @param sid Session ID
      * @return Session Service URL.
      * @exception SessionException
@@ -1360,14 +1379,14 @@ public class Session extends GeneralTaskRunnable {
             }
         }
 
-        return getSessionServiceURL(sid.getSessionServerProtocol(), 
-            sid.getSessionServer(), sid.getSessionServerPort(), 
+        return getSessionServiceURL(sid.getSessionServerProtocol(),
+            sid.getSessionServer(), sid.getSessionServerPort(),
             sid.getSessionServerURI());
     }
 
     /**
      * Returns Session Service URL.
-     * 
+     *
      * @param protocol Session Server protocol.
      * @param server Session Server host name.
      * @param port Session Server port.
@@ -1376,9 +1395,9 @@ public class Session extends GeneralTaskRunnable {
      * @exception SessionException
      */
     static public URL getSessionServiceURL(
-        String protocol, 
+        String protocol,
         String server,
-        String port, 
+        String port,
         String uri
     ) throws SessionException {
         String key = protocol + "://" + server + ":" + port + uri;
@@ -1398,7 +1417,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns Session Service URL for a given server ID.
-     * 
+     *
      * @param serverID server ID from the platform server list.
      * @return Session Service URL.
      * @exception SessionException
@@ -1410,7 +1429,7 @@ public class Session extends GeneralTaskRunnable {
                     .getServerFromID(serverID));
             return getSessionServiceURL(
                 parsedServerURL.getProtocol(),
-                parsedServerURL.getHost(), 
+                parsedServerURL.getHost(),
                 Integer.toString(parsedServerURL.getPort()),
                 parsedServerURL.getPath());
         } catch (Exception e) {
@@ -1422,7 +1441,7 @@ public class Session extends GeneralTaskRunnable {
      * Returns all the valid sessions for a particular Session Service URL. If a
      * user is not allowed to access the Sessions of the input Session Server,
      * it will return null.
-     * 
+     *
      * @param svcurl Session Service URL.
      * @exception SessionException
      */
@@ -1437,13 +1456,13 @@ public class Session extends GeneralTaskRunnable {
                 infos = sessionService.getValidSessions(this, pattern, status);
                 isLocal = true;
             } else {
-                SessionRequest sreq = 
+                SessionRequest sreq =
                         new SessionRequest(SessionRequest.GetValidSessions, sessionID.toString(), false);
-                
+
                 if (pattern != null) {
                     sreq.setPattern(pattern);
                 }
-                
+
                 SessionResponse sres = requests.getSessionResponseWithRetry(svcurl, sreq, this);
                 infos = sres.getSessionInfo();
                 status[0] = sres.getStatus();
@@ -1451,7 +1470,7 @@ public class Session extends GeneralTaskRunnable {
 
             Map<String, Session> sessions = new HashMap<String, Session>();
             Session session = null;
-            
+
             for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.sid);
                 session = new Session(sid, isLocal);
@@ -1459,7 +1478,7 @@ public class Session extends GeneralTaskRunnable {
                 session.update(info);
                 sessions.put(info.sid, session);
             }
-            
+
             return new SearchResults(sessions.size(), sessions.keySet(), status[0], sessions);
         } catch (Exception ex) {
             sessionDebug.error("Session:getValidSession : ", ex);
@@ -1471,7 +1490,7 @@ public class Session extends GeneralTaskRunnable {
      * Adds a session listener for all sessions residing on the same session
      * server as this session object resides. This session is subject to access
      * control in order to receive session events on all sessions.
-     * 
+     *
      * @param listener A reference to the Session Listener object.
      * @exception SessionException if there was an error.
      */
@@ -1490,14 +1509,14 @@ public class Session extends GeneralTaskRunnable {
                 throw new SessionException(e);
             }
         }
-        
+
         allSessionEventListeners.add(listener);
     }
 
     /**
      * Gets the latest session from session server and updates the local cache
      * of this session.
-     * 
+     *
      * @param reset The flag to indicate whether to reset the latest session
      *        access time in the session server.
      * @exception SessionException if the session reached its
@@ -1562,7 +1581,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Updates the session from the session information server.
-     * 
+     *
      * @param info Session Information.
      */
     synchronized void update(SessionInfo info) throws SessionException {
@@ -1652,8 +1671,8 @@ public class Session extends GeneralTaskRunnable {
                     + " from server:"+sres.getException());
             }
             // Check if this exception was thrown due to Session Time out or not
-            // If yes then set the private variable timedOutAt to the current 
-            // time But before that check if this timedOutAt is already set 
+            // If yes then set the private variable timedOutAt to the current
+            // time But before that check if this timedOutAt is already set
             // or not. No need of setting it again
             String exceptionMessage = sres.getException();
             if(timedOutAt <= 0) {
@@ -1673,10 +1692,10 @@ public class Session extends GeneralTaskRunnable {
                         sessionDebug.message("Session."
                             + "processSessionResponseException: Destorying AppToken");
                     }
-                       
+
                     AdminTokenAction.invalid();
                     RestrictedTokenContext.clear();
-                    
+
                     if (sessionDebug.warningEnabled()) {
                         sessionDebug.warning("Session."
                             +"processSessionResponseException"
@@ -1684,7 +1703,7 @@ public class Session extends GeneralTaskRunnable {
                             +": server responded with app token invalid"
                             +" error,refetching the app sso token");
                     }
-                    SSOToken newAppSSOToken = (SSOToken) 
+                    SSOToken newAppSSOToken = (SSOToken)
                         AccessController.doPrivileged(
                                 AdminTokenAction.getInstance());
 
@@ -1741,7 +1760,7 @@ public class Session extends GeneralTaskRunnable {
      * ampersand before appending session ID if other query parameters exists in
      * the URL.
      * <p>
-     * 
+     *
      * @param res HTTP Servlet Response.
      * @param url the URL to be encoded.
      * @return the encoded URL if cookies are not supported and URL if cookies
@@ -1757,7 +1776,7 @@ public class Session extends GeneralTaskRunnable {
      * ampersand before appending session id if other query parameters exists in
      * the URL.
      * <p>
-     * 
+     *
      * @param res HTTP Servlet Response.
      * @param url  the URL to be encoded
      * @param cookieName AM cookie name
@@ -1773,7 +1792,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Returns the encoded URL , rewritten to include the session id. Cookie
      * will be written to the URL in as a query string.
-     * 
+     *
      * @param url the URL to be encoded.
      * @param escape true if ampersand entity escaping needs to done
      *        else false. This parameter is valid only when encoding scheme
@@ -1788,10 +1807,10 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Returns the encoded URL , rewritten to include the session id. Cookie
      * will be written to the URL in as a query string.
-     * 
+     *
      * @param url the URL to be encoded
-     * @param escape true if ampersand entity escaping needs to 
-     *        done else false.This parameter is valid only when encoding 
+     * @param escape true if ampersand entity escaping needs to
+     *        done else false.This parameter is valid only when encoding
      *        scheme is <code>SessionUtils.QUERY</code>.
      * @param cookieName cookie name.
      * @return the encoded URL if cookies are not supported or the URL if
@@ -1804,7 +1823,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Returns the encoded URL , rewritten to include the session id in the
      * query string with entity escaping
-     * 
+     *
      * @param url the URL to be encoded
      * @return the encoded URL if cookies are not supported or the URL if
      *         cookies are supported.
@@ -1816,7 +1835,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Returns the encoded URL , rewritten to include the session id in the
      * query string with entity escaping
-     * 
+     *
      * @param url the URL to be encoded.
      * @param cookieName the cookie name.
      * @return the encoded URL if cookies are not supported or the URL if
@@ -1828,7 +1847,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the encoded URL , rewritten to include the session id.
-     * 
+     *
      * @param url the URL to be encoded.
      * @param encodingScheme the scheme to rewrite the cookie value in URL as
      *        a Query String or Path Info (Slash or Semicolon separated.
@@ -1847,12 +1866,12 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Returns the encoded URL , rewritten to include the session id.
-     * 
+     *
      * @param url the URL to be encoded.
      * @param encodingScheme the scheme to rewrite the cookie value in URL as
      *        a Query String or Path Info (Slash or Semicolon separated. Allowed
      *        values are <code>SessionUtils.QUERY</code>,
-     *        <code>SessionUtils.SLASH</code> and 
+     *        <code>SessionUtils.SLASH</code> and
      *        <code>SessionUtils.SEMICOLON</code>.
      * @param escape true if ampersand entity escaping needs to done
      *        else false. This parameter is valid only when encoding scheme
@@ -1933,7 +1952,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Indicates whether local or remote invocation of Sesion Service should be
      * used
-     * 
+     *
      * @return true if local invocation should be used, false otherwise
      */
     boolean isLocal() {
@@ -1943,7 +1962,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Marks session referenced by Session ID as non-local so that remote
      * invocations of Session Service methods are to be used.
-     * 
+     *
      * @param sid session ID.
      */
     public static void markNonLocal(SessionID sid) {
@@ -1956,7 +1975,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Actively checks whether current session should be considered local (so
      * that local invocations of Session Service methods are to be used)
-     * 
+     *
      * @return true if the session local.
      */
     private boolean checkSessionLocal() throws SessionException {
@@ -1978,7 +1997,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * Determines whether session code runs in core server or client SDK
      * run-time mode
-     * 
+     *
      * @return true if running in core server mode, false otherwise
      */
     public static boolean isServerMode() {
@@ -2047,7 +2066,7 @@ public class Session extends GeneralTaskRunnable {
 
     /**
      * Checks if the cookie name is in the cookie string.
-     * 
+     *
      * @param cookieStr cookie string (<code>cookieName=cookieValue</code>).
      * @param cookieName name of the cookie.
      * @return true if <code>cookieName</code> is in the <code>cookieStr</code>.
@@ -2067,14 +2086,14 @@ public class Session extends GeneralTaskRunnable {
         }
         return foundCookieName;
     }
-    
+
     class SessionPollerSender implements Runnable {
         SessionInfo info = null;
 
         Session session = null;
 
         SessionID sid = null;
-        
+
         Debug debug = null;
 
         public SessionPollerSender(Session sess, Debug sessionDebug) {
@@ -2096,7 +2115,7 @@ public class Session extends GeneralTaskRunnable {
                 }
 
                 List<SessionInfo> infos = sres.getSessionInfo();
-                
+
                 if (infos.size() == 1) {
                     info = infos.get(0);
                 }

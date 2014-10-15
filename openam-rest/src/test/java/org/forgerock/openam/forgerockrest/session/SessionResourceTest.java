@@ -43,8 +43,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -165,6 +165,7 @@ public class SessionResourceTest {
         given(ssoTokenManager.isValidToken(ssoToken)).willReturn(true);
         given(ssoToken.getTokenID()).willReturn(ssoTokenId);
         given(ssoTokenId.toString()).willReturn("SSO_TOKEN_ID");
+        given(ssoTokenManager.createSSOToken(ssoTokenId.toString())).willReturn(ssoToken);
 
         //When
         sessionResource.actionCollection(context, request, handler);
@@ -225,5 +226,192 @@ public class SessionResourceTest {
         assertThat(responseCaptor.getValue().get("valid").asBoolean()).isTrue();
         assertThat(responseCaptor.getValue().get("uid").asString()).isEqualTo("demo");
         assertThat(responseCaptor.getValue().get("realm").asString()).isEqualTo("/");
+    }
+
+    @Test
+    public void actionInstanceShouldBeActiveWhenSSOTokenValid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("isactive");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+
+        assertThat(responseCaptor.getValue().get("active").asBoolean()).isEqualTo(true);
+    }
+
+
+    @Test
+    public void actionInstanceShouldRefreshWhenParameterPresentAndSSOTokenValid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("isactive");
+        given(request.getAdditionalParameter("refresh")).willReturn("true");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        verify(ssoTokenManager).refreshSession(ssoToken);
+    }
+
+
+    @Test
+    public void actionInstanceShouldBeInactiveWhenSSOTokenInvalid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("isactive");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(false);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+
+        assertThat(responseCaptor.getValue().get("active").asBoolean()).isEqualTo(false);
+    }
+
+    @Test
+    public void actionInstanceShouldGiveTimeLeftWhenSSOTokenValid() throws SSOException {
+
+        final int TIME_LEFT = 5000;
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("getmaxtime");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(ssoToken.getTimeLeft()).willReturn((long) TIME_LEFT);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("maxtime").asInteger()).isEqualTo(TIME_LEFT);
+    }
+
+    @Test
+    public void actionInstanceShouldGiveMinusOneForMaxTimeWhenSSOTokenInvalid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("getmaxtime");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(false);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("maxtime").asInteger()).isEqualTo(-1);
+    }
+
+    @Test
+    public void actionInstanceShouldGiveIdleTimeWhenSSOTokenValid() throws SSOException {
+
+        final int IDLE = 50;
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("getidle");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
+        given(ssoToken.getIdleTime()).willReturn((long) IDLE);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("idletime").asInteger()).isEqualTo(IDLE);
+    }
+
+    @Test
+    public void actionInstanceShouldGiveMinusOneForIdleTimeWhenSSOTokenInvalid() throws SSOException {
+
+        //Given
+        final ServerContext context = mock(ServerContext.class);
+        final String resourceId = "SSO_TOKEN_ID";
+        final ActionRequest request = mock(ActionRequest.class);
+        final ResultHandler<JsonValue> handler = mock(ResultHandler.class);
+        final SSOToken ssoToken = mock(SSOToken.class);
+        final Principal principal = mock(Principal.class);
+
+        given(request.getAction()).willReturn("getidle");
+        given(ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(false);
+
+        //When
+        sessionResource.actionInstance(context, resourceId, request, handler);
+
+        //Then
+        final ArgumentCaptor<JsonValue> responseCaptor = ArgumentCaptor.forClass(JsonValue.class);
+        verify(handler).handleResult(responseCaptor.capture());
+        assertThat(responseCaptor.getValue().get("idletime").asInteger()).isEqualTo(-1);
+    }
+
+
+    @Test
+    public void shouldValidateActions() {
+        assertThat(SessionResource.isActionValid("isActive")).isTrue();
+        assertThat(SessionResource.isActionValid("isactive")).isTrue();
+        assertThat(SessionResource.isActionValid("ISACTIVE")).isTrue();
+        assertThat(SessionResource.isActionValid("is_active")).isFalse();
+        assertThat(SessionResource.isActionValid("rubbish")).isFalse();
     }
 }

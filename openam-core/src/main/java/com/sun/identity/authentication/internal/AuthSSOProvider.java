@@ -24,6 +24,7 @@
  *
  * $Id: AuthSSOProvider.java,v 1.2 2008/06/25 05:41:53 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
  */
 
 package com.sun.identity.authentication.internal;
@@ -43,13 +44,15 @@ public class AuthSSOProvider implements SSOProvider {
         // do nothing
     }
 
+    @Override
     public SSOToken createSSOToken(HttpServletRequest request)
             throws SSOException, UnsupportedOperationException {
         throw (new UnsupportedOperationException());
     }
 
+    @Override
     public SSOToken createSSOToken(java.security.Principal user,
-            String password) throws SSOException, UnsupportedOperationException 
+            String password) throws SSOException, UnsupportedOperationException
     {
         try {
             AuthContext auth = new AuthContext(user, password.toCharArray());
@@ -60,6 +63,7 @@ public class AuthSSOProvider implements SSOProvider {
         }
     }
 
+    @Override
     public SSOToken createSSOToken(String tokenID) throws SSOException,
             UnsupportedOperationException {
         SSOToken token = null;
@@ -74,35 +78,64 @@ public class AuthSSOProvider implements SSOProvider {
         return (token);
     }
 
+    @Override
+    public SSOToken createSSOToken(String tokenId, boolean invokedByAuth, boolean possiblyResetIdleTime)
+            throws SSOException, UnsupportedOperationException {
+        return createSSOToken(tokenId);
+    }
+
+    @Override
     public SSOToken createSSOToken(String tokenID, String clientIP)
             throws SSOException, UnsupportedOperationException {
         return null;
     }
 
+    @Override
     public void destroyToken(SSOToken token) throws SSOException {
         AuthSSOToken authToken = (AuthSSOToken) token;
         authToken.invalidate();
     }
 
+    @Override
     public boolean isValidToken(SSOToken token) {
         AuthSSOToken authToken = (AuthSSOToken) token;
         return (authToken.isValid());
     }
 
+    /**
+     * This class ignores the "refresh" parameter, which is just not needed here.
+     * @param token The SSOToken object to be validated.
+     * @param ignored The refresh parameter, which is completely ignored.
+     * @return true if the token is valid, false otherwise.
+     */
+    @Override
+    public boolean isValidToken(SSOToken token, boolean ignored) {
+        return isValidToken(token);
+    }
+
+    @Override
     public void validateToken(SSOToken token) throws SSOException {
         AuthSSOToken authToken = (AuthSSOToken) token;
         authToken.validate();
     }
 
+    @Override
     public void refreshSession(SSOToken token) throws SSOException,
             UnsupportedOperationException {
     }
 
+    @Override
+    public void refreshSession(SSOToken token, boolean resetIdleTime)
+            throws SSOException, UnsupportedOperationException {
+    }
+
+    @Override
     public void destroyToken(SSOToken destroyer, SSOToken destroyed)
             throws SSOException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    @Override
     public Set getValidSessions(SSOToken requester, String server)
             throws SSOException {
         throw new UnsupportedOperationException("Not implemented");

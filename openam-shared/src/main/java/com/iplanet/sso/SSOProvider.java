@@ -24,6 +24,7 @@
  *
  * $Id: SSOProvider.java,v 1.2 2008/06/25 05:41:42 qcheng Exp $
  *
+ * Portions copyright 2014 ForgeRock AS.
  */
 
 package com.iplanet.sso;
@@ -43,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface SSOProvider {
     /**
      * Creates an SSOToken.
-     * 
+     *
      * @param request HttpServletRequest
      * @return SSOToken
      * @exception SSOException is thrown if the SSOToken can't be created.
@@ -53,108 +54,128 @@ public interface SSOProvider {
 
     /**
      * Creates an SSOToken.
-     * 
+     *
      * @param user Principal representing a user or service
      * @param password LDAP password of the user or service
      * @return SSOToken
-     * @exception An
-     *                SSOException is thrown if the SSOToken can't be created.
-     * @exception an UnsupporedOperationException is thrown when other errors 
-     * occur during the token creation.
+     * @exception SSOException is thrown if the SSOToken can't be created.
+     * @exception UnsupportedOperationException is thrown when other errors occur during the token creation.
      */
     public SSOToken createSSOToken(Principal user, String password)
             throws SSOException, UnsupportedOperationException;
 
-    /** 
+    /**
      * Creates an SSOToken.
      * @param sid String representing the SSOToken Id
      * @return SSOToken
-     * @exception SSOException is thrown if the SSOToken can't be 
+     * @exception SSOException is thrown if the SSOToken can't be
      * created.
-     * @exception UnsupportedOperationException is thrown when other unsupported
-     * operation is performed.
+     * @exception UnsupportedOperationException is thrown when other unsupported operation is performed.
      */
     public SSOToken createSSOToken(String sid) throws SSOException,
             UnsupportedOperationException;
 
     /**
      * Creates an SSOToken.
-     * 
+     * @param sid String representing the SSOToken Id
+     * @param invokedByAuth boolean flag indicating that this method has been invoked by the AuthContext.getSSOToken()
+     * API.
+     * @param possiblyResetIdleTime If true, the idle time of the token/session may be reset to zero.  If false, the
+     * idle time will never be reset.
+     * @return SSOToken
+     * @exception SSOException is thrown if the SSOToken can't be created.
+     * @exception UnsupportedOperationException is thrown when other unsupported operation is performed.
+     */
+    public SSOToken createSSOToken(String sid, boolean invokedByAuth, boolean possiblyResetIdleTime)
+            throws SSOException, UnsupportedOperationException;
+
+    /**
+     * Creates an SSOToken.
+     *
      * @param sid
      *            representing the SSOToken Id
      * @param clientIP
      *            representing the IP address of the client
      * @return SSOToken
-     * @exception An
-     *                SSOException is thrown if the SSOToken can't be created.
+     * @exception SSOException is thrown if the SSOToken can't be created.
      */
     public SSOToken createSSOToken(String sid, String clientIP)
             throws SSOException, UnsupportedOperationException;
 
     /**
      * Destroys an SSOToken.
-     * 
+     *
      * @param token
      *            The SSOToken object to be destroyed
-     * @exception An SSOException is thrown if the SSOToken can't be destroyed.
+     * @exception SSOException is thrown if the SSOToken can't be destroyed.
      */
     public void destroyToken(SSOToken token) throws SSOException;
 
     /**
-     * Checks if an SSOToken is valid or not.
-     * 
-     * @param token
-     *            The SSOToken object to be validated.
+     * Checks if an SSOToken is valid or not.  Your token may be refreshed.
+     *
+     * @param token The SSOToken object to be validated.
      * @return true or false, true if the token is valid
      */
     public boolean isValidToken(SSOToken token);
 
     /**
+     * Checks if an SSOToken is valid or not.
+     *
+     * @param token The SSOToken object to be validated.
+     * @param refresh Refresh the token only if this flag is set to true.
+     * @return true if the token is valid, false otherwise
+     */
+    public boolean isValidToken(SSOToken token, boolean refresh);
+
+    /**
      * Checks if the SSOToken is valid.
-     * 
-     * @exception An
-     *                SSOException is thrown if the SSOToken is not valid.
+     *
+     * @exception SSOException is thrown if the SSOToken is not valid.
      */
     public void validateToken(SSOToken token) throws SSOException;
 
     /**
      * Refresh the Session corresponding to the SSOToken from the Session
-     * Server.
-     * 
+     * Server, always resetting the idle time.
+     *
      * @param token SSOToken
-     * @exception An SSOException is thrown if the session cannot be refreshed 
-     * for the token
-     * 
+     * @exception SSOException thrown if the session cannot be refreshed for the token
      */
     public void refreshSession(SSOToken token) throws SSOException;
 
     /**
+     * Refresh the Session corresponding to the SSOToken from the Session
+     * Server, but only optionally resetting the idle time.
+     *
+     * @param token SSOToken
+     * @param resetIdle if true, reset the idle time to zero, if false, do not do this.
+     * @exception SSOException thrown if the session cannot be refreshed for the token
+     */
+    public void refreshSession(SSOToken token, boolean resetIdle) throws SSOException;
+
+    /**
      * Destroys an SSOToken.
-     * 
+     *
      * @param destroyer
      *            The SSOToken object used to authorize the operation
      * @param destroyed
      *            The SSOToken object to be destroyed.
-     * @exception A
-     *                SSOException is thrown if the there was an error during
-     *                communication with session service.
+     * @exception SSOException thrown if the there was an error during communication with session service.
      */
     public void destroyToken(SSOToken destroyer, SSOToken destroyed)
             throws SSOException;
 
     /**
      * Returns valid Sessions.
-     * 
+     *
      * @param requester
      *            The SSOToken object used to authorize the operation
      * @param server
      *            The server for which the valid sessions are to be retrieved
      * @return Set The set of Valid Sessions
-     * @exception A
-     *                SSOException is thrown if the there was an error during
-     *                communication with session service.
+     * @exception SSOException thrown if the there was an error during communication with session service.
      */
     public Set getValidSessions(SSOToken requester, String server)
             throws SSOException;
-
 }

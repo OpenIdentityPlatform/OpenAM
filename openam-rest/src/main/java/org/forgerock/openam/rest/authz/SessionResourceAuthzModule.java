@@ -28,6 +28,8 @@ import org.forgerock.openam.utils.Config;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 
+import java.util.Set;
+
 /**
  * Authorization module specifically designed for the Sessions Resource endpoint. This allows anonymous access
  * to the Sessions Endpoint for the ACTIONS of 'logout' and 'validate'. All other endpoint requests are
@@ -43,11 +45,13 @@ public class SessionResourceAuthzModule extends AdminOnlyAuthzModule {
     }
 
     /**
-     * Lets through requests to ?_action=logout and ?_action=validate, otherwise defers to {@link AdminOnlyAuthzModule}.
+     * Lets through requests known to {@link SessionResource}.... otherwise it defers to
+     * {@link AdminOnlyAuthzModule}.
      */
     @Override
     public Promise<AuthorizationResult, ResourceException> authorizeAction(ServerContext context, ActionRequest request) {
-        if (SessionResource.LOGOUT.equals(request.getAction()) || SessionResource.VALIDATE.equals(request.getAction())) {
+
+        if (SessionResource.isActionValid(request.getAction())) {
             if (debug.messageEnabled()) {
                 debug.message("SessionResourceAuthzModule :: " + request.getAction() +
                         " action request authorized by module.");
