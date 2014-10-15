@@ -28,80 +28,20 @@
 
 : Portions Copyrighted 2010-2014 ForgeRock AS.
 
-setlocal
+setlocal enabledelayedexpansion
 
 IF NOT DEFINED JAVA_HOME (
-	set JAVA_HOME=\@JAVA_HOME@
+	set JAVA_HOME="\@JAVA_HOME@"
 )
+
 set TOOLS_HOME=@TOOLS_HOME@
-
 set ORIG_CLASSPATH=%CLASSPATH%
+set CLASSPATH=@CONFIG_DIR@
+set CLASSPATH=%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources
 
-set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/forgerock-util-${commons.forgerock-util.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-distribution-amadmsetup-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/opendj-server-${opendj.server.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/mail-${mail.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/servlet-api-${servlet-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-api-${webservices-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-rt-${webservices-rt.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/json-${json.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-${webservices-extra.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/webservices-extra-api-${webservices-extra-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xalan-${xalan.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xercesImpl-${xercesj.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-apis-${xercesj.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xml-serializer-${xercesj.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/xmlsec-${santuario.xmlsec.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/commons-logging-api-${commons-logging-api.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/commons-lang-${commons-lang.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-cli-definitions-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-cli-impl-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-core-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-shared-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-entitlements-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-ad-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-adaptive-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-anonymous-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-application-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-cert-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-datastore-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-hotp-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-httpbasic-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-jdbc-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-ldap-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-membership-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-msisdn-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-nt-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-oath-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-oauth2-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-radius-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-safeword-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-scripted-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-scripting-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-securid-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-auth-windowsdesktopsso-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-coretoken-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-dtd-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-entitlements-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-federation-library-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-idsvcs-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-jaxrpc-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-liberty-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-mib-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-oauth-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/oauth2-core-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/oauth2-restlet-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openid-connect-core-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openid-connect-restlet-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-oauth2-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-rest-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-saml2-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-locale-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-wsfederation-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-xacml3-schema-${project.version}.jar"
-set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/OpenFM-${project.version}.jar"
+for /f %%f in ('dir /b "%TOOLS_HOME%/lib"') do (
+    set CLASSPATH=!CLASSPATH!;%TOOLS_HOME%/lib/%%f
+)
 
 IF DEFINED ORIG_CLASSPATH (
 	set CLASSPATH=%ORIG_CLASSPATH%;%CLASSPATH%
