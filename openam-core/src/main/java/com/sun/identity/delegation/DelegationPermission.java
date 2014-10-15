@@ -26,20 +26,16 @@
  *
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.delegation;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
-import org.forgerock.guice.core.InjectorHolder;
-import org.forgerock.util.promise.Function;
-import org.forgerock.util.promise.NeverThrowsException;
-
+import com.sun.identity.sm.DNMapper;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.util.promise.Function;
+import org.forgerock.util.promise.NeverThrowsException;
 
 /**
  * The <code>DelegationPermission</code> class represents an access control
@@ -74,9 +70,7 @@ public class DelegationPermission {
      * Default constructor for <code>DelegationPermission</code>.
      */
     public DelegationPermission() {
-        orgNameToDNFunc = InjectorHolder.getInstance(
-                Key.get(new TypeLiteral<Function<String, String, NeverThrowsException>>() {},
-                        Names.named("orgNameToDN")));
+        orgNameToDNFunc = new OrgNameToDNFunction();
     }
 
     /**
@@ -417,5 +411,14 @@ public class DelegationPermission {
         sb.append("\nextensions=");
         sb.append(extensions);
         return sb.toString();
+    }
+
+    private static class OrgNameToDNFunction implements Function<String, String, NeverThrowsException> {
+
+        @Override
+        public String apply(String orgName) {
+            return DNMapper.orgNameToDN(orgName);
+        }
+
     }
 }

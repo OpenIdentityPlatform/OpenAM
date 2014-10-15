@@ -214,17 +214,6 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
 
         bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
-                .annotatedWith(Names.named("orgNameToDN"))
-                .toInstance(new Function<String, String, NeverThrowsException>() {
-
-                    @Override
-                    public String apply(String orgName) {
-                        return DNMapper.orgNameToDN(orgName);
-    }
-
-                });
-
-        bind(new TypeLiteral<Function<String, String, NeverThrowsException>>() {})
                 .annotatedWith(Names.named("tagSwapFunc"))
                 .toInstance(new Function<String, String, NeverThrowsException>() {
 
