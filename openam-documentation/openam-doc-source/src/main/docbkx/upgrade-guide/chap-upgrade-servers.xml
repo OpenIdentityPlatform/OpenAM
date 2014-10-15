@@ -34,7 +34,7 @@
 
  <para>This chapter covers upgrade from OpenAM core server 9.5 or later to the
  current version. For other OpenAM components, see <link xlink:show="new"
- xlink:href="admin-guide#chap-backup-restore"
+ xlink:href="upgrade-guide#chap-upgrade-components"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Upgrading OpenAM
  Components</citetitle></link>.</para>
 
