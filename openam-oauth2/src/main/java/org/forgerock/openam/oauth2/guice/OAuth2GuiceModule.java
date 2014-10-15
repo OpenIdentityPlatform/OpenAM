@@ -39,6 +39,7 @@ import org.forgerock.oauth2.core.ClientCredentialsRequestValidator;
 import org.forgerock.oauth2.core.ClientCredentialsRequestValidatorImpl;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.GrantTypeHandler;
+import org.forgerock.oauth2.core.JwtBearerGrantTypeHandler;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
@@ -145,6 +146,7 @@ public class OAuth2GuiceModule extends AbstractModule {
         grantTypeHandlers.addBinding("client_credentials").to(ClientCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("password").to(PasswordCredentialsGrantTypeHandler.class);
         grantTypeHandlers.addBinding("authorization_code").to(AuthorizationCodeGrantTypeHandler.class);
+        grantTypeHandlers.addBinding(OAuth2Constants.TokenEndpoint.JWT_BEARER).to(JwtBearerGrantTypeHandler.class);
 
         final Multibinder<AuthorizeRequestHook> authorizeRequestHooks = Multibinder.newSetBinder(
                 binder(), AuthorizeRequestHook.class);

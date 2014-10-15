@@ -424,6 +424,16 @@
                   </DefaultValues>
               </AttributeSchema>
 
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.clientJwtPublicKey"
+                      type="single"
+                      syntax="paragraph"
+                      i18nKey="a747">
+                  <DefaultValues>
+                      <Value></Value>
+                  </DefaultValues>
+              </AttributeSchema>
+
           </SubSchema>
 
 	      <SubSchema name="WebAgent" inheritance="multiple">

@@ -16,7 +16,11 @@
 
 package org.forgerock.openidconnect;
 
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,6 +30,8 @@ import java.util.Set;
  * @since 12.0.0
  */
 public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistration {
+
+    private static final byte[] SHARED_SECRET = "SHARED_SECRET".getBytes(Charset.forName("UTF-8"));
 
     private final Client client;
 
@@ -131,5 +137,10 @@ public class OpenIdClientRegistrationImpl implements OpenIdConnectClientRegistra
 
     public String getClientSessionURI() {
         return client.getClientSessionURI();
+    }
+
+    @Override
+    public SigningHandler getClientJwtSigningHandler() {
+        return new SigningManager().newHmacSigningHandler(SHARED_SECRET);
     }
 }

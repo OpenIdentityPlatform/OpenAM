@@ -20,12 +20,21 @@
 
 package org.forgerock.openam.oauth2;
 
+import static org.forgerock.oauth2.core.OAuth2Constants.JwtProfile.CLIENT_ASSERTION;
+import static org.forgerock.oauth2.core.OAuth2Constants.JwtProfile.CLIENT_ASSERTION_TYPE;
+import static org.forgerock.oauth2.core.OAuth2Constants.JwtProfile.JWT_PROFILE_CLIENT_ASSERTION_TYPE;
+import static org.forgerock.oauth2.core.Utils.isEmpty;
+
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientAuthenticator;
 import org.forgerock.oauth2.core.ClientRegistration;
 import org.forgerock.oauth2.core.ClientRegistrationStore;
+import org.forgerock.oauth2.core.OAuth2Jwt;
+import org.forgerock.oauth2.core.OAuth2ProviderSettings;
+import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailedException;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
@@ -43,8 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.forgerock.oauth2.core.Utils.isEmpty;
-
 /**
  * Authenticates OAuth2 clients by extracting the client's identifier and secret from the request.
  *
@@ -57,6 +64,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
     private final ClientRegistrationStore clientRegistrationStore;
     private final OAuth2AuditLogger auditLogger;
     private final RealmNormaliser realmNormaliser;
+    private final OAuth2ProviderSettingsFactory providerSettingsFactory;
 
     /**
      * Constructs a new ClientAuthenticatorImpl.
@@ -64,13 +72,15 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
      * @param clientRegistrationStore An instance of the ClientRegistrationStore.
      * @param auditLogger An instance of the OAuth2AuditLogger.
      * @param realmNormaliser An instance of the RealmNormaliser.
+     * @param providerSettingsFactory An instance of the OAuth2ProviderSettingsFactory.
      */
     @Inject
     public ClientAuthenticatorImpl(ClientRegistrationStore clientRegistrationStore, OAuth2AuditLogger auditLogger,
-            RealmNormaliser realmNormaliser) {
+            RealmNormaliser realmNormaliser, OAuth2ProviderSettingsFactory providerSettingsFactory) {
         this.clientRegistrationStore = clientRegistrationStore;
         this.auditLogger = auditLogger;
         this.realmNormaliser = realmNormaliser;
+        this.providerSettingsFactory = providerSettingsFactory;
     }
 
     /**
@@ -93,7 +103,8 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
                 return clientRegistration;
             }
 
-            if (!authenticate(clientCredentials.clientId, clientCredentials.clientSecret, realm)) {
+            if (!clientCredentials.isAuthenticated &&
+                    !authenticate(clientCredentials.clientId, clientCredentials.clientSecret, realm)) {
                 logger.error("ClientVerifierImpl::Unable to verify password for: " + clientCredentials.clientId);
                 throw new InvalidClientException("Client authentication failed");
             }
@@ -132,18 +143,24 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             InvalidClientException {
 
         final Request req = request.getRequest();
+        boolean basicAuth = false;
+        if (req.getChallengeResponse() != null) {
+            basicAuth = true;
+        }
+
+        if (JWT_PROFILE_CLIENT_ASSERTION_TYPE.equalsIgnoreCase(request.<String>getParameter(CLIENT_ASSERTION_TYPE))) {
+            return verifyJwtBearer(request, basicAuth);
+        }
 
         String clientId = request.getParameter("client_id");
         String clientSecret = request.getParameter("client_secret");
 
-        if (req.getChallengeResponse() != null && clientId != null) {
+        if (basicAuth && clientId != null) {
             logger.error("Client (" + clientId + ") using multiple authentication methods");
             throw new InvalidRequestException("Client authentication failed");
         }
 
-        boolean basicAuth = false;
         if (req.getChallengeResponse() != null) {
-            basicAuth = true;
             final ChallengeResponse challengeResponse = req.getChallengeResponse();
 
             clientId = challengeResponse.getIdentifier();
@@ -158,7 +175,34 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
             throw new InvalidClientException("Client authentication failed");
         }
 
-        return new ClientCredentials(clientId, clientSecret == null ? null : clientSecret.toCharArray(), basicAuth);
+        return new ClientCredentials(clientId, clientSecret == null ? null : clientSecret.toCharArray(), false,
+                basicAuth);
+    }
+
+    private ClientCredentials verifyJwtBearer(OAuth2Request request, boolean basicAuth) throws InvalidClientException,
+            InvalidRequestException {
+
+        OAuth2Jwt jwt = OAuth2Jwt.create(request.<String>getParameter(CLIENT_ASSERTION));
+
+        ClientRegistration clientRegistration = clientRegistrationStore.get(jwt.getSubject(), request);
+
+        OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
+        SigningHandler signingHandler = clientRegistration.getClientJwtSigningHandler();
+
+        if (!jwt.isValid(signingHandler)) {
+            throw new InvalidClientException("JWT is has expired or is not valid");
+        }
+
+        if (basicAuth && jwt.getSubject() != null) {
+            logger.error("Client (" + jwt.getSubject() + ") using multiple authentication methods");
+            throw new InvalidRequestException("Client authentication failed");
+        }
+
+        if (!jwt.isIntendedForAudience(providerSettings.getTokenEndpoint())) {
+            throw new InvalidClientException("Audience validation failed");
+        }
+
+        return new ClientCredentials(jwt.getSubject(), null, true, false);
     }
 
     /**
@@ -221,6 +265,7 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
 
         private final String clientId;
         private final char[] clientSecret;
+        private final boolean isAuthenticated;
         private final boolean basicAuth;
 
         /**
@@ -228,11 +273,15 @@ public class ClientAuthenticatorImpl implements ClientAuthenticator {
          *
          * @param clientId The client's identifier.
          * @param clientSecret The client's secret.
+         * @param isAuthenticated If the process of getting the client credentials has authenticated the client. i.e.
+         *                        Jwt assertion.
          * @param basicAuth Whether the Client's credentials where sent using the Basic Auth header.
          */
-        private ClientCredentials(final String clientId, final char[] clientSecret, final boolean basicAuth) {
+        private ClientCredentials(final String clientId, final char[] clientSecret, final boolean isAuthenticated,
+                final boolean basicAuth) {
             this.clientId = clientId;
             this.clientSecret = clientSecret;
+            this.isAuthenticated = isAuthenticated;
             this.basicAuth = basicAuth;
         }
 

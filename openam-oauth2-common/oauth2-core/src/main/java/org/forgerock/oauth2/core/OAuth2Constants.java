@@ -284,6 +284,8 @@ public class OAuth2Constants {
          *      Grants</a>
          */
         public static final String SAML2_BEARER = "urn:ietf:params:oauth:grant-type:saml2-bearer";
+
+        public static final String JWT_BEARER = "urn:ietf:params:oauth:grant-type:jwt-bearer";
     }
 
     /**
@@ -451,6 +453,29 @@ public class OAuth2Constants {
          * Change controller: IETF Specification document(s): [[ this document
          * ]] Related information: None
          */
+    }
+
+    /**
+     * Constants for the OAuth2 Jwt Bearer extension specification.
+     *
+     * @see <a href="http://self-issued.info/docs/draft-ietf-oauth-jwt-bearer.html">OAuth2 Jwt Bearer</a>
+     */
+    public class JwtProfile {
+        /**
+         * The parameter name for the client assertion type.
+         */
+        public static final String CLIENT_ASSERTION_TYPE = "client_assertion_type";
+
+        /**
+         * The parameter name for the client assertion.
+         */
+        public static final String CLIENT_ASSERTION = "client_assertion";
+
+        /**
+         * The parameter value for the JWT Bearer client assertion type.
+         */
+        public static final String JWT_PROFILE_CLIENT_ASSERTION_TYPE
+                = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
     }
 
     /**
@@ -821,6 +846,7 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
         public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
         public static final String CLIENT_NAME = "com.forgerock.openam.oauth2provider.clientName";
+        public static final String CLIENT_JWT_PUBLIC_KEY = "com.forgerock.openam.oauth2provider.clientJwtPublicKey";
     }
 
     public class JWTTokenParams {

@@ -18,12 +18,18 @@ package org.forgerock.openam.oauth2;
 
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.Base64;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Constants;
 import org.forgerock.openidconnect.OpenIdConnectClientRegistration;
 import org.restlet.Request;
 
 import java.net.URI;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,6 +46,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
     private final Debug logger = Debug.getInstance("OAuth2Provider");
     private final AMIdentity amIdentity;
+    private final SigningManager signingManager = new SigningManager();
 
     /**
      * Constructs a new OpenAMClientRegistration.
@@ -279,6 +286,35 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository");
         }
         return set.iterator().next();
+    }
+
+    @Override
+    public SigningHandler getClientJwtSigningHandler() {
+
+        try {
+            Set<String> set = amIdentity.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_JWT_PUBLIC_KEY);
+
+            if (set == null || set.isEmpty()) {
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                        "No Client Bearer Jwt Public key set");
+            }
+
+            String encodedKey = set.iterator().next()
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .trim();
+            byte[] decodedKey = Base64.decode(encodedKey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodedKey);
+            PublicKey key = keyFactory.generatePublic(keySpec);
+
+            return signingManager.newRsaSigningHandler(key);
+
+        } catch (Exception e) {
+            logger.error("Unable to get Client Bearer Jwt Public key from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get Client Bearer Jwt Public key from repository");
+        }
     }
 
     /**

@@ -16,6 +16,8 @@
 
 package org.forgerock.oauth2.core;
 
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -113,4 +115,12 @@ public interface ClientRegistration {
      * @return The client's session URI.
      */
     String getClientSessionURI();
+
+    /**
+     * Gets the {@link SigningHandler} for verifying the signature of the clients JWT as either a grant type or client
+     * authentication.
+     *
+     * @return The {@code SigningHandler}.
+     */
+    SigningHandler getClientJwtSigningHandler();
 }

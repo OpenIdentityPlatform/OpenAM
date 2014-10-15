@@ -79,6 +79,7 @@ public class OAuth2Application extends Application {
         endpointClasses.put(TokenEndpoint.REFRESH_TOKEN, new GuicedRestlet(context, RefreshTokenResource.class));
         endpointClasses.put(TokenEndpoint.CLIENT_CREDENTIALS, new GuicedRestlet(context, TokenEndpointResource.class));
         endpointClasses.put(TokenEndpoint.PASSWORD, new GuicedRestlet(context, TokenEndpointResource.class));
+        endpointClasses.put(TokenEndpoint.JWT_BEARER, new GuicedRestlet(context, TokenEndpointResource.class));
 
         OAuth2FlowFinder finder = new OAuth2FlowFinder(context, requestFactory, exceptionHandler, endpointClasses);
 
