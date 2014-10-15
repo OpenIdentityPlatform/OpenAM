@@ -3294,7 +3294,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      <term>Account Mapper</term>
      <listitem>
       <para>Class implementing account mapping. The default value is
-      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
+      <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-account-mapper</literal></para>
      </listitem>
@@ -3311,10 +3311,20 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Account Provider</term>
+     <listitem>
+      <para>An account provider.
+       Default:
+      <literal>org.forgerock.openam.authentication.modules.common.mapping.AccountProvider</literal></para>
+      <para><command>ssoadm</command> attribute:
+       <literal>org-forgerock-auth-oauth-account-provider</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>Attribute Mapper</term>
      <listitem>
-      <para>Class implementing attribute mapping. Default:
-      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal></para>
+      <para>Class implementing attribute mapping with a multiple value field. Default:
+      <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal></para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-attribute-mapper</literal></para>
      </listitem>
@@ -3487,6 +3497,12 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       <literal>iplanet-am-auth-oauth-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
+   <note>
+    <para>
+     Old uses of <literal>DefaultAccountMapper</literal> are automatically
+     upgraded to the equivalent default implementations.
+    </para>
+   </note>
 
     <para>The following tables show endpoint URLs for OpenAM when <link
     xlink:href="admin-guide#chap-oauth2"
@@ -3885,7 +3901,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
     </varlistentry>
 
     <varlistentry>
-     <term>Principal mapper class</term>
+     <term>Principal Mapper class</term>
      <listitem>
       <para>
        The principal mapper matches the OpenID Connect end user
@@ -3896,7 +3912,7 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
       </para>
 
       <para>
-       Default: <literal>org.forgerock.openam.authentication.modules.oidc.DefaultPrincipalMapper</literal>
+       Default: <literal>org.forgerock.openam.authentication.common.mapping.AttributeMapper</literal>
       </para>
 
       <para>
@@ -3906,6 +3922,24 @@ IDToken1=&lt;valid anonymous username&gt;</literallayout>
      </listitem>
     </varlistentry>
 
+    <varlistentry>
+     <term>Principal Account Provider class</term>
+     <listitem>
+      <para>
+       The principal account provider provides the means to search for and
+       create OpenID Connect users given a set of attributes.
+      </para>
+
+      <para>
+       Default: <literal>org.forgerock.openam.authentication.common.mapping.AccountProvider</literal>
+      </para>
+
+      <para>
+       <command>ssoadm</command> attribute:
+       <literal>openam-auth-openidconnect-account-provider-class</literal>
+      </para>
+     </listitem>
+    </varlistentry>
    </variablelist>
   </section>
 

@@ -689,6 +689,17 @@ Agreement (yes/no): [no]:</screen>
     ><citetitle>Logging</citetitle></link>.
    </para>
   </listitem>
+  <listitem>
+   <para><emphasis role="bold">Updates to OAuth 2.0 and OpenID Connect Authentication Modules</emphasis>.
+    Any custom implementations of
+    <literal>org.forgerock.openam.authentication.modules.oauth2.AccountMapper</literal> or
+    <literal>org.forgerock.openam.authentication.modules.oauth2.AttributeMapper</literal>
+    no longer works, and needs to be reimplemented against
+    <literal>org.forgerock.openam.authentication.modules.common.mapping.AttributeMapper</literal>
+    and/or <literal>org.forgerock.openam.authentication.modules.common.mapping.AccountProvider</literal>
+    as appropriate.
+   </para>
+  </listitem>
 
  </itemizedlist>
 </chapter>
