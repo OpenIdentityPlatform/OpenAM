@@ -27,6 +27,7 @@ import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.sun.identity.shared.debug.Debug;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -107,7 +108,11 @@ public class ServerSessionOperationStrategy implements SessionOperationStrategy 
         }
 
         if (service.isSessionFailoverEnabled() && cts.hasSession(session)) {
-            // Cross talk is reduced.
+
+            // If cross talk is reduced... by this point, we know the session is remote.
+            // We get CTS to do the legwork for us, knowing that CTSOperations will delegate
+            // to RemoteOperations.
+            //
             if (service.isReducedCrossTalkEnabled()) {
                 return logAndWrap(session, cts, SessionMonitorType.CTS);
             }

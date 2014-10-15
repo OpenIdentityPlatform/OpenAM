@@ -28,16 +28,21 @@ import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.exceptions.ReadFailedException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.fest.assertions.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 
 public class CTSOperationsTest {
 
@@ -67,8 +72,8 @@ public class CTSOperationsTest {
 
         given(mockIdFactory.toSessionTokenId(any(SessionID.class))).willReturn("TEST");
 
-        ctsOperations = new CTSOperations(mockCTS, mockAdapter, mockIdFactory, mockInfoFactory, mockSessionService, mockRemote, mock(Debug.class));
-
+        ctsOperations = new CTSOperations(mockCTS, mockAdapter, mockIdFactory, mockInfoFactory, mockSessionService,
+                                            mockRemote, mock(Debug.class));
     }
 
     @Test
@@ -130,33 +135,54 @@ public class CTSOperationsTest {
         ctsOperations.refresh(mockSession, false);
     }
 
-    @Test
-    public void shouldDeleteTokenFromCTSDuringLogout() throws SessionException, CoreTokenException {
+    @Test(expectedExceptions = SessionException.class)
+    public void shouldDThrowExceptionWhenGivenLocalSession() throws SessionException {
         // Given
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockSessionService.checkSessionLocal(mockSessionID)).willReturn(true);
+
+        // When
+        ctsOperations.logout(mockSession);
+    }
+
+    @Test
+    public void shouldDeleteRemoteTokenDuringLogout() throws SessionException, CoreTokenException {
+        // Given
+        SessionID mockSessionID = mock(SessionID.class);
+        given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockSessionService.checkSessionLocal(mockSessionID)).willReturn(false);
 
         // When
         ctsOperations.logout(mockSession);
 
         // Then
-        verify(mockCTS).delete(anyString());
-        verify(mockSessionService).logoutInternalSession(eq(mockSessionID));
+        verify(mockRemote).logout(mockSession);
     }
 
-    @Test
-    public void shouldDeleteTokenFromCTSDuringDestroy() throws Exception {
+    @Test(expectedExceptions = SessionException.class)
+    public void shouldNotDeleteLocalTokenDuringLogout() throws SessionException, CoreTokenException {
         // Given
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockSessionService.checkSessionLocal(mockSessionID)).willReturn(true);
+
+        // When
+        ctsOperations.logout(mockSession);
+    }
+
+    @Test
+    public void shouldOnlyDeleteTokenRemotelyDuringDestroy() throws Exception {
+        // Given
+        SessionID mockSessionID = mock(SessionID.class);
+        given(mockSession.getID()).willReturn(mockSessionID);
+        given(mockSessionService.checkSessionLocal(mockSessionID)).willReturn(false);
 
         // When
         ctsOperations.destroy(mockRequester, mockSession);
 
         // Then
-        verify(mockCTS).delete(anyString());
-        verify(mockSessionService).checkPermissionToDestroySession(mockRequester, mockSessionID);
-        verify(mockSessionService).destroyInternalSession(eq(mockSessionID));
+        verify(mockRemote).destroy(mockRequester, mockSession);
     }
 
     @Test (expectedExceptions = SessionException.class)
@@ -165,14 +191,14 @@ public class CTSOperationsTest {
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
 
-        doThrow(new DeleteFailedException("", mock(Throwable.class))).when(mockCTS).delete(anyString());
+        doThrow(new SessionException("")).when(mockRemote).logout(mockSession);
 
         // When / Then Throw
         ctsOperations.logout(mockSession);
     }
 
     @Test
-    public void shouldUpdateTokenDuringSetProperty() throws SessionException, CoreTokenException {
+    public void shouldInvokeRemoteActionDuringSetProperty() throws SessionException, CoreTokenException {
         // Given
         String name = "name";
         String value = "value";
@@ -190,38 +216,18 @@ public class CTSOperationsTest {
         ctsOperations.setProperty(mockSession, name, value);
 
         // Then
-        verify(mockCTS).read(anyString());
-        verify(mockCTS).update(any(Token.class));
+        verify(mockRemote).setProperty(mockSession, name, value);
     }
 
-    @Test (expectedExceptions = SessionException.class)
-    public void shouldThrownExceptionIfReadFailsDuringSetProperty() throws CoreTokenException, SessionException {
+    @Test
+    public void shouldCallRemoteSetPropertyDuringSetProperty() throws SessionException {
         // Given
         SessionID mockSessionID = mock(SessionID.class);
         given(mockSession.getID()).willReturn(mockSessionID);
 
-        doThrow(new CoreTokenException("")).when(mockCTS).read(anyString());
-
         // When / Then Throw
-        ctsOperations.setProperty(mockSession, "", "");
-    }
+        ctsOperations.setProperty(mockSession, "a", "b");
 
-    @Test (expectedExceptions = SessionException.class)
-    public void shouldThrownExceptionIfUpdateFailsDuringSetProperty() throws CoreTokenException, SessionException {
-        // Given
-        SessionID mockSessionID = mock(SessionID.class);
-        given(mockSession.getID()).willReturn(mockSessionID);
-
-        Token mockToken = mock(Token.class);
-        given(mockCTS.read(anyString())).willReturn(mockToken);
-
-        InternalSession mockInternalSession = mock(InternalSession.class);
-        given(mockAdapter.fromToken(eq(mockToken))).willReturn(mockInternalSession);
-        given(mockAdapter.toToken(any(InternalSession.class))).willReturn(mockToken);
-
-        doThrow(new CoreTokenException("")).when(mockCTS).update(any(Token.class));
-
-        // When / Then Throw
-        ctsOperations.setProperty(mockSession, "", "");
+        verify(mockRemote).setProperty(mockSession, "a", "b");
     }
 }

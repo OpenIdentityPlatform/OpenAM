@@ -28,7 +28,6 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
-import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
@@ -36,21 +35,24 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.ReadFailedException;
 import org.forgerock.openam.cts.impl.query.PartialToken;
 
-import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collection;
 
 /**
  * Responsible for providing an implementation of the Session Operations
  * strategy that is backed by the Core Token Service (CTS).
  *
- * The operations themselves depend on the presence of an InternalSession which
- * the CTS can provide by deserialising the token stored in the CTS.
+ * Note that this class now deals ONLY WITH REMOTE SESSIONS.  Local sessions should be
+ * handled by the LocalOperations class and if a local session is accidentally passed
+ * into a couple of these functions (logout and destroy), you'll get a SessionException.
  *
- * Note: This implementation is only appropriate in the situation where the
- * remote site that is typically responsible for servicing a Session is down.
+ * For this reason you'll find that read operations work, write operations should be
+ * delegated to the home server (achieved via PLL requests made by the RemoteOperations
+ * class).
  */
 public class CTSOperations implements SessionOperations {
+
     private final CTSPersistentStore cts;
     private final SessionAdapter adapter;
     private final TokenIdFactory idFactory;
@@ -112,81 +114,60 @@ public class CTSOperations implements SessionOperations {
     }
 
     /**
-     * Perform a logout based on the SessionID.
+     * Performs a remote logout of the session.
      *
-     * Locates the token in the CTS and performs a delete.
-     *
-     * @param session Non null SessionID to use for the delete.
-     * @throws SessionException If there was a problem deleting the token from the CTS.
+     * @param session Non null Session to use for the delete.
+     * @throws SessionException If we somehow passed a local session into this function
      */
     public void logout(Session session) throws SessionException {
+
+        // See OPENAM-4543.  The check for a local session should be removed if it proves to be a performance
+        // bottleneck.  As Peter points out, because we "know" this is a remote session, we will force checkSessionLocal
+        // to look in three hashtables, then do a couple of string compares... all for peace of mind.
+        //
         SessionID sessionID = session.getID();
-        removeToken(sessionID);
-        sessionService.logoutInternalSession(sessionID);
+        if (sessionService.checkSessionLocal(sessionID)) {
+            throw new SessionException("CTSOperations received a local session (only remote sessions expected)");
+        }
+        remote.logout(session);
     }
 
     /**
-     * Perform a destroy operation on the SessionID.
-     *
-     * This will, like logout, perform a delete on the token.
+     * Perform a remote destroy operation on the SessionID, because we know this is a remote session.
      *
      * @param requester {@inheritDoc}
      * @param session {@inheritDoc}
-     * @throws SessionException {@inheritDoc}
+     * @throws SessionException if we somehow passed a local session into this function
      */
     @Override
     public void destroy(Session requester, Session session) throws SessionException {
-        SessionID sessionID = session.getID();
-        String sid = sessionID.toString();
-        if (sid.startsWith(SessionService.SHANDLE_SCHEME_PREFIX)) {
-            try {
-                Collection<PartialToken> matches = cts.attributeQuery(new TokenFilterBuilder()
-                        .returnAttribute(SessionTokenField.SESSION_ID.getField())
-                        .withAttribute(SessionTokenField.SESSION_HANDLE.getField(), sid)
-                        .build());
-                for (PartialToken match : matches) {
-                    //There should be always only one match, so this should be safe
-                    sessionID = new SessionID(match.<String>getValue(SessionTokenField.SESSION_ID.getField()));
-                }
-            } catch (CoreTokenException cte) {
-                debug.error("Failed to query/delete token based on session handle: " + sid, cte);
-                throw new SessionException(cte);
-            }
-        }
 
-        sessionService.checkPermissionToDestroySession(requester, sessionID);
-        sessionService.destroyInternalSession(sessionID);
-        removeToken(sessionID);
+        // Comments as for logout.  The check for a local session should be removed if it proves to be a performance
+        // bottleneck.
+        //
+        SessionID sessionID = session.getID();
+        if (sessionService.checkSessionLocal(sessionID)) {
+            throw new SessionException("CTSOperations received a local session (only remote sessions expected)");
+        }
+        remote.destroy(requester, session);
     }
 
     /**
-     * Sets the property using the {@link InternalSession#putProperty} method.
+     * Set the property of the remote session.
      *
      * {@inheritDoc}
      */
     public void setProperty(Session session, String name, String value) throws SessionException {
-        InternalSession internalSession = readToken(session.getID());
-        internalSession.putProperty(name, value);
-
-        Token token = adapter.toToken(internalSession);
-        try {
-            cts.update(token);
-        } catch (CoreTokenException e) {
-            debug.error("Failed to update token: " + token.getTokenId(), e);
-            throw new SessionException(e);
-        }
+        remote.setProperty(session, name, value);
     }
 
-    private void removeToken(SessionID sessionID) throws SessionException {
-        String tokenId = idFactory.toSessionTokenId(sessionID);
-        try {
-            cts.delete(tokenId);
-        } catch (CoreTokenException e) {
-            debug.error("Failed to delete Token: " + tokenId, e);
-            throw new SessionException(e);
-        }
-    }
-
+    /**
+     * Reading from CTS should be safe, since it changes to the session will be written to CTS by the remote server.
+     *
+     * @param sessionID the session id
+     * @return the internal session as stored in CTS
+     * @throws SessionException
+     */
     private InternalSession readToken(SessionID sessionID) throws SessionException {
         String tokenID = idFactory.toSessionTokenId(sessionID);
         try {
