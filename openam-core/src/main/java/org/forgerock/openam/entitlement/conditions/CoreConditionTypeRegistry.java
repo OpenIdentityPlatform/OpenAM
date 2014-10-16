@@ -18,6 +18,7 @@ package org.forgerock.openam.entitlement.conditions;
 
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementSubject;
+import com.sun.identity.entitlement.JwtClaimSubject;
 import org.forgerock.openam.entitlement.ConditionTypeRegistry;
 import org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition;
 import org.forgerock.openam.entitlement.conditions.environment.AuthLevelCondition;
@@ -55,6 +56,7 @@ public class CoreConditionTypeRegistry implements ConditionTypeRegistry {
 
         conditions.add(IdentitySubject.class);
         conditions.add(AuthenticatedUsers.class);
+        conditions.add(JwtClaimSubject.class);
 
         return conditions;
     }

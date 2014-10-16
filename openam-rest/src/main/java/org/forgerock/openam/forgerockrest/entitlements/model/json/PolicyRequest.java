@@ -19,13 +19,18 @@ package org.forgerock.openam.forgerockrest.entitlements.model.json;
 import com.sun.identity.entitlement.ApplicationTypeManager;
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtPrincipal;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.exceptions.JwtReconstructionException;
+import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SubjectContext;
 import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
 import org.forgerock.util.promise.Function;
@@ -47,6 +52,9 @@ public abstract class PolicyRequest {
 
     // Used to map a list to a set.
     private final static ListToSetMapper LIST_TO_SET_MAPPER = new ListToSetMapper();
+
+    /** Used to parse Json Web Tokens. */
+    private final static JwtReconstruction JWT_RECONSTRUCTION = new JwtReconstruction();
 
     private final Subject restSubject;
     private final Subject policySubject;
@@ -154,22 +162,63 @@ public abstract class PolicyRequest {
             return restSubject;
         }
 
+        /**
+         * Gets the subject for which policy is being evaluated (i.e., the target of the decision). Checks to see if a
+         * "subject" attribute is present in the request. If so, then the JSON object it contains is parsed, with each
+         * key of the object resulting in a new Principal in the resulting Subject. The following keys are supported:
+         * <ul>
+         *     <li>{@code ssoToken} - value is an SSO token id</li>
+         *     <li>{@code jwt} - value is a (possibly signed) Json Web Token (e.g., OIDC id_token)</li>
+         *     <li>{@code claims} - value is a JSON object containing raw JWT claims</li>
+         * </ul>
+         * The latter two options must include a {@code sub} claim containing the name of the subject. If multiple
+         * principals are specified, there is no guarantee about the order they will appear in the subject.
+         *
+         * @param context the subject context in which the request is being processed.
+         * @param value the request JSON body.
+         * @param defaultSubject the default subject to use if the request does not specify one.
+         * @return the subject to use in evaluating the request.
+         * @throws EntitlementException if a subject is present in the request but invalid.
+         */
         private Subject getPolicySubject(final SubjectContext context, final JsonValue value,
                                          final Subject defaultSubject) throws EntitlementException {
-            if (value.isDefined(SUBJECT)) {
-                final String tokenId = value.get(SUBJECT).asString();
-                final Subject policySubject = context.getSubject(tokenId);
+            final JsonValue subject = value.get(SUBJECT);
+            if (subject.isNull()) {
+                return defaultSubject;
+            }
 
-                if (policySubject == null) {
+            try {
+                Subject policySubject = new Subject();
+
+                if (subject.isDefined("ssoToken")) {
+                    policySubject = context.getSubject(subject.get("ssoToken").asString());
+                }
+
+                if (subject.isDefined("jwt")) {
+                    final Jwt jwt = JWT_RECONSTRUCTION.reconstructJwt(subject.get("jwt").asString(), Jwt.class);
+                    final JsonValue claims = JsonValueBuilder.toJsonValue(jwt.getClaimsSet().build());
+                    final JwtPrincipal principal = new JwtPrincipal(claims);
+                    policySubject.getPrincipals().add(principal);
+                }
+
+                if (subject.isDefined("claims")) {
+                    final JwtPrincipal principal = new JwtPrincipal(subject.get("claims"));
+                    policySubject.getPrincipals().add(principal);
+                }
+
+                if (policySubject == null || policySubject.getPrincipals().isEmpty()) {
                     // Invalid subject defined.
                     throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{SUBJECT});
                 }
 
                 return policySubject;
+            } catch (JwtReconstructionException ex) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{SUBJECT});
+            } catch (IllegalArgumentException ex) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{SUBJECT});
+            } catch (NullPointerException ex) {
+                throw new EntitlementException(EntitlementException.INVALID_VALUE, new Object[]{SUBJECT});
             }
-
-            // If no subject has been specified default to the REST subject.
-            return defaultSubject;
         }
 
         private String getApplication(final JsonValue value) {

@@ -23,20 +23,22 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SubjectAttributesManager.java,v 1.3 2009/09/24 22:37:43 hengming Exp $
+ *
+ * Portions Copyrighted 2014 ForgeRock AS.
  */
 
 package com.sun.identity.entitlement;
 
+import com.sun.identity.shared.debug.Debug;
+
+import javax.security.auth.Subject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.security.auth.Subject;
 
 /**
  * Manages multiple instances of <class>SubjectAttributesCollector</class>,
@@ -45,6 +47,8 @@ import javax.security.auth.Subject;
  * memberships.
  */
 public class SubjectAttributesManager {
+    private static final Debug DEBUG = Debug.getInstance("amEntitlements");
+
     private String realmName;
     private SubjectAttributesCollector attrCollector;
     private static final String DEFAULT_SUBJECT_ATTRIBUTES_COLLECTOR_NAME =
@@ -226,14 +230,20 @@ public class SubjectAttributesManager {
                 realmName, applicationName);
             SubjectAttributesManager sam = SubjectAttributesManager.getInstance(
                 adminSubject, realmName);
-            Map<String, Set<String>> values = sam.getAttributes(subject, names);
+            try {
+                Map<String, Set<String>> values = sam.getAttributes(subject, names);
 
-            if (values != null) {
-                for (String k : values.keySet()) {
-                    Set<String> set = values.get(k);
-                    for (String v : set) {
-                        results.add(k + "=" + v);
+                if (values != null) {
+                    for (String k : values.keySet()) {
+                        Set<String> set = values.get(k);
+                        for (String v : set) {
+                            results.add(k + "=" + v);
+                        }
                     }
+                }
+            } catch (EntitlementException ex) {
+                if (DEBUG.warningEnabled()) {
+                    DEBUG.warning("Unable to read subject attributes", ex);
                 }
             }
         }

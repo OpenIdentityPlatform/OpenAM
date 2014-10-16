@@ -18,8 +18,15 @@ package org.forgerock.openam.forgerockrest.entitlements.model.json;
 
 import com.sun.identity.entitlement.Entitlement;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.JwtPrincipal;
 import org.fest.assertions.Condition;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.jose.jws.JwsHeader;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jws.handlers.NOPSigningHandler;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.json.jose.jwt.Jwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.openam.forgerockrest.entitlements.PolicyEvaluator;
@@ -31,14 +38,19 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -62,6 +74,7 @@ public class PolicyRequestTest {
         MockitoAnnotations.initMocks(this);
         restSubject = new Subject();
         policySubject = new Subject();
+        policySubject.getPrincipals().add(mock(Principal.class));
     }
 
     @Test(expectedExceptions = NullPointerException.class)
@@ -82,11 +95,11 @@ public class PolicyRequestTest {
         env.put("test", Arrays.asList("123", "456"));
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("subject", "some-value");
+        properties.put("subject", Collections.singletonMap("ssoToken", "some-value"));
         properties.put("application", "some-application");
         properties.put("environment", env);
 
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
         given(subjectContext.getSubject("some-value")).willReturn(policySubject);
 
@@ -126,7 +139,7 @@ public class PolicyRequestTest {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("subject", "some-value");
 
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
         given(subjectContext.getSubject("some-value")).willReturn(null);
 
         // When...
@@ -140,7 +153,7 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
         ServerContext context = buildContextStructure("/abc");
@@ -157,12 +170,65 @@ public class PolicyRequestTest {
     }
 
     @Test
+    public void shouldAllowJsonSubject() throws Exception {
+        // Given
+        final String subjectName = "test";
+        given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        final JsonValue jwt = getJsonSubject(subjectName);
+        given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("claims", jwt.asMap()))))));
+
+        // When
+        ServerContext context = buildContextStructure("/abc");
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+
+        // Then
+        Subject policySubject = request.getPolicySubject();
+        Set<JwtPrincipal> jwtPrincipals = policySubject.getPrincipals(JwtPrincipal.class);
+        assertThat(jwtPrincipals).hasSize(1);
+        assertThat(jwtPrincipals).contains(new JwtPrincipal(jwt));
+    }
+
+    @Test
+    public void shouldAllowJwtSubject() throws Exception {
+        // Given
+        final String subjectName = "test";
+        given(subjectContext.getCallerSubject()).willReturn(restSubject);
+        Jwt jwt = getJwtSubject(subjectName);
+
+        given(actionRequest.getContent()).willReturn(json(object(field("subject", object(field("jwt", jwt.build()))))));
+
+        // When
+        ServerContext context = buildContextStructure("/abc");
+        PolicyRequest request = MockRequest.getRequest(context, actionRequest);
+
+        // Then
+        Subject policySubject = request.getPolicySubject();
+        Set<JwtPrincipal> jwtPrincipals = policySubject.getPrincipals(JwtPrincipal.class);
+        assertThat(jwtPrincipals).hasSize(1);
+        assertThat(jwtPrincipals).contains(new JwtPrincipal(getJsonSubject(subjectName)));
+
+    }
+
+    private Jwt getJwtSubject(final String subjectName) {
+        JwsHeader header = new JwsHeader(Collections.<String, Object>emptyMap());
+        JwtClaimsSet claims = new JwtClaimsSet();
+        claims.setSubject(subjectName);
+
+        SigningHandler handler = new NOPSigningHandler();
+        return new SignedJwt(header, claims, handler);
+    }
+
+    private JsonValue getJsonSubject(final String subjectName) {
+        return json(object(field("sub", subjectName)));
+    }
+
+    @Test
     public void shouldDefaultToApplication() throws EntitlementException {
         // Given...
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
         ServerContext context = buildContextStructure("/abc");
@@ -183,7 +249,7 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
         ServerContext context = buildContextStructure("");
@@ -204,7 +270,7 @@ public class PolicyRequestTest {
         given(subjectContext.getCallerSubject()).willReturn(restSubject);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        given(actionRequest.getContent()).willReturn(JsonValue.json(properties));
+        given(actionRequest.getContent()).willReturn(json(properties));
 
         // When...
         ServerContext context = buildContextStructure("");
