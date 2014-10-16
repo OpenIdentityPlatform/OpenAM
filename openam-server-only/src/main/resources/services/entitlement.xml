@@ -475,7 +475,8 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resources" />
-                            <Value>*</Value>
+                            <Value>*://*:*/*</Value>
+                            <Value>*://*:*/*?*</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="subjects" />
