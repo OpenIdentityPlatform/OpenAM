@@ -610,6 +610,11 @@ $ <userinput>mv ~/Downloads/openam*.war /path/to/tomcat/webapps/openam.war</user
     <literal>http://www.example.com:8000/</literal> that allows HTTP GET, and
     then click Finish to save your work.</para>
 
+    <para>
+     Make sure you add the trailing <literal>/</literal> in the rule.
+     Otherwise the policy does not match the HTTP GET.
+    </para>
+
     <mediaobject xml:id="figure-openam-policy-rule">
      <alt>OpenAM Policy Rule</alt>
      <imageobject>
