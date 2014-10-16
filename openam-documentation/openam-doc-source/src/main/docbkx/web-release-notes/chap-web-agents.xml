@@ -262,55 +262,11 @@ Agreement (yes/no): [no]:</computeroutput>
    <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
   </section>
 
-  <section xml:id="browser-requirements-web-agents">
-   <title>Web Agents Browser Requirements</title>
-
-   <para>
-    The following table summarizes browser support.
-   </para>
-
-   <xinclude:include href="../shared/table-browser-requirements.xml" />
-  </section>
+  <xinclude:include href="../shared/sec-browser-requirements.xml" />
 
   <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
-  <section xml:id="web-pa-platform-requirements">
-   <title>Web Policy Agents Platform Requirements</title>
-
-   <para>
-    The following table summarizes platform support.
-   </para>
-
-   <xinclude:include href="../shared/table-web-pa-platform-requirements.xml" />
-
-   <para>
-    Before installing web policy agents on Linux,
-    make sure the system can run <command>gcc</command> 4.4.7.
-    <literal>libc.so.6</literal> must be available
-    and it must support the GLIBC_2.3 ABI.
-    You can check this by running the following command:
-    <command>strings libc.so.6 | grep GLIBC_2</command>.
-    Also, <literal>libstdc++.so.6</literal> must be available
-    and it must support GLIBCXX_3.4 and CXXABI_1.3.
-    You can check this by running the following commands:
-    <command>strings libstdc++.so.6 | grep GLIBCXX_3</command>
-    and <command>strings libstdc++.so.6 | grep CXXABI_1</command>.
-   </para>
-
-   <para>
-    Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
-    make sure that the optional Application Development component of
-    Web Server (IIS) is installed.
-    In the Windows Server 2012 Server Manager for example,
-    Application Development is a component of Web Server (IIS) | Web Server.
-   </para>
-
-   <para>
-    Before installing web policy agents on Solaris 10,
-    make sure you have applied the latest shared library patch for C++,
-    at least 119963-16 on SPARC or 119964-12 on x64.
-   </para>
-  </section>
+  <xinclude:include href="../shared/sec-web-pa-platform-requirements.xml" />
 
   <xinclude:include href="../shared/sec-special-requests.xml" />
  </section>

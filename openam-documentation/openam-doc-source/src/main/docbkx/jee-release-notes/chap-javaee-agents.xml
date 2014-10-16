@@ -126,27 +126,11 @@ Agreement (yes/no): [no]:</computeroutput>
    <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
   </section>
 
-  <section xml:id="browser-requirements-javaee-agents">
-   <title>Java EE Agents Browser Requirements</title>
-
-   <para>
-    The following table summarizes browser support.
-   </para>
-
-   <xinclude:include href="../shared/table-browser-requirements.xml" />
-  </section>
+  <xinclude:include href="../shared/sec-browser-requirements.xml" />
 
   <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
-  <section xml:id="jee-pa-platform-requirements">
-   <title>Java EE Agents Platform Requirements</title>
-
-   <para>
-    The following table summarizes platform support.
-   </para>
-
-   <xinclude:include href="../shared/table-jee-pa-platform-requirements.xml" />
-  </section>
+  <xinclude:include href="../shared/sec-jee-pa-platform-requirements.xml" />
 
   <xinclude:include href="../shared/sec-special-requests.xml" />
  </section>

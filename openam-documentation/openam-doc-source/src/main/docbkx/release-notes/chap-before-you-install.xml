@@ -27,7 +27,6 @@
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Before You Install OpenAM <?eval ${serverDocTargetVersion}?> Software</title>
 
@@ -40,64 +39,7 @@
 
  <para>TODO: Update for release</para>
 
- <section xml:id="os-requirements">
-  <title>Operating System Requirements</title>
-
-  <itemizedlist>
-   <para>
-    ForgeRock supports customers using OpenAM server software
-    on the following operating system versions.
-   </para>
-
-   <listitem>
-    <para>
-     CentOS 6, 7
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Microsoft Windows Server 2008, 2008 R2, 2012, 2012 R2
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Oracle Linux 6, 7
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Oracle Solaris x64 10, 11
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Oracle Solaris SPARC 10, 11
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Red Hat Enterprise Linux 6, 7
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     SuSE Linux 11
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Ubuntu Linux 12.04 LTS, 14.04 LTS
-    </para>
-   </listitem>
-  </itemizedlist>
- </section>
+ <xinclude:include href="../shared/sec-openam-os-requirements.xml" />
 
  <section xml:id="java-requirements">
   <title>Java Requirements</title>
@@ -110,78 +52,11 @@
   <xinclude:include href="../shared/itemizedlist-java-requirements.xml" />
  </section>
 
- <section xml:id="web-container-requirements">
-  <title>Web Application Container Requirements</title>
+ <xinclude:include href="../shared/sec-openam-web-container-requirements.xml" />
 
-  <itemizedlist>
-   <para>
-    ForgeRock supports customers using OpenAM server software
-    in the following web application container versions.
-   </para>
+ <xinclude:include href="../shared/sec-openam-data-store-requirements.xml" />
 
-   <listitem>
-    <para>
-     Apache Tomcat 6, 7, 8 (ForgeRock's preferred web container for OpenAM)
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     IBM WebSphere Application Server 8, 8.5
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     JBoss Enterprise Application Platform 6
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     JBoss Application Server 7
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     Oracle WebLogic Server 11g, 12c
-    </para>
-   </listitem>
-
-   <listitem>
-    <para>
-     WildFly 8
-    </para>
-   </listitem>
-  </itemizedlist>
-
-  <para>
-   The web application container
-   must be able to write to its own home directory,
-   where OpenAM stores configuration files.
-  </para>
- </section>
-
- <section xml:id="data-store-requirements">
-  <title>Data Store Requirements</title>
-
-  <para>
-   The following table summarizes data store support.
-  </para>
-
-  <xinclude:include href="../shared/table-data-store-requirements.xml" />
- </section>
-
- <section xml:id="browser-requirements">
-  <title>Browser Requirements</title>
-
-  <para>
-   The following table summarizes browser support.
-  </para>
-
-  <xinclude:include href="../shared/table-browser-requirements.xml" />
- </section>
+ <xinclude:include href="../shared/sec-browser-requirements.xml" />
 
  <xinclude:include href="../shared/sec-native-application-platforms.xml" />
 
