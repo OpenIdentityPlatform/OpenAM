@@ -55,7 +55,13 @@
       <member>Oracle Linux</member>
      </simplelist>
     </entry>
-    <entry>5, 6, 7</entry>
+    <entry>
+     <simplelist>
+      <member>5</member>
+      <member>6</member>
+      <member>7</member>
+     </simplelist>
+    </entry>
     <entry>
      <simplelist>
       <member>Apache HTTP Server 2.2</member>
@@ -65,14 +71,36 @@
    </row>
 
    <row>
-    <entry morerows="1">Microsoft Windows Server</entry>
-    <entry>2008, 2008 R2</entry>
-    <entry>Microsoft IIS 7</entry>
+    <entry morerows="1">
+     <simplelist>
+      <member>Microsoft Windows Server</member>
+     </simplelist>
+    </entry>
+    <entry>
+     <simplelist>
+      <member>2008</member>
+      <member>2008 R2</member>
+     </simplelist>
+    </entry>
+    <entry>
+     <simplelist>
+      <member>Microsoft IIS 7</member>
+     </simplelist>
+    </entry>
    </row>
 
    <row>
-    <entry>2012, 2012 R2</entry>
-    <entry>Microsoft IIS 8</entry>
+    <entry>
+     <simplelist>
+      <member>2012</member>
+      <member>2012 R2</member>
+     </simplelist>
+    </entry>
+    <entry>
+     <simplelist>
+      <member>Microsoft IIS 8</member>
+     </simplelist>
+    </entry>
    </row>
 
    <row>
@@ -92,8 +120,17 @@
    </row>
 
    <row>
-    <entry>Ubuntu Linux</entry>
-    <entry>12.04 LTS, 14.04 LTS</entry>
+    <entry>
+     <simplelist>
+      <member>Ubuntu Linux</member>
+     </simplelist>
+    </entry>
+    <entry>
+     <simplelist>
+      <member>12.04 LTS</member>
+      <member>14.04 LTS</member>
+     </simplelist>
+    </entry>
     <entry>
      <simplelist>
       <member>Apache HTTP Server 2.2</member>
