@@ -271,18 +271,15 @@
    </listitem>
 
    <listitem>
-    <para>When using HTTPS, use <link xlink:show="new"
-    xlink:href="http://en.wikipedia.org/wiki/HTTP_cookie#Secure_and_HttpOnly"
-    >secure cookies</link>.</para>
-
     <para>
-     Secure cookies are meant to be transmitted only over secured connections.
+     When using HTTPS, use secure cookies,
+     which are transmitted only over secured connections.
     </para>
 
     <para>
-     You can configure OpenAM server to use Secure cookies
+     You can configure OpenAM server to use secure cookies
      by browsing in OpenAM console to
-     Configuration > Servers and Sites > Default Server Settings > Security > Cookie,
+     Configuration &gt; Servers and Sites &gt; Default Server Settings &gt; Security &gt; Cookie,
      selecting Yes in the Secure Cookie field,
      and then clicking Save to keep your work.
     </para>
