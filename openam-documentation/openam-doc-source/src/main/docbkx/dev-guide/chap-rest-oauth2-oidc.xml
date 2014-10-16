@@ -527,32 +527,6 @@ $ <userinput>curl \
 <computeroutput>{"success":"true"}</computeroutput>
    </screen>
 
-   <para>
-    OAuth 2.0 clients can now manage their OAuth 2.0 tokens
-    on their user pages via the OpenAM console.
-    For example, log in to the OpenAM
-    console as <literal>demo</literal>, and then click the Dashboard link on the
-    Profile page.
-    In the Authorized Apps section, view your OAuth 2.0 tokens or
-    remove them by clicking the Revoke Access link.
-   </para>
-
-   <!--TODO: Update image with applications and oauth2 tokens /-->
-   <figure xml:id="figure-xui-oauth2-self-service">
-    <title>OAuth2 Self-Service</title>
-    <mediaobject>
-     <alt>OAuth2 Self-Service</alt>
-     <imageobject>
-      <imagedata fileref="images/xui-oauth2-self-service.png"
-                 format="PNG" />
-     </imageobject>
-     <textobject>
-      <para>XUI OAuth 2.0 Self-Service
-      </para>
-     </textobject>
-    </mediaobject>
-   </figure>
-
   </section>
  </section>
 

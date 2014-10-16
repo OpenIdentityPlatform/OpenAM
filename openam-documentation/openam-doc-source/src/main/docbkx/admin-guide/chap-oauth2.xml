@@ -815,9 +815,8 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
   </mediaobject>
 
   -->
- </section>
 
- <section xml:id="oauth2-client-plus-authz">
+  <section xml:id="oauth2-client-plus-authz">
   <title>Configuring OpenAM as Authorization Server &amp; Client</title>
 
   <para>
@@ -1255,7 +1254,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
   </example>
  </section>
 
- <section xml:id="oauth2-sp-and-authz">
+  <section xml:id="oauth2-sp-and-authz">
   <title>Configuring OpenAM as Both SAML 2.0 Service Provider &amp; OAuth 2.0
   Authorization Server</title>
 
@@ -1492,6 +1491,38 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942
     </substeps>
    </step>
   </procedure>
+ </section>
+
+  <section xml:id="oauth2-user-consent">
+   <title>User Consent Management</title>
+   <para>
+    Users of OAuth 2.0 clients can now manage their OAuth 2.0 tokens
+    on their user pages via the OpenAM console.
+    For example, the user logs in to the OpenAM
+    console as <literal>demo</literal>, and then clicks the Dashboard link on the
+    Profile page.
+    In the Authorized Apps section, the users can view their OAuth 2.0 tokens or
+    remove them by clicking the Revoke Access link, effectively removing their
+    consent to the application.
+   </para>
+
+   <!--TODO: Update image with applications and oauth2 tokens /-->
+   <figure xml:id="figure-xui-oauth2-self-service">
+    <title>OAuth2 Self-Service</title>
+    <mediaobject>
+     <alt>OAuth2 Self-Service</alt>
+     <imageobject>
+      <imagedata fileref="images/xui-oauth2-self-service.png"
+                 format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>XUI OAuth 2.0 Self-Service
+      </para>
+     </textobject>
+    </mediaobject>
+   </figure>
+
+  </section>
  </section>
 
  <section xml:id="oauth2-security-considerations">
