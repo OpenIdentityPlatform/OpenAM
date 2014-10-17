@@ -81,6 +81,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_MODIFIED_SUB_START = "upgrade.entitlement.modified.subjects.start";
     private static final String AUDIT_MODIFIED_CON_START = "upgrade.entitlement.modified.conditions.start";
     private static final String AUDIT_MODIFIED_COM_START = "upgrade.entitlement.modified.combiners.start";
+    private static final String AUDIT_MODIFIED_RES_START = "upgrade.entitlement.modified.resources.start";
     private static final String AUDIT_UPGRADE_SUCCESS = "upgrade.success";
     private static final String AUDIT_UPGRADE_FAIL = "upgrade.failed";
 
@@ -91,6 +92,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     private final List<Node> missingApps;
     private final Map<String, Set<String>> changedConditions;
     private final Map<String, Set<String>> changedSubjects;
+    private final Map<String, Set<String>> changedResources;
     private final Map<String, Map<String, Boolean>> missingActions;
     private final Map<String, String> changedCombiners;
 
@@ -106,6 +108,7 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         missingActions = new HashMap<String, Map<String, Boolean>>();
         changedConditions = new HashMap<String, Set<String>>();
         changedSubjects = new HashMap<String, Set<String>>();
+        changedResources = new HashMap<String, Set<String>>();
         changedCombiners = new HashMap<String, String>();
     }
 
@@ -134,18 +137,22 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
 
                 //app will be null if application needs to be created (see missing entries)
                 final Application app = getApplication(name);
+                final Map<String, Set<String>> subConfigAttrs = parseAttributeValuePairTags(subConfig);
 
                 captureDifferentSet(app == null ? null : app.getSubjects(),
-                        EntitlementUtils.getSubjects(parseAttributeValuePairTags(subConfig)), changedSubjects, name);
+                        EntitlementUtils.getSubjects(subConfigAttrs), changedSubjects, name);
                 captureDifferentSet(app == null ? null : app.getConditions(),
-                        EntitlementUtils.getConditions(parseAttributeValuePairTags(subConfig)),
+                        EntitlementUtils.getConditions(subConfigAttrs),
                         changedConditions, name);
 
                 final EntitlementCombiner combiner = (app == null ? null : app.getEntitlementCombiner());
 
                 captureDifferentEntitlementCombiner(combiner == null ? null : combiner.getName(),
-                        EntitlementUtils.getCombiner(parseAttributeValuePairTags(subConfig)),
+                        EntitlementUtils.getCombiner(subConfigAttrs),
                         name);
+
+                captureDifferentSet(app == null ? null : app.getResources(),
+                        EntitlementUtils.getResources(subConfigAttrs), changedResources, name);
             }
         }
     }
@@ -255,7 +262,8 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
     @Override
     public boolean isApplicable() {
         return !missingTypes.isEmpty() || !missingApps.isEmpty() || !missingActions.isEmpty() ||
-                !changedConditions.isEmpty() || !changedSubjects.isEmpty() || !changedCombiners.isEmpty();
+                !changedConditions.isEmpty() || !changedSubjects.isEmpty() || !changedCombiners.isEmpty() ||
+                !changedResources.isEmpty();
     }
 
     @Override
@@ -277,6 +285,9 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
         }
         if (!changedCombiners.isEmpty()) {
             addChangedCombiners();
+        }
+        if (!changedResources.isEmpty()) {
+            addChangedResources();
         }
     }
 
@@ -305,7 +316,6 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             }
         }
     }
-
 
     /**
      * Add missing application types.
@@ -431,6 +441,34 @@ public class UpgradeEntitlementSubConfigsStep extends AbstractUpgradeStep {
             }
         }
     }
+
+    /**
+     * Clears the resource patterns currently associated with an application and then replaces them with the new set
+     * of resources defined.
+     *
+     * @throws UpgradeException If there is an error performing the upgrade.
+     */
+    private void addChangedResources() throws UpgradeException {
+        for (final Map.Entry<String, Set<String>> entry : changedResources.entrySet()) {
+            final String appName = entry.getKey();
+            final Set<String> resources = entry.getValue();
+
+            try {
+                UpgradeProgress.reportStart(AUDIT_MODIFIED_RES_START, appName);
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Modifying application " + appName + " ; adding resources: " + resources);
+                }
+                final Application application = getApplication(appName);
+                application.setResources(resources);
+                entitlementService.storeApplication(application);
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_SUCCESS);
+            } catch (EntitlementException ex) {
+                UpgradeProgress.reportEnd(AUDIT_UPGRADE_FAIL);
+                throw new UpgradeException(ex);
+            }
+        }
+    }
+
 
     /**
      * Adds the missing actions to their corresponding application type's.

@@ -30,6 +30,7 @@ import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.upgrade.UpgradeException;
+import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.mockito.ArgumentMatcher;
 import org.testng.annotations.BeforeMethod;
@@ -186,10 +187,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(type1));
         upgradeStep.perform();
 
-        verify(entitlementService, atMost(3)).getApplicationTypes();
-        verify(entitlementService, atMost(5)).getApplications();
-        verify(entitlementService, times(4)).storeApplication(argThat(new ApplicationMatch()));
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
+        verify(entitlementService, atLeastOnce()).storeApplication(argThat(new ApplicationMatch()));
     }
 
     @Test
@@ -211,11 +209,8 @@ public class UpgradeEntitlementSubConfigsStepTest {
 
         upgradeStep.perform();
 
-        verify(entitlementService, atMost(3)).getApplicationTypes();
-        verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
-        verify(entitlementService, times(4)).storeApplication(argThat(new ApplicationMatch()));
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
+        verify(entitlementService, atLeastOnce()).storeApplication(argThat(new ApplicationMatch()));
     }
 
     @Test
@@ -238,7 +233,27 @@ public class UpgradeEntitlementSubConfigsStepTest {
         verify(entitlementService, atMost(3)).getApplicationTypes();
         verify(entitlementService, atMost(5)).getApplications();
         verify(entitlementService).storeApplicationType(argThat(new TypeMatch()));
-        verifyNoMoreInteractions(entitlementService, adminTokenAction, connectionFactory);
+    }
+
+    @Test
+    public void shouldUpdateApplicationResourcePatterns() throws Exception {
+        // Given
+        ApplicationType appType = newType("type4");
+        Application app = newApplication("application4", appType);
+        final Set<String> oldResources = CollectionUtils.asSet("one", "two", "three");
+        final Set<String> newResources = CollectionUtils.asSet("http://*", "https://*"); // test-entitlement.xml
+        app.setResources(oldResources);
+
+        when(entitlementService.getApplicationTypes()).thenReturn(Collections.singleton(appType));
+        when(entitlementService.getApplications()).thenReturn(Collections.singleton(app));
+
+        // When
+        upgradeStep.initialize();
+        upgradeStep.perform();
+
+        // Then
+        assertThat(app.getResources()).isEqualTo(newResources);
+        verify(entitlementService, atLeastOnce()).storeApplication(app);
     }
 
     // Used to match the application as defined in the test xml.

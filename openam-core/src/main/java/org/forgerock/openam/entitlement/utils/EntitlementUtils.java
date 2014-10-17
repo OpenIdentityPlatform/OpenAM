@@ -220,6 +220,12 @@ public final class EntitlementUtils {
         return data.get(CONFIG_CONDITIONS);
     }
 
+    public static Set<String> getResources(Map<String, Set<String>> data) {
+        Reject.ifNull(data);
+
+        return data.get(CONFIG_RESOURCES);
+    }
+
     /**
      * Converts the set of actions in key=value format to an actual map.
      *
