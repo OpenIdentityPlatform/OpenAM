@@ -3002,7 +3002,7 @@
   </variablelist>
 
   <variablelist xml:id="rest-security-configuration">
-   <title>REST Security</title>
+   <title>User Self Service</title>
 
    <para><command>ssoadm</command> service name:
    <literal>RestSecurity</literal></para>

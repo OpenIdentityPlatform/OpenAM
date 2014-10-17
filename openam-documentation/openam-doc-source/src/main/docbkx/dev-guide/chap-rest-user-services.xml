@@ -74,12 +74,12 @@
    </step>
 
    <step>
-    <para>Configure REST Security.</para>
+    <para>Configure User Self Service.</para>
 
     <para>
-     You must enable self-registration in the REST
-     Security service. You can configure these globally in OpenAM console at
-     Configure &gt; Global &gt; REST Security. On the REST Security page, click
+     You must enable self-registration in the User Self Service
+     service. You can configure these globally in OpenAM console at
+     Configure &gt; Global &gt; User Self Service. On the User Self Service page, click
      the <literal>Enabled</literal> checkbox next to Self-Registration for Users,
      and then click Save.
     </para>
@@ -268,11 +268,11 @@ $ <userinput>curl \
    feature to change a password.</para></tip>
 
   <para>The option is disabled by default. You can enable it in the OpenAM Console
-  globally by using Configuration > Global > REST Security.</para>
+  globally by using Configuration > Global > User Self Service.</para>
 
   <para>Alternatively, you can enable it for an individual realm under
   Access Control > <replaceable>Realm Name</replaceable> > Services > Add >
-  REST Security.</para>
+  User Self Service.</para>
 
   <orderedlist>
    <para>An example follows, showing the steps in more detail.</para>

@@ -71,11 +71,11 @@
    </step>
 
    <step>
-    <para>Configure REST Security to enable self-registration.
+    <para>Configure User Self Service to enable self-registration.
     </para>
     <para>
      You can configure these globally in OpenAM console at
-     Configure &gt; Global &gt; REST Security. On the REST Security page, click
+     Configure &gt; Global &gt; User Self Service. On the User Self Service page, click
      the <literal>Enabled</literal> checkbox next to Self-Registration for Users,
      and then click Save.
     </para>
