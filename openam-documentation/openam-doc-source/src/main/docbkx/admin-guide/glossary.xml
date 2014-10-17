@@ -30,6 +30,22 @@
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>OpenAM Glossary</title>
 
+
+ <glossentry>
+  <glossterm>Access control</glossterm>
+  <glossdef>
+   <para>Control to grant or to deny access to a resource</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Account lockout</glossterm>
+  <glossdef>
+   <para>The act of making an account temporarily or permanently inactive
+    after successive authentication failures</para>
+  </glossdef>
+ </glossentry>
+
  <glossentry>
   <glossterm>Agent administrator</glossterm>
   <glossdef>
@@ -40,29 +56,46 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Application</glossterm>
+  <glossterm>Agent authenticator</glossterm>
+  <glossdef>
+   <para>Entity with read-only access to multiple agent profiles defined in the
+    same realm; allows an agent to read web service profiles</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Application (general)</glossterm>
   <glossdef>
    <para>
-    In general terms, a service exposing protected resources
+    In general terms, a service exposing protected resources.
    </para>
+  </glossdef>
+ </glossentry>
 
-   <para>
-    Specifically for authorization,
-    a constrained application of policy for a given context
-   </para>
+ <glossentry>
+  <glossterm>Application (entitlements)</glossterm>
+  <glossdef>
+   <para>In the context of OpenAM entitlements, protected resources that share
+    a common set of actions and related policies</para>
+  </glossdef>
+ </glossentry>
 
+ <glossentry>
+  <glossterm>Application configuration</glossterm>
+  <glossdef>
    <para>
-    An application configuration defines
-    the root resources,
-    the subset of environment and subject conditions,
-    the set of actions,
-    the comparator logic,
-    and the pre-defined policy configuration properties
+    An application configuration defines the root resources,
+    the subset of environment and subject conditions, the set of actions,
+    the comparator logic, and the pre-defined policy configuration properties
     for how policy applies for a specific application.
-    The application configuration constrains
-    policies created for the application.
+    The application configuration constrains policies created for the application.
    </para>
+  </glossdef>
+ </glossentry>
 
+ <glossentry>
+  <glossterm>Application type</glossterm>
+  <glossdef>
    <para>
     Application types act as templates for creating applications.
     Application types define a preset list of actions and functional logic,
@@ -72,17 +105,17 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Authentication</glossterm>
+  <glossterm>Attribute-based access control (ABAC)</glossterm>
   <glossdef>
-   <para>The act of confirming the identity of a principal</para>
+   <para>Access control that is based on attributes of a user, such as how old
+    a user is or whether she is a paying customer</para>
   </glossdef>
  </glossentry>
 
  <glossentry>
-  <glossterm>Authentication module</glossterm>
+  <glossterm>Authentication</glossterm>
   <glossdef>
-   <para>OpenAM authentication unit that handles one way of obtaining and
-   verifying credentials</para>
+   <para>The act of confirming the identity of a principal</para>
   </glossdef>
  </glossentry>
 
@@ -96,50 +129,19 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Access control</glossterm>
-  <glossdef>
-   <para>Control to grant or to deny access to a resource</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Account lockout</glossterm>
-  <glossdef>
-   <para>The act of making an account temporarily or permanently inactive
-   after successive authentication failures</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Agent authenticator</glossterm>
-  <glossdef>
-   <para>Entity with read-only access to multiple agent profiles defined in the
-   same realm; allows an agent to read web service profiles</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Application</glossterm>
-  <glossdef>
-   <para>In the context of OpenAM entitlements, protected resources that share
-   a common set of actions and related policies</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Attribute based access control (ABAC)</glossterm>
-  <glossdef>
-   <para>Access control that is based on attributes of a user, such as how old
-   a user is or whether she is a paying customer</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
   <glossterm>Authentication level</glossterm>
   <glossdef>
    <para>Positive integer associated with an authentication module, usually
-   used to require success with more stringent authentication measures when
-   requesting resources requiring special protection</para>
+    used to require success with more stringent authentication measures when
+    requesting resources requiring special protection</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Authentication module</glossterm>
+  <glossdef>
+   <para>OpenAM authentication unit that handles one way of obtaining and
+    verifying credentials</para>
   </glossdef>
  </glossentry>
 
@@ -205,7 +207,7 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Configuration data store</glossterm>
+  <glossterm>Configuration datastore</glossterm>
   <glossdef>
    <para>LDAP directory service holding OpenAM configuration data</para>
   </glossdef>
@@ -339,22 +341,22 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Policy administration point (PAP)</glossterm>
+  <glossterm>Policy Agent</glossterm>
+  <glossdef>
+   <para>Agent that intercepts requests for resources, directs principals to
+    OpenAM for authentication, and enforces policy decisions from OpenAM</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Policy Administration Point (PAP)</glossterm>
   <glossdef>
    <para>Entity that manages and stores policy definitions</para>
   </glossdef>
  </glossentry>
 
  <glossentry>
-  <glossterm>Policy agent</glossterm>
-  <glossdef>
-   <para>Agent that intercepts requests for resources, directs principals to
-   OpenAM for authentication, and enforces policy decisions from OpenAM</para>
-  </glossdef>
- </glossentry>
-
- <glossentry>
-  <glossterm>Policy decision point (PDP)</glossterm>
+  <glossterm>Policy Decision Point (PDP)</glossterm>
   <glossdef>
    <para>Entity that evaluates access rights and then issues authorization
    decisions</para>
@@ -362,7 +364,7 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Policy enforcement point (PEP)</glossterm>
+  <glossterm>Policy Enforcement Point (PEP)</glossterm>
   <glossdef>
    <para>Entity that intercepts a request for a resource and then enforces
    policy decisions from a PDP</para>
@@ -370,7 +372,7 @@
  </glossentry>
 
  <glossentry>
-  <glossterm>Policy information point</glossterm>
+  <glossterm>Policy Information Point (PIP)</glossterm>
   <glossdef>
    <para>Entity that provides extra information such as user profile attributes
    that a PDP needs in order to make a decision</para>
@@ -450,7 +452,7 @@
   <glossterm>Resource server</glossterm>
   <glossdef>
    <para>In OAuth 2.0, server hosting protected web resources, capable of
-   handling access tokens to respond to requests for such resources</para>
+    handling access tokens to respond to requests for such resources</para>
   </glossdef>
  </glossentry>
 
@@ -458,7 +460,7 @@
   <glossterm>Response providers</glossterm>
   <glossdef>
    <para>Policy extensions that define additional information to return in an
-   authorization decision beyond "allow" or "deny"</para>
+    authorization decision beyond "allow" or "deny"</para>
   </glossdef>
  </glossentry>
 
