@@ -64,6 +64,7 @@ public class ConfigureSocialAuthN extends Task {
     static final String WELL_KNOWN_AUTH_URL = "authorization_endpoint";
     static final String WELL_KNOWN_PROFILE_URL = "userinfo_endpoint";
     static final String WELL_KNOWN_ISSUER = "issuer";
+    static final String WELL_KNOWN_JWK = "jwks_uri";
     static final String AUTH_MODULE_AUTH_URL = "iplanet-am-auth-oauth-auth-service";
     static final String AUTH_MODULE_TOKEN_URL = "iplanet-am-auth-oauth-token-service";
     static final String AUTH_MODULE_USER_PROFILE_URL = "iplanet-am-auth-oauth-user-profile-service";
@@ -238,14 +239,19 @@ public class ConfigureSocialAuthN extends Task {
             throws WorkflowException {
 
         String configurationContents = getWebContent(locale, url);
-        Map<String, Object> parsedJson =  Utils.parseJson(configurationContents);
-        JsonValue config = new JsonValue(parsedJson);
+        Map<String, Object> config =  Utils.parseJson(configurationContents);
 
         Map<String, Set<String>> attrs = new CaseInsensitiveHashMap();
-        attrs.put(AUTH_MODULE_AUTH_URL, asSet(config.get(WELL_KNOWN_AUTH_URL).asString()));
-        attrs.put(AUTH_MODULE_TOKEN_URL, asSet(config.get(WELL_KNOWN_TOKEN_URL).asString()));
-        attrs.put(AUTH_MODULE_USER_PROFILE_URL, asSet(config.get(WELL_KNOWN_PROFILE_URL).asString()));
-        attrs.put(AUTH_MODULE_ISSUER, asSet(config.get(WELL_KNOWN_ISSUER).asString()));
+        attrs.put(AUTH_MODULE_AUTH_URL, asSet((String) config.get(WELL_KNOWN_AUTH_URL)));
+        attrs.put(AUTH_MODULE_TOKEN_URL, asSet((String) config.get(WELL_KNOWN_TOKEN_URL)));
+        attrs.put(AUTH_MODULE_USER_PROFILE_URL, asSet((String) config.get(WELL_KNOWN_PROFILE_URL)));
+        attrs.put(AUTH_MODULE_ISSUER, asSet((String) config.get(WELL_KNOWN_ISSUER)));
+
+        String jwkURL = (String) config.get(WELL_KNOWN_JWK);
+        if (jwkURL != null && !jwkURL.isEmpty()) {
+            attrs.put(AUTH_MODULE_CRYPTO_TYPE, asSet("jwk_url"));
+            attrs.put(AUTH_MODULE_CRYPTO_VALUE, asSet(jwkURL));
+        }
 
         return attrs;
     }

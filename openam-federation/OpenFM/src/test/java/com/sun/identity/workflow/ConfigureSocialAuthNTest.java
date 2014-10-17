@@ -193,6 +193,50 @@ public class ConfigureSocialAuthNTest {
     }
 
     @Test
+    public void testCollectAuthModuleAttributesUsingWellKnownConfigWithEmptyJwkUrl() throws Exception {
+        // Given
+        Map<String, Set<String>> params = new HashMap<String, Set<String>>();
+        params.put(P_CLIENT_ID, asSet("fred"));
+        params.put(P_CLIENT_SECRET, asSet("freddy"));
+        params.put(P_CLIENT_SECRET_CONFIRM, asSet("freddy"));
+        params.put(P_REDIRECT_URL, asSet("http://example.com"));
+        String wellKnownUrl = "http://local.example.com/.well-known/config";
+        params.put(P_OPENID_DISCOVERY_URL, asSet(wellKnownUrl));
+        ConfigureSocialAuthN task = spy(new ConfigureSocialAuthN());
+        String content = WELL_KNOWN_CONTENT.replaceAll("}", ",\""+ WELL_KNOWN_JWK +"\": \"\"}");
+        doReturn(content).when(task).getWebContent(Locale.ENGLISH, wellKnownUrl);
+
+        // When
+        Map<String, Set<String>> attrs = task.collectAuthModuleAttributes(Locale.ENGLISH, "microsoft", params);
+
+        // Then
+        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_TYPE), "client_secret");
+        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE), "freddy");
+    }
+
+    @Test
+    public void testCollectAuthModuleAttributesUsingWellKnownConfigWithJwkUrl() throws Exception {
+        // Given
+        Map<String, Set<String>> params = new HashMap<String, Set<String>>();
+        params.put(P_CLIENT_ID, asSet("fred"));
+        params.put(P_CLIENT_SECRET, asSet("freddy"));
+        params.put(P_CLIENT_SECRET_CONFIRM, asSet("freddy"));
+        params.put(P_REDIRECT_URL, asSet("http://example.com"));
+        String wellKnownUrl = "http://local.example.com/.well-known/config";
+        params.put(P_OPENID_DISCOVERY_URL, asSet(wellKnownUrl));
+        ConfigureSocialAuthN task = spy(new ConfigureSocialAuthN());
+        String content = WELL_KNOWN_CONTENT.replaceAll("}", ",\""+ WELL_KNOWN_JWK +"\": \"a\"}");
+        doReturn(content).when(task).getWebContent(Locale.ENGLISH, wellKnownUrl);
+
+        // When
+        Map<String, Set<String>> attrs = task.collectAuthModuleAttributes(Locale.ENGLISH, "microsoft", params);
+
+        // Then
+        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_TYPE), "jwk_url");
+        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE), "a");
+    }
+
+    @Test
     public void testCollectAuthModuleAttributesMissingClientId() throws Exception {
         Map<String, Set<String>> params = new HashMap<String, Set<String>>();
         try {
