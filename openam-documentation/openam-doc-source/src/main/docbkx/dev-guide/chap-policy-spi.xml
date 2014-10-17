@@ -30,6 +30,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
+
  <title>Customizing Policy Evaluation</title>
  <indexterm>
   <primary>Policy</primary>
@@ -125,8 +126,11 @@
     </listitem>
    </varlistentry>
   </variablelist>
-  
-  <para>
+
+  <procedure xml:id="building-a-sample-plugin">
+  <title>To Build a Sample Plugin</title>
+
+  <step><para>
    Build the module using Apache Maven.
   </para>
 
@@ -154,24 +158,30 @@ $ <userinput>mvn install</userinput>
 [INFO] Finished at: Mon Nov 25 19:07:15 CET 2013
 [INFO] Final Memory: 21M/228M
 [INFO] ------------------------------------------------------------------------</computeroutput>
-  </screen>
+   </screen>
+  </step>
 
-  <para>
+  <step>
+   <para>
    Copy the .jar to the <filename>WEB-INF/lib</filename> directory
    where you deployed OpenAM.
-  </para>
+   </para>
 
-  <screen>
+   <screen>
 $ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userinput>
-  </screen>
+   </screen>
+  </step>
 
-  <para>
-   Restart OpenAM or the container in which it runs.
-  </para>
+  <step>
+   <para>
+    Restart OpenAM or the container in which it runs.
+   </para>
+  </step>
+ </procedure>
  </section>
  
- <section xml:id="configure-sample-policy-plugin">
-  <title>Configuring A Sample Policy Plugin</title>
+ <section xml:id="configuring-sample-policy-plugin">
+  <title>Configuring a Sample Policy Plugin</title>
   
   <para>
    This section shows how to configure the sample custom policy condition.
@@ -184,111 +194,129 @@ $ <userinput>cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</userin
    where the strings describing your plugin are included as properties values.
   </para>
 
-  <para>
-   Extract <filename>amPolicy.properties</filename>,
-   <filename>amPolicyConfig.properties</filename>,
-   and if necessary the localized versions of this file
-   from <filename>${coreLibrary}</filename>
-   to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
-   For example, if OpenAM is deployed under
-   <filename>/path/to/tomcat/webapps/openam</filename>,
-   then you could run the following commands.
-  </para>
-
-  <screen>
-$ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
-$ <userinput>jar -xvf ../lib/${coreLibrary} amPolicy.properties \
- amPolicyConfig.properties</userinput>
- <computeroutput>inflated: amPolicyConfig.properties
- inflated: amPolicy.properties</computeroutput>
-  </screen>
-
-  <para>
-   In <filename>amPolicy.properties</filename> add this property:
-  </para>
-  
-  <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
- 
-  <para>
-   In <filename>amPolicyConfig.properties</filename> add this property:</para>
-  
-  <literallayout class="monospaced">x100=Sample Condition</literallayout>
-  
-  <para>Add the schema that describes your plugin to OpenAM.</para>
-  
-  <screen>
-$ <userinput>ssoadm \
- add-plugin-schema \
- --adminid amadmin \
- --password-file /tmp/pwd.txt \
- --servicename iPlanetAMPolicyService \
- --interfacename Condition \
- --pluginname SampleCondition \
- --i18nname amPolicy \
- --i18nkey samplecondition-policy-name \
- --classname org.forgerock.openam.examples.SampleCondition</userinput>
-
-<computeroutput>Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</computeroutput>
-  </screen>
-  
-  <para>
-   Set the choice values of the schema to include your plugin
-   with other policy conditions in the policy service.
-  </para>
-  
-  <screen>
-$ <userinput>ssoadm \
- set-attr-choicevals \
- --adminid amadmin \
- --password-file /tmp/pwd.txt \
- --servicename iPlanetAMPolicyConfigService \
- --schematype Organization \
- --attributename iplanet-am-policy-selected-conditions \
- --add \
- --choicevalues "x100=SampleCondition" </userinput>
-
-<computeroutput>Choice Values were set.</computeroutput>
-  </screen>
-  
-  <para>
-   Set the plugin policy condition as one of the default attributes
-   of the policy service.
-  </para>
-  
-  <screen>
-$ <userinput>ssoadm \
- add-attr-defs \
- --adminid amadmin \
- --password-file /tmp/pwd.txt \
- --servicename iPlanetAMPolicyConfigService \
- --schematype Organization \
- --attributevalues "iplanet-am-policy-selected-conditions=SampleCondition"</userinput>
-
-<computeroutput>Schema attribute defaults were added.</computeroutput>
-  </screen>
-  
-  <para>
-   After completing configuration, restart OpenAM or the container in which it runs.
-  </para>
-
-  <para>
-   In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
-   Name</replaceable> &gt; Policies &gt; <replaceable>Policy Name</replaceable>
-   &gt; Conditions &gt; New.
-   Notice in the list of conditions that you can now apply your Sample Condition.
-  </para>
-  
-  <mediaobject xml:id="figure-sample-condition">
-   <alt>Sample Condition in list of conditions</alt>
-   <imageobject>
-    <imagedata fileref="images/sample-condition.png" format="PNG"/>
-   </imageobject>
-   <textobject>
+  <procedure xml:id="configure-the-sample-policy-plugin">
+   <title>To Configure the Sample Policy Plugin</title>
+   <step>
     <para>
-     The sample condition you added is present in the list of conditions.
+     Extract <filename>amPolicy.properties</filename>,
+     <filename>amPolicyConfig.properties</filename>,
+     and if necessary the localized versions of this file
+     from <filename>${coreLibrary}</filename>
+     to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+     For example, if OpenAM is deployed under
+     <filename>/path/to/tomcat/webapps/openam</filename>,
+     then you could run the following commands.
     </para>
-   </textobject>
-  </mediaobject>
+
+    <screen>
+     $ <userinput>cd /path/to/tomcat/webapps/openam/WEB-INF/classes/</userinput>
+     $ <userinput>jar -xvf ../lib/${coreLibrary} amPolicy.properties \
+     amPolicyConfig.properties</userinput>
+     <computeroutput>inflated: amPolicyConfig.properties
+      inflated: amPolicy.properties</computeroutput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     In <filename>amPolicy.properties</filename> add this property:
+    </para>
+
+    <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
+   </step>
+
+   <step>
+    <para>
+     In <filename>amPolicyConfig.properties</filename> add this property:</para>
+
+    <literallayout class="monospaced">x100=Sample Condition</literallayout>
+   </step>
+
+   <step>
+    <para>Add the schema that describes your plugin to OpenAM.</para>
+
+    <screen>
+     $ <userinput>ssoadm \
+     add-plugin-schema \
+     --adminid amadmin \
+     --password-file /tmp/pwd.txt \
+     --servicename iPlanetAMPolicyService \
+     --interfacename Condition \
+     --pluginname SampleCondition \
+     --i18nname amPolicy \
+     --i18nkey samplecondition-policy-name \
+     --classname org.forgerock.openam.examples.SampleCondition</userinput>
+
+     <computeroutput>Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</computeroutput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Set the choice values of the schema to include your plugin
+     with other policy conditions in the policy service.
+    </para>
+
+    <screen>
+     $ <userinput>ssoadm \
+     set-attr-choicevals \
+     --adminid amadmin \
+     --password-file /tmp/pwd.txt \
+     --servicename iPlanetAMPolicyConfigService \
+     --schematype Organization \
+     --attributename iplanet-am-policy-selected-conditions \
+     --add \
+     --choicevalues "x100=SampleCondition" </userinput>
+
+     <computeroutput>Choice Values were set.</computeroutput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     Set the plugin policy condition as one of the default attributes
+     of the policy service.
+    </para>
+
+    <screen>
+     $ <userinput>ssoadm \
+     add-attr-defs \
+     --adminid amadmin \
+     --password-file /tmp/pwd.txt \
+     --servicename iPlanetAMPolicyConfigService \
+     --schematype Organization \
+     --attributevalues "iplanet-am-policy-selected-conditions=SampleCondition"</userinput>
+
+     <computeroutput>Schema attribute defaults were added.</computeroutput>
+    </screen>
+   </step>
+
+   <step>
+    <para>
+     After completing configuration, restart OpenAM or the container in which it runs.
+    </para>
+
+    <para>
+     In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
+     Name</replaceable> &gt; Policies &gt; <replaceable>Policy Name</replaceable>
+     &gt; Conditions &gt; New.
+     Notice in the list of conditions that you can now apply your Sample Condition.
+    </para>
+
+    <mediaobject xml:id="figure-sample-condition">
+     <alt>Sample Condition in list of conditions</alt>
+     <imageobject>
+      <imagedata fileref="images/sample-condition.png" format="PNG"/>
+     </imageobject>
+     <textobject>
+      <para>
+       The sample condition you added is present in the list of conditions.
+      </para>
+     </textobject>
+    </mediaobject>
+   </step>
+  </procedure>
+
  </section>
 
  <section xml:id="extend-ssoadm-classpath">

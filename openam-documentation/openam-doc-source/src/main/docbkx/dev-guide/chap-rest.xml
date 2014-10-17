@@ -303,7 +303,14 @@
      (creating, reading, updating, deleting realms)
     </link></para>
    </listitem>
-
+   <listitem>
+    <para><link
+     xlink:show="new"
+     xlink:href="dev-guide#chap-rest-sts"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     >Secure Token Service (STS)
+    </link></para>
+   </listitem>
   </itemizedlist>
 
   <para>This chapter also includes a section on <link
