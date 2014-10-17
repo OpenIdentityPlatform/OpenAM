@@ -276,7 +276,11 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
 
         final String id = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getRefreshTokenLifetime() * 1000) + System.currentTimeMillis();
-        final String authModules = request.getToken(AuthorizationCode.class).getAuthModules();
+        AuthorizationCode token = request.getToken(AuthorizationCode.class);
+        String authModules = null;
+        if (token != null) {
+            authModules = token.getAuthModules();
+        }
 
         RefreshToken refreshToken = new OpenAMRefreshToken(id, resourceOwnerId, clientId, redirectUri, scope,
                 expiryTime, "Bearer", OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, grantType, realm, authModules);
