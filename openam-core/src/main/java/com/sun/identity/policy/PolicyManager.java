@@ -616,12 +616,6 @@ public final class PolicyManager {
                 Set<IPrivilege> privileges = PrivilegeUtils.policyToPrivileges(
                     policy);
                 pis.add(privileges);
-                if (policy.isReferralPolicy()) {
-                    ReferralPrivilegeManager refpm =
-                        new ReferralPrivilegeManager(realmName, adminSubject);
-                    refpm.addApplicationToSubRealm(
-                        (ReferralPrivilege)privileges.iterator().next());
-                }
                 policyCache.sendPolicyChangeNotification(null, policy,
                     ServiceListener.ADDED);
             } else {

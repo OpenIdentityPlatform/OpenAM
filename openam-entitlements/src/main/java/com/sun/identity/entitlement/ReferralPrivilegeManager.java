@@ -68,7 +68,6 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
      */
     @Override
     public void add(ReferralPrivilege referral) throws EntitlementException {
-        validate(referral);
         Date date = new Date();
         referral.setCreationDate(date.getTime());
         referral.setLastModifiedDate(date.getTime());
@@ -85,54 +84,10 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
         PolicyDataStore pdb = PolicyDataStore.getInstance();
         pdb.addReferral(adminSubject, realm, referral);
 
-        addApplicationToSubRealm(referral);
+        for (String r : referral.getRealms()) {
+            ReferredApplicationManager.getInstance().clearCache(r);
+        }
         notifyPrivilegeChanged(null, referral);
-    }
-
-    private void validate(ReferralPrivilege referral) throws EntitlementException {
-        if (!realm.equals("/")) {
-            Map<String, Set<String>> map = referral.getOriginalMapApplNameToResources();
-            for (String appName : map.keySet()) {
-                Application appl = ApplicationManager.getApplication(
-                    PrivilegeManager.superAdminSubject, realm, appName);
-                ResourceName comp = appl.getResourceComparator();
-                Set<String> resources = appl.getResources();
-                Set<String> refResources = map.get(appName);
-
-                for (String r : resources) {
-                    validate(referral, comp, r, refResources);
-                }
-            }
-        }
-    }
-
-    private void validate(ReferralPrivilege referral, ResourceName comp, String res, Set<String> refResources)
-            throws EntitlementException {
-
-        if (!res.endsWith("*")) {
-            res += "*";
-        }
-        for (String rr : refResources) {
-            ResourceMatch match = comp.compare(rr, res, true);
-            if (match.equals(ResourceMatch.EXACT_MATCH) ||
-                match.equals(ResourceMatch.WILDCARD_MATCH) ||
-                match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                return;
-            }
-        }
-        Object[] param = {referral.getName()};
-        throw new EntitlementException(267, param);
-    }
-
-    public void addApplicationToSubRealm(ReferralPrivilege referral) throws EntitlementException {
-        Map<String, Set<String>> map = referral.getMapApplNameToResources();
-        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
-            String appName = entry.getKey();
-            Set<String> resources = entry.getValue();
-            for (String r : referral.getRealms()) {
-                ApplicationManager.referApplication(adminSubject, realm, r, appName, resources);
-            }
-        }
     }
 
     /**
@@ -171,21 +126,12 @@ public class ReferralPrivilegeManager implements IPrivilegeManager<ReferralPrivi
         ReferralPrivilege referral = findByName(name);
 
         if (referral != null) {
-            removeApplicationFromSubRealm(referral);
+            for (String r : referral.getRealms()) {
+                ReferredApplicationManager.getInstance().clearCache(r);
+            }
             PolicyDataStore pdb = PolicyDataStore.getInstance();
             pdb.removeReferral(adminSubject, realm, referral);
             notifyPrivilegeChanged(null, referral);
-        }
-    }
-
-    private void removeApplicationFromSubRealm(ReferralPrivilege referral) throws EntitlementException {
-        Map<String, Set<String>> map = referral.getMapApplNameToResources();
-        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
-            String appName = entry.getKey();
-            Set<String> resources = entry.getValue();
-            for (String r : referral.getRealms()) {
-                ApplicationManager.dereferApplication(adminSubject, r, appName, resources);
-            }
         }
     }
 
