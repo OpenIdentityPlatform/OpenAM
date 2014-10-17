@@ -414,7 +414,6 @@ public final class ApplicationManager {
             throw new EntitlementException(228);
         }
 
-        validateApplication(adminSubject, realm, application);
         Date date = new Date();
         Set<Principal> principals = adminSubject.getPrincipals();
         String principalName = ((principals != null) && !principals.isEmpty()) ?
@@ -536,39 +535,6 @@ public final class ApplicationManager {
             }
         }
         return true;
-    }
-
-    private static void validateApplication(
-        Subject adminSubject,
-        String realm,
-        Application application
-    ) throws EntitlementException {
-        if (!realm.equals("/")) {
-            String applTypeName = application.getApplicationType().getName();
-            ResourceName comp = application.getResourceComparator();
-            Set<String> referredRes = getReferredResources(
-                adminSubject, realm, applTypeName);
-            for (String r : application.getResources()) {
-                validateApplication(application, comp, r, referredRes);
-            }
-        }
-    }
-
-    private static void validateApplication(
-        Application application,
-        ResourceName comp,
-        String res,
-        Set<String> referredRes) throws EntitlementException {
-        for (String r : referredRes) {
-            ResourceMatch match = comp.compare(res, r, true);
-            if (match.equals(ResourceMatch.EXACT_MATCH) ||
-                match.equals(ResourceMatch.WILDCARD_MATCH) ||
-                match.equals(ResourceMatch.SUB_RESOURCE_MATCH)) {
-                return;
-            }
-        }
-        Object[] param = {application.getName()};
-        throw new EntitlementException(247, param);
     }
     
     /**
