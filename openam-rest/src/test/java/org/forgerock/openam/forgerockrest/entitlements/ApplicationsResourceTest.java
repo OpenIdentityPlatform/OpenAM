@@ -22,23 +22,10 @@ import com.sun.identity.entitlement.PrivilegeManager;
 import com.sun.identity.entitlement.util.SearchFilter;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
-import java.io.IOException;
-import java.util.Collections;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.security.auth.Subject;
-import static org.fest.assertions.Assertions.assertThat;
 import org.forgerock.json.fluent.JsonValue;
-import static org.forgerock.json.fluent.JsonValue.json;
-import static org.forgerock.json.fluent.JsonValue.object;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.QueryFilter;
-import static org.forgerock.json.resource.QueryFilter.*;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
@@ -46,6 +33,7 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.SortKey;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.entitlements.query.AttributeType;
 import org.forgerock.openam.forgerockrest.entitlements.query.QueryAttribute;
@@ -54,10 +42,37 @@ import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationTypeM
 import org.forgerock.openam.forgerockrest.entitlements.wrappers.ApplicationWrapper;
 import org.forgerock.openam.rest.resource.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
-import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.util.promise.Function;
 import org.forgerock.util.promise.NeverThrowsException;
 import org.mockito.ArgumentCaptor;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+import javax.security.auth.Subject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.forgerock.json.fluent.JsonValue.field;
+import static org.forgerock.json.fluent.JsonValue.json;
+import static org.forgerock.json.fluent.JsonValue.object;
+import static org.forgerock.json.resource.QueryFilter.alwaysFalse;
+import static org.forgerock.json.resource.QueryFilter.alwaysTrue;
+import static org.forgerock.json.resource.QueryFilter.and;
+import static org.forgerock.json.resource.QueryFilter.comparisonFilter;
+import static org.forgerock.json.resource.QueryFilter.equalTo;
+import static org.forgerock.json.resource.QueryFilter.present;
+import static org.forgerock.openam.utils.CollectionUtils.asOrderedSet;
+import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.transformList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -68,11 +83,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import org.testng.Assert;
 import static org.testng.Assert.fail;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 /**
  * @since 12.0.0
@@ -328,6 +339,35 @@ public class ApplicationsResourceTest {
     }
 
     @Test
+    public void mapBetweenReservedAppNamesDuringCreate() {
+        // Given...
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/");
+        Subject mockSubject = new Subject();
+
+        given(mockSSOTokenContext.getCallerSubject()).willReturn(mockSubject);
+
+        Application mockApplication = mock(Application.class);
+        given(applicationWrapper.getApplication()).willReturn(mockApplication);
+        given(mockApplication.getRealm()).willReturn("/");
+
+        given(applicationWrapper.getName())
+                .willReturn("agentProtectedApplication")
+                .willReturn("iPlanetAMWebAgentService");
+
+        ResultHandler mockResultHandler = mock(ResultHandler.class);
+        CreateRequest mockCreateRequest = mock(CreateRequest.class);
+
+        // When...
+        applicationsResource.createInstance(realmContext, mockCreateRequest, mockResultHandler);
+
+        // Then...
+        verify(applicationWrapper).setName("iPlanetAMWebAgentService");
+        verify(applicationWrapper).setName("agentProtectedApplication");
+        verify(mockResultHandler, times(1)).handleResult(any(Resource.class));
+    }
+
+    @Test
     public void shouldThrowBadRequestIfSubjectNotFoundOnRead() {
         // Given
         SSOTokenContext subjectContext = mock(SSOTokenContext.class);
@@ -412,6 +452,59 @@ public class ApplicationsResourceTest {
     }
 
     @Test
+    public void mapBetweenReservedAppNamesDuringRead() throws EntitlementException {
+        // Given...
+
+        // Override the creation of the application wrapper so to return a mocked version.
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
+
+            @Override
+            protected ApplicationWrapper createApplicationWrapper(
+                    Application application, ApplicationTypeManagerWrapper type) {
+
+                ApplicationWrapper wrapper = mock(ApplicationWrapper.class);
+                String appName = application.getName();
+                given(wrapper.getName()).willReturn(appName);
+
+                try {
+                    JsonValue jsonValue = mock(JsonValue.class);
+                    given(wrapper.toJsonValue()).willReturn(jsonValue);
+                } catch (IOException e) {
+                    fail();
+                }
+
+                return wrapper;
+            }
+        };
+
+        SSOTokenContext mockSSOTokenContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSSOTokenContext, "/abc");
+        ServerContext serverContext = new ServerContext(realmContext);
+
+        Subject subject = new Subject();
+        given(mockSSOTokenContext.getCallerSubject()).willReturn(subject);
+
+        Application mockApplication = mock(Application.class);
+        given(applicationManagerWrapper.getApplication(
+                any(Subject.class), anyString(), eq("iPlanetAMWebAgentService"))).willReturn(mockApplication);
+        given(mockApplication.getName()).willReturn("agentProtectedApplication");
+
+        // When...
+        applicationsResource.readInstance(serverContext, "agentProtectedApplication", null, mockResultHandler);
+
+        // Then...
+        verify(applicationManagerWrapper).getApplication(eq(subject), anyString(), eq("iPlanetAMWebAgentService"));
+        verify(mockApplication).setName("agentProtectedApplication");
+
+        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
+        verify(mockResultHandler).handleResult(resourceCaptor.capture());
+
+        Resource resource = resourceCaptor.getValue();
+        assertThat(resource.getId()).isEqualTo("agentProtectedApplication");
+    }
+
+    @Test
     public void shouldDeleteInstance() throws EntitlementException {
 
         //Given
@@ -434,6 +527,34 @@ public class ApplicationsResourceTest {
         verify(handler).handleResult(resourceCaptor.capture());
         Resource resource = resourceCaptor.getValue();
         Assert.assertEquals(resource.getId(), resourceId);
+        Assert.assertEquals(resource.getRevision(), "0");
+        Assert.assertEquals(resource.getContent(), json(object()));
+    }
+
+    @Test
+    public void mapReservedAppNameDuringDelete() throws EntitlementException {
+        // Given...
+        SSOTokenContext subjectContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(subjectContext, "REALM");
+        ServerContext context = new ServerContext(realmContext);
+        Subject subject = new Subject();
+
+        given(subjectContext.getCallerSubject()).willReturn(subject);
+
+
+        DeleteRequest request = mock(DeleteRequest.class);
+        ResultHandler<Resource> handler = mock(ResultHandler.class);
+
+        // When...
+        applicationsResource.deleteInstance(context, "agentProtectedApplication", request, handler);
+
+        // Then...
+        verify(applicationManagerWrapper).deleteApplication(subject, "REALM", "iPlanetAMWebAgentService");
+
+        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
+        verify(handler).handleResult(resourceCaptor.capture());
+        Resource resource = resourceCaptor.getValue();
+        Assert.assertEquals(resource.getId(), "agentProtectedApplication");
         Assert.assertEquals(resource.getRevision(), "0");
         Assert.assertEquals(resource.getContent(), json(object()));
     }
@@ -531,6 +652,53 @@ public class ApplicationsResourceTest {
     }
 
     @Test
+    public void updateMapsUserFacingToInternalName() throws EntitlementException, IOException {
+        // Given...
+        SSOTokenContext subjectContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(subjectContext, "REALM");
+        ServerContext context = new ServerContext(realmContext);
+        Subject subject = new Subject();
+        given(subjectContext.getCallerSubject()).willReturn(subject);
+
+        UpdateRequest request = mock(UpdateRequest.class);
+        JsonValue content = mock(JsonValue.class);
+        given(request.getContent()).willReturn(content);
+
+        given(applicationWrapper.getName())
+                .willReturn("agentProtectedApplication")
+                .willReturn("agentProtectedApplication")
+                .willReturn("iPlanetAMWebAgentService")
+                .willReturn("agentProtectedApplication");
+
+        Application application = mock(Application.class);
+        given(applicationManagerWrapper.getApplication(subject, "REALM", "iPlanetAMWebAgentService")).willReturn(application);
+
+        Application newApplication = mock(Application.class);
+        JsonValue response = mock(JsonValue.class);
+        given(applicationWrapper.getApplication()).willReturn(newApplication);
+        given(newApplication.getRealm()).willReturn("REALM");
+        given(newApplication.getLastModifiedDate()).willReturn(1000L);
+        given(applicationWrapper.toJsonValue()).willReturn(response);
+
+        ResultHandler<Resource> handler = mock(ResultHandler.class);
+
+        // When...
+        applicationsResource.updateInstance(context, "agentProtectedApplication", request, handler);
+
+        // Then...
+        verify(applicationWrapper).setName("iPlanetAMWebAgentService");
+        verify(applicationManagerWrapper)
+                .updateApplication(application, applicationWrapper.getApplication(), subject);
+        verify(applicationWrapper).setName("agentProtectedApplication");
+        ArgumentCaptor<Resource> resourceCaptor = ArgumentCaptor.forClass(Resource.class);
+        verify(handler).handleResult(resourceCaptor.capture());
+        Resource resource = resourceCaptor.getValue();
+        Assert.assertEquals(resource.getId(), "agentProtectedApplication");
+        Assert.assertEquals(resource.getRevision(), "1000");
+        Assert.assertEquals(resource.getContent(), response);
+    }
+
+    @Test
     public void updateInstanceShouldReturnServerInternalExceptionWhenApplicationToJson() throws EntitlementException,
             IOException {
 
@@ -588,7 +756,7 @@ public class ApplicationsResourceTest {
         given(mockApplication.getRealm()).willReturn("REALM");
         given(applicationManagerWrapper.getApplication(subject, "REALM", resourceId)).willReturn(mockApplication);
         doThrow(EntitlementException.class).when(applicationManagerWrapper)
-                .updateApplication(any(Application.class),any(Application.class), any(Subject.class));
+                .updateApplication(any(Application.class), any(Application.class), any(Subject.class));
 
         //When
         applicationsResource.updateInstance(context, resourceId, request, handler);
@@ -675,7 +843,7 @@ public class ApplicationsResourceTest {
                 given(wrapper.getName()).willReturn(appName);
 
                 try {
-                    JsonValue jsonValue = mock(JsonValue.class);
+                    JsonValue jsonValue = json(object(field("name", appName)));
                     given(wrapper.toJsonValue()).willReturn(jsonValue);
                 } catch (IOException e) {
                     fail();
@@ -695,6 +863,7 @@ public class ApplicationsResourceTest {
         QueryRequest request = mock(QueryRequest.class);
         given(request.getPageSize()).willReturn(3);
         given(request.getPagedResultsOffset()).willReturn(1);
+        given(request.getSortKeys()).willReturn(Arrays.asList(SortKey.ascendingOrder("name")));
 
         QueryResultHandler handler = mock(QueryResultHandler.class);
         given(handler.handleResource(any(Resource.class))).willReturn(true);
@@ -702,7 +871,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
-        Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5");
+        Set<String> appNames = asSet("app1", "app2", "app3", "app4", "app5", "iPlanetAMWebAgentService");
         given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
@@ -717,7 +886,7 @@ public class ApplicationsResourceTest {
 
         // Then
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
-        verify(applicationManagerWrapper, times(5)).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(applicationManagerWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
         verify(handler, times(3)).handleResource(resourceCapture.capture());
@@ -729,7 +898,72 @@ public class ApplicationsResourceTest {
         verify(handler).handleResult(resultCapture.capture());
 
         QueryResult result = resultCapture.getValue();
-        assertThat(result.getRemainingPagedResults()).isEqualTo(1);
+        assertThat(result.getRemainingPagedResults()).isEqualTo(2);
+    }
+
+    @Test
+    public void reservedInternalAppIsMappedDuringQuery()
+            throws EntitlementException, IllegalAccessException, InstantiationException {
+
+        // Override the creation of the application wrapper so to return a mocked version.
+        applicationsResource = new ApplicationsResource(
+                debug, applicationManagerWrapper, applicationTypeManagerWrapper, queryAttributes) {
+
+            @Override
+            protected ApplicationWrapper createApplicationWrapper(
+                    Application application, ApplicationTypeManagerWrapper type) {
+
+                ApplicationWrapper wrapper = mock(ApplicationWrapper.class);
+                String appName = application.getName();
+                given(wrapper.getName()).willReturn(appName);
+
+                try {
+                    JsonValue jsonValue = mock(JsonValue.class);
+                    given(wrapper.toJsonValue()).willReturn(jsonValue);
+                } catch (IOException e) {
+                    fail();
+                }
+
+                return wrapper;
+            }
+        };
+
+
+        // Given...
+        SSOTokenContext mockSubjectContext = mock(SSOTokenContext.class);
+        RealmContext realmContext = new RealmContext(mockSubjectContext, "/abc");
+        ServerContext serverContext = new ServerContext(realmContext);
+
+        QueryRequest request = mock(QueryRequest.class);
+
+        Subject subject = new Subject();
+        given(mockSubjectContext.getCallerSubject()).willReturn(subject);
+
+        Set<String> appNames = asSet("iPlanetAMWebAgentService");
+        given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
+
+        Application app = mock(Application.class);
+        given(applicationManagerWrapper.getApplication(
+                eq(subject), eq("/abc"), eq("iPlanetAMWebAgentService"))).willReturn(app);
+        given(app.getName()).willReturn("iPlanetAMWebAgentService");
+
+        given(app.getName()).willReturn("agentProtectedApplication");
+        QueryResultHandler handler = mock(QueryResultHandler.class);
+        given(handler.handleResource(any(Resource.class))).willReturn(true);
+
+        // When...
+        applicationsResource.queryCollection(serverContext, request, handler);
+
+        // Then...
+        verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
+        verify(applicationManagerWrapper).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(app).setName("agentProtectedApplication");
+
+        ArgumentCaptor<Resource> resourceCapture = ArgumentCaptor.forClass(Resource.class);
+        verify(handler).handleResource(resourceCapture.capture());
+
+        Resource resource = resourceCapture.getValue();
+        assertThat(resource.getId()).isEqualTo("agentProtectedApplication");
     }
 
     @Test
@@ -808,7 +1042,7 @@ public class ApplicationsResourceTest {
         Subject subject = new Subject();
         given(mockSubjectContext.getCallerSubject()).willReturn(subject);
 
-        Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5");
+        Set<String> appNames = asOrderedSet("app1", "app2", "app3", "app4", "app5", "iPlanetAMWebAgentService");
         given(applicationManagerWrapper.search(eq(subject), eq("/abc"), any(Set.class))).willReturn(appNames);
 
         for (String appName : appNames) {
@@ -823,7 +1057,7 @@ public class ApplicationsResourceTest {
 
         // Then
         verify(applicationManagerWrapper).search(eq(subject), eq("/abc"), any(Set.class));
-        verify(applicationManagerWrapper, times(5)).getApplication(eq(subject), eq("/abc"), anyString());
+        verify(applicationManagerWrapper, times(appNames.size())).getApplication(eq(subject), eq("/abc"), anyString());
 
         ArgumentCaptor<ResourceException> exceptionCapture = ArgumentCaptor.forClass(ResourceException.class);
         verify(handler).handleError(exceptionCapture.capture());
