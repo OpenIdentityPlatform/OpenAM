@@ -181,6 +181,9 @@ define("org/forgerock/openam/ui/policy/EditSubjectView", [
                     .prev('label')
                     .removeClass('showLabel');
 
+
+                this.$el.removeClass('invalid-rule');
+
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {
 

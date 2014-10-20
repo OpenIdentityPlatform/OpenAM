@@ -258,7 +258,6 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                             if (value.type === 'string' || value.type === 'number' || value.type === 'integer') {
 
-
                                 if (value["enum"]) {
 
                                     returnVal +=  uiUtils.fillTemplateWithData("templates/policy/ConditionAttrEnum.html", {data:value, title:key, selected:itemData[key], id:count});
@@ -290,7 +289,6 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
 
                             } else {
                                 console.error('Unexpected data type:',key,value);
-
                             }
 
                             count++;
@@ -346,12 +344,13 @@ define( "org/forgerock/openam/ui/policy/EditEnvironmentView", [
                     .find('label').removeClass('showLabel')
                     .next('input') 
                     .addClass('placeholderText');
-                    //.prop('readonly', true);
-
+          
                 this.$el.find('.field-float-select select:not(#selection)')
                     .addClass('placeholderText')
                     .prev('label')
                     .removeClass('showLabel');
+
+                this.$el.removeClass('invalid-rule');
 
                 // setTimeout needed to delay transitions.
                 setTimeout( function() {

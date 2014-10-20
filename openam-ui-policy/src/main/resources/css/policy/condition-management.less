@@ -21,7 +21,6 @@ body{
 }
 
 
-
 /* POLICY */
 body.dragging,
 body.dragging *{
@@ -92,15 +91,63 @@ body.editing{
 		min-height: 8px;
 	}
 
-	#pickup-area{
-		padding:10px 8px;
-		margin:5px;
+	#outter-arrow-up {
+		width: 0;
+		height: 0;
+		margin: 10px auto 0;
+		transition: all 200ms ease-out;
+
+		border-left: 15px solid transparent;
+		border-right: 15px solid transparent;
+		border-bottom: 0 solid #ccc;
+
+		#inner-arrow-up {
+			transition: all 200ms ease-out;
+			border-left: 15px solid transparent;
+			border-right: 15px solid transparent;
+			border-bottom: 0 solid #eee;
+			margin: 2px 0 0 -15px;
+			position: absolute;
+		}
+	}
+
+	#pickUpArea{
+		transition: background-color 200ms ease-out;
+	}
+
+	&.show-hint{
+
+		#pickUpArea{
+			background-color:#D7E9F8;
+		}
+
+		#outter-arrow-up {
+			border-bottom: 15px solid #ccc;
+			#inner-arrow-up {
+				border-bottom: 15px solid #D7E9F8;
+			}
+		}
+	}
+
+	.rules-help{
+		margin-top:20px;
+	}
+
+	#pickUpArea{
+		padding: 10px 8px;
+		margin: 0 5px 5px 5px;
 		border: 1px solid #ccc;
-		
+		background: #eee;
+		border-radius: 5px;
+				
 		ol#pickUpItem {
 
+			min-height: 77px;
+			background: #fff;
+			margin: 0 0 20px 0;
+			border: 2px dashed #ddd;
+
 			li.operator, li.rule{
-		 		margin: 10px 0 0;
 				cursor: move;
 				box-shadow:0 1px 1px 0 rgba(0,0,0,0.5);
 				background-image:url(@grabber-image);
@@ -117,9 +164,23 @@ body.editing{
 
 		 	}
 
+		 	li.operator:not(.dragged){
+		 		margin-top: 14px;
+		 	}
+		 	
+
 		}
 
 	}
+
+	ol#dropOffArea li.invalid-rule{
+		.invalid-background;
+
+		span.item-button-panel > span {
+			color:#B65D5D;
+		}
+	}
+
 
     span.item-button-panel {
         float:right;
@@ -130,8 +191,15 @@ body.editing{
 
             &.tooltips {
                 &:hover span, &:focus span {
-                    margin-left: -53px;
+                    margin-left: -54px;
                     width: 100px;
+                }
+
+                &.tooltips-wide{
+                	&:hover span, &:focus span {
+                		margin-left: -105px;
+	                    width: 200px;
+	                }
                 }
             }
         }
@@ -218,6 +286,13 @@ body.editing{
 					background-image:url(@grabber-image);
 					background-color: #ccc;
 				}
+
+				&.legacy-condition{
+					.invalid-background(#FCFFD4);
+					span.item-button-panel > span {
+						color:#9B9E75;
+					}
+				}
 			}
 
 			&.placeholder {
@@ -251,10 +326,6 @@ body.editing{
 				border-right: none;
 			}
 
-			&.invalid{
-				color: #888;
-			}
-
 			h3{
 				font-weight: bold;
 				font-size: 11px;
@@ -283,10 +354,8 @@ body.editing{
 		 div.field-float-selectize {
 			float: left;
 			min-width: 133px;
-			max-width: 588px;  // margin-bottom:0; required for clearing
-			margin: 5px 5px 0 5px; 
-			
-			
+			max-width: 588px;  
+			margin: 5px 5px 0 5px; // margin-bottom:0; required for clearing
 
 		}
 
@@ -312,7 +381,6 @@ body.editing{
 
 	.field-float-pattern, .field-float-select{
 
-		margin-top: 18px;
 		position:relative;
 	  	margin: 5px;
 	  	float:left;
@@ -350,6 +418,7 @@ body.editing{
 		select {
 
 			margin-top: 16px;
+			margin-bottom: 1px;
 			min-width: 177px;
 			clear:left;
 			float:left;
@@ -380,8 +449,8 @@ body.editing{
 /*Overrides for accordion states*/
 section.active-step{
 
-	#condition-management #pickup-area ol#pickUpItem li.operator:not(.dragged),
-	#condition-management #pickup-area ol#pickUpItem li.rule:not(.dragged) {
+	#condition-management #pickUpArea ol#pickUpItem li.operator:not(.dragged),
+	#condition-management #pickUpArea ol#pickUpItem li.rule:not(.dragged) {
 		display: block;
 	}
 }

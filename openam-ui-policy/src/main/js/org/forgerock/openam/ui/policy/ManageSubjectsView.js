@@ -49,7 +49,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
             'keyup    #operatorSub_0 .rule > .item-button-panel > .icon-pencil' :    'toggleEditing',
             'click    #operatorSub_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
             'keyup    #operatorSub_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
-            'dblclick #operatorSub_0 li.rule' :                                      'toggleEditing'
+            'dblclick #operatorSub_0 li.rule:not(.legacy-condition)' :               'toggleEditing'
         },
         data: {},
         buttons:{},
@@ -97,7 +97,7 @@ define( "org/forgerock/openam/ui/policy/ManageSubjectsView", [
                 this.buttons.clearBtn       = this.$el.find("a#clear");
                 this.buttons.addCondition   = this.$el.find("a#addCondition");
                 this.buttons.addOperator    = this.$el.find("a#addOperator");
-                this.pickUpItem             = this.$el.find('#pickUpItem');
+                this.pickUpItem             = this.$el.find('ol#pickUpItem');
 
                 if (self.data.operators.length === 0) {
                     this.buttons.addOperator.hide();

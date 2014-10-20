@@ -4,16 +4,30 @@
 
 		{{#each this}}
 
-	    <div>
-			<h3>{{camelCaseToTitle @key}}</h3>
-			<span>{{this}}</span>
-		</div>
+		{{#ifObject this}}
+		  		
+		    <div>
+			  	<h3>{{camelCaseToTitle @key}}</h3>
+				<span>{{stringify this}}</span>
+		    </div>
+		   
+		  	{{else}}
+
+		  	<div>
+			  	<h3>{{camelCaseToTitle @key}}</h3>
+				<span>{{this}}</span>
+		    </div>
+	
+		  	{{/ifObject}}
 
 	    {{/each}}
 
 	{{else}}
 
-		<div class="invalid"><h3>blank</h3><span>edit rule...</span></div>
+		<div>
+			<h3>Type</h3>
+			<span>Nothing selected</span>
+		</div>
 
 	{{/if}}
   
@@ -23,4 +37,6 @@
 
 
 
+
+		  	
 

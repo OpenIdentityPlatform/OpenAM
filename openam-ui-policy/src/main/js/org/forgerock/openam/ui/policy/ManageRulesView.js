@@ -33,10 +33,11 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
         "org/forgerock/openam/ui/policy/EditEnvironmentView",
         "org/forgerock/openam/ui/policy/EditSubjectView",
         "org/forgerock/openam/ui/policy/OperatorRulesView",
+        "org/forgerock/openam/ui/policy/LegacyListItemView",
         "org/forgerock/commons/ui/common/main/EventManager",
         "org/forgerock/commons/ui/common/util/Constants"
 
-], function(AbstractView, EditEnvironmentView, EditSubjectView, OperatorRulesView, EventManager, Constants ) {
+], function(AbstractView, EditEnvironmentView, EditSubjectView, OperatorRulesView, LegacyListItemView, EventManager, Constants ) {
 
     var ManageRulesView = AbstractView.extend({
 
@@ -51,8 +52,10 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
         },
         types: {
             ENVIRONMENT: 'environmentType',
-            SUBJECT: 'subjectType'
+            SUBJECT: 'subjectType',
+            LEGACY: "Policy"
         },
+
         pickUpItem: null,
         localEntity: {},
         groupCounter: 0,
@@ -101,10 +104,15 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
 
                         } else if ( !_.isEmpty(item) ) {
 
-                            newRule = self.getNewRule();
-                            properties = self.getProperties();
-                            newRule.render( properties, null, container, self.idCount, item);
-                            newRule.createListItem(properties, newRule.$el );
+                            if( item.type === Constants.LEGACY){
+                                newRule = new LegacyListItemView();
+                                newRule.render( item, null, container, self.idCount);
+                            } else {
+                                newRule = self.getNewRule();
+                                properties = self.getProperties();
+                                newRule.render( properties, null, container, self.idCount, item);
+                                newRule.createListItem( properties, newRule.$el );
+                            }
 
                             self.idCount++;
                         }
@@ -159,6 +167,7 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
                     self.setInactive(self.buttons.clearBtn, true);
                     self.setInactive(self.buttons.addCondition, false);
                     self.setInactive(self.buttons.addOperator, false);
+                    self.showHint(false);
 
                     item.focus();
                     item.css({width: item.width()}).addClass("dragged");
@@ -313,12 +322,17 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
             else { button.removeClass('inactive'); }
         },
 
+        showHint:function(state){
+            this.$el.find('#condition-management').toggleClass('show-hint', state);  
+        },
+
         onClear: function(e) {
             if(e) { e.preventDefault();}
             this.pickUpItem.children().remove();
             this.setInactive(this.buttons.clearBtn, true);
             this.setInactive(this.buttons.addCondition, false);
             this.setInactive(this.buttons.addOperator, false);
+            this.showHint(false);
         },
 
         addOperator: function(e) {
@@ -330,6 +344,8 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
 
             var operatorRules = new OperatorRulesView();
                 operatorRules.render(this.data, null, this.pickUpItem, this.idPrefix + this.idCount);
+
+            this.showHint(true);
             this.idCount++;
         },
 
@@ -342,6 +358,8 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
 
             var editRuleView = this.getNewRule();
                 editRuleView.render(this.getProperties(), null, this.pickUpItem, this.idCount);
+
+            this.showHint(true);
             this.idCount++;
         },
 
@@ -419,8 +437,6 @@ define( "org/forgerock/openam/ui/policy/ManageRulesView", [
             }
 
             console.log("\n" + this.property + ":",  JSON.stringify(this.data.entity[this.property], null, 2));
-            //console.log("\n" + this.property + ":",  JSON.stringify(this.data.entity[this.property]));
-
         }
 
     });

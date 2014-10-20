@@ -48,7 +48,6 @@ define("org/forgerock/openam/ui/policy/ResponseAttrsUserView", [
             this.data.allUserAttributes = [];
 
             _.each(args[1], function(propertyName){
-
                 attr = {};
                 attr.propertyName = propertyName;
                 attr.selected = (_.find(self.data.selectedUserAttributes, function (obj) { return obj.propertyName === propertyName; }));

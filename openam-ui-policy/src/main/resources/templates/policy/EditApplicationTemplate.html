@@ -1,19 +1,14 @@
 <div class="content-bg">
+
+    <a href="#apps/" class="button float-right" id="backButton">Back</a>
     
     {{#if entity.name}}
     <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
     {{else}}
     <h1>{{t "config.messages.PolicyMessages.createApp"}}</h1>
     {{/if}}
-    
 
-    <div class="clearfix">
-        <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified
-            service. This template is then used when policies are created for the service. To create an application, begin
-            with Step 1 and progress through step 3. Modifications can be made after the application has been created.</p>
-
-        <a href="#apps/" class="button float-right" id="backButton">Back</a>
-    </div>
+    <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified service. This template is then used when policies are created for the service. To create an application, begin with Step 1 and progress through step 3. Modifications can be made after the application has been created.</p>
 
     <form class="form">
         <div class="accordion">

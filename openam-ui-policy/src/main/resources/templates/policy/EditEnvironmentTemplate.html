@@ -1,4 +1,4 @@
-<li class="rule clearfix" id="environment_{{itemID}}" tabindex="0" >
+<li class="rule clearfix invalid-rule" id="environment_{{itemID}}" tabindex="0" >
 
 
 	<span class="item-button-panel">
@@ -12,7 +12,7 @@
 			<label for="selection" >Type</label>
 			<select id="selection" class="placeholdertext" tabindex="0" >
 				<option value="" selected disabled >select...</option>
-				{{#conditions}}<option value="{{title}}">{{camelCaseToTitle title}}</option>{{/conditions}}
+				{{#conditions}}<option value="{{title}}" {{#equals title 'Policy'}}hidden{{/equals}}>{{camelCaseToTitle title}}</option>{{/conditions}}
 			</select>
 		</div>
 

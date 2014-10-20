@@ -51,7 +51,7 @@ define( "org/forgerock/openam/ui/policy/ManageEnvironmentsView", [
             'keyup    #operatorEnv_0 .rule > .item-button-panel > .icon-pencil' :    'toggleEditing',
             'click    #operatorEnv_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
             'keyup    #operatorEnv_0 .rule > .item-button-panel > .icon-checkmark' : 'toggleEditing',
-            'dblclick #operatorEnv_0 li.rule' :                                      'toggleEditing'
+            'dblclick #operatorEnv_0 li.rule:not(.legacy-condition)' :               'toggleEditing'
         },
         data: {},
         buttons:{},
@@ -99,7 +99,7 @@ define( "org/forgerock/openam/ui/policy/ManageEnvironmentsView", [
                 this.buttons.clearBtn       = this.$el.find("a#clear");
                 this.buttons.addCondition   = this.$el.find("a#addCondition");
                 this.buttons.addOperator    = this.$el.find("a#addOperator");
-                this.pickUpItem             = this.$el.find('#pickUpItem');
+                this.pickUpItem             = this.$el.find('ol#pickUpItem');
 
                 if (self.data.operators.length === 0) {
                     this.buttons.addOperator.hide();

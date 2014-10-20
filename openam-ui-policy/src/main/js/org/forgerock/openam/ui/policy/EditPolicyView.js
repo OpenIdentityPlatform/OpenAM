@@ -70,7 +70,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 allEnvironmentsPromise = policyDelegate.getEnvironmentConditions(),
                 allUserAttributesPromise = policyDelegate.getAllUserAttributes();
 
-
             $.when(policyPromise, appPromise, allSubjectsPromise, allEnvironmentsPromise, allUserAttributesPromise).done(function (policy, app, allSubjects, allEnvironments, allUserAttributes) {
                 var actions = [],
                     subjects = [],
@@ -83,7 +82,6 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                     data.entity = policy;
                     data.entityName = policyName;
 
-                   // data.resourceAttributes = policy.resourceAttributes;
                 } else {
                     data.entity = {};
                     data.entityName = null;
@@ -93,13 +91,13 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 });
 
                 data.options = {};
-                data.options.availableSubjects =     _.findByValues(allSubjects[0].result, 'title', app[0].subjects);
-                data.options.availableEnvironments = _.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+                // this is a temporary hack... not to be committed, to get round the fact that the default apps have differnt condition types than the endpoints.
+                data.options.availableSubjects =     allSubjects[0].result; //_.findByValues(allSubjects[0].result, 'title', app[0].subjects);
+                data.options.availableEnvironments = allEnvironments[0].result; //_.findByValues(allEnvironments[0].result, 'title', app[0].conditions); 
+
                 data.options.availableActions =      _.sortBy(actions, "action");
                 data.options.resourcePatterns =      _.sortBy(app[0].resources);
 
-
-                
                 // here we split by type
                 staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType}); 
                 staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);

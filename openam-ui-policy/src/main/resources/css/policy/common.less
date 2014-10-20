@@ -1,9 +1,17 @@
 @active-background-color: #EDFCF5;
+@table-hightlight-bg-color:#D7E9F8;
+@table-rollover-bg-color:#d5d5d5;
 
 
-.invalid-background{
-    background-color:#ffd4d4;
+.webkit-text-rendering-bugfix{
+    -webkit-transform: translateZ(0px);
+    -webkit-backface-visibility: hidden;
+}
+
+.invalid-background(@bgcolor: #ffd4d4){
+    background-color:@bgcolor;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(60, 60, 60, 0.1) 35px, rgba(60, 60, 60, 0.1) 70px);
+    .webkit-text-rendering-bugfix;
 }
 
 .filter-sort-grid {
@@ -106,8 +114,17 @@
             cursor:default;
         }
 
-        &:focus:not(.accordion-step-disabled), &:hover:not(.accordion-step-disabled), &.step-active:not(.accordion-step-disabled){
+      
+
+         
+
+        &:focus:not(.accordion-step-disabled), &:hover:not(.accordion-step-disabled){
             background-color: #D7E9F8;
+        }
+
+        &.step-active:not(.accordion-step-disabled){
+            background-color: #5a646d;
+            color:white;
             box-shadow:none;
         }
 
@@ -232,7 +249,7 @@
         }
 
         &:hover, &:focus{
-            background-color: #bebebe;
+            background-color: #D7E9F8;
             box-shadow:none;
         }
 
@@ -291,28 +308,13 @@
             padding: 0 3px;
 
             &.tooltips {
+                .webkit-text-rendering-bugfix;
                 &:hover span, &:focus span {
                     margin-left: -40px;
                     width: 70px;
                 }
             }
         }
-    }
-
-    .ui-state-hover {
-        border-color: rgba(0, 0, 0, 0.2);
-    }
-
-    .ui-state-highlight {
-        background: inherit;
-        border-color: #ccc;
-        color: inherit;
-    }
-
-    .highlight {
-        background: #d7f8e9;
-        border-color: rgba(0, 0, 0, 0.2);
-        color: inherit;
     }
 
     tr.ui-widget-content {
@@ -328,31 +330,80 @@
         display: none;
     }
 
-    tr.jqgrow td[aria-describedby*="_iconChB"] {
-        text-align: center;
+    tr.jqgrow {
 
-        span {
-            font-size: 16px;
+        td[aria-describedby*="_iconChB"] {
+            text-align: center;
+            color: #A6A6A6;
+
+            span {
+                font-size: 16px;
+                    background-color: white;
+                    border: 1px #A6A6A6 solid;
+                    border-radius: 3px;
+                    transition:all 200ms linear;
+
+                    &:hover, &:focus {
+                         color: #777;
+                         border-color: #777;
+                         box-shadow:none;
+                    }
+            }
         }
-    }
 
-    tr.jqgrow td[aria-describedby*="_name"] {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-    }
+        td[aria-describedby*="_name"] {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
 
-    tr.jqgrow td[aria-describedby*="_actions"] {
-        background-color: #ebebeb;
-        overflow: visible;
-        white-space: normal;
-        text-align: center;
-    }
-
-    tr.jqgrow.ui-state-hover, tr.jqgrow.highlight {
         td[aria-describedby*="_actions"] {
-            background-color: inherit;
+            background-color: #ebebeb;
+            overflow: visible;
+            white-space: normal;
+            text-align: center;
         }
+
+        /*&.ui-state-hover, &.highlight {
+            
+        }*/
+
+        &.ui-state-hover {
+            border-color: rgba(0, 0, 0, 0.2);
+            background: @table-rollover-bg-color;
+            color: inherit;
+
+            td[aria-describedby*="_actions"] {
+                transition: all 200ms linear;
+                background-color: darken(@table-rollover-bg-color,5%);
+            }
+
+        }
+
+       &.ui-state-highlight, &.highlight {
+            background: @table-hightlight-bg-color;
+            transition: all 200ms linear;
+            border-color: rgba(0, 0, 0, 0.2);
+            color: inherit;
+
+            td[aria-describedby*="_iconChB"] span {
+                color: darken(@table-hightlight-bg-color,50%);
+                border-color: darken(@table-hightlight-bg-color,50%);
+                opacity:0.5;
+                &:hover, &:focus {
+                     opacity:1;     
+                }
+            }
+
+            td[aria-describedby*="_actions"] {
+                background-color: darken(@table-hightlight-bg-color,5%);
+            }
+
+            span.item-button-panel > span{
+                color:darken(@table-hightlight-bg-color,50%);
+            }
+        }
+        
     }
 }
 
@@ -651,7 +702,7 @@ input[type="text"]:invalid:required{
     color: #80b7ab;
 }
 
-/// this needs to be integrated into the above 
+
 
 .selectize-control.multi .selectize-input {
 
@@ -698,3 +749,21 @@ input[type="text"]:invalid:required{
 #realImport {
     display: none;
 }
+
+/* These are jquery-theme over-rides*/
+
+.ui-widget-content .ui-state-hover{
+    border-color: #5d6871;
+    font-weight: normal;
+    color: #80b7ab;
+    background: #5d6871;
+    transition: background 100ms linear;
+}
+
+.ui-widget-content th.ui-state-hover{
+    background: lighten(#5d6871, 10%);
+    color: white;
+}
+
+
+/*...*/

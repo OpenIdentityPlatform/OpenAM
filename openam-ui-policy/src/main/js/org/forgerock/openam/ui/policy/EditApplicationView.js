@@ -123,10 +123,6 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
         },
 
         processConditions: function (data, envConditions, subjConditions) {
-            // AME-4011
-            subjConditions = _.reject(subjConditions, function(obj){ return obj.title === 'Policy'; });
-            envConditions  = _.reject(envConditions,  function(obj){ return obj.title === 'Policy'; });
-
             if (!data.entityName){
                 data.entity.conditions = this.populateConditions(envConditions, envConditions);
                 data.entity.subjects = this.populateConditions(subjConditions, subjConditions);

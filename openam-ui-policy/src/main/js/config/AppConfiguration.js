@@ -101,12 +101,12 @@ define("config/AppConfiguration", function () {
                         "templates/policy/EditEnvironmentTemplate.html",
                         "templates/policy/OperatorRulesTemplate.html",
                         "templates/policy/ConditionAttrTimeDate.html",
-                        "templates/policy/ConditionTypePolicy.html",
                         "templates/policy/ConditionAttrEnum.html",
                         "templates/policy/ConditionAttrString.html",
                         "templates/policy/ConditionAttrBoolean.html",
                         "templates/policy/ConditionAttrArray.html",
                         "templates/policy/ListItem.html",
+                        "templates/policy/LegacyListItem.html",
                         "templates/policy/ApplicationTableCellActionsTemplate.html",
                         "templates/policy/ApplicationTableGlobalActionsTemplate.html",
                         "templates/policy/PoliciesTableGlobalActionsTemplate.html"
