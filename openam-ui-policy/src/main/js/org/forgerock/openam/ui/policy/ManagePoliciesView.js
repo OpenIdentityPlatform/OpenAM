@@ -61,25 +61,29 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                 this.setGridButtonSet();
 
                 var options = {
-                        url: '/openam/json' + subrealm + '/policies?_queryFilter=' + encodeURIComponent('applicationName eq "' + this.data.appName + '"'),
+                        url: '/openam/json' + subrealm + '/policies',
                         colNames: ['', 'Name', 'Description', 'Author', 'Created', 'Modified By', 'Last Modified',
                             'Actions', 'Resources', 'Resource Attributes', 'Subject'],
                         colModel: [
-                            {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
+                            {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter,
+                                frozen: true, title: false, search: false},
                             {name: 'name', width: 250, frozen: true},
                             {name: 'description', sortable: false, width: 150},
                             {name: 'createdBy', width: 250, hidden: true},
-                            {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
+                            {name: 'creationDate', width: 150, search: false, hidden: true,
+                                formatter: uiUtils.commonJQGridFormatters.dateFormatter},
                             {name: 'lastModifiedBy', width: 250, hidden: true},
-                            {name: 'lastModified', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
-                            {name: 'actionValues', width: 205, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter},
-                            {name: 'resources', width: 250, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
-                            {name: 'resourceAttributes', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter, hidden: true},
-                            {name: 'subject', width: 150, sortable: false, formatter: uiUtils.commonJQGridFormatters.objectFormatter, hidden: true}
+                            {name: 'lastModified', width: 150, search: false, hidden: true,
+                                formatter: uiUtils.commonJQGridFormatters.dateFormatter},
+                            {name: 'actionValues', width: 205, sortable: false,
+                                formatter: uiUtils.commonJQGridFormatters.objectFormatter},
+                            {name: 'resources', width: 250, sortable: false,
+                                formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'resourceAttributes', width: 150, sortable: false, hidden: true,
+                                formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                            {name: 'subject', width: 150, sortable: false, hidden: true,
+                                formatter: uiUtils.commonJQGridFormatters.objectFormatter}
                         ],
-                        gridComplete: function () {
-                            $(this).jqGrid('hideCol', 'cb');
-                        },
                         beforeSelectRow: function (rowId, e) {
                             var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
                             if (!checkBoxCellSelected) {
@@ -91,21 +95,22 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
                             self.onRowSelect(rowid, status, e);
                         },
                         loadError: function (xhr, status, error){
-                            
                             if ( uiUtils.responseMessageMatch(xhr.responseText, "Unable to retrieve policy") ){
                                 eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unableToRetrievePolicy");
                             } else {
                                 console.log('loadError', xhr.responseText, status, error);
                             }
-    
                         },
-                        multiselect: true,
                         sortname: 'name',
                         width: 920,
                         shrinkToFit: false,
                         pager: '#policiesPager'
                     },
                     additionalOptions = {
+                        search: true,
+                        searchFilter: [
+                            {field: 'applicationName', op: 'eq', val: this.data.appName}
+                        ],
                         columnChooserOptions: {
                             width: 501,
                             height: 230

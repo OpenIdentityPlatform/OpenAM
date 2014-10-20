@@ -71,13 +71,20 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
 
         onRowSelect: function (rowid, status, e) {
             var $target = $(e.target),
-                $chB = $target.is(this.checkBox) ? $target : $target.find(this.checkBox);
-            if (status) {
+                $chB = $target.is(this.checkBox) ? $target : $target.find(this.checkBox),
+                checked = $chB.hasClass(this.checkBoxCheckedClass);
+
+            if (!checked) {
                 $chB.removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
                 this.selectedItems.push(this.data.result[rowid - 1].name);
+                $target.closest('tr').addClass("highlight");
+                this.grid.find('tr[id=' + rowid + ']').addClass("highlight");
             } else {
                 $chB.removeClass(this.checkBoxCheckedClass).addClass(this.checkBoxUncheckedClass);
                 this.selectedItems = _.without(this.selectedItems, this.data.result[rowid - 1].name);
+                this.grid.jqGrid('resetSelection', rowid);
+                $target.closest('tr').removeClass("highlight");
+                this.grid.find('tr[id=' + rowid + ']').removeClass("highlight");
             }
 
             sessionStorage.setItem(this.storageKey, JSON.stringify(this.selectedItems));
@@ -88,9 +95,9 @@ define("org/forgerock/openam/ui/policy/GenericGridView", [
         selectRow: function (e, rowid, rowdata) {
             if (this.selectedItems) {
                 if (this.selectedItems.indexOf(rowdata.name) !== -1) {
-                    this.grid.find('tr[id=' + rowid + ']').find(this.checkBox)
-                        .removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
-                    this.grid.jqGrid('setSelection', rowid, false);
+                    var tr = this.grid.find('tr[id=' + rowid + ']');
+                    tr.find(this.checkBox).removeClass(this.checkBoxUncheckedClass).addClass(this.checkBoxCheckedClass);
+                    tr.addClass("highlight");
                 }
             }
         },

@@ -70,22 +70,24 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 this.setGridButtonSet();
 
                 options = {
-                    url: '/openam/json' + this.subrealm + '/applications?_queryFilter=true',
+                    url: '/openam/json' + this.subrealm + '/applications',
                     colNames: ['', '', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                     colModel: [
-                        {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true, title: false},
-                        {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true, title: false},
+                        {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true,
+                            title: false, search: false},
+                        {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true,
+                            title: false, search: false},
                         {name: 'name', width: 230, frozen: true},
                         {name: 'realm', width: 150},
                         {name: 'description', width: 170, sortable: false},
-                        {name: 'resources', width: 240, sortable: false, formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
+                        {name: 'resources', width: 240, sortable: false,
+                            formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                         {name: 'createdBy', width: 250, hidden: true},
-                        {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true},
-                        {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter, hidden: true}
+                        {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,
+                            hidden: true, search: false},
+                        {name: 'lastModifiedDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,
+                            hidden: true, search: false}
                     ],
-                    gridComplete: function () {
-                        $(this).jqGrid('hideCol', 'cb');
-                    },
                     beforeSelectRow: function (rowId, e) {
                         var checkBoxCellSelected = self.isCheckBoxCellSelected(e);
                         if (!checkBoxCellSelected && !$(e.target).hasClass('icon-pencil')) {
@@ -97,7 +99,6 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                     onSelectRow: function (rowid, status, e) {
                         self.onRowSelect(rowid, status, e);
                     },
-                    multiselect: true,
                     sortname: 'name',
                     width: 920,
                     shrinkToFit: false,
@@ -105,6 +106,7 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
                 };
 
                 additionalOptions = {
+                    search: true,
                     columnChooserOptions: {
                         width: 501,
                         height: 180

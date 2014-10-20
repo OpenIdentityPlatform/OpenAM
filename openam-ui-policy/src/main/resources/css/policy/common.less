@@ -260,6 +260,31 @@
     cursor: pointer;
     margin: 15px 0 0 0;
 
+    .ui-jqgrid-hbox {
+        height: 60px;
+    }
+
+    .ui-jqgrid-htable .ui-search-toolbar {
+        th {
+            height: 30px;
+            padding: 0;
+            vertical-align: top;
+        }
+
+        .ui-search-table {
+            .ui-search-clear {
+                display: none;
+            }
+
+            .ui-search-input {
+                & > input {
+                    height: 30px;
+                    margin: 0;
+                }
+            }
+        }
+    }
+
     span.item-button-panel {
         > span {
             font-size: 16px;
@@ -279,6 +304,12 @@
     }
 
     .ui-state-highlight {
+        background: inherit;
+        border-color: #ccc;
+        color: inherit;
+    }
+
+    .highlight {
         background: #d7f8e9;
         border-color: rgba(0, 0, 0, 0.2);
         color: inherit;
@@ -318,16 +349,22 @@
         text-align: center;
     }
 
-    tr.jqgrow.ui-state-hover, tr.jqgrow.ui-state-highlight {
+    tr.jqgrow.ui-state-hover, tr.jqgrow.highlight {
         td[aria-describedby*="_actions"] {
             background-color: inherit;
         }
     }
 }
 
+th.ui-state-default.ui-th-column {
+    border: 0;
+    background: inherit;
+}
+
 [id*='gview_'] .frozen-bdiv {
     overflow: visible !important;
     height: auto !important;
+    top: 61px !important;
 }
 
 .ui-multiselect {
