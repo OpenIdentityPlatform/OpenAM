@@ -91,47 +91,53 @@ public class AuthorizationCodeGrantTypeHandler implements GrantTypeHandler {
             throw new InvalidRequestException("Authorization code doesn't exist.");
         }
 
-        if (authorizationCode.isIssued()) {
-            tokenInvalidator.invalidateTokens(code);
-            tokenStore.deleteAuthorizationCode(code);
-            logger.error("Authorization Code has already been issued, " + code);
-            throw new InvalidGrantException();
-        }
-
-        if (!authorizationCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
-            logger.error("Authorization code was issued with a different redirect URI, " + code + ". Expected, "
-                    + authorizationCode.getRedirectUri() + ", actual, " + redirectUri);
-            throw new InvalidGrantException();
-        }
-
-        if (!authorizationCode.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
-            logger.error("Authorization Code was issued to a different client, " + code + ". Expected, "
-                    + authorizationCode.getClientId() + ", actual, " + clientRegistration.getClientId());
-            throw new InvalidGrantException();
-        }
-
-        if (authorizationCode.isExpired()) {
-            logger.error("Authorization code has expired, " + code);
-            throw new InvalidCodeException("Authorization code expired.");
-        }
-
-        final String grantType = request.getParameter("grant_type");
-        final Set<String> authorizationScope = authorizationCode.getScope();
-        final String resourceOwnerId = authorizationCode.getResourceOwnerId();
-
-        final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         RefreshToken refreshToken = null;
-        if (providerSettings.issueRefreshTokens()) {
-            refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
-                    resourceOwnerId, redirectUri, authorizationScope, request);
+        AccessToken accessToken;
+        OAuth2ProviderSettings providerSettings;
+        Set<String> authorizationScope;
+        // Only allow one request per code through here at a time, to prevent replay.
+        synchronized (code) {
+            if (authorizationCode.isIssued()) {
+                tokenInvalidator.invalidateTokens(code);
+                tokenStore.deleteAuthorizationCode(code);
+                logger.error("Authorization Code has already been issued, " + code);
+                throw new InvalidGrantException();
+            }
+
+            if (!authorizationCode.getRedirectUri().equalsIgnoreCase(redirectUri)) {
+                logger.error("Authorization code was issued with a different redirect URI, " + code + ". Expected, "
+                        + authorizationCode.getRedirectUri() + ", actual, " + redirectUri);
+                throw new InvalidGrantException();
+            }
+
+            if (!authorizationCode.getClientId().equalsIgnoreCase(clientRegistration.getClientId())) {
+                logger.error("Authorization Code was issued to a different client, " + code + ". Expected, "
+                        + authorizationCode.getClientId() + ", actual, " + clientRegistration.getClientId());
+                throw new InvalidGrantException();
+            }
+
+            if (authorizationCode.isExpired()) {
+                logger.error("Authorization code has expired, " + code);
+                throw new InvalidCodeException("Authorization code expired.");
+            }
+
+            final String grantType = request.getParameter("grant_type");
+            authorizationScope = authorizationCode.getScope();
+            final String resourceOwnerId = authorizationCode.getResourceOwnerId();
+
+            providerSettings = providerSettingsFactory.get(request);
+            if (providerSettings.issueRefreshTokens()) {
+                refreshToken = tokenStore.createRefreshToken(grantType, clientRegistration.getClientId(),
+                        resourceOwnerId, redirectUri, authorizationScope, request);
+            }
+
+            accessToken = tokenStore.createAccessToken(grantType, "Bearer", code,
+                    resourceOwnerId, clientRegistration.getClientId(), redirectUri, authorizationScope, refreshToken,
+                    authorizationCode.getNonce(), request);
+
+            authorizationCode.setIssued();
+            tokenStore.updateAuthorizationCode(authorizationCode);
         }
-
-        final AccessToken accessToken = tokenStore.createAccessToken(grantType, "Bearer", code,
-                resourceOwnerId, clientRegistration.getClientId(), redirectUri, authorizationScope, refreshToken,
-                authorizationCode.getNonce(), request);
-
-        authorizationCode.setIssued();
-        tokenStore.updateAuthorizationCode(authorizationCode);
 
         if (refreshToken != null) {
             accessToken.addExtraData("refresh_token", refreshToken.getTokenId());

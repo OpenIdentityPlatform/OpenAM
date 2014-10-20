@@ -24,6 +24,8 @@ import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -76,6 +78,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = null;
 
@@ -96,6 +99,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
@@ -122,6 +126,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
@@ -145,6 +150,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
@@ -170,6 +176,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
 
@@ -196,6 +203,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         RefreshToken refreshToken = mock(RefreshToken.class);
@@ -240,6 +248,7 @@ public class AuthorizationCodeGrantTypeHandlerTest {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         AccessToken accessToken = mock(AccessToken.class);
@@ -275,12 +284,97 @@ public class AuthorizationCodeGrantTypeHandlerTest {
     }
 
     @Test
+    public void shouldHandleOneAccessTokenRequestPerCodeAtATime() throws Exception {
+
+        //Given
+        final OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
+        ClientRegistration clientRegistration = mock(ClientRegistration.class);
+        final AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
+        final AccessToken accessToken = mock(AccessToken.class);
+        Set<String> validatedScope = new HashSet<String>();
+
+        given(clientAuthenticator.authenticate(request)).willReturn(clientRegistration);
+        given(request.getParameter("redirect_uri")).willReturn("REDIRECT_URI");
+        final Holder holder = new Holder();
+        given(tokenStore.readAuthorizationCode(eq(request), anyString())).willAnswer(new Answer<Object>() {
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                holder.value++;
+                return authorizationCode;
+            }
+        });
+        given(authorizationCode.isIssued()).willAnswer(new Answer<Boolean>() {
+            public Boolean answer(InvocationOnMock invocation) throws Throwable {
+                return holder.value > 1;
+            }
+        });
+        given(authorizationCode.getRedirectUri()).willReturn("REDIRECT_URI");
+        given(authorizationCode.getClientId()).willReturn("CLIENT_ID");
+        given(clientRegistration.getClientId()).willReturn("CLIENT_ID");
+        given(authorizationCode.getExpiryTime()).willReturn(System.currentTimeMillis() + 100);
+        given(providerSettings.issueRefreshTokens()).willReturn(false);
+        given(tokenStore.createAccessToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+                anySetOf(String.class), Matchers.<RefreshToken>anyObject(), anyString(), eq(request)))
+                .willAnswer(new Answer<Object>() {
+                    public Object answer(InvocationOnMock invocation) throws Throwable {
+                        while(holder.value < 2) {
+                            Thread.sleep(100);
+                        }
+                        Thread.sleep(100);
+                        return accessToken;
+                    }
+                });
+        given(providerSettings.validateAccessTokenScope(eq(clientRegistration), anySetOf(String.class), eq(request)))
+                .willReturn(validatedScope);
+
+        // When/Then
+        Thread thread1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AccessToken actualAccessToken = grantTypeHandler.handle(request);
+                    assertEquals(actualAccessToken, accessToken);
+                } catch (Exception e) {
+                    holder.thread1Failure = new AssertionError("First thread should succeed");
+                }
+            }
+        });
+        thread1.start();
+
+        Thread thread2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    grantTypeHandler.handle(request);
+                    holder.thread1Failure = new AssertionError("Second thread should have already issued authorization code");
+                } catch (InvalidGrantException e) {
+                    // pass
+                } catch (Exception e) {
+                    holder.thread1Failure = new AssertionError("Wrong exception");
+                }
+            }
+        });
+        thread2.start();
+
+        thread1.join();
+        thread2.join();
+
+        if (holder.thread1Failure != null) {
+            fail(holder.thread1Failure.getMessage());
+        }
+        if (holder.thread2Failure != null) {
+            fail(holder.thread2Failure.getMessage());
+        }
+    }
+
+    @Test
     public void shouldHandleAndIncludeScopeInAccessToken() throws InvalidGrantException, RedirectUriMismatchException,
             ClientAuthenticationFailedException, InvalidRequestException, InvalidCodeException, InvalidClientException,
             ServerException {
 
         //Given
         OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter("code")).willReturn("abc123");
         ClientRegistration clientRegistration = mock(ClientRegistration.class);
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         AccessToken accessToken = mock(AccessToken.class);
@@ -312,5 +406,11 @@ public class AuthorizationCodeGrantTypeHandlerTest {
         verify(providerSettings).additionalDataToReturnFromTokenEndpoint(accessToken, request);
         verify(accessToken).addExtraData(eq("scope"), anyString());
         assertEquals(actualAccessToken, accessToken);
+    }
+
+    private static class Holder {
+        int value = 0;
+        Throwable thread1Failure;
+        Throwable thread2Failure;
     }
 }
