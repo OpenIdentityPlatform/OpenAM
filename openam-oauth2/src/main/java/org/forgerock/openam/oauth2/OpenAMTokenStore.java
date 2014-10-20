@@ -105,17 +105,9 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         final String code = UUID.randomUUID().toString();
         final long expiryTime = (providerSettings.getAuthorizationCodeLifetime() * 1000) + System.currentTimeMillis();
 
-        String authModules = null;
-        try {
-            SSOToken token = ssoTokenManager.createSSOToken(ServletUtils.getRequest(request.<Request>getRequest()));
-            authModules = token.getProperty(ISAuthConstants.AUTH_TYPE);
-        } catch (SSOException e) {
-            logger.warning("Could not get list of auth modules from authentication", e);
-        }
-
         final AuthorizationCode authorizationCode = new OpenAMAuthorizationCode(code, resourceOwnerId, clientId,
                 redirectUri, scope, expiryTime, nonce, realmNormaliser.normalise(request.<String>getParameter("realm")),
-                authModules);
+                getAuthModulesFromSSOToken(request));
 
         // Store in CTS
         try {
@@ -126,6 +118,19 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         }
 
         return authorizationCode;
+    }
+
+    private String getAuthModulesFromSSOToken(OAuth2Request request) {
+        String authModules = null;
+        try {
+            SSOToken token = ssoTokenManager.createSSOToken(ServletUtils.getRequest(request.<Request>getRequest()));
+            if (token != null) {
+                authModules = token.getProperty(ISAuthConstants.AUTH_TYPE);
+            }
+        } catch (SSOException e) {
+            logger.warning("Could not get list of auth modules from authentication", e);
+        }
+        return authModules;
     }
 
     /**
@@ -172,8 +177,10 @@ public class OpenAMTokenStore implements OpenIdConnectTokenStore {
         String authModules;
         if (request.getToken(AuthorizationCode.class) != null) {
             authModules = request.getToken(AuthorizationCode.class).getAuthModules();
-        } else {
+        } else if (request.getToken(RefreshToken.class) != null) {
             authModules = request.getToken(RefreshToken.class).getAuthModules();
+        } else {
+            authModules = getAuthModulesFromSSOToken(request);
         }
 
         if (authModules != null) {
