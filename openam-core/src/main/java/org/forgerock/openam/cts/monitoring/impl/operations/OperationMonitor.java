@@ -71,7 +71,7 @@ class OperationMonitor {
      */
     void increment() {
         count.incrementAndGet();
-        rateWindow.recalculate(timerGetter.now());
+        rateWindow.incrementForTimestamp(timerGetter.now());
     }
     /**
      * Returns the average rate at which an operation has been performed.

@@ -13,16 +13,12 @@
  *
  * Copyright 2014 ForgeRock AS.
  */
-
 package org.forgerock.openam.shared.monitoring;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,14 +36,14 @@ public class RateWindow {
     private final RateTimer timer;
     private final int size;
     private final long sampleRate;
-    private final LinkedHashMap<Long, AtomicLong> window;
-    private final Set<AtomicLong> minMaxRate = new TreeSet<AtomicLong>(new Comparator<AtomicLong>() {
-        public int compare(AtomicLong rate, AtomicLong rate2) {
-            return (int) (rate.get() - rate2.get());
-        }
-    });
+    private final ConcurrentSkipListMap<Long, AtomicLong> window = new ConcurrentSkipListMap<Long, AtomicLong>();
+    private final Comparator<AtomicLong> atomicLongComparator = new Comparator<AtomicLong>() {
 
-    private long currentIndex = 0L;
+        @Override
+        public int compare(AtomicLong rate, AtomicLong rate2) {
+            return Long.compare(rate.get(), rate2.get());
+        }
+    };
 
     /**
      * Constructs a new instance of the RateWindow.
@@ -60,7 +56,6 @@ public class RateWindow {
         this.timer = timer;
         this.size = size;
         this.sampleRate = sampleRate;
-        this.window = new LinkedHashMap<Long, AtomicLong>(size);
     }
 
     /**
@@ -68,78 +63,42 @@ public class RateWindow {
      *
      * @param timestamp The millisecond timestamp of the event.
      */
-    public synchronized void recalculate(final long timestamp) {
-        long sample = toSampleRate(timestamp);
+    public void incrementForTimestamp(final long timestamp) {
+        long index = getIndexForTimestamp(timestamp);
 
-        if (sample < currentIndex) {
-            // timestamp is after current index so is in the past so just update a previous rate
-            updatePastRate(sample, currentIndex);
-            return;
-        }
-
-        if (isAtCurrentIndex(sample)) {
-            AtomicLong rate = window.get(currentIndex);
+        if (isWithinWindow(index)) {
+            AtomicLong rate = window.get(index);
+            if (rate == null) {
+                //fill in the RateWindow until the current index
+                fillInWindow(index - 1);
+                rate = new AtomicLong(0);
+                AtomicLong previousValue = window.putIfAbsent(index, rate);
+                if (previousValue == null) {
+                    //this is a new entry, hence we should clear out old entries to prevent memory leak
+                    window.headMap(window.lastKey() - size, true).clear();
+                } else {
+                    rate = previousValue;
+                }
+            }
             rate.incrementAndGet();
-            return;
         }
-
-        // Otherwise sample is ahead of currentIndex
-        addNextSlot();
-        recalculate(timestamp);
     }
 
     /**
-     * Given a sample that is behind the current index, this method will traverse backwards to find the right slot in
-     * the window to update the rate for.
-     * <br/>
-     * If the window has moved past the slot for the sample then the sample is dropped without further action.
+     * Fills in the windows with 0 values until the index provided. This ensures that there are no empty spots between
+     * the indexes, so the information stored in the window actually represents a rolling window of data.
      *
-     * @param sample The sample rate index.
-     * @param index The index in the window.
+     * @param index The index until which the window should be filled. The entry corresponding to the provided index
+     * will be also initialized
      */
-    private void updatePastRate(final long sample, final long index) {
-        final long i = index - 1;
-        if (window.size() == 0 || window.get(i) == null) {
-            // Window has passed the sample time so nothing to do
-            return;
+    private void fillInWindow(long index) {
+        if (!window.isEmpty()) {
+            Long lastKey = window.lastKey();
+            for (lastKey = lastKey + 1; lastKey <= index; lastKey++) {
+                window.putIfAbsent(lastKey, new AtomicLong(0));
+            }
+            window.headMap(window.lastKey() - size, true).clear();
         }
-
-        if (i == sample) {
-            AtomicLong rate = window.get(i);
-            rate.incrementAndGet();
-            return;
-        }
-
-        updatePastRate(sample, i);
-    }
-
-    /**
-     * Updates the min and max figures when the window moves forwards.
-     *
-     * @param currentIndex The current index in the window.
-     * @param oldestIndex The oldest index in the window.
-     */
-    private void updateMinAndMax(final long currentIndex, final long oldestIndex) {
-        final AtomicLong oldestRate = window.get(oldestIndex);
-        if (!minMaxRate.isEmpty() && oldestRate != null) {
-            minMaxRate.remove(oldestRate);
-        }
-
-        final AtomicLong currentRate = window.get(currentIndex);
-        minMaxRate.add(currentRate);
-    }
-
-    /**
-     * Adds the next window slot to the window.
-     */
-    private void addNextSlot() {
-        long nextIndex = getNextIndex();
-        final long oldestIndex = getPastIndex(nextIndex);
-        updateMinAndMax(currentIndex, oldestIndex);
-        currentIndex = nextIndex;
-        window.put(nextIndex, new AtomicLong(0));
-        // Each time we add a new index, we move the window along by removing the oldest index.
-        window.remove(oldestIndex);
     }
 
     /**
@@ -151,15 +110,14 @@ public class RateWindow {
      * @return The average event rate.
      */
     public synchronized double getAverageRate() {
-
-        if(window.size()  == 0) {
+        if (window.isEmpty()) {
             return 0D;
         }
 
+        fillInWindow(getCurrentIndex());
         double averageRate = 0;
-        final long now = toSampleRate(timer.now());
         for (Map.Entry<Long, AtomicLong> entry : window.entrySet()) {
-            if (isAtCurrentIndex(now) && entry.getKey().equals(currentIndex)) {
+            if (entry.getKey().equals(getCurrentIndex())) {
                 /*
                  * If this is true then the latest window slot has not completed so the rate in it will not be
                  * accurate so skip it.
@@ -178,14 +136,13 @@ public class RateWindow {
      *
      * @return The minimum event rate.
      */
-    public synchronized long getMinRate() {
-        if (minMaxRate.isEmpty()) {
+    public long getMinRate() {
+        if (window.isEmpty()) {
             return 0L;
         }
-        if (isAtCurrentIndex(toSampleRate(timer.now()))) {
-            addNextSlot();
-        }
-        return new ArrayList<AtomicLong>(minMaxRate).get(0).get();
+
+        fillInWindow(getCurrentIndex());
+        return Collections.min(window.values(), atomicLongComparator).get();
     }
 
     /**
@@ -193,15 +150,13 @@ public class RateWindow {
      *
      * @return The maximum event rate.
      */
-    public synchronized long getMaxRate() {
-        if (minMaxRate.isEmpty()) {
+    public long getMaxRate() {
+        if (window.isEmpty()) {
             return 0L;
         }
-        if (isAtCurrentIndex(toSampleRate(timer.now()))) {
-            addNextSlot();
-        }
-        List<AtomicLong> maxRate = new ArrayList<AtomicLong>(minMaxRate);
-        return maxRate.get(maxRate.size() - 1).get();
+
+        fillInWindow(getCurrentIndex());
+        return Collections.max(window.values(), atomicLongComparator).get();
     }
 
     /**
@@ -210,46 +165,15 @@ public class RateWindow {
      * @param timestamp The millisecond timestamp.
      * @return The sample rate.
      */
-    private long toSampleRate(final long timestamp) {
+    private long getIndexForTimestamp(final long timestamp) {
         return timestamp / sampleRate;
     }
 
-    /**
-     * Determines if the given sample rate index is at the current index.
-     * <br/>
-     * Will set up the window if not done yet.
-     *
-     * @param sample The sample rate index.
-     * @return Whether the given sample rate index is the current index.
-     */
-    private boolean isAtCurrentIndex(final long sample) {
-        // If is first time the window has been used we need to first set the currentIndex to the given sample.
-        if (currentIndex == 0L) {
-            currentIndex = sample;
-            window.put(currentIndex, new AtomicLong(0));
-            return true;
-        }
-
-        return currentIndex == sample;
+    private long getCurrentIndex() {
+        return getIndexForTimestamp(timer.now());
     }
 
-    /**
-     * Calculates the next window index.
-     *
-     * @return The next window sample index.
-     */
-    private long getNextIndex() {
-        return currentIndex + 1;
+    private boolean isWithinWindow(final long index) {
+        return getCurrentIndex() - size < index;
     }
-
-    /**
-     * Calculates the oldest sample index of the window.
-     *
-     * @param nextIndex The upcoming next sample index of the window.
-     * @return The oldest sample index.
-     */
-    private long getPastIndex(final long nextIndex) {
-        return nextIndex - size;
-    }
-
 }

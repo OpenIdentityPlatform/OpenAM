@@ -64,7 +64,7 @@ class EvaluationMonitoringStore {
      */
     public void increment() {
         count.incrementAndGet();
-        rateWindow.recalculate(timerGetter.now());
+        rateWindow.incrementForTimestamp(timerGetter.now());
     }
     /**
      * Returns the average rate at which evaluations have been performed.

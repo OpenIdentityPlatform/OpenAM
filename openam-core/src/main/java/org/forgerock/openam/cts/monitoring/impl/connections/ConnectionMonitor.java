@@ -33,7 +33,7 @@ class ConnectionMonitor  {
     private final RateTimer timer;
     private final RateWindow rateWindow;
 
-    private AtomicLong count = new AtomicLong(0);
+    private final AtomicLong count = new AtomicLong(0);
 
     public ConnectionMonitor() {
         this(new RateTimer());
@@ -58,10 +58,8 @@ class ConnectionMonitor  {
      * rate information recalculated.
      */
     public void add() {
-        synchronized (this) {
-            count.incrementAndGet();
-        }
-        rateWindow.recalculate(timer.now());
+        count.incrementAndGet();
+        rateWindow.incrementForTimestamp(timer.now());
     }
 
     /**

@@ -18,12 +18,14 @@ package org.forgerock.openam.monitoring;
 
 import org.forgerock.openam.shared.monitoring.RateTimer;
 import org.forgerock.openam.shared.monitoring.RateWindow;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class RateWindowTest {
 
@@ -56,27 +58,10 @@ public class RateWindowTest {
         long timestamp = getNowTimestamp(SAMPLE_RATE);
 
         //When
-        rateWindow.recalculate(timestamp);
+        rateWindow.incrementForTimestamp(timestamp);
 
         //Then
         assertEquals(rateWindow.getAverageRate(), 1D);
-    }
-
-    @Test (expectedExceptions = AssertionError.class)
-    public void shouldThrowAssertionErrorWhenLatestTimestampBeforeCurrent() {
-
-        //Given
-        RateWindow rateWindow = createRateWindow(1);
-        long timestamp1 = getNowTimestamp(SAMPLE_RATE);
-        long timestamp2 = timestamp1 - SAMPLE_RATE;
-
-        rateWindow.recalculate(timestamp1);
-
-        //When
-        rateWindow.recalculate(timestamp2);
-
-        //Then
-        fail();
     }
 
     @Test
@@ -87,10 +72,12 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 - SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
+        given(timer.now()).willReturn(timestamp1 + SAMPLE_RATE);
+
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //When
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //Then
         assertEquals(rateWindow.getMaxRate(), 0L);
@@ -103,13 +90,12 @@ public class RateWindowTest {
         RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
-        long timestamp3 = timestamp2 - SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //When
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //Then
         assertEquals(rateWindow.getMaxRate(), 2L);
@@ -123,14 +109,13 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
-        long timestamp4 = timestamp2 - SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
-        rateWindow.recalculate(timestamp4);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //Then
         assertEquals(rateWindow.getMaxRate(), 2L);
@@ -142,12 +127,11 @@ public class RateWindowTest {
         //Given
         RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
-        long timestamp2 = timestamp1;
 
-        rateWindow.recalculate(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //When
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //Then
         assertEquals(rateWindow.getAverageRate(), 2D);
@@ -161,10 +145,10 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE - 1;
 
-        rateWindow.recalculate(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //When
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //Then
         assertEquals(rateWindow.getAverageRate(), 2D);
@@ -178,10 +162,10 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //When
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //Then
         assertEquals(rateWindow.getAverageRate(), 1D);
@@ -195,17 +179,17 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + (SAMPLE_RATE * 2);
 
-        rateWindow.recalculate(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
 
         //When
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //Then
         assertEquals(rateWindow.getAverageRate(), 0.5);
     }
 
     @Test
-    public void shouldGetAverageRateWhenTimeIsPassedLatestIndex() {
+    public void shouldGetAverageRateWhenTimeHasPassedLatestIndex() {
 
         //Given
         RateWindow rateWindow = createRateWindow(2);
@@ -214,14 +198,14 @@ public class RateWindowTest {
 
         given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2));
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //When
         double rate = rateWindow.getAverageRate();
 
         //Then
-        assertEquals(rate, 1D);
+        assertEquals(rate, 0.5D);
     }
 
     @Test
@@ -232,10 +216,10 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + SAMPLE_RATE);
+        given(timer.now()).willReturn(timestamp2);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //When
         double rate = rateWindow.getAverageRate();
@@ -252,10 +236,10 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) - 1);
+        given(timer.now()).willReturn(timestamp2 + SAMPLE_RATE - 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //When
         double rate = rateWindow.getAverageRate();
@@ -286,13 +270,13 @@ public class RateWindowTest {
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -310,12 +294,12 @@ public class RateWindowTest {
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -332,13 +316,13 @@ public class RateWindowTest {
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) - 1);
+        given(timer.now()).willReturn(timestamp2 + SAMPLE_RATE - 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -357,18 +341,18 @@ public class RateWindowTest {
         long timestamp3 = timestamp2 + SAMPLE_RATE;
         long timestamp4 = timestamp3 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) + 1);
+        given(timer.now()).willReturn(timestamp3 + 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
         rateWindow.getMinRate();
-        rateWindow.recalculate(timestamp4);
+        rateWindow.incrementForTimestamp(timestamp4);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -387,18 +371,18 @@ public class RateWindowTest {
         long timestamp3 = timestamp2 + SAMPLE_RATE;
         long timestamp4 = timestamp3 + (SAMPLE_RATE * 2);
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) + 1);
+        given(timer.now()).willReturn(timestamp3 + 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
         rateWindow.getMinRate();
-        rateWindow.recalculate(timestamp4);
+        rateWindow.incrementForTimestamp(timestamp4);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -429,23 +413,23 @@ public class RateWindowTest {
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
         long rate = rateWindow.getMaxRate();
 
         //Then
-        assertEquals(rate, 4L);
+        assertEquals(rate, 6L);
     }
 
     @Test
@@ -457,16 +441,16 @@ public class RateWindowTest {
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) + 1);
+        given(timer.now()).willReturn(timestamp3 + 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
         long rate = rateWindow.getMaxRate();
@@ -484,19 +468,19 @@ public class RateWindowTest {
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 3) - 1);
+        given(timer.now()).willReturn(timestamp3 + SAMPLE_RATE - 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
 
         //When
         long rate = rateWindow.getMaxRate();
@@ -515,18 +499,18 @@ public class RateWindowTest {
         long timestamp3 = timestamp2 + SAMPLE_RATE;
         long timestamp4 = timestamp3 + SAMPLE_RATE;
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) + 1);
+        given(timer.now()).willReturn(timestamp3 + 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
         rateWindow.getMaxRate();
-        rateWindow.recalculate(timestamp4);
+        rateWindow.incrementForTimestamp(timestamp4);
 
         //When
         long rate = rateWindow.getMaxRate();
@@ -545,23 +529,47 @@ public class RateWindowTest {
         long timestamp3 = timestamp2 + SAMPLE_RATE;
         long timestamp4 = timestamp3 + (SAMPLE_RATE * 2);
 
-        given(timer.now()).willReturn(timestamp1 + (SAMPLE_RATE * 2) + 1);
+        given(timer.now()).willReturn(timestamp3 + 1);
 
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp1);
-        rateWindow.recalculate(timestamp2);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
-        rateWindow.recalculate(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
+        rateWindow.incrementForTimestamp(timestamp3);
         rateWindow.getMaxRate();
-        rateWindow.recalculate(timestamp4);
+        rateWindow.incrementForTimestamp(timestamp4);
 
         //When
         long rate = rateWindow.getMaxRate();
 
         //Then
         assertEquals(rate, 3L);
+    }
+
+    @Test
+    public void windowShouldBeExtendedWhenCalculatingMaxRate() {
+        RateWindow rateWindow = createRateWindow(2);
+        long timestamp1 = getNowTimestamp(SAMPLE_RATE);
+        long timestamp2 = timestamp1 + SAMPLE_RATE;
+        long timestamp3 = timestamp2 + SAMPLE_RATE;
+        long timestamp4 = timestamp3 + (SAMPLE_RATE * 2);
+
+        given(timer.now()).willReturn(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+        rateWindow.incrementForTimestamp(timestamp1);
+
+        given(timer.now()).willReturn(timestamp2);
+        rateWindow.incrementForTimestamp(timestamp2);
+        assertThat(rateWindow.getMaxRate()).isEqualTo(3);
+
+        given(timer.now()).willReturn(timestamp3);
+        assertThat(rateWindow.getMaxRate()).isEqualTo(1);
+        
+        given(timer.now()).willReturn(timestamp4);
+        assertThat(rateWindow.getMaxRate()).isEqualTo(0);
     }
 }
