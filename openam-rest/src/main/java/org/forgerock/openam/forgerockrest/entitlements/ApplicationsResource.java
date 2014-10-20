@@ -179,7 +179,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                 ": Application failed to create the resource specified. ", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
@@ -199,9 +199,31 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
+        // Map to the internal name.
         if (ReservedAppName.USER_FACING.equals(wrapp.getName())) {
-            // Map to the internal name.
             wrapp.setName(ReservedAppName.INTERNAL.getName());
+        }
+
+        final Application previousApp;
+
+        try {
+            previousApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
+        } catch (EntitlementException e) {
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Application failed to query the resource set. ", e);
+            }
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return;
+        }
+
+        if (previousApp != null) { //return conflict
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: CREATE by " + principalName +
+                        ": Application already exists " + previousApp.getName());
+            }
+            handler.handleError(ResourceException.getException(ResourceException.CONFLICT));
+            return;
         }
 
         try {
@@ -215,20 +237,23 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
-        if (ReservedAppName.INTERNAL.equals(wrapp.getName())) {
-            // Map to the user facing name.
-            wrapp.setName(ReservedAppName.USER_FACING.getName());
-        }
-
         try {
-            final Resource resource = new Resource(wrapp.getName(),
-                    Long.toString(wrapp.getApplication().getLastModifiedDate()), wrapp.toJsonValue());
+            Application savedApp = appManager.getApplication(callingSubject, realm, wrapp.getName());
+            ApplicationWrapper savedAppWrapper = createApplicationWrapper(savedApp, appTypeManagerWrapper);
+
+            // Map to the external name.
+            if (ReservedAppName.INTERNAL.equals(savedAppWrapper.getName())) {
+                savedAppWrapper.setName(ReservedAppName.USER_FACING.getName());
+            }
+
+            final Resource resource = new Resource(savedAppWrapper.getName(),
+                    Long.toString(savedAppWrapper.getLastModifiedDate()), savedAppWrapper.toJsonValue());
             if (debug.messageEnabled()) {
                 debug.message("ApplicationsResource :: CREATE by " + principalName +
                         ": for Application: " + wrapp.getName());
             }
             handler.handleResult(resource);
-        } catch (IOException e) {
+        } catch (Exception e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: CREATE by " + principalName +
                         ": Application failed to return the resource created. ", e);
@@ -306,23 +331,28 @@ public class ApplicationsResource extends RealmAwareResource {
                               ResultHandler<Resource> handler) {
 
         //auth
-        final Subject mySubject = getContextSubject(context);
+        final Subject callingSubject = getContextSubject(context);
 
-        if (mySubject == null) {
+        if (callingSubject == null) {
             debug.error("ApplicationsResource :: DELETE : Unknown Subject");
             handler.handleError(ResourceException.getException(ResourceException.BAD_REQUEST));
             return;
         }
 
         final String realm = getRealm(context);
-        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(mySubject);
-
-        // Map from user facing to internal name.
+        final String principalName = PrincipalRestUtils.getPrincipalNameFromSubject(callingSubject);
         final String mappedResourceId = (ReservedAppName.USER_FACING.equals(resourceId))
                 ? ReservedAppName.INTERNAL.getName() : resourceId;
 
         try {
-            appManager.deleteApplication(mySubject, realm, mappedResourceId);
+            Application oldApp = appManager.getApplication(callingSubject, realm, mappedResourceId);
+
+            if (oldApp == null) {
+                handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
+                return;
+            }
+
+            appManager.deleteApplication(callingSubject, realm, mappedResourceId);
 
             final Resource resource = new Resource(resourceId, "0", JsonValue.json(JsonValue.object()));
             handler.handleResult(resource);
@@ -479,7 +509,7 @@ public class ApplicationsResource extends RealmAwareResource {
                 debug.error("ApplicationsResource :: READ by " + principalName +
                         ": Application failed to retrieve the resource specified.", e);
             }
-            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            handler.handleError(ResourceException.getException(ResourceException.NOT_FOUND));
         } catch (IOException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: READ by " + principalName +
@@ -574,12 +604,32 @@ public class ApplicationsResource extends RealmAwareResource {
             return;
         }
 
+        //conflict if the name we're changing TO is currently taken, and isn't this one
+        try {
+            if (!mappedResourceId.equals(wrapp.getName()) && //return conflict
+                    appManager.getApplication(mySubject, getRealm(context), wrapp.getName()) != null) {
+                if (debug.errorEnabled()) {
+                    debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                            ": Application already exists " + wrapp.getName());
+                }
+                handler.handleError(ResourceException.getException(ResourceException.CONFLICT));
+                return;
+            }
+        } catch (EntitlementException e) {
+            if (debug.errorEnabled()) {
+                debug.error("ApplicationsResource :: UPDATE by " + principalName +
+                        ": Application failed to query the resource set. ", e);
+            }
+            handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
+            return;
+        }
+
         try {
             appManager.updateApplication(oldApplication, wrapp.getApplication(), mySubject);
         } catch (EntitlementException e) {
             if (debug.errorEnabled()) {
                 debug.error("ApplicationsResource :: UPDATE by " + principalName +
-                        ": Error  performing update operation.");
+                        ": Error performing update operation.");
             }
             handler.handleError(ResourceException.getException(ResourceException.INTERNAL_ERROR));
             return;
