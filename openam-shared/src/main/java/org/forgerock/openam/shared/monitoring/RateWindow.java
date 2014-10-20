@@ -41,7 +41,9 @@ public class RateWindow {
 
         @Override
         public int compare(AtomicLong rate, AtomicLong rate2) {
-            return Long.compare(rate.get(), rate2.get());
+            long x = rate.get();
+            long y = rate2.get();
+            return x > y ? 1 : x < y ? -1 : 0;
         }
     };
 
