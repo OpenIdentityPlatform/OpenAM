@@ -249,5 +249,10 @@
     Click Add to save your work.
    </para>
   </step>
+  <step>
+   <para>
+    Restart all the OpenAM servers in the site.
+   </para>
+  </step>
  </procedure>
 </chapter>
