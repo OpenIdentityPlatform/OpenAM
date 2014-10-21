@@ -2478,9 +2478,9 @@
      >plugin-class-name</replaceable></literal>.</para>
 
      <para>Defaults:
-     <literal>code|org.forgerock.oauth2.reslet.responseTypes.CodeResponseType</literal>,
-     <literal>id_token|org.forgerock.oauth2.reslet.responseTypes.IDTokenResponseType</literal>,
-     <literal>token|org.forgerock.oauth2.reslet.responseTypes.TokenResponseType</literal></para>
+     <literal>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</literal>,
+     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</literal>,
+     <literal>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</literal></para>
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-response-type-map-class</literal></para>
@@ -2605,6 +2605,143 @@
      <para>
       <command>ssoadm</command> attribute:
       <literal>forgerock-oauth2-provider-keypair-name</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Allow Open Dynamic Client Registration</term>
+    <listitem>
+     <para>
+      Allow clients to register without an access token
+     </para>
+
+     <para>
+      If enabled, you should consider adding some form of rate limiting.
+     </para>
+
+     <para>
+      Default: <literal>false</literal>
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-allow-open-dynamic-registration</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Generate Registration Access Tokens</term>
+    <listitem>
+     <para>
+      Whether to generate Registration Access Tokens for clients
+      that register via open dynamic client registration
+     </para>
+
+     <para>
+      Such tokens allow the client to access the Client Configuration Endpoint
+      as described in the OpenID Connect specification.
+      This setting has no effect if open dynamic client registration is disabled.
+     </para>
+
+     <para>
+      Default: <literal>true</literal>
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-generate-registration-access-tokens</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>OpenID Connect acr_values to Auth Chain Mapping</term>
+    <listitem>
+     <para>
+      Map of Mobile Connect levels of assurance,
+      sent as <literal>acr_values</literal> in the authorization request,
+      to OpenAM authentication chains provide those levels of assurance
+     </para>
+
+     <para>
+      Also see the <citetitle>Administration Guide</citetitle> section,
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#mobile-connect-configure"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Configuring OpenAM as an OP for Mobile Connect</citetitle></link>.
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-loa-mapping</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>OpenID Connect default acr claim</term>
+    <listitem>
+     <para>
+      The "acr" claim value to return in the ID Token
+      when falling back to the default authentication chain
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-default-acr</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>OpenID Connect id_token amr values to Auth Module mappings</term>
+    <listitem>
+     <para>
+      Map of the "amr" values to return in the ID Token
+      after successfully authenticating with specified authentication modules
+     </para>
+
+     <para>
+      Also see the <citetitle>Administration Guide</citetitle> section,
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#mobile-connect-configure"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Configuring OpenAM as an OP for Mobile Connect</citetitle></link>.
+     </para>
+
+     <para>
+      <command>ssoadm</command> attribute:
+      <literal>forgerock-oauth2-provider-amr-mappings</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Modified Timestamp attribute name</term>
+    <term>Created Timestamp attribute name</term>
+    <listitem>
+     <para>
+      The identity Data Store attributes used to return
+      "updated_at" values in the ID Token
+     </para>
+
+     <para>
+      Also see the <citetitle>Administration Guide</citetitle> section,
+      <link
+       xlink:show="new"
+       xlink:href="admin-guide#mobile-connect-configure"
+       xlink:role="http://docbook.org/xlink/role/olink"
+      ><citetitle>Configuring OpenAM as an OP for Mobile Connect</citetitle></link>.
+     </para>
+
+     <para>
+      <command>ssoadm</command> attributes:
+      <literal>forgerock-oauth2-provider-modified-attribute-name</literal>,
+      <literal>forgerock-oauth2-provider-created-attribute-name</literal>
      </para>
     </listitem>
    </varlistentry>

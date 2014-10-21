@@ -144,6 +144,28 @@ Agreement (yes/no): [no]:</screen>
    </para>
 
   </listitem>
+
+  <listitem>
+   <para>   <!-- Epic: AME-4630 -->
+    <emphasis role="bold">GSMA Mobile Connect Support</emphasis>.
+    OpenAM now includes support for GSMA Mobile Connect,
+    an application of OpenID Connect 1.0.
+    Mobile Connect lets users authenticate with their mobile phones,
+    regardless of the service or the device on which it is consumed.
+    This allows Mobile Network Operators to serve as identity providers
+    for their customers.
+   </para>
+
+   <para>
+    For more information, see
+    <link
+     xlink:href="admin-guide#mobile-connect"
+     xlink:role="http://docbook.org/xlink/role/olink"
+     xlink:show="new"
+    ><citetitle>Using OpenAM with Mobile Connect</citetitle></link>.
+   </para>
+  </listitem>
+
   <listitem>
    <para><!-- Enhancement: AME-3299 -->
     <emphasis role="bold">CORS support for OpenAM APIs</emphasis>.

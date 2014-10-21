@@ -439,7 +439,7 @@
 
    <step performance="optional">
     <para>
-     If your provider has a custom <literal>ResponseTypeHandler</literal> plugin,
+     If your provider has a custom response type plugin,
      put it on the OpenAM classpath,
      and then add the custom response types and the plugin class names
      to the list of Response Type Plugins.

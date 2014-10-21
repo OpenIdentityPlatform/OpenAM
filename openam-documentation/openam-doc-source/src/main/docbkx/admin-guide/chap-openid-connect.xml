@@ -281,22 +281,101 @@
  <section xml:id="configure-openid-connect-provider">
   <title>Configuring OpenAM As OpenID Provider</title>
 
-  <para>You can configure OpenAM's OAuth 2.0 authorization service to double
-  as an OpenID Provider. To do so, make sure that the Response Type
-  Plugins list includes at least the default plugin classes.</para>
-
   <para>
-   Custom plugins should implement the
-   <link
-    xlink:href="${javadocBase}?org/forgerock/oauth2/core/ResponseTypeHandler.html"
-    xlink:show="new"
-   ><literal>ResponseTypeHandler</literal></link> interface.
+   You can configure OpenAM's OAuth 2.0 authorization service
+   to double as an OpenID Provider.
   </para>
 
-  <para>See <link xlink:href="admin-guide#configure-oauth2-authz"
-  xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"
-  ><citetitle>Configuring the OAuth 2.0 Authorization Service</citetitle></link>
-  for detailed instructions on configuring the service.</para>
+  <para>
+   First, follow the instructions for
+   <link
+    xlink:href="admin-guide#configure-oauth2-authz"
+    xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Configuring the OAuth 2.0 Authorization Service</citetitle></link>,
+   making sure that the Response Type Plugins list includes
+   at least the default plugin classes.
+  </para>
+
+  <itemizedlist>
+   <para>
+    Next, configure the OpenID Connect specific options.
+   </para>
+
+   <listitem>
+    <para>
+     The JSON Web Key URL field allows you to set a URL to a
+     <link
+      xlink:show="new"
+      xlink:href="https://tools.ietf.org/html/draft-ietf-jose-json-web-key"
+     >JSON Web Key set</link>
+     with the public key(s) for the provider.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The Subject Types supported map allows you to support pairwise subject types
+     as described in the OpenID Connect core specification section concerning
+     <link
+      xlink:show="new"
+      xlink:href="http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes"
+     >Subject Identifier Types</link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The ID Token Signing Algorithms supported list allows you
+     to change the list of algorithms used sign ID Tokens.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The Supported Claims list allows you
+     to restrict the claims supported by OpenAM's userinfo endpoint.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The Alias of ID Token Signing Key alias allows you
+     to set the key pair alias for the key used to sign ID Tokens
+     when using a signing algorithm that involves asymmetric keys.
+    </para>
+
+    <para>
+     For instructions on changing the key pair, see
+     <link
+      xlink:show="new"
+      xlink:href="admin-guide#change-signing-key"
+      xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>To Change the Signing Key for Federation</citetitle></link>.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The Allow Open Dynamic Client Registration checkbox enables relying parties
+     to register without using an access token.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     The Generate Registration Access Tokens checkbox has OpenAM generate
+     Registration Access Tokens for dynamic client registration when
+     Allow Open Dynamic Client Registration is enabled.
+     This allows the client to view and update its registration.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Finally, if your provider is part of a GSMA Mobile Connect deployment, see
+   <xref linkend="mobile-connect-configure" />.
+  </para>
  </section>
 
  <section xml:id="configure-openid-connect-discovery">
@@ -827,5 +906,682 @@ $ <userinput>curl \
   xlink:href="http://openid.net/specs/openid-connect-messages-1_0.html#security-considerations"
   xlink:show="new"><citetitle>Security Considerations</citetitle></link> in
   the OpenID Connect Messages draft specification.</para>
+ </section>
+
+ <section xml:id="mobile-connect">
+  <title>Using OpenAM with Mobile Connect</title>
+
+  <para>
+   <link
+    xlink:href="http://gsmamobileeconomy.com/gsmamc/"
+    xlink:show="new"
+   >GSMA Mobile Connect</link> is an application of OpenID Connect (OIDC).
+   Mobile Connect builds on OIDC
+   to facilitate use of mobile phones as authentication devices
+   independently of the service provided
+   and independently of the device used to consume the service.
+   Mobile Connect thus offers a standard way for Mobile Network Operators
+   to act as general-purpose identity providers,
+   providing a range of levels of assurance and profile data
+   to Mobile Connect-compliant Service Providers.
+  </para>
+
+  <itemizedlist>
+   <para>
+    This section includes an overview, as well as the following.
+   </para>
+
+   <listitem>
+    <para>
+     <xref linkend="mobile-connect-table-auth-request-params" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="mobile-connect-table-id-token-properties" />
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     <xref linkend="mobile-connect-configure" />
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   In a Mobile Connect deployment OpenAM can play the OpenID Provider role,
+   implementing the Mobile Connect Profile
+   as part of the Service Provider - Identity Gateway interface.
+  </para>
+
+  <para>
+   OpenAM can also play the Authenticator role
+   as part of the Identity Gateway - Authenticators interface.
+   In this role, OpenAM serves to authenticate users
+   at the appropriate Level of Assurance (LoA).
+   In Mobile Connect, LoAs represent the authentication level achieved.
+   A Service Provider can request LoAs without regard to the implementation,
+   and the Identity Gateway includes a claim in the ID Token
+   that indicates the LoA achieved.
+  </para>
+
+  <para>
+   In OpenAM, Mobile Connect LoAs map to an authentication mechanism.
+   Service Providers acting as OpenID Relying Parties (RP) request an LoA
+   by using the "acr_values" field in an OIDC authentication request.
+   In OIDC, "acr_values" specifies Authentication Context Class Reference values.
+   The RP sets "acr_values" as part of the OIDC Authentication Request.
+   OpenAM returns the corresponding "acr" claim in the Authentication Response
+   as the value of the ID Token "acr" field.
+  </para>
+
+  <para>
+   OpenAM as OP supports LoAs 1 (low - little or no confidence),
+   2 (medium - some confidence, as in single-factor authentication),
+   and 3 (high - high confidence, as in multi-factor authentication),
+   though out of the box it does not include support for 4,
+   which involves digital signatures.
+  </para>
+
+  <para>
+   As Mobile Connect OP, OpenAM supports mandatory request parameters,
+   and a number of optional request parameters.
+  </para>
+
+  <table xml:id="mobile-connect-table-auth-request-params">
+   <title>Authorization Request Parameters</title>
+
+   <tgroup cols="3">
+
+    <colspec colnum="1" colwidth="2*"/>
+    <colspec colnum="2" colwidth="1*"/>
+    <colspec colnum="3" colwidth="3*"/>
+
+    <thead>
+     <row>
+      <entry>Request Parameter</entry>
+      <entry>Support</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        <literal>response_type</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        OAuth 2.0 grant type to use.
+        Set this to <literal>code</literal> for the authorization grant.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>client_id</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Set this to the client identifier.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>scope</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Space delimited OAuth 2.0 scope values.
+       </para>
+
+       <para>
+        Required: <literal>openid</literal>
+       </para>
+
+       <para>
+        Optional: <literal>profile</literal>, <literal>email</literal>,
+        <literal>address</literal>, <literal>phone</literal>,
+        <literal>offline_access</literal>
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>redirect_uri</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        OAuth 2.0 URI where the authorization request callback should go.
+        Must match the <literal>redirect_uri</literal> in the client profile
+        that you registered with OpenAM.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>state</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Value to maintain state between the request and the callback.
+        Required for Mobile Connect.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>nonce</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        String value to associate the client session with the ID Token.
+        Optional in OIDC, but required for Mobile Connect.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>display</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        String value to specify the user interface display.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>login_hint</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        String value indicating the the ID to use for login.
+       </para>
+
+       <para>
+        When provided as part of the OIDC Authentication Request,
+        the <literal>login_hint</literal> is set
+        as the value of a cookie named oidcLoginHint,
+        which is an HttpOnly cookie (only sent over HTTPS).
+        Authentication modules can then retrieve the cookie's value.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>acr_values</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Authentication Context class Reference values
+        used to communicate acceptable LoAs.
+       </para>
+
+       <para>
+        When the OIDC relying party on the server provider
+        supplies <literal>acr_values</literal> in the authorization request,
+        OpenAM uses the OP configuration to map the values
+        to authentication chains.
+        It runs through the list of <literal>acr_values</literal> in order,
+        attempting to use the first authentication chain that matches.
+        OpenAM then returns the authentication chain used
+        as the value of the ID token "acr" claims property.
+        In this way the relying part on the service provider
+        can determine the LoA achieved during authentication.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>dtbs</literal>
+      </entry>
+      <entry>
+       <para>
+        Not supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Data To Be Signed
+       </para>
+
+       <para>
+        At present OpenAM does not support LoA 4.
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+  <para>
+   As Mobile Connect OP, OpenAM responds to a successful authorization request
+   with a response containing all the required fields,
+   and also the optional "expires_in" field.
+   OpenAM supports the mandatory ID Token properties,
+   though the relying party is expected to use the "expires_in" value,
+   rather than specifying <literal>max_age</literal> as a request parameter.
+  </para>
+
+  <table xml:id="mobile-connect-table-id-token-properties">
+   <title>ID Token Properties</title>
+
+   <tgroup cols="3">
+
+    <colspec colnum="1" colwidth="2*"/>
+    <colspec colnum="2" colwidth="1*"/>
+    <colspec colnum="3" colwidth="3*"/>
+
+    <thead>
+     <row>
+      <entry>Request Parameter</entry>
+      <entry>Support</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        <literal>iss</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Issuer identifier
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>sub</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Subject identifier
+       </para>
+
+       <para>
+        By default OpenAM returns the identifier from the user profile.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>aud</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Audience, an array including the <literal>client_id</literal>
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>exp</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Expiration time in seconds since the epoch
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>iat</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Issued at time in seconds since the epoch
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <literal>nonce</literal>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        The nonce supplied in the request
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>at_hash</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Base64url encoding of the SHA-256 hash of the "access_token" value
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>acr</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Authentication Context class Reference for the LoA achieved
+       </para>
+
+       <para>
+        For example, if the request specifies
+        <literal>acr_values=loa-3 loa-2</literal>
+        and OpenAM achieves LoA 2, then the ID token includes
+        <literal>"acr": "loa-2"</literal>.
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>amr</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Authentication Methods Reference to indicate the authentication method
+       </para>
+
+       <para>
+        OpenAM maps these to authentication modules.
+       </para>
+
+       <para>
+        Suggested values include the following:
+        <literal>OK, DEV_PIN, SIM_PIN, UID_PWD, BIOM, HDR, OTP</literal>
+       </para>
+      </entry>
+     </row>
+
+     <row>
+      <entry>
+       <para>
+        <literal>azp</literal>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Authorized party identifier, which is the <literal>client_id</literal>
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+  <para>
+   In addition to the standard OIDC user information returned with userinfo,
+   OpenAM as OP for Mobile Connect returns the "updated_at" property,
+   representing the time last updated as seconds since the epoch.
+  </para>
+
+  <procedure xml:id="mobile-connect-configure">
+   <title>Configuring OpenAM as an OP for Mobile Connect</title>
+
+   <para>
+    You configure OpenAM as an OpenID Provider for Mobile Connect
+    by changing the OAuth2 Provider configuration.
+   </para>
+
+   <para>
+    In OpenAM console, the OAuth2 Provider configuration is
+    under Access Control > <replaceable>Realm Name</replaceable>
+    > Services > OAuth2 Provider for the configuration in a specific realm,
+    and under Configuration > Global > OAuth2 Provider
+    for the inherited global settings.
+   </para>
+
+   <step>
+    <para>
+     Configure OpenAM as an OpenID Provider as described in
+     <xref linkend="configure-openid-connect-provider" />.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     For the OpenID Connect acr_values to Auth Chain Mapping,
+     configure the mapping between <literal>acr_values</literal>
+     in the authorization request and OpenAM authentication chains.
+    </para>
+
+    <para>
+     For example, if the relying party request includes
+     <literal>acr_values=loa-3 loa-2</literal>
+     and the map includes <literal>[loa-2]=ldapService</literal>,
+     and <literal>[loa-3]=msisdnAndHotpChain</literal>,
+     then the authentication chain for the request
+     is <literal>msisdnPlusHotpChain</literal>.
+    </para>
+
+    <para>
+     The <command>ssoadm</command> attribute is
+     <literal>forgerock-oauth2-provider-loa-mapping</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     For the OpenID Connect default acr claim,
+     set the "acr" claim value to return in the ID Token
+     when falling back to the default authentication chain.
+    </para>
+
+    <para>
+     The <command>ssoadm</command> attribute is
+     <literal>forgerock-oauth2-provider-default-acr</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     For the OpenID Connect id_token amr values to Auth Module mappings,
+     set the "amr" values to return in the ID Token
+     after successfully authenticating with specified authentication modules.
+    </para>
+
+    <para>
+     For example, you could set <literal>[UID_PWD]=LDAP</literal> to return
+     <literal>"amr": [ "UID_PWD" ]</literal> in the ID Token
+     after authenticating with the LDAP module.
+    </para>
+
+    <para>
+     The <command>ssoadm</command> attribute is
+     <literal>forgerock-oauth2-provider-amr-mappings</literal>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Configure the identity Data Store attributes used to return
+     "updated_at" values in the ID Token.
+    </para>
+
+    <para>
+     For Mobile Connect clients,
+     the user info endpoint returns "updated_at" values in the ID Token.
+     If the user profile has never been updated "updated_at"
+     reflects creation time.
+    </para>
+
+    <para>
+     The "updated_at" values are read from the profile attributes you specify.
+     When using OpenDJ directory server as an identity Data Store,
+     the value is read from the <literal>modifyTimestamp</literal> attribute,
+     or the <literal>createTimestamp</literal> attribute
+     for a profile that has never been modified.
+    </para>
+
+    <para>
+     The <command>ssoadm</command> attribute
+     for Modified Timestamp attribute name is
+     <literal>forgerock-oauth2-provider-modified-attribute-name</literal>.
+    </para>
+
+    <para>
+     The <command>ssoadm</command> attribute is
+     for Created Timestamp attribute name is
+     <literal>forgerock-oauth2-provider-created-attribute-name</literal>.
+    </para>
+
+    <para>
+     In addition, you must also add these attributes to the list
+     of LDAP User Attributes for the data store.
+     Otherwise the attributes are not returned when OpenAM reads the user profile.
+     To edit the list in OpenAM console, browse to
+     Access Control > <replaceable>Realm Name</replaceable>
+     > Data Stores > <replaceable>Data Store Name</replaceable>
+     > LDAP User Attributes.
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   A simple, non-secure GSMA Mobile Connect relying party example is
+   <link
+    xlink:href="https://github.com/markcraig/openid"
+    xlink:show="new"
+   >available online</link>.
+  </para>
  </section>
 </chapter>

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock AS
+  !      Copyright 2013-2014 ForgeRock AS
   !
 -->
 <chapter xml:id='chap-mobile'
@@ -52,12 +52,16 @@
    <link
     xlink:show="new"
     xlink:href="admin-guide#chap-oauth2"
-    xlink:role="http://docbook.org/xlink/role/olink">OAuth 2.0</link> and
+    xlink:role="http://docbook.org/xlink/role/olink">OAuth 2.0</link>,
    <link
     xlink:show="new"
     xlink:href="admin-guide#chap-openid"
     xlink:role="http://docbook.org/xlink/role/olink"
-   >OpenID Connect 1.0</link>.
+   >OpenID Connect 1.0</link>, and
+   <link
+    xlink:show="new"
+    xlink:href="http://gsmamobileeconomy.com/gsmamc/"
+   >GSMA Mobile Connect</link>.
    After registering an application with OpenAM as an OAuth/OpenID Connect client,
    the application can then redirect a user to OpenAM
    to authenticate and to authorize access to resources that the user owns,
@@ -106,6 +110,24 @@
   <para>The OAuth and OpenID Connect standards specify REST interfaces,
   making them essentially programming language-independent and accessible
   for web applications and mobile applications alike.</para>
+
+  <para>
+   Mobile Connect is an application of OpenID Connect
+   that enables authentication to work through a mobile phone,
+   regardless of the service provided or the device consuming the service.
+   Mobile Connect therefore allows Mobile Network Operators
+   to act as an identity provider for their customers.
+   OpenAM fits well in Mobile Connect deployments as it can play
+   both the role of OpenID Provider and also of Authenticator,
+   with many authentication modules built in as described in
+   <xref linkend="mobile-oath" />.
+   For details on using OpenAM in a Mobile Connect installation, see
+   <link
+    xlink:show="new"
+    xlink:href="admin-guide#mobile-connect"
+    xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Using OpenAM with Mobile Connect</citetitle></link>.
+  </para>
 
   <para>OpenAM also supports <link xlink:href="http://www.openauthentication.org/"
   xlink:show="new">Open Authentication</link> architecture with the OATH module
