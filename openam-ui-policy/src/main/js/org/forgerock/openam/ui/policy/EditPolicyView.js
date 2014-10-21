@@ -94,7 +94,7 @@ define("org/forgerock/openam/ui/policy/EditPolicyView", [
                 });
 
 
-
+                data.options.realm = app[0].realm;
                 // here we split by type
                 staticAttributes =  _.where(policy.resourceAttributes, {type: responseAttrsStaticView.attrType}); 
                 staticAttributes = responseAttrsStaticView.splitAttrs( staticAttributes);

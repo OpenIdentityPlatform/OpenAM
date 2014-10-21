@@ -1,13 +1,14 @@
 <div class="content-bg">
-
-    <a href="#apps/" class="button float-right" id="backButton">Back</a>
-    
-    {{#if entity.name}}
-    <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
-    {{else}}
-    <h1>{{t "config.messages.PolicyMessages.createApp"}}</h1>
-    {{/if}}
-
+    <div class="policy-header">
+        <a href="#apps/" class="button float-right" id="backButton">Back</a>
+        
+        {{#if entity.name}}
+        <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
+        {{else}}
+        <h1>{{t "config.messages.PolicyMessages.createApp"}}</h1>
+        {{/if}}
+        <h2>Realm: {{entity.realm}}</h2>
+    </div>
     <p>An application (term as used in the Entitlements Service) consolidates policy-related meta data for a specified service. This template is then used when policies are created for the service. To create an application, begin with Step 1 and progress through step 3. Modifications can be made after the application has been created.</p>
 
     <form class="form">
@@ -20,11 +21,6 @@
                     <div class="group-field-block col2 ">
                         <label class="prop-name" for="appName">Name:</label>
                         <input class="prop-val" id="appName" type="text" value="{{entity.name}}" data-field="name" placeholder="required" required autofocus/>
-                    </div>
-
-                     <div class="group-field-block col2">
-                        <label class="prop-name" for="appRealm">Realm</label>
-                        <input class="prop-val" id="appRealm" type="text" value="{{entity.realm}}" data-field="realm"  />
                     </div>
                 </div>
 

@@ -49,8 +49,10 @@ define("org/forgerock/openam/ui/policy/ManagePoliciesView", [
             var self = this,
                 subrealm = "";
 
-            if (conf.globalData.auth.realm !== "/") {
-                subrealm = conf.globalData.auth.realm;
+            this.data.realm = conf.globalData.auth.realm;
+
+            if (this.data.realm !== "/") {
+                subrealm = this.data.realm;
             }
 
             _.extend(this.data, {appName: args[0]});

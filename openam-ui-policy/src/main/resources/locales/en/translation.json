@@ -52,7 +52,8 @@
                 "duplicateResource" : "Duplicate resource",
                 "duplicateAttribute": "Duplicate attribute",
                 "unableToPersistPolicy" : "Unable to persist policy in datastore",
-                "policiesUploaded" : "Policies uploaded successfully"
+                "policiesUploaded" : "Policies uploaded successfully",
+                "policiesUploadFailed": "Failed to upload policies"
 
             }
         },

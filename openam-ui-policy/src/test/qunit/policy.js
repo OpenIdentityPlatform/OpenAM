@@ -72,7 +72,6 @@ define([
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === entity.name, "Name is set");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === (entity.description ? entity.description : ''), "Description is set");
-                    QUnit.ok(editAppView.$el.find('#appRealm').val() === entity.realm, "Realm is set");
 
                     // Step 2
                     selectPatternsView.render([], function () {
@@ -158,8 +157,7 @@ define([
                             // Step 3
                             $('#reviewInfo', editAppView.$el).html(uiUtils.fillTemplateWithData('templates/policy/ReviewApplicationStepTemplate.html', editAppView.data, function () {
                                 
-                                var realms = [], 
-                                    resources = []; 
+                                var resources = [];
 
                                 QUnit.ok(editAppView.$el.find('#reviewName').html() === entity.name, "Correct name is displayed in the review step");
 
@@ -170,14 +168,7 @@ define([
                                     QUnit.ok(editAppView.$el.find('#reviewDesc').html() === (entity.description ? entity.description : ''), "Correct description is displayed in the review step");
                                 }
 
-                                // Realms
-                                if (entity.realm.length) {
-                                     _.each(editAppView.$el.find('ul#reviewRealm').find('li'), function (value, key) {
-                                        realms[key] = value.innerHTML;
-                                    });
-                                     // Currently only one realm, so hardcoded to [0];
-                                    QUnit.ok(realms[0] === entity.realm, "Correct realm is displayed in the review step");
-                                }
+
 
                                 // Resources
                                 if (entity.resources.length) {
@@ -215,7 +206,6 @@ define([
                     // Step 1
                     QUnit.ok(editAppView.$el.find('#appName').val() === '', "Name is empty");
                     QUnit.ok(editAppView.$el.find('#appDescription').val() === '', "Description is empty");
-                    QUnit.ok(editAppView.$el.find('#appRealm').val() === '', "Realm is empty");
 
                     // Step 2
                     resListView.render([], function () {

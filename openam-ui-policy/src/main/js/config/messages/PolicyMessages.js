@@ -86,6 +86,10 @@ define("config/messages/PolicyMessages", [], function () {
         "policiesUploaded": {
             msg: "config.messages.PolicyMessages.policiesUploaded",
             type: "info"
+        },
+        "policiesUploadFailed": {
+            msg: "config.messages.PolicyMessages.policiesUploadFailed",
+            type: "error"
         }
     };
 });

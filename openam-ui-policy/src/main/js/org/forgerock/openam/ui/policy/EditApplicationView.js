@@ -36,8 +36,9 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/openam/ui/common/components/Accordion",
     "org/forgerock/commons/ui/common/util/Constants",
+    "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager"
-], function (AbstractView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, eventManager) {
+], function (AbstractView, resourcesListView, addNewResourceView, reviewInfoView, policyDelegate, uiUtils, Accordion, constants, conf, eventManager) {
     var EditApplicationView = AbstractView.extend({
         baseTemplate: "templates/policy/BaseTemplate.html",
         template: "templates/policy/EditApplicationTemplate.html",
@@ -65,6 +66,10 @@ define("org/forgerock/openam/ui/policy/EditApplicationView", [
                 function (appType, envConditions, subjConditions, decisionCombiners) {
                     if (!data.entity.applicationType) {
                         data.entity.applicationType = self.APPLICATION_TYPE;
+                    }
+
+                    if (!data.entity.realm) {
+                        data.entity.realm = conf.globalData.auth.realm;
                     }
 
                     self.processConditions(data, envConditions[0].result, subjConditions[0].result);

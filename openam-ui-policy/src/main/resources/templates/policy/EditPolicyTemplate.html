@@ -1,11 +1,13 @@
 <div class="content-bg">
-    <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button float-right">Back</a>
-    {{#if entity.name}}
-    <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}<span></h1>
-    {{else}}
-    <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
-    {{/if}}
-    
+    <div class="policy-header">
+        <a href="#app/{{entity.applicationName}}/policies/" id="cancelButton" class="button float-right">Back</a>
+        {{#if entity.name}}
+        <h1>{{t "config.messages.PolicyMessages.edit"}}<span>{{entity.name}}</span></h1>
+        {{else}}
+        <h1>{{t "config.messages.PolicyMessages.createPol"}}</h1>
+        {{/if}}
+        <h2>Realm: {{options.realm}}</h2>
+    </div>
     <p>To designate the conditions that define access to a protected resource, begin with Step 1 and progress through to step 7. Modifications can be made after it has been created.</p>
         
     <form class="form">

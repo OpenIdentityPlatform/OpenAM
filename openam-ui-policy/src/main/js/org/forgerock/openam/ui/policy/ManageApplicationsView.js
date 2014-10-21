@@ -57,12 +57,14 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
             this.initBaseView('templates/policy/ApplicationTableGlobalActionsTemplate.html', 'PE-mng-apps-sel');
 
+            this.data.realm = conf.globalData.auth.realm;
+
             this.parentRender(function () {
                 var options,
                     additionalOptions;
 
-                if (conf.globalData.auth.realm !== "/") {
-                    this.subrealm = conf.globalData.auth.realm;
+                if (this.data.realm !== "/") {
+                    this.subrealm = this.data.realm;
                 } else {
                     this.subrealm = "";
                 }
@@ -71,16 +73,15 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
 
                 options = {
                     url: '/openam/json' + this.subrealm + '/applications',
-                    colNames: ['', '', 'Name', 'Realm', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
+                    colNames: ['', '', 'Name', 'Description', 'Application Base', 'Author', 'Created', 'Last Modified'],
                     colModel: [
                         {name: 'iconChB', width: 40, sortable: false, formatter: self.checkBoxFormatter, frozen: true,
                             title: false, search: false},
-                        {name: 'actions', width: 60, sortable: false, formatter: actionsFormatter, frozen: true,
+                        {name: 'actions', width: 65, sortable: false, formatter: actionsFormatter, frozen: true,
                             title: false, search: false},
                         {name: 'name', width: 230, frozen: true},
-                        {name: 'realm', width: 150},
-                        {name: 'description', width: 170, sortable: false},
-                        {name: 'resources', width: 240, sortable: false, search: false,
+                        {name: 'description', width: 220, sortable: false},
+                        {name: 'resources', width: 340, sortable: false, search: false,
                             formatter: uiUtils.commonJQGridFormatters.arrayFormatter},
                         {name: 'createdBy', width: 250, hidden: true},
                         {name: 'creationDate', width: 150, formatter: uiUtils.commonJQGridFormatters.dateFormatter,
@@ -162,6 +163,9 @@ define("org/forgerock/openam/ui/policy/ManageApplicationsView", [
             policyDelegate.importPolicies( e.target.result)
                 .done( function () {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploaded");
+                })
+                .fail( function () {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "policiesUploadFailed");
                 });
         },
 
